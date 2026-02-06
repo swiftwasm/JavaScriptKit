@@ -2,6 +2,303 @@
   "exported" : {
     "classes" : [
       {
+        "methods" : [
+          {
+            "abiName" : "bjs_ClosureSupportExports_static_makeIntToInt",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "makeIntToInt",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "base",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSi_Si",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "int" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "int" : {
+
+                    }
+                  }
+                },
+                "useJSTypedClosure" : false
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ClosureSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClosureSupportExports_static_makeDoubleToDouble",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "makeDoubleToDouble",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "base",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSd_Sd",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "double" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "double" : {
+
+                    }
+                  }
+                },
+                "useJSTypedClosure" : false
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ClosureSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClosureSupportExports_static_makeStringToString",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "makeStringToString",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "prefix",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "string" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "string" : {
+
+                    }
+                  }
+                },
+                "useJSTypedClosure" : false
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ClosureSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClosureSupportExports_static_makeJSIntToInt",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "makeJSIntToInt",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "base",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSi_Si",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "int" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "int" : {
+
+                    }
+                  }
+                },
+                "useJSTypedClosure" : true
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ClosureSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClosureSupportExports_static_makeJSDoubleToDouble",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "makeJSDoubleToDouble",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "base",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSd_Sd",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "double" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "double" : {
+
+                    }
+                  }
+                },
+                "useJSTypedClosure" : true
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ClosureSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ClosureSupportExports_static_makeJSStringToString",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "makeJSStringToString",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "prefix",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "string" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "string" : {
+
+                    }
+                  }
+                },
+                "useJSTypedClosure" : true
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ClosureSupportExports"
+              }
+            }
+          }
+        ],
+        "name" : "ClosureSupportExports",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "ClosureSupportExports"
+      },
+      {
         "constructor" : {
           "abiName" : "bjs_Greeter_init",
           "effects" : {
@@ -105,7 +402,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -154,7 +452,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -196,7 +495,8 @@
                       "_0" : "Greeter"
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             },
             "staticContext" : {
@@ -235,7 +535,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           }
@@ -2246,7 +2547,8 @@
 
                       }
                     }
-                  }
+                  },
+                  "useJSTypedClosure" : false
                 }
               }
             }
@@ -2328,7 +2630,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -2369,7 +2672,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -2409,7 +2713,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -2456,7 +2761,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -2503,7 +2809,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -2549,7 +2856,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -2584,7 +2892,8 @@
                       "_1" : "null"
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -2619,7 +2928,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -2662,7 +2972,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -2705,7 +3016,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -2747,7 +3059,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -2788,7 +3101,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -2823,7 +3137,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -2858,7 +3173,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -2892,7 +3208,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -2932,7 +3249,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -2980,7 +3298,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -3027,7 +3346,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -3073,7 +3393,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           }
@@ -8141,7 +8462,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           }
@@ -8190,7 +8512,8 @@
 
                 }
               }
-            }
+            },
+            "useJSTypedClosure" : false
           }
         }
       },
@@ -8232,7 +8555,8 @@
 
                 }
               }
-            }
+            },
+            "useJSTypedClosure" : false
           }
         }
       },
@@ -10539,7 +10863,8 @@
                       "_1" : "null"
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           }
@@ -12916,6 +13241,640 @@
     "children" : [
       {
         "functions" : [
+
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "ClosureSupportImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "name" : "jsApplyVoid",
+                "parameters" : [
+                  {
+                    "name" : "callback",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsy_y",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsApplyBool",
+                "parameters" : [
+                  {
+                    "name" : "callback",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsy_Sb",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+
+                          ],
+                          "returnType" : {
+                            "bool" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsApplyInt",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "int" : {
+
+                      }
+                    }
+                  },
+                  {
+                    "name" : "transform",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSi_Si",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "int" : {
+
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "int" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsApplyDouble",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  },
+                  {
+                    "name" : "transform",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSd_Sd",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "double" : {
+
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "double" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsApplyString",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  },
+                  {
+                    "name" : "transform",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "string" : {
+
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "string" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsApplyJSObject",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "jsObject" : {
+
+                      }
+                    }
+                  },
+                  {
+                    "name" : "transform",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTests8JSObjectC_8JSObjectC",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "jsObject" : {
+
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "jsObject" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsMakeIntToInt",
+                "parameters" : [
+                  {
+                    "name" : "base",
+                    "type" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTestsSi_Si",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "int" : {
+
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "int" : {
+
+                        }
+                      }
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              },
+              {
+                "name" : "jsMakeDoubleToDouble",
+                "parameters" : [
+                  {
+                    "name" : "base",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTestsSd_Sd",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "double" : {
+
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "double" : {
+
+                        }
+                      }
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              },
+              {
+                "name" : "jsMakeStringToString",
+                "parameters" : [
+                  {
+                    "name" : "prefix",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "string" : {
+
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "string" : {
+
+                        }
+                      }
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              },
+              {
+                "name" : "jsCallTwice",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "int" : {
+
+                      }
+                    }
+                  },
+                  {
+                    "name" : "callback",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSi_y",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "int" : {
+
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsCallBinary",
+                "parameters" : [
+                  {
+                    "name" : "callback",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSiSi_Si",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "int" : {
+
+                              }
+                            },
+                            {
+                              "int" : {
+
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "int" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsCallTriple",
+                "parameters" : [
+                  {
+                    "name" : "callback",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSiSiSi_Si",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "int" : {
+
+                              }
+                            },
+                            {
+                              "int" : {
+
+                              }
+                            },
+                            {
+                              "int" : {
+
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "int" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsCallAfterRelease",
+                "parameters" : [
+                  {
+                    "name" : "callback",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsy_y",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsOptionalInvoke",
+                "parameters" : [
+                  {
+                    "name" : "callback",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "closure" : {
+                            "_0" : {
+                              "isAsync" : false,
+                              "isThrows" : false,
+                              "mangleName" : "20BridgeJSRuntimeTestsy_Sb",
+                              "moduleName" : "BridgeJSRuntimeTests",
+                              "parameters" : [
+
+                              ],
+                              "returnType" : {
+                                "bool" : {
+
+                                }
+                              }
+                            },
+                            "useJSTypedClosure" : true
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsStoreClosure",
+                "parameters" : [
+                  {
+                    "name" : "callback",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsy_y",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          }
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsCallStoredClosure",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsHeapCount",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "runJsClosureSupportTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
           {
             "name" : "jsRoundTripDictionary",
             "parameters" : [
@@ -14179,212 +15138,6 @@
 
             ]
           }
-        ]
-      },
-      {
-        "functions" : [
-          {
-            "name" : "jsApplyInt",
-            "parameters" : [
-              {
-                "name" : "value",
-                "type" : {
-                  "int" : {
-
-                  }
-                }
-              },
-              {
-                "name" : "transform",
-                "type" : {
-                  "closure" : {
-                    "_0" : {
-                      "isAsync" : false,
-                      "isThrows" : false,
-                      "mangleName" : "20BridgeJSRuntimeTestsSi_Si",
-                      "moduleName" : "BridgeJSRuntimeTests",
-                      "parameters" : [
-                        {
-                          "int" : {
-
-                          }
-                        }
-                      ],
-                      "returnType" : {
-                        "int" : {
-
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "int" : {
-
-              }
-            }
-          },
-          {
-            "name" : "jsMakeAdder",
-            "parameters" : [
-              {
-                "name" : "base",
-                "type" : {
-                  "int" : {
-
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "closure" : {
-                "_0" : {
-                  "isAsync" : false,
-                  "isThrows" : false,
-                  "mangleName" : "20BridgeJSRuntimeTestsSi_Si",
-                  "moduleName" : "BridgeJSRuntimeTests",
-                  "parameters" : [
-                    {
-                      "int" : {
-
-                      }
-                    }
-                  ],
-                  "returnType" : {
-                    "int" : {
-
-                    }
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsMapString",
-            "parameters" : [
-              {
-                "name" : "value",
-                "type" : {
-                  "string" : {
-
-                  }
-                }
-              },
-              {
-                "name" : "transform",
-                "type" : {
-                  "closure" : {
-                    "_0" : {
-                      "isAsync" : false,
-                      "isThrows" : false,
-                      "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
-                      "moduleName" : "BridgeJSRuntimeTests",
-                      "parameters" : [
-                        {
-                          "string" : {
-
-                          }
-                        }
-                      ],
-                      "returnType" : {
-                        "string" : {
-
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "string" : {
-
-              }
-            }
-          },
-          {
-            "name" : "jsMakePrefixer",
-            "parameters" : [
-              {
-                "name" : "prefix",
-                "type" : {
-                  "string" : {
-
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "closure" : {
-                "_0" : {
-                  "isAsync" : false,
-                  "isThrows" : false,
-                  "mangleName" : "20BridgeJSRuntimeTestsSS_SS",
-                  "moduleName" : "BridgeJSRuntimeTests",
-                  "parameters" : [
-                    {
-                      "string" : {
-
-                      }
-                    }
-                  ],
-                  "returnType" : {
-                    "string" : {
-
-                    }
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsCallTwice",
-            "parameters" : [
-              {
-                "name" : "value",
-                "type" : {
-                  "int" : {
-
-                  }
-                }
-              },
-              {
-                "name" : "callback",
-                "type" : {
-                  "closure" : {
-                    "_0" : {
-                      "isAsync" : false,
-                      "isThrows" : false,
-                      "mangleName" : "20BridgeJSRuntimeTestsSi_y",
-                      "moduleName" : "BridgeJSRuntimeTests",
-                      "parameters" : [
-                        {
-                          "int" : {
-
-                          }
-                        }
-                      ],
-                      "returnType" : {
-                        "void" : {
-
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "int" : {
-
-              }
-            }
-          }
-        ],
-        "types" : [
-
         ]
       },
       {

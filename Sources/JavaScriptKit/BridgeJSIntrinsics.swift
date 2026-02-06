@@ -49,6 +49,40 @@ import _CJavaScriptKit
     #endif
 }
 
+/// Releases a Swift closure from the FinalizationRegistry
+///
+/// This function is called by the BridgeJS code generator when a Swift closure is released.
+/// The closure is released from the FinalizationRegistry so it can be garbage collected to
+/// balance the
+///
+/// - Parameter pointer: The pointer to `_BridgeJSTypedClosureBox` instance
+@_expose(wasm, "bjs_release_swift_closure")
+public func _bjs_release_swift_closure(_ pointer: UnsafeMutableRawPointer) {
+    Unmanaged<AnyObject>.fromOpaque(pointer).release()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_closure_unregister")
+internal func _swift_js_closure_unregister(_ id: Int32)
+#else
+/// Unregisters a Swift closure from the FinalizationRegistry
+///
+/// - Parameter id: The JavaScriptObjectRef of the JS closure object created by
+///                 the BridgeJS's `make_swift_closure_{signature}` function.
+///
+/// - Note: This is a best-effort operation.
+///         According to the ECMAScript specification, calling
+///         `FinalizationRegistry.prototype.unregister` does not guarantee that
+///         a finalization callback will be suppressed if the target object has
+///         already been garbage-collected and cleanup has been scheduled.
+///         This means that the finalization callback should be tolerant of the
+///         object being already collected.
+///         See: https://tc39.es/ecma262/multipage/managing-memory.html#sec-finalization-registry.prototype.unregister
+internal func _swift_js_closure_unregister(_ id: Int32) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
 // MARK: Type lowering/lifting
 //
 // The following part defines the parameter and return value lowering/lifting
@@ -1105,6 +1139,21 @@ extension UnsafeMutablePointer: _BridgedSwiftStackType {
     }
     @_spi(BridgeJS) public consuming func bridgeJSLowerStackReturn() {
         _swift_js_push_pointer(bridgeJSLowerParameter())
+    }
+}
+
+// Optional support for JSTypedClosure
+extension Optional {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter<Signature>() -> (
+        isSome: Int32, value: Int32
+    ) where Wrapped == JSTypedClosure<Signature> {
+        switch consume self {
+        case .none:
+            return (isSome: 0, value: 0)
+        case .some(let wrapped):
+            // Use return lowering to retain the JS function so JS lifting can fetch it from the heap.
+            return (isSome: 1, value: wrapped.bridgeJSLowerParameter())
+        }
     }
 }
 

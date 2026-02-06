@@ -85,6 +85,8 @@ public struct ImportTS {
         var destructuredVarNames: [String] = []
         // Stack-lowered parameters should be evaluated in reverse order to match LIFO stacks
         var stackLoweringStmts: [CodeBlockItemSyntax] = []
+        // Values to extend lifetime during call
+        var valuesToExtendLifetimeDuringCall: [ExprSyntax] = []
 
         init(moduleName: String, abiName: String, context: BridgeContext = .importTS) {
             self.moduleName = moduleName
@@ -95,15 +97,17 @@ public struct ImportTS {
         func lowerParameter(param: Parameter) throws {
             let loweringInfo = try param.type.loweringParameterInfo(context: context)
 
-            let initializerExpr: ExprSyntax
             switch param.type {
-            case .closure(let signature):
-                initializerExpr = ExprSyntax(
-                    "_BJS_Closure_\(raw: signature.mangleName).bridgeJSLower(\(raw: param.name))"
-                )
+            case .closure(let signature, useJSTypedClosure: false):
+                let jsTypedClosureType = BridgeType.closure(signature, useJSTypedClosure: true).swiftType
+                body.append("let \(raw: param.name) = \(raw: jsTypedClosureType)(\(raw: param.name))")
+                // The just created JSObject is not owned by the caller unlike those passed in parameters,
+                // so we need to extend its lifetime during the call to ensure the JSObject.id is valid.
+                valuesToExtendLifetimeDuringCall.append("\(raw: param.name)")
             default:
-                initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
+                break
             }
+            let initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
 
             if loweringInfo.loweredParameters.isEmpty {
                 let stmt = CodeBlockItemSyntax(
@@ -193,7 +197,7 @@ public struct ImportTS {
             let liftingInfo = try returnType.liftingReturnInfo(context: context)
             body.append(contentsOf: stackLoweringStmts)
 
-            let callExpr = FunctionCallExprSyntax(
+            var callExpr = FunctionCallExprSyntax(
                 calledExpression: ExprSyntax("\(raw: abiName)"),
                 leftParen: .leftParenToken(),
                 arguments: LabeledExprListSyntax {
@@ -204,12 +208,33 @@ public struct ImportTS {
                 rightParen: .rightParenToken()
             )
 
-            if returnType == .void {
-                body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
-            } else if returnType.usesSideChannelForOptionalReturn() {
-                // Side channel returns don't need "let ret ="
-                body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
-            } else if liftingInfo.valueToLift == nil {
+            if !valuesToExtendLifetimeDuringCall.isEmpty {
+                callExpr = FunctionCallExprSyntax(
+                    calledExpression: ExprSyntax("withExtendedLifetime"),
+                    leftParen: .leftParenToken(),
+                    arguments: LabeledExprListSyntax {
+                        LabeledExprSyntax(
+                            expression: TupleExprSyntax(
+                                elements: LabeledExprListSyntax {
+                                    for value in valuesToExtendLifetimeDuringCall {
+                                        LabeledExprSyntax(expression: value)
+                                    }
+                                }
+                            )
+                        )
+                    },
+                    rightParen: .rightParenToken(),
+                    trailingClosure: ClosureExprSyntax(
+                        leftBrace: .leftBraceToken(),
+                        statements: CodeBlockItemListSyntax {
+                            CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr))))
+                        },
+                        rightBrace: .rightBraceToken()
+                    )
+                )
+            }
+
+            if returnType == .void || returnType.usesSideChannelForOptionalReturn() || liftingInfo.valueToLift == nil {
                 body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
             } else {
                 body.append("let ret = \(raw: callExpr)")
@@ -249,7 +274,7 @@ public struct ImportTS {
                 abiReturnType = liftingInfo.valueToLift
                 let liftExpr: ExprSyntax
                 switch returnType {
-                case .closure(let signature):
+                case .closure(let signature, _):
                     liftExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(ret)")
                 default:
                     if liftingInfo.valueToLift != nil {
@@ -722,11 +747,9 @@ struct SwiftSignatureBuilder {
     }
 
     /// Builds a parameter type syntax from a BridgeType.
-    ///
-    /// Swift closure parameters must be `@escaping` because they are boxed and can be invoked from JavaScript.
     static func buildParameterTypeSyntax(from type: BridgeType) -> TypeSyntax {
         switch type {
-        case .closure:
+        case .closure(_, useJSTypedClosure: false):
             return TypeSyntax("@escaping \(raw: type.swiftType)")
         default:
             return buildTypeSyntax(from: type)
@@ -930,8 +953,8 @@ extension BridgeType {
         case .jsValue: return .jsValue
         case .void: return .void
         case .closure:
-            // Swift closure is boxed and passed to JS as a pointer.
-            return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
+            // Swift closure is passed to JS as a JS function reference.
+            return LoweringParameterInfo(loweredParameters: [("funcRef", .i32)])
         case .unsafePointer:
             return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
         case .swiftHeapObject(let className):

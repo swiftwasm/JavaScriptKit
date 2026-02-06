@@ -16,18 +16,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests1
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTests10HttpStatusO_Si: _BridgedSwiftClosureBox {
-    let closure: (HttpStatus) -> Int
-    init(_ closure: @escaping (HttpStatus) -> Int) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTests10HttpStatusO_Si {
-    static func bridgeJSLower(_ closure: @escaping (HttpStatus) -> Int) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTests10HttpStatusO_Si(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (HttpStatus) -> Int {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -43,12 +41,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests10HttpStatusO_Si {
     }
 }
 
+extension JSTypedClosure where Signature == (HttpStatus) -> Int {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (HttpStatus) -> Int) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTests10HttpStatusO_Si>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(HttpStatus.bridgeJSLiftParameter(param0))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(HttpStatus) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(HttpStatus.bridgeJSLiftParameter(param0))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -64,18 +73,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTests5ThemeO_SS: _BridgedSwiftClosureBox {
-    let closure: (Theme) -> String
-    init(_ closure: @escaping (Theme) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTests5ThemeO_SS {
-    static func bridgeJSLower(_ closure: @escaping (Theme) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTests5ThemeO_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Theme) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -91,12 +98,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests5ThemeO_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Theme) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Theme) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTests5ThemeO_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Theme.bridgeJSLiftParameter(param0Bytes, param0Length))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Theme) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Theme.bridgeJSLiftParameter(param0Bytes, param0Length))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -112,18 +130,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTests5ThemeO_Sb: _BridgedSwiftClosureBox {
-    let closure: (Theme) -> Bool
-    init(_ closure: @escaping (Theme) -> Bool) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTests5ThemeO_Sb {
-    static func bridgeJSLower(_ closure: @escaping (Theme) -> Bool) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTests5ThemeO_Sb(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Theme) -> Bool {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -139,12 +155,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests5ThemeO_Sb {
     }
 }
 
+extension JSTypedClosure where Signature == (Theme) -> Bool {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Theme) -> Bool) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTests5ThemeO_Sb>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Theme.bridgeJSLiftParameter(param0Bytes, param0Length))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Theme) -> Bool>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Theme.bridgeJSLiftParameter(param0Bytes, param0Length))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -160,18 +187,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTests7GreeterC_SS: _BridgedSwiftClosureBox {
-    let closure: (Greeter) -> String
-    init(_ closure: @escaping (Greeter) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7GreeterC_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7GreeterC_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7GreeterC_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTests7GreeterC_SS {
-    static func bridgeJSLower(_ closure: @escaping (Greeter) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTests7GreeterC_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Greeter) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -187,12 +212,80 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests7GreeterC_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Greeter) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Greeter) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7GreeterC_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7GreeterC_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7GreeterC_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7GreeterC_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTests7GreeterC_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Greeter.bridgeJSLiftParameter(param0))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Greeter) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Greeter.bridgeJSLiftParameter(param0))
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC(_ callback: Int32, _ param0: Int32) -> Int32
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC(_ callback: Int32, _ param0: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+private enum _BJS_Closure_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC {
+    static func bridgeJSLift(_ callbackId: Int32) -> (JSObject) -> JSObject {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0Value = param0.bridgeJSLowerParameter()
+            let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC(callbackValue, param0Value)
+            return JSObject.bridgeJSLiftReturn(ret)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (JSObject) -> JSObject {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (JSObject) -> JSObject) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(JSObject) -> JSObject>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(JSObject.bridgeJSLiftParameter(param0))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -208,18 +301,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTests9APIResultO_SS: _BridgedSwiftClosureBox {
-    let closure: (APIResult) -> String
-    init(_ closure: @escaping (APIResult) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9APIResultO_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9APIResultO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9APIResultO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTests9APIResultO_SS {
-    static func bridgeJSLower(_ closure: @escaping (APIResult) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTests9APIResultO_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (APIResult) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -235,12 +326,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests9APIResultO_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (APIResult) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (APIResult) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9APIResultO_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9APIResultO_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9APIResultO_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9APIResultO_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTests9APIResultO_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(APIResult.bridgeJSLiftParameter(param0))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(APIResult) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(APIResult.bridgeJSLiftParameter(param0))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -256,18 +358,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTests9DirectionO_SS: _BridgedSwiftClosureBox {
-    let closure: (Direction) -> String
-    init(_ closure: @escaping (Direction) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTests9DirectionO_SS {
-    static func bridgeJSLower(_ closure: @escaping (Direction) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTests9DirectionO_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Direction) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -283,12 +383,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests9DirectionO_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Direction) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Direction) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTests9DirectionO_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Direction.bridgeJSLiftParameter(param0))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Direction) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Direction.bridgeJSLiftParameter(param0))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -304,18 +415,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTests9DirectionO_Sb: _BridgedSwiftClosureBox {
-    let closure: (Direction) -> Bool
-    init(_ closure: @escaping (Direction) -> Bool) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_Sb")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_Sb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_Sb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTests9DirectionO_Sb {
-    static func bridgeJSLower(_ closure: @escaping (Direction) -> Bool) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTests9DirectionO_Sb(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Direction) -> Bool {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -331,12 +440,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests9DirectionO_Sb {
     }
 }
 
+extension JSTypedClosure where Signature == (Direction) -> Bool {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Direction) -> Bool) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_Sb,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_Sb")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_Sb")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests9DirectionO_Sb(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTests9DirectionO_Sb>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Direction.bridgeJSLiftParameter(param0))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Direction) -> Bool>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Direction.bridgeJSLiftParameter(param0))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -352,18 +472,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSS_7GreeterC: _BridgedSwiftClosureBox {
-    let closure: (String) -> Greeter
-    init(_ closure: @escaping (String) -> Greeter) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_7GreeterC {
-    static func bridgeJSLower(_ closure: @escaping (String) -> Greeter) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSS_7GreeterC(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (String) -> Greeter {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -379,12 +497,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_7GreeterC {
     }
 }
 
+extension JSTypedClosure where Signature == (String) -> Greeter {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (String) -> Greeter) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSS_7GreeterC>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(String) -> Greeter>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -400,18 +529,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSS_SS: _BridgedSwiftClosureBox {
-    let closure: (String) -> String
-    init(_ closure: @escaping (String) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_SS {
-    static func bridgeJSLower(_ closure: @escaping (String) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSS_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (String) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -427,12 +554,80 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (String) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (String) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSS_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(String) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd(_ callback: Int32, _ param0: Float64) -> Float64
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd(_ callback: Int32, _ param0: Float64) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSd_Sd {
+    static func bridgeJSLift(_ callbackId: Int32) -> (Double) -> Double {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0Value = param0.bridgeJSLowerParameter()
+            let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd(callbackValue, param0Value)
+            return Double.bridgeJSLiftReturn(ret)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (Double) -> Double {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Double) -> Double) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd(_ boxPtr: UnsafeMutableRawPointer, _ param0: Float64) -> Float64 {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Double) -> Double>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Double.bridgeJSLiftParameter(param0))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -448,18 +643,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSiSSSd_SS: _BridgedSwiftClosureBox {
-    let closure: (Int, String, Double) -> String
-    init(_ closure: @escaping (Int, String, Double) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSiSSSd_SS {
-    static func bridgeJSLower(_ closure: @escaping (Int, String, Double) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSiSSSd_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Int, String, Double) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0, param1, param2 in
@@ -477,12 +670,140 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSiSSSd_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Int, String, Double) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Int, String, Double) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32, _ param1Bytes: Int32, _ param1Length: Int32, _ param2: Float64) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSiSSSd_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Int.bridgeJSLiftParameter(param0), String.bridgeJSLiftParameter(param1Bytes, param1Length), Double.bridgeJSLiftParameter(param2))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Int, String, Double) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Int.bridgeJSLiftParameter(param0), String.bridgeJSLiftParameter(param1Bytes, param1Length), Double.bridgeJSLiftParameter(param2))
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si(_ callback: Int32, _ param0: Int32, _ param1: Int32, _ param2: Int32) -> Int32
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si(_ callback: Int32, _ param0: Int32, _ param1: Int32, _ param2: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSiSiSi_Si {
+    static func bridgeJSLift(_ callbackId: Int32) -> (Int, Int, Int) -> Int {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0, param1, param2 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0Value = param0.bridgeJSLowerParameter()
+            let param1Value = param1.bridgeJSLowerParameter()
+            let param2Value = param2.bridgeJSLowerParameter()
+            let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si(callbackValue, param0Value, param1Value, param2Value)
+            return Int.bridgeJSLiftReturn(ret)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (Int, Int, Int) -> Int {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Int, Int, Int) -> Int) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSiSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32, _ param1: Int32, _ param2: Int32) -> Int32 {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Int, Int, Int) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Int.bridgeJSLiftParameter(param0), Int.bridgeJSLiftParameter(param1), Int.bridgeJSLiftParameter(param2))
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si(_ callback: Int32, _ param0: Int32, _ param1: Int32) -> Int32
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si(_ callback: Int32, _ param0: Int32, _ param1: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSiSi_Si {
+    static func bridgeJSLift(_ callbackId: Int32) -> (Int, Int) -> Int {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0, param1 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0Value = param0.bridgeJSLowerParameter()
+            let param1Value = param1.bridgeJSLowerParameter()
+            let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si(callbackValue, param0Value, param1Value)
+            return Int.bridgeJSLiftReturn(ret)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (Int, Int) -> Int {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Int, Int) -> Int) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32, _ param1: Int32) -> Int32 {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Int, Int) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Int.bridgeJSLiftParameter(param0), Int.bridgeJSLiftParameter(param1))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -498,18 +819,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSi_Si: _BridgedSwiftClosureBox {
-    let closure: (Int) -> Int
-    init(_ closure: @escaping (Int) -> Int) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_Si")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSi_Si {
-    static func bridgeJSLower(_ closure: @escaping (Int) -> Int) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSi_Si(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Int) -> Int {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -525,12 +844,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSi_Si {
     }
 }
 
+extension JSTypedClosure where Signature == (Int) -> Int {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Int) -> Int) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_Si,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_Si")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_Si")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSi_Si>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Int.bridgeJSLiftParameter(param0))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Int) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Int.bridgeJSLiftParameter(param0))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -546,18 +876,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSi_y: _BridgedSwiftClosureBox {
-    let closure: (Int) -> Void
-    init(_ closure: @escaping (Int) -> Void) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSi_y {
-    static func bridgeJSLower(_ closure: @escaping (Int) -> Void) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSi_y(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Int) -> Void {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -572,12 +900,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSi_y {
     }
 }
 
+extension JSTypedClosure where Signature == (Int) -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Int) -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSi_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSi_y>.fromOpaque(boxPtr).takeUnretainedValue()
-    box.closure(Int.bridgeJSLiftParameter(param0))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Int) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(Int.bridgeJSLiftParameter(param0))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -592,18 +931,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSq5ThemeO_SS: _BridgedSwiftClosureBox {
-    let closure: (Optional<Theme>) -> String
-    init(_ closure: @escaping (Optional<Theme>) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSq5ThemeO_SS {
-    static func bridgeJSLower(_ closure: @escaping (Optional<Theme>) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSq5ThemeO_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Theme>) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -619,12 +956,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSq5ThemeO_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Optional<Theme>) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Optional<Theme>) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSq5ThemeO_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Optional<Theme>.bridgeJSLiftParameter(param0IsSome, param0Bytes, param0Length))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Theme>) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Optional<Theme>.bridgeJSLiftParameter(param0IsSome, param0Bytes, param0Length))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -640,18 +988,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSq7GreeterC_SS: _BridgedSwiftClosureBox {
-    let closure: (Optional<Greeter>) -> String
-    init(_ closure: @escaping (Optional<Greeter>) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSq7GreeterC_SS {
-    static func bridgeJSLower(_ closure: @escaping (Optional<Greeter>) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSq7GreeterC_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Greeter>) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -667,12 +1013,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSq7GreeterC_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Optional<Greeter>) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Optional<Greeter>) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSq7GreeterC_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Optional<Greeter>.bridgeJSLiftParameter(param0IsSome, param0Value))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Greeter>) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Optional<Greeter>.bridgeJSLiftParameter(param0IsSome, param0Value))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -688,18 +1045,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC: _BridgedSwiftClosureBox {
-    let closure: (Optional<Greeter>) -> Optional<Greeter>
-    init(_ closure: @escaping (Optional<Greeter>) -> Optional<Greeter>) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC {
-    static func bridgeJSLower(_ closure: @escaping (Optional<Greeter>) -> Optional<Greeter>) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Greeter>) -> Optional<Greeter> {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -715,12 +1070,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC {
     }
 }
 
+extension JSTypedClosure where Signature == (Optional<Greeter>) -> Optional<Greeter> {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Optional<Greeter>) -> Optional<Greeter>) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Optional<Greeter>.bridgeJSLiftParameter(param0IsSome, param0Value))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Greeter>) -> Optional<Greeter>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Optional<Greeter>.bridgeJSLiftParameter(param0IsSome, param0Value))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -736,18 +1102,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSq9APIResultO_SS: _BridgedSwiftClosureBox {
-    let closure: (Optional<APIResult>) -> String
-    init(_ closure: @escaping (Optional<APIResult>) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9APIResultO_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9APIResultO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9APIResultO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSq9APIResultO_SS {
-    static func bridgeJSLower(_ closure: @escaping (Optional<APIResult>) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSq9APIResultO_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<APIResult>) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -763,12 +1127,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSq9APIResultO_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Optional<APIResult>) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Optional<APIResult>) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9APIResultO_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9APIResultO_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9APIResultO_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9APIResultO_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSq9APIResultO_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Optional<APIResult>.bridgeJSLiftParameter(param0IsSome, param0CaseId))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<APIResult>) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Optional<APIResult>.bridgeJSLiftParameter(param0IsSome, param0CaseId))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -784,18 +1159,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSq9DirectionO_SS: _BridgedSwiftClosureBox {
-    let closure: (Optional<Direction>) -> String
-    init(_ closure: @escaping (Optional<Direction>) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9DirectionO_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9DirectionO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9DirectionO_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSq9DirectionO_SS {
-    static func bridgeJSLower(_ closure: @escaping (Optional<Direction>) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSq9DirectionO_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Direction>) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -811,12 +1184,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSq9DirectionO_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Optional<Direction>) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Optional<Direction>) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9DirectionO_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9DirectionO_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9DirectionO_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9DirectionO_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSq9DirectionO_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Optional<Direction>.bridgeJSLiftParameter(param0IsSome, param0Value))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Direction>) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Optional<Direction>.bridgeJSLiftParameter(param0IsSome, param0Value))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -832,18 +1216,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSqSS_SS: _BridgedSwiftClosureBox {
-    let closure: (Optional<String>) -> String
-    init(_ closure: @escaping (Optional<String>) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSqSS_SS {
-    static func bridgeJSLower(_ closure: @escaping (Optional<String>) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSqSS_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<String>) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -859,12 +1241,23 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSqSS_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Optional<String>) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Optional<String>) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSqSS_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Optional<String>.bridgeJSLiftParameter(param0IsSome, param0Bytes, param0Length))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<String>) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Optional<String>.bridgeJSLiftParameter(param0IsSome, param0Bytes, param0Length))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -880,18 +1273,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsSqSi_SS: _BridgedSwiftClosureBox {
-    let closure: (Optional<Int>) -> String
-    init(_ closure: @escaping (Optional<Int>) -> String) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSi_SS")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSi_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSi_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSqSi_SS {
-    static func bridgeJSLower(_ closure: @escaping (Optional<Int>) -> String) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsSqSi_SS(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Int>) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
@@ -907,12 +1298,79 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSqSi_SS {
     }
 }
 
+extension JSTypedClosure where Signature == (Optional<Int>) -> String {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Optional<Int>) -> String) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSi_SS,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSi_SS")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSi_SS")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSi_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsSqSi_SS>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure(Optional<Int>.bridgeJSLiftParameter(param0IsSome, param0Value))
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Int>) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Optional<Int>.bridgeJSLiftParameter(param0IsSome, param0Value))
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb(_ callback: Int32) -> Int32
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb(_ callback: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsy_Sb {
+    static func bridgeJSLift(_ callbackId: Int32) -> () -> Bool {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb(callbackValue)
+            return Bool.bridgeJSLiftReturn(ret)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == () -> Bool {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping () -> Bool) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sb(_ boxPtr: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<() -> Bool>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure()
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -928,18 +1386,16 @@ fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy
 }
 #endif
 
-private final class _BJS_ClosureBox_20BridgeJSRuntimeTestsy_Sq7GreeterC: _BridgedSwiftClosureBox {
-    let closure: () -> Optional<Greeter>
-    init(_ closure: @escaping () -> Optional<Greeter>) {
-        self.closure = closure
-    }
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sq7GreeterC")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sq7GreeterC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sq7GreeterC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
 }
+#endif
 
 private enum _BJS_Closure_20BridgeJSRuntimeTestsy_Sq7GreeterC {
-    static func bridgeJSLower(_ closure: @escaping () -> Optional<Greeter>) -> UnsafeMutableRawPointer {
-        let box = _BJS_ClosureBox_20BridgeJSRuntimeTestsy_Sq7GreeterC(closure)
-        return Unmanaged.passRetained(box).toOpaque()
-    }
     static func bridgeJSLift(_ callbackId: Int32) -> () -> Optional<Greeter> {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] in
@@ -954,13 +1410,78 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsy_Sq7GreeterC {
     }
 }
 
+extension JSTypedClosure where Signature == () -> Optional<Greeter> {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping () -> Optional<Greeter>) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sq7GreeterC,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
 @_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sq7GreeterC")
 @_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sq7GreeterC")
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_Sq7GreeterC(_ boxPtr: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let box = Unmanaged<_BJS_ClosureBox_20BridgeJSRuntimeTestsy_Sq7GreeterC>.fromOpaque(boxPtr).takeUnretainedValue()
-    let result = box.closure()
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<() -> Optional<Greeter>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure()
     return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y(_ callback: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y(_ callback: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsy_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> () -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y(callbackValue)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == () -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping () -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y(_ boxPtr: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<() -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4934,10 +5455,10 @@ public func _bjs_formatName(_ nameBytes: Int32, _ nameLength: Int32, _ transform
 
 @_expose(wasm, "bjs_makeFormatter")
 @_cdecl("bjs_makeFormatter")
-public func _bjs_makeFormatter(_ prefixBytes: Int32, _ prefixLength: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_makeFormatter(_ prefixBytes: Int32, _ prefixLength: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = makeFormatter(prefix: String.bridgeJSLiftParameter(prefixBytes, prefixLength))
-    return _BJS_Closure_20BridgeJSRuntimeTestsSS_SS.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -4945,10 +5466,10 @@ public func _bjs_makeFormatter(_ prefixBytes: Int32, _ prefixLength: Int32) -> U
 
 @_expose(wasm, "bjs_makeAdder")
 @_cdecl("bjs_makeAdder")
-public func _bjs_makeAdder(_ base: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_makeAdder(_ base: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = makeAdder(base: Int.bridgeJSLiftParameter(base))
-    return _BJS_Closure_20BridgeJSRuntimeTestsSi_Si.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6081,6 +6602,97 @@ public func _bjs_arrayMembersFirst() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_ClosureSupportExports_static_makeIntToInt")
+@_cdecl("bjs_ClosureSupportExports_static_makeIntToInt")
+public func _bjs_ClosureSupportExports_static_makeIntToInt(_ base: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = ClosureSupportExports.makeIntToInt(_: Int.bridgeJSLiftParameter(base))
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClosureSupportExports_static_makeDoubleToDouble")
+@_cdecl("bjs_ClosureSupportExports_static_makeDoubleToDouble")
+public func _bjs_ClosureSupportExports_static_makeDoubleToDouble(_ base: Float64) -> Int32 {
+    #if arch(wasm32)
+    let ret = ClosureSupportExports.makeDoubleToDouble(_: Double.bridgeJSLiftParameter(base))
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClosureSupportExports_static_makeStringToString")
+@_cdecl("bjs_ClosureSupportExports_static_makeStringToString")
+public func _bjs_ClosureSupportExports_static_makeStringToString(_ prefixBytes: Int32, _ prefixLength: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = ClosureSupportExports.makeStringToString(_: String.bridgeJSLiftParameter(prefixBytes, prefixLength))
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClosureSupportExports_static_makeJSIntToInt")
+@_cdecl("bjs_ClosureSupportExports_static_makeJSIntToInt")
+public func _bjs_ClosureSupportExports_static_makeJSIntToInt(_ base: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = ClosureSupportExports.makeJSIntToInt(_: Int.bridgeJSLiftParameter(base))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClosureSupportExports_static_makeJSDoubleToDouble")
+@_cdecl("bjs_ClosureSupportExports_static_makeJSDoubleToDouble")
+public func _bjs_ClosureSupportExports_static_makeJSDoubleToDouble(_ base: Float64) -> Int32 {
+    #if arch(wasm32)
+    let ret = ClosureSupportExports.makeJSDoubleToDouble(_: Double.bridgeJSLiftParameter(base))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClosureSupportExports_static_makeJSStringToString")
+@_cdecl("bjs_ClosureSupportExports_static_makeJSStringToString")
+public func _bjs_ClosureSupportExports_static_makeJSStringToString(_ prefixBytes: Int32, _ prefixLength: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = ClosureSupportExports.makeJSStringToString(_: String.bridgeJSLiftParameter(prefixBytes, prefixLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClosureSupportExports_deinit")
+@_cdecl("bjs_ClosureSupportExports_deinit")
+public func _bjs_ClosureSupportExports_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<ClosureSupportExports>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension ClosureSupportExports: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_ClosureSupportExports_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportExports_wrap")
+fileprivate func _bjs_ClosureSupportExports_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_ClosureSupportExports_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 @_expose(wasm, "bjs_Greeter_init")
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
@@ -6126,10 +6738,10 @@ public func _bjs_Greeter_greetWith(_ _self: UnsafeMutableRawPointer, _ greeter: 
 
 @_expose(wasm, "bjs_Greeter_makeFormatter")
 @_cdecl("bjs_Greeter_makeFormatter")
-public func _bjs_Greeter_makeFormatter(_ _self: UnsafeMutableRawPointer, _ suffixBytes: Int32, _ suffixLength: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_Greeter_makeFormatter(_ _self: UnsafeMutableRawPointer, _ suffixBytes: Int32, _ suffixLength: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = Greeter.bridgeJSLiftParameter(_self).makeFormatter(suffix: String.bridgeJSLiftParameter(suffixBytes, suffixLength))
-    return _BJS_Closure_20BridgeJSRuntimeTestsSS_SS.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6137,10 +6749,10 @@ public func _bjs_Greeter_makeFormatter(_ _self: UnsafeMutableRawPointer, _ suffi
 
 @_expose(wasm, "bjs_Greeter_static_makeCreator")
 @_cdecl("bjs_Greeter_static_makeCreator")
-public func _bjs_Greeter_static_makeCreator(_ defaultNameBytes: Int32, _ defaultNameLength: Int32) -> UnsafeMutableRawPointer {
+public func _bjs_Greeter_static_makeCreator(_ defaultNameBytes: Int32, _ defaultNameLength: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = Greeter.makeCreator(defaultName: String.bridgeJSLiftParameter(defaultNameBytes, defaultNameLength))
-    return _BJS_Closure_20BridgeJSRuntimeTestsSS_7GreeterC.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6148,10 +6760,10 @@ public func _bjs_Greeter_static_makeCreator(_ defaultNameBytes: Int32, _ default
 
 @_expose(wasm, "bjs_Greeter_makeCustomGreeter")
 @_cdecl("bjs_Greeter_makeCustomGreeter")
-public func _bjs_Greeter_makeCustomGreeter(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_Greeter_makeCustomGreeter(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = Greeter.bridgeJSLiftParameter(_self).makeCustomGreeter()
-    return _BJS_Closure_20BridgeJSRuntimeTests7GreeterC_SS.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -7981,10 +8593,10 @@ public func _bjs_TextProcessor_processWithCustom(_ _self: UnsafeMutableRawPointe
 
 @_expose(wasm, "bjs_TextProcessor_getTransform")
 @_cdecl("bjs_TextProcessor_getTransform")
-public func _bjs_TextProcessor_getTransform(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_TextProcessor_getTransform(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = TextProcessor.bridgeJSLiftParameter(_self).getTransform()
-    return _BJS_Closure_20BridgeJSRuntimeTestsSS_SS.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8025,10 +8637,10 @@ public func _bjs_TextProcessor_processOptionalGreeter(_ _self: UnsafeMutableRawP
 
 @_expose(wasm, "bjs_TextProcessor_makeOptionalStringFormatter")
 @_cdecl("bjs_TextProcessor_makeOptionalStringFormatter")
-public func _bjs_TextProcessor_makeOptionalStringFormatter(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_TextProcessor_makeOptionalStringFormatter(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = TextProcessor.bridgeJSLiftParameter(_self).makeOptionalStringFormatter()
-    return _BJS_Closure_20BridgeJSRuntimeTestsSqSS_SS.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8036,10 +8648,10 @@ public func _bjs_TextProcessor_makeOptionalStringFormatter(_ _self: UnsafeMutabl
 
 @_expose(wasm, "bjs_TextProcessor_makeOptionalGreeterCreator")
 @_cdecl("bjs_TextProcessor_makeOptionalGreeterCreator")
-public func _bjs_TextProcessor_makeOptionalGreeterCreator(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_TextProcessor_makeOptionalGreeterCreator(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = TextProcessor.bridgeJSLiftParameter(_self).makeOptionalGreeterCreator()
-    return _BJS_Closure_20BridgeJSRuntimeTestsy_Sq7GreeterC.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8091,10 +8703,10 @@ public func _bjs_TextProcessor_processAPIResult(_ _self: UnsafeMutableRawPointer
 
 @_expose(wasm, "bjs_TextProcessor_makeDirectionChecker")
 @_cdecl("bjs_TextProcessor_makeDirectionChecker")
-public func _bjs_TextProcessor_makeDirectionChecker(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_TextProcessor_makeDirectionChecker(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = TextProcessor.bridgeJSLiftParameter(_self).makeDirectionChecker()
-    return _BJS_Closure_20BridgeJSRuntimeTests9DirectionO_Sb.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8102,10 +8714,10 @@ public func _bjs_TextProcessor_makeDirectionChecker(_ _self: UnsafeMutableRawPoi
 
 @_expose(wasm, "bjs_TextProcessor_makeThemeValidator")
 @_cdecl("bjs_TextProcessor_makeThemeValidator")
-public func _bjs_TextProcessor_makeThemeValidator(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_TextProcessor_makeThemeValidator(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = TextProcessor.bridgeJSLiftParameter(_self).makeThemeValidator()
-    return _BJS_Closure_20BridgeJSRuntimeTests5ThemeO_Sb.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8113,10 +8725,10 @@ public func _bjs_TextProcessor_makeThemeValidator(_ _self: UnsafeMutableRawPoint
 
 @_expose(wasm, "bjs_TextProcessor_makeStatusCodeExtractor")
 @_cdecl("bjs_TextProcessor_makeStatusCodeExtractor")
-public func _bjs_TextProcessor_makeStatusCodeExtractor(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_TextProcessor_makeStatusCodeExtractor(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = TextProcessor.bridgeJSLiftParameter(_self).makeStatusCodeExtractor()
-    return _BJS_Closure_20BridgeJSRuntimeTests10HttpStatusO_Si.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8124,10 +8736,10 @@ public func _bjs_TextProcessor_makeStatusCodeExtractor(_ _self: UnsafeMutableRaw
 
 @_expose(wasm, "bjs_TextProcessor_makeAPIResultHandler")
 @_cdecl("bjs_TextProcessor_makeAPIResultHandler")
-public func _bjs_TextProcessor_makeAPIResultHandler(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_TextProcessor_makeAPIResultHandler(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = TextProcessor.bridgeJSLiftParameter(_self).makeAPIResultHandler()
-    return _BJS_Closure_20BridgeJSRuntimeTests9APIResultO_SS.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8168,10 +8780,10 @@ public func _bjs_TextProcessor_processOptionalAPIResult(_ _self: UnsafeMutableRa
 
 @_expose(wasm, "bjs_TextProcessor_makeOptionalDirectionFormatter")
 @_cdecl("bjs_TextProcessor_makeOptionalDirectionFormatter")
-public func _bjs_TextProcessor_makeOptionalDirectionFormatter(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+public func _bjs_TextProcessor_makeOptionalDirectionFormatter(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = TextProcessor.bridgeJSLiftParameter(_self).makeOptionalDirectionFormatter()
-    return _BJS_Closure_20BridgeJSRuntimeTestsSq9DirectionO_SS.bridgeJSLower(ret)
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8458,6 +9070,328 @@ fileprivate func _bjs_Container_wrap(_ pointer: UnsafeMutableRawPointer) -> Int3
     fatalError("Only available on WebAssembly")
 }
 #endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsApplyVoid_static")
+fileprivate func bjs_ClosureSupportImports_jsApplyVoid_static(_ callback: Int32) -> Void
+#else
+fileprivate func bjs_ClosureSupportImports_jsApplyVoid_static(_ callback: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsApplyBool_static")
+fileprivate func bjs_ClosureSupportImports_jsApplyBool_static(_ callback: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsApplyBool_static(_ callback: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsApplyInt_static")
+fileprivate func bjs_ClosureSupportImports_jsApplyInt_static(_ value: Int32, _ transform: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsApplyInt_static(_ value: Int32, _ transform: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsApplyDouble_static")
+fileprivate func bjs_ClosureSupportImports_jsApplyDouble_static(_ value: Float64, _ transform: Int32) -> Float64
+#else
+fileprivate func bjs_ClosureSupportImports_jsApplyDouble_static(_ value: Float64, _ transform: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsApplyString_static")
+fileprivate func bjs_ClosureSupportImports_jsApplyString_static(_ value: Int32, _ transform: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsApplyString_static(_ value: Int32, _ transform: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsApplyJSObject_static")
+fileprivate func bjs_ClosureSupportImports_jsApplyJSObject_static(_ value: Int32, _ transform: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsApplyJSObject_static(_ value: Int32, _ transform: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsMakeIntToInt_static")
+fileprivate func bjs_ClosureSupportImports_jsMakeIntToInt_static(_ base: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsMakeIntToInt_static(_ base: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsMakeDoubleToDouble_static")
+fileprivate func bjs_ClosureSupportImports_jsMakeDoubleToDouble_static(_ base: Float64) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsMakeDoubleToDouble_static(_ base: Float64) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsMakeStringToString_static")
+fileprivate func bjs_ClosureSupportImports_jsMakeStringToString_static(_ prefix: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsMakeStringToString_static(_ prefix: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsCallTwice_static")
+fileprivate func bjs_ClosureSupportImports_jsCallTwice_static(_ value: Int32, _ callback: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsCallTwice_static(_ value: Int32, _ callback: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsCallBinary_static")
+fileprivate func bjs_ClosureSupportImports_jsCallBinary_static(_ callback: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsCallBinary_static(_ callback: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsCallTriple_static")
+fileprivate func bjs_ClosureSupportImports_jsCallTriple_static(_ callback: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsCallTriple_static(_ callback: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsCallAfterRelease_static")
+fileprivate func bjs_ClosureSupportImports_jsCallAfterRelease_static(_ callback: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsCallAfterRelease_static(_ callback: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsOptionalInvoke_static")
+fileprivate func bjs_ClosureSupportImports_jsOptionalInvoke_static(_ callbackIsSome: Int32, _ callbackFuncRef: Int32) -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsOptionalInvoke_static(_ callbackIsSome: Int32, _ callbackFuncRef: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsStoreClosure_static")
+fileprivate func bjs_ClosureSupportImports_jsStoreClosure_static(_ callback: Int32) -> Void
+#else
+fileprivate func bjs_ClosureSupportImports_jsStoreClosure_static(_ callback: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsCallStoredClosure_static")
+fileprivate func bjs_ClosureSupportImports_jsCallStoredClosure_static() -> Void
+#else
+fileprivate func bjs_ClosureSupportImports_jsCallStoredClosure_static() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsHeapCount_static")
+fileprivate func bjs_ClosureSupportImports_jsHeapCount_static() -> Int32
+#else
+fileprivate func bjs_ClosureSupportImports_jsHeapCount_static() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_runJsClosureSupportTests_static")
+fileprivate func bjs_ClosureSupportImports_runJsClosureSupportTests_static() -> Void
+#else
+fileprivate func bjs_ClosureSupportImports_runJsClosureSupportTests_static() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$ClosureSupportImports_jsApplyVoid(_ callback: JSTypedClosure<() -> Void>) throws(JSException) -> Void {
+    let callbackFuncRef = callback.bridgeJSLowerParameter()
+    bjs_ClosureSupportImports_jsApplyVoid_static(callbackFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$ClosureSupportImports_jsApplyBool(_ callback: JSTypedClosure<() -> Bool>) throws(JSException) -> Bool {
+    let callbackFuncRef = callback.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsApplyBool_static(callbackFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Bool.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsApplyInt(_ value: Int, _ transform: JSTypedClosure<(Int) -> Int>) throws(JSException) -> Int {
+    let valueValue = value.bridgeJSLowerParameter()
+    let transformFuncRef = transform.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsApplyInt_static(valueValue, transformFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsApplyDouble(_ value: Double, _ transform: JSTypedClosure<(Double) -> Double>) throws(JSException) -> Double {
+    let valueValue = value.bridgeJSLowerParameter()
+    let transformFuncRef = transform.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsApplyDouble_static(valueValue, transformFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsApplyString(_ value: String, _ transform: JSTypedClosure<(String) -> String>) throws(JSException) -> String {
+    let valueValue = value.bridgeJSLowerParameter()
+    let transformFuncRef = transform.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsApplyString_static(valueValue, transformFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsApplyJSObject(_ value: JSObject, _ transform: JSTypedClosure<(JSObject) -> JSObject>) throws(JSException) -> JSObject {
+    let valueValue = value.bridgeJSLowerParameter()
+    let transformFuncRef = transform.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsApplyJSObject_static(valueValue, transformFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsMakeIntToInt(_ base: Int) throws(JSException) -> (Int) -> Int {
+    let baseValue = base.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsMakeIntToInt_static(baseValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return _BJS_Closure_20BridgeJSRuntimeTestsSi_Si.bridgeJSLift(ret)
+}
+
+func _$ClosureSupportImports_jsMakeDoubleToDouble(_ base: Double) throws(JSException) -> (Double) -> Double {
+    let baseValue = base.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsMakeDoubleToDouble_static(baseValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return _BJS_Closure_20BridgeJSRuntimeTestsSd_Sd.bridgeJSLift(ret)
+}
+
+func _$ClosureSupportImports_jsMakeStringToString(_ prefix: String) throws(JSException) -> (String) -> String {
+    let prefixValue = prefix.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsMakeStringToString_static(prefixValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return _BJS_Closure_20BridgeJSRuntimeTestsSS_SS.bridgeJSLift(ret)
+}
+
+func _$ClosureSupportImports_jsCallTwice(_ value: Int, _ callback: JSTypedClosure<(Int) -> Void>) throws(JSException) -> Int {
+    let valueValue = value.bridgeJSLowerParameter()
+    let callbackFuncRef = callback.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsCallTwice_static(valueValue, callbackFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsCallBinary(_ callback: JSTypedClosure<(Int, Int) -> Int>) throws(JSException) -> Int {
+    let callbackFuncRef = callback.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsCallBinary_static(callbackFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsCallTriple(_ callback: JSTypedClosure<(Int, Int, Int) -> Int>) throws(JSException) -> Int {
+    let callbackFuncRef = callback.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsCallTriple_static(callbackFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsCallAfterRelease(_ callback: JSTypedClosure<() -> Void>) throws(JSException) -> String {
+    let callbackFuncRef = callback.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsCallAfterRelease_static(callbackFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsOptionalInvoke(_ callback: Optional<JSTypedClosure<() -> Bool>>) throws(JSException) -> Bool {
+    let (callbackIsSome, callbackFuncRef) = callback.bridgeJSLowerParameter()
+    let ret = bjs_ClosureSupportImports_jsOptionalInvoke_static(callbackIsSome, callbackFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Bool.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_jsStoreClosure(_ callback: JSTypedClosure<() -> Void>) throws(JSException) -> Void {
+    let callbackFuncRef = callback.bridgeJSLowerParameter()
+    bjs_ClosureSupportImports_jsStoreClosure_static(callbackFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$ClosureSupportImports_jsCallStoredClosure() throws(JSException) -> Void {
+    bjs_ClosureSupportImports_jsCallStoredClosure_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$ClosureSupportImports_jsHeapCount() throws(JSException) -> Int {
+    let ret = bjs_ClosureSupportImports_jsHeapCount_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$ClosureSupportImports_runJsClosureSupportTests() throws(JSException) -> Void {
+    bjs_ClosureSupportImports_runJsClosureSupportTests_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripDictionary")
@@ -9624,99 +10558,6 @@ func _$ArrayHost_firstLabel(_ self: JSObject, _ values: [String]) throws(JSExcep
         throw error
     }
     return String.bridgeJSLiftReturn(ret)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsApplyInt")
-fileprivate func bjs_jsApplyInt(_ value: Int32, _ transform: UnsafeMutableRawPointer) -> Int32
-#else
-fileprivate func bjs_jsApplyInt(_ value: Int32, _ transform: UnsafeMutableRawPointer) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$jsApplyInt(_ value: Int, _ transform: @escaping (Int) -> Int) throws(JSException) -> Int {
-    let valueValue = value.bridgeJSLowerParameter()
-    let transformPointer = _BJS_Closure_20BridgeJSRuntimeTestsSi_Si.bridgeJSLower(transform)
-    let ret = bjs_jsApplyInt(valueValue, transformPointer)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return Int.bridgeJSLiftReturn(ret)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsMakeAdder")
-fileprivate func bjs_jsMakeAdder(_ base: Int32) -> Int32
-#else
-fileprivate func bjs_jsMakeAdder(_ base: Int32) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$jsMakeAdder(_ base: Int) throws(JSException) -> (Int) -> Int {
-    let baseValue = base.bridgeJSLowerParameter()
-    let ret = bjs_jsMakeAdder(baseValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return _BJS_Closure_20BridgeJSRuntimeTestsSi_Si.bridgeJSLift(ret)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsMapString")
-fileprivate func bjs_jsMapString(_ value: Int32, _ transform: UnsafeMutableRawPointer) -> Int32
-#else
-fileprivate func bjs_jsMapString(_ value: Int32, _ transform: UnsafeMutableRawPointer) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$jsMapString(_ value: String, _ transform: @escaping (String) -> String) throws(JSException) -> String {
-    let valueValue = value.bridgeJSLowerParameter()
-    let transformPointer = _BJS_Closure_20BridgeJSRuntimeTestsSS_SS.bridgeJSLower(transform)
-    let ret = bjs_jsMapString(valueValue, transformPointer)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return String.bridgeJSLiftReturn(ret)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsMakePrefixer")
-fileprivate func bjs_jsMakePrefixer(_ prefix: Int32) -> Int32
-#else
-fileprivate func bjs_jsMakePrefixer(_ prefix: Int32) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$jsMakePrefixer(_ prefix: String) throws(JSException) -> (String) -> String {
-    let prefixValue = prefix.bridgeJSLowerParameter()
-    let ret = bjs_jsMakePrefixer(prefixValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return _BJS_Closure_20BridgeJSRuntimeTestsSS_SS.bridgeJSLift(ret)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsCallTwice")
-fileprivate func bjs_jsCallTwice(_ value: Int32, _ callback: UnsafeMutableRawPointer) -> Int32
-#else
-fileprivate func bjs_jsCallTwice(_ value: Int32, _ callback: UnsafeMutableRawPointer) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$jsCallTwice(_ value: Int, _ callback: @escaping (Int) -> Void) throws(JSException) -> Int {
-    let valueValue = value.bridgeJSLowerParameter()
-    let callbackPointer = _BJS_Closure_20BridgeJSRuntimeTestsSi_y.bridgeJSLower(callback)
-    let ret = bjs_jsCallTwice(valueValue, callbackPointer)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return Int.bridgeJSLiftReturn(ret)
 }
 
 #if arch(wasm32)

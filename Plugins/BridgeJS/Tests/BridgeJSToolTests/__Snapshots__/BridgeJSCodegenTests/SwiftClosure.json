@@ -62,7 +62,8 @@
 
                       }
                     }
-                  }
+                  },
+                  "useJSTypedClosure" : false
                 }
               }
             }
@@ -99,7 +100,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -143,7 +145,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -237,7 +240,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -279,7 +283,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -303,7 +308,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -343,7 +349,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -372,7 +379,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -407,7 +415,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -450,7 +459,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -493,7 +503,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -535,7 +546,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -576,7 +588,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -611,7 +624,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -646,7 +660,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -680,7 +695,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           },
@@ -720,7 +736,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -768,7 +785,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -815,7 +833,8 @@
 
                         }
                       }
-                    }
+                    },
+                    "useJSTypedClosure" : false
                   }
                 }
               }
@@ -861,7 +880,8 @@
 
                     }
                   }
-                }
+                },
+                "useJSTypedClosure" : false
               }
             }
           }

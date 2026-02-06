@@ -523,5 +523,9 @@ class JavaScriptKitTests: XCTestCase {
     }
 }
 
+#if arch(wasm32)
 @_extern(c, "llvm.wasm.memory.grow.i32")
 func growMemory(_ memory: Int32, _ pages: Int32) -> Int32
+#else
+func growMemory(_ memory: Int32, _ pages: Int32) -> Int32 { return 0 }
+#endif
