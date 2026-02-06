@@ -48,6 +48,63 @@ exports[`ts2swift > snapshots Swift output for Async.d.ts > Async 1`] = `
 "
 `;
 
+exports[`ts2swift > snapshots Swift output for Documentation.d.ts > Documentation 1`] = `
+"// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
+// DO NOT EDIT.
+//
+// To update this file, just rebuild your project or run
+// \`swift package bridge-js\`.
+
+@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+
+/// Return a greeting for a user.
+///
+/// - Parameters:
+///   - name: The user's name.
+/// - Returns: The greeting message.
+@JSFunction func greet(_ name: String) throws(JSException) -> String
+
+@JSFunction func origin() throws(JSException) -> Point
+
+/// Represents a 2D point.
+@JSClass struct Point {
+    /// The horizontal position.
+    @JSGetter var x: Double
+    @JSSetter func setX(_ value: Double) throws(JSException)
+    /// Translate the point.
+    ///
+    /// - Parameters:
+    ///   - dx: Delta to apply on x.
+    ///   - dy: Delta to apply on y.
+    /// - Returns: The moved point.
+    @JSFunction func translate(_ dx: Double, _ dy: Double) throws(JSException) -> Point
+}
+
+/// Move a point by the given delta.
+///
+/// - Parameters:
+///   - point: The point to move.
+///   - dx: Delta to apply on x.
+///   - dy: Delta to apply on y.
+@JSFunction func translatePoint(_ point: Point, _ dx: Double, _ dy: Double) throws(JSException) -> Point
+
+/// A greeter that keeps the target name.
+@JSClass struct Greeter {
+    /// Create a greeter.
+    ///
+    /// - Parameters:
+    ///   - name: Name to greet.
+    @JSFunction init(_ name: String) throws(JSException)
+    /// The configured name.
+    @JSGetter var targetName: String
+    /// Say hello.
+    ///
+    /// - Returns: Greeting message.
+    @JSFunction func greet() throws(JSException) -> String
+}
+"
+`;
+
 exports[`ts2swift > snapshots Swift output for Interface.d.ts > Interface 1`] = `
 "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
 // DO NOT EDIT.
