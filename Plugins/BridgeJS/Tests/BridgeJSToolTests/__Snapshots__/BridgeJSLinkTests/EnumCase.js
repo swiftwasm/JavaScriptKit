@@ -221,6 +221,7 @@ export async function createInstantiator(options, swift) {
                 tmpRetOptionalHeapObject = undefined;
                 return pointer || 0;
             }
+            bjs["swift_js_closure_unregister"] = function(funcRef) {}
         },
         setInstance: (i) => {
             instance = i;
