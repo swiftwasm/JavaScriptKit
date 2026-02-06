@@ -48,26 +48,6 @@ exports[`ts2swift > snapshots Swift output for Async.d.ts > Async 1`] = `
 "
 `;
 
-exports[`ts2swift > snapshots Swift output for DOMLike.d.ts > DOMLike 1`] = `
-"// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
-// DO NOT EDIT.
-//
-// To update this file, just rebuild your project or run
-// \`swift package bridge-js\`.
-
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
-
-/// Schedules a function to be run after a delay.
-///
-/// - Parameters:
-///   - handler: A function to execute after the timer expires.
-///   - timeout: The time, in milliseconds, the timer should wait before the handler is executed.
-///   - args: Additional arguments to pass to the handler.
-/// - Returns: A numeric identifier for the timer.
-@JSFunction func setTimeout(_ handler: JSObject, _ timeout: JSUndefinedOr<Double>, _ args: [JSValue]) throws(JSException) -> Double
-"
-`;
-
 exports[`ts2swift > snapshots Swift output for Documentation.d.ts > Documentation 1`] = `
 "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
 // DO NOT EDIT.
