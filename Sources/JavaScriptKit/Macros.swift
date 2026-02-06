@@ -202,7 +202,7 @@ public macro JSFunction(jsName: String? = nil, from: JSImportFrom? = nil) =
 ///
 /// - Parameter from: Selects where the constructor is looked up from.
 ///   Use `.global` to construct globals like `WebSocket` via `globalThis`.
-@attached(member, names: arbitrary)
+@attached(member, names: named(jsObject), named(init(unsafelyWrapping:)))
 @attached(extension, conformances: _JSBridgedClass)
 @_spi(Experimental)
 public macro JSClass(jsName: String? = nil, from: JSImportFrom? = nil) =

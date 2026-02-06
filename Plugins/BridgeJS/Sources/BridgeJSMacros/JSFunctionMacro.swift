@@ -14,7 +14,17 @@ extension JSFunctionMacro: BodyMacro {
         if let functionDecl = declaration.as(FunctionDeclSyntax.self) {
             let enclosingTypeName = JSMacroHelper.enclosingTypeName(from: context)
             let isStatic = JSMacroHelper.isStatic(functionDecl.modifiers)
-            let isInstanceMember = enclosingTypeName != nil && !isStatic
+            let isTopLevel = enclosingTypeName == nil
+            let isInstanceMember = !isTopLevel && !isStatic
+            if !isTopLevel {
+                JSMacroHelper.diagnoseMissingJSClass(node: node, for: "JSFunction", in: context)
+            }
+
+            JSMacroHelper.diagnoseThrowsRequiresJSException(
+                signature: functionDecl.signature,
+                on: Syntax(functionDecl),
+                in: context
+            )
 
             // Strip backticks from function name (e.g., "`prefix`" -> "prefix")
             // Backticks are only needed for Swift identifiers, not function names
@@ -34,8 +44,7 @@ extension JSFunctionMacro: BodyMacro {
 
             let effects = functionDecl.signature.effectSpecifiers
             let isAsync = effects?.asyncSpecifier != nil
-            let isThrows = effects?.throwsClause != nil
-            let prefix = JSMacroHelper.tryAwaitPrefix(isAsync: isAsync, isThrows: isThrows)
+            let prefix = JSMacroHelper.tryAwaitPrefix(isAsync: isAsync, isThrows: true)
 
             let isVoid = JSMacroHelper.isVoidReturn(functionDecl.signature.returnClause?.type)
             let line = isVoid ? "\(prefix)\(call)" : "return \(prefix)\(call)"
@@ -45,10 +54,28 @@ extension JSFunctionMacro: BodyMacro {
         if let initializerDecl = declaration.as(InitializerDeclSyntax.self) {
             guard let enclosingTypeName = JSMacroHelper.enclosingTypeName(from: context) else {
                 context.diagnose(
-                    Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedDeclaration)
+                    Diagnostic(
+                        node: Syntax(declaration),
+                        message: JSMacroMessage.unsupportedDeclaration,
+                        notes: [
+                            Note(
+                                node: Syntax(declaration),
+                                message: JSMacroNoteMessage(
+                                    message: "Move this initializer inside a JS wrapper type annotated with @JSClass."
+                                )
+                            )
+                        ]
+                    )
                 )
                 return [CodeBlockItemSyntax(stringLiteral: "fatalError(\"@JSFunction init must be inside a type\")")]
             }
+
+            JSMacroHelper.diagnoseMissingJSClass(node: node, for: "JSFunction", in: context)
+            JSMacroHelper.diagnoseThrowsRequiresJSException(
+                signature: initializerDecl.signature,
+                on: Syntax(initializerDecl),
+                in: context
+            )
 
             let glueName = JSMacroHelper.glueName(baseName: "init", enclosingTypeName: enclosingTypeName)
             let parameters = initializerDecl.signature.parameterClause.parameters
@@ -57,8 +84,7 @@ extension JSFunctionMacro: BodyMacro {
 
             let effects = initializerDecl.signature.effectSpecifiers
             let isAsync = effects?.asyncSpecifier != nil
-            let isThrows = effects?.throwsClause != nil
-            let prefix = JSMacroHelper.tryAwaitPrefix(isAsync: isAsync, isThrows: isThrows)
+            let prefix = JSMacroHelper.tryAwaitPrefix(isAsync: isAsync, isThrows: true)
 
             return [
                 CodeBlockItemSyntax(stringLiteral: "let jsObject = \(prefix)\(call)"),
@@ -66,7 +92,20 @@ extension JSFunctionMacro: BodyMacro {
             ]
         }
 
-        context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedDeclaration))
+        context.diagnose(
+            Diagnostic(
+                node: Syntax(declaration),
+                message: JSMacroMessage.unsupportedDeclaration,
+                notes: [
+                    Note(
+                        node: Syntax(declaration),
+                        message: JSMacroNoteMessage(
+                            message: "Apply @JSFunction to a function or initializer on your @JSClass wrapper type."
+                        )
+                    )
+                ]
+            )
+        )
         return []
     }
 }
@@ -82,7 +121,21 @@ extension JSFunctionMacro: PeerMacro {
     ) throws -> [DeclSyntax] {
         if declaration.is(FunctionDeclSyntax.self) { return [] }
         if declaration.is(InitializerDeclSyntax.self) { return [] }
-        context.diagnose(Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedDeclaration))
+        context.diagnose(
+            Diagnostic(
+                node: Syntax(declaration),
+                message: JSMacroMessage.unsupportedDeclaration,
+                notes: [
+                    Note(
+                        node: Syntax(declaration),
+                        message: JSMacroNoteMessage(
+                            message:
+                                "Place @JSFunction on a function or initializer; use @JSGetter/@JSSetter for properties."
+                        )
+                    )
+                ]
+            )
+        )
         return []
     }
 }

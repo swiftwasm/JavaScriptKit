@@ -13,8 +13,35 @@ extension JSClassMacro: MemberMacro {
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         guard declaration.is(StructDeclSyntax.self) else {
+            var fixIts: [FixIt] = []
+            let note = Note(
+                node: Syntax(declaration),
+                message: JSMacroNoteMessage(
+                    message: "Use @JSClass on a struct wrapper to synthesize jsObject and JS bridging members."
+                )
+            )
+
+            if let classDecl = declaration.as(ClassDeclSyntax.self) {
+                let structKeyword = classDecl.classKeyword.with(\.tokenKind, .keyword(.struct))
+                fixIts.append(
+                    FixIt(
+                        message: JSMacroFixItMessage(message: "Change 'class' to 'struct'"),
+                        changes: [
+                            .replace(
+                                oldNode: Syntax(classDecl.classKeyword),
+                                newNode: Syntax(structKeyword)
+                            )
+                        ]
+                    )
+                )
+            }
             context.diagnose(
-                Diagnostic(node: Syntax(declaration), message: JSMacroMessage.unsupportedJSClassDeclaration)
+                Diagnostic(
+                    node: Syntax(declaration),
+                    message: JSMacroMessage.unsupportedJSClassDeclaration,
+                    notes: [note],
+                    fixIts: fixIts
+                )
             )
             return []
         }

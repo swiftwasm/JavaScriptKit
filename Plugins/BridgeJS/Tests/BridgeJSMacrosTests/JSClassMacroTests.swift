@@ -159,7 +159,17 @@ import BridgeJSMacros
                 DiagnosticSpec(
                     message: "@JSClass can only be applied to structs.",
                     line: 1,
-                    column: 1
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "Use @JSClass on a struct wrapper to synthesize jsObject and JS bridging members.",
+                            line: 1,
+                            column: 1
+                        )
+                    ],
+                    fixIts: [
+                        FixItSpec(message: "Change 'class' to 'struct'")
+                    ]
                 )
             ],
             macroSpecs: macroSpecs,
@@ -182,7 +192,14 @@ import BridgeJSMacros
                 DiagnosticSpec(
                     message: "@JSClass can only be applied to structs.",
                     line: 1,
-                    column: 1
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "Use @JSClass on a struct wrapper to synthesize jsObject and JS bridging members.",
+                            line: 1,
+                            column: 1
+                        )
+                    ]
                 )
             ],
             macroSpecs: macroSpecs,
@@ -205,7 +222,14 @@ import BridgeJSMacros
                 DiagnosticSpec(
                     message: "@JSClass can only be applied to structs.",
                     line: 1,
-                    column: 1
+                    column: 1,
+                    notes: [
+                        NoteSpec(
+                            message: "Use @JSClass on a struct wrapper to synthesize jsObject and JS bridging members.",
+                            line: 1,
+                            column: 1
+                        )
+                    ]
                 )
             ],
             macroSpecs: macroSpecs,
