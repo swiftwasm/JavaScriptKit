@@ -48,6 +48,63 @@ exports[`ts2swift > snapshots Swift output for Async.d.ts > Async 1`] = `
 "
 `;
 
+exports[`ts2swift > snapshots Swift output for Documentation.d.ts > Documentation 1`] = `
+"// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
+// DO NOT EDIT.
+//
+// To update this file, just rebuild your project or run
+// \`swift package bridge-js\`.
+
+@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+
+/// Return a greeting for a user.
+///
+/// - Parameters:
+///   - name: The user's name.
+/// - Returns: The greeting message.
+@JSFunction func greet(_ name: String) throws(JSException) -> String
+
+@JSFunction func origin() throws(JSException) -> Point
+
+/// Represents a 2D point.
+@JSClass struct Point {
+    /// The horizontal position.
+    @JSGetter var x: Double
+    @JSSetter func setX(_ value: Double) throws(JSException)
+    /// Translate the point.
+    ///
+    /// - Parameters:
+    ///   - dx: Delta to apply on x.
+    ///   - dy: Delta to apply on y.
+    /// - Returns: The moved point.
+    @JSFunction func translate(_ dx: Double, _ dy: Double) throws(JSException) -> Point
+}
+
+/// Move a point by the given delta.
+///
+/// - Parameters:
+///   - point: The point to move.
+///   - dx: Delta to apply on x.
+///   - dy: Delta to apply on y.
+@JSFunction func translatePoint(_ point: Point, _ dx: Double, _ dy: Double) throws(JSException) -> Point
+
+/// A greeter that keeps the target name.
+@JSClass struct Greeter {
+    /// Create a greeter.
+    ///
+    /// - Parameters:
+    ///   - name: Name to greet.
+    @JSFunction init(_ name: String) throws(JSException)
+    /// The configured name.
+    @JSGetter var targetName: String
+    /// Say hello.
+    ///
+    /// - Returns: Greeting message.
+    @JSFunction func greet() throws(JSException) -> String
+}
+"
+`;
+
 exports[`ts2swift > snapshots Swift output for Interface.d.ts > Interface 1`] = `
 "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
 // DO NOT EDIT.
@@ -400,5 +457,92 @@ exports[`ts2swift > snapshots Swift output for VoidParameterVoidReturn.d.ts > Vo
 @_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func check() throws(JSException) -> Void
+"
+`;
+
+exports[`ts2swift > snapshots Swift output for WebIDLDOMDocs.d.ts > WebIDLDOMDocs 1`] = `
+"// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
+// DO NOT EDIT.
+//
+// To update this file, just rebuild your project or run
+// \`swift package bridge-js\`.
+
+@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+
+/// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document)
+@JSGetter var document: Document
+
+/// A simple Document subset with WebIDL-derived comments.
+@JSClass struct Document {
+    /// Creates an instance of the element for the specified tag.
+    ///
+    /// - Parameters:
+    ///   - tagName: The name of an element.
+    ///     
+    ///     [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/createElement)
+    @JSFunction func createElement(_ tagName: String, _ options: JSUndefinedOr<ElementCreationOptions>) throws(JSException) -> Element
+    /// Returns an element with namespace namespace. Its namespace prefix will be everything before ":" (U+003E) in qualifiedName or null. Its local name will be everything after ":" (U+003E) in qualifiedName or qualifiedName.
+    ///
+    /// If localName does not match the Name production an "InvalidCharacterError" DOMException will be thrown.
+    ///
+    /// If one of the following conditions is true a "NamespaceError" DOMException will be thrown:
+    ///
+    /// localName does not match the QName production.
+    /// Namespace prefix is not null and namespace is the empty string.
+    /// Namespace prefix is "xml" and namespace is not the XML namespace.
+    /// qualifiedName or namespace prefix is "xmlns" and namespace is not the XMLNS namespace.
+    /// namespace is the XMLNS namespace and neither qualifiedName nor namespace prefix is "xmlns".
+    ///
+    /// When supplied, options's is can be used to create a customized built-in element.
+    ///
+    /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/createElementNS)
+    @JSFunction func createElementNS(_ namespaceURI: Optional<String>, _ qualifiedName: String, _ options: JSObject) throws(JSException) -> Element
+    /// Creates a TreeWalker object.
+    ///
+    /// - Parameters:
+    ///   - root: The root element or node to start traversing on.
+    ///   - whatToShow: The type of nodes or elements to appear in the node list
+    ///   - filter: A custom NodeFilter function to use. For more information, see filter. Use null for no filter.
+    /// - Returns: The created TreeWalker.
+    ///   
+    ///   [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/createTreeWalker)
+    @JSFunction func createTreeWalker(_ root: Node, _ whatToShow: JSUndefinedOr<Double>, _ filter: JSUndefinedOr<JSObject>) throws(JSException) -> TreeWalker
+}
+
+@JSClass struct ElementCreationOptions {
+    @JSGetter var \`is\`: JSUndefinedOr<String>
+    @JSSetter func setIs(_ value: JSUndefinedOr<String>) throws(JSException)
+}
+
+@JSClass struct Element {
+    /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/textContent)
+    @JSGetter var textContent: Optional<String>
+    @JSSetter func setTextContent(_ value: Optional<String>) throws(JSException)
+    /// Returns a copy of node. If deep is true, the copy also includes the node's descendants.
+    ///
+    /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/cloneNode)
+    @JSFunction func cloneNode(_ subtree: JSObject) throws(JSException) -> Node
+}
+
+/// Minimal stubs to mirror lib.dom.d.ts documentation converted from WebIDL.
+@JSClass struct Node {
+    /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/textContent)
+    @JSGetter var textContent: Optional<String>
+    @JSSetter func setTextContent(_ value: Optional<String>) throws(JSException)
+    /// Returns a copy of node. If deep is true, the copy also includes the node's descendants.
+    ///
+    /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Node/cloneNode)
+    @JSFunction func cloneNode(_ subtree: JSObject) throws(JSException) -> Node
+}
+
+@JSClass struct TreeWalker {
+    /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/TreeWalker/currentNode)
+    @JSGetter var currentNode: Node
+    @JSSetter func setCurrentNode(_ value: Node) throws(JSException)
+    /// Moves the currentNode to the next visible node in the document order.
+    ///
+    /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/TreeWalker/nextNode)
+    @JSFunction func nextNode() throws(JSException) -> Optional<Node>
+}
 "
 `;

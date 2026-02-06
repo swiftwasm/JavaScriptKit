@@ -157,10 +157,9 @@ export class TypeProcessor {
                             this.visitEnumType(type, node);
                             continue;
                         }
-                        const typeString = this.checker.typeToString(type);
                         const members = type.getProperties();
                         if (members) {
-                            this.visitStructuredType(typeString, members);
+                            this.visitStructuredType(type, node, members);
                         }
                     }
                 });
@@ -284,6 +283,7 @@ export class TypeProcessor {
             if (fromArg) args.push(fromArg);
             const annotation = this.renderMacroAnnotation("JSGetter", args);
 
+            this.emitDocComment(decl, { indent: "" });
             this.swiftLines.push(`${annotation} var ${swiftVarName}: ${swiftType}`);
             this.swiftLines.push("");
         }
@@ -338,6 +338,7 @@ export class TypeProcessor {
         this.emittedEnumNames.add(enumName);
 
         const members = decl.members ?? [];
+        this.emitDocComment(decl, { indent: "" });
         if (members.length === 0) {
             this.diagnosticEngine.print("warning", `Empty enum is not supported: ${enumName}`, diagnosticNode);
             this.swiftLines.push(`typealias ${this.renderIdentifier(enumName)} = String`);
@@ -448,30 +449,182 @@ export class TypeProcessor {
         const signature = this.checker.getSignatureFromDeclaration(node);
         if (!signature) return;
 
-        const params = this.renderParameters(signature.getParameters(), node);
+        const parameters = signature.getParameters();
+        const parameterNameMap = this.buildParameterNameMap(parameters);
+        const params = this.renderParameters(parameters, node);
         const returnType = this.visitType(signature.getReturnType(), node);
         const effects = this.renderEffects({ isAsync: false });
         const swiftFuncName = this.renderIdentifier(swiftName);
 
+        this.emitDocComment(node, { parameterNameMap });
         this.swiftLines.push(`${annotation} func ${swiftFuncName}(${params}) ${effects} -> ${returnType}`);
         this.swiftLines.push("");
     }
 
     /**
-     * Get the full JSDoc text from a node
-     * @param {ts.Node} node - The node to get the JSDoc text from
-     * @returns {string | undefined} The full JSDoc text
+     * Convert a JSDoc comment node content to plain text.
+     * @param {string | ts.NodeArray<ts.JSDocComment> | undefined} comment
+     * @returns {string}
+     * @private
      */
-    getFullJSDocText(node) {
-        const docs = ts.getJSDocCommentsAndTags(node);
-        const parts = [];
-        for (const doc of docs) {
-            if (ts.isJSDoc(doc)) {
-                parts.push(doc.comment ?? "");
+    renderJSDocText(comment) {
+        if (!comment) return "";
+        if (typeof comment === "string") return comment;
+        let result = "";
+        for (const part of comment) {
+            if (typeof part === "string") {
+                result += part;
+                continue;
+            }
+            // JSDocText/JSDocLink both have a `text` field
+            // https://github.com/microsoft/TypeScript/blob/main/src/compiler/types.ts
+            // @ts-ignore
+            if (typeof part.text === "string") {
+                // @ts-ignore
+                result += part.text;
+                continue;
+            }
+            if (typeof part.getText === "function") {
+                result += part.getText();
             }
         }
-        if (parts.length === 0) return undefined;
-        return parts.join("\n");
+        return result;
+    }
+
+    /**
+     * Split documentation text into lines suitable for DocC rendering.
+     * @param {string} text
+     * @returns {string[]}
+     * @private
+     */
+    splitDocumentationText(text) {
+        if (!text) return [];
+        return text.split(/\r?\n/).map(line => line.trimEnd());
+    }
+
+    /**
+     * @param {string[]} lines
+     * @returns {boolean}
+     * @private
+     */
+    hasMeaningfulLine(lines) {
+        return lines.some(line => line.trim().length > 0);
+    }
+
+    /**
+     * Render Swift doc comments from a node's JSDoc, including parameter/return tags.
+     * @param {ts.Node} node
+     * @param {{ indent?: string, parameterNameMap?: Map<string, string> }} options
+     * @private
+     */
+    emitDocComment(node, options = {}) {
+        const indent = options.indent ?? "";
+        const parameterNameMap = options.parameterNameMap ?? new Map();
+
+        /** @type {string[]} */
+        const descriptionLines = [];
+        for (const doc of ts.getJSDocCommentsAndTags(node)) {
+            if (!ts.isJSDoc(doc)) continue;
+            const text = this.renderJSDocText(doc.comment);
+            if (text) {
+                descriptionLines.push(...this.splitDocumentationText(text));
+            }
+        }
+
+        /** @type {Array<{ name: string, lines: string[] }>} */
+        const parameterDocs = [];
+        const supportsParameters = (
+            ts.isFunctionLike(node) ||
+            ts.isMethodSignature(node) ||
+            ts.isCallSignatureDeclaration(node) ||
+            ts.isConstructSignatureDeclaration(node)
+        );
+        /** @type {ts.JSDocReturnTag | undefined} */
+        let returnTag = undefined;
+        if (supportsParameters) {
+            for (const tag of ts.getJSDocTags(node)) {
+                if (ts.isJSDocParameterTag(tag)) {
+                    const tsName = tag.name.getText();
+                    const name = parameterNameMap.get(tsName) ?? this.renderIdentifier(tsName);
+                    const text = this.renderJSDocText(tag.comment);
+                    const lines = this.splitDocumentationText(text);
+                    parameterDocs.push({ name, lines });
+                } else if (!returnTag && ts.isJSDocReturnTag(tag)) {
+                    returnTag = tag;
+                }
+            }
+        }
+
+        const returnLines = returnTag ? this.splitDocumentationText(this.renderJSDocText(returnTag.comment)) : [];
+        const hasDescription = this.hasMeaningfulLine(descriptionLines);
+        const hasParameters = parameterDocs.length > 0;
+        const hasReturns = returnTag !== undefined;
+
+        if (!hasDescription && !hasParameters && !hasReturns) {
+            return;
+        }
+
+        /** @type {string[]} */
+        const docLines = [];
+        if (hasDescription) {
+            docLines.push(...descriptionLines);
+        }
+
+        if (hasDescription && (hasParameters || hasReturns)) {
+            docLines.push("");
+        }
+
+        if (hasParameters) {
+            docLines.push("- Parameters:");
+            for (const param of parameterDocs) {
+                const hasParamDescription = this.hasMeaningfulLine(param.lines);
+                const [firstParamLine, ...restParamLines] = param.lines;
+                if (hasParamDescription) {
+                    docLines.push(`  - ${param.name}: ${firstParamLine}`);
+                    for (const line of restParamLines) {
+                        docLines.push(`    ${line}`);
+                    }
+                } else {
+                    docLines.push(`  - ${param.name}:`);
+                }
+            }
+        }
+
+        if (hasReturns) {
+            const hasReturnDescription = this.hasMeaningfulLine(returnLines);
+            const [firstReturnLine, ...restReturnLines] = returnLines;
+            if (hasReturnDescription) {
+                docLines.push(`- Returns: ${firstReturnLine}`);
+                for (const line of restReturnLines) {
+                    docLines.push(`  ${line}`);
+                }
+            } else {
+                docLines.push("- Returns:");
+            }
+        }
+
+        const prefix = `${indent}///`;
+        for (const line of docLines) {
+            if (line.length === 0) {
+                this.swiftLines.push(prefix);
+            } else {
+                this.swiftLines.push(`${prefix} ${line}`);
+            }
+        }
+    }
+
+    /**
+     * Build a map from TypeScript parameter names to rendered Swift identifiers.
+     * @param {ts.Symbol[]} parameters
+     * @returns {Map<string, string>}
+     * @private
+     */
+    buildParameterNameMap(parameters) {
+        const map = new Map();
+        for (const parameter of parameters) {
+            map.set(parameter.name, this.renderIdentifier(parameter.name));
+        }
+        return map;
     }
 
     /** @returns {string} */
@@ -481,21 +634,9 @@ export class TypeProcessor {
     }
 
     /**
-     * Render constructor parameters
-     * @param {ts.ConstructorDeclaration} node
-     * @returns {string} Rendered parameters
-     * @private
-     */
-    renderConstructorParameters(node) {
-        const signature = this.checker.getSignatureFromDeclaration(node);
-        if (!signature) return "";
-
-        return this.renderParameters(signature.getParameters(), node);
-    }
-
-    /**
+     * Visit a property declaration and extract metadata
      * @param {ts.PropertyDeclaration | ts.PropertySignature} node
-     * @returns {{ jsName: string, swiftName: string, type: string, isReadonly: boolean, documentation: string | undefined } | null}
+     * @returns {{ jsName: string, swiftName: string, type: string, isReadonly: boolean } | null}
      */
     visitPropertyDecl(node) {
         if (!node.name) return null;
@@ -515,8 +656,7 @@ export class TypeProcessor {
         const type = this.checker.getTypeAtLocation(node)
         const swiftType = this.visitType(type, node);
         const isReadonly = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ReadonlyKeyword) ?? false;
-        const documentation = this.getFullJSDocText(node);
-        return { jsName, swiftName, type: swiftType, isReadonly, documentation };
+        return { jsName, swiftName, type: swiftType, isReadonly };
     }
 
     /**
@@ -551,6 +691,7 @@ export class TypeProcessor {
         if (fromArg) args.push(fromArg);
         const annotation = this.renderMacroAnnotation("JSClass", args);
         const className = this.renderIdentifier(swiftName);
+        this.emitDocComment(node, { indent: "" });
         this.swiftLines.push(`${annotation} struct ${className} {`);
 
         // Process members in declaration order
@@ -600,11 +741,15 @@ export class TypeProcessor {
 
     /**
      * Visit a structured type (interface) and render Swift code
-     * @param {string} name
+     * @param {ts.Type} type
+     * @param {ts.Node} diagnosticNode
      * @param {ts.Symbol[]} members
      * @private
      */
-    visitStructuredType(name, members) {
+    visitStructuredType(type, diagnosticNode, members) {
+        const symbol = type.getSymbol() ?? type.aliasSymbol;
+        const name = symbol?.name ?? this.checker.typeToString(type);
+        if (!name) return;
         if (this.emittedStructuredTypeNames.has(name)) return;
         this.emittedStructuredTypeNames.add(name);
 
@@ -615,17 +760,22 @@ export class TypeProcessor {
         if (jsNameArg) args.push(jsNameArg);
         const annotation = this.renderMacroAnnotation("JSClass", args);
         const typeName = this.renderIdentifier(swiftName);
+        const docNode = symbol?.getDeclarations()?.[0] ?? diagnosticNode;
+        if (docNode) {
+            this.emitDocComment(docNode, { indent: "" });
+        }
         this.swiftLines.push(`${annotation} struct ${typeName} {`);
 
         // Collect all declarations with their positions to preserve order
         /** @type {Array<{ decl: ts.Node, symbol: ts.Symbol, position: number }>} */
         const allDecls = [];
 
-        for (const symbol of members) {
-            for (const decl of symbol.getDeclarations() ?? []) {
+        const typeMembers = members ?? type.getProperties() ?? [];
+        for (const memberSymbol of typeMembers) {
+            for (const decl of memberSymbol.getDeclarations() ?? []) {
                 const sourceFile = decl.getSourceFile();
                 const pos = sourceFile ? decl.getStart() : 0;
-                allDecls.push({ decl, symbol, position: pos });
+                allDecls.push({ decl, symbol: memberSymbol, position: pos });
             }
         }
 
@@ -854,6 +1004,7 @@ export class TypeProcessor {
         const getterAnnotation = this.renderMacroAnnotation("JSGetter", getterArgs);
 
         // Always render getter
+        this.emitDocComment(node, { indent: "    " });
         this.swiftLines.push(`    ${getterAnnotation} var ${swiftName}: ${type}`);
 
         // Render setter if not readonly
@@ -903,7 +1054,9 @@ export class TypeProcessor {
         const signature = this.checker.getSignatureFromDeclaration(node);
         if (!signature) return;
 
-        const params = this.renderParameters(signature.getParameters(), node);
+        const parameters = signature.getParameters();
+        const parameterNameMap = this.buildParameterNameMap(parameters);
+        const params = this.renderParameters(parameters, node);
         const returnType = this.visitType(signature.getReturnType(), node);
         const effects = this.renderEffects({ isAsync: false });
         const swiftMethodName = this.renderIdentifier(swiftName);
@@ -912,6 +1065,7 @@ export class TypeProcessor {
         ) ?? false;
         const staticKeyword = isStatic ? "static " : "";
 
+        this.emitDocComment(node, { indent: "    ", parameterNameMap });
         this.swiftLines.push(`    ${annotation} ${staticKeyword}func ${swiftMethodName}(${params}) ${effects} -> ${returnType}`);
     }
 
@@ -930,8 +1084,14 @@ export class TypeProcessor {
      * @private
      */
     renderConstructor(node) {
-        const params = this.renderConstructorParameters(node);
+        const signature = this.checker.getSignatureFromDeclaration(node);
+        if (!signature) return;
+
+        const parameters = signature.getParameters();
+        const parameterNameMap = this.buildParameterNameMap(parameters);
+        const params = this.renderParameters(parameters, node);
         const effects = this.renderEffects({ isAsync: false });
+        this.emitDocComment(node, { indent: "    ", parameterNameMap });
         this.swiftLines.push(`    @JSFunction init(${params}) ${effects}`);
     }
 
