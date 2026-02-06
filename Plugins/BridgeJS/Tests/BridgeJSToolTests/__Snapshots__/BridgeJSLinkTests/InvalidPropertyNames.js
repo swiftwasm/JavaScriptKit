@@ -198,6 +198,7 @@ export async function createInstantiator(options, swift) {
                 tmpRetOptionalHeapObject = undefined;
                 return pointer || 0;
             }
+            bjs["swift_js_closure_unregister"] = function(funcRef) {}
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_createWeirdObject"] = function bjs_createWeirdObject() {
                 try {

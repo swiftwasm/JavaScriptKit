@@ -602,6 +602,11 @@ public struct BridgeJSLink {
                     printer.write("return pointer || 0;")
                 }
                 printer.write("}")
+                // Always provide swift_js_closure_unregister as a no-op by default.
+                // The @_extern(wasm) declaration in BridgeJSIntrinsics.swift is unconditional,
+                // so the WASM binary always imports this symbol. When closures ARE used,
+                // the real implementation below will override this no-op.
+                printer.write("bjs[\"swift_js_closure_unregister\"] = function(funcRef) {}")
 
                 for unified in skeletons {
                     let moduleName = unified.moduleName
