@@ -22,17 +22,26 @@ func assertSnapshot(
 
     if FileManager.default.fileExists(atPath: snapshotPath.path) {
         let existingSnapshot = try String(contentsOf: snapshotPath, encoding: .utf8)
-        let ok = existingSnapshot == String(data: input, encoding: .utf8)!
+        let actual = String(data: input, encoding: .utf8)!
+        let ok = existingSnapshot == actual
         let actualFilePath = snapshotPath.path + ".actual"
         let updateSnapshots = ProcessInfo.processInfo.environment["UPDATE_SNAPSHOTS"] != nil
-        func buildComment() -> Comment {
-            "Snapshot mismatch: \(actualFilePath) \(snapshotPath.path)"
-        }
+
         if !updateSnapshots {
-            #expect(ok, buildComment(), sourceLocation: sourceLocation)
             if !ok {
-                try input.write(to: URL(fileURLWithPath: actualFilePath))
+                try actual.write(toFile: actualFilePath, atomically: true, encoding: .utf8)
             }
+
+            let diff = ok ? nil : unifiedDiff(expectedPath: snapshotPath.path, actualPath: actualFilePath)
+            func buildComment() -> Comment {
+                var message = "Snapshot mismatch: \(actualFilePath) \(snapshotPath.path)"
+                if let diff {
+                    message.append("\n\n" + diff)
+                }
+                return Comment(rawValue: message)
+            }
+
+            #expect(ok, buildComment(), sourceLocation: sourceLocation)
         } else {
             try input.write(to: snapshotPath)
         }
@@ -40,4 +49,24 @@ func assertSnapshot(
         try input.write(to: snapshotPath)
         #expect(Bool(false), "Snapshot created at \(snapshotPath.path)", sourceLocation: sourceLocation)
     }
+}
+
+private func unifiedDiff(expectedPath: String, actualPath: String) -> String? {
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+    process.arguments = ["diff", "-u", expectedPath, actualPath]
+    let output = Pipe()
+    process.standardOutput = output
+    process.standardError = Pipe()
+
+    do {
+        try process.run()
+    } catch {
+        return nil
+    }
+    process.waitUntilExit()
+
+    let data = output.fileHandleForReading.readDataToEndOfFile()
+    guard !data.isEmpty else { return nil }
+    return String(data: data, encoding: .utf8)
 }
