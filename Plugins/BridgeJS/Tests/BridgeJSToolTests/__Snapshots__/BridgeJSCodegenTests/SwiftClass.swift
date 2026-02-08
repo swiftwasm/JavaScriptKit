@@ -135,3 +135,21 @@ fileprivate func _bjs_PackageGreeter_wrap(_ pointer: UnsafeMutableRawPointer) ->
     fatalError("Only available on WebAssembly")
 }
 #endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_jsRoundTripGreeter")
+fileprivate func bjs_jsRoundTripGreeter(_ greeter: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
+#else
+fileprivate func bjs_jsRoundTripGreeter(_ greeter: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsRoundTripGreeter(_ greeter: Greeter) throws(JSException) -> Greeter {
+    let greeterPointer = greeter.bridgeJSLowerParameter()
+    let ret = bjs_jsRoundTripGreeter(greeterPointer)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Greeter.bridgeJSLiftReturn(ret)
+}

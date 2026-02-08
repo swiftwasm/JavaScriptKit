@@ -31,6 +31,7 @@ export type Exports = {
     takeGreeter(greeter: Greeter): void;
 }
 export type Imports = {
+    jsRoundTripGreeter(greeter: Greeter): Greeter;
 }
 export function createInstantiator(options: {
     imports: Imports;

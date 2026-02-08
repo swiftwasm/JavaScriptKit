@@ -15310,6 +15310,45 @@
         "types" : [
 
         ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "SwiftClassSupportImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "name" : "jsRoundTripGreeter",
+                "parameters" : [
+                  {
+                    "name" : "greeter",
+                    "type" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            ]
+          }
+        ]
       }
     ]
   },

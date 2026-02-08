@@ -6,6 +6,7 @@ import {
 import { ImportedFoo } from './BridgeJSRuntimeTests/JavaScript/Types.mjs';
 import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
 import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/JavaScript/ClosureSupportTests.mjs';
+import { getImports as getSwiftClassSupportImports } from './BridgeJSRuntimeTests/JavaScript/SwiftClassSupportTests.mjs';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
 export async function setupOptions(options, context) {
@@ -213,6 +214,7 @@ export async function setupOptions(options, context) {
                     runJsOptionalSupportTests(exports);
                 },
                 ClosureSupportImports: getClosureSupportImports(importsContext),
+                SwiftClassSupportImports: getSwiftClassSupportImports(importsContext),
             };
         },
         addToCoreImports(importObject, importsContext) {

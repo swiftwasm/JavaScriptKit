@@ -957,18 +957,8 @@ extension BridgeType {
             return LoweringParameterInfo(loweredParameters: [("funcRef", .i32)])
         case .unsafePointer:
             return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
-        case .swiftHeapObject(let className):
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError(
-                    """
-                    swiftHeapObject '\(className)' is not supported in TypeScript imports.
-                    Swift classes can only be used in @JS protocols where Swift owns the instance.
-                    """
-                )
-            case .exportSwift:
-                return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
-            }
+        case .swiftHeapObject:
+            return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
         case .swiftProtocol:
             throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
         case .caseEnum:
@@ -1038,18 +1028,8 @@ extension BridgeType {
             return LiftingReturnInfo(valueToLift: .i32)
         case .unsafePointer:
             return LiftingReturnInfo(valueToLift: .pointer)
-        case .swiftHeapObject(let className):
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError(
-                    """
-                    swiftHeapObject '\(className)' cannot be returned from imported TypeScript functions.
-                    JavaScript cannot create Swift heap objects.
-                    """
-                )
-            case .exportSwift:
-                return LiftingReturnInfo(valueToLift: .pointer)
-            }
+        case .swiftHeapObject:
+            return LiftingReturnInfo(valueToLift: .pointer)
         case .swiftProtocol:
             throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
         case .caseEnum:

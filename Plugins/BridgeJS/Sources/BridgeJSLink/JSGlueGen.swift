@@ -581,7 +581,7 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["pointer"],
             printCode: { arguments, scope, printer, cleanupCode in
-                return ["\(name).__construct(\(arguments[0]))"]
+                return ["_exports['\(name)'].__construct(\(arguments[0]))"]
             }
         )
     }
@@ -1985,14 +1985,7 @@ struct IntrinsicJSFragment: Sendable {
         case .jsValue: return .jsValueLiftParameter
         case .unsafePointer: return .identity
         case .swiftHeapObject(let name):
-            switch context {
-            case .importTS:
-                throw BridgeJSLinkError(
-                    message: "swiftHeapObject '\(name)' can only be used in protocol exports, not in \(context)"
-                )
-            case .exportSwift:
-                return .swiftHeapObjectLiftParameter(name)
-            }
+            return .swiftHeapObjectLiftParameter(name)
         case .swiftProtocol: return .jsObjectLiftParameter
         case .void:
             throw BridgeJSLinkError(
@@ -2074,15 +2067,8 @@ struct IntrinsicJSFragment: Sendable {
         case .jsObject: return .jsObjectLowerReturn
         case .jsValue: return .jsValueLowerReturn(context: context)
         case .unsafePointer: return .identity
-        case .swiftHeapObject(let name):
-            switch context {
-            case .importTS:
-                throw BridgeJSLinkError(
-                    message: "swiftHeapObject '\(name)' can only be used in protocol exports, not in \(context)"
-                )
-            case .exportSwift:
-                return .swiftHeapObjectLowerReturn
-            }
+        case .swiftHeapObject:
+            return .swiftHeapObjectLowerReturn
         case .swiftProtocol: return .jsObjectLowerReturn
         case .void: return .void
         case .nullable(let wrappedType, let kind):
