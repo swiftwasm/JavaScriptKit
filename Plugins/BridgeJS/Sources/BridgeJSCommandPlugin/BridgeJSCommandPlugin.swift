@@ -98,7 +98,6 @@ extension BridgeJSCommandPlugin.Context {
         printStderr("Generating bridge code for \(target.name)...")
 
         let generatedDirectory = target.directoryURL.appending(path: "Generated")
-        let generatedJavaScriptDirectory = generatedDirectory.appending(path: "JavaScript")
 
         let bridgeDtsPath = target.directoryURL.appending(path: "bridge-js.d.ts")
         let tsconfigPath = context.package.directoryURL.appending(path: "tsconfig.json")
