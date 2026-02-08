@@ -1,5 +1,9 @@
 import JavaScriptKit
+#if compiler(>=6.3)
 @_spi(ExperimentalCustomExecutors) import _Concurrency
+#else
+import _Concurrency
+#endif
 import _CJavaScriptEventLoop
 import _CJavaScriptKit
 
