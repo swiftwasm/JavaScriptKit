@@ -9,41 +9,34 @@ import JavaScriptKit
 }
 
 @JS class TestProcessor {
-    private var transform: (String) -> String
-
-    @JS init(transform: @escaping (String) -> String) {
-        self.transform = transform
-    }
-
-    @JS func getTransform() -> (String) -> String
-
-    @JS func processWithCustom(_ text: String, customTransform: (String) -> String) -> String
-
-    @JS func printTogether(
-        person: Person,
-        name: String,
-        ratio: Double,
-        customTransform: (Person?, String?, Double?) -> String
-    ) -> String
-
-    @JS func roundtrip(_ personClosure: (Person) -> String) -> (Person) -> String
-    @JS func roundtripOptional(_ personClosure: (Person?) -> String) -> (Person?) -> String
-
-    @JS func processDirection(_ callback: (Direction) -> String) -> String
-    @JS func processTheme(_ callback: (Theme) -> String) -> String
-    @JS func processHttpStatus(_ callback: (HttpStatus) -> Int) -> Int
-    @JS func processAPIResult(_ callback: (APIResult) -> String) -> String
-
-    @JS func makeDirectionChecker() -> (Direction) -> Bool
-    @JS func makeThemeValidator() -> (Theme) -> Bool
-    @JS func makeStatusCodeExtractor() -> (HttpStatus) -> Int
-    @JS func makeAPIResultHandler() -> (APIResult) -> String
-
-    @JS func processOptionalDirection(_ callback: (Direction?) -> String) -> String
-    @JS func processOptionalTheme(_ callback: (Theme?) -> String) -> String
-    @JS func processOptionalAPIResult(_ callback: (APIResult?) -> String) -> String
-    @JS func makeOptionalDirectionFormatter() -> (Direction?) -> String
+    @JS init(transform: @escaping (String) -> String) {}
 }
+
+@JS func roundtripString(_ stringClosure: (String) -> String) -> (String) -> String
+@JS func roundtripInt(_ intClosure: (Int) -> Int) -> (Int) -> Int
+@JS func roundtripBool(_ boolClosure: (Bool) -> Bool) -> (Bool) -> Bool
+@JS func roundtripFloat(_ floatClosure: (Float) -> Float) -> (Float) -> Float
+@JS func roundtripDouble(_ doubleClosure: (Double) -> Double) -> (Double) -> Double
+
+@JS func roundtripOptionalString(_ stringClosure: (String?) -> String?) -> (String?) -> String?
+@JS func roundtripOptionalInt(_ intClosure: (Int?) -> Int?) -> (Int?) -> Int?
+@JS func roundtripOptionalBool(_ boolClosure: (Bool?) -> Bool?) -> (Bool?) -> Bool?
+@JS func roundtripOptionalFloat(_ floatClosure: (Float?) -> Float?) -> (Float?) -> Float?
+@JS func roundtripOptionalDouble(_ doubleClosure: (Double?) -> Double?) -> (Double?) -> Double?
+
+@JS func roundtripPerson(_ personClosure: (Person) -> Person) -> (Person) -> Person
+@JS func roundtripOptionalPerson(_ personClosure: (Person?) -> Person?) -> (Person?) -> Person?
+
+@JS func roundtripDirection(_ callback: (Direction) -> Direction) -> (Direction) -> Direction
+@JS func roundtripTheme(_ callback: (Theme) -> Theme) -> (Theme) -> Theme
+@JS func roundtripHttpStatus(_ callback: (HttpStatus) -> HttpStatus) -> (HttpStatus) -> HttpStatus
+@JS func roundtripAPIResult(_ callback: (APIResult) -> APIResult) -> (APIResult) -> APIResult
+
+@JS func roundtripOptionalDirection(_ callback: (Direction?) -> Direction?) -> (Direction?) -> Direction?
+@JS func roundtripOptionalTheme(_ callback: (Theme?) -> Theme?) -> (Theme?) -> Theme?
+@JS func roundtripOptionalHttpStatus(_ callback: (HttpStatus?) -> HttpStatus?) -> (HttpStatus?) -> HttpStatus?
+@JS func roundtripOptionalAPIResult(_ callback: (APIResult?) -> APIResult?) -> (APIResult?) -> APIResult?
+@JS func roundtripOptionalDirection(_ callback: (Direction?) -> Direction?) -> (Direction?) -> Direction?
 
 @JS enum Direction {
     case north

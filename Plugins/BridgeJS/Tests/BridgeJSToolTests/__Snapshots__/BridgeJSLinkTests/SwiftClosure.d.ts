@@ -59,23 +59,6 @@ export interface SwiftHeapObject {
 export interface Person extends SwiftHeapObject {
 }
 export interface TestProcessor extends SwiftHeapObject {
-    getTransform(): (arg0: string) => string;
-    processWithCustom(text: string, customTransform: (arg0: string) => string): string;
-    printTogether(person: Person, name: string, ratio: number, customTransform: (arg0: Person | null, arg1: string | null, arg2: number | null) => string): string;
-    roundtrip(personClosure: (arg0: Person) => string): (arg0: Person) => string;
-    roundtripOptional(personClosure: (arg0: Person | null) => string): (arg0: Person | null) => string;
-    processDirection(callback: (arg0: DirectionTag) => string): string;
-    processTheme(callback: (arg0: ThemeTag) => string): string;
-    processHttpStatus(callback: (arg0: HttpStatusTag) => number): number;
-    processAPIResult(callback: (arg0: APIResultTag) => string): string;
-    makeDirectionChecker(): (arg0: DirectionTag) => boolean;
-    makeThemeValidator(): (arg0: ThemeTag) => boolean;
-    makeStatusCodeExtractor(): (arg0: HttpStatusTag) => number;
-    makeAPIResultHandler(): (arg0: APIResultTag) => string;
-    processOptionalDirection(callback: (arg0: DirectionTag | null) => string): string;
-    processOptionalTheme(callback: (arg0: ThemeTag | null) => string): string;
-    processOptionalAPIResult(callback: (arg0: APIResultTag | null) => string): string;
-    makeOptionalDirectionFormatter(): (arg0: DirectionTag | null) => string;
 }
 export type Exports = {
     Person: {
@@ -84,6 +67,27 @@ export type Exports = {
     TestProcessor: {
         new(transform: (arg0: string) => string): TestProcessor;
     }
+    roundtripString(stringClosure: (arg0: string) => string): (arg0: string) => string;
+    roundtripInt(intClosure: (arg0: number) => number): (arg0: number) => number;
+    roundtripBool(boolClosure: (arg0: boolean) => boolean): (arg0: boolean) => boolean;
+    roundtripFloat(floatClosure: (arg0: number) => number): (arg0: number) => number;
+    roundtripDouble(doubleClosure: (arg0: number) => number): (arg0: number) => number;
+    roundtripOptionalString(stringClosure: (arg0: string | null) => string | null): (arg0: string | null) => string | null;
+    roundtripOptionalInt(intClosure: (arg0: number | null) => number | null): (arg0: number | null) => number | null;
+    roundtripOptionalBool(boolClosure: (arg0: boolean | null) => boolean | null): (arg0: boolean | null) => boolean | null;
+    roundtripOptionalFloat(floatClosure: (arg0: number | null) => number | null): (arg0: number | null) => number | null;
+    roundtripOptionalDouble(doubleClosure: (arg0: number | null) => number | null): (arg0: number | null) => number | null;
+    roundtripPerson(personClosure: (arg0: Person) => Person): (arg0: Person) => Person;
+    roundtripOptionalPerson(personClosure: (arg0: Person | null) => Person | null): (arg0: Person | null) => Person | null;
+    roundtripDirection(callback: (arg0: DirectionTag) => DirectionTag): (arg0: DirectionTag) => DirectionTag;
+    roundtripTheme(callback: (arg0: ThemeTag) => ThemeTag): (arg0: ThemeTag) => ThemeTag;
+    roundtripHttpStatus(callback: (arg0: HttpStatusTag) => HttpStatusTag): (arg0: HttpStatusTag) => HttpStatusTag;
+    roundtripAPIResult(callback: (arg0: APIResultTag) => APIResultTag): (arg0: APIResultTag) => APIResultTag;
+    roundtripOptionalDirection(callback: (arg0: DirectionTag | null) => DirectionTag | null): (arg0: DirectionTag | null) => DirectionTag | null;
+    roundtripOptionalTheme(callback: (arg0: ThemeTag | null) => ThemeTag | null): (arg0: ThemeTag | null) => ThemeTag | null;
+    roundtripOptionalHttpStatus(callback: (arg0: HttpStatusTag | null) => HttpStatusTag | null): (arg0: HttpStatusTag | null) => HttpStatusTag | null;
+    roundtripOptionalAPIResult(callback: (arg0: APIResultTag | null) => APIResultTag | null): (arg0: APIResultTag | null) => APIResultTag | null;
+    roundtripOptionalDirection(callback: (arg0: DirectionTag | null) => DirectionTag | null): (arg0: DirectionTag | null) => DirectionTag | null;
     Direction: DirectionObject
     Theme: ThemeObject
     HttpStatus: HttpStatusObject
