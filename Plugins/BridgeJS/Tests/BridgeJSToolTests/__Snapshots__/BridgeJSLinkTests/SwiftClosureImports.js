@@ -228,28 +228,26 @@ export async function createInstantiator(options, swift) {
                 const func = swift.memory.getObject(funcRef);
                 func.__unregister();
             }
-
-            bjs["invoke_js_callback_TestModule_10TestModuleSi_Si"] = function(callbackId, param0Id) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSi_Si"] = function(callbackId, param0) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    let param0 = param0Id;
-                    const result = callback(param0);
-                    return result | 0;
+                    let ret = callback(param0);
+                    return ret;
                 } catch (error) {
-                    setException?.(error);
-                    return 0;
+                    setException(error);
+                    return 0
                 }
-            };
+            }
             bjs["make_swift_closure_TestModule_10TestModuleSi_Si"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSi_Si = function(param0) {
-                    const invokeResult = instance.exports.invoke_swift_closure_TestModule_10TestModuleSi_Si(boxPtr, param0);
+                    const ret = instance.exports.invoke_swift_closure_TestModule_10TestModuleSi_Si(boxPtr, param0);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
                         tmpRetException = undefined;
                         throw error;
                     }
-                    return invokeResult | 0;
+                    return ret;
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSi_Si);
             }

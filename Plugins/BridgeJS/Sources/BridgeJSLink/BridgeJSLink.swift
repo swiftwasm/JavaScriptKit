@@ -716,71 +716,25 @@ public struct BridgeJSLink {
         signature: ClosureSignature,
         functionName: String
     ) throws -> [String] {
-        let printer = CodeFragmentPrinter()
-        let context = IntrinsicJSFragment.PrintCodeContext(
-            scope: JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry),
-            printer: printer,
-            cleanupCode: CodeFragmentPrinter()
-        )
+        let thunkBuilder = ImportedThunkBuilder(context: .exportSwift, intrinsicRegistry: intrinsicRegistry)
+        thunkBuilder.parameterNames.append("callbackId")
+        thunkBuilder.body.write("const callback = \(JSGlueVariableScope.reservedSwift).memory.getObject(callbackId);")
 
-        // Build parameter list for invoke function
-        var invokeParams: [String] = ["callbackId"]
         for (index, paramType) in signature.parameters.enumerated() {
-            if case .nullable = paramType {
-                invokeParams.append("param\(index)IsSome")
-                invokeParams.append("param\(index)Value")
-            } else {
-                invokeParams.append("param\(index)Id")
-            }
+            let paramName = "param\(index)"
+            try thunkBuilder.liftParameter(param: Parameter(label: nil, name: paramName, type: paramType))
         }
 
-        printer.nextLine()
-        printer.write("bjs[\"\(functionName)\"] = function(\(invokeParams.joined(separator: ", "))) {")
-        try printer.indent {
-            printer.write("try {")
-            try printer.indent {
-                printer.write("const callback = \(JSGlueVariableScope.reservedSwift).memory.getObject(callbackId);")
+        let returnExpr = try thunkBuilder.call(calleeExpr: "callback", returnType: signature.returnType)
 
-                for (index, paramType) in signature.parameters.enumerated() {
-                    let fragment = try IntrinsicJSFragment.closureLiftParameter(type: paramType)
-                    let args: [String]
-                    if case .nullable = paramType {
-                        args = ["param\(index)IsSome", "param\(index)Value", "param\(index)"]
-                    } else {
-                        args = ["param\(index)Id", "param\(index)"]
-                    }
-                    _ = try fragment.printCode(args, context)
-                }
+        var functionLines = thunkBuilder.renderFunction(
+            name: nil,
+            returnExpr: returnExpr,
+            returnType: signature.returnType
+        )
+        functionLines[0] = "bjs[\"\(functionName)\"] = " + functionLines[0]
 
-                let callbackParams = signature.parameters.indices.map { "param\($0)" }.joined(separator: ", ")
-                printer.write("const result = callback(\(callbackParams));")
-
-                // Type check if needed (for example, formatName requires string return)
-                switch signature.returnType {
-                case .string:
-                    printer.write("if (typeof result !== \"string\") {")
-                    printer.indent {
-                        printer.write("throw new TypeError(\"Callback must return a string\");")
-                    }
-                    printer.write("}")
-                default:
-                    break
-                }
-
-                let returnFragment = try IntrinsicJSFragment.closureLowerReturn(type: signature.returnType)
-                _ = try returnFragment.printCode(["result"], context)
-            }
-            printer.write("} catch (error) {")
-            try printer.indent {
-                printer.write("\(JSGlueVariableScope.reservedSetException)?.(error);")
-                let errorFragment = IntrinsicJSFragment.closureErrorReturn(type: signature.returnType)
-                _ = try errorFragment.printCode([], context)
-            }
-            printer.write("}")
-        }
-        printer.write("};")
-
-        return printer.lines
+        return functionLines
     }
 
     /// Generates a lower_closure_* function that wraps a Swift closure for JavaScript
@@ -789,46 +743,27 @@ public struct BridgeJSLink {
         functionName: String
     ) throws -> [String] {
         let printer = CodeFragmentPrinter()
-        let context = IntrinsicJSFragment.PrintCodeContext(
-            scope: JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry),
-            printer: printer,
-            cleanupCode: CodeFragmentPrinter()
+        let builder = ExportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: true),
+            hasDirectAccessToSwiftClass: false,
+            intrinsicRegistry: intrinsicRegistry
         )
+        builder.parameterForwardings.append("boxPtr")
 
         printer.write(
             "const \(functionName) = function(\(signature.parameters.indices.map { "param\($0)" }.joined(separator: ", "))) {"
         )
         try printer.indent {
-            var invokeArgs: [String] = ["boxPtr"]
-
+            // Lower parameters using shared thunk builder
             for (index, paramType) in signature.parameters.enumerated() {
                 let paramName = "param\(index)"
-                let fragment = try IntrinsicJSFragment.lowerParameter(type: paramType)
-                let lowered = try fragment.printCode([paramName], context)
-                invokeArgs.append(contentsOf: lowered)
+                try builder.lowerParameter(param: Parameter(label: nil, name: paramName, type: paramType))
             }
 
-            // Call the Swift invoke function
             let invokeCall =
-                "\(JSGlueVariableScope.reservedInstance).exports.invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)(\(invokeArgs.joined(separator: ", ")))"
-            let invokeResultName = "invokeResult"
-            printer.write("const \(invokeResultName) = \(invokeCall);")
-
-            printer.write("if (\(JSGlueVariableScope.reservedStorageToReturnException)) {")
-            printer.indent {
-                printer.write(
-                    "const error = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(JSGlueVariableScope.reservedStorageToReturnException));"
-                )
-                printer.write(
-                    "\(JSGlueVariableScope.reservedSwift).memory.release(\(JSGlueVariableScope.reservedStorageToReturnException));"
-                )
-                printer.write("\(JSGlueVariableScope.reservedStorageToReturnException) = undefined;")
-                printer.write("throw error;")
-            }
-            printer.write("}")
-
-            let returnFragment = try IntrinsicJSFragment.closureLiftReturn(type: signature.returnType)
-            _ = try returnFragment.printCode([invokeResultName], context)
+                "invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)"
+            let returnExpr = try builder.call(abiName: invokeCall, returnType: signature.returnType)
+            builder.renderFunctionBody(into: printer, returnExpr: returnExpr)
         }
         printer.write("};")
 
@@ -1291,7 +1226,7 @@ public struct BridgeJSLink {
         let scope: JSGlueVariableScope
         let context: IntrinsicJSFragment.PrintCodeContext
 
-        init(effects: Effects, intrinsicRegistry: JSIntrinsicRegistry) {
+        init(effects: Effects, hasDirectAccessToSwiftClass: Bool = true, intrinsicRegistry: JSIntrinsicRegistry) {
             self.effects = effects
             self.scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
             self.body = CodeFragmentPrinter()
@@ -1299,7 +1234,8 @@ public struct BridgeJSLink {
             self.context = IntrinsicJSFragment.PrintCodeContext(
                 scope: scope,
                 printer: body,
-                cleanupCode: cleanupCode
+                cleanupCode: cleanupCode,
+                hasDirectAccessToSwiftClass: hasDirectAccessToSwiftClass
             )
         }
 
@@ -2221,13 +2157,13 @@ extension BridgeJSLink {
         }
 
         func renderFunction(
-            name: String,
+            name: String?,
             returnExpr: String?,
             returnType: BridgeType
         ) -> [String] {
             let printer = CodeFragmentPrinter()
 
-            printer.write("function \(name)(\(parameterNames.joined(separator: ", "))) {")
+            printer.write("function\(name.map { " \($0)" } ?? "")(\(parameterNames.joined(separator: ", "))) {")
             printer.indent {
                 printer.write("try {")
                 printer.indent {
@@ -2259,7 +2195,7 @@ extension BridgeJSLink {
             return try call(name: name, fromObjectExpr: "imports", returnType: returnType)
         }
 
-        private func call(calleeExpr: String, returnType: BridgeType) throws -> String? {
+        func call(calleeExpr: String, returnType: BridgeType) throws -> String? {
             let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
             return try self.call(callExpr: callExpr, returnType: returnType)
         }
