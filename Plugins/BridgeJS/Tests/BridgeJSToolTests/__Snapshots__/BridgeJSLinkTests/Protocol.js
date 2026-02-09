@@ -538,6 +538,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     let ret = swift.memory.getObject(self).createOptionalHelper();
                     const isSome = ret != null;
+                    return isSome ? ret.pointer : 0;
                 } catch (error) {
                     setException(error);
                 }

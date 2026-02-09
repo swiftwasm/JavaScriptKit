@@ -20,3 +20,4 @@
 @JS package class PackageGreeter {}
 
 @JSFunction func jsRoundTripGreeter(greeter: Greeter) throws(JSException) -> Greeter
+@JSFunction func jsRoundTripOptionalGreeter(greeter: Greeter?) throws(JSException) -> Greeter?

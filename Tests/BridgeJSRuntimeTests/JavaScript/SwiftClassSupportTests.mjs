@@ -6,5 +6,8 @@ export function getImports(importsContext) {
         jsRoundTripGreeter: (greeter) => {
             return greeter;
         },
+        jsRoundTripOptionalGreeter: (greeter) => {
+            return greeter;
+        },
     };
 }

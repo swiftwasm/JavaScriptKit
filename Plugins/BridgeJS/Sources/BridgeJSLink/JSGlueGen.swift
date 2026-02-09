@@ -1120,6 +1120,8 @@ struct IntrinsicJSFragment: Sendable {
                         scope.emitPushF64Parameter(payload2Var, printer: printer)
                     }
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
+                case .swiftHeapObject:
+                    printer.write("return \(isSomeVar) ? \(value).pointer : 0;")
                 case .array(let elementType):
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {

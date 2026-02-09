@@ -225,6 +225,15 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
+            TestModule["bjs_jsRoundTripOptionalGreeter"] = function bjs_jsRoundTripOptionalGreeter(greeterIsSome, greeterWrappedValue) {
+                try {
+                    let ret = imports.jsRoundTripOptionalGreeter(greeterIsSome ? Greeter.__construct(greeterWrappedValue) : null);
+                    const isSome = ret != null;
+                    return isSome ? ret.pointer : 0;
+                } catch (error) {
+                    setException(error);
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;

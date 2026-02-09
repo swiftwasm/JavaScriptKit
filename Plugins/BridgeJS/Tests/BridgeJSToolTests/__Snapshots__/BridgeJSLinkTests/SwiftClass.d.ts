@@ -32,6 +32,7 @@ export type Exports = {
 }
 export type Imports = {
     jsRoundTripGreeter(greeter: Greeter): Greeter;
+    jsRoundTripOptionalGreeter(greeter: Greeter | null): Greeter | null;
 }
 export function createInstantiator(options: {
     imports: Imports;

@@ -10677,6 +10677,15 @@ fileprivate func bjs_SwiftClassSupportImports_jsRoundTripGreeter_static(_ greete
 }
 #endif
 
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SwiftClassSupportImports_jsRoundTripOptionalGreeter_static")
+fileprivate func bjs_SwiftClassSupportImports_jsRoundTripOptionalGreeter_static(_ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
+#else
+fileprivate func bjs_SwiftClassSupportImports_jsRoundTripOptionalGreeter_static(_ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 func _$SwiftClassSupportImports_jsRoundTripGreeter(_ greeter: Greeter) throws(JSException) -> Greeter {
     let greeterPointer = greeter.bridgeJSLowerParameter()
     let ret = bjs_SwiftClassSupportImports_jsRoundTripGreeter_static(greeterPointer)
@@ -10684,4 +10693,13 @@ func _$SwiftClassSupportImports_jsRoundTripGreeter(_ greeter: Greeter) throws(JS
         throw error
     }
     return Greeter.bridgeJSLiftReturn(ret)
+}
+
+func _$SwiftClassSupportImports_jsRoundTripOptionalGreeter(_ greeter: Optional<Greeter>) throws(JSException) -> Optional<Greeter> {
+    let (greeterIsSome, greeterPointer) = greeter.bridgeJSLowerParameter()
+    let ret = bjs_SwiftClassSupportImports_jsRoundTripOptionalGreeter_static(greeterIsSome, greeterPointer)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<Greeter>.bridgeJSLiftReturn(ret)
 }
