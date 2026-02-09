@@ -1,12 +1,3 @@
-import class Foundation.FileHandle
-import class Foundation.ProcessInfo
-import func Foundation.open
-import func Foundation.strerror
-import var Foundation.errno
-import var Foundation.O_WRONLY
-import var Foundation.O_CREAT
-import var Foundation.O_TRUNC
-
 // MARK: - ProgressReporting
 
 public struct ProgressReporting {
@@ -31,61 +22,66 @@ public struct ProgressReporting {
 
 // MARK: - Profiling
 
-/// A simple time-profiler to emit `chrome://tracing` format
+/// A simple time-profiler API
 public final class Profiling {
     nonisolated(unsafe) static var current: Profiling?
 
-    let startTime: ContinuousClock.Instant
-    let clock = ContinuousClock()
-    let output: @Sendable (String) -> Void
-    var firstEntry = true
+    let beginEntry: (_ label: String) -> Void
+    let endEntry: (_ label: String) -> Void
+    let finalize: () -> Void
 
-    init(output: @Sendable @escaping (String) -> Void) {
-        self.startTime = ContinuousClock.now
-        self.output = output
+    /// Create a profiling instance that outputs Trace Event Format, which
+    /// can be viewed in chrome://tracing or other compatible viewers.
+    /// https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit?usp=sharing
+    public static func traceEvent(output: @escaping (String) -> Void) -> Profiling {
+        let clock = ContinuousClock()
+        let startTime = clock.now
+        var firstEntry = true
+
+        func formatTimestamp() -> Int {
+            let duration = startTime.duration(to: .now)
+            let (seconds, attoseconds) = duration.components
+            // Convert to microseconds
+            return Int(seconds * 1_000_000 + attoseconds / 1_000_000_000_000)
+        }
+
+        return Profiling(
+            beginEntry: { label in
+                let entry = #"{"ph":"B","pid":1,"name":\#(JSON.serialize(label)),"ts":\#(formatTimestamp())}"#
+                if firstEntry {
+                    firstEntry = false
+                    output("[\n\(entry)")
+                } else {
+                    output(",\n\(entry)")
+                }
+            },
+            endEntry: { label in
+                output(#",\n{"ph":"E","pid":1,"name":\#(JSON.serialize(label)),"ts":\#(formatTimestamp())}"#)
+            },
+            finalize: {
+                output("]\n")
+            }
+        )
     }
 
-    public static func with(body: @escaping () throws -> Void) rethrows -> Void {
-        guard let outputPath = ProcessInfo.processInfo.environment["BRIDGE_JS_PROFILING"] else {
+    public init(
+        beginEntry: @escaping (_ label: String) -> Void,
+        endEntry: @escaping (_ label: String) -> Void,
+        finalize: @escaping () -> Void
+    ) {
+        self.beginEntry = beginEntry
+        self.endEntry = endEntry
+        self.finalize = finalize
+    }
+
+    public static func with(_ makeCurrent: () -> Profiling?, body: @escaping () throws -> Void) rethrows -> Void {
+        guard let current = makeCurrent() else {
             return try body()
         }
-        let fd = open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, 0o644)
-        guard fd >= 0 else {
-            let error = String(cString: strerror(errno))
-            fatalError("Failed to open profiling output file \(outputPath): \(error)")
-        }
-        let output = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
-        let profiling = Profiling(output: { output.write($0.data(using: .utf8) ?? Data()) })
-        defer {
-            profiling.output("]\n")
-        }
-        Profiling.current = profiling
-        defer {
-            Profiling.current = nil
-        }
+        defer { current.finalize() }
+        Profiling.current = current
+        defer { Profiling.current = nil }
         return try body()
-    }
-
-    private func formatTimestamp(instant: ContinuousClock.Instant) -> Int {
-        let duration = self.startTime.duration(to: instant)
-        let (seconds, attoseconds) = duration.components
-        // Convert to microseconds
-        return Int(seconds * 1_000_000 + attoseconds / 1_000_000_000_000)
-    }
-
-    func begin(_ label: String, _ instant: ContinuousClock.Instant) {
-        let entry = #"{"ph":"B","pid":1,"name":\#(JSON.serialize(label)),"ts":\#(formatTimestamp(instant: instant))}"#
-        if firstEntry {
-            firstEntry = false
-            output("[\n\(entry)")
-        } else {
-            output(",\n\(entry)")
-        }
-    }
-
-    func end(_ label: String, _ instant: ContinuousClock.Instant) {
-        let entry = #"{"ph":"E","pid":1,"name":\#(JSON.serialize(label)),"ts":\#(formatTimestamp(instant: instant))}"#
-        output(",\n\(entry)")
     }
 }
 
@@ -94,9 +90,9 @@ public func withSpan<T>(_ label: String, body: @escaping () throws -> T) rethrow
     guard let profiling = Profiling.current else {
         return try body()
     }
-    profiling.begin(label, profiling.clock.now)
+    profiling.beginEntry(label)
     defer {
-        profiling.end(label, profiling.clock.now)
+        profiling.endEntry(label)
     }
     return try body()
 }
