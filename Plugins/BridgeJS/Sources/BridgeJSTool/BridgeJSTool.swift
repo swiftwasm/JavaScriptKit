@@ -50,7 +50,9 @@ import BridgeJSUtilities
 
     static func main() throws {
         do {
-            try run()
+            try Profiling.with {
+                try run()
+            }
         } catch {
             printStderr("error: \(error)")
             exit(1)
@@ -121,18 +123,22 @@ import BridgeJSUtilities
                 let bridgeJSMacrosPath = outputDirectory.appending(path: "BridgeJS.Macros.swift")
                 let primaryDtsPath = hasDts ? bridgeJsDtsPath.path : bridgeJsGlobalDtsPath.path
                 let globalDtsFiles = (hasDts && hasGlobalDts) ? [bridgeJsGlobalDtsPath.path] : []
-                _ = try invokeTS2Swift(
-                    dtsFile: primaryDtsPath,
-                    globalDtsFiles: globalDtsFiles,
-                    tsconfigPath: tsconfigPath,
-                    nodePath: nodePath,
-                    progress: progress,
-                    outputPath: bridgeJSMacrosPath.path
-                )
+                try withSpan("invokeTS2Swift") {
+                    _ = try invokeTS2Swift(
+                        dtsFile: primaryDtsPath,
+                        globalDtsFiles: globalDtsFiles,
+                        tsconfigPath: tsconfigPath,
+                        nodePath: nodePath,
+                        progress: progress,
+                        outputPath: bridgeJSMacrosPath.path
+                    )
+                }
                 generatedMacrosPath = bridgeJSMacrosPath.path
             }
 
-            var inputFiles = inputSwiftFiles(targetDirectory: targetDirectory, positionalArguments: positionalArguments)
+            var inputFiles = withSpan("Collecting Swift files") {
+                return inputSwiftFiles(targetDirectory: targetDirectory, positionalArguments: positionalArguments)
+            }
             // BridgeJS.Macros.swift contains imported declarations (@JSFunction, @JSClass, etc.) that need
             // to be processed by SwiftToSkeleton to populate the imported skeleton. The command plugin
             // filters out Generated/ files, so we explicitly add it here after generation.
@@ -148,22 +154,28 @@ import BridgeJSUtilities
                 exposeToGlobal: config.exposeToGlobal
             )
             for inputFile in inputFiles.sorted() {
-                let inputURL = URL(fileURLWithPath: inputFile)
-                // Skip directories (e.g. .docc catalogs included in target.sourceFiles)
-                var isDirectory: ObjCBool = false
-                if FileManager.default.fileExists(atPath: inputFile, isDirectory: &isDirectory), isDirectory.boolValue {
-                    continue
-                }
-                let content = try String(contentsOf: inputURL, encoding: .utf8)
-                if hasBridgeJSSkipComment(content) {
-                    continue
-                }
+                try withSpan("Parsing \(inputFile)") {
+                    let inputURL = URL(fileURLWithPath: inputFile)
+                    // Skip directories (e.g. .docc catalogs included in target.sourceFiles)
+                    var isDirectory: ObjCBool = false
+                    if FileManager.default.fileExists(atPath: inputFile, isDirectory: &isDirectory),
+                        isDirectory.boolValue
+                    {
+                        return
+                    }
+                    let content = try String(contentsOf: inputURL, encoding: .utf8)
+                    if hasBridgeJSSkipComment(content) {
+                        return
+                    }
 
-                let sourceFile = Parser.parse(source: content)
-                swiftToSkeleton.addSourceFile(sourceFile, inputFilePath: inputFile)
+                    let sourceFile = Parser.parse(source: content)
+                    swiftToSkeleton.addSourceFile(sourceFile, inputFilePath: inputFile)
+                }
             }
 
-            let skeleton = try swiftToSkeleton.finalize()
+            let skeleton = try withSpan("SwiftToSkeleton.finalize") {
+                return try swiftToSkeleton.finalize()
+            }
 
             var exporter: ExportSwift?
             if let skeleton = skeleton.exported {
@@ -183,10 +195,16 @@ import BridgeJSUtilities
             }
 
             // Generate unified closure support for both import/export to avoid duplicate symbols when concatenating.
-            let closureSupport = try ClosureCodegen().renderSupport(for: skeleton)
+            let closureSupport = try withSpan("ClosureCodegen.renderSupport") {
+                return try ClosureCodegen().renderSupport(for: skeleton)
+            }
 
-            let importResult = try importer?.finalize()
-            let exportResult = try exporter?.finalize()
+            let importResult = try withSpan("ImportTS.finalize") {
+                return try importer?.finalize()
+            }
+            let exportResult = try withSpan("ExportSwift.finalize") {
+                return try exporter?.finalize()
+            }
 
             // Combine and write unified Swift output
             let outputSwiftURL = outputDirectory.appending(path: "BridgeJS.swift")
@@ -194,25 +212,29 @@ import BridgeJSUtilities
             let outputSwift = combineGeneratedSwift(combinedSwift)
             let shouldWrite = doubleDashOptions["always-write"] == "true" || !outputSwift.isEmpty
             if shouldWrite {
-                try FileManager.default.createDirectory(
-                    at: outputSwiftURL.deletingLastPathComponent(),
-                    withIntermediateDirectories: true,
-                    attributes: nil
-                )
-                try outputSwift.write(to: outputSwiftURL, atomically: true, encoding: .utf8)
+                try withSpan("Writing output Swift") {
+                    try FileManager.default.createDirectory(
+                        at: outputSwiftURL.deletingLastPathComponent(),
+                        withIntermediateDirectories: true,
+                        attributes: nil
+                    )
+                    try outputSwift.write(to: outputSwiftURL, atomically: true, encoding: .utf8)
+                }
             }
 
             // Write unified skeleton
             let outputSkeletonURL = outputDirectory.appending(path: "JavaScript/BridgeJS.json")
-            try FileManager.default.createDirectory(
-                at: outputSkeletonURL.deletingLastPathComponent(),
-                withIntermediateDirectories: true,
-                attributes: nil
-            )
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            let skeletonData = try encoder.encode(skeleton)
-            try skeletonData.write(to: outputSkeletonURL)
+            try withSpan("Writing output skeleton") {
+                try FileManager.default.createDirectory(
+                    at: outputSkeletonURL.deletingLastPathComponent(),
+                    withIntermediateDirectories: true,
+                    attributes: nil
+                )
+                let encoder = JSONEncoder()
+                encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+                let skeletonData = try encoder.encode(skeleton)
+                try skeletonData.write(to: outputSkeletonURL)
+            }
 
             if skeleton.exported != nil || skeleton.imported != nil {
                 progress.print("Generated BridgeJS code")

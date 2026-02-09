@@ -32,17 +32,23 @@ public struct ImportTS {
         var decls: [DeclSyntax] = []
 
         for skeleton in self.skeleton.children {
-            for getter in skeleton.globalGetters {
-                let getterDecls = try renderSwiftGlobalGetter(getter, topLevelDecls: &decls)
-                decls.append(contentsOf: getterDecls)
+            try withSpan("Render Global Getters") {
+                for getter in skeleton.globalGetters {
+                    let getterDecls = try renderSwiftGlobalGetter(getter, topLevelDecls: &decls)
+                    decls.append(contentsOf: getterDecls)
+                }
             }
-            for function in skeleton.functions {
-                let thunkDecls = try renderSwiftThunk(function, topLevelDecls: &decls)
-                decls.append(contentsOf: thunkDecls)
+            try withSpan("Render Functions") {
+                for function in skeleton.functions {
+                    let thunkDecls = try renderSwiftThunk(function, topLevelDecls: &decls)
+                    decls.append(contentsOf: thunkDecls)
+                }
             }
-            for type in skeleton.types {
-                let typeDecls = try renderSwiftType(type, topLevelDecls: &decls)
-                decls.append(contentsOf: typeDecls)
+            try withSpan("Render Types") {
+                for type in skeleton.types {
+                    let typeDecls = try renderSwiftType(type, topLevelDecls: &decls)
+                    decls.append(contentsOf: typeDecls)
+                }
             }
         }
         if decls.isEmpty {
@@ -50,8 +56,10 @@ public struct ImportTS {
             return nil
         }
 
-        let format = BasicFormat()
-        return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+        return withSpan("Format Import Glue") {
+            let format = BasicFormat()
+            return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+        }
     }
 
     func renderSwiftGlobalGetter(
