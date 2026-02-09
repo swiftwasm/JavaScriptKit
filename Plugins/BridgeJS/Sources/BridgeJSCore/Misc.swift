@@ -1,3 +1,12 @@
+import class Foundation.FileHandle
+import class Foundation.ProcessInfo
+import func Foundation.open
+import func Foundation.strerror
+import var Foundation.errno
+import var Foundation.O_WRONLY
+import var Foundation.O_CREAT
+import var Foundation.O_TRUNC
+
 // MARK: - ProgressReporting
 
 public struct ProgressReporting {
@@ -17,6 +26,112 @@ public struct ProgressReporting {
 
     public func print(_ message: String) {
         self.print(message)
+    }
+}
+
+// MARK: - Profiling
+
+/// A simple time-profiler to emit `chrome://tracing` format
+public final class Profiling {
+    nonisolated(unsafe) static var current: Profiling?
+
+    let startTime: ContinuousClock.Instant
+    let clock = ContinuousClock()
+    let output: @Sendable (String) -> Void
+    var firstEntry = true
+
+    init(output: @Sendable @escaping (String) -> Void) {
+        self.startTime = ContinuousClock.now
+        self.output = output
+    }
+
+    public static func with(body: @escaping () throws -> Void) rethrows -> Void {
+        guard let outputPath = ProcessInfo.processInfo.environment["BRIDGE_JS_PROFILING"] else {
+            return try body()
+        }
+        let fd = open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, 0o644)
+        guard fd >= 0 else {
+            let error = String(cString: strerror(errno))
+            fatalError("Failed to open profiling output file \(outputPath): \(error)")
+        }
+        let output = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+        let profiling = Profiling(output: { output.write($0.data(using: .utf8) ?? Data()) })
+        defer {
+            profiling.output("]\n")
+        }
+        Profiling.current = profiling
+        defer {
+            Profiling.current = nil
+        }
+        return try body()
+    }
+
+    private func formatTimestamp(instant: ContinuousClock.Instant) -> Int {
+        let duration = self.startTime.duration(to: instant)
+        let (seconds, attoseconds) = duration.components
+        // Convert to microseconds
+        return Int(seconds * 1_000_000 + attoseconds / 1_000_000_000_000)
+    }
+
+    func begin(_ label: String, _ instant: ContinuousClock.Instant) {
+        let entry = #"{"ph":"B","pid":1,"name":\#(JSON.serialize(label)),"ts":\#(formatTimestamp(instant: instant))}"#
+        if firstEntry {
+            firstEntry = false
+            output("[\n\(entry)")
+        } else {
+            output(",\n\(entry)")
+        }
+    }
+
+    func end(_ label: String, _ instant: ContinuousClock.Instant) {
+        let entry = #"{"ph":"E","pid":1,"name":\#(JSON.serialize(label)),"ts":\#(formatTimestamp(instant: instant))}"#
+        output(",\n\(entry)")
+    }
+}
+
+/// Mark a span of code with a label and measure the duration.
+public func withSpan<T>(_ label: String, body: @escaping () throws -> T) rethrows -> T {
+    guard let profiling = Profiling.current else {
+        return try body()
+    }
+    profiling.begin(label, profiling.clock.now)
+    defer {
+        profiling.end(label, profiling.clock.now)
+    }
+    return try body()
+}
+
+/// Foundation-less JSON serialization
+private enum JSON {
+    static func serialize(_ value: String) -> String {
+        // https://www.ietf.org/rfc/rfc4627.txt
+        var output = "\""
+        for scalar in value.unicodeScalars {
+            switch scalar {
+            case "\"":
+                output += "\\\""
+            case "\\":
+                output += "\\\\"
+            case "\u{08}":
+                output += "\\b"
+            case "\u{0C}":
+                output += "\\f"
+            case "\n":
+                output += "\\n"
+            case "\r":
+                output += "\\r"
+            case "\t":
+                output += "\\t"
+            case "\u{20}"..."\u{21}", "\u{23}"..."\u{5B}", "\u{5D}"..."\u{10FFFF}":
+                output.unicodeScalars.append(scalar)
+            default:
+                var hex = String(scalar.value, radix: 16, uppercase: true)
+                hex = String(repeating: "0", count: 4 - hex.count) + hex
+                output += "\\u" + hex
+            }
+        }
+        output += "\""
+        return output
     }
 }
 

@@ -47,45 +47,53 @@ public class ExportSwift {
     func renderSwiftGlue() throws -> String? {
         var decls: [DeclSyntax] = []
 
-        let protocolCodegen = ProtocolCodegen()
-        for proto in skeleton.protocols {
-            decls.append(contentsOf: try protocolCodegen.renderProtocolWrapper(proto, moduleName: moduleName))
+        try withSpan("Render Protocols") { [self] in
+            let protocolCodegen = ProtocolCodegen()
+            for proto in skeleton.protocols {
+                decls.append(contentsOf: try protocolCodegen.renderProtocolWrapper(proto, moduleName: moduleName))
+            }
         }
 
-        let enumCodegen = EnumCodegen()
-        for enumDef in skeleton.enums {
-            if let enumHelpers = enumCodegen.renderEnumHelpers(enumDef) {
-                decls.append(enumHelpers)
-            }
+        try withSpan("Render Enums") { [self] in
+            let enumCodegen = EnumCodegen()
+            for enumDef in skeleton.enums {
+                if let enumHelpers = enumCodegen.renderEnumHelpers(enumDef) {
+                    decls.append(enumHelpers)
+                }
 
-            for staticMethod in enumDef.staticMethods {
-                decls.append(try renderSingleExportedFunction(function: staticMethod))
-            }
+                for staticMethod in enumDef.staticMethods {
+                    decls.append(try renderSingleExportedFunction(function: staticMethod))
+                }
 
-            for staticProperty in enumDef.staticProperties {
-                decls.append(
-                    contentsOf: try renderSingleExportedProperty(
-                        property: staticProperty,
-                        context: .enumStatic(enumDef: enumDef)
+                for staticProperty in enumDef.staticProperties {
+                    decls.append(
+                        contentsOf: try renderSingleExportedProperty(
+                            property: staticProperty,
+                            context: .enumStatic(enumDef: enumDef)
+                        )
                     )
-                )
+                }
             }
         }
 
-        let structCodegen = StructCodegen()
-        for structDef in skeleton.structs {
-            decls.append(contentsOf: structCodegen.renderStructHelpers(structDef))
-            decls.append(contentsOf: try renderSingleExportedStruct(struct: structDef))
-        }
+        try withSpan("Render Structs") { [self] in
+            let structCodegen = StructCodegen()
+            for structDef in skeleton.structs {
+                decls.append(contentsOf: structCodegen.renderStructHelpers(structDef))
+                decls.append(contentsOf: try renderSingleExportedStruct(struct: structDef))
+            }
 
-        for function in skeleton.functions {
-            decls.append(try renderSingleExportedFunction(function: function))
+            for function in skeleton.functions {
+                decls.append(try renderSingleExportedFunction(function: function))
+            }
+            for klass in skeleton.classes {
+                decls.append(contentsOf: try renderSingleExportedClass(klass: klass))
+            }
         }
-        for klass in skeleton.classes {
-            decls.append(contentsOf: try renderSingleExportedClass(klass: klass))
+        return withSpan("Format Export Glue") {
+            let format = BasicFormat()
+            return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
         }
-        let format = BasicFormat()
-        return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
     }
 
     class ExportedThunkBuilder {

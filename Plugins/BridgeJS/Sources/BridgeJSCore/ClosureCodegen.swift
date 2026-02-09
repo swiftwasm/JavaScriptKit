@@ -328,7 +328,9 @@ public struct ClosureCodegen {
             decls.append(try renderClosureInvokeHandler(signature))
         }
 
-        let format = BasicFormat()
-        return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+        return withSpan("Format Closure Glue") {
+            let format = BasicFormat()
+            return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+        }
     }
 }
