@@ -56,7 +56,7 @@ public final class Profiling {
                 }
             },
             endEntry: { label in
-                output(#",\n{"ph":"E","pid":1,"name":\#(JSON.serialize(label)),"ts":\#(formatTimestamp())}"#)
+                output(#",\#n{"ph":"E","pid":1,"name":\#(JSON.serialize(label)),"ts":\#(formatTimestamp())}"#)
             },
             finalize: {
                 output("]\n")
