@@ -141,5 +141,34 @@
 
     ]
   },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "jsRoundTripGreeter",
+            "parameters" : [
+              {
+                "name" : "greeter",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "Greeter"
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
   "moduleName" : "TestModule"
 }

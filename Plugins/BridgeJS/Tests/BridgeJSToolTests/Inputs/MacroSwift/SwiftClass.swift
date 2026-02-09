@@ -18,3 +18,5 @@
 
 @JS public class PublicGreeter {}
 @JS package class PackageGreeter {}
+
+@JSFunction func jsRoundTripGreeter(greeter: Greeter) throws(JSException) -> Greeter

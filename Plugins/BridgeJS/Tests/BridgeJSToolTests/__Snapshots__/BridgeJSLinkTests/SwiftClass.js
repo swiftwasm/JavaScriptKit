@@ -38,6 +38,7 @@ export async function createInstantiator(options, swift) {
         addImports: (importObject, importsContext) => {
             bjs = {};
             importObject["bjs"] = bjs;
+            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
                 tmpRetString = textDecoder.decode(bytes);
@@ -214,6 +215,16 @@ export async function createInstantiator(options, swift) {
                 const obj = PublicGreeter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
+            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
+            TestModule["bjs_jsRoundTripGreeter"] = function bjs_jsRoundTripGreeter(greeter) {
+                try {
+                    let ret = imports.jsRoundTripGreeter(_exports['Greeter'].__construct(greeter));
+                    return ret.pointer;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;

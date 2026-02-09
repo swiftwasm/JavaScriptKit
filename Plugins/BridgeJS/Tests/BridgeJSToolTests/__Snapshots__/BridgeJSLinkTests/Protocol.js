@@ -513,7 +513,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_onHelperUpdated"] = function bjs_MyViewControllerDelegate_onHelperUpdated(self, helper) {
                 try {
-                    swift.memory.getObject(self).onHelperUpdated(Helper.__construct(helper));
+                    swift.memory.getObject(self).onHelperUpdated(_exports['Helper'].__construct(helper));
                 } catch (error) {
                     setException(error);
                 }
