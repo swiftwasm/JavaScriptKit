@@ -2291,7 +2291,10 @@ struct IntrinsicJSFragment: Sendable {
                             let fragment = IntrinsicJSFragment.associatedValuePushPayload(enumCase: enumCase)
                             _ = try fragment.printCode(
                                 ["value", enumName, caseName],
-                                context.with(\.scope, caseScope).with(\.printer, lowerPrinter).with(\.cleanupCode, caseCleanup)
+                                context.with(\.scope, caseScope).with(\.printer, lowerPrinter).with(
+                                    \.cleanupCode,
+                                    caseCleanup
+                                )
                             )
                         }
 
@@ -2322,7 +2325,10 @@ struct IntrinsicJSFragment: Sendable {
                             let fragment = IntrinsicJSFragment.associatedValuePopPayload(enumCase: enumCase)
                             _ = try fragment.printCode(
                                 [enumName, caseName],
-                                context.with(\.scope, caseScope).with(\.printer, liftPrinter).with(\.cleanupCode, caseCleanup)
+                                context.with(\.scope, caseScope).with(\.printer, liftPrinter).with(
+                                    \.cleanupCode,
+                                    caseCleanup
+                                )
                             )
                         }
 
