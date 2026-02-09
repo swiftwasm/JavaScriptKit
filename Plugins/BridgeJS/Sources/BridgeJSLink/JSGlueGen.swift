@@ -1,6 +1,9 @@
 #if canImport(BridgeJSSkeleton)
 import BridgeJSSkeleton
 #endif
+#if canImport(BridgeJSUtilities)
+import BridgeJSUtilities
+#endif
 
 /// A scope for variables for JS glue code
 final class JSGlueVariableScope {
