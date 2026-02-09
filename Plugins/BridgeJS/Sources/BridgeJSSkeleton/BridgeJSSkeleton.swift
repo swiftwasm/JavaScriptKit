@@ -247,6 +247,138 @@ public struct Parameter: Codable, Equatable, Sendable {
     }
 }
 
+// MARK: - BridgeType Visitor
+
+public protocol BridgeTypeVisitor {
+    mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool)
+}
+
+public struct BridgeTypeWalker<Visitor: BridgeTypeVisitor> {
+    public var visitor: Visitor
+
+    public init(visitor: Visitor) {
+        self.visitor = visitor
+    }
+
+    public mutating func walk(_ type: BridgeType) {
+        switch type {
+        case .closure(let signature, let useJSTypedClosure):
+            visitor.visitClosure(signature, useJSTypedClosure: useJSTypedClosure)
+            for paramType in signature.parameters {
+                walk(paramType)
+            }
+            walk(signature.returnType)
+        case .nullable(let wrapped, _):
+            walk(wrapped)
+        case .array(let element):
+            walk(element)
+        case .dictionary(let value):
+            walk(value)
+        default:
+            break
+        }
+    }
+    public mutating func walk(_ parameters: [Parameter]) {
+        for param in parameters {
+            walk(param.type)
+        }
+    }
+    public mutating func walk(_ function: ExportedFunction) {
+        walk(function.parameters)
+        walk(function.returnType)
+    }
+    public mutating func walk(_ constructor: ExportedConstructor) {
+        walk(constructor.parameters)
+    }
+    public mutating func walk(_ skeleton: ExportedSkeleton) {
+        for function in skeleton.functions {
+            walk(function)
+        }
+        for klass in skeleton.classes {
+            if let constructor = klass.constructor {
+                walk(constructor.parameters)
+            }
+            for method in klass.methods {
+                walk(method)
+            }
+            for property in klass.properties {
+                walk(property.type)
+            }
+        }
+        for proto in skeleton.protocols {
+            for method in proto.methods {
+                walk(method)
+            }
+            for property in proto.properties {
+                walk(property.type)
+            }
+        }
+        for structDecl in skeleton.structs {
+            for property in structDecl.properties {
+                walk(property.type)
+            }
+            if let constructor = structDecl.constructor {
+                walk(constructor.parameters)
+            }
+            for method in structDecl.methods {
+                walk(method)
+            }
+        }
+        for enumDecl in skeleton.enums {
+            for enumCase in enumDecl.cases {
+                for associatedValue in enumCase.associatedValues {
+                    walk(associatedValue.type)
+                }
+            }
+            for method in enumDecl.staticMethods {
+                walk(method)
+            }
+            for property in enumDecl.staticProperties {
+                walk(property.type)
+            }
+        }
+    }
+    public mutating func walk(_ function: ImportedFunctionSkeleton) {
+        walk(function.parameters)
+        walk(function.returnType)
+    }
+    public mutating func walk(_ skeleton: ImportedModuleSkeleton) {
+        for fileSkeleton in skeleton.children {
+            for getter in fileSkeleton.globalGetters {
+                walk(getter.type)
+            }
+            for setter in fileSkeleton.globalSetters {
+                walk(setter.type)
+            }
+            for function in fileSkeleton.functions {
+                walk(function)
+            }
+            for type in fileSkeleton.types {
+                if let constructor = type.constructor {
+                    walk(constructor.parameters)
+                }
+                for getter in type.getters {
+                    walk(getter.type)
+                }
+                for setter in type.setters {
+                    walk(setter.type)
+                }
+                for method in type.methods + type.staticMethods {
+                    walk(method)
+                }
+            }
+        }
+    }
+    public mutating func walk(_ skeleton: BridgeJSSkeleton) {
+        if let exported = skeleton.exported {
+            walk(exported)
+        }
+        if let imported = skeleton.imported {
+            walk(imported)
+        }
+    }
+}
+
 public struct Effects: Codable, Equatable, Sendable {
     public var isAsync: Bool
     public var isThrows: Bool
@@ -870,6 +1002,20 @@ public struct ImportedModuleSkeleton: Codable {
 
     public init(children: [ImportedFileSkeleton]) {
         self.children = children
+    }
+}
+
+// MARK: - Closure signature collection visitor
+
+public struct ClosureSignatureCollectorVisitor: BridgeTypeVisitor {
+    public var signatures: Set<ClosureSignature> = []
+
+    public init(signatures: Set<ClosureSignature> = []) {
+        self.signatures = signatures
+    }
+
+    public mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool) {
+        signatures.insert(signature)
     }
 }
 

@@ -8,27 +8,6 @@ import BridgeJSSkeleton
 public struct ClosureCodegen {
     public init() {}
 
-    func collectClosureSignatures(from parameters: [Parameter], into signatures: inout Set<ClosureSignature>) {
-        for param in parameters {
-            collectClosureSignatures(from: param.type, into: &signatures)
-        }
-    }
-
-    func collectClosureSignatures(from type: BridgeType, into signatures: inout Set<ClosureSignature>) {
-        switch type {
-        case .closure(let signature, _):
-            signatures.insert(signature)
-            for paramType in signature.parameters {
-                collectClosureSignatures(from: paramType, into: &signatures)
-            }
-            collectClosureSignatures(from: signature.returnType, into: &signatures)
-        case .nullable(let wrapped, _):
-            collectClosureSignatures(from: wrapped, into: &signatures)
-        default:
-            break
-        }
-    }
-
     func renderClosureHelpers(_ signature: ClosureSignature) throws -> [DeclSyntax] {
         let mangledName = signature.mangleName
         let helperName = "_BJS_Closure_\(mangledName)"
@@ -242,83 +221,10 @@ public struct ClosureCodegen {
     }
 
     public func renderSupport(for skeleton: BridgeJSSkeleton) throws -> String? {
-        var closureSignatures: Set<ClosureSignature> = []
-
-        if let exported = skeleton.exported {
-            for function in exported.functions {
-                collectClosureSignatures(from: function.parameters, into: &closureSignatures)
-                collectClosureSignatures(from: function.returnType, into: &closureSignatures)
-            }
-            for klass in exported.classes {
-                if let constructor = klass.constructor {
-                    collectClosureSignatures(from: constructor.parameters, into: &closureSignatures)
-                }
-                for method in klass.methods {
-                    collectClosureSignatures(from: method.parameters, into: &closureSignatures)
-                    collectClosureSignatures(from: method.returnType, into: &closureSignatures)
-                }
-                for property in klass.properties {
-                    collectClosureSignatures(from: property.type, into: &closureSignatures)
-                }
-            }
-            for proto in exported.protocols {
-                for method in proto.methods {
-                    collectClosureSignatures(from: method.parameters, into: &closureSignatures)
-                    collectClosureSignatures(from: method.returnType, into: &closureSignatures)
-                }
-                for property in proto.properties {
-                    collectClosureSignatures(from: property.type, into: &closureSignatures)
-                }
-            }
-            for structDecl in exported.structs {
-                for property in structDecl.properties {
-                    collectClosureSignatures(from: property.type, into: &closureSignatures)
-                }
-                if let constructor = structDecl.constructor {
-                    collectClosureSignatures(from: constructor.parameters, into: &closureSignatures)
-                }
-                for method in structDecl.methods {
-                    collectClosureSignatures(from: method.parameters, into: &closureSignatures)
-                    collectClosureSignatures(from: method.returnType, into: &closureSignatures)
-                }
-            }
-            for enumDecl in exported.enums {
-                for method in enumDecl.staticMethods {
-                    collectClosureSignatures(from: method.parameters, into: &closureSignatures)
-                    collectClosureSignatures(from: method.returnType, into: &closureSignatures)
-                }
-                for property in enumDecl.staticProperties {
-                    collectClosureSignatures(from: property.type, into: &closureSignatures)
-                }
-            }
-        }
-
-        if let imported = skeleton.imported {
-            for fileSkeleton in imported.children {
-                for getter in fileSkeleton.globalGetters {
-                    collectClosureSignatures(from: getter.type, into: &closureSignatures)
-                }
-                for function in fileSkeleton.functions {
-                    collectClosureSignatures(from: function.parameters, into: &closureSignatures)
-                    collectClosureSignatures(from: function.returnType, into: &closureSignatures)
-                }
-                for type in fileSkeleton.types {
-                    if let constructor = type.constructor {
-                        collectClosureSignatures(from: constructor.parameters, into: &closureSignatures)
-                    }
-                    for getter in type.getters {
-                        collectClosureSignatures(from: getter.type, into: &closureSignatures)
-                    }
-                    for setter in type.setters {
-                        collectClosureSignatures(from: setter.type, into: &closureSignatures)
-                    }
-                    for method in type.methods + type.staticMethods {
-                        collectClosureSignatures(from: method.parameters, into: &closureSignatures)
-                        collectClosureSignatures(from: method.returnType, into: &closureSignatures)
-                    }
-                }
-            }
-        }
+        let collector = ClosureSignatureCollectorVisitor()
+        var walker = BridgeTypeWalker(visitor: collector)
+        walker.walk(skeleton)
+        let closureSignatures = walker.visitor.signatures
 
         guard !closureSignatures.isEmpty else { return nil }
 
