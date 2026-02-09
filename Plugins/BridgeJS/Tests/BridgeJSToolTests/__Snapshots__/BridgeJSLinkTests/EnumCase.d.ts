@@ -42,9 +42,9 @@ export type Exports = {
     getDirection(): DirectionTag;
     processDirection(input: DirectionTag): StatusTag;
     roundTripOptionalDirection(input: DirectionTag | null): DirectionTag | null;
-    setTSDirection(direction: TSDirectionTag): void;
-    getTSDirection(): TSDirectionTag;
-    roundTripOptionalTSDirection(input: TSDirectionTag | null): TSDirectionTag | null;
+    setTSDirection(direction: TSDirection): void;
+    getTSDirection(): TSDirection;
+    roundTripOptionalTSDirection(input: TSDirection | null): TSDirection | null;
     Direction: DirectionObject
     Status: StatusObject
     PublicStatus: PublicStatusObject

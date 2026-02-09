@@ -1359,6 +1359,9 @@ public struct BridgeJSLink {
                         case .namespaceEnum:
                             return enumDef.tsFullPath
                         default:
+                            if enumDef.emitStyle == .tsEnum {
+                                return enumDef.tsFullPath
+                            }
                             return "\(enumDef.tsFullPath)Tag"
                         }
                     }
@@ -1679,7 +1682,7 @@ public struct BridgeJSLink {
                         ]
                         for (associatedValueIndex, associatedValue) in enumCase.associatedValues.enumerated() {
                             let prop = associatedValue.label ?? "param\(associatedValueIndex)"
-                            fields.append("\(prop): \(associatedValue.type.tsType)")
+                            fields.append("\(prop): \(resolveTypeScriptType(associatedValue.type))")
                         }
                         unionParts.append("{ \(fields.joined(separator: "; ")) }")
                     }
@@ -2819,6 +2822,7 @@ extension BridgeJSLink {
                         depth: 1,
                         printer: printer,
                         exposeToGlobal: true,
+                        exportedSkeletons: exportedSkeletons,
                         renderTSSignatureCallback: renderTSSignatureCallback
                     )
                     printer.unindent()
@@ -2837,6 +2841,7 @@ extension BridgeJSLink {
                         depth: 1,
                         printer: printer,
                         exposeToGlobal: false,
+                        exportedSkeletons: exportedSkeletons,
                         renderTSSignatureCallback: renderTSSignatureCallback
                     )
                 }
@@ -2850,6 +2855,7 @@ extension BridgeJSLink {
             depth: Int,
             printer: CodeFragmentPrinter,
             exposeToGlobal: Bool,
+            exportedSkeletons: [ExportedSkeleton],
             renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String
         ) {
             func hasContent(node: NamespaceNode) -> Bool {
@@ -3004,7 +3010,9 @@ extension BridgeJSLink {
                                         .enumerated()
                                     {
                                         let prop = associatedValue.label ?? "param\(associatedValueIndex)"
-                                        fields.append("\(prop): \(associatedValue.type.tsType)")
+                                        fields.append(
+                                            "\(prop): \(BridgeJSLink.resolveTypeScriptType(associatedValue.type, exportedSkeletons: exportedSkeletons))"
+                                        )
                                     }
                                     unionParts.append("{ \(fields.joined(separator: "; ")) }")
                                 }
@@ -3038,6 +3046,7 @@ extension BridgeJSLink {
                         depth: depth + 1,
                         printer: printer,
                         exposeToGlobal: exposeToGlobal,
+                        exportedSkeletons: exportedSkeletons,
                         renderTSSignatureCallback: renderTSSignatureCallback
                     )
 
