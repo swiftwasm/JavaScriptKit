@@ -1,10 +1,17 @@
 @preconcurrency import func Foundation.exit
 @preconcurrency import func Foundation.fputs
+@preconcurrency import func Foundation.open
+@preconcurrency import func Foundation.strerror
 @preconcurrency import var Foundation.stderr
+@preconcurrency import var Foundation.errno
+@preconcurrency import var Foundation.O_WRONLY
+@preconcurrency import var Foundation.O_CREAT
+@preconcurrency import var Foundation.O_TRUNC
 @preconcurrency import struct Foundation.URL
 @preconcurrency import struct Foundation.Data
 @preconcurrency import struct Foundation.ObjCBool
 @preconcurrency import class Foundation.JSONEncoder
+@preconcurrency import class Foundation.FileHandle
 @preconcurrency import class Foundation.FileManager
 @preconcurrency import class Foundation.JSONDecoder
 @preconcurrency import class Foundation.ProcessInfo
@@ -50,7 +57,7 @@ import BridgeJSUtilities
 
     static func main() throws {
         do {
-            try Profiling.with {
+            try Profiling.with(Profiling.make) {
                 try run()
             }
         } catch {
@@ -316,6 +323,21 @@ private func inputSwiftFiles(targetDirectory: URL, positionalArguments: [String]
         return recursivelyCollectSwiftFiles(from: targetDirectory).map(\.path)
     }
     return positionalArguments
+}
+
+extension Profiling {
+    static func make() -> Profiling? {
+        guard let outputPath = ProcessInfo.processInfo.environment["BRIDGE_JS_PROFILING"] else {
+            return nil
+        }
+        let fd = open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, 0o644)
+        guard fd >= 0 else {
+            let error = String(cString: strerror(errno))
+            fatalError("Failed to open profiling output file \(outputPath): \(error)")
+        }
+        let output = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+        return Profiling.traceEvent(output: { output.write($0.data(using: .utf8) ?? Data()) })
+    }
 }
 
 // MARK: - Minimal Argument Parsing
