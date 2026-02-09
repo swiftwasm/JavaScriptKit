@@ -668,7 +668,7 @@ struct IntrinsicJSFragment: Sendable {
                     resultExpr =
                         "\(isSome) ? \(JSGlueVariableScope.reservedSwift).memory.getObject(\(wrappedValue)) : \(absenceLiteral)"
                 case .swiftHeapObject(let name):
-                    resultExpr = "\(isSome) ? \(name).__construct(\(wrappedValue)) : \(absenceLiteral)"
+                    resultExpr = "\(isSome) ? _exports['\(name)'].__construct(\(wrappedValue)) : \(absenceLiteral)"
                 case .jsObject:
                     resultExpr =
                         "\(isSome) ? \(JSGlueVariableScope.reservedSwift).memory.getObject(\(wrappedValue)) : \(absenceLiteral)"
@@ -1232,7 +1232,9 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
                 default:
-                    throw BridgeJSLinkError(message: "Unsupported wrapped type for returning from JS function: \(wrappedType)")
+                    throw BridgeJSLinkError(
+                        message: "Unsupported wrapped type for returning from JS function: \(wrappedType)"
+                    )
                 }
 
                 return []
