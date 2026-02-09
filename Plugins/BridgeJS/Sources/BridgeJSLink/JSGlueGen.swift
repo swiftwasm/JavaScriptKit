@@ -2291,11 +2291,7 @@ struct IntrinsicJSFragment: Sendable {
                             let fragment = IntrinsicJSFragment.associatedValuePushPayload(enumCase: enumCase)
                             _ = try fragment.printCode(
                                 ["value", enumName, caseName],
-                                IntrinsicJSFragment.PrintCodeContext(
-                                    scope: caseScope,
-                                    printer: lowerPrinter,
-                                    cleanupCode: caseCleanup
-                                )
+                                context.with(\.scope, caseScope).with(\.printer, lowerPrinter).with(\.cleanupCode, caseCleanup)
                             )
                         }
 
@@ -2326,11 +2322,7 @@ struct IntrinsicJSFragment: Sendable {
                             let fragment = IntrinsicJSFragment.associatedValuePopPayload(enumCase: enumCase)
                             _ = try fragment.printCode(
                                 [enumName, caseName],
-                                IntrinsicJSFragment.PrintCodeContext(
-                                    scope: caseScope,
-                                    printer: liftPrinter,
-                                    cleanupCode: caseCleanup
-                                )
+                                context.with(\.scope, caseScope).with(\.printer, liftPrinter).with(\.cleanupCode, caseCleanup)
                             )
                         }
 
@@ -3526,11 +3518,7 @@ struct IntrinsicJSFragment: Sendable {
             let fieldValue = "value.\(property.name)"
             _ = try fragment.printCode(
                 [fieldValue],
-                IntrinsicJSFragment.PrintCodeContext(
-                    scope: lowerScope,
-                    printer: lowerPrinter,
-                    cleanupCode: lowerCleanup,
-                )
+                context.with(\.scope, lowerScope).with(\.printer, lowerPrinter).with(\.cleanupCode, lowerCleanup)
             )
         }
 
