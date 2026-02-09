@@ -717,8 +717,11 @@ public struct BridgeJSLink {
         functionName: String
     ) throws -> [String] {
         let printer = CodeFragmentPrinter()
-        let scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-        let cleanupCode = CodeFragmentPrinter()
+        let context = IntrinsicJSFragment.PrintCodeContext(
+            scope: JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry),
+            printer: printer,
+            cleanupCode: CodeFragmentPrinter()
+        )
 
         // Build parameter list for invoke function
         var invokeParams: [String] = ["callbackId"]
@@ -746,7 +749,7 @@ public struct BridgeJSLink {
                     } else {
                         args = ["param\(index)Id", "param\(index)"]
                     }
-                    _ = try fragment.printCode(args, scope, printer, cleanupCode)
+                    _ = try fragment.printCode(args, context)
                 }
 
                 let callbackParams = signature.parameters.indices.map { "param\($0)" }.joined(separator: ", ")
@@ -765,13 +768,13 @@ public struct BridgeJSLink {
                 }
 
                 let returnFragment = try IntrinsicJSFragment.closureLowerReturn(type: signature.returnType)
-                _ = try returnFragment.printCode(["result"], scope, printer, cleanupCode)
+                _ = try returnFragment.printCode(["result"], context)
             }
             printer.write("} catch (error) {")
             try printer.indent {
                 printer.write("\(JSGlueVariableScope.reservedSetException)?.(error);")
                 let errorFragment = IntrinsicJSFragment.closureErrorReturn(type: signature.returnType)
-                _ = try errorFragment.printCode([], scope, printer, cleanupCode)
+                _ = try errorFragment.printCode([], context)
             }
             printer.write("}")
         }
@@ -786,8 +789,11 @@ public struct BridgeJSLink {
         functionName: String
     ) throws -> [String] {
         let printer = CodeFragmentPrinter()
-        let scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-        let cleanupCode = CodeFragmentPrinter()
+        let context = IntrinsicJSFragment.PrintCodeContext(
+            scope: JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry),
+            printer: printer,
+            cleanupCode: CodeFragmentPrinter()
+        )
 
         printer.write(
             "const \(functionName) = function(\(signature.parameters.indices.map { "param\($0)" }.joined(separator: ", "))) {"
@@ -798,7 +804,7 @@ public struct BridgeJSLink {
             for (index, paramType) in signature.parameters.enumerated() {
                 let paramName = "param\(index)"
                 let fragment = try IntrinsicJSFragment.lowerParameter(type: paramType)
-                let lowered = try fragment.printCode([paramName], scope, printer, cleanupCode)
+                let lowered = try fragment.printCode([paramName], context)
                 invokeArgs.append(contentsOf: lowered)
             }
 
@@ -822,7 +828,7 @@ public struct BridgeJSLink {
             printer.write("}")
 
             let returnFragment = try IntrinsicJSFragment.closureLiftReturn(type: signature.returnType)
-            _ = try returnFragment.printCode([invokeResultName], scope, printer, cleanupCode)
+            _ = try returnFragment.printCode([invokeResultName], context)
         }
         printer.write("};")
 
@@ -1010,7 +1016,14 @@ public struct BridgeJSLink {
                 let structScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
                 let structCleanup = CodeFragmentPrinter()
                 let fragment = IntrinsicJSFragment.structHelper(structDefinition: structDef, allStructs: allStructs)
-                _ = try fragment.printCode([structDef.name], structScope, structPrinter, structCleanup)
+                _ = try fragment.printCode(
+                    [structDef.name],
+                    IntrinsicJSFragment.PrintCodeContext(
+                        scope: structScope,
+                        printer: structPrinter,
+                        cleanupCode: structCleanup
+                    )
+                )
                 bodyPrinter.write(lines: structPrinter.lines)
             }
 
@@ -1022,7 +1035,14 @@ public struct BridgeJSLink {
                 let enumScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
                 let enumCleanup = CodeFragmentPrinter()
                 let fragment = IntrinsicJSFragment.associatedValueEnumHelperFactory(enumDefinition: enumDef)
-                _ = try fragment.printCode([enumDef.valuesName], enumScope, enumPrinter, enumCleanup)
+                _ = try fragment.printCode(
+                    [enumDef.valuesName],
+                    IntrinsicJSFragment.PrintCodeContext(
+                        scope: enumScope,
+                        printer: enumPrinter,
+                        cleanupCode: enumCleanup
+                    )
+                )
                 bodyPrinter.write(lines: enumPrinter.lines)
             }
             bodyPrinter.nextLine()
@@ -1269,12 +1289,18 @@ public struct BridgeJSLink {
         var parameterForwardings: [String] = []
         let effects: Effects
         let scope: JSGlueVariableScope
+        let context: IntrinsicJSFragment.PrintCodeContext
 
         init(effects: Effects, intrinsicRegistry: JSIntrinsicRegistry) {
             self.effects = effects
             self.scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
             self.body = CodeFragmentPrinter()
             self.cleanupCode = CodeFragmentPrinter()
+            self.context = IntrinsicJSFragment.PrintCodeContext(
+                scope: scope,
+                printer: body,
+                cleanupCode: cleanupCode
+            )
         }
 
         func lowerParameter(param: Parameter) throws {
@@ -1283,7 +1309,7 @@ public struct BridgeJSLink {
                 loweringFragment.parameters.count == 1,
                 "Lowering fragment should have exactly one parameter to lower"
             )
-            let loweredValues = try loweringFragment.printCode([param.name], scope, body, cleanupCode)
+            let loweredValues = try loweringFragment.printCode([param.name], context)
             parameterForwardings.append(contentsOf: loweredValues)
         }
 
@@ -1315,7 +1341,7 @@ public struct BridgeJSLink {
                 body.write("const \(returnVariable) = \(call);")
                 fragmentArguments = [returnVariable]
             }
-            let liftedValues = try liftingFragment.printCode(fragmentArguments, scope, body, cleanupCode)
+            let liftedValues = try liftingFragment.printCode(fragmentArguments, context)
             assert(liftedValues.count <= 1, "Lifting fragment should produce at most one value")
             return liftedValues.first
         }
@@ -1566,14 +1592,18 @@ public struct BridgeJSLink {
         var jsTopLevelLines: [String] = []
         var dtsTypeLines: [String] = []
         let scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-        let cleanup = CodeFragmentPrinter()
         let printer = CodeFragmentPrinter()
+        let context = IntrinsicJSFragment.PrintCodeContext(
+            scope: scope,
+            printer: printer,
+            cleanupCode: CodeFragmentPrinter()
+        )
         let enumValuesName = enumDefinition.valuesName
 
         switch enumDefinition.enumType {
         case .simple:
             let fragment = IntrinsicJSFragment.simpleEnumHelper(enumDefinition: enumDefinition)
-            _ = try fragment.printCode([enumValuesName], scope, printer, cleanup)
+            _ = try fragment.printCode([enumValuesName], context)
             jsTopLevelLines.append(contentsOf: printer.lines)
         case .rawValue:
             guard enumDefinition.rawType != nil else {
@@ -1581,11 +1611,11 @@ public struct BridgeJSLink {
             }
 
             let fragment = IntrinsicJSFragment.rawValueEnumHelper(enumDefinition: enumDefinition)
-            _ = try fragment.printCode([enumValuesName], scope, printer, cleanup)
+            _ = try fragment.printCode([enumValuesName], context)
             jsTopLevelLines.append(contentsOf: printer.lines)
         case .associatedValue:
             let fragment = IntrinsicJSFragment.associatedValueEnumValues(enumDefinition: enumDefinition)
-            _ = try fragment.printCode([enumValuesName], scope, printer, cleanup)
+            _ = try fragment.printCode([enumValuesName], context)
             jsTopLevelLines.append(contentsOf: printer.lines)
         case .namespace:
             break
@@ -2155,12 +2185,18 @@ extension BridgeJSLink {
         let context: BridgeContext
         var parameterNames: [String] = []
         var parameterForwardings: [String] = []
+        let printContext: IntrinsicJSFragment.PrintCodeContext
 
         init(context: BridgeContext = .importTS, intrinsicRegistry: JSIntrinsicRegistry) {
             self.body = CodeFragmentPrinter()
             self.scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
             self.cleanupCode = CodeFragmentPrinter()
             self.context = context
+            self.printContext = IntrinsicJSFragment.PrintCodeContext(
+                scope: scope,
+                printer: body,
+                cleanupCode: cleanupCode
+            )
         }
 
         func liftSelf() {
@@ -2179,7 +2215,7 @@ extension BridgeJSLink {
                 valuesToLift = liftingFragment.parameters.map { scope.variable(param.name + $0.capitalizedFirstLetter) }
                 parameterNames.append(contentsOf: valuesToLift)
             }
-            let liftedValues = try liftingFragment.printCode(valuesToLift, scope, body, cleanupCode)
+            let liftedValues = try liftingFragment.printCode(valuesToLift, printContext)
             assert(liftedValues.count == 1, "Lifting fragment should produce exactly one value")
             parameterForwardings.append(contentsOf: liftedValues)
         }
@@ -2289,7 +2325,7 @@ extension BridgeJSLink {
                 )
 
                 let fragment = try IntrinsicJSFragment.protocolPropertyOptionalToSideChannel(wrappedType: wrappedType)
-                _ = try fragment.printCode([resultVar], scope, body, cleanupCode)
+                _ = try fragment.printCode([resultVar], printContext)
 
                 return nil  // Side-channel types return nil (no direct return value)
             }
@@ -2342,7 +2378,10 @@ extension BridgeJSLink {
             loweringFragment: IntrinsicJSFragment
         ) throws -> String? {
             assert(loweringFragment.parameters.count <= 1, "Lowering fragment should have at most one parameter")
-            let loweredValues = try loweringFragment.printCode(returnExpr.map { [$0] } ?? [], scope, body, cleanupCode)
+            let loweredValues = try loweringFragment.printCode(
+                returnExpr.map { [$0] } ?? [],
+                printContext
+            )
             assert(loweredValues.count <= 1, "Lowering fragment should produce at most one value")
             return loweredValues.first
         }
