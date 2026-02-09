@@ -29,7 +29,19 @@
 <body>
   <script type="module">
     import { init } from "./Bundle/index.js"
-    init();
+    init({
+      getImports: () => {
+        return {
+          // WORKAROUND: BridgeJS doesn't support subscripting on objects
+          assignImageDataPixel: (data, index, red, green, blue, alpha) => {
+            data[index] = red * 255;
+            data[index + 1] = green * 255;
+            data[index + 2] = blue * 255;
+            data[index + 3] = alpha * 255;
+          }
+        }
+      }
+    });
   </script>
   <h1>Threading Example</h1>
   <p>

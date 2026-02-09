@@ -19,6 +19,12 @@ let package = Package(
                 .product(name: "JavaScriptKit", package: "JavaScriptKit"),
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
                 .product(name: "ChibiRay", package: "chibi-ray"),
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("Extern"),
+            ],
+            plugins: [
+                .plugin(name: "BridgeJS", package: "JavaScriptKit"),
             ]
         )
     ]

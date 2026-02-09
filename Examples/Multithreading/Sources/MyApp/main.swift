@@ -1,24 +1,44 @@
 import ChibiRay
 import JavaScriptEventLoop
-import JavaScriptKit
+@_spi(Experimental) import JavaScriptKit
 
 JavaScriptEventLoop.installGlobalExecutor()
 
-func renderInCanvas(ctx: JSObject, image: ImageView) {
-    let imageData = ctx.createImageData!(image.width, image.height).object!
-    let data = imageData.data.object!
+@JSClass struct JSCanvasContext2D {
+    @JSFunction func createImageData(_ width: Int, _ height: Int) throws -> JSImageData
+    @JSFunction func putImageData(_ imageData: JSImageData, _ dx: Int, _ dy: Int) throws -> Void
+}
+
+@JSClass struct JSImageData {
+    @JSGetter var data: JSObject
+}
+
+
+@JSFunction func assignImageDataPixel(
+    _ data: JSObject,
+    _ index: Int,
+    _ red: Double, _ green: Double, _ blue: Double, _ alpha: Double
+) throws -> Void
+
+@JSFunction(from: .global) func setInterval(_ callback: JSTypedClosure<() -> Void>, _ delay: Int) throws -> Int
+@JSFunction(from: .global) func clearInterval(_ interval: Int) throws -> Void
+
+@JSClass struct JSElement {
+    @JSSetter func setTextContent(_ text: String) throws -> Void
+}
+
+func renderInCanvas(ctx: JSCanvasContext2D, image: ImageView) throws {
+    let imageData = try ctx.createImageData(image.width, image.height)
+    let data = try imageData.data
 
     for y in 0..<image.height {
         for x in 0..<image.width {
             let index = (y * image.width + x) * 4
             let pixel = image[x, y]
-            data[index] = .number(Double(pixel.red * 255))
-            data[index + 1] = .number(Double(pixel.green * 255))
-            data[index + 2] = .number(Double(pixel.blue * 255))
-            data[index + 3] = .number(Double(255))
+            try assignImageDataPixel(data, index, Double(pixel.red), Double(pixel.green), Double(pixel.blue), 1.0)
         }
     }
-    _ = ctx.putImageData!(imageData, 0, 0)
+    try ctx.putImageData(imageData, 0, 0)
 }
 
 struct ImageView: @unchecked Sendable {
@@ -58,11 +78,11 @@ struct Work: Sendable {
 
 func render(
     scene: Scene,
-    ctx: JSObject,
-    renderTimeElement: JSObject,
+    ctx: JSCanvasContext2D,
+    renderTimeElement: JSElement,
     concurrency: Int,
     executor: (some TaskExecutor)?
-) async {
+) async throws {
 
     let imageBuffer = UnsafeMutableBufferPointer<Color>.allocate(capacity: scene.width * scene.height)
     // Initialize the buffer with black color
@@ -72,18 +92,17 @@ func render(
     let clock = ContinuousClock()
     let start = clock.now
 
-    func updateRenderTime() {
+    func updateRenderTime() throws {
         let renderSceneDuration = clock.now - start
-        renderTimeElement.textContent = .string("Render time: \(renderSceneDuration)")
+        try renderTimeElement.setTextContent("Render time: \(renderSceneDuration)")
     }
 
-    var checkTimer: JSValue?
-    checkTimer = JSObject.global.setInterval!(
-        JSClosure { _ in
+    var checkTimer: Int?
+    checkTimer = try setInterval(
+        JSTypedClosure {
             print("Checking thread work...")
-            renderInCanvas(ctx: ctx, image: imageView)
-            updateRenderTime()
-            return .undefined
+            try! renderInCanvas(ctx: ctx, image: imageView)
+            try! updateRenderTime()
         },
         250
     )
@@ -102,11 +121,11 @@ func render(
         }
     }
 
-    _ = JSObject.global.clearInterval!(checkTimer!)
+    try clearInterval(checkTimer!)
     checkTimer = nil
 
-    renderInCanvas(ctx: ctx, image: imageView)
-    updateRenderTime()
+    try renderInCanvas(ctx: ctx, image: imageView)
+    try updateRenderTime()
     imageBuffer.deallocate()
     print("All work done")
 }
@@ -128,10 +147,10 @@ func onClick() async throws {
     canvasElement.width = .number(Double(scene.width))
     canvasElement.height = .number(Double(scene.height))
 
-    await render(
+    try await render(
         scene: scene,
-        ctx: ctx,
-        renderTimeElement: renderTimeElement,
+        ctx: JSCanvasContext2D(unsafelyWrapping: ctx),
+        renderTimeElement: JSElement(unsafelyWrapping: renderTimeElement),
         concurrency: concurrency,
         executor: executor
     )
