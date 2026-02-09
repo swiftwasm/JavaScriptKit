@@ -2409,7 +2409,7 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value", "enumName", "caseName"],
             printCode: { arguments, context in
-                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                let (printer, cleanup) = (context.printer, context.cleanupCode)
                 let enumName = arguments[1]
                 let caseName = arguments[2]
 
@@ -2454,7 +2454,7 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["enumName", "caseName"],
             printCode: { arguments, context in
-                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                let printer = context.printer
                 let enumName = arguments[0]
                 let caseName = arguments[1]
 
@@ -2712,7 +2712,7 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: [],
             printCode: { arguments, context in
-                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                let (scope, printer) = (context.scope, context.printer)
                 let optVar = scope.variable("optional")
                 let isSomeVar = scope.variable("isSome")
 
@@ -3152,7 +3152,7 @@ struct IntrinsicJSFragment: Sendable {
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
-                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                    let (scope, printer) = (context.scope, context.printer)
                     registerJSValueHelpers(scope: scope)
                     let lowered = try jsValueLower.printCode([arguments[0]], context)
                     let kindVar = lowered[0]
@@ -3372,7 +3372,7 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: [],
             printCode: { arguments, context in
-                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                let (scope, printer) = (context.scope, context.printer)
                 let isSomeVar = scope.variable("isSome")
                 let resultVar = scope.variable("optValue")
 
