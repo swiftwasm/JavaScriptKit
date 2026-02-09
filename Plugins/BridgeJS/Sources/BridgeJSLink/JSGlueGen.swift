@@ -1230,7 +1230,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
                 default:
-                    ()
+                    throw BridgeJSLinkError(message: "Unsupported wrapped type for returning from JS function: \(wrappedType)")
                 }
 
                 return []
