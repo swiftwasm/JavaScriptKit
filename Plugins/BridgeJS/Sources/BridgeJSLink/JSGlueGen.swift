@@ -671,7 +671,7 @@ struct IntrinsicJSFragment: Sendable {
                     resultExpr =
                         "\(isSome) ? \(JSGlueVariableScope.reservedSwift).memory.getObject(\(wrappedValue)) : \(absenceLiteral)"
                 case .swiftHeapObject(let name):
-                    resultExpr = "\(isSome) ? \(name).__construct(\(wrappedValue)) : \(absenceLiteral)"
+                    resultExpr = "\(isSome) ? _exports['\(name)'].__construct(\(wrappedValue)) : \(absenceLiteral)"
                 case .jsObject:
                     resultExpr =
                         "\(isSome) ? \(JSGlueVariableScope.reservedSwift).memory.getObject(\(wrappedValue)) : \(absenceLiteral)"
@@ -1123,6 +1123,8 @@ struct IntrinsicJSFragment: Sendable {
                         scope.emitPushF64Parameter(payload2Var, printer: printer)
                     }
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
+                case .swiftHeapObject:
+                    printer.write("return \(isSomeVar) ? \(value).pointer : 0;")
                 case .array(let elementType):
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {
@@ -1233,7 +1235,9 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
                 default:
-                    ()
+                    throw BridgeJSLinkError(
+                        message: "Unsupported wrapped type for returning from JS function: \(wrappedType)"
+                    )
                 }
 
                 return []

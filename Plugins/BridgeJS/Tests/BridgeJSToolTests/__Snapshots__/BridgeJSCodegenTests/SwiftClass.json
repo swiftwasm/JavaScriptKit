@@ -162,6 +162,34 @@
                 "_0" : "Greeter"
               }
             }
+          },
+          {
+            "name" : "jsRoundTripOptionalGreeter",
+            "parameters" : [
+              {
+                "name" : "greeter",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
           }
         ],
         "types" : [
