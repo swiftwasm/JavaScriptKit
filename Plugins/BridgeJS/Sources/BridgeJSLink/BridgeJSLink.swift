@@ -610,13 +610,10 @@ public struct BridgeJSLink {
 
                 for unified in skeletons {
                     let moduleName = unified.moduleName
-                    var closureSignatures: Set<ClosureSignature> = []
-                    if let exported = unified.exported {
-                        collectClosureSignatures(from: exported, into: &closureSignatures)
-                    }
-                    if let imported = unified.imported {
-                        collectClosureSignatures(from: imported, into: &closureSignatures)
-                    }
+                    let collector = ClosureSignatureCollectorVisitor()
+                    var walker = BridgeTypeWalker(visitor: collector)
+                    walker.walk(unified)
+                    let closureSignatures = walker.visitor.signatures
 
                     guard !closureSignatures.isEmpty else { continue }
 
@@ -712,77 +709,6 @@ public struct BridgeJSLink {
         }
 
         return printer
-    }
-
-    private func collectClosureSignatures(from skeleton: ExportedSkeleton, into signatures: inout Set<ClosureSignature>)
-    {
-        for function in skeleton.functions {
-            collectClosureSignatures(from: function.parameters, into: &signatures)
-            collectClosureSignatures(from: function.returnType, into: &signatures)
-        }
-        for klass in skeleton.classes {
-            if let constructor = klass.constructor {
-                collectClosureSignatures(from: constructor.parameters, into: &signatures)
-            }
-            for method in klass.methods {
-                collectClosureSignatures(from: method.parameters, into: &signatures)
-                collectClosureSignatures(from: method.returnType, into: &signatures)
-            }
-            for property in klass.properties {
-                collectClosureSignatures(from: property.type, into: &signatures)
-            }
-        }
-    }
-
-    private func collectClosureSignatures(
-        from skeleton: ImportedModuleSkeleton,
-        into signatures: inout Set<ClosureSignature>
-    ) {
-        for fileSkeleton in skeleton.children {
-            for getter in fileSkeleton.globalGetters {
-                collectClosureSignatures(from: getter.type, into: &signatures)
-            }
-            for function in fileSkeleton.functions {
-                collectClosureSignatures(from: function.parameters, into: &signatures)
-                collectClosureSignatures(from: function.returnType, into: &signatures)
-            }
-            for type in fileSkeleton.types {
-                if let constructor = type.constructor {
-                    collectClosureSignatures(from: constructor.parameters, into: &signatures)
-                }
-                for getter in type.getters {
-                    collectClosureSignatures(from: getter.type, into: &signatures)
-                }
-                for setter in type.setters {
-                    collectClosureSignatures(from: setter.type, into: &signatures)
-                }
-                for method in type.methods + type.staticMethods {
-                    collectClosureSignatures(from: method.parameters, into: &signatures)
-                    collectClosureSignatures(from: method.returnType, into: &signatures)
-                }
-            }
-        }
-    }
-
-    private func collectClosureSignatures(from parameters: [Parameter], into signatures: inout Set<ClosureSignature>) {
-        for param in parameters {
-            collectClosureSignatures(from: param.type, into: &signatures)
-        }
-    }
-
-    private func collectClosureSignatures(from type: BridgeType, into signatures: inout Set<ClosureSignature>) {
-        switch type {
-        case .closure(let signature, _):
-            signatures.insert(signature)
-            for paramType in signature.parameters {
-                collectClosureSignatures(from: paramType, into: &signatures)
-            }
-            collectClosureSignatures(from: signature.returnType, into: &signatures)
-        case .nullable(let wrapped, _):
-            collectClosureSignatures(from: wrapped, into: &signatures)
-        default:
-            break
-        }
     }
 
     private func generateInvokeFunction(
