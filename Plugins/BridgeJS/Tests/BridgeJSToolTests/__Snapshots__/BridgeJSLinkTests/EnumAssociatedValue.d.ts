@@ -82,7 +82,7 @@ export const AllTypesResultValues: {
 };
 
 export type AllTypesResultTag =
-  { tag: typeof AllTypesResultValues.Tag.StructPayload; param0: PointTag } | { tag: typeof AllTypesResultValues.Tag.ClassPayload; param0: User } | { tag: typeof AllTypesResultValues.Tag.JsObjectPayload; param0: any } | { tag: typeof AllTypesResultValues.Tag.NestedEnum; param0: APIResultTag } | { tag: typeof AllTypesResultValues.Tag.ArrayPayload; param0: number[] } | { tag: typeof AllTypesResultValues.Tag.Empty }
+  { tag: typeof AllTypesResultValues.Tag.StructPayload; param0: Point } | { tag: typeof AllTypesResultValues.Tag.ClassPayload; param0: User } | { tag: typeof AllTypesResultValues.Tag.JsObjectPayload; param0: any } | { tag: typeof AllTypesResultValues.Tag.NestedEnum; param0: APIResultTag } | { tag: typeof AllTypesResultValues.Tag.ArrayPayload; param0: number[] } | { tag: typeof AllTypesResultValues.Tag.Empty }
 
 export const OptionalAllTypesResultValues: {
     readonly Tag: {
@@ -96,7 +96,7 @@ export const OptionalAllTypesResultValues: {
 };
 
 export type OptionalAllTypesResultTag =
-  { tag: typeof OptionalAllTypesResultValues.Tag.OptStruct; param0: PointTag | null } | { tag: typeof OptionalAllTypesResultValues.Tag.OptClass; param0: User | null } | { tag: typeof OptionalAllTypesResultValues.Tag.OptJSObject; param0: any | null } | { tag: typeof OptionalAllTypesResultValues.Tag.OptNestedEnum; param0: APIResultTag | null } | { tag: typeof OptionalAllTypesResultValues.Tag.OptArray; param0: number[] | null } | { tag: typeof OptionalAllTypesResultValues.Tag.Empty }
+  { tag: typeof OptionalAllTypesResultValues.Tag.OptStruct; param0: Point | null } | { tag: typeof OptionalAllTypesResultValues.Tag.OptClass; param0: User | null } | { tag: typeof OptionalAllTypesResultValues.Tag.OptJSObject; param0: any | null } | { tag: typeof OptionalAllTypesResultValues.Tag.OptNestedEnum; param0: APIResultTag | null } | { tag: typeof OptionalAllTypesResultValues.Tag.OptArray; param0: number[] | null } | { tag: typeof OptionalAllTypesResultValues.Tag.Empty }
 
 export interface Point {
     x: number;
