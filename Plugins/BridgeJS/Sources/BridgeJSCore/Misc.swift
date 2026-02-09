@@ -134,6 +134,7 @@ private enum JSON {
 // MARK: - DiagnosticError
 
 import SwiftSyntax
+import class Foundation.ProcessInfo
 
 struct DiagnosticError: Error {
     let node: Syntax
@@ -146,15 +147,152 @@ struct DiagnosticError: Error {
         self.hint = hint
     }
 
-    func formattedDescription(fileName: String) -> String {
-        let locationConverter = SourceLocationConverter(fileName: fileName, tree: node.root)
-        let location = locationConverter.location(for: node.position)
-        var description = "\(fileName):\(location.line):\(location.column): error: \(message)"
-        if let hint {
-            description += "\nHint: \(hint)"
+    /// Formats the diagnostic error as a string.
+    ///
+    /// - Parameters:
+    ///   - fileName: The name of the file to display in the output.
+    ///   - colorize: Whether to colorize the output with ANSI escape sequences.
+    /// - Returns: The formatted diagnostic error string.
+    func formattedDescription(fileName: String, colorize: Bool = Self.shouldColorize) -> String {
+        let displayFileName = fileName == "-" ? "<stdin>" : fileName
+        let converter = SourceLocationConverter(fileName: displayFileName, tree: node.root)
+        let startLocation = converter.location(for: node.positionAfterSkippingLeadingTrivia)
+        let endLocation = converter.location(for: node.endPositionBeforeTrailingTrivia)
+
+        let sourceText = node.root.description
+        let lines = sourceText.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
+        let startLineIndex = max(0, min(lines.count - 1, startLocation.line - 1))
+        let mainLine = String(lines[startLineIndex])
+
+        let lineNumberWidth = max(3, String(lines.count).count)
+
+        let header: String = {
+            guard colorize else {
+                return "\(displayFileName):\(startLocation.line):\(startLocation.column): error: \(message)"
+            }
+            return
+                "\(displayFileName):\(startLocation.line):\(startLocation.column): \(ANSI.boldRed)error: \(ANSI.boldDefault)\(message)\(ANSI.reset)"
+        }()
+
+        let highlightStartColumn = min(max(1, startLocation.column), mainLine.utf8.count + 1)
+        let availableColumns = max(0, mainLine.utf8.count - (highlightStartColumn - 1))
+        let rawHighlightLength: Int = {
+            guard availableColumns > 0 else { return 0 }
+            if startLocation.line == endLocation.line {
+                return max(1, min(endLocation.column - startLocation.column, availableColumns))
+            } else {
+                return min(1, availableColumns)
+            }
+        }()
+        let highlightLength = min(rawHighlightLength, availableColumns)
+
+        let formattedMainLine: String = {
+            guard colorize, highlightLength > 0 else { return mainLine }
+
+            let startIndex = Self.index(atUTF8Offset: highlightStartColumn - 1, in: mainLine)
+            let endIndex = Self.index(atUTF8Offset: highlightStartColumn - 1 + highlightLength, in: mainLine)
+
+            let prefix = String(mainLine[..<startIndex])
+            let highlighted = String(mainLine[startIndex..<endIndex])
+            let suffix = String(mainLine[endIndex...])
+
+            return prefix + ANSI.underline + highlighted + ANSI.reset + suffix
+        }()
+
+        var descriptionParts = [header]
+
+        // Include up to the previous three lines for context
+        for offset in (-3)...(-1) {
+            let lineIndex = startLineIndex + offset
+            guard lineIndex >= 0, lineIndex < lines.count else { continue }
+            descriptionParts.append(
+                Self.formatSourceLine(
+                    number: lineIndex + 1,
+                    text: String(lines[lineIndex]),
+                    width: lineNumberWidth,
+                    colorize: colorize
+                )
+            )
         }
-        return description
+
+        descriptionParts.append(
+            Self.formatSourceLine(
+                number: startLocation.line,
+                text: formattedMainLine,
+                width: lineNumberWidth,
+                colorize: colorize
+            )
+        )
+
+        let pointerSpacing = max(0, highlightStartColumn - 1)
+        let pointerMessage: String = {
+            let pointer = String(repeating: " ", count: pointerSpacing) + "`- "
+            guard colorize else { return pointer + "error: \(message)" }
+            return pointer + "\(ANSI.boldRed)error: \(ANSI.boldDefault)\(message)\(ANSI.reset)"
+        }()
+        descriptionParts.append(
+            Self.formatSourceLine(
+                number: nil,
+                text: pointerMessage,
+                width: lineNumberWidth,
+                colorize: colorize
+            )
+        )
+
+        if startLineIndex + 1 < lines.count {
+            descriptionParts.append(
+                Self.formatSourceLine(
+                    number: startLocation.line + 1,
+                    text: String(lines[startLineIndex + 1]),
+                    width: lineNumberWidth,
+                    colorize: colorize
+                )
+            )
+        }
+
+        if let hint {
+            descriptionParts.append("Hint: \(hint)")
+        }
+
+        return descriptionParts.joined(separator: "\n")
     }
+
+    private static func formatSourceLine(
+        number: Int?,
+        text: String,
+        width: Int,
+        colorize: Bool
+    ) -> String {
+        let gutter: String
+        if let number {
+            let paddedNumber = String(repeating: " ", count: max(0, width - String(number).count)) + String(number)
+            gutter = colorize ? ANSI.cyan + paddedNumber + ANSI.reset : paddedNumber
+        } else {
+            gutter = String(repeating: " ", count: width)
+        }
+        return "\(gutter) | \(text)"
+    }
+
+    private static var shouldColorize: Bool {
+        let env = ProcessInfo.processInfo.environment
+        let termIsDumb = env["TERM"] == "dumb"
+        return env["NO_COLOR"] == nil && !termIsDumb
+    }
+
+    private static func index(atUTF8Offset offset: Int, in line: String) -> String.Index {
+        let clamped = max(0, min(offset, line.utf8.count))
+        let utf8Index = line.utf8.index(line.utf8.startIndex, offsetBy: clamped)
+        // String.Index initializer is guaranteed to succeed because the UTF8 index comes from the same string.
+        return String.Index(utf8Index, within: line)!
+    }
+}
+
+private enum ANSI {
+    static let reset = "\u{001B}[0;0m"
+    static let boldRed = "\u{001B}[1;31m"
+    static let boldDefault = "\u{001B}[1;39m"
+    static let cyan = "\u{001B}[0;36m"
+    static let underline = "\u{001B}[4;39m"
 }
 
 // MARK: - BridgeJSCoreError
