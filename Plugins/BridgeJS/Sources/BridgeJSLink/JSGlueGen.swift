@@ -146,31 +146,54 @@ extension JSGlueVariableScope {
 ///
 /// See `BridgeJSIntrinsics.swift` in the main JavaScriptKit module for Swift side lowering/lifting implementation.
 struct IntrinsicJSFragment: Sendable {
-    /// The names of the parameters that the fragment expects.
-    let parameters: [String]
 
-    /// Prints the fragment code.
+    struct PrintCodeContext {
+        /// The scope of the variables.
+        var scope: JSGlueVariableScope
+        /// The printer to print the main fragment code.
+        var printer: CodeFragmentPrinter
+        /// The printer to print the code that is expected to be executed at the end of the caller of the fragment.
+        var cleanupCode: CodeFragmentPrinter
+
+        func with<T>(_ keyPath: WritableKeyPath<PrintCodeContext, T>, _ value: T) -> PrintCodeContext {
+            var new = self
+            new[keyPath: keyPath] = value
+            return new
+        }
+    }
+
+    /// A function that prints the fragment code.
     ///
     /// - Parameters:
     ///   - arguments: The arguments that the fragment expects. An argument may be an expression with side effects,
     ///     so the callee is responsible for evaluating the arguments only once.
-    ///   - scope: The scope of the variables.
-    ///   - printer: The printer to print the main fragment code.
-    ///   - cleanupCode: The printer to print the code that is expected to be executed at the end of the caller of the
-    ///     fragment.
+    ///   - context: The context of the printing.
     /// - Returns: List of result expressions.
-    let printCode:
+    typealias PrintCode =
         @Sendable (
             _ arguments: [String],
-            _ scope: JSGlueVariableScope,
-            _ printer: CodeFragmentPrinter,
-            _ cleanupCode: CodeFragmentPrinter
+            _ context: PrintCodeContext
         ) throws -> [String]
+
+    /// The names of the parameters that the fragment expects.
+    let parameters: [String]
+
+    /// Prints the fragment code.
+    let printCode: PrintCode
+
+    init(parameters: [String], printCode: @escaping PrintCode) {
+        self.parameters = parameters
+        self.printCode = printCode
+    }
+
+    func printCode(_ arguments: [String], _ context: PrintCodeContext) throws -> [String] {
+        return try printCode(arguments, context)
+    }
 
     /// A fragment that does nothing
     static let void = IntrinsicJSFragment(
         parameters: [],
-        printCode: { _, _, _, _ in
+        printCode: { _, _ in
             return []
         }
     )
@@ -178,7 +201,7 @@ struct IntrinsicJSFragment: Sendable {
     /// A fragment that returns the argument as is.
     static let identity = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, _ in
             return [arguments[0]]
         }
     )
@@ -188,19 +211,19 @@ struct IntrinsicJSFragment: Sendable {
     static let boolLowerParameter = identity
     static let boolLiftReturn = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, _ in
             return ["\(arguments[0]) !== 0"]
         }
     )
     static let boolLiftParameter = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, _ in
             return ["\(arguments[0]) !== 0"]
         }
     )
     static let boolLowerReturn = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, _ in
             return ["\(arguments[0]) ? 1 : 0"]
         }
     )
@@ -208,7 +231,7 @@ struct IntrinsicJSFragment: Sendable {
     /// Convert signed Int32 to unsigned for UInt values
     static let uintLiftReturn = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, _ in
             return ["\(arguments[0]) >>> 0"]
         }
     )
@@ -216,7 +239,8 @@ struct IntrinsicJSFragment: Sendable {
 
     static let stringLowerParameter = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
+            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
             let argument = arguments[0]
             let bytesLabel = scope.variable("\(argument)Bytes")
             let bytesIdLabel = scope.variable("\(argument)Id")
@@ -228,7 +252,8 @@ struct IntrinsicJSFragment: Sendable {
     )
     static let stringLiftReturn = IntrinsicJSFragment(
         parameters: [],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
+            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
             let resultLabel = scope.variable("ret")
             printer.write("const \(resultLabel) = \(JSGlueVariableScope.reservedStorageToReturnString);")
             printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
@@ -237,7 +262,8 @@ struct IntrinsicJSFragment: Sendable {
     )
     static let stringLiftParameter = IntrinsicJSFragment(
         parameters: ["objectId"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
+            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
             let objectId = arguments[0]
             let objectLabel = scope.variable("\(objectId)Object")
             // TODO: Implement "take" operation
@@ -248,7 +274,8 @@ struct IntrinsicJSFragment: Sendable {
     )
     static let stringLowerReturn = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
+            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
             printer.write(
                 "\(JSGlueVariableScope.reservedStorageToReturnBytes) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(arguments[0]));"
             )
@@ -258,13 +285,14 @@ struct IntrinsicJSFragment: Sendable {
 
     static let jsObjectLowerParameter = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, _ in
             return ["swift.memory.retain(\(arguments[0]))"]
         }
     )
     static let jsObjectLiftReturn = IntrinsicJSFragment(
         parameters: ["retId"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
+            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
             // TODO: Implement "take" operation
             let resultLabel = scope.variable("ret")
             let retId = arguments[0]
@@ -275,7 +303,8 @@ struct IntrinsicJSFragment: Sendable {
     )
     static let jsObjectLiftRetainedObjectId = IntrinsicJSFragment(
         parameters: ["objectId"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
+            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
             let resultLabel = scope.variable("value")
             let objectId = arguments[0]
             printer.write(
@@ -287,13 +316,13 @@ struct IntrinsicJSFragment: Sendable {
     )
     static let jsObjectLiftParameter = IntrinsicJSFragment(
         parameters: ["objectId"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, _ in
             return ["\(JSGlueVariableScope.reservedSwift).memory.getObject(\(arguments[0]))"]
         }
     )
     static let jsObjectLowerReturn = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, _ in
             return ["\(JSGlueVariableScope.reservedSwift).memory.retain(\(arguments[0]))"]
         }
     )
@@ -419,7 +448,8 @@ struct IntrinsicJSFragment: Sendable {
 
     static let jsValueLower = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
+            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
             let value = arguments[0]
             let kindVar = scope.variable("\(value)Kind")
             let payload1Var = scope.variable("\(value)Payload1")
@@ -507,8 +537,9 @@ struct IntrinsicJSFragment: Sendable {
             // via the parameter stacks that `_swift_js_pop_*` read from.
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanupCode in
-                    let lowered = try jsValueLower.printCode(arguments, scope, printer, cleanupCode)
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
+                    let lowered = try jsValueLower.printCode(arguments, context)
                     let kindVar = lowered[0]
                     let payload1Var = lowered[1]
                     let payload2Var = lowered[2]
@@ -523,8 +554,12 @@ struct IntrinsicJSFragment: Sendable {
             // to tmpRet stacks directly.
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanupCode in
-                    let lowered = try jsValueLower.printCode(arguments, scope, printer, cleanupCode)
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
+                    let lowered = try jsValueLower.printCode(
+                        arguments,
+                        context
+                    )
                     let kindVar = lowered[0]
                     let payload1Var = lowered[1]
                     let payload2Var = lowered[2]
@@ -539,7 +574,8 @@ struct IntrinsicJSFragment: Sendable {
 
     static let jsValueLift = IntrinsicJSFragment(
         parameters: [],
-        printCode: { _, scope, printer, cleanupCode in
+        printCode: { _, context in
+            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
             let payload2 = scope.variable("jsValuePayload2")
             let payload1 = scope.variable("jsValuePayload1")
             let kind = scope.variable("jsValueKind")
@@ -556,7 +592,8 @@ struct IntrinsicJSFragment: Sendable {
     )
     static let jsValueLiftParameter = IntrinsicJSFragment(
         parameters: ["kind", "payload1", "payload2"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
+            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
             let resultVar = scope.variable("jsValue")
             registerJSValueHelpers(scope: scope)
             printer.write(
@@ -568,14 +605,14 @@ struct IntrinsicJSFragment: Sendable {
 
     static let swiftHeapObjectLowerParameter = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
             return ["\(arguments[0]).pointer"]
         }
     )
     static func swiftHeapObjectLiftReturn(_ name: String) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
                 return ["\(name).__construct(\(arguments[0]))"]
             }
         )
@@ -583,14 +620,14 @@ struct IntrinsicJSFragment: Sendable {
     static func swiftHeapObjectLiftParameter(_ name: String) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["pointer"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
                 return ["_exports['\(name)'].__construct(\(arguments[0]))"]
             }
         )
     }
     static let swiftHeapObjectLowerReturn = IntrinsicJSFragment(
         parameters: ["value"],
-        printCode: { arguments, scope, printer, cleanupCode in
+        printCode: { arguments, context in
             return ["\(arguments[0]).pointer"]
         }
     )
@@ -598,7 +635,8 @@ struct IntrinsicJSFragment: Sendable {
     static func associatedEnumLowerParameter(enumBase: String) -> IntrinsicJSFragment {
         IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let (printer, cleanup) = (context.printer, context.cleanupCode)
                 let value = arguments[0]
                 let caseIdName = "\(value)CaseId"
                 let cleanupName = "\(value)Cleanup"
@@ -614,7 +652,8 @@ struct IntrinsicJSFragment: Sendable {
     static func associatedEnumLiftReturn(enumBase: String) -> IntrinsicJSFragment {
         IntrinsicJSFragment(
             parameters: [],
-            printCode: { _, scope, printer, _ in
+            printCode: { _, context in
+                let (scope, printer) = (context.scope, context.printer)
                 let retName = scope.variable("ret")
                 printer.write(
                     "const \(retName) = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lift(\(scope.popTag()));"
@@ -628,13 +667,11 @@ struct IntrinsicJSFragment: Sendable {
         if case .jsValue = wrappedType {
             return IntrinsicJSFragment(
                 parameters: ["isSome", "kind", "payload1", "payload2"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
                     let isSome = arguments[0]
                     let lifted = try jsValueLiftParameter.printCode(
                         [arguments[1], arguments[2], arguments[3]],
-                        scope,
-                        printer,
-                        cleanupCode
+                        context
                     )
                     let valueExpr = lifted.first ?? "undefined"
                     return ["\(isSome) ? \(valueExpr) : null"]
@@ -644,7 +681,8 @@ struct IntrinsicJSFragment: Sendable {
 
         return IntrinsicJSFragment(
             parameters: ["isSome", "wrappedValue"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
                 let isSome = arguments[0]
                 let wrappedValue = arguments[1]
                 let resultExpr: String
@@ -728,7 +766,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSome)) {")
                     try printer.indent {
                         let arrayLiftFragment = try arrayLift(elementType: elementType)
-                        let liftResults = try arrayLiftFragment.printCode([], scope, printer, cleanupCode)
+                        let liftResults = try arrayLiftFragment.printCode([], context)
                         if let liftResult = liftResults.first {
                             printer.write("\(arrayVar) = \(liftResult);")
                         }
@@ -745,7 +783,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSome)) {")
                     try printer.indent {
                         let dictLiftFragment = try dictionaryLift(valueType: valueType)
-                        let liftResults = try dictLiftFragment.printCode([], scope, printer, cleanupCode)
+                        let liftResults = try dictLiftFragment.printCode([], context)
                         if let liftResult = liftResults.first {
                             printer.write("\(dictVar) = \(liftResult);")
                         }
@@ -768,7 +806,8 @@ struct IntrinsicJSFragment: Sendable {
     static func optionalLowerParameter(wrappedType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
                 printer.write("const \(isSomeVar) = \(value) != null;")
@@ -808,7 +847,7 @@ struct IntrinsicJSFragment: Sendable {
 
                     return ["+\(isSomeVar)", "\(isSomeVar) ? \(idVar) : 0", "\(isSomeVar) ? \(bytesVar).length : 0"]
                 case .jsValue:
-                    let lowered = try jsValueLower.printCode([value], scope, printer, cleanupCode)
+                    let lowered = try jsValueLower.printCode([value], context)
                     return ["+\(isSomeVar)"] + lowered
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
@@ -839,7 +878,10 @@ struct IntrinsicJSFragment: Sendable {
                     try printer.indent {
                         let arrayLowerFragment = try arrayLower(elementType: elementType)
                         let arrayCleanup = CodeFragmentPrinter()
-                        let _ = try arrayLowerFragment.printCode([value], scope, printer, arrayCleanup)
+                        let _ = try arrayLowerFragment.printCode(
+                            [value],
+                            context.with(\.cleanupCode, arrayCleanup)
+                        )
                         if !arrayCleanup.lines.isEmpty {
                             for line in arrayCleanup.lines {
                                 printer.write("\(cleanupArrayVar).push(() => { \(line) });")
@@ -856,7 +898,10 @@ struct IntrinsicJSFragment: Sendable {
                     try printer.indent {
                         let dictLowerFragment = try dictionaryLower(valueType: valueType)
                         let dictCleanup = CodeFragmentPrinter()
-                        let _ = try dictLowerFragment.printCode([value], scope, printer, dictCleanup)
+                        let _ = try dictLowerFragment.printCode(
+                            [value],
+                            context.with(\.cleanupCode, dictCleanup)
+                        )
                         if !dictCleanup.lines.isEmpty {
                             for line in dictCleanup.lines {
                                 printer.write("\(cleanupArrayVar).push(() => { \(line) });")
@@ -903,9 +948,11 @@ struct IntrinsicJSFragment: Sendable {
         kind: JSOptionalKind
     ) -> IntrinsicJSFragment {
         let absenceLiteral = kind.absenceLiteral
+        let bridgeContext = context
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
                 let resultVar = scope.variable("optResult")
                 switch wrappedType {
                 case .bool:
@@ -933,7 +980,7 @@ struct IntrinsicJSFragment: Sendable {
                     )
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = undefined;")
                     let constructExpr =
-                        context == .exportSwift
+                        bridgeContext == .exportSwift
                         ? "\(className).__construct(\(pointerVar))"
                         : "_exports['\(className)'].__construct(\(pointerVar))"
                     printer.write(
@@ -1007,7 +1054,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {
                         let arrayLiftFragment = try arrayLift(elementType: elementType)
-                        let liftResults = try arrayLiftFragment.printCode([], scope, printer, cleanupCode)
+                        let liftResults = try arrayLiftFragment.printCode([], context)
                         if let liftResult = liftResults.first {
                             printer.write("\(resultVar) = \(liftResult);")
                         }
@@ -1024,7 +1071,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {
                         let dictLiftFragment = try dictionaryLift(valueType: valueType)
-                        let liftResults = try dictLiftFragment.printCode([], scope, printer, cleanupCode)
+                        let liftResults = try dictLiftFragment.printCode([], context)
                         if let liftResult = liftResults.first {
                             printer.write("\(resultVar) = \(liftResult);")
                         }
@@ -1040,7 +1087,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("let \(resultVar);")
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {
-                        let lifted = try jsValueLift.printCode([], scope, printer, cleanupCode)
+                        let lifted = try jsValueLift.printCode([], context)
                         if let liftedValue = lifted.first {
                             printer.write("\(resultVar) = \(liftedValue);")
                         }
@@ -1068,7 +1115,8 @@ struct IntrinsicJSFragment: Sendable {
 
         return IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
                 let presenceExpr = kind.presenceCheck(value: value)
@@ -1114,7 +1162,7 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("bjs[\"swift_js_return_optional_object\"](\(isSomeVar) ? 1 : 0, \(idVar));")
                 case .jsValue:
                     if value != "undefined" {
-                        let lowered = try jsValueLower.printCode([value], scope, printer, cleanupCode)
+                        let lowered = try jsValueLower.printCode([value], context)
                         let kindVar = lowered[0]
                         let payload1Var = lowered[1]
                         let payload2Var = lowered[2]
@@ -1130,7 +1178,10 @@ struct IntrinsicJSFragment: Sendable {
                     try printer.indent {
                         let arrayLowerFragment = try arrayLower(elementType: elementType)
                         let arrayCleanup = CodeFragmentPrinter()
-                        let _ = try arrayLowerFragment.printCode([value], scope, printer, arrayCleanup)
+                        let _ = try arrayLowerFragment.printCode(
+                            [value],
+                            context.with(\.cleanupCode, arrayCleanup)
+                        )
                         if !arrayCleanup.lines.isEmpty {
                             for line in arrayCleanup.lines {
                                 printer.write(line)
@@ -1204,7 +1255,10 @@ struct IntrinsicJSFragment: Sendable {
 
                             let keyFragment = try stackLowerFragment(elementType: .string)
                             let keyCleanup = CodeFragmentPrinter()
-                            let _ = try keyFragment.printCode([keyVar], scope, printer, keyCleanup)
+                            let _ = try keyFragment.printCode(
+                                [keyVar],
+                                context.with(\.cleanupCode, keyCleanup)
+                            )
                             if !keyCleanup.lines.isEmpty {
                                 printer.write("\(cleanupArrayVar).push(() => {")
                                 printer.indent {
@@ -1217,7 +1271,10 @@ struct IntrinsicJSFragment: Sendable {
 
                             let valueFragment = try stackLowerFragment(elementType: valueType)
                             let valueCleanup = CodeFragmentPrinter()
-                            let _ = try valueFragment.printCode([valueVar], scope, printer, valueCleanup)
+                            let _ = try valueFragment.printCode(
+                                [valueVar],
+                                context.with(\.cleanupCode, valueCleanup)
+                            )
                             if !valueCleanup.lines.isEmpty {
                                 printer.write("\(cleanupArrayVar).push(() => {")
                                 printer.indent {
@@ -1268,7 +1325,8 @@ struct IntrinsicJSFragment: Sendable {
 
         return IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let printer = context.printer
                 let value = arguments[0]
 
                 switch wrappedType {
@@ -1299,7 +1357,8 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .float, .double, .caseEnum:
             return IntrinsicJSFragment(
                 parameters: ["value", "targetVar"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let printer = context.printer
                     printer.write("let \(arguments[1]) = \(arguments[0]);")
                     return []
                 }
@@ -1307,9 +1366,10 @@ struct IntrinsicJSFragment: Sendable {
         case .bool:
             return IntrinsicJSFragment(
                 parameters: ["value", "targetVar"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let printer = context.printer
                     let baseFragment = boolLiftParameter
-                    let lifted = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
+                    let lifted = try baseFragment.printCode([arguments[0]], context)
                     printer.write("let \(arguments[1]) = \(lifted[0]);")
                     return []
                 }
@@ -1317,9 +1377,10 @@ struct IntrinsicJSFragment: Sendable {
         case .string:
             return IntrinsicJSFragment(
                 parameters: ["objectId", "targetVar"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let printer = context.printer
                     let baseFragment = stringLiftParameter
-                    let lifted = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
+                    let lifted = try baseFragment.printCode([arguments[0]], context)
                     printer.write("let \(arguments[1]) = String(\(lifted[0]));")
                     return []
                 }
@@ -1329,9 +1390,10 @@ struct IntrinsicJSFragment: Sendable {
             case .string:
                 return IntrinsicJSFragment(
                     parameters: ["objectId", "targetVar"],
-                    printCode: { arguments, scope, printer, cleanupCode in
+                    printCode: { arguments, context in
+                        let printer = context.printer
                         let baseFragment = stringLiftParameter
-                        let lifted = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
+                        let lifted = try baseFragment.printCode([arguments[0]], context)
                         printer.write("let \(arguments[1]) = String(\(lifted[0]));")
                         return []
                     }
@@ -1339,9 +1401,10 @@ struct IntrinsicJSFragment: Sendable {
             case .bool:
                 return IntrinsicJSFragment(
                     parameters: ["value", "targetVar"],
-                    printCode: { arguments, scope, printer, cleanupCode in
+                    printCode: { arguments, context in
+                        let printer = context.printer
                         let baseFragment = boolLiftParameter
-                        let lifted = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
+                        let lifted = try baseFragment.printCode([arguments[0]], context)
                         printer.write("let \(arguments[1]) = \(lifted[0]);")
                         return []
                     }
@@ -1349,7 +1412,8 @@ struct IntrinsicJSFragment: Sendable {
             default:
                 return IntrinsicJSFragment(
                     parameters: ["value", "targetVar"],
-                    printCode: { arguments, scope, printer, cleanupCode in
+                    printCode: { arguments, context in
+                        let printer = context.printer
                         printer.write("let \(arguments[1]) = \(arguments[0]);")
                         return []
                     }
@@ -1358,7 +1422,8 @@ struct IntrinsicJSFragment: Sendable {
         case .jsObject:
             return IntrinsicJSFragment(
                 parameters: ["objectId", "targetVar"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let printer = context.printer
                     let objectId = arguments[0]
                     let targetVar = arguments[1]
                     printer.write(
@@ -1371,7 +1436,8 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftHeapObject(let name):
             return IntrinsicJSFragment(
                 parameters: ["pointer", "targetVar"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let printer = context.printer
                     let pointer = arguments[0]
                     let targetVar = arguments[1]
                     printer.write("let \(targetVar) = _exports['\(name)'].__construct(\(pointer));")
@@ -1381,7 +1447,8 @@ struct IntrinsicJSFragment: Sendable {
         case .associatedValueEnum(let fullName):
             return IntrinsicJSFragment(
                 parameters: ["caseId", "targetVar"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let printer = context.printer
                     let caseId = arguments[0]
                     let targetVar = arguments[1]
                     let base = fullName.components(separatedBy: ".").last ?? fullName
@@ -1416,7 +1483,8 @@ struct IntrinsicJSFragment: Sendable {
 
         return IntrinsicJSFragment(
             parameters: ["isSome", "value", "targetVar"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
                 let isSome = arguments[0]
                 let value = arguments[1]
                 let targetVar = arguments[2]
@@ -1483,72 +1551,72 @@ struct IntrinsicJSFragment: Sendable {
         case .void:
             return IntrinsicJSFragment(
                 parameters: ["result"],
-                printCode: { _, _, printer, _ in
-                    printer.write("return;")
+                printCode: { _, context in
+                    context.printer.write("return;")
                     return []
                 }
             )
         case .int, .caseEnum:
             return IntrinsicJSFragment(
                 parameters: ["result"],
-                printCode: { arguments, scope, printer, cleanupCode in
-                    printer.write("return \(arguments[0]) | 0;")
+                printCode: { arguments, context in
+                    context.printer.write("return \(arguments[0]) | 0;")
                     return []
                 }
             )
         case .bool:
             return IntrinsicJSFragment(
                 parameters: ["result"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
                     let baseFragment = boolLowerReturn
-                    let lowered = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
-                    printer.write("return \(lowered[0]);")
+                    let lowered = try baseFragment.printCode([arguments[0]], context)
+                    context.printer.write("return \(lowered[0]);")
                     return []
                 }
             )
         case .float:
             return IntrinsicJSFragment(
                 parameters: ["result"],
-                printCode: { arguments, scope, printer, cleanupCode in
-                    printer.write("return Math.fround(\(arguments[0]));")
+                printCode: { arguments, context in
+                    context.printer.write("return Math.fround(\(arguments[0]));")
                     return []
                 }
             )
         case .double:
             return IntrinsicJSFragment(
                 parameters: ["result"],
-                printCode: { arguments, scope, printer, cleanupCode in
-                    printer.write("return \(arguments[0]);")
+                printCode: { arguments, context in
+                    context.printer.write("return \(arguments[0]);")
                     return []
                 }
             )
         case .string:
             return IntrinsicJSFragment(
                 parameters: ["result"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
                     let baseFragment = stringLowerReturn
-                    let lowered = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
-                    printer.write("return \(lowered[0]);")
+                    let lowered = try baseFragment.printCode([arguments[0]], context)
+                    context.printer.write("return \(lowered[0]);")
                     return []
                 }
             )
         case .jsObject:
             return IntrinsicJSFragment(
                 parameters: ["result"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
                     let baseFragment = jsObjectLowerReturn
-                    let lowered = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
-                    printer.write("return \(lowered[0]);")
+                    let lowered = try baseFragment.printCode([arguments[0]], context)
+                    context.printer.write("return \(lowered[0]);")
                     return []
                 }
             )
         case .swiftHeapObject:
             return IntrinsicJSFragment(
                 parameters: ["result"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
                     let baseFragment = swiftHeapObjectLowerReturn
-                    let lowered = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
-                    printer.write("return \(lowered[0]);")
+                    let lowered = try baseFragment.printCode([arguments[0]], context)
+                    context.printer.write("return \(lowered[0]);")
                     return []
                 }
             )
@@ -1557,28 +1625,28 @@ struct IntrinsicJSFragment: Sendable {
             case .string:
                 return IntrinsicJSFragment(
                     parameters: ["result"],
-                    printCode: { arguments, scope, printer, cleanupCode in
+                    printCode: { arguments, context in
                         let baseFragment = stringLowerReturn
-                        let lowered = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
-                        printer.write("return \(lowered[0]);")
+                        let lowered = try baseFragment.printCode([arguments[0]], context)
+                        context.printer.write("return \(lowered[0]);")
                         return []
                     }
                 )
             case .bool:
                 return IntrinsicJSFragment(
                     parameters: ["result"],
-                    printCode: { arguments, scope, printer, cleanupCode in
+                    printCode: { arguments, context in
                         let baseFragment = boolLowerReturn
-                        let lowered = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
-                        printer.write("return \(lowered[0]);")
+                        let lowered = try baseFragment.printCode([arguments[0]], context)
+                        context.printer.write("return \(lowered[0]);")
                         return []
                     }
                 )
             default:
                 return IntrinsicJSFragment(
                     parameters: ["result"],
-                    printCode: { arguments, scope, printer, cleanupCode in
-                        printer.write("return \(arguments[0]) | 0;")
+                    printCode: { arguments, context in
+                        context.printer.write("return \(arguments[0]) | 0;")
                         return []
                     }
                 )
@@ -1586,7 +1654,8 @@ struct IntrinsicJSFragment: Sendable {
         case .associatedValueEnum(let fullName):
             return IntrinsicJSFragment(
                 parameters: ["result"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
                     let result = arguments[0]
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let caseIdVar = scope.variable("caseId")
@@ -1610,7 +1679,8 @@ struct IntrinsicJSFragment: Sendable {
     private static func closureOptionalLowerReturn(wrappedType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["result"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
                 let result = arguments[0]
 
                 switch wrappedType {
@@ -1685,7 +1755,8 @@ struct IntrinsicJSFragment: Sendable {
         case .void:
             return IntrinsicJSFragment(
                 parameters: ["invokeCall"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let printer = context.printer
                     printer.write("\(arguments[0]);")
                     printer.write("return;")
                     return []
@@ -1694,55 +1765,56 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .caseEnum:
             return IntrinsicJSFragment(
                 parameters: ["invokeCall"],
-                printCode: { arguments, scope, printer, cleanupCode in
-                    printer.write("return \(arguments[0]) | 0;")
+                printCode: { arguments, context in
+                    context.printer.write("return \(arguments[0]) | 0;")
                     return []
                 }
             )
         case .bool:
             return IntrinsicJSFragment(
                 parameters: ["invokeCall"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
                     let baseFragment = boolLiftReturn
-                    let lifted = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
-                    printer.write("return \(lifted[0]);")
+                    let lifted = try baseFragment.printCode([arguments[0]], context)
+                    context.printer.write("return \(lifted[0]);")
                     return []
                 }
             )
         case .float, .double:
             return IntrinsicJSFragment(
                 parameters: ["invokeCall"],
-                printCode: { arguments, scope, printer, cleanupCode in
-                    printer.write("return \(arguments[0]);")
+                printCode: { arguments, context in
+                    context.printer.write("return \(arguments[0]);")
                     return []
                 }
             )
         case .string:
             return IntrinsicJSFragment(
                 parameters: ["invokeCall"],
-                printCode: { arguments, scope, printer, cleanupCode in
-                    printer.write("const resultLen = \(arguments[0]);")
+                printCode: { arguments, context in
+                    context.printer.write("const resultLen = \(arguments[0]);")
                     let baseFragment = stringLiftReturn
-                    let lifted = try baseFragment.printCode([], scope, printer, cleanupCode)
-                    printer.write("return \(lifted[0]);")
+                    let lifted = try baseFragment.printCode([], context)
+                    context.printer.write("return \(lifted[0]);")
                     return []
                 }
             )
         case .jsObject:
             return IntrinsicJSFragment(
                 parameters: ["invokeCall"],
-                printCode: { arguments, scope, printer, cleanupCode in
-                    printer.write("const resultId = \(arguments[0]);")
+                printCode: { arguments, context in
+                    context.printer.write("const resultId = \(arguments[0]);")
                     let baseFragment = jsObjectLiftReturn
-                    let lifted = try baseFragment.printCode(["resultId"], scope, printer, cleanupCode)
-                    printer.write("return \(lifted[0]);")
+                    let lifted = try baseFragment.printCode(["resultId"], context)
+                    context.printer.write("return \(lifted[0]);")
                     return []
                 }
             )
         case .swiftHeapObject(let className):
             return IntrinsicJSFragment(
                 parameters: ["invokeCall"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let printer = context.printer
                     printer.write("const resultPtr = \(arguments[0]);")
                     printer.write("return _exports['\(className)'].__construct(resultPtr);")
                     return []
@@ -1751,7 +1823,8 @@ struct IntrinsicJSFragment: Sendable {
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["invokeCall"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let funcRefVar = scope.variable("swiftClosureFuncRef")
                     printer.write("const \(funcRefVar) = \(arguments[0]);")
                     printer.write(
@@ -1767,20 +1840,22 @@ struct IntrinsicJSFragment: Sendable {
             case .string:
                 return IntrinsicJSFragment(
                     parameters: ["invokeCall"],
-                    printCode: { arguments, scope, printer, cleanupCode in
+                    printCode: { arguments, context in
+                        let printer = context.printer
                         printer.write("const resultLen = \(arguments[0]);")
                         let baseFragment = stringLiftReturn
-                        let lifted = try baseFragment.printCode([], scope, printer, cleanupCode)
-                        printer.write("return \(lifted[0]);")
+                        let lifted = try baseFragment.printCode([], context)
+                        context.printer.write("return \(lifted[0]);")
                         return []
                     }
                 )
             case .bool:
                 return IntrinsicJSFragment(
                     parameters: ["invokeCall"],
-                    printCode: { arguments, scope, printer, cleanupCode in
+                    printCode: { arguments, context in
+                        let printer = context.printer
                         let baseFragment = boolLiftReturn
-                        let lifted = try baseFragment.printCode([arguments[0]], scope, printer, cleanupCode)
+                        let lifted = try baseFragment.printCode([arguments[0]], context)
                         printer.write("return \(lifted[0]);")
                         return []
                     }
@@ -1788,8 +1863,8 @@ struct IntrinsicJSFragment: Sendable {
             default:
                 return IntrinsicJSFragment(
                     parameters: ["invokeCall"],
-                    printCode: { arguments, scope, printer, cleanupCode in
-                        printer.write("return \(arguments[0]) | 0;")
+                    printCode: { arguments, context in
+                        context.printer.write("return \(arguments[0]) | 0;")
                         return []
                     }
                 )
@@ -1797,7 +1872,8 @@ struct IntrinsicJSFragment: Sendable {
         case .associatedValueEnum(let fullName):
             return IntrinsicJSFragment(
                 parameters: ["invokeCall"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     printer.write("\(arguments[0]);")
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let resultVar = scope.variable("result")
@@ -1822,7 +1898,8 @@ struct IntrinsicJSFragment: Sendable {
     ) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["invokeCall"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let printer = context.printer
                 let invokeCall = arguments[0]
                 printer.write("\(invokeCall);")
                 let baseFragment = optionalLiftReturn(
@@ -1830,7 +1907,7 @@ struct IntrinsicJSFragment: Sendable {
                     context: .importTS,
                     kind: kind
                 )
-                let lifted = try baseFragment.printCode([], scope, printer, cleanupCode)
+                let lifted = try baseFragment.printCode([], context)
                 if !lifted.isEmpty {
                     printer.write("return \(lifted[0]);")
                 }
@@ -1843,7 +1920,8 @@ struct IntrinsicJSFragment: Sendable {
     static func closureErrorReturn(type: BridgeType) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let printer = context.printer
                 switch type {
                 case .void:
                     printer.write("return;")
@@ -1914,7 +1992,8 @@ struct IntrinsicJSFragment: Sendable {
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["closure"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let closure = arguments[0]
                     let callbackIdVar = scope.variable("callbackId")
                     printer.write(
@@ -1963,7 +2042,7 @@ struct IntrinsicJSFragment: Sendable {
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["funcRef"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
                     let funcRef = arguments[0]
                     return ["\(JSGlueVariableScope.reservedSwift).memory.getObject(\(funcRef))"]
                 }
@@ -2018,7 +2097,8 @@ struct IntrinsicJSFragment: Sendable {
                 let base = fullName.components(separatedBy: ".").last ?? fullName
                 return IntrinsicJSFragment(
                     parameters: ["caseId"],
-                    printCode: { arguments, scope, printer, cleanupCode in
+                    printCode: { arguments, context in
+                        let (scope, printer) = (context.scope, context.printer)
                         let caseId = arguments[0]
                         let resultVar = scope.variable("enumValue")
                         printer.write(
@@ -2036,7 +2116,8 @@ struct IntrinsicJSFragment: Sendable {
                 let base = fullName.components(separatedBy: ".").last ?? fullName
                 return IntrinsicJSFragment(
                     parameters: [],
-                    printCode: { arguments, scope, printer, cleanupCode in
+                    printCode: { arguments, context in
+                        let (scope, printer) = (context.scope, context.printer)
                         let resultVar = scope.variable("structValue")
                         printer.write(
                             "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(base).lift();"
@@ -2048,7 +2129,7 @@ struct IntrinsicJSFragment: Sendable {
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["funcRef"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
                     let funcRef = arguments[0]
                     return ["\(JSGlueVariableScope.reservedSwift).memory.getObject(\(funcRef))"]
                 }
@@ -2108,7 +2189,8 @@ struct IntrinsicJSFragment: Sendable {
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanupCode in
+                printCode: { arguments, context in
+                    let printer = context.printer
                     let value = arguments[0]
                     printer.write("if (typeof \(value) !== \"function\") {")
                     printer.indent {
@@ -2135,7 +2217,8 @@ struct IntrinsicJSFragment: Sendable {
         let base = fullName.components(separatedBy: ".").last ?? fullName
         return IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
                 let value = arguments[0]
                 let caseIdVar = scope.variable("caseId")
                 let cleanupVar = scope.variable("cleanup")
@@ -2154,7 +2237,8 @@ struct IntrinsicJSFragment: Sendable {
     static func associatedValueEnumValues(enumDefinition: ExportedEnum) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["enumName"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let printer = context.printer
                 let enumName = arguments[0]
 
                 printer.write("const \(enumName) = {")
@@ -2181,7 +2265,8 @@ struct IntrinsicJSFragment: Sendable {
     static func associatedValueEnumHelperFactory(enumDefinition: ExportedEnum) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["enumName"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
                 let enumName = arguments[0]
 
                 printer.write("const __bjs_create\(enumName)Helpers = () => {")
@@ -2206,9 +2291,11 @@ struct IntrinsicJSFragment: Sendable {
                             let fragment = IntrinsicJSFragment.associatedValuePushPayload(enumCase: enumCase)
                             _ = try fragment.printCode(
                                 ["value", enumName, caseName],
-                                caseScope,
-                                lowerPrinter,
-                                caseCleanup
+                                IntrinsicJSFragment.PrintCodeContext(
+                                    scope: caseScope,
+                                    printer: lowerPrinter,
+                                    cleanupCode: caseCleanup
+                                )
                             )
                         }
 
@@ -2237,7 +2324,14 @@ struct IntrinsicJSFragment: Sendable {
                             let caseCleanup = CodeFragmentPrinter()
 
                             let fragment = IntrinsicJSFragment.associatedValuePopPayload(enumCase: enumCase)
-                            _ = try fragment.printCode([enumName, caseName], caseScope, liftPrinter, caseCleanup)
+                            _ = try fragment.printCode(
+                                [enumName, caseName],
+                                IntrinsicJSFragment.PrintCodeContext(
+                                    scope: caseScope,
+                                    printer: liftPrinter,
+                                    cleanupCode: caseCleanup
+                                )
+                            )
                         }
 
                         for line in liftPrinter.lines {
@@ -2264,7 +2358,8 @@ struct IntrinsicJSFragment: Sendable {
     static func simpleEnumHelper(enumDefinition: ExportedEnum) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["enumName"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let printer = context.printer
                 let enumName = arguments[0]
                 printer.write("const \(enumName) = {")
                 printer.indent {
@@ -2288,7 +2383,8 @@ struct IntrinsicJSFragment: Sendable {
     static func rawValueEnumHelper(enumDefinition: ExportedEnum) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["enumName"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let printer = context.printer
                 let enumName = arguments[0]
                 printer.write("const \(enumName) = {")
                 printer.indent {
@@ -2312,7 +2408,8 @@ struct IntrinsicJSFragment: Sendable {
     private static func associatedValuePushPayload(enumCase: EnumCase) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["value", "enumName", "caseName"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                 let enumName = arguments[1]
                 let caseName = arguments[2]
 
@@ -2332,7 +2429,7 @@ struct IntrinsicJSFragment: Sendable {
                                 type: associatedValue.type
                             )
 
-                            _ = try fragment.printCode(["value.\(prop)"], scope, printer, cleanup)
+                            _ = try fragment.printCode(["value.\(prop)"], context)
                         }
 
                         if cleanup.lines.isEmpty {
@@ -2356,7 +2453,8 @@ struct IntrinsicJSFragment: Sendable {
     private static func associatedValuePopPayload(enumCase: EnumCase) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["enumName", "caseName"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                 let enumName = arguments[0]
                 let caseName = arguments[1]
 
@@ -2371,7 +2469,7 @@ struct IntrinsicJSFragment: Sendable {
                         let prop = associatedValue.label ?? "param\(associatedValueIndex)"
                         let fragment = try IntrinsicJSFragment.associatedValuePopPayload(type: associatedValue.type)
 
-                        let result = try fragment.printCode([], scope, casePrinter, cleanup)
+                        let result = try fragment.printCode([], context.with(\.printer, casePrinter))
                         let varName = result.first ?? "value_\(associatedValueIndex)"
 
                         fieldPairs.append("\(prop): \(varName)")
@@ -2409,7 +2507,8 @@ struct IntrinsicJSFragment: Sendable {
     ) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
                 printer.write("const \(isSomeVar) = \(kind.presenceCheck(value: value));")
@@ -2568,7 +2667,10 @@ struct IntrinsicJSFragment: Sendable {
                     try printer.indent {
                         let localCleanup = CodeFragmentPrinter()
                         let arrFragment = try arrayLower(elementType: elementType)
-                        _ = try arrFragment.printCode([value], scope, printer, localCleanup)
+                        _ = try arrFragment.printCode(
+                            [value],
+                            context.with(\.cleanupCode, localCleanup)
+                        )
                         let cleanupLines = localCleanup.lines.filter {
                             !$0.trimmingCharacters(in: .whitespaces).isEmpty
                         }
@@ -2609,7 +2711,8 @@ struct IntrinsicJSFragment: Sendable {
     ) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                 let optVar = scope.variable("optional")
                 let isSomeVar = scope.variable("isSome")
 
@@ -2628,7 +2731,7 @@ struct IntrinsicJSFragment: Sendable {
                         )
                     } else {
                         let wrappedFragment = try associatedValuePopPayload(type: wrappedType)
-                        let wrappedResults = try wrappedFragment.printCode([], scope, printer, cleanup)
+                        let wrappedResults = try wrappedFragment.printCode([], context)
                         if let wrappedResult = wrappedResults.first {
                             printer.write("\(optVar) = \(wrappedResult);")
                         } else {
@@ -2651,7 +2754,8 @@ struct IntrinsicJSFragment: Sendable {
         let base = fullName.components(separatedBy: ".").last ?? fullName
         return IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
                 let value = arguments[0]
                 let cleanupVar = scope.variable("cleanup")
                 printer.write(
@@ -2666,7 +2770,8 @@ struct IntrinsicJSFragment: Sendable {
     static func swiftStructLowerParameter(structBase: String) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
                 let value = arguments[0]
                 let cleanupVar = scope.variable("cleanup")
                 printer.write(
@@ -2681,7 +2786,8 @@ struct IntrinsicJSFragment: Sendable {
     static func swiftStructLiftReturn(structBase: String) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
                 let resultVar = scope.variable("structValue")
                 printer.write(
                     "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).lift();"
@@ -2697,7 +2803,8 @@ struct IntrinsicJSFragment: Sendable {
     static func arrayLower(elementType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["arr"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
                 let arr = arguments[0]
                 let cleanupArrayVar = scope.variable("arrayCleanups")
 
@@ -2707,7 +2814,10 @@ struct IntrinsicJSFragment: Sendable {
                 try printer.indent {
                     let elementFragment = try stackLowerFragment(elementType: elementType)
                     let elementCleanup = CodeFragmentPrinter()
-                    let _ = try elementFragment.printCode([elemVar], scope, printer, elementCleanup)
+                    let _ = try elementFragment.printCode(
+                        [elemVar],
+                        context.with(\.cleanupCode, elementCleanup)
+                    )
                     if !elementCleanup.lines.isEmpty {
                         printer.write("\(cleanupArrayVar).push(() => {")
                         printer.indent {
@@ -2730,7 +2840,8 @@ struct IntrinsicJSFragment: Sendable {
     static func dictionaryLower(valueType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["dict"],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
                 let dict = arguments[0]
                 let cleanupArrayVar = scope.variable("arrayCleanups")
 
@@ -2746,7 +2857,10 @@ struct IntrinsicJSFragment: Sendable {
 
                     let keyFragment = try stackLowerFragment(elementType: .string)
                     let keyCleanup = CodeFragmentPrinter()
-                    let _ = try keyFragment.printCode([keyVar], scope, printer, keyCleanup)
+                    let _ = try keyFragment.printCode(
+                        [keyVar],
+                        context.with(\.cleanupCode, keyCleanup)
+                    )
                     if !keyCleanup.lines.isEmpty {
                         printer.write("\(cleanupArrayVar).push(() => {")
                         printer.indent {
@@ -2759,7 +2873,10 @@ struct IntrinsicJSFragment: Sendable {
 
                     let valueFragment = try stackLowerFragment(elementType: valueType)
                     let valueCleanup = CodeFragmentPrinter()
-                    let _ = try valueFragment.printCode([valueVar], scope, printer, valueCleanup)
+                    let _ = try valueFragment.printCode(
+                        [valueVar],
+                        context.with(\.cleanupCode, valueCleanup)
+                    )
                     if !valueCleanup.lines.isEmpty {
                         printer.write("\(cleanupArrayVar).push(() => {")
                         printer.indent {
@@ -2782,7 +2899,8 @@ struct IntrinsicJSFragment: Sendable {
     static func arrayLift(elementType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
                 let resultVar = scope.variable("arrayResult")
                 let lenVar = scope.variable("arrayLen")
                 let iVar = scope.variable("i")
@@ -2792,7 +2910,7 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
                 try printer.indent {
                     let elementFragment = try stackLiftFragment(elementType: elementType)
-                    let elementResults = try elementFragment.printCode([], scope, printer, cleanupCode)
+                    let elementResults = try elementFragment.printCode([], context)
                     if let elementExpr = elementResults.first {
                         printer.write("\(resultVar).push(\(elementExpr));")
                     }
@@ -2808,7 +2926,8 @@ struct IntrinsicJSFragment: Sendable {
     static func dictionaryLift(valueType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, scope, printer, cleanupCode in
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
                 let resultVar = scope.variable("dictResult")
                 let lenVar = scope.variable("dictLen")
                 let iVar = scope.variable("i")
@@ -2818,9 +2937,9 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
                 try printer.indent {
                     let valueFragment = try stackLiftFragment(elementType: valueType)
-                    let valueResults = try valueFragment.printCode([], scope, printer, cleanupCode)
+                    let valueResults = try valueFragment.printCode([], context)
                     let keyFragment = try stackLiftFragment(elementType: .string)
-                    let keyResults = try keyFragment.printCode([], scope, printer, cleanupCode)
+                    let keyResults = try keyFragment.printCode([], context)
                     if let keyExpr = keyResults.first, let valueExpr = valueResults.first {
                         printer.write("\(resultVar)[\(keyExpr)] = \(valueExpr);")
                     }
@@ -2836,7 +2955,8 @@ struct IntrinsicJSFragment: Sendable {
         case .jsValue:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { _, scope, printer, cleanup in
+                printCode: { _, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let payload2Var = scope.variable("jsValuePayload2")
                     let payload1Var = scope.variable("jsValuePayload1")
                     let kindVar = scope.variable("jsValueKind")
@@ -2854,7 +2974,8 @@ struct IntrinsicJSFragment: Sendable {
         case .string:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let strVar = scope.variable("string")
                     printer.write("const \(strVar) = \(scope.popString());")
                     return [strVar]
@@ -2863,7 +2984,8 @@ struct IntrinsicJSFragment: Sendable {
         case .bool:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let bVar = scope.variable("bool")
                     printer.write("const \(bVar) = \(scope.popI32()) !== 0;")
                     return [bVar]
@@ -2872,7 +2994,8 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .uint:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let iVar = scope.variable("int")
                     printer.write("const \(iVar) = \(scope.popI32());")
                     return [iVar]
@@ -2881,7 +3004,8 @@ struct IntrinsicJSFragment: Sendable {
         case .float:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let fVar = scope.variable("f32")
                     printer.write("const \(fVar) = \(scope.popF32());")
                     return [fVar]
@@ -2890,7 +3014,8 @@ struct IntrinsicJSFragment: Sendable {
         case .double:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let dVar = scope.variable("f64")
                     printer.write("const \(dVar) = \(scope.popF64());")
                     return [dVar]
@@ -2900,7 +3025,8 @@ struct IntrinsicJSFragment: Sendable {
             let structBase = fullName.components(separatedBy: ".").last ?? fullName
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let resultVar = scope.variable("struct")
                     printer.write(
                         "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).lift();"
@@ -2911,7 +3037,8 @@ struct IntrinsicJSFragment: Sendable {
         case .caseEnum:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let varName = scope.variable("caseId")
                     printer.write("const \(varName) = \(scope.popI32());")
                     return [varName]
@@ -2922,7 +3049,8 @@ struct IntrinsicJSFragment: Sendable {
             case .string:
                 return IntrinsicJSFragment(
                     parameters: [],
-                    printCode: { arguments, scope, printer, cleanup in
+                    printCode: { arguments, context in
+                        let (scope, printer) = (context.scope, context.printer)
                         let varName = scope.variable("rawValue")
                         printer.write("const \(varName) = \(scope.popString());")
                         return [varName]
@@ -2931,7 +3059,8 @@ struct IntrinsicJSFragment: Sendable {
             case .float:
                 return IntrinsicJSFragment(
                     parameters: [],
-                    printCode: { arguments, scope, printer, cleanup in
+                    printCode: { arguments, context in
+                        let (scope, printer) = (context.scope, context.printer)
                         let varName = scope.variable("rawValue")
                         printer.write("const \(varName) = \(scope.popF32());")
                         return [varName]
@@ -2940,7 +3069,8 @@ struct IntrinsicJSFragment: Sendable {
             case .double:
                 return IntrinsicJSFragment(
                     parameters: [],
-                    printCode: { arguments, scope, printer, cleanup in
+                    printCode: { arguments, context in
+                        let (scope, printer) = (context.scope, context.printer)
                         let varName = scope.variable("rawValue")
                         printer.write("const \(varName) = \(scope.popF64());")
                         return [varName]
@@ -2949,7 +3079,8 @@ struct IntrinsicJSFragment: Sendable {
             default:
                 return IntrinsicJSFragment(
                     parameters: [],
-                    printCode: { arguments, scope, printer, cleanup in
+                    printCode: { arguments, context in
+                        let (scope, printer) = (context.scope, context.printer)
                         let varName = scope.variable("rawValue")
                         printer.write("const \(varName) = \(scope.popI32());")
                         return [varName]
@@ -2960,7 +3091,8 @@ struct IntrinsicJSFragment: Sendable {
             let base = fullName.components(separatedBy: ".").last ?? fullName
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let resultVar = scope.variable("enumValue")
                     printer.write(
                         "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(scope.popTag()), );"
@@ -2971,7 +3103,8 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftHeapObject(let className):
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let ptrVar = scope.variable("ptr")
                     let objVar = scope.variable("obj")
                     printer.write("const \(ptrVar) = \(scope.popPointer());")
@@ -2982,7 +3115,8 @@ struct IntrinsicJSFragment: Sendable {
         case .jsObject, .swiftProtocol:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let idVar = scope.variable("objId")
                     let objVar = scope.variable("obj")
                     printer.write("const \(idVar) = \(scope.popI32());")
@@ -3000,7 +3134,8 @@ struct IntrinsicJSFragment: Sendable {
         case .unsafePointer:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let pVar = scope.variable("pointer")
                     printer.write("const \(pVar) = \(scope.popPointer());")
                     return [pVar]
@@ -3016,9 +3151,10 @@ struct IntrinsicJSFragment: Sendable {
         case .jsValue:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                     registerJSValueHelpers(scope: scope)
-                    let lowered = try jsValueLower.printCode([arguments[0]], scope, printer, cleanup)
+                    let lowered = try jsValueLower.printCode([arguments[0]], context)
                     let kindVar = lowered[0]
                     let payload1Var = lowered[1]
                     let payload2Var = lowered[2]
@@ -3031,7 +3167,8 @@ struct IntrinsicJSFragment: Sendable {
         case .string:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                     let value = arguments[0]
                     let bytesVar = scope.variable("bytes")
                     let idVar = scope.variable("id")
@@ -3046,7 +3183,8 @@ struct IntrinsicJSFragment: Sendable {
         case .bool:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     scope.emitPushI32Parameter("\(arguments[0]) ? 1 : 0", printer: printer)
                     return []
                 }
@@ -3054,7 +3192,8 @@ struct IntrinsicJSFragment: Sendable {
         case .int, .uint:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     scope.emitPushI32Parameter("(\(arguments[0]) | 0)", printer: printer)
                     return []
                 }
@@ -3062,7 +3201,8 @@ struct IntrinsicJSFragment: Sendable {
         case .float:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     scope.emitPushF32Parameter("Math.fround(\(arguments[0]))", printer: printer)
                     return []
                 }
@@ -3070,7 +3210,8 @@ struct IntrinsicJSFragment: Sendable {
         case .double:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     scope.emitPushF64Parameter("\(arguments[0])", printer: printer)
                     return []
                 }
@@ -3079,7 +3220,8 @@ struct IntrinsicJSFragment: Sendable {
             let structBase = fullName.components(separatedBy: ".").last ?? fullName
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                     let value = arguments[0]
                     let cleanupVar = scope.variable("structCleanup")
                     printer.write(
@@ -3092,7 +3234,8 @@ struct IntrinsicJSFragment: Sendable {
         case .caseEnum:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     scope.emitPushI32Parameter("(\(arguments[0]) | 0)", printer: printer)
                     return []
                 }
@@ -3102,7 +3245,8 @@ struct IntrinsicJSFragment: Sendable {
             case .string:
                 return IntrinsicJSFragment(
                     parameters: ["value"],
-                    printCode: { arguments, scope, printer, cleanup in
+                    printCode: { arguments, context in
+                        let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                         let value = arguments[0]
                         let bytesVar = scope.variable("bytes")
                         let idVar = scope.variable("id")
@@ -3121,7 +3265,8 @@ struct IntrinsicJSFragment: Sendable {
             case .float:
                 return IntrinsicJSFragment(
                     parameters: ["value"],
-                    printCode: { arguments, scope, printer, cleanup in
+                    printCode: { arguments, context in
+                        let (scope, printer) = (context.scope, context.printer)
                         scope.emitPushF32Parameter("Math.fround(\(arguments[0]))", printer: printer)
                         return []
                     }
@@ -3129,7 +3274,8 @@ struct IntrinsicJSFragment: Sendable {
             case .double:
                 return IntrinsicJSFragment(
                     parameters: ["value"],
-                    printCode: { arguments, scope, printer, cleanup in
+                    printCode: { arguments, context in
+                        let (scope, printer) = (context.scope, context.printer)
                         scope.emitPushF64Parameter("\(arguments[0])", printer: printer)
                         return []
                     }
@@ -3137,7 +3283,8 @@ struct IntrinsicJSFragment: Sendable {
             default:
                 return IntrinsicJSFragment(
                     parameters: ["value"],
-                    printCode: { arguments, scope, printer, cleanup in
+                    printCode: { arguments, context in
+                        let (scope, printer) = (context.scope, context.printer)
                         scope.emitPushI32Parameter("(\(arguments[0]) | 0)", printer: printer)
                         return []
                     }
@@ -3147,7 +3294,8 @@ struct IntrinsicJSFragment: Sendable {
             let base = fullName.components(separatedBy: ".").last ?? fullName
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                     let value = arguments[0]
                     let caseIdVar = scope.variable("caseId")
                     let cleanupVar = scope.variable("enumCleanup")
@@ -3162,7 +3310,8 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftHeapObject:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     scope.emitPushPointerParameter("\(arguments[0]).pointer", printer: printer)
                     return []
                 }
@@ -3170,7 +3319,8 @@ struct IntrinsicJSFragment: Sendable {
         case .jsObject:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let value = arguments[0]
                     let idVar = scope.variable("objId")
                     printer.write("const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
@@ -3191,7 +3341,8 @@ struct IntrinsicJSFragment: Sendable {
             // Same as jsObject but no cleanup — Swift's AnyProtocol wrapper releases via deinit
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let value = arguments[0]
                     let idVar = scope.variable("objId")
                     printer.write("const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
@@ -3202,7 +3353,8 @@ struct IntrinsicJSFragment: Sendable {
         case .unsafePointer:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     scope.emitPushPointerParameter("(\(arguments[0]) | 0)", printer: printer)
                     return []
                 }
@@ -3219,7 +3371,8 @@ struct IntrinsicJSFragment: Sendable {
         let absenceLiteral = kind.absenceLiteral
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                 let isSomeVar = scope.variable("isSome")
                 let resultVar = scope.variable("optValue")
 
@@ -3232,7 +3385,7 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write("} else {")
                 try printer.indent {
                     let innerFragment = try stackLiftFragment(elementType: wrappedType)
-                    let innerResults = try innerFragment.printCode([], scope, printer, cleanup)
+                    let innerResults = try innerFragment.printCode([], context)
                     if let innerResult = innerResults.first {
                         printer.write("\(resultVar) = \(innerResult);")
                     } else {
@@ -3252,7 +3405,8 @@ struct IntrinsicJSFragment: Sendable {
     ) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["value"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
 
@@ -3263,7 +3417,10 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write("if (\(isSomeVar)) {")
                 try printer.indent {
                     let innerFragment = try stackLowerFragment(elementType: wrappedType)
-                    let _ = try innerFragment.printCode([value], scope, printer, localCleanupWriter)
+                    let _ = try innerFragment.printCode(
+                        [value],
+                        context.with(\.cleanupCode, localCleanupWriter)
+                    )
                     let localCleanupLines = localCleanupWriter.lines.filter {
                         !$0.trimmingCharacters(in: .whitespaces).isEmpty
                     }
@@ -3303,7 +3460,8 @@ struct IntrinsicJSFragment: Sendable {
     static func structHelper(structDefinition: ExportedStruct, allStructs: [ExportedStruct]) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["structName"],
-            printCode: { arguments, scope, printer, cleanup in
+            printCode: { arguments, context in
+                let printer = context.printer
                 let structName = arguments[0]
                 let capturedStructDef = structDefinition
                 let capturedAllStructs = allStructs
@@ -3320,8 +3478,7 @@ struct IntrinsicJSFragment: Sendable {
                     try generateStructLowerCode(
                         structDef: capturedStructDef,
                         allStructs: capturedAllStructs,
-                        scope: scope,
-                        printer: printer
+                        context: context
                     )
                 }
                 printer.write("},")
@@ -3333,8 +3490,7 @@ struct IntrinsicJSFragment: Sendable {
                     try generateStructLiftCode(
                         structDef: capturedStructDef,
                         allStructs: capturedAllStructs,
-                        scope: scope,
-                        printer: printer,
+                        context: context,
                         attachMethods: true
                     )
                 }
@@ -3356,9 +3512,9 @@ struct IntrinsicJSFragment: Sendable {
     private static func generateStructLowerCode(
         structDef: ExportedStruct,
         allStructs: [ExportedStruct],
-        scope: JSGlueVariableScope,
-        printer: CodeFragmentPrinter
+        context: IntrinsicJSFragment.PrintCodeContext
     ) throws {
+        let (scope, printer) = (context.scope, context.printer)
         let lowerPrinter = CodeFragmentPrinter()
         let lowerScope = scope.makeChildScope()
         let lowerCleanup = CodeFragmentPrinter()
@@ -3368,7 +3524,14 @@ struct IntrinsicJSFragment: Sendable {
         for property in instanceProps {
             let fragment = try structFieldLowerFragment(field: property, allStructs: allStructs)
             let fieldValue = "value.\(property.name)"
-            _ = try fragment.printCode([fieldValue], lowerScope, lowerPrinter, lowerCleanup)
+            _ = try fragment.printCode(
+                [fieldValue],
+                IntrinsicJSFragment.PrintCodeContext(
+                    scope: lowerScope,
+                    printer: lowerPrinter,
+                    cleanupCode: lowerCleanup,
+                )
+            )
         }
 
         for line in lowerPrinter.lines {
@@ -3388,19 +3551,18 @@ struct IntrinsicJSFragment: Sendable {
     private static func generateStructLiftCode(
         structDef: ExportedStruct,
         allStructs: [ExportedStruct],
-        scope: JSGlueVariableScope,
-        printer: CodeFragmentPrinter,
+        context: IntrinsicJSFragment.PrintCodeContext,
         attachMethods: Bool = false
     ) throws {
-        let liftScope = scope.makeChildScope()
-        let liftCleanup = CodeFragmentPrinter()
+        let (scope, printer) = (context.scope, context.printer)
+        let liftScope = context.scope.makeChildScope()
 
         var fieldExpressions: [(name: String, expression: String)] = []
 
         let instanceProps = structDef.properties.filter { !$0.isStatic }
         for property in instanceProps.reversed() {
             let fragment = try structFieldLiftFragment(field: property, allStructs: allStructs)
-            let results = try fragment.printCode([], liftScope, printer, liftCleanup)
+            let results = try fragment.printCode([], context)
 
             if let resultExpr = results.first {
                 fieldExpressions.append((property.name, resultExpr))
@@ -3437,7 +3599,7 @@ struct IntrinsicJSFragment: Sendable {
                     var paramForwardings: [String] = []
                     for param in method.parameters {
                         let fragment = try IntrinsicJSFragment.lowerParameter(type: param.type)
-                        let loweredValues = try fragment.printCode([param.name], methodScope, printer, methodCleanup)
+                        let loweredValues = try fragment.printCode([param.name], context)
                         paramForwardings.append(contentsOf: loweredValues)
                     }
 
@@ -3456,7 +3618,7 @@ struct IntrinsicJSFragment: Sendable {
                     if method.returnType != .void {
                         let liftFragment = try IntrinsicJSFragment.liftReturn(type: method.returnType)
                         let liftArgs = liftFragment.parameters.isEmpty ? [] : ["ret"]
-                        let lifted = try liftFragment.printCode(liftArgs, methodScope, printer, methodCleanup)
+                        let lifted = try liftFragment.printCode(liftArgs, context)
                         if let liftedValue = lifted.first {
                             printer.write("return \(liftedValue);")
                         }
@@ -3481,7 +3643,8 @@ struct IntrinsicJSFragment: Sendable {
         case .jsObject:
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                     let value = arguments[0]
                     let idVar = scope.variable("id")
                     printer.write("let \(idVar);")
@@ -3511,7 +3674,8 @@ struct IntrinsicJSFragment: Sendable {
         case .nullable(let wrappedType, let kind):
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
                     let value = arguments[0]
                     let isSomeVar = scope.variable("isSome")
                     printer.write("const \(isSomeVar) = \(kind.presenceCheck(value: value));")
@@ -3749,7 +3913,10 @@ struct IntrinsicJSFragment: Sendable {
                             )
                             let guardedPrinter = CodeFragmentPrinter()
                             let guardedCleanup = CodeFragmentPrinter()
-                            _ = try wrappedFragment.printCode([value], scope, guardedPrinter, guardedCleanup)
+                            _ = try wrappedFragment.printCode(
+                                [value],
+                                context.with(\.printer, guardedPrinter).with(\.cleanupCode, guardedCleanup)
+                            )
                             var loweredLines = guardedPrinter.lines
                             var hoistedCleanupVar: String?
                             if let first = loweredLines.first {
@@ -3788,13 +3955,14 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftStruct(let nestedName):
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let value = arguments[0]
                     let structResultVar = scope.variable("structResult")
                     printer.write(
                         "const \(structResultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(nestedName).lower(\(value));"
                     )
-                    cleanup.write("if (\(structResultVar).cleanup) { \(structResultVar).cleanup(); }")
+                    context.cleanupCode.write("if (\(structResultVar).cleanup) { \(structResultVar).cleanup(); }")
                     return []
                 }
             )
@@ -3802,8 +3970,10 @@ struct IntrinsicJSFragment: Sendable {
             // These types should not appear as struct fields - return error fragment
             return IntrinsicJSFragment(
                 parameters: ["value"],
-                printCode: { arguments, scope, printer, cleanup in
-                    printer.write("throw new Error(\"Unsupported struct field type for lowering: \(field.type)\");")
+                printCode: { arguments, context in
+                    context.printer.write(
+                        "throw new Error(\"Unsupported struct field type for lowering: \(field.type)\");"
+                    )
                     return []
                 }
             )
@@ -3867,7 +4037,8 @@ struct IntrinsicJSFragment: Sendable {
         case .nullable(let wrappedType, let kind):
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let isSomeVar = scope.variable("isSome")
                     let optVar = scope.variable("optional")
                     printer.write("const \(isSomeVar) = \(scope.popI32());")
@@ -3892,7 +4063,7 @@ struct IntrinsicJSFragment: Sendable {
                                 ),
                                 allStructs: allStructs
                             )
-                            let wrappedResults = try wrappedFragment.printCode([], scope, printer, cleanup)
+                            let wrappedResults = try wrappedFragment.printCode([], context)
                             if let wrappedResult = wrappedResults.first {
                                 printer.write("\(optVar) = \(wrappedResult);")
                             } else {
@@ -3911,7 +4082,8 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftStruct(let nestedName):
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let structVar = scope.variable("struct")
                     printer.write(
                         "const \(structVar) = \(JSGlueVariableScope.reservedStructHelpers).\(nestedName).lift();"
@@ -3922,7 +4094,8 @@ struct IntrinsicJSFragment: Sendable {
         case .jsObject:
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
                     let objectIdVar = scope.variable("objectId")
                     let varName = scope.variable("value")
                     printer.write("const \(objectIdVar) = \(scope.popI32());")
@@ -3946,8 +4119,8 @@ struct IntrinsicJSFragment: Sendable {
             // These types should not appear as struct fields
             return IntrinsicJSFragment(
                 parameters: [],
-                printCode: { arguments, scope, printer, cleanup in
-                    printer.write("throw new Error(\"Unsupported struct field type: \(field.type)\");")
+                printCode: { arguments, context in
+                    context.printer.write("throw new Error(\"Unsupported struct field type: \(field.type)\");")
                     return []
                 }
             )
