@@ -6,10 +6,10 @@ final class JSIntrinsicRegistry {
         entries.isEmpty
     }
 
-    func register(name: String, build: (CodeFragmentPrinter) -> Void) {
+    func register(name: String, build: (CodeFragmentPrinter) throws -> Void) rethrows {
         guard entries[name] == nil else { return }
         let printer = CodeFragmentPrinter()
-        build(printer)
+        try build(printer)
         entries[name] = printer.lines
     }
 
