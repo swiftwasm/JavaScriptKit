@@ -1,27 +1,24 @@
 import Foundation
-import JavaScriptKit
+@_spi(Experimental) import JavaScriptKit
 
 func sleepOnThread(milliseconds: Int, isolation: isolated (any Actor)? = #isolation) async {
     // Use the JavaScript setTimeout function to avoid hopping back to the main thread
     await withCheckedContinuation(isolation: isolation) { continuation in
-        _ = JSObject.global.setTimeout!(
-            JSOneshotClosure { _ in
-                continuation.resume()
-                return JSValue.undefined
-            },
-            milliseconds
-        )
+        let callback = JSTypedClosure<() -> Void> {
+            continuation.resume()
+        }
+        try! setTimeout(callback, milliseconds)
     }
 }
 
 func renderAnimation(
-    canvas: JSObject,
+    canvas: JSHTMLCanvasElement,
     size: Int,
     isolation: isolated (any Actor)? = #isolation
 )
     async throws
 {
-    let ctx = canvas.getContext!("2d").object!
+    let ctx = try canvas.getContext("2d")
 
     // Animation state variables
     var time: Double = 0
@@ -58,8 +55,8 @@ func renderAnimation(
 
     while !Task.isCancelled {
         // Semi-transparent background for trail effect
-        _ = ctx.fillStyle = .string("rgba(0, 0, 0, 0.05)")
-        _ = ctx.fillRect!(0, 0, size, size)
+        try ctx.setFillStyle("rgba(0, 0, 0, 0.05)")
+        _ = try ctx.fillRect(0.0, 0.0, Double(size), Double(size))
 
         // Intentionally add a computationally expensive calculation for main thread demonstration
         var expensiveCalculation = 0.0
@@ -113,10 +110,10 @@ func renderAnimation(
             let hue = (particles[i][5] + time * 10).truncatingRemainder(dividingBy: 360)
 
             // Draw particle
-            _ = ctx.beginPath!()
-            ctx.fillStyle = .string("hsla(\(hue), 100%, 60%, \(opacity))")
-            _ = ctx.arc!(x, y, size, 0, 2 * Double.pi)
-            _ = ctx.fill!()
+            try ctx.beginPath()
+            try ctx.setFillStyle("hsla(\(hue), 100%, 60%, \(opacity))")
+            try ctx.arc(x, y, size, 0, 2 * Double.pi)
+            try ctx.fill()
 
             // Connect nearby particles with lines (only check some to save CPU)
             if i % 20 == 0 {
@@ -126,12 +123,12 @@ func renderAnimation(
                     let dist = sqrt(dx * dx + dy * dy)
 
                     if dist < 30 {
-                        _ = ctx.beginPath!()
-                        ctx.strokeStyle = .string("rgba(255, 255, 255, \(0.1 * opacity))")
-                        ctx.lineWidth = .number(0.3)
-                        _ = ctx.moveTo!(x, y)
-                        _ = ctx.lineTo!(particles[j][0], particles[j][1])
-                        _ = ctx.stroke!()
+                        try ctx.beginPath()
+                        try ctx.setStrokeStyle("rgba(255, 255, 255, \(0.1 * opacity))")
+                        try ctx.setLineWidth(0.3)
+                        try ctx.moveTo(x, y)
+                        try ctx.lineTo(particles[j][0], particles[j][1])
+                        try ctx.stroke()
                     }
                 }
             }
@@ -147,20 +144,20 @@ func renderAnimation(
             let hue = (time * 50 + Double(i) * 72).truncatingRemainder(dividingBy: 360)
 
             // Draw glow
-            let gradient = ctx.createRadialGradient!(x, y, 0, x, y, pulseSize * 2).object!
-            _ = gradient.addColorStop!(0, "hsla(\(hue), 100%, 70%, 0.8)")
-            _ = gradient.addColorStop!(1, "hsla(\(hue), 100%, 50%, 0)")
+            let gradient = try ctx.createRadialGradient(x, y, 0, x, y, pulseSize * 2)
+            try gradient.addColorStop(0, "hsla(\(hue), 100%, 70%, 0.8)")
+            try gradient.addColorStop(1, "hsla(\(hue), 100%, 50%, 0)")
 
-            _ = ctx.beginPath!()
-            ctx.fillStyle = .object(gradient)
-            _ = ctx.arc!(x, y, pulseSize * 2, 0, 2 * Double.pi)
-            _ = ctx.fill!()
+            try ctx.beginPath()
+            try ctx.setFillStyleWithObject(gradient.jsObject)
+            try ctx.arc(x, y, pulseSize * 2, 0, 2 * Double.pi)
+            try ctx.fill()
 
             // Center of emitter
-            _ = ctx.beginPath!()
-            ctx.fillStyle = .string("hsla(\(hue), 100%, 70%, 0.8)")
-            _ = ctx.arc!(x, y, pulseSize * 0.5, 0, 2 * Double.pi)
-            _ = ctx.fill!()
+            try ctx.beginPath()
+            try ctx.setFillStyle("hsla(\(hue), 100%, 70%, 0.8)")
+            try ctx.arc(x, y, pulseSize * 0.5, 0, 2 * Double.pi)
+            try ctx.fill()
         }
 
         // Update time and emitter positions

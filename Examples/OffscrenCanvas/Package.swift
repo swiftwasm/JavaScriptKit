@@ -14,6 +14,12 @@ let package = Package(
             dependencies: [
                 .product(name: "JavaScriptKit", package: "JavaScriptKit"),
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("Extern"),
+            ],
+            plugins: [
+                .plugin(name: "BridgeJS", package: "JavaScriptKit"),
             ]
         )
     ]

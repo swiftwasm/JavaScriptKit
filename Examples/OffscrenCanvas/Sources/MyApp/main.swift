@@ -1,5 +1,49 @@
 import JavaScriptEventLoop
-import JavaScriptKit
+@_spi(Experimental) import JavaScriptKit
+
+@JSClass struct JSHTMLCanvasElement {
+    @JSFunction func getContext(_ contextId: String) throws(JSException) -> JSCanvasRenderingContext2D
+}
+
+@JSClass struct JSCanvasRenderingContext2D {
+    @JSSetter func setFillStyle(_ style: String) throws(JSException)
+    @JSSetter(jsName: "fillStyle") func setFillStyleWithObject(_ style: JSObject) throws(JSException)
+    @JSSetter func setStrokeStyle(_ style: String) throws(JSException)
+    @JSSetter func setLineWidth(_ width: Double) throws(JSException)
+
+    @JSFunction func beginPath() throws(JSException)
+    @JSFunction func moveTo(_ x: Double, _ y: Double) throws(JSException)
+    @JSFunction func lineTo(_ x: Double, _ y: Double) throws(JSException)
+    @JSFunction func arc(_ x: Double, _ y: Double, _ radius: Double, _ startAngle: Double, _ endAngle: Double) throws(JSException)
+    @JSFunction func fillRect(_ x: Double, _ y: Double, _ width: Double, _ height: Double) throws(JSException)
+    @JSFunction func fill() throws(JSException)
+    @JSFunction func stroke() throws(JSException)
+    @JSFunction func createRadialGradient(_ x0: Double, _ y0: Double, _ r0: Double, _ x1: Double, _ y1: Double, _ r1: Double) throws(JSException) -> JSCanvasGradient
+}
+
+@JSClass struct JSCanvasGradient {
+    @JSFunction func addColorStop(_ offset: Double, _ color: String) throws(JSException)
+}
+
+@JSClass struct JSWindow {
+    @JSFunction func requestAnimationFrame(_ callback: JSTypedClosure<() -> Void>) throws(JSException)
+}
+
+@JSGetter(from: .global) var window: JSWindow
+
+@JSClass struct JSPerformance {
+    @JSFunction func now() throws(JSException) -> Double
+}
+
+@JSGetter(from: .global) var performance: JSPerformance
+
+@JSFunction(from: .global) func setTimeout(_ callback: JSTypedClosure<() -> Void>, _ milliseconds: Int) throws(JSException)
+
+@JSClass struct JSDocument {
+    @JSFunction func getElementById(_ id: String) throws(JSException) -> JSObject
+}
+
+@JSGetter(from: .global) var document: JSDocument
 
 JavaScriptEventLoop.installGlobalExecutor()
 
@@ -12,7 +56,7 @@ struct BackgroundRenderer: CanvasRenderer {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         let transfer = JSSending.transfer(canvas)
         let renderingTask = Task(executorPreference: executor) {
-            let canvas = try await transfer.receive()
+            let canvas = try await JSHTMLCanvasElement(unsafelyWrapping: transfer.receive())
             try await renderAnimation(canvas: canvas, size: size)
         }
         await withTaskCancellationHandler {
@@ -26,21 +70,21 @@ struct BackgroundRenderer: CanvasRenderer {
 
 struct MainThreadRenderer: CanvasRenderer {
     func render(canvas: JSObject, size: Int) async throws {
-        try await renderAnimation(canvas: canvas, size: size)
+        try await renderAnimation(canvas: JSHTMLCanvasElement(unsafelyWrapping: canvas), size: size)
     }
 }
 
 // FPS Counter for CSS animation
-func startFPSMonitor() {
-    let fpsCounterElement = JSObject.global.document.getElementById("fps-counter").object!
+func startFPSMonitor(window: JSWindow, performance: JSPerformance) throws {
+    let fpsCounterElement = try document.getElementById("fps-counter")
 
-    var lastTime = JSObject.global.performance.now().number!
+    var lastTime = try performance.now()
     var frames = 0
 
     // Create a frame counter function
-    func countFrame() {
+    func countFrame() throws {
         frames += 1
-        let currentTime = JSObject.global.performance.now().number!
+        let currentTime = try performance.now()
         let elapsed = currentTime - lastTime
 
         if elapsed >= 1000 {
@@ -51,16 +95,13 @@ func startFPSMonitor() {
         }
 
         // Request next frame
-        _ = JSObject.global.requestAnimationFrame!(
-            JSClosure { _ in
-                countFrame()
-                return .undefined
-            }
-        )
+        try window.requestAnimationFrame(JSTypedClosure<() -> Void> {
+            try! countFrame()
+        })
     }
 
     // Start counting
-    countFrame()
+    try countFrame()
 }
 
 @MainActor
@@ -94,7 +135,7 @@ func main() async throws {
     var renderingTask: Task<Void, Error>? = nil
 
     // Start the FPS monitor for CSS animations
-    startFPSMonitor()
+    try startFPSMonitor(window: window, performance: performance)
 
     _ = renderButtonElement.addEventListener!(
         "click",
