@@ -327,7 +327,7 @@ private func inputSwiftFiles(targetDirectory: URL, positionalArguments: [String]
 
 extension Profiling {
     static func make() -> Profiling? {
-        guard let outputPath = ProcessInfo.processInfo.environment["BRIDGE_JS_PROFILING"] else {
+        guard let outputPath = ProcessInfo.processInfo.environment["BRIDGEJS_PROFILING"] else {
             return nil
         }
         let fd = open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, 0o644)
