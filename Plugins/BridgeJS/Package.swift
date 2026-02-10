@@ -58,6 +58,8 @@ let package = Package(
                 "BridgeJSCore",
                 "BridgeJSLink",
                 "TS2Swift",
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
             ],
             exclude: ["__Snapshots__", "Inputs"]
         ),
