@@ -69,6 +69,8 @@ jobs:
           git diff --exit-code Sources/JavaScriptKit/Runtime
       - run: swift test --package-path ./Plugins/PackageToJS
       - run: swift test --package-path ./Plugins/BridgeJS
+      - name: Validate BridgeJS TypeScript declarations
+        run: npm run check:bridgejs-dts
 
   test-bridgejs-against-swift-versions:
     name: Test BridgeJS against Swift versions
@@ -90,6 +92,8 @@ jobs:
           node-version: '20'
       - name: Install TypeScript
         run: npm install
+      - name: Validate BridgeJS TypeScript declarations
+        run: npm run check:bridgejs-dts
       - name: Run BridgeJS tests
         # NOTE: Seems like the prebuilt SwiftSyntax binaries are not compatible with
         # non-macro dependents, so disable experimental prebuilts for now.
