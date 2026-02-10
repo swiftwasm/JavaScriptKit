@@ -1,17 +1,28 @@
+/// A wrapper that represents a JavaScript value of `Wrapped | undefined`.
+///
+/// In BridgeJS, `Optional<Wrapped>` is bridged as `Wrapped | null`.
+/// Use `JSUndefinedOr<Wrapped>` when the JavaScript API expects
+/// `Wrapped | undefined` instead.
 @frozen public enum JSUndefinedOr<Wrapped> {
+    /// The JavaScript value is `undefined`.
     case undefined
+    /// The JavaScript value is present and wrapped.
     case value(Wrapped)
 
-    /// Convenience accessor for the undefined case.
-    public static var undefinedValue: Self { .undefined }
-
+    /// Creates a wrapper from a Swift optional.
+    ///
+    /// - Parameter optional: The optional value to wrap.
+    ///   `nil` becomes ``undefined`` and a non-`nil` value becomes ``value(_:)``.
     @inlinable
     public init(optional: Wrapped?) {
         self = optional.map(Self.value) ?? .undefined
     }
 
+    /// Returns the wrapped value as a Swift optional.
+    ///
+    /// Returns `nil` when this value is ``undefined``.
     @inlinable
-    public var optionalRepresentation: Wrapped? {
+    public var asOptional: Wrapped? {
         switch self {
         case .undefined:
             return nil
