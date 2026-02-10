@@ -156,7 +156,7 @@ public class ExportSwift {
                     let absentExpr =
                         kind == .null
                         ? "\(optionalSwiftType)<[\(swiftTypeName)]>.none"
-                        : "\(optionalSwiftType)<[\(swiftTypeName)]>.undefinedValue"
+                        : "\(optionalSwiftType)<[\(swiftTypeName)]>.undefined"
                     liftingExpr = ExprSyntax(
                         """
                         {
@@ -934,7 +934,7 @@ struct StackCodegen {
             let swiftTypeName = elementType.swiftType
             let absentExpr =
                 kind == .null
-                ? "\(typeName)<[\(swiftTypeName)]>.none" : "\(typeName)<[\(swiftTypeName)]>.undefinedValue"
+                ? "\(typeName)<[\(swiftTypeName)]>.none" : "\(typeName)<[\(swiftTypeName)]>.undefined"
             return """
                 {
                     let __isSome = _swift_js_pop_i32()
@@ -951,7 +951,7 @@ struct StackCodegen {
             let absentExpr =
                 kind == .null
                 ? "\(typeName)<[String: \(swiftTypeName)]>.none"
-                : "\(typeName)<[String: \(swiftTypeName)]>.undefinedValue"
+                : "\(typeName)<[String: \(swiftTypeName)]>.undefined"
             return """
                 {
                     let __isSome = _swift_js_pop_i32()

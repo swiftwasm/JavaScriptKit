@@ -57,7 +57,7 @@ final class DictionaryTests: XCTestCase {
 
     func testRoundTripOptionalDictionaryUndefined() throws {
         let some: JSUndefinedOr<[String: Int]> = .value(["n": 42])
-        let undefined: JSUndefinedOr<[String: Int]> = .undefinedValue
+        let undefined: JSUndefinedOr<[String: Int]> = .undefined
 
         let returnedSome = try jsRoundTripUndefinedDictionary(some)
         switch returnedSome {

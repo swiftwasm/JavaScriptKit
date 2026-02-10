@@ -143,7 +143,7 @@ public protocol _BridgedSwiftStackType {
 /// Used by JSUndefinedOr so all bridge methods delegate to Optional<Wrapped>.
 public protocol _BridgedAsOptional {
     associatedtype Wrapped
-    var optionalRepresentation: Wrapped? { get }
+    var asOptional: Wrapped? { get }
     init(optional: Wrapped?)
 }
 
@@ -2019,7 +2019,7 @@ extension Optional where Wrapped: _BridgedSwiftStruct {
 
 extension _BridgedAsOptional where Wrapped == Bool {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Self {
@@ -2035,13 +2035,13 @@ extension _BridgedAsOptional where Wrapped == Bool {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped == Int {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Self {
@@ -2057,13 +2057,13 @@ extension _BridgedAsOptional where Wrapped == Int {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped == UInt {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Self {
@@ -2079,13 +2079,13 @@ extension _BridgedAsOptional where Wrapped == UInt {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped == String {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(
@@ -2105,13 +2105,13 @@ extension _BridgedAsOptional where Wrapped == String {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped == JSObject {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> Self {
@@ -2123,7 +2123,7 @@ extension _BridgedAsOptional where Wrapped == JSObject {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
@@ -2133,20 +2133,20 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftProtocolWrapper {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped: _BridgedSwiftHeapObject {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, pointer: UnsafeMutableRawPointer)
     {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameterWithRetain() -> (
         isSome: Int32, pointer: UnsafeMutableRawPointer
     ) {
-        optionalRepresentation.bridgeJSLowerParameterWithRetain()
+        asOptional.bridgeJSLowerParameterWithRetain()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(
@@ -2165,13 +2165,13 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftHeapObject {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped == Float {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Float32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float32) -> Self {
@@ -2187,13 +2187,13 @@ extension _BridgedAsOptional where Wrapped == Float {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped == Double {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Float64) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float64) -> Self {
@@ -2209,13 +2209,13 @@ extension _BridgedAsOptional where Wrapped == Double {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ caseId: Int32) -> Self {
@@ -2231,20 +2231,20 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftCaseEnum {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped: _BridgedSwiftTypeLoweredIntoVoidType {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional
 where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == String {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(
@@ -2264,14 +2264,14 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional
 where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Int {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Self {
@@ -2287,7 +2287,7 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
@@ -2302,14 +2302,14 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional
 where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Float {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Float32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float32) -> Self {
@@ -2325,14 +2325,14 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional
 where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Double {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, value: Float64) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float64) -> Self {
@@ -2348,13 +2348,13 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
 extension _BridgedAsOptional where Wrapped: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, caseId: Int32) {
-        optionalRepresentation.bridgeJSLowerParameter()
+        asOptional.bridgeJSLowerParameter()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ caseId: Int32) -> Self {
@@ -2370,7 +2370,7 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftAssociatedValueEnum {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
@@ -2384,7 +2384,7 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftStruct {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        optionalRepresentation.bridgeJSLowerReturn()
+        asOptional.bridgeJSLowerReturn()
     }
 }
 
@@ -2526,7 +2526,7 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftDictionaryStackType {
     typealias DictionaryValue = Wrapped.DictionaryValue
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
-        let opt = optionalRepresentation
+        let opt = asOptional
         if let dict = opt {
             dict.bridgeJSLowerReturn()
             return 1

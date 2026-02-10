@@ -23,7 +23,7 @@ final class OptionalSupportTests: XCTestCase {
             XCTFail("Expected defined value")
         }
 
-        let undefined = try jsRoundTripOptionalStringUndefined(.undefinedValue)
+        let undefined = try jsRoundTripOptionalStringUndefined(.undefined)
         if case .value = undefined {
             XCTFail("Expected undefined")
         }
