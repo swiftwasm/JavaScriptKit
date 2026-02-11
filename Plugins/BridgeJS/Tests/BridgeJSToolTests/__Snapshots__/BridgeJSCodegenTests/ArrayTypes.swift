@@ -229,17 +229,19 @@ public func _bjs_processOptionalIntArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Int>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -254,17 +256,19 @@ public func _bjs_processOptionalStringArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<String>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<String>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -281,10 +285,11 @@ public func _bjs_processOptionalArray(_ values: Int32) -> Void {
         } else {
             return [Int].bridgeJSLiftParameter()
         }
-        }())
+    }())
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -299,17 +304,19 @@ public func _bjs_processOptionalPointArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Point>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Point>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -324,17 +331,19 @@ public func _bjs_processOptionalDirectionArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Direction>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Direction>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -349,17 +358,19 @@ public func _bjs_processOptionalStatusArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Status>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Status>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -374,14 +385,15 @@ public func _bjs_processNestedIntArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Int]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Int].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -396,14 +408,15 @@ public func _bjs_processNestedStringArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[String]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([String].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -418,14 +431,15 @@ public func _bjs_processNestedPointArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Point]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Point].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -451,14 +465,15 @@ public func _bjs_processNestedItemArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Item]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Item].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -484,17 +499,19 @@ public func _bjs_processOptionalJSObjectArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<JSObject>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<JSObject>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -509,14 +526,15 @@ public func _bjs_processNestedJSObjectArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[JSObject]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([JSObject].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")

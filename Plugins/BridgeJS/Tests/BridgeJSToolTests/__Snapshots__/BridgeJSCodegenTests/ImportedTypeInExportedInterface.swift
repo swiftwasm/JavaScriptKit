@@ -1,8 +1,6 @@
 extension FooContainer: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> FooContainer {
-        let optionalFoo = Optional<JSObject>.bridgeJSLiftParameter().map {
-            Foo(unsafelyWrapping: $0)
-        }
+        let optionalFoo = Optional<JSObject>.bridgeJSLiftParameter().map { Foo(unsafelyWrapping: $0) }
         let foo = Foo(unsafelyWrapping: JSObject.bridgeJSLiftParameter())
         return FooContainer(foo: foo, optionalFoo: optionalFoo)
     }
@@ -11,7 +9,7 @@ extension FooContainer: _BridgedSwiftStruct {
         self.foo.jsObject.bridgeJSLowerStackReturn()
         let __bjs_isSome_optionalFoo = self.optionalFoo != nil
         if let __bjs_unwrapped_optionalFoo = self.optionalFoo {
-            __bjs_unwrapped_optionalFoo.jsObject.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optionalFoo.jsObject.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optionalFoo ? 1 : 0)
     }
@@ -82,15 +80,13 @@ public func _bjs_processFooArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Foo] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Foo(unsafelyWrapping: JSObject.bridgeJSLiftParameter()))
         }
         __result.reverse()
         return __result
-        }())
-    ret.map {
-        $0.jsObject
-    } .bridgeJSLowerReturn()
+    }())
+    ret.map { $0.jsObject }.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -104,19 +100,19 @@ public func _bjs_processOptionalFooArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Foo>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
-            __result.append(Optional<JSObject>.bridgeJSLiftParameter().map {
-                        Foo(unsafelyWrapping: $0)
-                    })
+        for _ in 0..<__count {
+            __result.append(Optional<JSObject>.bridgeJSLiftParameter().map { Foo(unsafelyWrapping: $0) })
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.jsObject.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.jsObject.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")

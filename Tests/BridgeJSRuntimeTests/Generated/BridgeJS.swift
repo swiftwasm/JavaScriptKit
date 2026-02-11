@@ -655,7 +655,7 @@ fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSiSSSd_SS {
     static func bridgeJSLift(_ callbackId: Int32) -> (Int, String, Double) -> String {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
-        return { [callback] param0, param1, param2 in
+        return { [callback] (param0, param1, param2) in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
@@ -714,7 +714,7 @@ fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSiSiSi_Si {
     static func bridgeJSLift(_ callbackId: Int32) -> (Int, Int, Int) -> Int {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
-        return { [callback] param0, param1, param2 in
+        return { [callback] (param0, param1, param2) in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
@@ -773,7 +773,7 @@ fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsS
 private enum _BJS_Closure_20BridgeJSRuntimeTestsSiSi_Si {
     static func bridgeJSLift(_ callbackId: Int32) -> (Int, Int) -> Int {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
-        return { [callback] param0, param1 in
+        return { [callback] (param0, param1) in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
@@ -2443,14 +2443,14 @@ extension TypedPayloadResult: _BridgedSwiftAssociatedValueEnum {
         case .optPrecision(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(2)
         case .optDirection(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(3)
@@ -2480,14 +2480,14 @@ extension TypedPayloadResult: _BridgedSwiftAssociatedValueEnum {
         case .optPrecision(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(2))
         case .optDirection(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(3))
@@ -2815,17 +2815,15 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
             return .optNestedEnum(Optional<APIResult>.bridgeJSLiftParameter())
         case 4:
             return .optArray({
-                let __isSome = _swift_js_pop_i32()
-                if __isSome == 0 {
-                    return Optional<[Int]>.none
-                } else {
-                    return [Int].bridgeJSLiftParameter()
-                }
-                }())
+    let __isSome = _swift_js_pop_i32()
+    if __isSome == 0 {
+        return Optional<[Int]>.none
+    } else {
+        return [Int].bridgeJSLiftParameter()
+    }
+}())
         case 5:
-            return .optJsClass(Optional<JSObject>.bridgeJSLiftParameter().map {
-                    Foo(unsafelyWrapping: $0)
-                })
+            return .optJsClass(Optional<JSObject>.bridgeJSLiftParameter().map { Foo(unsafelyWrapping: $0) })
         case 6:
             return .empty
         default:
@@ -2840,42 +2838,42 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
         case .optStruct(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(0)
         case .optClass(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(1)
         case .optJSObject(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(2)
         case .optNestedEnum(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
+            _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(3)
         case .optArray(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(4)
         case .optJsClass(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.jsObject.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.jsObject.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(5)
@@ -2899,42 +2897,42 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
         case .optStruct(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(0))
         case .optClass(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(1))
         case .optJSObject(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(2))
         case .optNestedEnum(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
+            _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(3))
         case .optArray(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(4))
         case .optJsClass(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.jsObject.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.jsObject.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(5))
@@ -2965,36 +2963,36 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
         case .success(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(0)
         case .failure(let param0, let param1):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             return Int32(1)
         case .status(let param0, let param1, let param2):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             let __bjs_isSome_param2 = param2 != nil
             if let __bjs_unwrapped_param2 = param2 {
-                __bjs_unwrapped_param2.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param2.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
             return Int32(2)
@@ -3016,36 +3014,36 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
         case .success(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(0))
         case .failure(let param0, let param1):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             _swift_js_push_tag(Int32(1))
         case .status(let param0, let param1, let param2):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             let __bjs_isSome_param2 = param2 != nil
             if let __bjs_unwrapped_param2 = param2 {
-                __bjs_unwrapped_param2.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param2.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
             _swift_js_push_tag(Int32(2))
@@ -3176,12 +3174,12 @@ extension DataPoint: _BridgedSwiftStruct {
         self.label.bridgeJSLowerStackReturn()
         let __bjs_isSome_optCount = self.optCount != nil
         if let __bjs_unwrapped_optCount = self.optCount {
-            __bjs_unwrapped_optCount.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optCount.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optCount ? 1 : 0)
         let __bjs_isSome_optFlag = self.optFlag != nil
         if let __bjs_unwrapped_optFlag = self.optFlag {
-            __bjs_unwrapped_optFlag.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optFlag.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optFlag ? 1 : 0)
     }
@@ -3243,7 +3241,7 @@ extension Address: _BridgedSwiftStruct {
         self.city.bridgeJSLowerStackReturn()
         let __bjs_isSome_zipCode = self.zipCode != nil
         if let __bjs_unwrapped_zipCode = self.zipCode {
-            __bjs_unwrapped_zipCode.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_zipCode.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_zipCode ? 1 : 0)
     }
@@ -3297,12 +3295,12 @@ extension Contact: _BridgedSwiftStruct {
         self.address.bridgeJSLowerReturn()
         let __bjs_isSome_email = self.email != nil
         if let __bjs_unwrapped_email = self.email {
-            __bjs_unwrapped_email.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_email.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
         let __bjs_isSome_secondaryAddress = self.secondaryAddress != nil
         if let __bjs_unwrapped_secondaryAddress = self.secondaryAddress {
-            __bjs_unwrapped_secondaryAddress.bridgeJSLowerReturn()
+        __bjs_unwrapped_secondaryAddress.bridgeJSLowerReturn()
         }
         _swift_js_push_i32(__bjs_isSome_secondaryAddress ? 1 : 0)
     }
@@ -3353,12 +3351,12 @@ extension Config: _BridgedSwiftStruct {
         self.name.bridgeJSLowerStackReturn()
         let __bjs_isSome_theme = self.theme != nil
         if let __bjs_unwrapped_theme = self.theme {
-            __bjs_unwrapped_theme.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_theme.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_theme ? 1 : 0)
         let __bjs_isSome_direction = self.direction != nil
         if let __bjs_unwrapped_direction = self.direction {
-            __bjs_unwrapped_direction.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_direction.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_direction ? 1 : 0)
         self.status.bridgeJSLowerStackReturn()
@@ -3408,7 +3406,7 @@ extension SessionData: _BridgedSwiftStruct {
         self.id.bridgeJSLowerStackReturn()
         let __bjs_isSome_owner = self.owner != nil
         if let __bjs_unwrapped_owner = self.owner {
-            __bjs_unwrapped_owner.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_owner.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_owner ? 1 : 0)
     }
@@ -3460,12 +3458,12 @@ extension ValidationReport: _BridgedSwiftStruct {
         self.result.bridgeJSLowerReturn()
         let __bjs_isSome_status = self.status != nil
         if let __bjs_unwrapped_status = self.status {
-            __bjs_unwrapped_status.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_status.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_status ? 1 : 0)
         let __bjs_isSome_outcome = self.outcome != nil
         if let __bjs_unwrapped_outcome = self.outcome {
-            _swift_js_push_i32(__bjs_unwrapped_outcome.bridgeJSLowerParameter())
+        _swift_js_push_i32(__bjs_unwrapped_outcome.bridgeJSLowerParameter())
         }
         _swift_js_push_i32(__bjs_isSome_outcome ? 1 : 0)
     }
@@ -3526,23 +3524,23 @@ extension AdvancedConfig: _BridgedSwiftStruct {
         self.status.bridgeJSLowerStackReturn()
         let __bjs_isSome_result = self.result != nil
         if let __bjs_unwrapped_result = self.result {
-            _swift_js_push_i32(__bjs_unwrapped_result.bridgeJSLowerParameter())
+        _swift_js_push_i32(__bjs_unwrapped_result.bridgeJSLowerParameter())
         }
         _swift_js_push_i32(__bjs_isSome_result ? 1 : 0)
         let __bjs_isSome_metadata = self.metadata != nil
         if let __bjs_unwrapped_metadata = self.metadata {
-            __bjs_unwrapped_metadata.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_metadata.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_metadata ? 1 : 0)
         let __bjs_isSome_location = self.location != nil
         if let __bjs_unwrapped_location = self.location {
-            __bjs_unwrapped_location.bridgeJSLowerReturn()
+        __bjs_unwrapped_location.bridgeJSLowerReturn()
         }
         _swift_js_push_i32(__bjs_isSome_location ? 1 : 0)
         self.defaults.bridgeJSLowerReturn()
         let __bjs_isSome_overrideDefaults = self.overrideDefaults != nil
         if let __bjs_unwrapped_overrideDefaults = self.overrideDefaults {
-            __bjs_unwrapped_overrideDefaults.bridgeJSLowerReturn()
+        __bjs_unwrapped_overrideDefaults.bridgeJSLowerReturn()
         }
         _swift_js_push_i32(__bjs_isSome_overrideDefaults ? 1 : 0)
     }
@@ -3594,12 +3592,12 @@ extension MeasurementConfig: _BridgedSwiftStruct {
         self.ratio.bridgeJSLowerStackReturn()
         let __bjs_isSome_optionalPrecision = self.optionalPrecision != nil
         if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
-            __bjs_unwrapped_optionalPrecision.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optionalPrecision.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optionalPrecision ? 1 : 0)
         let __bjs_isSome_optionalRatio = self.optionalRatio != nil
         if let __bjs_unwrapped_optionalRatio = self.optionalRatio {
-            __bjs_unwrapped_optionalRatio.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optionalRatio.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optionalRatio ? 1 : 0)
     }
@@ -3735,7 +3733,7 @@ extension CopyableCart: _BridgedSwiftStruct {
         self.x.bridgeJSLowerStackReturn()
         let __bjs_isSome_note = self.note != nil
         if let __bjs_unwrapped_note = self.note {
-            __bjs_unwrapped_note.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_note.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_note ? 1 : 0)
     }
@@ -3842,7 +3840,7 @@ extension CopyableNestedCart: _BridgedSwiftStruct {
         self.item.bridgeJSLowerReturn()
         let __bjs_isSome_shippingAddress = self.shippingAddress != nil
         if let __bjs_unwrapped_shippingAddress = self.shippingAddress {
-            __bjs_unwrapped_shippingAddress.bridgeJSLowerReturn()
+        __bjs_unwrapped_shippingAddress.bridgeJSLowerReturn()
         }
         _swift_js_push_i32(__bjs_isSome_shippingAddress ? 1 : 0)
     }
@@ -4011,7 +4009,7 @@ extension JSObjectContainer: _BridgedSwiftStruct {
         self.object.bridgeJSLowerStackReturn()
         let __bjs_isSome_optionalObject = self.optionalObject != nil
         if let __bjs_unwrapped_optionalObject = self.optionalObject {
-            __bjs_unwrapped_optionalObject.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optionalObject.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optionalObject ? 1 : 0)
     }
@@ -4051,9 +4049,7 @@ fileprivate func _bjs_struct_lift_JSObjectContainer() -> Int32 {
 
 extension FooContainer: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> FooContainer {
-        let optionalFoo = Optional<JSObject>.bridgeJSLiftParameter().map {
-            Foo(unsafelyWrapping: $0)
-        }
+        let optionalFoo = Optional<JSObject>.bridgeJSLiftParameter().map { Foo(unsafelyWrapping: $0) }
         let foo = Foo(unsafelyWrapping: JSObject.bridgeJSLiftParameter())
         return FooContainer(foo: foo, optionalFoo: optionalFoo)
     }
@@ -4062,7 +4058,7 @@ extension FooContainer: _BridgedSwiftStruct {
         self.foo.jsObject.bridgeJSLowerStackReturn()
         let __bjs_isSome_optionalFoo = self.optionalFoo != nil
         if let __bjs_unwrapped_optionalFoo = self.optionalFoo {
-            __bjs_unwrapped_optionalFoo.jsObject.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optionalFoo.jsObject.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optionalFoo ? 1 : 0)
     }
@@ -4109,7 +4105,7 @@ extension ArrayMembers: _BridgedSwiftStruct {
     } else {
         return [String].bridgeJSLiftParameter()
     }
-        }()
+}()
         let ints = [Int].bridgeJSLiftParameter()
         return ArrayMembers(ints: ints, optStrings: optStrings)
     }
@@ -4118,7 +4114,7 @@ extension ArrayMembers: _BridgedSwiftStruct {
         self.ints.bridgeJSLowerReturn()
         let __bjs_isSome_optStrings = self.optStrings != nil
         if let __bjs_unwrapped_optStrings = self.optStrings {
-            __bjs_unwrapped_optStrings.bridgeJSLowerReturn()
+        __bjs_unwrapped_optStrings.bridgeJSLowerReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optStrings ? 1 : 0)
     }
@@ -4396,10 +4392,11 @@ public func _bjs_roundTripOptionalJSValueArray(_ v: Int32) -> Void {
         } else {
             return [JSValue].bridgeJSLiftParameter()
         }
-        }())
+    }())
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -4636,7 +4633,7 @@ public func _bjs_asyncRoundTripVoid() -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         await asyncRoundTripVoid()
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4649,7 +4646,7 @@ public func _bjs_asyncRoundTripInt(_ v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripInt(v: Int.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4662,7 +4659,7 @@ public func _bjs_asyncRoundTripFloat(_ v: Float32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripFloat(v: Float.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4675,7 +4672,7 @@ public func _bjs_asyncRoundTripDouble(_ v: Float64) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripDouble(v: Double.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4688,7 +4685,7 @@ public func _bjs_asyncRoundTripBool(_ v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripBool(v: Bool.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4701,7 +4698,7 @@ public func _bjs_asyncRoundTripString(_ vBytes: Int32, _ vLength: Int32) -> Int3
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripString(v: String.bridgeJSLiftParameter(vBytes, vLength)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4714,7 +4711,7 @@ public func _bjs_asyncRoundTripSwiftHeapObject(_ v: UnsafeMutableRawPointer) -> 
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripSwiftHeapObject(v: Greeter.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -4727,7 +4724,7 @@ public func _bjs_asyncRoundTripJSObject(_ v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripJSObject(v: JSObject.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -5424,7 +5421,7 @@ public func _bjs_arrayWithOptionalDefault(_ values: Int32) -> Int32 {
         } else {
             return [Int].bridgeJSLiftParameter()
         }
-        }())
+    }())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -5593,17 +5590,19 @@ public func _bjs_roundTripOptionalIntArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Int>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5618,17 +5617,19 @@ public func _bjs_roundTripOptionalStringArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<String>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<String>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5643,17 +5644,19 @@ public func _bjs_roundTripOptionalDataPointArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<DataPoint>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<DataPoint>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5668,17 +5671,19 @@ public func _bjs_roundTripOptionalDirectionArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Direction>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Direction>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5693,17 +5698,19 @@ public func _bjs_roundTripOptionalStatusArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Status>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Status>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5720,10 +5727,11 @@ public func _bjs_roundTripOptionalIntArrayType(_ values: Int32) -> Void {
         } else {
             return [Int].bridgeJSLiftParameter()
         }
-        }())
+    }())
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -5740,10 +5748,11 @@ public func _bjs_roundTripOptionalStringArrayType(_ values: Int32) -> Void {
         } else {
             return [String].bridgeJSLiftParameter()
         }
-        }())
+    }())
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -5760,10 +5769,11 @@ public func _bjs_roundTripOptionalGreeterArrayType(_ greeters: Int32) -> Void {
         } else {
             return [Greeter].bridgeJSLiftParameter()
         }
-        }())
+    }())
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -5778,14 +5788,15 @@ public func _bjs_roundTripNestedIntArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Int]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Int].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5800,14 +5811,15 @@ public func _bjs_roundTripNestedStringArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[String]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([String].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5822,14 +5834,15 @@ public func _bjs_roundTripNestedDoubleArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Double]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Double].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5844,14 +5857,15 @@ public func _bjs_roundTripNestedBoolArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Bool]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Bool].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5866,14 +5880,15 @@ public func _bjs_roundTripNestedDataPointArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[DataPoint]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([DataPoint].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5888,14 +5903,15 @@ public func _bjs_roundTripNestedDirectionArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Direction]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Direction].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5910,14 +5926,15 @@ public func _bjs_roundTripNestedGreeterArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Greeter]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Greeter].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -5995,9 +6012,7 @@ public func _bjs_consumeDataProcessorArrayType() -> Int32 {
 public func _bjs_roundTripDataProcessorArrayType() -> Void {
     #if arch(wasm32)
     let ret = roundTripDataProcessorArrayType(_: [AnyDataProcessor].bridgeJSLiftParameter())
-    ret.map {
-        $0 as! AnyDataProcessor
-    } .bridgeJSLowerReturn()
+    ret.map { $0 as! AnyDataProcessor }.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6022,17 +6037,19 @@ public func _bjs_roundTripOptionalJSObjectArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<JSObject>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<JSObject>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -6047,15 +6064,13 @@ public func _bjs_roundTripFooArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Foo] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Foo(unsafelyWrapping: JSObject.bridgeJSLiftParameter()))
         }
         __result.reverse()
         return __result
-        }())
-    ret.map {
-        $0.jsObject
-    } .bridgeJSLowerReturn()
+    }())
+    ret.map { $0.jsObject }.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6069,19 +6084,19 @@ public func _bjs_roundTripOptionalFooArray() -> Void {
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Foo>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
-            __result.append(Optional<JSObject>.bridgeJSLiftParameter().map {
-                        Foo(unsafelyWrapping: $0)
-                    })
+        for _ in 0..<__count {
+            __result.append(Optional<JSObject>.bridgeJSLiftParameter().map { Foo(unsafelyWrapping: $0) })
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.jsObject.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.jsObject.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -8160,9 +8175,7 @@ public func _bjs_DataProcessorManager_processor_set(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_DataProcessorManager_backupProcessor_get")
 public func _bjs_DataProcessorManager_backupProcessor_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor.flatMap {
-        $0 as? AnyDataProcessor
-    }
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor.flatMap { $0 as? AnyDataProcessor }
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

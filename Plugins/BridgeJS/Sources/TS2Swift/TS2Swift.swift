@@ -20,6 +20,12 @@ import BridgeJSCore
 import BridgeJSSkeleton
 #endif
 
+#if os(Windows)
+let PATH_SEPARATOR: Character = ";"
+#else
+let PATH_SEPARATOR: Character = ":"
+#endif
+
 internal func which(
     _ executable: String,
     environment: [String: String] = ProcessInfo.processInfo.environment
@@ -39,13 +45,8 @@ internal func which(
             }
         }
     }
-    let pathSeparator: Character
-    #if os(Windows)
-    pathSeparator = ";"
-    #else
-    pathSeparator = ":"
-    #endif
-    let paths = environment["PATH"]?.split(separator: pathSeparator) ?? []
+
+    let paths = environment["PATH"]?.split(separator: PATH_SEPARATOR) ?? []
     for path in paths {
         let url = URL(fileURLWithPath: String(path)).appendingPathComponent(executable)
         if checkCandidate(url) {

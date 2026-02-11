@@ -17,12 +17,12 @@ extension DataPoint: _BridgedSwiftStruct {
         self.label.bridgeJSLowerStackReturn()
         let __bjs_isSome_optCount = self.optCount != nil
         if let __bjs_unwrapped_optCount = self.optCount {
-            __bjs_unwrapped_optCount.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optCount.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optCount ? 1 : 0)
         let __bjs_isSome_optFlag = self.optFlag != nil
         if let __bjs_unwrapped_optFlag = self.optFlag {
-            __bjs_unwrapped_optFlag.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optFlag.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optFlag ? 1 : 0)
     }
@@ -84,7 +84,7 @@ extension Address: _BridgedSwiftStruct {
         self.city.bridgeJSLowerStackReturn()
         let __bjs_isSome_zipCode = self.zipCode != nil
         if let __bjs_unwrapped_zipCode = self.zipCode {
-            __bjs_unwrapped_zipCode.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_zipCode.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_zipCode ? 1 : 0)
     }
@@ -137,7 +137,7 @@ extension Person: _BridgedSwiftStruct {
         self.address.bridgeJSLowerReturn()
         let __bjs_isSome_email = self.email != nil
         if let __bjs_unwrapped_email = self.email {
-            __bjs_unwrapped_email.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_email.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
     }
@@ -233,7 +233,7 @@ extension Measurement: _BridgedSwiftStruct {
         self.precision.bridgeJSLowerStackReturn()
         let __bjs_isSome_optionalPrecision = self.optionalPrecision != nil
         if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
-            __bjs_unwrapped_optionalPrecision.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optionalPrecision.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optionalPrecision ? 1 : 0)
     }
@@ -277,7 +277,6 @@ extension ConfigStruct: _BridgedSwiftStruct {
     }
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -399,7 +398,7 @@ extension Container: _BridgedSwiftStruct {
         self.object.bridgeJSLowerStackReturn()
         let __bjs_isSome_optionalObject = self.optionalObject != nil
         if let __bjs_unwrapped_optionalObject = self.optionalObject {
-            __bjs_unwrapped_optionalObject.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_optionalObject.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_optionalObject ? 1 : 0)
     }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@testable import TS2Swift
 
 /// Runs the TS2Swift JavaScript test suite (Vitest) so that `swift test --package-path ./Plugins/BridgeJS`
 /// validates both the TypeScript ts2swift output and the Swift codegen. For fast iteration on ts2swift,
@@ -17,8 +18,16 @@ import Testing
             .appendingPathComponent("TS2Swift")
             .appendingPathComponent("JavaScript")
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-        var arguments = ["npm", "run", "test"]
+        guard let npmExecutable = which("npm"), let nodeExecutable = which("node") else {
+            Issue.record("No \"npm\" command found in your system")
+            return
+        }
+        process.executableURL = npmExecutable
+        var environment = ProcessInfo.processInfo.environment
+        environment["PATH"] =
+            "\(nodeExecutable.deletingLastPathComponent().path)\(PATH_SEPARATOR) \(environment["PATH"] ?? "")"
+        process.environment = environment
+        var arguments = ["run", "test"]
         if ProcessInfo.processInfo.environment["UPDATE_SNAPSHOTS"] != nil {
             arguments.append(contentsOf: ["--", "--update"])
         }

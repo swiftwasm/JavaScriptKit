@@ -309,36 +309,36 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
         case .success(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(0)
         case .failure(let param0, let param1):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             return Int32(1)
         case .status(let param0, let param1, let param2):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             let __bjs_isSome_param2 = param2 != nil
             if let __bjs_unwrapped_param2 = param2 {
-                __bjs_unwrapped_param2.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param2.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
             return Int32(2)
@@ -360,36 +360,36 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
         case .success(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(0))
         case .failure(let param0, let param1):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             _swift_js_push_tag(Int32(1))
         case .status(let param0, let param1, let param2):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             let __bjs_isSome_param1 = param1 != nil
             if let __bjs_unwrapped_param1 = param1 {
-                __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
             let __bjs_isSome_param2 = param2 != nil
             if let __bjs_unwrapped_param2 = param2 {
-                __bjs_unwrapped_param2.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param2.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
             _swift_js_push_tag(Int32(2))
@@ -474,14 +474,14 @@ extension TypedPayloadResult: _BridgedSwiftAssociatedValueEnum {
         case .optPrecision(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(2)
         case .optDirection(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(3)
@@ -511,14 +511,14 @@ extension TypedPayloadResult: _BridgedSwiftAssociatedValueEnum {
         case .optPrecision(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(2))
         case .optDirection(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(3))
@@ -618,13 +618,13 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
             return .optNestedEnum(Optional<APIResult>.bridgeJSLiftParameter())
         case 4:
             return .optArray({
-                let __isSome = _swift_js_pop_i32()
-                if __isSome == 0 {
-                    return Optional<[Int]>.none
-                } else {
-                    return [Int].bridgeJSLiftParameter()
-                }
-                }())
+    let __isSome = _swift_js_pop_i32()
+    if __isSome == 0 {
+        return Optional<[Int]>.none
+    } else {
+        return [Int].bridgeJSLiftParameter()
+    }
+}())
         case 5:
             return .empty
         default:
@@ -639,35 +639,35 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
         case .optStruct(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(0)
         case .optClass(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(1)
         case .optJSObject(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(2)
         case .optNestedEnum(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
+            _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(3)
         case .optArray(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(4)
@@ -691,35 +691,35 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
         case .optStruct(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(0))
         case .optClass(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(1))
         case .optJSObject(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(2))
         case .optNestedEnum(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
+            _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(3))
         case .optArray(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-                __bjs_unwrapped_param0.bridgeJSLowerReturn()
+            __bjs_unwrapped_param0.bridgeJSLowerReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             _swift_js_push_tag(Int32(4))
