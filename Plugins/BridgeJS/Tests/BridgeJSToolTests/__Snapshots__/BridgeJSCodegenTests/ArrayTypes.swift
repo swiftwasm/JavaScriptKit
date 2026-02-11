@@ -381,20 +381,8 @@ public func _bjs_processOptionalStatusArray() -> Void {
 @_cdecl("bjs_processNestedIntArray")
 public func _bjs_processNestedIntArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedIntArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[Int]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([Int].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = processNestedIntArray(_: [[Int]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -404,20 +392,8 @@ public func _bjs_processNestedIntArray() -> Void {
 @_cdecl("bjs_processNestedStringArray")
 public func _bjs_processNestedStringArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedStringArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[String]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([String].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = processNestedStringArray(_: [[String]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -427,20 +403,8 @@ public func _bjs_processNestedStringArray() -> Void {
 @_cdecl("bjs_processNestedPointArray")
 public func _bjs_processNestedPointArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedPointArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[Point]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([Point].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = processNestedPointArray(_: [[Point]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -461,20 +425,8 @@ public func _bjs_processItemArray() -> Void {
 @_cdecl("bjs_processNestedItemArray")
 public func _bjs_processNestedItemArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedItemArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[Item]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([Item].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = processNestedItemArray(_: [[Item]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -522,20 +474,8 @@ public func _bjs_processOptionalJSObjectArray() -> Void {
 @_cdecl("bjs_processNestedJSObjectArray")
 public func _bjs_processNestedJSObjectArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedJSObjectArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[JSObject]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([JSObject].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = processNestedJSObjectArray(_: [[JSObject]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -838,18 +838,16 @@ struct StackCodegen {
 
     func liftArrayExpression(elementType: BridgeType) -> ExprSyntax {
         switch elementType {
-        case .int, .uint, .float, .double, .string, .bool, .jsValue,
-            .jsObject(nil), .swiftStruct, .caseEnum, .swiftHeapObject,
-            .unsafePointer, .rawValueEnum, .associatedValueEnum:
-            return "[\(raw: elementType.swiftType)].bridgeJSLiftParameter()"
-        case .jsObject(_?):
+        case .jsObject(let className?) where className != "JSObject":
             return liftArrayExpressionInline(elementType: elementType)
         case .swiftProtocol(let protocolName):
             return "[Any\(raw: protocolName)].bridgeJSLiftParameter()"
-        case .nullable, .array, .closure, .dictionary:
+        case .nullable, .closure:
             return liftArrayExpressionInline(elementType: elementType)
         case .void, .namespaceEnum:
             fatalError("Invalid array element type: \(elementType)")
+        default:
+            return "[\(raw: elementType.swiftType)].bridgeJSLiftParameter()"
         }
     }
 
@@ -872,11 +870,7 @@ struct StackCodegen {
 
     func liftDictionaryExpression(valueType: BridgeType) -> ExprSyntax {
         switch valueType {
-        case .int, .uint, .float, .double, .string, .bool, .jsValue,
-            .jsObject(nil), .swiftStruct, .caseEnum, .swiftHeapObject,
-            .unsafePointer, .rawValueEnum, .associatedValueEnum:
-            return "[String: \(raw: valueType.swiftType)].bridgeJSLiftParameter()"
-        case .jsObject(let className?):
+        case .jsObject(let className?) where className != "JSObject":
             return """
                 {
                     let __dict = [String: JSObject].bridgeJSLiftParameter()
@@ -890,10 +884,12 @@ struct StackCodegen {
                     return __dict.mapValues { $0 as! Any\(raw: protocolName) }
                 }()
                 """
-        case .nullable, .array, .dictionary, .closure:
+        case .nullable, .closure:
             return liftDictionaryExpressionInline(valueType: valueType)
         case .void, .namespaceEnum:
             fatalError("Invalid dictionary value type: \(valueType)")
+        default:
+            return "[String: \(raw: valueType.swiftType)].bridgeJSLiftParameter()"
         }
     }
 
@@ -1005,15 +1001,11 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch elementType {
-        case .int, .uint, .float, .double, .string, .bool, .jsValue,
-            .jsObject(nil), .swiftStruct, .caseEnum, .swiftHeapObject,
-            .unsafePointer, .rawValueEnum, .associatedValueEnum:
-            return ["\(raw: accessor).bridgeJSLowerReturn()"]
-        case .jsObject(_?):
+        case .jsObject(let className?) where className != "JSObject":
             return ["\(raw: accessor).map { $0.jsObject }.bridgeJSLowerReturn()"]
         case .swiftProtocol(let protocolName):
             return ["\(raw: accessor).map { $0 as! Any\(raw: protocolName) }.bridgeJSLowerReturn()"]
-        case .nullable, .array, .closure, .dictionary:
+        case .nullable, .closure:
             return lowerArrayStatementsInline(
                 elementType: elementType,
                 accessor: accessor,
@@ -1021,6 +1013,8 @@ struct StackCodegen {
             )
         case .void, .namespaceEnum:
             fatalError("Invalid array element type: \(elementType)")
+        default:
+            return ["\(raw: accessor).bridgeJSLowerReturn()"]
         }
     }
 
@@ -1054,15 +1048,11 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch valueType {
-        case .int, .uint, .float, .double, .string, .bool, .jsValue,
-            .jsObject(nil), .swiftStruct, .caseEnum, .swiftHeapObject,
-            .unsafePointer, .rawValueEnum, .associatedValueEnum:
-            return ["\(raw: accessor).bridgeJSLowerReturn()"]
-        case .jsObject(_?):
+        case .jsObject(let className?) where className != "JSObject":
             return ["\(raw: accessor).mapValues { $0.jsObject }.bridgeJSLowerReturn()"]
         case .swiftProtocol(let protocolName):
             return ["\(raw: accessor).mapValues { $0 as! Any\(raw: protocolName) }.bridgeJSLowerReturn()"]
-        case .nullable, .array, .dictionary, .closure:
+        case .nullable, .closure:
             return lowerDictionaryStatementsInline(
                 valueType: valueType,
                 accessor: accessor,
@@ -1070,6 +1060,8 @@ struct StackCodegen {
             )
         case .void, .namespaceEnum:
             fatalError("Invalid dictionary value type: \(valueType)")
+        default:
+            return ["\(raw: accessor).bridgeJSLowerReturn()"]
         }
     }
 
