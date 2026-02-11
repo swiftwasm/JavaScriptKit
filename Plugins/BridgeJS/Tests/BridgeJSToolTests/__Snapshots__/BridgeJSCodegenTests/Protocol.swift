@@ -417,9 +417,7 @@ extension Priority: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 public func _bjs_processDelegates() -> Void {
     #if arch(wasm32)
     let ret = processDelegates(_: [AnyMyViewControllerDelegate].bridgeJSLiftParameter())
-    ret.map {
-        $0 as! AnyMyViewControllerDelegate
-    } .bridgeJSLowerReturn()
+    ret.map { $0 as! AnyMyViewControllerDelegate }.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -590,9 +588,7 @@ public func _bjs_MyViewController_delegate_set(_ _self: UnsafeMutableRawPointer,
 @_cdecl("bjs_MyViewController_secondDelegate_get")
 public func _bjs_MyViewController_secondDelegate_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = MyViewController.bridgeJSLiftParameter(_self).secondDelegate.flatMap {
-        $0 as? AnyMyViewControllerDelegate
-    }
+    let ret = MyViewController.bridgeJSLiftParameter(_self).secondDelegate.flatMap { $0 as? AnyMyViewControllerDelegate }
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -660,9 +656,7 @@ public func _bjs_DelegateManager_notifyAll(_ _self: UnsafeMutableRawPointer) -> 
 public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = DelegateManager.bridgeJSLiftParameter(_self).delegates
-    ret.map {
-        $0 as! AnyMyViewControllerDelegate
-    } .bridgeJSLowerReturn()
+    ret.map { $0 as! AnyMyViewControllerDelegate }.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

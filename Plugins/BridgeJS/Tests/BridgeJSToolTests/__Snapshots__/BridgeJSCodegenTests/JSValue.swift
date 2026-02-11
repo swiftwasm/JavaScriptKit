@@ -41,10 +41,11 @@ public func _bjs_roundTripOptionalJSValueArray(_ values: Int32) -> Void {
         } else {
             return [JSValue].bridgeJSLiftParameter()
         }
-        }())
+    }())
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")

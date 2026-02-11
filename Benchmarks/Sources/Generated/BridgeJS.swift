@@ -312,7 +312,7 @@ extension Person: _BridgedSwiftStruct {
         self.address.bridgeJSLowerReturn()
         let __bjs_isSome_email = self.email != nil
         if let __bjs_unwrapped_email = self.email {
-            __bjs_unwrapped_email.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_email.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
     }
@@ -1569,12 +1569,12 @@ public func _bjs_ArrayRoundtrip_takeNestedIntArray(_ _self: UnsafeMutableRawPoin
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Int]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Int].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1586,7 +1586,8 @@ public func _bjs_ArrayRoundtrip_makeNestedIntArray(_ _self: UnsafeMutableRawPoin
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeNestedIntArray()
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -1601,14 +1602,15 @@ public func _bjs_ArrayRoundtrip_roundtripNestedIntArray(_ _self: UnsafeMutableRa
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Int]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Int].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -1623,12 +1625,12 @@ public func _bjs_ArrayRoundtrip_takeNestedPointArray(_ _self: UnsafeMutableRawPo
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Point]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Point].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1640,7 +1642,8 @@ public func _bjs_ArrayRoundtrip_makeNestedPointArray(_ _self: UnsafeMutableRawPo
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeNestedPointArray()
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -1655,14 +1658,15 @@ public func _bjs_ArrayRoundtrip_roundtripNestedPointArray(_ _self: UnsafeMutable
         let __count = Int(_swift_js_pop_i32())
         var __result: [[Point]] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append([Point].bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()}
+    __bjs_elem_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -1677,12 +1681,12 @@ public func _bjs_ArrayRoundtrip_takeOptionalIntArray(_ _self: UnsafeMutableRawPo
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Int>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1696,8 +1700,10 @@ public func _bjs_ArrayRoundtrip_makeOptionalIntArray(_ _self: UnsafeMutableRawPo
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -1712,17 +1718,19 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalIntArray(_ _self: UnsafeMutable
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Int>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -1737,12 +1745,12 @@ public func _bjs_ArrayRoundtrip_takeOptionalPointArray(_ _self: UnsafeMutableRaw
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Point>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Point>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1756,8 +1764,10 @@ public func _bjs_ArrayRoundtrip_makeOptionalPointArray(_ _self: UnsafeMutableRaw
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -1772,17 +1782,19 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalPointArray(_ _self: UnsafeMutab
         let __count = Int(_swift_js_pop_i32())
         var __result: [Optional<Point>] = []
         __result.reserveCapacity(__count)
-        for _ in 0 ..< __count {
+        for _ in 0..<__count {
             __result.append(Optional<Point>.bridgeJSLiftParameter())
         }
         __result.reverse()
         return __result
-        }())
+    }())
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()}
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)}
+    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()
+    }
+    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -1799,7 +1811,7 @@ public func _bjs_ArrayRoundtrip_takeOptionalArray(_ _self: UnsafeMutableRawPoint
         } else {
             return [Int].bridgeJSLiftParameter()
         }
-        }())
+    }())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1812,7 +1824,8 @@ public func _bjs_ArrayRoundtrip_makeOptionalArraySome(_ _self: UnsafeMutableRawP
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalArraySome()
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -1826,7 +1839,8 @@ public func _bjs_ArrayRoundtrip_makeOptionalArrayNone(_ _self: UnsafeMutableRawP
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalArrayNone()
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")
@@ -1843,10 +1857,11 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalArray(_ _self: UnsafeMutableRaw
         } else {
             return [Int].bridgeJSLiftParameter()
         }
-        }())
+    }())
     let __bjs_isSome_ret = ret != nil
     if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()}
+    __bjs_unwrapped_ret.bridgeJSLowerReturn()
+    }
     _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
     #else
     fatalError("Only available on WebAssembly")

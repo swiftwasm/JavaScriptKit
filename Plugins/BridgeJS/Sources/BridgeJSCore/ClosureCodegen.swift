@@ -4,6 +4,9 @@ import SwiftSyntaxBuilder
 #if canImport(BridgeJSSkeleton)
 import BridgeJSSkeleton
 #endif
+#if canImport(BridgeJSUtilities)
+import BridgeJSUtilities
+#endif
 
 public struct ClosureCodegen {
     public init() {}
@@ -41,9 +44,6 @@ public struct ClosureCodegen {
         try builder.call(returnType: signature.returnType)
         try builder.liftReturnValue(returnType: signature.returnType)
 
-        // Get the body code
-        let bodyCode = builder.getBody()
-
         // Generate extern declaration using CallJSEmission
         let externDecl = builder.renderImportDecl()
 
@@ -58,79 +58,42 @@ public struct ClosureCodegen {
             #endif
             """
 
-        let helperEnumDecl = EnumDeclSyntax(
-            modifiers: DeclModifierListSyntax {
-                DeclModifierSyntax(name: .keyword(.private))
-            },
-            name: .identifier(helperName),
-            memberBlockBuilder: {
-                DeclSyntax(
-                    FunctionDeclSyntax(
-                        modifiers: DeclModifierListSyntax {
-                            DeclModifierSyntax(name: .keyword(.static))
-                        },
-                        name: .identifier("bridgeJSLift"),
-                        signature: FunctionSignatureSyntax(
-                            parameterClause: FunctionParameterClauseSyntax {
-                                FunctionParameterSyntax(
-                                    firstName: .wildcardToken(),
-                                    secondName: .identifier("callbackId"),
-                                    colon: .colonToken(),
-                                    type: IdentifierTypeSyntax(name: .identifier("Int32"))
-                                )
-                            },
-                            returnClause: ReturnClauseSyntax(
-                                arrow: .arrowToken(),
-                                type: IdentifierTypeSyntax(name: .identifier(swiftClosureType))
-                            )
-                        ),
-                        body: CodeBlockSyntax {
-                            "let callback = JSObject.bridgeJSLiftParameter(callbackId)"
-                            ReturnStmtSyntax(
-                                expression: ClosureExprSyntax(
-                                    leftBrace: .leftBraceToken(),
-                                    signature: ClosureSignatureSyntax(
-                                        capture: ClosureCaptureClauseSyntax(
-                                            leftSquare: .leftSquareToken(),
-                                            items: ClosureCaptureListSyntax {
-                                                #if canImport(SwiftSyntax602)
-                                                ClosureCaptureSyntax(
-                                                    name: .identifier("", presence: .missing),
-                                                    initializer: InitializerClauseSyntax(
-                                                        equal: .equalToken(presence: .missing),
-                                                        nil,
-                                                        value: ExprSyntax("callback")
-                                                    ),
-                                                    trailingTrivia: nil
-                                                )
-                                                #else
-                                                ClosureCaptureSyntax(
-                                                    expression: ExprSyntax("callback")
-                                                )
-                                                #endif
-                                            },
-                                            rightSquare: .rightSquareToken()
-                                        ),
-                                        parameterClause: .simpleInput(
-                                            ClosureShorthandParameterListSyntax {
-                                                for (index, _) in signature.parameters.enumerated() {
-                                                    ClosureShorthandParameterSyntax(name: .identifier("param\(index)"))
-                                                }
-                                            }
-                                        ),
-                                        inKeyword: .keyword(.in)
-                                    ),
-                                    statements: CodeBlockItemListSyntax {
-                                        SwiftCodePattern.buildWasmConditionalCompilation(wasmBody: bodyCode.statements)
-                                    },
-                                    rightBrace: .rightBraceToken()
-                                )
-                            )
+        let helperEnumDeclPrinter = CodeFragmentPrinter()
+        helperEnumDeclPrinter.write("private enum \(helperName) {")
+        helperEnumDeclPrinter.indent {
+            helperEnumDeclPrinter.write("static func bridgeJSLift(_ callbackId: Int32) -> \(swiftClosureType) {")
+            helperEnumDeclPrinter.indent {
+                helperEnumDeclPrinter.write("let callback = JSObject.bridgeJSLiftParameter(callbackId)")
+                let parameters: String
+                if signature.parameters.isEmpty {
+                    parameters = ""
+                } else if signature.parameters.count == 1 {
+                    parameters = " param0"
+                } else {
+                    parameters =
+                        " ("
+                        + signature.parameters.enumerated().map { index, param in
+                            "param\(index)"
+                        }.joined(separator: ", ") + ")"
+                }
+                helperEnumDeclPrinter.write("return { [callback]\(parameters) in")
+                helperEnumDeclPrinter.indent {
+                    SwiftCodePattern.buildWasmConditionalCompilation(
+                        printer: helperEnumDeclPrinter,
+                        wasmBody: { printer in
+                            printer.write(lines: builder.body.lines)
                         }
                     )
-                )
+                }
+                helperEnumDeclPrinter.write("}")
+
             }
-        )
+            helperEnumDeclPrinter.write("}")
+        }
+        helperEnumDeclPrinter.write("}")
+
+        let helperEnumDecl: DeclSyntax = "\(raw: helperEnumDeclPrinter.lines.joined(separator: "\n"))"
+
         let typedClosureExtension: DeclSyntax = """
             extension JSTypedClosure where Signature == \(raw: swiftClosureType) {
                 init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping \(raw: swiftClosureType)) {
@@ -145,7 +108,7 @@ public struct ClosureCodegen {
             """
 
         return [
-            externDecl, makeClosureExternDecl, DeclSyntax(helperEnumDecl), typedClosureExtension,
+            externDecl, makeClosureExternDecl, helperEnumDecl, typedClosureExtension,
         ]
     }
 
@@ -199,23 +162,19 @@ public struct ClosureCodegen {
             returnType: abiReturnWasmType
         )
 
-        // Build body
-        let body = CodeBlockItemListSyntax {
-            "let closure = Unmanaged<\(raw: boxType)>.fromOpaque(boxPtr).takeUnretainedValue().closure"
-            if signature.returnType == .void {
-                closureCallExpr
-            } else {
-                "let result = \(closureCallExpr)"
-                "return result.bridgeJSLowerReturn()"
-            }
-        }
-
         // Build function declaration using helper
         let funcDecl = SwiftCodePattern.buildExposedFunctionDecl(
             abiName: abiName,
-            signature: funcSignature,
-            body: body
-        )
+            signature: funcSignature
+        ) { printer in
+            printer.write("let closure = Unmanaged<\(boxType)>.fromOpaque(boxPtr).takeUnretainedValue().closure")
+            if signature.returnType == .void {
+                printer.write(closureCallExpr.description)
+            } else {
+                printer.write("let result = \(closureCallExpr)")
+                printer.write("return result.bridgeJSLowerReturn()")
+            }
+        }
 
         return DeclSyntax(funcDecl)
     }

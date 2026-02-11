@@ -60,6 +60,12 @@ public final class CodeFragmentPrinter {
         self.write(lines: printer.lines)
     }
 
+    public func write(multilineString: String) {
+        for line in multilineString.split(separator: "\n") {
+            write(line)
+        }
+    }
+
     public func indent() {
         indentLevel += 1
     }

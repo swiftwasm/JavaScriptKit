@@ -85,16 +85,16 @@ public struct ImportTS {
         let moduleName: String
         let context: BridgeContext
 
-        var body: [CodeBlockItemSyntax] = []
-        var abiParameterForwardings: [LabeledExprSyntax] = []
+        var body = CodeFragmentPrinter()
+        var abiParameterForwardings: [String] = []
         var abiParameterSignatures: [(name: String, type: WasmCoreType)] = []
         var abiReturnType: WasmCoreType?
         // Track destructured variable names for multiple lowered parameters
         var destructuredVarNames: [String] = []
         // Stack-lowered parameters should be evaluated in reverse order to match LIFO stacks
-        var stackLoweringStmts: [CodeBlockItemSyntax] = []
+        var stackLoweringStmts: [String] = []
         // Values to extend lifetime during call
-        var valuesToExtendLifetimeDuringCall: [ExprSyntax] = []
+        var valuesToExtendLifetimeDuringCall: [String] = []
 
         init(moduleName: String, abiName: String, context: BridgeContext = .importTS) {
             self.moduleName = moduleName
@@ -108,34 +108,17 @@ public struct ImportTS {
             switch param.type {
             case .closure(let signature, useJSTypedClosure: false):
                 let jsTypedClosureType = BridgeType.closure(signature, useJSTypedClosure: true).swiftType
-                body.append("let \(raw: param.name) = \(raw: jsTypedClosureType)(\(raw: param.name))")
+                body.write("let \(param.name) = \(jsTypedClosureType)(\(param.name))")
                 // The just created JSObject is not owned by the caller unlike those passed in parameters,
                 // so we need to extend its lifetime during the call to ensure the JSObject.id is valid.
-                valuesToExtendLifetimeDuringCall.append("\(raw: param.name)")
+                valuesToExtendLifetimeDuringCall.append(param.name)
             default:
                 break
             }
             let initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
 
             if loweringInfo.loweredParameters.isEmpty {
-                let stmt = CodeBlockItemSyntax(
-                    item: .decl(
-                        DeclSyntax(
-                            VariableDeclSyntax(
-                                bindingSpecifier: .keyword(.let),
-                                bindings: PatternBindingListSyntax {
-                                    PatternBindingSyntax(
-                                        pattern: PatternSyntax(
-                                            IdentifierPatternSyntax(identifier: .wildcardToken())
-                                        ),
-                                        initializer: InitializerClauseSyntax(value: initializerExpr)
-                                    )
-                                }
-                            )
-                        )
-                    )
-                )
-                stackLoweringStmts.insert(stmt, at: 0)
+                stackLoweringStmts.insert("let _ = \(initializerExpr)", at: 0)
                 return
             }
 
@@ -145,40 +128,14 @@ public struct ImportTS {
             }
 
             // Always add destructuring statement to body (unified for single and multiple)
-            let pattern: PatternSyntax
+            let pattern: String
             if destructuredNames.count == 1 {
-                pattern = PatternSyntax(IdentifierPatternSyntax(identifier: .identifier(destructuredNames[0])))
+                pattern = destructuredNames[0]
             } else {
-                pattern = PatternSyntax(
-                    TuplePatternSyntax {
-                        for name in destructuredNames {
-                            TuplePatternElementSyntax(
-                                pattern: IdentifierPatternSyntax(identifier: .identifier(name))
-                            )
-                        }
-                    }
-                )
+                pattern = "(" + destructuredNames.joined(separator: ", ") + ")"
             }
 
-            body.append(
-                CodeBlockItemSyntax(
-                    item: .decl(
-                        DeclSyntax(
-                            VariableDeclSyntax(
-                                bindingSpecifier: .keyword(.let),
-                                bindings: PatternBindingListSyntax {
-                                    PatternBindingSyntax(
-                                        pattern: pattern,
-                                        initializer: InitializerClauseSyntax(
-                                            value: initializerExpr
-                                        )
-                                    )
-                                }
-                            )
-                        )
-                    )
-                )
-            )
+            body.write("let \(pattern) = \(initializerExpr)")
             destructuredVarNames.append(contentsOf: destructuredNames)
 
             // Add to signatures and forwardings (unified for both single and multiple)
@@ -194,63 +151,36 @@ public struct ImportTS {
 
                 // Always use destructured variable in call without labels
                 // Swift allows omitting labels when they match parameter names
-                let callExpr = ExprSyntax("\(raw: destructuredNames[index])")
-                abiParameterForwardings.append(
-                    LabeledExprSyntax(expression: callExpr)
-                )
+                abiParameterForwardings.append(destructuredNames[index])
             }
         }
 
         func call(returnType: BridgeType) throws {
-            let liftingInfo = try returnType.liftingReturnInfo(context: context)
-            body.append(contentsOf: stackLoweringStmts)
-
-            var callExpr = FunctionCallExprSyntax(
-                calledExpression: ExprSyntax("\(raw: abiName)"),
-                leftParen: .leftParenToken(),
-                arguments: LabeledExprListSyntax {
-                    for forwarding in abiParameterForwardings {
-                        forwarding
-                    }
-                },
-                rightParen: .rightParenToken()
-            )
-
-            if !valuesToExtendLifetimeDuringCall.isEmpty {
-                callExpr = FunctionCallExprSyntax(
-                    calledExpression: ExprSyntax("withExtendedLifetime"),
-                    leftParen: .leftParenToken(),
-                    arguments: LabeledExprListSyntax {
-                        LabeledExprSyntax(
-                            expression: TupleExprSyntax(
-                                elements: LabeledExprListSyntax {
-                                    for value in valuesToExtendLifetimeDuringCall {
-                                        LabeledExprSyntax(expression: value)
-                                    }
-                                }
-                            )
-                        )
-                    },
-                    rightParen: .rightParenToken(),
-                    trailingClosure: ClosureExprSyntax(
-                        leftBrace: .leftBraceToken(),
-                        statements: CodeBlockItemListSyntax {
-                            CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr))))
-                        },
-                        rightBrace: .rightBraceToken()
-                    )
-                )
+            let liftingInfo: BridgeType.LiftingReturnInfo = try returnType.liftingReturnInfo(context: context)
+            for stmt in stackLoweringStmts {
+                body.write(stmt.description)
             }
 
-            if returnType == .void || returnType.usesSideChannelForOptionalReturn() || liftingInfo.valueToLift == nil {
-                body.append(CodeBlockItemSyntax(item: .stmt(StmtSyntax(ExpressionStmtSyntax(expression: callExpr)))))
+            let assign =
+                (returnType == .void || returnType.usesSideChannelForOptionalReturn() || liftingInfo.valueToLift == nil)
+                ? "" : "let ret = "
+            let callExpr = "\(abiName)(\(abiParameterForwardings.joined(separator: ", ")))"
+
+            if !valuesToExtendLifetimeDuringCall.isEmpty {
+                body.write(
+                    "\(assign)withExtendedLifetime((\(valuesToExtendLifetimeDuringCall.joined(separator: ", ")))) {"
+                )
+                body.indent {
+                    body.write(callExpr)
+                }
+                body.write("}")
             } else {
-                body.append("let ret = \(raw: callExpr)")
+                body.write("\(assign)\(callExpr)")
             }
 
             // Add exception check for ImportTS context
             if context == .importTS {
-                body.append("if let error = _swift_js_take_exception() { throw error }")
+                body.write("if let error = _swift_js_take_exception() { throw error }")
             }
         }
 
@@ -265,46 +195,22 @@ public struct ImportTS {
             if returnType.usesSideChannelForOptionalReturn() {
                 // Side channel returns: extern function returns Void, value is retrieved via side channel
                 abiReturnType = nil
-                body.append(
-                    CodeBlockItemSyntax(
-                        item: .stmt(
-                            StmtSyntax(
-                                ReturnStmtSyntax(
-                                    expression: ExprSyntax(
-                                        "\(raw: returnType.swiftType).bridgeJSLiftReturnFromSideChannel()"
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
+                body.write("return \(returnType.swiftType).bridgeJSLiftReturnFromSideChannel()")
             } else {
                 abiReturnType = liftingInfo.valueToLift
-                let liftExpr: ExprSyntax
+                let liftExpr: String
                 switch returnType {
                 case .closure(let signature, _):
-                    liftExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(ret)")
+                    liftExpr = "_BJS_Closure_\(signature.mangleName).bridgeJSLift(ret)"
                 default:
                     if liftingInfo.valueToLift != nil {
-                        liftExpr = "\(raw: returnType.swiftType).bridgeJSLiftReturn(ret)"
+                        liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn(ret)"
                     } else {
-                        liftExpr = "\(raw: returnType.swiftType).bridgeJSLiftReturn()"
+                        liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn()"
                     }
                 }
-                body.append(
-                    CodeBlockItemSyntax(
-                        item: .stmt(
-                            StmtSyntax(
-                                ReturnStmtSyntax(expression: liftExpr)
-                            )
-                        )
-                    )
-                )
+                body.write("return \(liftExpr)")
             }
-        }
-
-        func getBody() -> CodeBlockSyntax {
-            return CodeBlockSyntax(statements: CodeBlockItemListSyntax(body))
         }
 
         func assignThis(returnType: BridgeType) {
@@ -312,7 +218,7 @@ public struct ImportTS {
                 preconditionFailure("assignThis can only be called with a jsObject return type")
             }
             abiReturnType = .i32
-            body.append("self.jsObject = JSObject(id: UInt32(bitPattern: ret))")
+            body.write("self.jsObject = JSObject(id: UInt32(bitPattern: ret))")
         }
 
         func renderImportDecl() -> DeclSyntax {
@@ -321,40 +227,33 @@ public struct ImportTS {
                 returnType: abiReturnType
             )
 
-            // Build extern function declaration (no body)
-            let externFuncDecl = FunctionDeclSyntax(
-                attributes: SwiftCodePattern.buildExternAttribute(moduleName: moduleName, abiName: abiName),
-                modifiers: DeclModifierListSyntax {
-                    DeclModifierSyntax(name: .keyword(.fileprivate)).with(\.trailingTrivia, .space)
+            let printer = CodeFragmentPrinter()
+            SwiftCodePattern.buildWasmConditionalCompilationDecls(
+                printer: printer,
+                wasmDecl: { printer in
+                    SwiftCodePattern.buildExternFunctionDecl(
+                        printer: printer,
+                        moduleName: moduleName,
+                        abiName: abiName,
+                        functionName: abiName,
+                        signature: signature
+                    )
                 },
-                funcKeyword: .keyword(.func).with(\.trailingTrivia, .space),
-                name: .identifier(abiName),
-                signature: signature
-            )
-
-            // Build stub function declaration (with fatalError body)
-            let stubFuncDecl = FunctionDeclSyntax(
-                modifiers: DeclModifierListSyntax {
-                    DeclModifierSyntax(name: .keyword(.fileprivate)).with(\.trailingTrivia, .space)
-                },
-                funcKeyword: .keyword(.func).with(\.trailingTrivia, .space),
-                name: .identifier(abiName),
-                signature: signature,
-                body: CodeBlockSyntax {
-                    "fatalError(\"Only available on WebAssembly\")"
+                elseDecl: { printer in
+                    printer.write(
+                        multilineString: """
+                            fileprivate func \(abiName)\(signature) {
+                                fatalError("Only available on WebAssembly")
+                            }
+                            """
+                    )
                 }
             )
-
-            // Use conditional compilation helper
-            return DeclSyntax(
-                SwiftCodePattern.buildWasmConditionalCompilationDecls(
-                    wasmDecl: DeclSyntax(externFuncDecl),
-                    elseDecl: DeclSyntax(stubFuncDecl)
-                )
-            )
+            return "\(raw: printer.lines.joined(separator: "\n"))"
         }
 
         func renderThunkDecl(name: String, parameters: [Parameter], returnType: BridgeType) -> DeclSyntax {
+            let printer = CodeFragmentPrinter()
             let effects = Effects(isAsync: false, isThrows: true)
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
                 parameters: parameters,
@@ -362,35 +261,28 @@ public struct ImportTS {
                 effects: effects,
                 useWildcardLabels: true
             )
-            return DeclSyntax(
-                FunctionDeclSyntax(
-                    name: .identifier(name.backtickIfNeeded()),
-                    signature: signature,
-                    body: CodeBlockSyntax {
-                        body
-                    }
-                )
-            )
+            printer.write("func \(name.backtickIfNeeded())\(signature) {")
+            printer.indent {
+                printer.write(lines: body.lines)
+            }
+            printer.write("}")
+            return "\(raw: printer.lines.joined(separator: "\n"))"
         }
 
         func renderConstructorDecl(parameters: [Parameter]) -> DeclSyntax {
+            let printer = CodeFragmentPrinter()
             let effects = Effects(isAsync: false, isThrows: true)
-            // Constructors don't have return types, so build signature without return clause
-            let signature = FunctionSignatureSyntax(
-                parameterClause: SwiftSignatureBuilder.buildParameterClause(
-                    parameters: parameters,
-                    useWildcardLabels: true
-                ),
-                effectSpecifiers: SwiftSignatureBuilder.buildEffectSpecifiers(effects: effects)
+            let parameterClause = SwiftSignatureBuilder.buildParameterClause(
+                parameters: parameters,
+                useWildcardLabels: true
             )
-            return DeclSyntax(
-                InitializerDeclSyntax(
-                    signature: signature,
-                    bodyBuilder: {
-                        body
-                    }
-                )
-            )
+            let effectSpecifiers = SwiftSignatureBuilder.buildEffectSpecifiers(effects: effects)
+            printer.write("init\(parameterClause)\(effectSpecifiers.map { " \($0)" } ?? "") {")
+            printer.indent {
+                printer.write(lines: body.lines)
+            }
+            printer.write("}")
+            return "\(raw: printer.lines.joined(separator: "\n"))"
         }
     }
 
@@ -600,12 +492,17 @@ struct SwiftSignatureBuilder {
         returnType: BridgeType,
         effects: Effects? = nil,
         useWildcardLabels: Bool = false
-    ) -> FunctionSignatureSyntax {
-        return FunctionSignatureSyntax(
-            parameterClause: buildParameterClause(parameters: parameters, useWildcardLabels: useWildcardLabels),
-            effectSpecifiers: effects.flatMap { buildEffectSpecifiers(effects: $0) },
-            returnClause: buildReturnClause(returnType: returnType)
-        )
+    ) -> String {
+        let parameterClause = buildParameterClause(parameters: parameters, useWildcardLabels: useWildcardLabels)
+        let effectSpecifiers = effects.flatMap { buildEffectSpecifiers(effects: $0) }
+        let returnClause = buildReturnClause(returnType: returnType)
+        var out = ""
+        out += parameterClause
+        if let effectSpecifiers {
+            out += " \(effectSpecifiers)"
+        }
+        out += returnClause
+        return out
     }
 
     /// Builds a function signature for ABI/extern functions using WasmCoreType parameters
@@ -619,12 +516,14 @@ struct SwiftSignatureBuilder {
         abiParameters: [(name: String, type: WasmCoreType)],
         returnType: WasmCoreType?,
         effects: Effects? = nil
-    ) -> FunctionSignatureSyntax {
-        return FunctionSignatureSyntax(
-            parameterClause: buildABIParameterClause(abiParameters: abiParameters),
-            effectSpecifiers: effects.flatMap { buildEffectSpecifiers(effects: $0) },
-            returnClause: buildABIReturnClause(returnType: returnType)
-        )
+    ) -> String {
+        var out = ""
+        out += buildABIParameterClause(abiParameters: abiParameters)
+        if let effects = effects, let effectSpecifiers = buildEffectSpecifiers(effects: effects) {
+            out += " \(effectSpecifiers)"
+        }
+        out += buildABIReturnClause(returnType: returnType)
+        return out
     }
 
     /// Builds a parameter clause from an array of Parameter structs
@@ -639,48 +538,28 @@ struct SwiftSignatureBuilder {
     static func buildParameterClause(
         parameters: [Parameter],
         useWildcardLabels: Bool = false
-    ) -> FunctionParameterClauseSyntax {
-        return FunctionParameterClauseSyntax(parametersBuilder: {
-            for param in parameters {
-                let paramTypeSyntax = buildParameterTypeSyntax(from: param.type)
-                if useWildcardLabels {
-                    // Always use wildcard labels: "_ name: Type"
-                    FunctionParameterSyntax(
-                        firstName: .wildcardToken(),
-                        secondName: .identifier(param.name),
-                        colon: .colonToken(),
-                        type: paramTypeSyntax
-                    )
-                } else {
-                    let label = param.label ?? param.name
-                    if label == param.name {
-                        // External label same as parameter name: "count: Int"
-                        FunctionParameterSyntax(
-                            firstName: .identifier(label),
-                            secondName: nil,
-                            colon: .colonToken(),
-                            type: paramTypeSyntax
-                        )
-                    } else if param.label == nil {
-                        // No label specified: use wildcard "_ name: Type"
-                        FunctionParameterSyntax(
-                            firstName: .wildcardToken(),
-                            secondName: .identifier(param.name),
-                            colon: .colonToken(),
-                            type: paramTypeSyntax
-                        )
-                    } else {
-                        // External label differs: "label count: Int"
-                        FunctionParameterSyntax(
-                            firstName: .identifier(label),
-                            secondName: .identifier(param.name),
-                            colon: .colonToken(),
-                            type: paramTypeSyntax
-                        )
-                    }
-                }
+    ) -> String {
+        var out = "("
+        out += parameters.map { param in
+            let label = param.label ?? param.name
+            let paramType = buildParameterTypeSyntax(from: param.type)
+
+            if useWildcardLabels {
+                // Always use wildcard labels: "_ name: Type"
+                return "_ \(param.name): \(paramType)"
+            } else if label == param.name {
+                // External label same as parameter name: "count: Int"
+                return "\(param.name): \(paramType)"
+            } else if param.label == nil {
+                // No label specified: use wildcard "_ name: Type"
+                return "_ \(param.name): \(paramType)"
+            } else {
+                // External label differs: "label count: Int"
+                return "\(label) \(param.name): \(paramType)"
             }
-        })
+        }.joined(separator: ", ")
+        out += ")"
+        return out
     }
 
     /// Builds a parameter clause for ABI/extern functions
@@ -688,77 +567,56 @@ struct SwiftSignatureBuilder {
     /// All parameters use wildcard labels: "_ name: Type"
     static func buildABIParameterClause(
         abiParameters: [(name: String, type: WasmCoreType)]
-    ) -> FunctionParameterClauseSyntax {
-        return FunctionParameterClauseSyntax(parametersBuilder: {
-            for param in abiParameters {
-                FunctionParameterSyntax(
-                    firstName: .wildcardToken().with(\.trailingTrivia, .space),
-                    secondName: .identifier(param.name),
-                    type: IdentifierTypeSyntax(name: .identifier(param.type.swiftType))
-                )
-            }
-        })
+    ) -> String {
+        "("
+            + abiParameters.map { param in
+                "_ \(param.name): \(param.type.swiftType)"
+            }.joined(separator: ", ") + ")"
     }
 
     /// Builds a return clause from a BridgeType
     ///
     /// Always returns a ReturnClauseSyntax, including for Void types
     /// (to match original behavior that explicitly includes "-> Void")
-    static func buildReturnClause(returnType: BridgeType) -> ReturnClauseSyntax? {
-        return ReturnClauseSyntax(
-            arrow: .arrowToken(),
-            type: buildTypeSyntax(from: returnType)
-        )
+    static func buildReturnClause(returnType: BridgeType) -> String {
+        return " -> \(returnType.swiftType)"
     }
 
     /// Builds a return clause for ABI/extern functions
     ///
     /// Returns nil for Void (when returnType is nil), otherwise returns a ReturnClauseSyntax
-    static func buildABIReturnClause(returnType: WasmCoreType?) -> ReturnClauseSyntax? {
+    static func buildABIReturnClause(returnType: WasmCoreType?) -> String {
         guard let returnType = returnType else {
-            return ReturnClauseSyntax(
-                arrow: .arrowToken(),
-                type: IdentifierTypeSyntax(name: .identifier("Void"))
-            )
+            return " -> Void"
         }
-        return ReturnClauseSyntax(
-            arrow: .arrowToken(),
-            type: IdentifierTypeSyntax(name: .identifier(returnType.swiftType))
-        )
+        return " -> \(returnType.swiftType)"
     }
 
     /// Builds effect specifiers (async/throws) from an Effects struct
     ///
     /// Uses JSException as the thrown error type for throws clauses
-    static func buildEffectSpecifiers(effects: Effects) -> FunctionEffectSpecifiersSyntax? {
+    static func buildEffectSpecifiers(effects: Effects) -> String? {
         guard effects.isAsync || effects.isThrows else {
             return nil
         }
-        return FunctionEffectSpecifiersSyntax(
-            asyncSpecifier: effects.isAsync ? .keyword(.async) : nil,
-            throwsClause: effects.isThrows
-                ? ThrowsClauseSyntax(
-                    throwsSpecifier: .keyword(.throws),
-                    leftParen: .leftParenToken(),
-                    type: IdentifierTypeSyntax(name: .identifier("JSException")),
-                    rightParen: .rightParenToken()
-                ) : nil
-        )
+        var items: [String] = []
+        if effects.isAsync { items.append("async") }
+        if effects.isThrows { items.append("throws(JSException)") }
+        return items.joined(separator: " ")
     }
 
     /// Builds a TypeSyntax node from a BridgeType
     ///
     /// Converts BridgeType to its Swift type representation as a TypeSyntax node
-    static func buildTypeSyntax(from type: BridgeType) -> TypeSyntax {
-        let identifierType = IdentifierTypeSyntax(name: .identifier(type.swiftType))
-        return TypeSyntax(identifierType)
+    static func buildTypeSyntax(from type: BridgeType) -> String {
+        return type.swiftType
     }
 
     /// Builds a parameter type syntax from a BridgeType.
-    static func buildParameterTypeSyntax(from type: BridgeType) -> TypeSyntax {
+    static func buildParameterTypeSyntax(from type: BridgeType) -> String {
         switch type {
         case .closure(_, useJSTypedClosure: false):
-            return TypeSyntax("@escaping \(raw: type.swiftType)")
+            return "@escaping \(type.swiftType)"
         default:
             return buildTypeSyntax(from: type)
         }
@@ -768,167 +626,69 @@ struct SwiftSignatureBuilder {
 enum SwiftCodePattern {
     /// Builds a conditional compilation block with #if arch(wasm32) and #else fatalError
     static func buildWasmConditionalCompilation(
-        wasmBody: CodeBlockItemListSyntax
-    ) -> IfConfigDeclSyntax {
-        return IfConfigDeclSyntax(
-            clauses: IfConfigClauseListSyntax {
-                IfConfigClauseSyntax(
-                    poundKeyword: .poundIfToken(),
-                    condition: ExprSyntax("arch(wasm32)"),
-                    elements: .statements(wasmBody)
-                )
-                IfConfigClauseSyntax(
-                    poundKeyword: .poundElseToken(),
-                    elements: .statements(
-                        CodeBlockItemListSyntax {
-                            "fatalError(\"Only available on WebAssembly\")"
-                        }
-                    )
-                )
-            }
-        )
+        printer: CodeFragmentPrinter,
+        wasmBody: (_ printer: CodeFragmentPrinter) -> Void
+    ) {
+        printer.write("#if arch(wasm32)")
+        wasmBody(printer)
+        printer.write("#else")
+        printer.write("fatalError(\"Only available on WebAssembly\")")
+        printer.write("#endif")
     }
 
     /// Builds a conditional compilation block with #if arch(wasm32) and #else for declarations
     static func buildWasmConditionalCompilationDecls(
-        wasmDecl: DeclSyntax,
-        elseDecl: DeclSyntax
-    ) -> IfConfigDeclSyntax {
-        return IfConfigDeclSyntax(
-            clauses: IfConfigClauseListSyntax {
-                IfConfigClauseSyntax(
-                    poundKeyword: .poundIfToken(),
-                    condition: ExprSyntax("arch(wasm32)"),
-                    elements: .statements(
-                        CodeBlockItemListSyntax {
-                            CodeBlockItemSyntax(item: .decl(wasmDecl))
-                        }
-                    )
-                )
-                IfConfigClauseSyntax(
-                    poundKeyword: .poundElseToken(),
-                    elements: .statements(
-                        CodeBlockItemListSyntax {
-                            CodeBlockItemSyntax(item: .decl(elseDecl))
-                        }
-                    )
-                )
-            }
-        )
+        printer: CodeFragmentPrinter,
+        wasmDecl: (_ printer: CodeFragmentPrinter) -> Void,
+        elseDecl: (_ printer: CodeFragmentPrinter) -> Void
+    ) {
+        printer.write("#if arch(wasm32)")
+        wasmDecl(printer)
+        printer.write("#else")
+        elseDecl(printer)
+        printer.write("#endif")
     }
 
     /// Builds the @_extern attribute for WebAssembly extern function declarations
     /// Builds an @_extern function declaration (no body, just the declaration)
     static func buildExternFunctionDecl(
+        printer: CodeFragmentPrinter,
         moduleName: String,
         abiName: String,
         functionName: String,
-        signature: FunctionSignatureSyntax
-    ) -> FunctionDeclSyntax {
-        return FunctionDeclSyntax(
-            attributes: buildExternAttribute(moduleName: moduleName, abiName: abiName),
-            modifiers: DeclModifierListSyntax {
-                DeclModifierSyntax(name: .keyword(.fileprivate))
-            },
-            funcKeyword: .keyword(.func),
-            name: .identifier(functionName),
-            signature: signature
-        )
+        signature: String
+    ) {
+        printer.write(buildExternAttribute(moduleName: moduleName, abiName: abiName))
+        printer.write("fileprivate func \(functionName)\(signature)")
     }
 
     /// Builds the standard @_expose and @_cdecl attributes for WebAssembly-exposed functions
-    static func buildExposeAttributes(abiName: String) -> AttributeListSyntax {
-        return AttributeListSyntax {
-            #if canImport(SwiftSyntax602)
-            let exposeAttrArgs = AttributeSyntax.Arguments.argumentList(
-                LabeledExprListSyntax {
-                    LabeledExprSyntax(label: nil, expression: DeclReferenceExprSyntax(baseName: "wasm"))
-                        .with(\.trailingComma, .commaToken())
-                    LabeledExprSyntax(label: nil, expression: StringLiteralExprSyntax(content: abiName))
-                }
-            )
-            let cdeclAttrArgs = AttributeSyntax.Arguments.argumentList(
-                [
-                    LabeledExprSyntax(label: nil, expression: StringLiteralExprSyntax(content: abiName))
-                ]
-            )
-            #else
-            let exposeAttrArgs = AttributeSyntax.Arguments.exposeAttributeArguments(
-                ExposeAttributeArgumentsSyntax(
-                    language: .identifier("wasm"),
-                    comma: .commaToken(),
-                    cxxName: StringLiteralExprSyntax(content: abiName)
-                )
-            )
-            let cdeclAttrArgs = AttributeSyntax.Arguments.string(StringLiteralExprSyntax(content: abiName))
-            #endif
-            AttributeSyntax(
-                attributeName: IdentifierTypeSyntax(name: .identifier("_expose")),
-                leftParen: .leftParenToken(),
-                arguments: exposeAttrArgs,
-                rightParen: .rightParenToken()
-            )
-            .with(\.trailingTrivia, .newline)
-
-            AttributeSyntax(
-                attributeName: IdentifierTypeSyntax(name: .identifier("_cdecl")),
-                leftParen: .leftParenToken(),
-                arguments: cdeclAttrArgs,
-                rightParen: .rightParenToken()
-            )
-            .with(\.trailingTrivia, .newline)
-        }
+    static func buildExposeAttributes(abiName: String) -> String {
+        return """
+            @_expose(wasm, "\(abiName)")
+            @_cdecl("\(abiName)")
+            """
     }
 
     /// Builds a function declaration with @_expose/@_cdecl attributes and conditional compilation
     static func buildExposedFunctionDecl(
         abiName: String,
-        signature: FunctionSignatureSyntax,
-        body: CodeBlockItemListSyntax
-    ) -> FunctionDeclSyntax {
-        let funcBody = CodeBlockSyntax {
-            buildWasmConditionalCompilation(wasmBody: body)
+        signature: String,
+        body: (CodeFragmentPrinter) -> Void
+    ) -> DeclSyntax {
+        let printer = CodeFragmentPrinter()
+        printer.write(buildExposeAttributes(abiName: abiName))
+        printer.write("public func _\(abiName)\(signature) {")
+        printer.indent {
+            buildWasmConditionalCompilation(printer: printer, wasmBody: body)
         }
-
-        return FunctionDeclSyntax(
-            attributes: buildExposeAttributes(abiName: abiName),
-            modifiers: DeclModifierListSyntax {
-                DeclModifierSyntax(name: .keyword(.public))
-            },
-            funcKeyword: .keyword(.func),
-            name: .identifier("_\(abiName)"),
-            signature: signature,
-            body: funcBody
-        )
+        printer.write("}")
+        return "\(raw: printer.lines.joined(separator: "\n"))"
     }
 
     /// Builds the @_extern attribute for WebAssembly extern function declarations
-    static func buildExternAttribute(moduleName: String, abiName: String) -> AttributeListSyntax {
-        return AttributeListSyntax {
-            AttributeSyntax(
-                attributeName: IdentifierTypeSyntax(name: .identifier("_extern")),
-                leftParen: .leftParenToken(),
-                arguments: .argumentList(
-                    LabeledExprListSyntax {
-                        LabeledExprSyntax(
-                            expression: ExprSyntax("wasm")
-                        )
-                        LabeledExprSyntax(
-                            label: .identifier("module"),
-                            colon: .colonToken(),
-                            expression: StringLiteralExprSyntax(content: moduleName)
-                        )
-                        LabeledExprSyntax(
-                            label: .identifier("name"),
-                            colon: .colonToken(),
-                            expression: StringLiteralExprSyntax(content: abiName)
-                        )
-                    }
-                ),
-                rightParen: .rightParenToken()
-            )
-            .with(\.trailingTrivia, .newline)
-        }
+    static func buildExternAttribute(moduleName: String, abiName: String) -> String {
+        return "@_extern(wasm, module: \"\(moduleName)\", name: \"\(abiName)\")"
     }
 }
 

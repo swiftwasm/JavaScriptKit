@@ -91,8 +91,7 @@ public class ExportSwift {
             }
         }
         return withSpan("Format Export Glue") {
-            let format = BasicFormat()
-            return decls.map { $0.formatted(using: format).description }.joined(separator: "\n\n")
+            return decls.map { $0.description }.joined(separator: "\n\n")
         }
     }
 
@@ -423,9 +422,10 @@ public class ExportSwift {
             // Build function declaration using helper function
             let funcDecl = SwiftCodePattern.buildExposedFunctionDecl(
                 abiName: abiName,
-                signature: signature,
-                body: body
-            )
+                signature: signature
+            ) { printer in
+                printer.write(multilineString: body.description)
+            }
 
             return DeclSyntax(funcDecl)
         }
@@ -715,11 +715,10 @@ public class ExportSwift {
                 signature: SwiftSignatureBuilder.buildABIFunctionSignature(
                     abiParameters: [("pointer", .pointer)],
                     returnType: nil
-                ),
-                body: CodeBlockItemListSyntax {
-                    "Unmanaged<\(raw: klass.swiftCallName)>.fromOpaque(pointer).release()"
-                }
-            )
+                )
+            ) { printer in
+                printer.write("Unmanaged<\(klass.swiftCallName)>.fromOpaque(pointer).release()")
+            }
             decls.append(DeclSyntax(funcDecl))
         }
 
@@ -763,34 +762,29 @@ public class ExportSwift {
             returnType: .i32
         )
 
-        // Build extern function declaration (no body)
-        let externFuncDecl = SwiftCodePattern.buildExternFunctionDecl(
-            moduleName: moduleName,
-            abiName: externFunctionName,
-            functionName: wrapFunctionName,
-            signature: funcSignature
-        )
-
-        // Build stub function declaration (with fatalError body)
-        let stubFuncDecl = FunctionDeclSyntax(
-            modifiers: DeclModifierListSyntax {
-                DeclModifierSyntax(name: .keyword(.fileprivate))
+        let externDeclPrinter = CodeFragmentPrinter()
+        SwiftCodePattern.buildWasmConditionalCompilationDecls(
+            printer: externDeclPrinter,
+            wasmDecl: { printer in
+                SwiftCodePattern.buildExternFunctionDecl(
+                    printer: printer,
+                    moduleName: moduleName,
+                    abiName: externFunctionName,
+                    functionName: wrapFunctionName,
+                    signature: funcSignature
+                )
             },
-            funcKeyword: .keyword(.func),
-            name: .identifier(wrapFunctionName),
-            signature: funcSignature,
-            body: CodeBlockSyntax {
-                "fatalError(\"Only available on WebAssembly\")"
+            elseDecl: { printer in
+                printer.write(
+                    multilineString: """
+                        fileprivate func \(wrapFunctionName)\(funcSignature) {
+                            fatalError("Only available on WebAssembly")
+                        }
+                        """
+                )
             }
         )
-
-        // Use helper function for conditional compilation
-        let externDecl = DeclSyntax(
-            SwiftCodePattern.buildWasmConditionalCompilationDecls(
-                wasmDecl: DeclSyntax(externFuncDecl),
-                elseDecl: DeclSyntax(stubFuncDecl)
-            )
-        )
+        let externDecl: DeclSyntax = "\(raw: externDeclPrinter.lines.joined(separator: "\n"))"
         return [extensionDecl, externDecl]
     }
 }
@@ -1035,9 +1029,9 @@ struct StackCodegen {
         accessor: String,
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
-        var statements: [CodeBlockItemSyntax] = []
+        var statements: [String] = []
         let elementVarName = "__bjs_elem_\(varPrefix)"
-        statements.append("for \(raw: elementVarName) in \(raw: accessor) {")
+        statements.append("for \(elementVarName) in \(accessor) {")
 
         let elementStatements = lowerStatements(
             for: elementType,
@@ -1045,12 +1039,13 @@ struct StackCodegen {
             varPrefix: "\(varPrefix)_elem"
         )
         for stmt in elementStatements {
-            statements.append(stmt)
+            statements.append(stmt.description)
         }
 
         statements.append("}")
-        statements.append("_swift_js_push_i32(Int32(\(raw: accessor).count))")
-        return statements
+        statements.append("_swift_js_push_i32(Int32(\(accessor).count))")
+        let parsed: CodeBlockItemListSyntax = "\(raw: statements.joined(separator: "\n"))"
+        return Array(parsed)
     }
 
     private func lowerDictionaryStatements(
@@ -1117,9 +1112,9 @@ struct StackCodegen {
         accessor: String,
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
-        var statements: [CodeBlockItemSyntax] = []
-        statements.append("let __bjs_isSome_\(raw: varPrefix) = \(raw: accessor) != nil")
-        statements.append("if let __bjs_unwrapped_\(raw: varPrefix) = \(raw: accessor) {")
+        var statements: [String] = []
+        statements.append("let __bjs_isSome_\(varPrefix) = \(accessor) != nil")
+        statements.append("if let __bjs_unwrapped_\(varPrefix) = \(accessor) {")
 
         let innerStatements = lowerUnwrappedOptionalStatements(
             wrappedType: wrappedType,
@@ -1127,12 +1122,13 @@ struct StackCodegen {
             varPrefix: varPrefix
         )
         for stmt in innerStatements {
-            statements.append(stmt)
+            statements.append(stmt.description)
         }
 
         statements.append("}")
-        statements.append("_swift_js_push_i32(__bjs_isSome_\(raw: varPrefix) ? 1 : 0)")
-        return statements
+        statements.append("_swift_js_push_i32(__bjs_isSome_\(varPrefix) ? 1 : 0)")
+        let parsed: CodeBlockItemListSyntax = "\(raw: statements.joined(separator: "\n"))"
+        return Array(parsed)
     }
 
     private func lowerUnwrappedOptionalStatements(
@@ -1186,104 +1182,151 @@ struct EnumCodegen {
     }
 
     private func renderCaseEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
-        let typeName = enumDef.swiftCallName
-        var initCases: [String] = []
-        var valueCases: [String] = []
-        for (index, enumCase) in enumDef.cases.enumerated() {
-            initCases.append("case \(index): self = .\(enumCase.name)")
-            valueCases.append("case .\(enumCase.name): return \(index)")
-        }
-        let initSwitch = (["switch bridgeJSRawValue {"] + initCases + ["default: return nil", "}"]).joined(
-            separator: "\n"
-        )
-        let valueSwitch = (["switch self {"] + valueCases + ["}"]).joined(separator: "\n")
+        let printer = CodeFragmentPrinter()
+        printer.write("extension \(enumDef.swiftCallName): _BridgedSwiftCaseEnum {")
+        printer.indent {
+            printer.write(
+                multilineString: """
+                    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+                        return bridgeJSRawValue
+                    }
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> \(enumDef.swiftCallName) {
+                        return bridgeJSLiftParameter(value)
+                    }
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> \(enumDef.swiftCallName) {
+                        return \(enumDef.swiftCallName)(bridgeJSRawValue: value)!
+                    }
+                    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+                        return bridgeJSLowerParameter()
+                    }
 
-        return """
-            extension \(raw: typeName): _BridgedSwiftCaseEnum {
-                @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
-                    return bridgeJSRawValue
-                }
-                @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> \(raw: typeName) {
-                    return bridgeJSLiftParameter(value)
-                }
-                @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> \(raw: typeName) {
-                    return \(raw: typeName)(bridgeJSRawValue: value)!
-                }
-                @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
-                    return bridgeJSLowerParameter()
-                }
+                    """
+            )
+            printer.nextLine()
 
-                private init?(bridgeJSRawValue: Int32) {
-                    \(raw: initSwitch)
+            printer.write("private init?(bridgeJSRawValue: Int32) {")
+            printer.indent {
+                printer.write("switch bridgeJSRawValue {")
+                for (index, enumCase) in enumDef.cases.enumerated() {
+                    printer.write("case \(index):")
+                    printer.indent {
+                        printer.write("self = .\(enumCase.name)")
+                    }
                 }
-
-                private var bridgeJSRawValue: Int32 {
-                    \(raw: valueSwitch)
+                printer.write("default:")
+                printer.indent {
+                    printer.write("return nil")
                 }
+                printer.write("}")
             }
-            """
+            printer.write("}")
+            printer.nextLine()
+
+            printer.write("private var bridgeJSRawValue: Int32 {")
+            printer.indent {
+                printer.write("switch self {")
+                for (index, enumCase) in enumDef.cases.enumerated() {
+                    printer.write("case .\(enumCase.name):")
+                    printer.indent {
+                        printer.write("return \(index)")
+                    }
+                }
+                printer.write("}")
+            }
+            printer.write("}")
+        }
+        printer.write("}")
+        return "\(raw: printer.lines.joined(separator: "\n"))"
     }
 
     private func renderRawValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
         let typeName = enumDef.swiftCallName
         guard enumDef.rawType != nil else {
             return """
-                extension \(raw: typeName): _BridgedSwiftEnumNoPayload {}
+                extension \(raw: typeName): _BridgedSwiftEnumNoPayload {
+                }
                 """
         }
         // When rawType is present, conform to _BridgedSwiftRawValueEnum which provides
         // default implementations for _BridgedSwiftStackType methods via protocol extension.
         return """
-            extension \(raw: typeName): _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
+            extension \(raw: typeName): _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+            }
             """
     }
 
     private func renderAssociatedValueEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
         let typeName = enumDef.swiftCallName
-        return """
-            extension \(raw: typeName): _BridgedSwiftAssociatedValueEnum {
-                private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> \(raw: typeName) {
-                    switch caseId {
-                    \(raw: generateStackLiftSwitchCases(enumDef: enumDef).joined(separator: "\n"))
-                    default: fatalError("Unknown \(raw: typeName) case ID: \\(caseId)")
-                    }
+        let printer = CodeFragmentPrinter()
+        printer.write("extension \(typeName): _BridgedSwiftAssociatedValueEnum {")
+        printer.indent {
+            printer.write("private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> \(typeName) {")
+            printer.indent {
+                printer.write("switch caseId {")
+                generateStackLiftSwitchCases(printer: printer, enumDef: enumDef)
+                printer.write("default:")
+                printer.indent {
+                    printer.write("fatalError(\"Unknown \(typeName) case ID: \\(caseId)\")")
                 }
-
-                // MARK: Protocol Export
-
-                @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
-                    switch self {
-                    \(raw: generateLowerParameterSwitchCases(enumDef: enumDef).joined(separator: "\n"))
-                    }
-                }
-
-                @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> \(raw: typeName) {
-                    return _bridgeJSLiftFromCaseId(caseId)
-                }
-
-                // MARK: ExportSwift
-
-                @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(raw: typeName) {
-                    return _bridgeJSLiftFromCaseId(caseId)
-                }
-
-                @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-                    switch self {
-                    \(raw: generateReturnSwitchCases(enumDef: enumDef).joined(separator: "\n"))
-                    }
-                }
+                printer.write("}")
             }
-            """
+            printer.write("}")
+            printer.nextLine()
+
+            printer.write("// MARK: Protocol Export")
+            printer.nextLine()
+
+            printer.write("@_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {")
+            printer.indent {
+                printer.write("switch self {")
+                generateLowerParameterSwitchCases(printer: printer, enumDef: enumDef)
+                printer.write("}")
+            }
+            printer.write("}")
+            printer.nextLine()
+
+            printer.write(
+                multilineString: """
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> \(typeName) {
+                        return _bridgeJSLiftFromCaseId(caseId)
+                    }
+                    """
+            )
+            printer.nextLine()
+
+            printer.write("// MARK: ExportSwift")
+            printer.nextLine()
+
+            printer.write(
+                multilineString: """
+                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(typeName) {
+                        return _bridgeJSLiftFromCaseId(caseId)
+                    }
+                    """
+            )
+            printer.nextLine()
+
+            printer.write("@_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {")
+            printer.indent {
+                printer.write("switch self {")
+                generateReturnSwitchCases(printer: printer, enumDef: enumDef)
+                printer.write("}")
+            }
+            printer.write("}")
+        }
+        printer.write("}")
+        return "\(raw: printer.lines.joined(separator: "\n"))"
     }
 
-    private func generateStackLiftSwitchCases(enumDef: ExportedEnum) -> [String] {
-        var cases: [String] = []
+    private func generateStackLiftSwitchCases(printer: CodeFragmentPrinter, enumDef: ExportedEnum) {
         for (caseIndex, enumCase) in enumDef.cases.enumerated() {
             if enumCase.associatedValues.isEmpty {
-                cases.append("case \(caseIndex): return .\(enumCase.name)")
+                printer.write("case \(caseIndex):")
+                printer.indent {
+                    printer.write("return .\(enumCase.name)")
+                }
             } else {
-                var lines: [String] = []
-                lines.append("case \(caseIndex):")
+                printer.write("case \(caseIndex):")
                 let argList = enumCase.associatedValues.map { associatedValue in
                     let labelPrefix: String
                     if let label = associatedValue.label {
@@ -1294,17 +1337,17 @@ struct EnumCodegen {
                     let liftExpr = stackCodegen.liftExpression(for: associatedValue.type)
                     return "\(labelPrefix)\(liftExpr)"
                 }
-                lines.append("return .\(enumCase.name)(\(argList.joined(separator: ", ")))")
-                cases.append(lines.joined(separator: "\n"))
+                printer.indent {
+                    printer.write("return .\(enumCase.name)(\(argList.joined(separator: ", ")))")
+                }
             }
         }
-        return cases
     }
 
     private func generatePayloadPushingCode(
+        printer: CodeFragmentPrinter,
         associatedValues: [AssociatedValue]
-    ) -> [String] {
-        var bodyLines: [String] = []
+    ) {
         for (index, associatedValue) in associatedValues.enumerated() {
             let paramName = associatedValue.label ?? "param\(index)"
             let statements = stackCodegen.lowerStatements(
@@ -1312,51 +1355,50 @@ struct EnumCodegen {
                 accessor: paramName,
                 varPrefix: paramName
             )
-            for stmt in statements {
-                bodyLines.append(stmt.description)
-            }
+            printer.write(multilineString: CodeBlockItemListSyntax(statements).description)
         }
-        return bodyLines
     }
 
-    private func generateLowerParameterSwitchCases(enumDef: ExportedEnum) -> [String] {
-        var cases: [String] = []
+    private func generateLowerParameterSwitchCases(printer: CodeFragmentPrinter, enumDef: ExportedEnum) {
         for (caseIndex, enumCase) in enumDef.cases.enumerated() {
             if enumCase.associatedValues.isEmpty {
-                cases.append("case .\(enumCase.name):")
-                cases.append("return Int32(\(caseIndex))")
-            } else {
-                let payloadCode = generatePayloadPushingCode(associatedValues: enumCase.associatedValues)
-                let pattern = enumCase.associatedValues.enumerated()
-                    .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
-                    .joined(separator: ", ")
-                cases.append("case .\(enumCase.name)(\(pattern)):")
-                cases.append(contentsOf: payloadCode)
-                cases.append("return Int32(\(caseIndex))")
-            }
-        }
-        return cases
-    }
-
-    private func generateReturnSwitchCases(enumDef: ExportedEnum) -> [String] {
-        var cases: [String] = []
-        for (caseIndex, enumCase) in enumDef.cases.enumerated() {
-            if enumCase.associatedValues.isEmpty {
-                cases.append("case .\(enumCase.name):")
-                cases.append("_swift_js_push_tag(Int32(\(caseIndex)))")
+                printer.write("case .\(enumCase.name):")
+                printer.indent {
+                    printer.write("return Int32(\(caseIndex))")
+                }
             } else {
                 let pattern = enumCase.associatedValues.enumerated()
                     .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
                     .joined(separator: ", ")
-                cases.append("case .\(enumCase.name)(\(pattern)):")
-                let payloadCode = generatePayloadPushingCode(associatedValues: enumCase.associatedValues)
-                cases.append(contentsOf: payloadCode)
-                // Push tag AFTER payloads so it's popped first (LIFO) by the JS lift function.
-                // This ensures nested enum tags don't overwrite the outer tag.
-                cases.append("_swift_js_push_tag(Int32(\(caseIndex)))")
+                printer.write("case .\(enumCase.name)(\(pattern)):")
+                printer.indent {
+                    generatePayloadPushingCode(printer: printer, associatedValues: enumCase.associatedValues)
+                    printer.write("return Int32(\(caseIndex))")
+                }
             }
         }
-        return cases
+    }
+
+    private func generateReturnSwitchCases(printer: CodeFragmentPrinter, enumDef: ExportedEnum) {
+        for (caseIndex, enumCase) in enumDef.cases.enumerated() {
+            if enumCase.associatedValues.isEmpty {
+                printer.write("case .\(enumCase.name):")
+                printer.indent {
+                    printer.write("_swift_js_push_tag(Int32(\(caseIndex)))")
+                }
+            } else {
+                let pattern = enumCase.associatedValues.enumerated()
+                    .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
+                    .joined(separator: ", ")
+                printer.write("case .\(enumCase.name)(\(pattern)):")
+                printer.indent {
+                    generatePayloadPushingCode(printer: printer, associatedValues: enumCase.associatedValues)
+                    // Push tag AFTER payloads so it's popped first (LIFO) by the JS lift function.
+                    // This ensures nested enum tags don't overwrite the outer tag.
+                    printer.write("_swift_js_push_tag(Int32(\(caseIndex)))")
+                }
+            }
+        }
     }
 }
 
@@ -1367,40 +1409,60 @@ struct StructCodegen {
 
     func renderStructHelpers(_ structDef: ExportedStruct) -> [DeclSyntax] {
         let typeName = structDef.swiftCallName
-        let liftCode = generateStructLiftCode(structDef: structDef)
-        let lowerCode = generateStructLowerCode(structDef: structDef)
-        let accessControl = structDef.explicitAccessControl.map { "\($0) " } ?? ""
 
         let lowerExternName = "swift_js_struct_lower_\(structDef.name)"
         let liftExternName = "swift_js_struct_lift_\(structDef.name)"
         let lowerFunctionName = "_bjs_struct_lower_\(structDef.name)"
         let liftFunctionName = "_bjs_struct_lift_\(structDef.name)"
 
-        let bridgedStructExtension: DeclSyntax = """
-            extension \(raw: typeName): _BridgedSwiftStruct {
-                @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> \(raw: typeName) {
-                    \(raw: liftCode.joined(separator: "\n"))
-                }
-
-                @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-                    \(raw: lowerCode.joined(separator: "\n"))
-                }
-
-                \(raw: accessControl)init(unsafelyCopying jsObject: JSObject) {
-                    let __bjs_cleanupId = \(raw: lowerFunctionName)(jsObject.bridgeJSLowerParameter())
-                    defer { _swift_js_struct_cleanup(__bjs_cleanupId) }
-                    self = Self.bridgeJSLiftParameter()
-                }
-
-                \(raw: accessControl)func toJSObject() -> JSObject {
-                    let __bjs_self = self
-                    __bjs_self.bridgeJSLowerReturn()
-                    return JSObject(id: UInt32(bitPattern: \(raw: liftFunctionName)()))
-                }
+        let printer = CodeFragmentPrinter()
+        printer.write("extension \(typeName): _BridgedSwiftStruct {")
+        printer.indent {
+            printer.write("@_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> \(typeName) {")
+            printer.indent {
+                printer.write(lines: generateStructLiftCode(structDef: structDef))
             }
-            """
+            printer.write("}")
+            printer.nextLine()
 
-        let lowerExternDecl = Self.renderStructExtern(
+            printer.write("@_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {")
+            printer.indent {
+                printer.write(lines: generateStructLowerCode(structDef: structDef))
+            }
+            printer.write("}")
+            printer.nextLine()
+
+            let accessControl = structDef.explicitAccessControl.map { "\($0) " } ?? ""
+            printer.write(
+                multilineString: """
+                    \(accessControl)init(unsafelyCopying jsObject: JSObject) {
+                        let __bjs_cleanupId = \(lowerFunctionName)(jsObject.bridgeJSLowerParameter())
+                        defer {
+                            _swift_js_struct_cleanup(__bjs_cleanupId)
+                        }
+                        self = Self.bridgeJSLiftParameter()
+                    }
+                    """
+            )
+            printer.nextLine()
+
+            printer.write(
+                multilineString: """
+                    \(accessControl)func toJSObject() -> JSObject {
+                        let __bjs_self = self
+                        __bjs_self.bridgeJSLowerReturn()
+                        return JSObject(id: UInt32(bitPattern: \(liftFunctionName)()))
+                    }
+                    """
+            )
+        }
+        printer.write("}")
+
+        let bridgedStructExtension: DeclSyntax = "\(raw: printer.lines.joined(separator: "\n"))"
+
+        let lowerExternDeclPrinter = CodeFragmentPrinter()
+        Self.renderStructExtern(
+            printer: lowerExternDeclPrinter,
             externName: lowerExternName,
             functionName: lowerFunctionName,
             signature: SwiftSignatureBuilder.buildABIFunctionSignature(
@@ -1408,7 +1470,9 @@ struct StructCodegen {
                 returnType: .i32
             )
         )
-        let liftExternDecl = Self.renderStructExtern(
+        let liftExternDeclPrinter = CodeFragmentPrinter()
+        Self.renderStructExtern(
+            printer: liftExternDeclPrinter,
             externName: liftExternName,
             functionName: liftFunctionName,
             signature: SwiftSignatureBuilder.buildABIFunctionSignature(
@@ -1417,38 +1481,38 @@ struct StructCodegen {
             )
         )
 
-        return [bridgedStructExtension, lowerExternDecl, liftExternDecl]
+        return [
+            bridgedStructExtension, "\(raw: lowerExternDeclPrinter.lines.joined(separator: "\n"))",
+            "\(raw: liftExternDeclPrinter.lines.joined(separator: "\n"))",
+        ]
     }
 
     private static func renderStructExtern(
+        printer: CodeFragmentPrinter,
         externName: String,
         functionName: String,
-        signature: FunctionSignatureSyntax
-    ) -> DeclSyntax {
-        let externFuncDecl = SwiftCodePattern.buildExternFunctionDecl(
-            moduleName: "bjs",
-            abiName: externName,
-            functionName: functionName,
-            signature: signature
-        )
-
-        let stubFuncDecl = FunctionDeclSyntax(
-            modifiers: DeclModifierListSyntax {
-                DeclModifierSyntax(name: .keyword(.fileprivate))
+        signature: String
+    ) {
+        SwiftCodePattern.buildWasmConditionalCompilationDecls(
+            printer: printer,
+            wasmDecl: { printer in
+                SwiftCodePattern.buildExternFunctionDecl(
+                    printer: printer,
+                    moduleName: "bjs",
+                    abiName: externName,
+                    functionName: functionName,
+                    signature: signature
+                )
             },
-            funcKeyword: .keyword(.func),
-            name: .identifier(functionName),
-            signature: signature,
-            body: CodeBlockSyntax {
-                "fatalError(\"Only available on WebAssembly\")"
+            elseDecl: { printer in
+                printer.write(
+                    multilineString: """
+                        fileprivate func \(functionName)\(signature) {
+                            fatalError("Only available on WebAssembly")
+                        }
+                        """
+                )
             }
-        )
-
-        return DeclSyntax(
-            SwiftCodePattern.buildWasmConditionalCompilationDecls(
-                wasmDecl: DeclSyntax(externFuncDecl),
-                elseDecl: DeclSyntax(stubFuncDecl)
-            )
         )
     }
 
@@ -1469,7 +1533,7 @@ struct StructCodegen {
     }
 
     private func generateStructLowerCode(structDef: ExportedStruct) -> [String] {
-        var lines: [String] = []
+        let printer = CodeFragmentPrinter()
         let instanceProps = structDef.properties.filter { !$0.isStatic }
 
         for property in instanceProps {
@@ -1479,12 +1543,10 @@ struct StructCodegen {
                 accessor: accessor,
                 varPrefix: property.name
             )
-            for stmt in statements {
-                lines.append(stmt.description)
-            }
+            printer.write(multilineString: CodeBlockItemListSyntax(statements).description)
         }
 
-        return lines
+        return printer.lines
     }
 }
 
@@ -1495,7 +1557,7 @@ struct ProtocolCodegen {
         let wrapperName = "Any\(proto.name)"
         let protocolName = proto.name
 
-        var methodDecls: [DeclSyntax] = []
+        var methodDecls: [CodeFragmentPrinter] = []
         var externDecls: [DeclSyntax] = []
 
         for method in proto.methods {
@@ -1523,72 +1585,72 @@ struct ProtocolCodegen {
                 abiParameters: builder.abiParameterSignatures,
                 returnType: builder.abiReturnType
             )
-            let externFuncDecl = SwiftCodePattern.buildExternFunctionDecl(
+            let externDeclPrinter = CodeFragmentPrinter()
+            SwiftCodePattern.buildExternFunctionDecl(
+                printer: externDeclPrinter,
                 moduleName: moduleName,
                 abiName: method.abiName,
                 functionName: "_extern_\(method.name)",
                 signature: externSignature
             )
-            externDecls.append(DeclSyntax(externFuncDecl))
-            let methodImplementation = DeclSyntax(
-                FunctionDeclSyntax(
-                    name: .identifier(method.name),
-                    signature: signature,
-                    body: builder.getBody()
-                )
-            )
-
-            methodDecls.append(methodImplementation)
+            externDecls.append(DeclSyntax("\(raw: externDeclPrinter.lines.joined(separator: "\n"))"))
+            let methodImplPrinter = CodeFragmentPrinter()
+            methodImplPrinter.write("func \(method.name)\(signature) {")
+            methodImplPrinter.indent {
+                methodImplPrinter.write(lines: builder.body.lines)
+            }
+            methodImplPrinter.write("}")
+            methodDecls.append(methodImplPrinter)
         }
 
-        var propertyDecls: [DeclSyntax] = []
+        var propertyDecls: [CodeFragmentPrinter] = []
 
         for property in proto.properties {
-            let (propertyImpl, propertyExternDecls) = try renderProtocolProperty(
+            let propertyDeclPrinter = CodeFragmentPrinter()
+            let propertyExternDecls = try renderProtocolProperty(
+                printer: propertyDeclPrinter,
                 property: property,
                 protocolName: protocolName,
                 moduleName: moduleName
             )
-            propertyDecls.append(propertyImpl)
+            propertyDecls.append(propertyDeclPrinter)
             externDecls.append(contentsOf: propertyExternDecls)
         }
 
-        let structDecl = StructDeclSyntax(
-            name: .identifier(wrapperName),
-            inheritanceClause: InheritanceClauseSyntax(
-                inheritedTypesBuilder: {
-                    InheritedTypeSyntax(type: IdentifierTypeSyntax(name: .identifier(protocolName)))
-                    InheritedTypeSyntax(type: IdentifierTypeSyntax(name: .identifier("_BridgedSwiftProtocolWrapper")))
-                }
-            ),
-            memberBlockBuilder: {
-                DeclSyntax(
-                    """
-                    let jsObject: JSObject
-                    """
-                ).with(\.trailingTrivia, .newlines(2))
+        let structDeclPrinter = CodeFragmentPrinter()
+        structDeclPrinter.write("struct \(wrapperName): \(protocolName), _BridgedSwiftProtocolWrapper {")
+        structDeclPrinter.indent {
+            structDeclPrinter.write("let jsObject: JSObject")
+            structDeclPrinter.nextLine()
 
-                for decl in methodDecls + propertyDecls {
-                    decl.with(\.trailingTrivia, .newlines(2))
-                }
+            for methodDecl in methodDecls {
+                structDeclPrinter.write(lines: methodDecl.lines)
+                structDeclPrinter.nextLine()
+            }
 
-                DeclSyntax(
-                    """
+            for decl in propertyDecls {
+                structDeclPrinter.write(lines: decl.lines)
+                structDeclPrinter.nextLine()
+            }
+            structDeclPrinter.write(
+                multilineString: """
                     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
-                        return \(raw: wrapperName)(jsObject: JSObject(id: UInt32(bitPattern: value)))
+                        return \(wrapperName)(jsObject: JSObject(id: UInt32(bitPattern: value)))
                     }
                     """
-                )
-            }
-        )
-        return [DeclSyntax(structDecl)] + externDecls
+            )
+        }
+        structDeclPrinter.write("}")
+
+        return ["\(raw: structDeclPrinter.lines.joined(separator: "\n"))"] + externDecls
     }
 
     private func renderProtocolProperty(
+        printer: CodeFragmentPrinter,
         property: ExportedProtocolProperty,
         protocolName: String,
         moduleName: String
-    ) throws -> (propertyDecl: DeclSyntax, externDecls: [DeclSyntax]) {
+    ) throws -> [DeclSyntax] {
         let getterAbiName = ABINameGenerator.generateABIName(
             baseName: property.name,
             operation: "get",
@@ -1614,37 +1676,27 @@ struct ProtocolCodegen {
             abiParameters: getterBuilder.abiParameterSignatures,
             returnType: getterBuilder.abiReturnType
         )
-        let getterExternDecl = SwiftCodePattern.buildExternFunctionDecl(
+        let getterExternDeclPrinter = CodeFragmentPrinter()
+        SwiftCodePattern.buildExternFunctionDecl(
+            printer: getterExternDeclPrinter,
             moduleName: moduleName,
             abiName: getterAbiName,
             functionName: getterAbiName,
             signature: getterExternSignature
         )
+        let getterExternDecl = DeclSyntax("\(raw: getterExternDeclPrinter.lines.joined(separator: "\n"))")
+        var externDecls: [DeclSyntax] = [getterExternDecl]
 
-        if property.isReadonly {
-            let propertyDecl = VariableDeclSyntax(
-                bindingSpecifier: .keyword(.var),
-                bindings: PatternBindingListSyntax {
-                    PatternBindingSyntax(
-                        pattern: IdentifierPatternSyntax(identifier: .identifier(property.name)),
-                        typeAnnotation: TypeAnnotationSyntax(
-                            type: IdentifierTypeSyntax(name: .identifier(property.type.swiftType))
-                        ),
-                        accessorBlock: AccessorBlockSyntax(
-                            accessors: .accessors(
-                                AccessorDeclListSyntax {
-                                    AccessorDeclSyntax(
-                                        accessorSpecifier: .keyword(.get),
-                                        body: getterBuilder.getBody()
-                                    )
-                                }
-                            )
-                        )
-                    )
-                }
-            )
-            return (DeclSyntax(propertyDecl), [DeclSyntax(getterExternDecl)])
-        } else {
+        printer.write("var \(property.name): \(property.type.swiftType) {")
+        try printer.indent {
+            printer.write("get {")
+            printer.indent {
+                printer.write(lines: getterBuilder.body.lines)
+            }
+            printer.write("}")
+
+            if property.isReadonly { return }
+
             let setterBuilder = ImportTS.CallJSEmission(
                 moduleName: moduleName,
                 abiName: setterAbiName,
@@ -1659,40 +1711,26 @@ struct ProtocolCodegen {
                 abiParameters: setterBuilder.abiParameterSignatures,
                 returnType: setterBuilder.abiReturnType
             )
-            let setterExternDecl = SwiftCodePattern.buildExternFunctionDecl(
+            let setterExternDeclPrinter = CodeFragmentPrinter()
+            SwiftCodePattern.buildExternFunctionDecl(
+                printer: setterExternDeclPrinter,
                 moduleName: moduleName,
                 abiName: setterAbiName,
                 functionName: setterAbiName,
                 signature: setterExternSignature
             )
+            let setterExternDecl = DeclSyntax("\(raw: setterExternDeclPrinter.lines.joined(separator: "\n"))")
+            externDecls.append(setterExternDecl)
 
-            let propertyDecl = VariableDeclSyntax(
-                bindingSpecifier: .keyword(.var),
-                bindings: PatternBindingListSyntax {
-                    PatternBindingSyntax(
-                        pattern: IdentifierPatternSyntax(identifier: .identifier(property.name)),
-                        typeAnnotation: TypeAnnotationSyntax(
-                            type: IdentifierTypeSyntax(name: .identifier(property.type.swiftType))
-                        ),
-                        accessorBlock: AccessorBlockSyntax(
-                            accessors: .accessors(
-                                AccessorDeclListSyntax {
-                                    AccessorDeclSyntax(
-                                        accessorSpecifier: .keyword(.get),
-                                        body: getterBuilder.getBody()
-                                    )
-                                    AccessorDeclSyntax(
-                                        accessorSpecifier: .keyword(.set),
-                                        body: setterBuilder.getBody()
-                                    )
-                                }
-                            )
-                        )
-                    )
-                }
-            )
-            return (DeclSyntax(propertyDecl), [DeclSyntax(getterExternDecl), DeclSyntax(setterExternDecl)])
+            printer.write("set {")
+            printer.indent {
+                printer.write(lines: setterBuilder.body.lines)
+            }
+            printer.write("}")
         }
+        printer.write("}")
+
+        return externDecls
     }
 }
 

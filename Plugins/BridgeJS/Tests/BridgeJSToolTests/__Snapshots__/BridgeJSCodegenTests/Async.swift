@@ -4,7 +4,7 @@ public func _bjs_asyncReturnVoid() -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         await asyncReturnVoid()
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -17,7 +17,7 @@ public func _bjs_asyncRoundTripInt(_ v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripInt(_: Int.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -30,7 +30,7 @@ public func _bjs_asyncRoundTripString(_ vBytes: Int32, _ vLength: Int32) -> Int3
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripString(_: String.bridgeJSLiftParameter(vBytes, vLength)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -43,7 +43,7 @@ public func _bjs_asyncRoundTripBool(_ v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripBool(_: Bool.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -56,7 +56,7 @@ public func _bjs_asyncRoundTripFloat(_ v: Float32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripFloat(_: Float.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -69,7 +69,7 @@ public func _bjs_asyncRoundTripDouble(_ v: Float64) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripDouble(_: Double.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -82,7 +82,7 @@ public func _bjs_asyncRoundTripJSObject(_ v: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = JSPromise.async {
         return await asyncRoundTripJSObject(_: JSObject.bridgeJSLiftParameter(v)).jsValue
-    } .jsObject
+    }.jsObject
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
