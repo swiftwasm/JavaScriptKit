@@ -521,7 +521,8 @@ export async function createInstantiator(options, swift) {
                         const structResult = structHelpers.Config.lower(point);
                         pointCleanup = structResult.cleanup;
                     }
-                    instance.exports.bjs_testOptionalStructDefault(+isSome);
+                    i32Stack.push(+isSome);
+                    instance.exports.bjs_testOptionalStructDefault();
                     const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
@@ -539,7 +540,8 @@ export async function createInstantiator(options, swift) {
                         const structResult = structHelpers.Config.lower(point);
                         pointCleanup = structResult.cleanup;
                     }
-                    instance.exports.bjs_testOptionalStructWithValueDefault(+isSome);
+                    i32Stack.push(+isSome);
+                    instance.exports.bjs_testOptionalStructWithValueDefault();
                     const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {

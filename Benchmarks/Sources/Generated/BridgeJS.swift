@@ -1762,11 +1762,7 @@ public func _bjs_ArrayRoundtrip_makeOptionalPointArray(_ _self: UnsafeMutableRaw
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalPointArray()
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSLowerReturn()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -1789,11 +1785,7 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalPointArray(_ _self: UnsafeMutab
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSLowerReturn()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -1803,15 +1795,9 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalPointArray(_ _self: UnsafeMutab
 
 @_expose(wasm, "bjs_ArrayRoundtrip_takeOptionalArray")
 @_cdecl("bjs_ArrayRoundtrip_takeOptionalArray")
-public func _bjs_ArrayRoundtrip_takeOptionalArray(_ _self: UnsafeMutableRawPointer, _ values: Int32) -> Void {
+public func _bjs_ArrayRoundtrip_takeOptionalArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeOptionalArray(_: {
-        if values == 0 {
-            return Optional<[Int]>.none
-        } else {
-            return [Int].bridgeJSLiftParameter()
-        }
-    }())
+    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeOptionalArray(_: Optional<[Int]>.bridgeJSLiftParameter())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1822,11 +1808,7 @@ public func _bjs_ArrayRoundtrip_takeOptionalArray(_ _self: UnsafeMutableRawPoint
 public func _bjs_ArrayRoundtrip_makeOptionalArraySome(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalArraySome()
-    let __bjs_isSome_ret = ret != nil
-    if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1837,11 +1819,7 @@ public func _bjs_ArrayRoundtrip_makeOptionalArraySome(_ _self: UnsafeMutableRawP
 public func _bjs_ArrayRoundtrip_makeOptionalArrayNone(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalArrayNone()
-    let __bjs_isSome_ret = ret != nil
-    if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1849,20 +1827,10 @@ public func _bjs_ArrayRoundtrip_makeOptionalArrayNone(_ _self: UnsafeMutableRawP
 
 @_expose(wasm, "bjs_ArrayRoundtrip_roundtripOptionalArray")
 @_cdecl("bjs_ArrayRoundtrip_roundtripOptionalArray")
-public func _bjs_ArrayRoundtrip_roundtripOptionalArray(_ _self: UnsafeMutableRawPointer, _ values: Int32) -> Void {
+public func _bjs_ArrayRoundtrip_roundtripOptionalArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripOptionalArray(_: {
-        if values == 0 {
-            return Optional<[Int]>.none
-        } else {
-            return [Int].bridgeJSLiftParameter()
-        }
-    }())
-    let __bjs_isSome_ret = ret != nil
-    if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
+    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripOptionalArray(_: Optional<[Int]>.bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -11,9 +11,9 @@ public func _bjs_mirrorDictionary() -> Void {
 
 @_expose(wasm, "bjs_optionalDictionary")
 @_cdecl("bjs_optionalDictionary")
-public func _bjs_optionalDictionary(_ values: Int32) -> Void {
+public func _bjs_optionalDictionary() -> Void {
     #if arch(wasm32)
-    let ret = optionalDictionary(_: Optional<[String: String]>.bridgeJSLiftParameter(values))
+    let ret = optionalDictionary(_: Optional<[String: String]>.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

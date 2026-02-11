@@ -832,7 +832,8 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
-                    return ["+\(isSomeVar)"]
+                    printer.write("\(JSGlueVariableScope.reservedI32Stack).push(+\(isSomeVar));")
+                    return []
                 case .string, .rawValueEnum(_, .string):
                     let bytesVar = scope.variable("\(value)Bytes")
                     let idVar = scope.variable("\(value)Id")
@@ -895,7 +896,8 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
-                    return ["+\(isSomeVar)"]
+                    printer.write("\(JSGlueVariableScope.reservedI32Stack).push(+\(isSomeVar));")
+                    return []
                 case .dictionary(let valueType):
                     let cleanupArrayVar = scope.variable("\(value)Cleanups")
                     printer.write("const \(cleanupArrayVar) = [];")
@@ -915,7 +917,8 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
-                    return ["+\(isSomeVar)"]
+                    printer.write("\(JSGlueVariableScope.reservedI32Stack).push(+\(isSomeVar));")
+                    return []
                 default:
                     switch wrappedType {
                     case .swiftHeapObject:

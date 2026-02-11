@@ -327,7 +327,8 @@ export async function createInstantiator(options, swift) {
                         i32Stack.push(entries.length);
                         valuesCleanups.push(() => { for (const cleanup of arrayCleanups) { cleanup(); } });
                     }
-                    instance.exports.bjs_optionalDictionary(+isSome);
+                    i32Stack.push(+isSome);
+                    instance.exports.bjs_optionalDictionary();
                     const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
