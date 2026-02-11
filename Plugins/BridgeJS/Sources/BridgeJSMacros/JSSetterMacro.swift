@@ -54,7 +54,7 @@ extension JSSetterMacro: BodyMacro {
                 firstName: .wildcardToken(trailingTrivia: .space),
                 secondName: .identifier("value"),
                 colon: .colonToken(trailingTrivia: .space),
-                type: TypeSyntax(stringLiteral: "<#Type#>")
+                type: IdentifierTypeSyntax(name: TokenSyntax(.identifier("<#Type#>"), presence: .present))
             )
             let newClause = FunctionParameterClauseSyntax(
                 leftParen: .leftParenToken(),
