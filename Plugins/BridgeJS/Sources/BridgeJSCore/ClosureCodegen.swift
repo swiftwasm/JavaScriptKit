@@ -11,17 +11,17 @@ import BridgeJSUtilities
 public struct ClosureCodegen {
     public init() {}
 
+    private func swiftClosureType(for signature: ClosureSignature) -> String {
+        let closureParams = signature.parameters.map { "\($0.swiftType)" }.joined(separator: ", ")
+        let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
+        let swiftReturnType = signature.returnType.swiftType
+        return "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
+    }
+
     func renderClosureHelpers(_ signature: ClosureSignature) throws -> [DeclSyntax] {
         let mangledName = signature.mangleName
         let helperName = "_BJS_Closure_\(mangledName)"
-
-        let closureParams = signature.parameters.enumerated().map { _, type in
-            "\(type.swiftType)"
-        }.joined(separator: ", ")
-
-        let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
-        let swiftReturnType = signature.returnType.swiftType
-        let swiftClosureType = "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
+        let swiftClosureType = swiftClosureType(for: signature)
 
         let externName = "invoke_js_callback_\(signature.moduleName)_\(mangledName)"
 
@@ -72,7 +72,7 @@ public struct ClosureCodegen {
                 } else {
                     parameters =
                         " ("
-                        + signature.parameters.enumerated().map { index, param in
+                        + signature.parameters.enumerated().map { index, _ in
                             "param\(index)"
                         }.joined(separator: ", ") + ")"
                 }
@@ -113,12 +113,7 @@ public struct ClosureCodegen {
     }
 
     func renderClosureInvokeHandler(_ signature: ClosureSignature) throws -> DeclSyntax {
-        let closureParams = signature.parameters.enumerated().map { _, type in
-            "\(type.swiftType)"
-        }.joined(separator: ", ")
-        let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
-        let swiftReturnType = signature.returnType.swiftType
-        let swiftClosureType = "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
+        let swiftClosureType = swiftClosureType(for: signature)
         let boxType = "_BridgeJSTypedClosureBox<\(swiftClosureType)>"
         let abiName = "invoke_swift_closure_\(signature.moduleName)_\(signature.mangleName)"
 
@@ -144,17 +139,7 @@ public struct ClosureCodegen {
 
         let closureCallExpr = ExprSyntax("closure(\(raw: liftedParams.joined(separator: ", ")))")
 
-        // Determine return type
-        let abiReturnWasmType: WasmCoreType?
-        if signature.returnType == .void {
-            abiReturnWasmType = nil
-        } else if let wasmType = try signature.returnType.loweringReturnInfo().returnType {
-            abiReturnWasmType = wasmType
-        } else {
-            abiReturnWasmType = nil
-        }
-
-        let throwReturn = abiReturnWasmType?.swiftReturnPlaceholderStmt ?? "return"
+        let abiReturnWasmType = try signature.returnType.loweringReturnInfo().returnType
 
         // Build signature using SwiftSignatureBuilder
         let funcSignature = SwiftSignatureBuilder.buildABIFunctionSignature(

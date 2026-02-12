@@ -76,16 +76,7 @@ public func _bjs_makeFoo() -> Int32 {
 @_cdecl("bjs_processFooArray")
 public func _bjs_processFooArray() -> Void {
     #if arch(wasm32)
-    let ret = processFooArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Foo] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Foo(unsafelyWrapping: JSObject.bridgeJSLiftParameter()))
-        }
-        __result.reverse()
-        return __result
-    }())
+    let ret = processFooArray(_: [JSObject].bridgeJSLiftParameter().map { Foo(unsafelyWrapping: $0) })
     ret.map { $0.jsObject }.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
