@@ -4,7 +4,7 @@ Learn how to expose Swift protocols to JavaScript as TypeScript interfaces.
 
 ## Overview
 
-> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
 BridgeJS allows you to export Swift protocols as TypeScript interfaces. JavaScript objects implementing these interfaces can be passed to Swift code, enabling protocol-oriented design across the Swift-JavaScript boundary.
 
@@ -31,28 +31,28 @@ import JavaScriptKit
 
 @JS class CounterManager {
     var delegate: Counter
-    
+
     @JS init(delegate: Counter) {
         self.delegate = delegate
     }
-    
+
     @JS func incrementTwice() {
         delegate.increment(by: 1)
         delegate.increment(by: 1)
     }
-    
+
     @JS func getCurrentValue() -> Int {
         return delegate.getValue()
     }
-    
+
     @JS func getCounterName() -> String {
         return delegate.name
     }
-    
+
     @JS func setCountValue(_ value: Int) {
         delegate.count = value
     }
-    
+
     @JS func updateLabel(_ newLabel: String?) {
         delegate.label = newLabel
     }
@@ -130,15 +130,15 @@ You can also implement protocols in Swift and use them from JavaScript:
 final class SwiftCounter: Counter {
     var count = 0
     let name = "SwiftCounter"
-    
+
     func increment(by amount: Int) {
         count += amount
     }
-    
+
     func reset() {
         count = 0
     }
-    
+
     func getValue() -> Int {
         return count
     }

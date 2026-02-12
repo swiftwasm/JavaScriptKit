@@ -4,13 +4,11 @@ Learn how to use Swift optionals in functions, classes, and enums exported to Ja
 
 ## Overview
 
-> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
 BridgeJS provides comprehensive support for Swift optionals across all bridged types. When you use `Optional<T>` or `T?` in Swift, it automatically maps to `T | null` in TypeScript/JavaScript.
 
 Swift optionals are translated to union types with `null` (not `undefined`) because `null` represents an explicit "no value" state that aligns semantically with Swift's `nil`. This design choice ensures consistent null handling across the Swift-JavaScript bridge and avoids the ambiguity that comes with JavaScript's `undefined`.
-
-> Important: BridgeJS optional support is **Swift → JavaScript only**. TypeScript → Swift optional imports are not currently supported.
 
 ## Supported Optional Syntax
 
@@ -35,7 +33,7 @@ All parameter types can be made optional, including primitives, objects, and enu
 ```swift
 @JS public func processOptionalData(
     text: String?,          // Optional string
-    count: Int?,            // Optional integer  
+    count: Int?,            // Optional integer
     flag: Bool?,            // Optional boolean
     rate: Double?,          // Optional double
     user: User?             // Optional Swift class
@@ -85,7 +83,7 @@ Constructors can accept optional parameters.
     @JS public var email: String?
     @JS public var age: Int?
     @JS public var avatar: User?
-    
+
     @JS public init(name: String?)
     @JS public func updateProfile(email: String?, age: Int?)
 }
@@ -100,7 +98,7 @@ export interface UserProfile extends SwiftHeapObject {
     email: string | null;
     age: number | null;
     avatar: User | null;
-    
+
     updateProfile(email: string | null, age: number | null): void;
 }
 export type UserProfile = {

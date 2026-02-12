@@ -4,7 +4,7 @@ Learn how to export Swift static and class functions as JavaScript static method
 
 ## Overview
 
-> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
 BridgeJS supports exporting Swift `static func` and `class func` to JavaScript static methods. Both generate identical JavaScript output but differ in Swift inheritance behavior.
 
@@ -17,15 +17,15 @@ Classes can export both `static` and `class` functions:
 ```swift
 @JS class MathUtils {
     @JS init() {}
-    
+
     @JS static func add(a: Int, b: Int) -> Int {
         return a + b
     }
-    
+
     @JS class func subtract(a: Int, b: Int) -> Int {
         return a - b
     }
-    
+
     @JS func multiply(x: Int, y: Int) -> Int {
         return x * y
     }
@@ -79,11 +79,11 @@ Enums can contain static functions that are exported as properties:
 @JS enum Calculator {
     case scientific
     case basic
-    
+
     @JS static func square(value: Int) -> Int {
         return value * value
     }
-    
+
     @JS static func cube(value: Int) -> Int {
         return value * value * value
     }
