@@ -7,7 +7,7 @@ exports[`ts2swift > snapshots Swift output for ArrayParameter.d.ts > ArrayParame
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func processNumbers(_ values: [Double]) throws(JSException) -> Void
 
@@ -30,7 +30,7 @@ exports[`ts2swift > snapshots Swift output for Async.d.ts > Async 1`] = `
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func asyncReturnVoid() throws(JSException) -> JSPromise
 
@@ -55,7 +55,7 @@ exports[`ts2swift > snapshots Swift output for Documentation.d.ts > Documentatio
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 /// Return a greeting for a user.
 ///
@@ -112,7 +112,7 @@ exports[`ts2swift > snapshots Swift output for Interface.d.ts > Interface 1`] = 
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func returnAnimatable() throws(JSException) -> Animatable
 
@@ -130,7 +130,7 @@ exports[`ts2swift > snapshots Swift output for InvalidPropertyNames.d.ts > Inval
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func createArrayBuffer() throws(JSException) -> ArrayBufferLike
 
@@ -178,7 +178,7 @@ exports[`ts2swift > snapshots Swift output for MultipleImportedTypes.d.ts > Mult
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func createDatabaseConnection(_ config: JSValue) throws(JSException) -> DatabaseConnection
 
@@ -215,7 +215,7 @@ exports[`ts2swift > snapshots Swift output for ObjectLikeTypes.d.ts > ObjectLike
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func acceptObject(_ v: JSObject) throws(JSException) -> Void
 "
@@ -228,7 +228,7 @@ exports[`ts2swift > snapshots Swift output for OptionalNullUndefined.d.ts > Opti
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func roundTripNumberNull(_ value: Optional<Double>) throws(JSException) -> Optional<Double>
 
@@ -269,7 +269,7 @@ exports[`ts2swift > snapshots Swift output for PrimitiveParameters.d.ts > Primit
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func check(_ a: Double, _ b: Bool) throws(JSException) -> Void
 "
@@ -282,7 +282,7 @@ exports[`ts2swift > snapshots Swift output for PrimitiveReturn.d.ts > PrimitiveR
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func checkNumber() throws(JSException) -> Double
 
@@ -297,7 +297,7 @@ exports[`ts2swift > snapshots Swift output for ReExportFrom.d.ts > ReExportFrom 
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func jsRoundTripNumber(_ v: Double) throws(JSException) -> Double
 
@@ -315,7 +315,7 @@ exports[`ts2swift > snapshots Swift output for RecordDictionary.d.ts > RecordDic
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func takeRecord(_ value: [String: Double]) throws(JSException) -> Void
 
@@ -345,7 +345,7 @@ exports[`ts2swift > snapshots Swift output for StringEnum.d.ts > StringEnum 1`] 
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 enum FeatureFlag: String {
     case foo = "foo"
@@ -366,7 +366,7 @@ exports[`ts2swift > snapshots Swift output for StringParameter.d.ts > StringPara
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func checkString(_ a: String) throws(JSException) -> Void
 
@@ -381,7 +381,7 @@ exports[`ts2swift > snapshots Swift output for StringReturn.d.ts > StringReturn 
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func checkString() throws(JSException) -> String
 "
@@ -394,7 +394,7 @@ exports[`ts2swift > snapshots Swift output for TS2SkeletonLike.d.ts > TS2Skeleto
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func createTS2Skeleton() throws(JSException) -> TypeScriptProcessor
 
@@ -420,7 +420,7 @@ exports[`ts2swift > snapshots Swift output for TypeAlias.d.ts > TypeAlias 1`] = 
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func checkSimple(_ a: Double) throws(JSException) -> Void
 "
@@ -433,7 +433,7 @@ exports[`ts2swift > snapshots Swift output for TypeAliasObject.d.ts > TypeAliasO
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func console() throws(JSException) -> Console
 
@@ -452,7 +452,7 @@ exports[`ts2swift > snapshots Swift output for TypeScriptClass.d.ts > TypeScript
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSClass struct Greeter {
     @JSGetter var name: String
@@ -473,7 +473,7 @@ exports[`ts2swift > snapshots Swift output for VoidParameterVoidReturn.d.ts > Vo
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func check() throws(JSException) -> Void
 "
@@ -486,7 +486,7 @@ exports[`ts2swift > snapshots Swift output for WebIDLDOMDocs.d.ts > WebIDLDOMDoc
 // To update this file, just rebuild your project or run
 // \`swift package bridge-js\`.
 
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 /// [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document)
 @JSGetter var document: Document

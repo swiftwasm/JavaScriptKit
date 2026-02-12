@@ -1,5 +1,5 @@
 import XCTest
-@_spi(Experimental) import JavaScriptKit
+import JavaScriptKit
 import JavaScriptEventLoop
 
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "runJsWorks")

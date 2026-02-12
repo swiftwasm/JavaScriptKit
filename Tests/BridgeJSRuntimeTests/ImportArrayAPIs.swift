@@ -1,4 +1,4 @@
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 
 @JSFunction func jsRoundTripIntArray(_ items: [Int]) throws(JSException) -> [Int]
 @JSFunction func jsArrayLength(_ items: [Int]) throws(JSException) -> Int
