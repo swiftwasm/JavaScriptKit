@@ -56,6 +56,8 @@ export class TypeProcessor {
         this.processedTypes = new Map();
         /** @type {Map<ts.Type, ts.Node>} Seen position by type */
         this.seenTypes = new Map();
+        /** @type {Map<ts.Type, string>} Preferred alias names by underlying type */
+        this.aliasNameByType = new Map();
         /** @type {string[]} Collected Swift code lines */
         this.swiftLines = [];
         /** @type {Set<string>} */
@@ -747,8 +749,8 @@ export class TypeProcessor {
      * @private
      */
     visitStructuredType(type, diagnosticNode, members) {
-        const symbol = type.getSymbol() ?? type.aliasSymbol;
-        const name = symbol?.name ?? this.checker.typeToString(type);
+        const symbol = type.aliasSymbol ?? type.getSymbol();
+        const name = type.aliasSymbol?.name ?? symbol?.name ?? this.checker.typeToString(type);
         if (!name) return;
         if (this.emittedStructuredTypeNames.has(name)) return;
         this.emittedStructuredTypeNames.add(name);
@@ -760,7 +762,7 @@ export class TypeProcessor {
         if (jsNameArg) args.push(jsNameArg);
         const annotation = this.renderMacroAnnotation("JSClass", args);
         const typeName = this.renderIdentifier(swiftName);
-        const docNode = symbol?.getDeclarations()?.[0] ?? diagnosticNode;
+        const docNode = type.aliasSymbol?.getDeclarations()?.[0] ?? symbol?.getDeclarations()?.[0] ?? diagnosticNode;
         if (docNode) {
             this.emitDocComment(docNode, { indent: "" });
         }
