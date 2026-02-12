@@ -5684,20 +5684,8 @@ public func _bjs_roundTripOptionalGreeterArrayType() -> Void {
 @_cdecl("bjs_roundTripNestedIntArray")
 public func _bjs_roundTripNestedIntArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripNestedIntArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[Int]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([Int].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripNestedIntArray(_: [[Int]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5707,20 +5695,8 @@ public func _bjs_roundTripNestedIntArray() -> Void {
 @_cdecl("bjs_roundTripNestedStringArray")
 public func _bjs_roundTripNestedStringArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripNestedStringArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[String]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([String].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripNestedStringArray(_: [[String]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5730,20 +5706,8 @@ public func _bjs_roundTripNestedStringArray() -> Void {
 @_cdecl("bjs_roundTripNestedDoubleArray")
 public func _bjs_roundTripNestedDoubleArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripNestedDoubleArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[Double]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([Double].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripNestedDoubleArray(_: [[Double]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5753,20 +5717,8 @@ public func _bjs_roundTripNestedDoubleArray() -> Void {
 @_cdecl("bjs_roundTripNestedBoolArray")
 public func _bjs_roundTripNestedBoolArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripNestedBoolArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[Bool]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([Bool].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripNestedBoolArray(_: [[Bool]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5776,20 +5728,8 @@ public func _bjs_roundTripNestedBoolArray() -> Void {
 @_cdecl("bjs_roundTripNestedDataPointArray")
 public func _bjs_roundTripNestedDataPointArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripNestedDataPointArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[DataPoint]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([DataPoint].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripNestedDataPointArray(_: [[DataPoint]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5799,20 +5739,8 @@ public func _bjs_roundTripNestedDataPointArray() -> Void {
 @_cdecl("bjs_roundTripNestedDirectionArray")
 public func _bjs_roundTripNestedDirectionArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripNestedDirectionArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[Direction]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([Direction].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripNestedDirectionArray(_: [[Direction]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5822,20 +5750,8 @@ public func _bjs_roundTripNestedDirectionArray() -> Void {
 @_cdecl("bjs_roundTripNestedGreeterArray")
 public func _bjs_roundTripNestedGreeterArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripNestedGreeterArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [[Greeter]] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append([Greeter].bridgeJSLiftParameter())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripNestedGreeterArray(_: [[Greeter]].bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
