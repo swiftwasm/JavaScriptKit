@@ -695,15 +695,6 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 #endif
 
 #if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_push_tag")
-@_spi(BridgeJS) public func _swift_js_push_tag(_ tag: Int32)
-#else
-@_spi(BridgeJS) public func _swift_js_push_tag(_ tag: Int32) {
-    _onlyAvailableOnWasm()
-}
-#endif
-
-#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_push_string")
 @_spi(BridgeJS) public func _swift_js_push_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
 #else
@@ -1963,7 +1954,7 @@ extension Optional where Wrapped: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         switch consume self {
         case .none:
-            _swift_js_push_tag(-1)  // Use -1 as sentinel for null
+            _swift_js_push_i32(-1)  // Use -1 as sentinel for null
         case .some(let value):
             value.bridgeJSLowerReturn()
         }

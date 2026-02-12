@@ -65,21 +65,21 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .failure(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .flag(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         case .rate(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(3))
+            _swift_js_push_i32(Int32(3))
         case .precise(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(4))
+            _swift_js_push_i32(Int32(4))
         case .info:
-            _swift_js_push_tag(Int32(5))
+            _swift_js_push_i32(Int32(5))
         }
     }
 }
@@ -162,26 +162,26 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .error(let param0, let param1):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .location(let param0, let param1, let param2):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
             param2.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         case .status(let param0, let param1, let param2):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
             param2.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(3))
+            _swift_js_push_i32(Int32(3))
         case .coordinates(let param0, let param1, let param2):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
             param2.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(4))
+            _swift_js_push_i32(Int32(4))
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
@@ -192,9 +192,9 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             param6.bridgeJSLowerStackReturn()
             param7.bridgeJSLowerStackReturn()
             param8.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(5))
+            _swift_js_push_i32(Int32(5))
         case .info:
-            _swift_js_push_tag(Int32(6))
+            _swift_js_push_i32(Int32(6))
         }
     }
 }

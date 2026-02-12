@@ -1245,21 +1245,21 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .failure(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .flag(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         case .rate(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(3))
+            _swift_js_push_i32(Int32(3))
         case .precise(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(4))
+            _swift_js_push_i32(Int32(4))
         case .info:
-            _swift_js_push_tag(Int32(5))
+            _swift_js_push_i32(Int32(5))
         }
     }
 }

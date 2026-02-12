@@ -2083,21 +2083,21 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .failure(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .flag(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         case .rate(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(3))
+            _swift_js_push_i32(Int32(3))
         case .precise(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(4))
+            _swift_js_push_i32(Int32(4))
         case .info:
-            _swift_js_push_tag(Int32(5))
+            _swift_js_push_i32(Int32(5))
         }
     }
 }
@@ -2180,26 +2180,26 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .error(let param0, let param1):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .location(let param0, let param1, let param2):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
             param2.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         case .status(let param0, let param1, let param2):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
             param2.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(3))
+            _swift_js_push_i32(Int32(3))
         case .coordinates(let param0, let param1, let param2):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
             param2.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(4))
+            _swift_js_push_i32(Int32(4))
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
@@ -2210,9 +2210,9 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
             param6.bridgeJSLowerStackReturn()
             param7.bridgeJSLowerStackReturn()
             param8.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(5))
+            _swift_js_push_i32(Int32(5))
         case .info:
-            _swift_js_push_tag(Int32(6))
+            _swift_js_push_i32(Int32(6))
         }
     }
 }
@@ -2264,16 +2264,16 @@ extension Utilities.Result: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .failure(let param0, let param1):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .status(let param0, let param1, let param2):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
             param2.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         }
     }
 }
@@ -2318,11 +2318,11 @@ extension API.NetworkingResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .failure(let param0, let param1):
             param0.bridgeJSLowerStackReturn()
             param1.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         }
     }
 }
@@ -2390,24 +2390,24 @@ extension AllTypesResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .structPayload(let param0):
             param0.bridgeJSLowerReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .classPayload(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .jsObjectPayload(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         case .nestedEnum(let param0):
             param0.bridgeJSLowerReturn()
-            _swift_js_push_tag(Int32(3))
+            _swift_js_push_i32(Int32(3))
         case .arrayPayload(let param0):
             param0.bridgeJSLowerReturn()
-            _swift_js_push_tag(Int32(4))
+            _swift_js_push_i32(Int32(4))
         case .jsClassPayload(let param0):
             param0.jsObject.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(5))
+            _swift_js_push_i32(Int32(5))
         case .empty:
-            _swift_js_push_tag(Int32(6))
+            _swift_js_push_i32(Int32(6))
         }
     }
 }
@@ -2473,26 +2473,26 @@ extension TypedPayloadResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .precision(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .direction(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .optPrecision(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
             __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         case .optDirection(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
             __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
-            _swift_js_push_tag(Int32(3))
+            _swift_js_push_i32(Int32(3))
         case .empty:
-            _swift_js_push_tag(Int32(4))
+            _swift_js_push_i32(Int32(4))
         }
     }
 }
@@ -2881,40 +2881,40 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .optStruct(let param0):
             param0.bridgeJSLowerReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .optClass(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
             __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .optJSObject(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
             __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         case .optNestedEnum(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
             _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
-            _swift_js_push_tag(Int32(3))
+            _swift_js_push_i32(Int32(3))
         case .optArray(let param0):
             param0.bridgeJSLowerReturn()
-            _swift_js_push_tag(Int32(4))
+            _swift_js_push_i32(Int32(4))
         case .optJsClass(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
             __bjs_unwrapped_param0.jsObject.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
-            _swift_js_push_tag(Int32(5))
+            _swift_js_push_i32(Int32(5))
         case .empty:
-            _swift_js_push_tag(Int32(6))
+            _swift_js_push_i32(Int32(6))
         }
     }
 }
@@ -2994,7 +2994,7 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .failure(let param0, let param1):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
@@ -3006,7 +3006,7 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_unwrapped_param1.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         case .status(let param0, let param1, let param2):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
@@ -3023,7 +3023,7 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
             __bjs_unwrapped_param2.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
-            _swift_js_push_tag(Int32(2))
+            _swift_js_push_i32(Int32(2))
         }
     }
 }

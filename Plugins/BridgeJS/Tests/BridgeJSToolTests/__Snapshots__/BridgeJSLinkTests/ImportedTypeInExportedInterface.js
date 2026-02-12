@@ -18,7 +18,6 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tagStack = [];
     let strStack = [];
     let i32Stack = [];
     let f32Stack = [];
@@ -129,9 +128,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
-            }
-            bjs["swift_js_push_tag"] = function(tag) {
-                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
                 i32Stack.push(v | 0);

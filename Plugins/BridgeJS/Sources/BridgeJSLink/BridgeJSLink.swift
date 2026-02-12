@@ -246,7 +246,6 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);",
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);",
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);",
-            "let \(JSGlueVariableScope.reservedTagStack) = [];",
             "let \(JSGlueVariableScope.reservedStringStack) = [];",
             "let \(JSGlueVariableScope.reservedI32Stack) = [];",
             "let \(JSGlueVariableScope.reservedF32Stack) = [];",
@@ -340,11 +339,6 @@ public struct BridgeJSLink {
                 printer.write("bjs[\"swift_js_release\"] = function(id) {")
                 printer.indent {
                     printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(id);")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_push_tag\"] = function(tag) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedTagStack).push(tag);")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_i32\"] = function(v) {")
