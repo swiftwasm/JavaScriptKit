@@ -48,7 +48,6 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tagStack = [];
     let strStack = [];
     let i32Stack = [];
     let f32Stack = [];
@@ -190,9 +189,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
-            }
-            bjs["swift_js_push_tag"] = function(tag) {
-                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
                 i32Stack.push(v | 0);
@@ -419,7 +415,7 @@ export async function createInstantiator(options, swift) {
                 const lower_closure_TestModule_10TestModule9APIResultO_9APIResultO = function(param0) {
                     const { caseId: param0CaseId, cleanup: param0Cleanup } = enumHelpers.APIResult.lower(param0);
                     instance.exports.invoke_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO(boxPtr, param0CaseId);
-                    const ret = enumHelpers.APIResult.lift(tagStack.pop());
+                    const ret = enumHelpers.APIResult.lift(i32Stack.pop());
                     if (param0Cleanup) { param0Cleanup(); }
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
@@ -701,7 +697,7 @@ export async function createInstantiator(options, swift) {
                         param0Cleanup = enumResult.cleanup;
                     }
                     instance.exports.invoke_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(boxPtr, +isSome, isSome ? param0CaseId : 0);
-                    const tag = tagStack.pop();
+                    const tag = i32Stack.pop();
                     const isNull = (tag === -1);
                     let optResult;
                     if (isNull) {

@@ -1323,7 +1323,7 @@ struct EnumCodegen {
             if enumCase.associatedValues.isEmpty {
                 printer.write("case .\(enumCase.name):")
                 printer.indent {
-                    printer.write("_swift_js_push_tag(Int32(\(caseIndex)))")
+                    printer.write("_swift_js_push_i32(Int32(\(caseIndex)))")
                 }
             } else {
                 let pattern = enumCase.associatedValues.enumerated()
@@ -1334,7 +1334,7 @@ struct EnumCodegen {
                     generatePayloadPushingCode(printer: printer, associatedValues: enumCase.associatedValues)
                     // Push tag AFTER payloads so it's popped first (LIFO) by the JS lift function.
                     // This ensures nested enum tags don't overwrite the outer tag.
-                    printer.write("_swift_js_push_tag(Int32(\(caseIndex)))")
+                    printer.write("_swift_js_push_i32(Int32(\(caseIndex)))")
                 }
             }
         }

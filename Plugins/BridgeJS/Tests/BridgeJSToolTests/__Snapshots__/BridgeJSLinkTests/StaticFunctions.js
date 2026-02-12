@@ -29,7 +29,6 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalFloat;
     let tmpRetOptionalDouble;
     let tmpRetOptionalHeapObject;
-    let tagStack = [];
     let strStack = [];
     let i32Stack = [];
     let f32Stack = [];
@@ -114,9 +113,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_release"] = function(id) {
                 swift.memory.release(id);
-            }
-            bjs["swift_js_push_tag"] = function(tag) {
-                tagStack.push(tag);
             }
             bjs["swift_js_push_i32"] = function(v) {
                 i32Stack.push(v | 0);
@@ -326,7 +322,7 @@ export async function createInstantiator(options, swift) {
                     roundtrip: function(value) {
                         const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
                         instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
-                        const ret = enumHelpers.APIResult.lift(tagStack.pop());
+                        const ret = enumHelpers.APIResult.lift(i32Stack.pop());
                         if (valueCleanup) { valueCleanup(); }
                         return ret;
                     }

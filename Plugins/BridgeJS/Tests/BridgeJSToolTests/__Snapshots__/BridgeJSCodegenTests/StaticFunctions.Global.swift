@@ -83,10 +83,10 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         switch self {
         case .success(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(0))
+            _swift_js_push_i32(Int32(0))
         case .failure(let param0):
             param0.bridgeJSLowerStackReturn()
-            _swift_js_push_tag(Int32(1))
+            _swift_js_push_i32(Int32(1))
         }
     }
 }

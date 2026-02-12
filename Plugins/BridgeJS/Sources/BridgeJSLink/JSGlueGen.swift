@@ -23,7 +23,6 @@ final class JSGlueVariableScope {
     static let reservedStorageToReturnOptionalHeapObject = "tmpRetOptionalHeapObject"
     static let reservedTextEncoder = "textEncoder"
     static let reservedTextDecoder = "textDecoder"
-    static let reservedTagStack = "tagStack"
     static let reservedStringStack = "strStack"
     static let reservedI32Stack = "i32Stack"
     static let reservedF32Stack = "f32Stack"
@@ -52,7 +51,6 @@ final class JSGlueVariableScope {
         reservedStorageToReturnOptionalHeapObject,
         reservedTextEncoder,
         reservedTextDecoder,
-        reservedTagStack,
         reservedStringStack,
         reservedI32Stack,
         reservedF32Stack,
@@ -121,9 +119,6 @@ extension JSGlueVariableScope {
     }
     func emitPushPointerReturn(_ value: String, printer: CodeFragmentPrinter) {
         printer.write("\(JSGlueVariableScope.reservedPointerStack).push(\(value));")
-    }
-    func popTag() -> String {
-        return "\(JSGlueVariableScope.reservedTagStack).pop()"
     }
     func popString() -> String {
         return "\(JSGlueVariableScope.reservedStringStack).pop()"
@@ -661,7 +656,7 @@ struct IntrinsicJSFragment: Sendable {
                 let (scope, printer) = (context.scope, context.printer)
                 let retName = scope.variable("ret")
                 printer.write(
-                    "const \(retName) = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lift(\(scope.popTag()));"
+                    "const \(retName) = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lift(\(scope.popI32()));"
                 )
                 return [retName]
             }
@@ -1022,7 +1017,7 @@ struct IntrinsicJSFragment: Sendable {
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let tagVar = scope.variable("tag")
-                    printer.write("const \(tagVar) = \(scope.popTag());")
+                    printer.write("const \(tagVar) = \(scope.popI32());")
                     let isNullVar = scope.variable("isNull")
                     printer.write("const \(isNullVar) = (\(tagVar) === -1);")
                     printer.write("let \(resultVar);")
@@ -2112,7 +2107,7 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write("if (\(isSomeVar)) {")
                 try printer.indent {
                     // For optional associated value enums, Swift uses bridgeJSLowerParameter()
-                    // which pushes caseId to i32Stack (not tagStack like bridgeJSLowerReturn()).
+                    // which pushes caseId to i32Stack (same as bridgeJSLowerReturn()).
                     if case .associatedValueEnum(let fullName) = wrappedType {
                         let base = fullName.components(separatedBy: ".").last ?? fullName
                         let caseIdVar = scope.variable("caseId")
@@ -2486,7 +2481,7 @@ struct IntrinsicJSFragment: Sendable {
                     let (scope, printer) = (context.scope, context.printer)
                     let resultVar = scope.variable("enumValue")
                     printer.write(
-                        "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(scope.popTag()), );"
+                        "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(scope.popI32()), );"
                     )
                     return [resultVar]
                 }
