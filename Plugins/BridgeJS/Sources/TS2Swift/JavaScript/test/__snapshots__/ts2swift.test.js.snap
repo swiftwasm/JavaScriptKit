@@ -437,7 +437,9 @@ exports[`ts2swift > snapshots Swift output for TypeAliasObject.d.ts > TypeAliasO
 
 @JSFunction func console() throws(JSException) -> Console
 
+/// Console from the environment.
 @JSClass struct Console {
+    /// Log a message.
     @JSFunction func log(_ message: String) throws(JSException) -> Void
 }
 "
