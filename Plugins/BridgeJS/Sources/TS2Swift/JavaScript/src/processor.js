@@ -747,8 +747,8 @@ export class TypeProcessor {
      * @private
      */
     visitStructuredType(type, diagnosticNode, members) {
-        const symbol = type.getSymbol() ?? type.aliasSymbol;
-        const name = symbol?.name ?? this.checker.typeToString(type);
+        const symbol = type.aliasSymbol ?? type.getSymbol();
+        const name = type.aliasSymbol?.name ?? symbol?.name ?? this.checker.typeToString(type);
         if (!name) return;
         if (this.emittedStructuredTypeNames.has(name)) return;
         this.emittedStructuredTypeNames.add(name);
@@ -760,7 +760,7 @@ export class TypeProcessor {
         if (jsNameArg) args.push(jsNameArg);
         const annotation = this.renderMacroAnnotation("JSClass", args);
         const typeName = this.renderIdentifier(swiftName);
-        const docNode = symbol?.getDeclarations()?.[0] ?? diagnosticNode;
+        const docNode = type.aliasSymbol?.getDeclarations()?.[0] ?? symbol?.getDeclarations()?.[0] ?? diagnosticNode;
         if (docNode) {
             this.emitDocComment(docNode, { indent: "" });
         }
