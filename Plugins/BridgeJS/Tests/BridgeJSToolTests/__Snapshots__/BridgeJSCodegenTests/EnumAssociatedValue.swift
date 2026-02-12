@@ -260,9 +260,9 @@ extension TypedPayloadResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> TypedPayloadResult {
         switch caseId {
         case 0:
-            return .precision(Precision.bridgeJSLiftParameter(_swift_js_pop_f32()))
+            return .precision(Precision.bridgeJSLiftParameter())
         case 1:
-            return .direction(CardinalDirection.bridgeJSLiftParameter(_swift_js_pop_i32()))
+            return .direction(CardinalDirection.bridgeJSLiftParameter())
         case 2:
             return .optPrecision(Optional<Precision>.bridgeJSLiftParameter())
         case 3:
@@ -312,7 +312,7 @@ extension AllTypesResult: _BridgedSwiftAssociatedValueEnum {
         case 2:
             return .jsObjectPayload(JSObject.bridgeJSLiftParameter())
         case 3:
-            return .nestedEnum(APIResult.bridgeJSLiftParameter(_swift_js_pop_i32()))
+            return .nestedEnum(APIResult.bridgeJSLiftParameter())
         case 4:
             return .arrayPayload([Int].bridgeJSLiftParameter())
         case 5:
