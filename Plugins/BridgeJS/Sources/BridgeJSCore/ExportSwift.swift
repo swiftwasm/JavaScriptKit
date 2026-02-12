@@ -1199,7 +1199,9 @@ struct EnumCodegen {
         let printer = CodeFragmentPrinter()
         printer.write("extension \(typeName): _BridgedSwiftAssociatedValueEnum {")
         printer.indent {
-            printer.write("private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> \(typeName) {")
+            printer.write(
+                "@_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> \(typeName) {"
+            )
             printer.indent {
                 printer.write("switch caseId {")
                 generateStackLiftSwitchCases(printer: printer, enumDef: enumDef)
@@ -1212,40 +1214,7 @@ struct EnumCodegen {
             printer.write("}")
             printer.nextLine()
 
-            printer.write("// MARK: Protocol Export")
-            printer.nextLine()
-
-            printer.write("@_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {")
-            printer.indent {
-                printer.write("switch self {")
-                generateLowerParameterSwitchCases(printer: printer, enumDef: enumDef)
-                printer.write("}")
-            }
-            printer.write("}")
-            printer.nextLine()
-
-            printer.write(
-                multilineString: """
-                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> \(typeName) {
-                        return _bridgeJSLiftFromCaseId(caseId)
-                    }
-                    """
-            )
-            printer.nextLine()
-
-            printer.write("// MARK: ExportSwift")
-            printer.nextLine()
-
-            printer.write(
-                multilineString: """
-                    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> \(typeName) {
-                        return _bridgeJSLiftFromCaseId(caseId)
-                    }
-                    """
-            )
-            printer.nextLine()
-
-            printer.write("@_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {")
+            printer.write("@_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {")
             printer.indent {
                 printer.write("switch self {")
                 generateReturnSwitchCases(printer: printer, enumDef: enumDef)
@@ -1298,32 +1267,12 @@ struct EnumCodegen {
         }
     }
 
-    private func generateLowerParameterSwitchCases(printer: CodeFragmentPrinter, enumDef: ExportedEnum) {
-        for (caseIndex, enumCase) in enumDef.cases.enumerated() {
-            if enumCase.associatedValues.isEmpty {
-                printer.write("case .\(enumCase.name):")
-                printer.indent {
-                    printer.write("return Int32(\(caseIndex))")
-                }
-            } else {
-                let pattern = enumCase.associatedValues.enumerated()
-                    .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
-                    .joined(separator: ", ")
-                printer.write("case .\(enumCase.name)(\(pattern)):")
-                printer.indent {
-                    generatePayloadPushingCode(printer: printer, associatedValues: enumCase.associatedValues)
-                    printer.write("return Int32(\(caseIndex))")
-                }
-            }
-        }
-    }
-
     private func generateReturnSwitchCases(printer: CodeFragmentPrinter, enumDef: ExportedEnum) {
         for (caseIndex, enumCase) in enumDef.cases.enumerated() {
             if enumCase.associatedValues.isEmpty {
                 printer.write("case .\(enumCase.name):")
                 printer.indent {
-                    printer.write("_swift_js_push_i32(Int32(\(caseIndex)))")
+                    printer.write("return Int32(\(caseIndex))")
                 }
             } else {
                 let pattern = enumCase.associatedValues.enumerated()
@@ -1334,7 +1283,7 @@ struct EnumCodegen {
                     generatePayloadPushingCode(printer: printer, associatedValues: enumCase.associatedValues)
                     // Push tag AFTER payloads so it's popped first (LIFO) by the JS lift function.
                     // This ensures nested enum tags don't overwrite the outer tag.
-                    printer.write("_swift_js_push_i32(Int32(\(caseIndex)))")
+                    printer.write("return Int32(\(caseIndex))")
                 }
             }
         }

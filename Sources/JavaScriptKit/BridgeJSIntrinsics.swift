@@ -601,22 +601,41 @@ extension _BridgedSwiftCaseEnum {
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
 public protocol _BridgedSwiftAssociatedValueEnum: _BridgedSwiftTypeLoweredIntoVoidType, _BridgedSwiftStackType {
-    // MARK: ImportTS
-    @_spi(BridgeJS) consuming func bridgeJSLowerParameter() -> Int32
-    @_spi(BridgeJS) static func bridgeJSLiftReturn(_ caseId: Int32) -> Self
+    /// Pops the payload of the associated value enum from the stack.
+    ///
+    /// - Parameter caseId: The enum case ID.
+    /// - Returns: The associated value enum with its payload popped from the stack.
+    @_spi(BridgeJS) static func bridgeJSStackPopPayload(_ caseId: Int32) -> Self
 
-    // MARK: ExportSwift
-    @_spi(BridgeJS) static func bridgeJSLiftParameter(_ caseId: Int32) -> Self
-    @_spi(BridgeJS) consuming func bridgeJSLowerReturn() -> Void
+    /// Pushes the payload of the associated value enum onto the stack.
+    ///
+    /// - Returns: The enum case ID.
+    @_spi(BridgeJS) consuming func bridgeJSStackPushPayload() -> Int32
 }
 
 extension _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> Self {
-        bridgeJSLiftParameter(_swift_js_pop_i32())
+        bridgeJSStackPopPayload(_swift_js_pop_i32())
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerStackReturn() {
         bridgeJSLowerReturn()
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ caseId: Int32) -> Self {
+        return bridgeJSStackPopPayload(caseId)
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
+        _swift_js_push_i32(bridgeJSStackPushPayload())
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSStackPushPayload()
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ caseId: Int32) -> Self {
+        return bridgeJSStackPopPayload(caseId)
     }
 }
 
