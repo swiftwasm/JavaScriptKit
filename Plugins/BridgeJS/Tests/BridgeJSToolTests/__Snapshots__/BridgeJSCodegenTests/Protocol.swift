@@ -565,7 +565,7 @@ public func _bjs_MyViewController_delegate_set(_ _self: UnsafeMutableRawPointer,
 @_cdecl("bjs_MyViewController_secondDelegate_get")
 public func _bjs_MyViewController_secondDelegate_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = MyViewController.bridgeJSLiftParameter(_self).secondDelegate.flatMap { $0 as? AnyMyViewControllerDelegate }
+    let ret = (MyViewController.bridgeJSLiftParameter(_self).secondDelegate).flatMap { $0 as? AnyMyViewControllerDelegate }
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

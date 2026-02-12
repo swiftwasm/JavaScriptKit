@@ -147,23 +147,9 @@ public class ExportSwift {
                 } else {
                     optionalSwiftType = "JSUndefinedOr"
                 }
-                if case .swiftProtocol(let protocolName) = wrappedType {
-                    let wrapperName = "Any\(protocolName)"
-                    typeNameForIntrinsic = "\(optionalSwiftType)<\(wrapperName)>"
-                    liftingExpr = ExprSyntax(
-                        "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
-                    )
-                } else {
-                    typeNameForIntrinsic = "\(optionalSwiftType)<\(wrappedType.swiftType)>"
-                    liftingExpr = ExprSyntax(
-                        "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
-                    )
-                }
-            case .swiftProtocol(let protocolName):
-                let wrapperName = "Any\(protocolName)"
-                typeNameForIntrinsic = wrapperName
+                typeNameForIntrinsic = "\(optionalSwiftType)<\(wrappedType.swiftType)>"
                 liftingExpr = ExprSyntax(
-                    "\(raw: wrapperName).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                    "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
             default:
                 typeNameForIntrinsic = param.type.swiftType
@@ -175,6 +161,20 @@ public class ExportSwift {
             liftedParameterExprs.append(liftingExpr)
             for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
                 abiParameterSignatures.append((name, type))
+            }
+        }
+
+        private func protocolCastSuffix(for returnType: BridgeType) -> (prefix: String, suffix: String) {
+            switch returnType {
+            case .swiftProtocol:
+                return ("", " as! \(returnType.swiftType)")
+            case .nullable(let wrappedType, _):
+                if case .swiftProtocol = wrappedType {
+                    return ("(", ").flatMap { $0 as? \(wrappedType.swiftType) }")
+                }
+                return ("", "")
+            default:
+                return ("", "")
             }
         }
 
@@ -211,26 +211,10 @@ public class ExportSwift {
             if returnType == .void {
                 return CodeBlockItemSyntax(item: .init(ExpressionStmtSyntax(expression: callExpr)))
             } else {
-                switch returnType {
-                case .swiftProtocol(let protocolName):
-                    let wrapperName = "Any\(protocolName)"
-                    return CodeBlockItemSyntax(
-                        item: .init(DeclSyntax("let ret = \(raw: callExpr) as! \(raw: wrapperName)"))
-                    )
-                case .nullable(let wrappedType, _):
-                    if case .swiftProtocol(let protocolName) = wrappedType {
-                        let wrapperName = "Any\(protocolName)"
-                        return CodeBlockItemSyntax(
-                            item: .init(
-                                DeclSyntax("let ret = (\(raw: callExpr)).flatMap { $0 as? \(raw: wrapperName) }")
-                            )
-                        )
-                    } else {
-                        return CodeBlockItemSyntax(item: .init(DeclSyntax("let ret = \(raw: callExpr)")))
-                    }
-                default:
-                    return CodeBlockItemSyntax(item: .init(DeclSyntax("let ret = \(raw: callExpr)")))
-                }
+                let (prefix, suffix) = protocolCastSuffix(for: returnType)
+                return CodeBlockItemSyntax(
+                    item: .init(DeclSyntax("let ret = \(raw: prefix)\(raw: callExpr)\(raw: suffix)"))
+                )
             }
         }
 
@@ -244,20 +228,8 @@ public class ExportSwift {
             if returnType == .void {
                 append("\(raw: name)")
             } else {
-                switch returnType {
-                case .swiftProtocol(let protocolName):
-                    let wrapperName = "Any\(protocolName)"
-                    append("let ret = \(raw: name) as! \(raw: wrapperName)")
-                case .nullable(let wrappedType, _):
-                    if case .swiftProtocol(let protocolName) = wrappedType {
-                        let wrapperName = "Any\(protocolName)"
-                        append("let ret = \(raw: name).flatMap { $0 as? \(raw: wrapperName) }")
-                    } else {
-                        append("let ret = \(raw: name)")
-                    }
-                default:
-                    append("let ret = \(raw: name)")
-                }
+                let (prefix, suffix) = protocolCastSuffix(for: returnType)
+                append("let ret = \(raw: prefix)\(raw: name)\(raw: suffix)")
             }
         }
 
@@ -301,20 +273,8 @@ public class ExportSwift {
             if returnType == .void {
                 append("\(raw: selfExpr).\(raw: propertyName)")
             } else {
-                switch returnType {
-                case .swiftProtocol(let protocolName):
-                    let wrapperName = "Any\(protocolName)"
-                    append("let ret = \(raw: selfExpr).\(raw: propertyName) as! \(raw: wrapperName)")
-                case .nullable(let wrappedType, _):
-                    if case .swiftProtocol(let protocolName) = wrappedType {
-                        let wrapperName = "Any\(protocolName)"
-                        append("let ret = \(raw: selfExpr).\(raw: propertyName).flatMap { $0 as? \(raw: wrapperName) }")
-                    } else {
-                        append("let ret = \(raw: selfExpr).\(raw: propertyName)")
-                    }
-                default:
-                    append("let ret = \(raw: selfExpr).\(raw: propertyName)")
-                }
+                let (prefix, suffix) = protocolCastSuffix(for: returnType)
+                append("let ret = \(raw: prefix)\(raw: selfExpr).\(raw: propertyName)\(raw: suffix)")
             }
         }
 
@@ -1051,18 +1011,14 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch wrappedType {
-        case .string, .int, .uint, .bool, .float, .double, .jsValue:
-            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
-        case .caseEnum, .rawValueEnum:
-            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
-        case .swiftHeapObject:
-            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
-        case .associatedValueEnum:
-            return ["_swift_js_push_i32(\(raw: unwrappedVar).bridgeJSLowerParameter())"]
-        case .jsObject(nil):
-            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
         case .jsObject(_?):
             return ["\(raw: unwrappedVar).jsObject.bridgeJSLowerStackReturn()"]
+        case .swiftProtocol:
+            return ["(\(raw: unwrappedVar) as! \(raw: wrappedType.swiftType)).bridgeJSLowerStackReturn()"]
+        case .string, .int, .uint, .bool, .float, .double, .jsValue,
+            .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
+            .caseEnum, .rawValueEnum, .associatedValueEnum:
+            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
         default:
             return ["preconditionFailure(\"BridgeJS: unsupported optional wrapped type\")"]
         }
