@@ -294,9 +294,9 @@ public func _bjs_testEmptyInit(_ greeter: UnsafeMutableRawPointer) -> UnsafeMuta
 
 @_expose(wasm, "bjs_testOptionalStructDefault")
 @_cdecl("bjs_testOptionalStructDefault")
-public func _bjs_testOptionalStructDefault(_ point: Int32) -> Void {
+public func _bjs_testOptionalStructDefault() -> Void {
     #if arch(wasm32)
-    let ret = testOptionalStructDefault(point: Optional<Config>.bridgeJSLiftParameter(point))
+    let ret = testOptionalStructDefault(point: Optional<Config>.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -305,9 +305,9 @@ public func _bjs_testOptionalStructDefault(_ point: Int32) -> Void {
 
 @_expose(wasm, "bjs_testOptionalStructWithValueDefault")
 @_cdecl("bjs_testOptionalStructWithValueDefault")
-public func _bjs_testOptionalStructWithValueDefault(_ point: Int32) -> Void {
+public func _bjs_testOptionalStructWithValueDefault() -> Void {
     #if arch(wasm32)
-    let ret = testOptionalStructWithValueDefault(point: Optional<Config>.bridgeJSLiftParameter(point))
+    let ret = testOptionalStructWithValueDefault(point: Optional<Config>.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

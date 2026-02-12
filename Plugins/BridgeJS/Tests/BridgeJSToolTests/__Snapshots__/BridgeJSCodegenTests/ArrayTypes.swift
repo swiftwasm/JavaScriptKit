@@ -277,20 +277,10 @@ public func _bjs_processOptionalStringArray() -> Void {
 
 @_expose(wasm, "bjs_processOptionalArray")
 @_cdecl("bjs_processOptionalArray")
-public func _bjs_processOptionalArray(_ values: Int32) -> Void {
+public func _bjs_processOptionalArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalArray(_: {
-        if values == 0 {
-            return Optional<[Int]>.none
-        } else {
-            return [Int].bridgeJSLiftParameter()
-        }
-    }())
-    let __bjs_isSome_ret = ret != nil
-    if let __bjs_unwrapped_ret = ret {
-    __bjs_unwrapped_ret.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret ? 1 : 0)
+    let ret = processOptionalArray(_: Optional<[Int]>.bridgeJSLiftParameter())
+    ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -311,11 +301,7 @@ public func _bjs_processOptionalPointArray() -> Void {
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerReturn()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSLowerReturn()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
