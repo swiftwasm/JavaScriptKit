@@ -2198,7 +2198,7 @@ extension AllTypesResult: _BridgedSwiftAssociatedValueEnum {
         case 2:
             return .jsObjectPayload(JSObject.bridgeJSLiftParameter())
         case 3:
-            return .nestedEnum(APIResult.bridgeJSLiftParameter(_swift_js_pop_i32()))
+            return .nestedEnum(APIResult.bridgeJSLiftParameter())
         case 4:
             return .arrayPayload([Int].bridgeJSLiftParameter())
         case 5:
@@ -2240,9 +2240,9 @@ extension TypedPayloadResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> TypedPayloadResult {
         switch caseId {
         case 0:
-            return .precision(Precision.bridgeJSLiftParameter(_swift_js_pop_f32()))
+            return .precision(Precision.bridgeJSLiftParameter())
         case 1:
-            return .direction(Direction.bridgeJSLiftParameter(_swift_js_pop_i32()))
+            return .direction(Direction.bridgeJSLiftParameter())
         case 2:
             return .optPrecision(Optional<Precision>.bridgeJSLiftParameter())
         case 3:
@@ -2992,7 +2992,7 @@ fileprivate func _bjs_struct_lift_Contact() -> Int32 {
 
 extension Config: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Config {
-        let status = Status.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let status = Status.bridgeJSLiftParameter()
         let direction = Optional<Direction>.bridgeJSLiftParameter()
         let theme = Optional<Theme>.bridgeJSLiftParameter()
         let name = String.bridgeJSLiftParameter()
@@ -3100,7 +3100,7 @@ extension ValidationReport: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ValidationReport {
         let outcome = Optional<APIResult>.bridgeJSLiftParameter()
         let status = Optional<Status>.bridgeJSLiftParameter()
-        let result = APIResult.bridgeJSLiftParameter(_swift_js_pop_i32())
+        let result = APIResult.bridgeJSLiftParameter()
         let id = Int.bridgeJSLiftParameter()
         return ValidationReport(id: id, result: result, status: status, outcome: outcome)
     }
@@ -3160,8 +3160,8 @@ extension AdvancedConfig: _BridgedSwiftStruct {
         let location = Optional<DataPoint>.bridgeJSLiftParameter()
         let metadata = Optional<JSObject>.bridgeJSLiftParameter()
         let result = Optional<APIResult>.bridgeJSLiftParameter()
-        let status = Status.bridgeJSLiftParameter(_swift_js_pop_i32())
-        let theme = Theme.bridgeJSLiftParameter(_swift_js_pop_i32(), _swift_js_pop_i32())
+        let status = Status.bridgeJSLiftParameter()
+        let theme = Theme.bridgeJSLiftParameter()
         let enabled = Bool.bridgeJSLiftParameter()
         let title = String.bridgeJSLiftParameter()
         let id = Int.bridgeJSLiftParameter()
@@ -3226,8 +3226,8 @@ extension MeasurementConfig: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MeasurementConfig {
         let optionalRatio = Optional<Ratio>.bridgeJSLiftParameter()
         let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter()
-        let ratio = Ratio.bridgeJSLiftParameter(_swift_js_pop_f64())
-        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_f32())
+        let ratio = Ratio.bridgeJSLiftParameter()
+        let precision = Precision.bridgeJSLiftParameter()
         return MeasurementConfig(precision: precision, ratio: ratio, optionalPrecision: optionalPrecision, optionalRatio: optionalRatio)
     }
 

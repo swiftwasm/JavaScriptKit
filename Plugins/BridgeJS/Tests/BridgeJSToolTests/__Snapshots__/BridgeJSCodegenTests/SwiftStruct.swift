@@ -223,7 +223,7 @@ fileprivate func _bjs_struct_lift_Session() -> Int32 {
 extension Measurement: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Measurement {
         let optionalPrecision = Optional<Precision>.bridgeJSLiftParameter()
-        let precision = Precision.bridgeJSLiftParameter(_swift_js_pop_f32())
+        let precision = Precision.bridgeJSLiftParameter()
         let value = Double.bridgeJSLiftParameter()
         return Measurement(value: value, precision: precision, optionalPrecision: optionalPrecision)
     }
