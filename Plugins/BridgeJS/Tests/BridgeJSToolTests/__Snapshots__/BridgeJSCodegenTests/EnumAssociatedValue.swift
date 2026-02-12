@@ -387,7 +387,7 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
         case .optNestedEnum(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-            _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(3)

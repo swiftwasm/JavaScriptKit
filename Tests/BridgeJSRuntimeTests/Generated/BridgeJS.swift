@@ -2631,7 +2631,7 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
         case .optNestedEnum(let param0):
             let __bjs_isSome_param0 = param0 != nil
             if let __bjs_unwrapped_param0 = param0 {
-            _swift_js_push_i32(__bjs_unwrapped_param0.bridgeJSLowerParameter())
+            __bjs_unwrapped_param0.bridgeJSLowerStackReturn()
             }
             _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
             return Int32(3)
@@ -3115,7 +3115,7 @@ extension ValidationReport: _BridgedSwiftStruct {
         _swift_js_push_i32(__bjs_isSome_status ? 1 : 0)
         let __bjs_isSome_outcome = self.outcome != nil
         if let __bjs_unwrapped_outcome = self.outcome {
-        _swift_js_push_i32(__bjs_unwrapped_outcome.bridgeJSLowerParameter())
+        __bjs_unwrapped_outcome.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_outcome ? 1 : 0)
     }
@@ -3176,7 +3176,7 @@ extension AdvancedConfig: _BridgedSwiftStruct {
         self.status.bridgeJSLowerStackReturn()
         let __bjs_isSome_result = self.result != nil
         if let __bjs_unwrapped_result = self.result {
-        _swift_js_push_i32(__bjs_unwrapped_result.bridgeJSLowerParameter())
+        __bjs_unwrapped_result.bridgeJSLowerStackReturn()
         }
         _swift_js_push_i32(__bjs_isSome_result ? 1 : 0)
         let __bjs_isSome_metadata = self.metadata != nil
@@ -7670,7 +7670,7 @@ public func _bjs_DataProcessorManager_processor_set(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_DataProcessorManager_backupProcessor_get")
 public func _bjs_DataProcessorManager_backupProcessor_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor.flatMap { $0 as? AnyDataProcessor }
+    let ret = (DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor).flatMap { $0 as? AnyDataProcessor }
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
