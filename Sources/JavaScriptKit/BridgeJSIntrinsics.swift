@@ -386,6 +386,19 @@ extension JSObject: _BridgedSwiftStackType {
 extension JSValue: _BridgedSwiftStackType {
     public typealias StackLiftResult = JSValue
 
+    @_transparent
+    private static func bridgeJSRetainPayloadIfNeeded(kind: Int32, payload1: Int32) -> Int32 {
+        guard let kindEnum = JavaScriptValueKind(rawValue: UInt32(kind)) else {
+            return payload1
+        }
+        switch kindEnum {
+        case .string, .object, .symbol, .bigInt:
+            return _swift_js_retain(payload1)
+        default:
+            return payload1
+        }
+    }
+
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (kind: Int32, payload1: Int32, payload2: Double) {
         return withRawJSValue { raw in
             (
@@ -409,17 +422,7 @@ extension JSValue: _BridgedSwiftStackType {
         _ payload1: Int32,
         _ payload2: Double
     ) -> JSValue {
-        let retainedPayload1: Int32
-        if let kindEnum = JavaScriptValueKind(rawValue: UInt32(kind)) {
-            switch kindEnum {
-            case .string, .object, .symbol, .bigInt:
-                retainedPayload1 = _swift_js_retain(payload1)
-            default:
-                retainedPayload1 = payload1
-            }
-        } else {
-            retainedPayload1 = payload1
-        }
+        let retainedPayload1 = bridgeJSRetainPayloadIfNeeded(kind: kind, payload1: payload1)
 
         guard let kindEnum = JavaScriptValueKind(rawValue: UInt32(kind)) else {
             fatalError("Invalid JSValue kind: \(kind)")
@@ -440,25 +443,12 @@ extension JSValue: _BridgedSwiftStackType {
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> JSValue {
-        let payload2 = _swift_js_pop_f64()
-        let payload1 = _swift_js_pop_i32()
-        let kind = _swift_js_pop_i32()
-        return bridgeJSLiftParameter(kind, payload1, payload2)
+        bridgeJSLiftParameter()
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         let lowered = bridgeJSLowerParameter()
-        let retainedPayload1: Int32
-        if let kind = JavaScriptValueKind(rawValue: UInt32(lowered.kind)) {
-            switch kind {
-            case .string, .object, .symbol, .bigInt:
-                retainedPayload1 = _swift_js_retain(lowered.payload1)
-            default:
-                retainedPayload1 = lowered.payload1
-            }
-        } else {
-            retainedPayload1 = lowered.payload1
-        }
+        let retainedPayload1 = Self.bridgeJSRetainPayloadIfNeeded(kind: lowered.kind, payload1: lowered.payload1)
         _swift_js_push_i32(lowered.kind)
         _swift_js_push_i32(retainedPayload1)
         _swift_js_push_f64(lowered.payload2)

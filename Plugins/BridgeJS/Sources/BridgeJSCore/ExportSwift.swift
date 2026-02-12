@@ -482,12 +482,7 @@ public class ExportSwift {
         }
 
         if function.effects.isStatic, let staticContext = function.staticContext {
-            let callName: String
-            switch staticContext {
-            case .className(let baseName), .enumName(let baseName), .structName(let baseName),
-                .namespaceEnum(let baseName):
-                callName = "\(baseName).\(function.name)"
-            }
+            let callName = "\(staticContextBaseName(staticContext)).\(function.name)"
             builder.call(name: callName, returnType: function.returnType)
         } else {
             builder.call(name: function.name, returnType: function.returnType)
@@ -497,17 +492,61 @@ public class ExportSwift {
         return builder.render(abiName: function.abiName)
     }
 
+    private func staticContextBaseName(_ staticContext: StaticContext) -> String {
+        switch staticContext {
+        case .className(let baseName), .enumName(let baseName), .structName(let baseName),
+            .namespaceEnum(let baseName):
+            return baseName
+        }
+    }
+
+    private func renderSingleExportedConstructor(
+        constructor: ExportedConstructor,
+        callName: String,
+        returnType: BridgeType
+    ) throws -> DeclSyntax {
+        let builder = ExportedThunkBuilder(effects: constructor.effects)
+        for param in constructor.parameters {
+            try builder.liftParameter(param: param)
+        }
+        builder.call(name: callName, returnType: returnType)
+        try builder.lowerReturnValue(returnType: returnType)
+        return builder.render(abiName: constructor.abiName)
+    }
+
+    private func renderSingleExportedMethod(
+        method: ExportedFunction,
+        ownerTypeName: String,
+        instanceSelfType: BridgeType
+    ) throws -> DeclSyntax {
+        let builder = ExportedThunkBuilder(effects: method.effects)
+        if !method.effects.isStatic {
+            try builder.liftParameter(param: Parameter(label: nil, name: "_self", type: instanceSelfType))
+        }
+        for param in method.parameters {
+            try builder.liftParameter(param: param)
+        }
+
+        if method.effects.isStatic {
+            builder.call(name: "\(ownerTypeName).\(method.name)", returnType: method.returnType)
+        } else {
+            builder.callMethod(methodName: method.name, returnType: method.returnType)
+        }
+        try builder.lowerReturnValue(returnType: method.returnType)
+        return builder.render(abiName: method.abiName)
+    }
+
     func renderSingleExportedStruct(struct structDef: ExportedStruct) throws -> [DeclSyntax] {
         var decls: [DeclSyntax] = []
 
         if let constructor = structDef.constructor {
-            let builder = ExportedThunkBuilder(effects: constructor.effects)
-            for param in constructor.parameters {
-                try builder.liftParameter(param: param)
-            }
-            builder.call(name: structDef.swiftCallName, returnType: .swiftStruct(structDef.swiftCallName))
-            try builder.lowerReturnValue(returnType: .swiftStruct(structDef.swiftCallName))
-            decls.append(builder.render(abiName: constructor.abiName))
+            decls.append(
+                try renderSingleExportedConstructor(
+                    constructor: constructor,
+                    callName: structDef.swiftCallName,
+                    returnType: .swiftStruct(structDef.swiftCallName)
+                )
+            )
         }
 
         for property in structDef.properties where property.isStatic {
@@ -520,28 +559,13 @@ public class ExportSwift {
         }
 
         for method in structDef.methods {
-            let builder = ExportedThunkBuilder(effects: method.effects)
-
-            if method.effects.isStatic {
-                for param in method.parameters {
-                    try builder.liftParameter(param: param)
-                }
-                builder.call(name: "\(structDef.swiftCallName).\(method.name)", returnType: method.returnType)
-            } else {
-                try builder.liftParameter(
-                    param: Parameter(label: nil, name: "_self", type: .swiftStruct(structDef.swiftCallName))
+            decls.append(
+                try renderSingleExportedMethod(
+                    method: method,
+                    ownerTypeName: structDef.swiftCallName,
+                    instanceSelfType: .swiftStruct(structDef.swiftCallName)
                 )
-                for param in method.parameters {
-                    try builder.liftParameter(param: param)
-                }
-                builder.callMethod(
-                    methodName: method.name,
-                    returnType: method.returnType
-                )
-            }
-
-            try builder.lowerReturnValue(returnType: method.returnType)
-            decls.append(builder.render(abiName: method.abiName))
+            )
         }
 
         return decls
@@ -598,55 +622,29 @@ public class ExportSwift {
         var decls: [DeclSyntax] = []
 
         if let constructor = klass.constructor {
-            let builder = ExportedThunkBuilder(effects: constructor.effects)
-            for param in constructor.parameters {
-                try builder.liftParameter(param: param)
-            }
-            builder.call(name: klass.swiftCallName, returnType: BridgeType.swiftHeapObject(klass.name))
-            try builder.lowerReturnValue(returnType: BridgeType.swiftHeapObject(klass.name))
-            decls.append(builder.render(abiName: constructor.abiName))
+            decls.append(
+                try renderSingleExportedConstructor(
+                    constructor: constructor,
+                    callName: klass.swiftCallName,
+                    returnType: .swiftHeapObject(klass.name)
+                )
+            )
         }
         for method in klass.methods {
-            let builder = ExportedThunkBuilder(effects: method.effects)
-
-            if method.effects.isStatic {
-                for param in method.parameters {
-                    try builder.liftParameter(param: param)
-                }
-                builder.call(name: "\(klass.swiftCallName).\(method.name)", returnType: method.returnType)
-            } else {
-                try builder.liftParameter(
-                    param: Parameter(label: nil, name: "_self", type: BridgeType.swiftHeapObject(klass.swiftCallName))
+            decls.append(
+                try renderSingleExportedMethod(
+                    method: method,
+                    ownerTypeName: klass.swiftCallName,
+                    instanceSelfType: .swiftHeapObject(klass.swiftCallName)
                 )
-                for param in method.parameters {
-                    try builder.liftParameter(param: param)
-                }
-                builder.callMethod(
-                    methodName: method.name,
-                    returnType: method.returnType
-                )
-            }
-            try builder.lowerReturnValue(returnType: method.returnType)
-            decls.append(builder.render(abiName: method.abiName))
+            )
         }
 
         // Generate property getters and setters
         for property in klass.properties {
-            if property.isStatic {
-                decls.append(
-                    contentsOf: try renderSingleExportedProperty(
-                        property: property,
-                        context: .classStatic(klass: klass)
-                    )
-                )
-            } else {
-                decls.append(
-                    contentsOf: try renderSingleExportedProperty(
-                        property: property,
-                        context: .classInstance(klass: klass)
-                    )
-                )
-            }
+            let context: PropertyRenderingContext =
+                property.isStatic ? .classStatic(klass: klass) : .classInstance(klass: klass)
+            decls.append(contentsOf: try renderSingleExportedProperty(property: property, context: context))
         }
 
         do {
@@ -760,7 +758,7 @@ struct StackCodegen {
     func liftArrayExpression(elementType: BridgeType) -> ExprSyntax {
         switch elementType {
         case .jsObject(let className?) where className != "JSObject":
-            return liftArrayExpressionInline(elementType: elementType)
+            return "[JSObject].bridgeJSLiftParameter().map { \(raw: className)(unsafelyWrapping: $0) }"
         case .nullable, .closure:
             return liftArrayExpressionInline(elementType: elementType)
         case .void, .namespaceEnum:
@@ -992,8 +990,7 @@ struct StackCodegen {
 
         let innerStatements = lowerUnwrappedOptionalStatements(
             wrappedType: wrappedType,
-            unwrappedVar: "__bjs_unwrapped_\(varPrefix)",
-            varPrefix: varPrefix
+            unwrappedVar: "__bjs_unwrapped_\(varPrefix)"
         )
         for stmt in innerStatements {
             statements.append(stmt.description)
@@ -1007,8 +1004,7 @@ struct StackCodegen {
 
     private func lowerUnwrappedOptionalStatements(
         wrappedType: BridgeType,
-        unwrappedVar: String,
-        varPrefix: String
+        unwrappedVar: String
     ) -> [CodeBlockItemSyntax] {
         switch wrappedType {
         case .jsObject(_?):

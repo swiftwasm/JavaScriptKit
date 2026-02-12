@@ -5555,16 +5555,7 @@ public func _bjs_roundTripOptionalJSObjectArray() -> Void {
 @_cdecl("bjs_roundTripFooArray")
 public func _bjs_roundTripFooArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripFooArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Foo] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Foo(unsafelyWrapping: JSObject.bridgeJSLiftParameter()))
-        }
-        __result.reverse()
-        return __result
-    }())
+    let ret = roundTripFooArray(_: [JSObject].bridgeJSLiftParameter().map { Foo(unsafelyWrapping: $0) })
     ret.map { $0.jsObject }.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
