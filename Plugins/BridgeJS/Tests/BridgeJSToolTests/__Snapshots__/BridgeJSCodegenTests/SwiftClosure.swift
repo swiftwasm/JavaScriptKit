@@ -1188,7 +1188,7 @@ extension HttpStatus: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
 extension APIResult: _BridgedSwiftAssociatedValueEnum {
-    private static func _bridgeJSLiftFromCaseId(_ caseId: Int32) -> APIResult {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
             return .success(String.bridgeJSLiftParameter())
@@ -1207,9 +1207,7 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
         }
     }
 
-    // MARK: Protocol Export
-
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
         switch self {
         case .success(let param0):
             param0.bridgeJSLowerStackReturn()
@@ -1228,38 +1226,6 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             return Int32(4)
         case .info:
             return Int32(5)
-        }
-    }
-
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ caseId: Int32) -> APIResult {
-        return _bridgeJSLiftFromCaseId(caseId)
-    }
-
-    // MARK: ExportSwift
-
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ caseId: Int32) -> APIResult {
-        return _bridgeJSLiftFromCaseId(caseId)
-    }
-
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        switch self {
-        case .success(let param0):
-            param0.bridgeJSLowerStackReturn()
-            _swift_js_push_i32(Int32(0))
-        case .failure(let param0):
-            param0.bridgeJSLowerStackReturn()
-            _swift_js_push_i32(Int32(1))
-        case .flag(let param0):
-            param0.bridgeJSLowerStackReturn()
-            _swift_js_push_i32(Int32(2))
-        case .rate(let param0):
-            param0.bridgeJSLowerStackReturn()
-            _swift_js_push_i32(Int32(3))
-        case .precise(let param0):
-            param0.bridgeJSLowerStackReturn()
-            _swift_js_push_i32(Int32(4))
-        case .info:
-            _swift_js_push_i32(Int32(5))
         }
     }
 }
