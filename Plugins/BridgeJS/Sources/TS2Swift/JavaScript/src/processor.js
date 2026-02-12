@@ -56,8 +56,6 @@ export class TypeProcessor {
         this.processedTypes = new Map();
         /** @type {Map<ts.Type, ts.Node>} Seen position by type */
         this.seenTypes = new Map();
-        /** @type {Map<ts.Type, string>} Preferred alias names by underlying type */
-        this.aliasNameByType = new Map();
         /** @type {string[]} Collected Swift code lines */
         this.swiftLines = [];
         /** @type {Set<string>} */
