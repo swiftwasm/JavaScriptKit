@@ -723,21 +723,29 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_push_f32")
-@_spi(BridgeJS) public func _swift_js_push_f32(_ value: Float32)
+private func _swift_js_push_f32_extern(_ value: Float32)
 #else
-@_spi(BridgeJS) public func _swift_js_push_f32(_ value: Float32) {
+private func _swift_js_push_f32_extern(_ value: Float32) {
     _onlyAvailableOnWasm()
 }
 #endif
 
+@_spi(BridgeJS) @inline(never) public func _swift_js_push_f32(_ value: Float32) {
+    _swift_js_push_f32_extern(value)
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_push_f64")
-@_spi(BridgeJS) public func _swift_js_push_f64(_ value: Float64)
+private func _swift_js_push_f64_extern(_ value: Float64)
 #else
-@_spi(BridgeJS) public func _swift_js_push_f64(_ value: Float64) {
+private func _swift_js_push_f64_extern(_ value: Float64) {
     _onlyAvailableOnWasm()
 }
 #endif
+
+@_spi(BridgeJS) @inline(never) public func _swift_js_push_f64(_ value: Float64) {
+    _swift_js_push_f64_extern(value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_pop_i32")
@@ -750,21 +758,29 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_pop_f32")
-@_spi(BridgeJS) public func _swift_js_pop_f32() -> Float32
+private func _swift_js_pop_f32_extern() -> Float32
 #else
-@_spi(BridgeJS) public func _swift_js_pop_f32() -> Float32 {
+private func _swift_js_pop_f32_extern() -> Float32 {
     _onlyAvailableOnWasm()
 }
 #endif
 
+@_spi(BridgeJS) @inline(never) public func _swift_js_pop_f32() -> Float32 {
+    _swift_js_pop_f32_extern()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_pop_f64")
-@_spi(BridgeJS) public func _swift_js_pop_f64() -> Float64
+private func _swift_js_pop_f64_extern() -> Float64
 #else
-@_spi(BridgeJS) public func _swift_js_pop_f64() -> Float64 {
+private func _swift_js_pop_f64_extern() -> Float64 {
     _onlyAvailableOnWasm()
 }
 #endif
+
+@_spi(BridgeJS) @inline(never) public func _swift_js_pop_f64() -> Float64 {
+    _swift_js_pop_f64_extern()
+}
 
 // MARK: Struct bridging helpers (JS-side lowering/raising)
 
