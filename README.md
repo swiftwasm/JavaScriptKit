@@ -101,10 +101,10 @@ import JavaScriptKit
 }
 
 @JS func run() throws(JSException) {
-    let button = document.createElement("button")!
+    let button = try document.createElement("button")
     try button.setInnerText("Click Me")
-    let container = document.getElementById("app")!
-    container.appendChild(button)
+    let container = try document.getElementById("app")
+    try container.appendChild(button)
 }
 ```
 
