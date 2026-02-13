@@ -3026,7 +3026,7 @@ struct IntrinsicJSFragment: Sendable {
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
-                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                    let (scope, printer) = (context.scope, context.printer)
                     let value = arguments[0]
                     let idVar = scope.variable("id")
                     printer.write("let \(idVar);")
@@ -3040,16 +3040,6 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     scope.emitPushI32Parameter("\(idVar) !== undefined ? \(idVar) : 0", printer: printer)
-                    cleanup.write("if(\(idVar) !== undefined && \(idVar) !== 0) {")
-                    cleanup.indent {
-                        cleanup.write("try {")
-                        cleanup.indent {
-                            cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.getObject(\(idVar));")
-                            cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
-                        }
-                        cleanup.write("} catch(e) {}")
-                    }
-                    cleanup.write("}")
                     return [idVar]
                 }
             )
@@ -3208,16 +3198,6 @@ struct IntrinsicJSFragment: Sendable {
                         }
                         printer.write("}")
                         scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                        cleanup.write("if(\(idVar) !== undefined && \(idVar) !== 0) {")
-                        cleanup.indent {
-                            cleanup.write("try {")
-                            cleanup.indent {
-                                cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.getObject(\(idVar));")
-                                cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
-                            }
-                            cleanup.write("} catch(e) {}")
-                        }
-                        cleanup.write("}")
                         return [idVar]
                     } else {
                         switch wrappedType {

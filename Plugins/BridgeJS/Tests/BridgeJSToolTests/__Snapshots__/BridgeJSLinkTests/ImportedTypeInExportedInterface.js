@@ -49,21 +49,7 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(0);
                 }
                 i32Stack.push(isSome ? 1 : 0);
-                const cleanup = () => {
-                    if(id !== undefined && id !== 0) {
-                        try {
-                            swift.memory.getObject(id);
-                            swift.memory.release(id);
-                        } catch(e) {}
-                    }
-                    if(id1 !== undefined && id1 !== 0) {
-                        try {
-                            swift.memory.getObject(id1);
-                            swift.memory.release(id1);
-                        } catch(e) {}
-                    }
-                };
-                return { cleanup };
+                return { cleanup: undefined };
             },
             lift: () => {
                 const isSome = i32Stack.pop();
