@@ -15,8 +15,13 @@ import _CJavaScriptKit
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_throw")
-@_spi(BridgeJS) public func _swift_js_throw(_ id: Int32)
+private func _swift_js_throw_extern(_ id: Int32)
 #else
+private func _swift_js_throw_extern(_ id: Int32) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
 /// Throws a JavaScript exception from Swift code.
 ///
 /// This function is called by the BridgeJS code generator when a Swift function throws
@@ -24,10 +29,9 @@ import _CJavaScriptKit
 /// JavaScript-side runtime code.
 ///
 /// - Parameter id: The ID of the JavaScript exception object to throw
-@_spi(BridgeJS) public func _swift_js_throw(_ id: Int32) {
-    _onlyAvailableOnWasm()
+@_spi(BridgeJS) @inline(never) public func _swift_js_throw(_ id: Int32) {
+    _swift_js_throw_extern(id)
 }
-#endif
 
 /// Retrieves and clears any pending JavaScript exception.
 ///
@@ -702,30 +706,43 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_init_memory")
-@_spi(BridgeJS) public func _swift_js_init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>)
+private func _swift_js_init_memory_extern(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>)
 #else
-@_spi(BridgeJS) public func _swift_js_init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>) {
+private func _swift_js_init_memory_extern(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>) {
     _onlyAvailableOnWasm()
 }
 #endif
+
+@_spi(BridgeJS) @inline(never) public func _swift_js_init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>)
+{
+    _swift_js_init_memory_extern(sourceId, ptr)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_push_string")
-@_spi(BridgeJS) public func _swift_js_push_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+private func _swift_js_push_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
 #else
-@_spi(BridgeJS) public func _swift_js_push_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+private func _swift_js_push_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
 
+@_spi(BridgeJS) @inline(never) public func _swift_js_push_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+    _swift_js_push_string_extern(ptr, len)
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_push_i32")
-@_spi(BridgeJS) public func _swift_js_push_i32(_ value: Int32)
+private func _swift_js_push_i32_extern(_ value: Int32)
 #else
-@_spi(BridgeJS) public func _swift_js_push_i32(_ value: Int32) {
+private func _swift_js_push_i32_extern(_ value: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
+
+@_spi(BridgeJS) @inline(never) public func _swift_js_push_i32(_ value: Int32) {
+    _swift_js_push_i32_extern(value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_push_f32")
@@ -755,12 +772,16 @@ private func _swift_js_push_f64_extern(_ value: Float64) {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_pop_i32")
-@_spi(BridgeJS) public func _swift_js_pop_i32() -> Int32
+private func _swift_js_pop_i32_extern() -> Int32
 #else
-@_spi(BridgeJS) public func _swift_js_pop_i32() -> Int32 {
+private func _swift_js_pop_i32_extern() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
+
+@_spi(BridgeJS) @inline(never) public func _swift_js_pop_i32() -> Int32 {
+    _swift_js_pop_i32_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_pop_f32")
@@ -792,12 +813,16 @@ private func _swift_js_pop_f64_extern() -> Float64 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_cleanup")
-@_spi(BridgeJS) public func _swift_js_struct_cleanup(_ cleanupId: Int32)
+private func _swift_js_struct_cleanup_extern(_ cleanupId: Int32)
 #else
-@_spi(BridgeJS) public func _swift_js_struct_cleanup(_ cleanupId: Int32) {
+private func _swift_js_struct_cleanup_extern(_ cleanupId: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
+
+@_spi(BridgeJS) @inline(never) public func _swift_js_struct_cleanup(_ cleanupId: Int32) {
+    _swift_js_struct_cleanup_extern(cleanupId)
+}
 
 // MARK: Wasm externs used by type lowering/lifting
 
@@ -986,12 +1011,16 @@ func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64) {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_push_pointer")
-@_spi(BridgeJS) public func _swift_js_push_pointer(_ pointer: UnsafeMutableRawPointer)
+private func _swift_js_push_pointer_extern(_ pointer: UnsafeMutableRawPointer)
 #else
-@_spi(BridgeJS) public func _swift_js_push_pointer(_ pointer: UnsafeMutableRawPointer) {
+private func _swift_js_push_pointer_extern(_ pointer: UnsafeMutableRawPointer) {
     _onlyAvailableOnWasm()
 }
 #endif
+
+@_spi(BridgeJS) @inline(never) public func _swift_js_push_pointer(_ pointer: UnsafeMutableRawPointer) {
+    _swift_js_push_pointer_extern(pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_pop_pointer")
