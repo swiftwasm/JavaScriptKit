@@ -40,6 +40,16 @@
     }
 }
 
+@JS public struct PublicPoint {
+    public var x: Int
+    public var y: Int
+
+    @JS public init(x: Int, y: Int) {
+        self.x = x
+        self.y = y
+    }
+}
+
 @JS struct Address {
     var street: String
     var city: String
@@ -166,6 +176,10 @@
 
 @JS func roundTripDataPoint(_ data: DataPoint) -> DataPoint {
     return data
+}
+
+@JS public func roundTripPublicPoint(_ point: PublicPoint) -> PublicPoint {
+    point
 }
 
 @JS func roundTripContact(_ contact: Contact) -> Contact {

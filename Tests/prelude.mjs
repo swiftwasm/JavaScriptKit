@@ -890,6 +890,9 @@ function testStructSupport(exports) {
     const data2 = { x: 0.0, y: 0.0, label: "", optCount: null, optFlag: null };
     assert.deepEqual(exports.roundTripDataPoint(data2), data2);
 
+    const publicPoint = { x: 9, y: -3 };
+    assert.deepEqual(exports.roundTripPublicPoint(publicPoint), publicPoint);
+
     const pointerFields1 = { raw: 1, mutRaw: 4, opaque: 1024, ptr: 65536, mutPtr: 2 };
     assert.deepEqual(exports.roundTripPointerFields(pointerFields1), pointerFields1);
 
