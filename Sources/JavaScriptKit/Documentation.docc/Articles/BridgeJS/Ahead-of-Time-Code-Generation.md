@@ -6,7 +6,7 @@ Learn how to improve build times by generating BridgeJS code ahead of time.
 
 > Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
 
-The BridgeJS build plugin automatically processes `@JS` annotations and TypeScript definitions during each build. While convenient, this can significantly increase build times for larger projects. To address this, JavaScriptKit provides a command plugin that lets you generate the bridge code ahead of time.
+The BridgeJS build plugin automatically processes macro annotations and TypeScript definitions during each build. While convenient, this can significantly increase build times for larger projects. To address this, JavaScriptKit provides a command plugin that lets you generate the bridge code ahead of time.
 
 ## Using the Command Plugin
 
@@ -54,7 +54,7 @@ $ echo "{}" > Sources/MyApp/bridge-js.config.json
 
 ### Step 3: Create Your Swift Code with @JS Annotations
 
-Write your Swift code with `@JS` annotations as usual:
+Write your Swift code with macro annotations as usual:
 
 ```swift
 import JavaScriptKit
@@ -65,13 +65,13 @@ import JavaScriptKit
 
 @JS class Counter {
     private var count = 0
-    
+
     @JS init() {}
-    
+
     @JS func increment() {
         count += 1
     }
-    
+
     @JS func getValue() -> Int {
         return count
     }
@@ -104,14 +104,15 @@ swift package plugin bridge-js
 
 This command will:
 
-1. Process all Swift files with `@JS` annotations
+1. Process all Swift files with macro annotations
 2. Process any TypeScript definition files
 3. Generate Swift binding code in a `Generated` directory within your source folder
 
 For example, with a target named "MyApp", it will create:
 
 ```
-Sources/MyApp/Generated/BridgeJS.swift     # Generated code for both exports and imports
+Sources/MyApp/Generated/BridgeJS.swift            # Glue code for both exports and imports
+Sources/MyApp/Generated/BridgeJS.Macros.swift     # Bridging interface generated from bridge-js.d.ts
 Sources/MyApp/Generated/JavaScript/BridgeJS.json  # Unified skeleton JSON
 ```
 
@@ -173,4 +174,4 @@ git commit -m "Update generated BridgeJS code"
 2. **Version Control**: Always commit the generated files if using the command plugin
 3. **API Boundaries**: Try to stabilize your API boundaries to minimize regeneration
 4. **Documentation**: Document your approach in your project README
-5. **CI/CD**: If using the command plugin, consider verifying that generated code is up-to-date in CI 
+5. **CI/CD**: If using the command plugin, consider verifying that generated code is up-to-date in CI

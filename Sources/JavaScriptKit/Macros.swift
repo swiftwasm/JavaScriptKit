@@ -125,7 +125,7 @@ public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Bui
 /// Example:
 ///
 /// ```swift
-/// @_spi(Experimental) import JavaScriptKit
+/// import JavaScriptKit
 ///
 /// @JSGetter var count: Int
 ///
@@ -137,7 +137,6 @@ public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Bui
 /// - Parameter from: Selects where the property is read from.
 ///   Use `.global` to read from `globalThis` (e.g. `console`, `document`).
 @attached(accessor)
-@_spi(Experimental)
 public macro JSGetter(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSGetterMacro")
 
@@ -151,12 +150,11 @@ public macro JSGetter(jsName: String? = nil, from: JSImportFrom? = nil) =
 /// Example:
 ///
 /// ```swift
-/// @_spi(Experimental) import JavaScriptKit
+/// import JavaScriptKit
 ///
 /// @JSSetter func setName(_ value: String) throws (JSException)
 /// ```
 @attached(body)
-@_spi(Experimental)
 public macro JSSetter(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSSetterMacro")
 
@@ -167,7 +165,7 @@ public macro JSSetter(jsName: String? = nil, from: JSImportFrom? = nil) =
 /// Example:
 ///
 /// ```swift
-/// @_spi(Experimental) import JavaScriptKit
+/// import JavaScriptKit
 ///
 /// @JSFunction func greet() throws (JSException) -> String
 /// @JSFunction init(_ name: String) throws (JSException)
@@ -178,7 +176,6 @@ public macro JSSetter(jsName: String? = nil, from: JSImportFrom? = nil) =
 /// - Parameter from: Selects where the function is looked up from.
 ///   Use `.global` to call a function on `globalThis` (e.g. `setTimeout`).
 @attached(body)
-@_spi(Experimental)
 public macro JSFunction(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSFunctionMacro")
 
@@ -189,7 +186,7 @@ public macro JSFunction(jsName: String? = nil, from: JSImportFrom? = nil) =
 /// Example:
 ///
 /// ```swift
-/// @_spi(Experimental) import JavaScriptKit
+/// import JavaScriptKit
 ///
 /// @JSClass
 /// struct JsGreeter {
@@ -204,6 +201,5 @@ public macro JSFunction(jsName: String? = nil, from: JSImportFrom? = nil) =
 ///   Use `.global` to construct globals like `WebSocket` via `globalThis`.
 @attached(member, names: named(jsObject), named(init(unsafelyWrapping:)))
 @attached(extension, conformances: _JSBridgedClass)
-@_spi(Experimental)
 public macro JSClass(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSClassMacro")

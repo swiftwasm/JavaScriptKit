@@ -4,7 +4,7 @@ Learn how to export Swift static and class properties as JavaScript static prope
 
 ## Overview
 
-> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
 BridgeJS supports exporting Swift `static var`, `static let`, and `class var` properties to JavaScript static properties. Both stored and computed properties are supported.
 
@@ -15,16 +15,16 @@ Classes can export both stored and computed static properties:
 ```swift
 @JS class Configuration {
     @JS init() {}
-    
+
     @JS static let version = "1.0.0"
     @JS static var debugMode = false
     @JS class var defaultTimeout = 30
-    
+
     @JS static var timestamp: Double {
         get { return Date().timeIntervalSince1970 }
         set { /* custom setter logic */ }
     }
-    
+
     @JS static var buildNumber: Int {
         return 12345
     }
@@ -81,7 +81,7 @@ Enums can contain static properties that are exported alongside enum cases:
 @JS enum PropertyEnum {
     case value1
     case value2
-    
+
     @JS static var enumProperty = "mutable"
     @JS static let enumConstant = 42
     @JS static var computedEnum: String {

@@ -4,7 +4,7 @@ Learn how to export Swift structs to JavaScript.
 
 ## Overview
 
-> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
 To export a Swift struct, mark it with `@JS`:
 
@@ -91,7 +91,7 @@ export type Exports = {
 ```swift
 @JS struct Config {
     var name: String
-    
+
     @JS nonisolated(unsafe) static var defaultTimeout: Double = 30.0
     @JS static let maxRetries: Int = 3
 }

@@ -4,7 +4,7 @@ Learn how to use default parameter values in Swift functions and constructors ex
 
 ## Overview
 
-> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
 BridgeJS supports default parameter values for Swift functions and class constructors exported to JavaScript. When you specify default values in your Swift code, they are automatically applied in the generated JavaScript bindings.
 
@@ -64,7 +64,7 @@ Constructor parameters also support default values, making it easy to create ins
     @JS var name: String
     @JS var timeout: Int
     @JS var retries: Int
-    
+
     @JS init(name: String = "default", timeout: Int = 30, retries: Int = 3) {
         self.name = name
         self.timeout = timeout

@@ -1,5 +1,5 @@
 import XCTest
-@_spi(Experimental) import JavaScriptKit
+import JavaScriptKit
 
 @JSClass struct ClosureSupportImports {
 

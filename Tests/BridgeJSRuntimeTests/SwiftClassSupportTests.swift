@@ -1,5 +1,5 @@
 import XCTest
-@_spi(Experimental) import JavaScriptKit
+import JavaScriptKit
 
 @JSClass struct SwiftClassSupportImports {
     @JSFunction static func jsRoundTripGreeter(_ greeter: Greeter) throws(JSException) -> Greeter

@@ -123,7 +123,7 @@ export function run(filePath, options) {
         "// To update this file, just rebuild your project or run",
         "// `swift package bridge-js`.",
         "",
-        "@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit",
+        "@_spi(BridgeJS) import JavaScriptKit",
         "",
         "",
     ].join("\n");

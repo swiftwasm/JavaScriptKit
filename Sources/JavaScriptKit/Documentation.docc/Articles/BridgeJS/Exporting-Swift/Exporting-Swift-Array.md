@@ -4,7 +4,7 @@ Learn how to pass Swift arrays to and from JavaScript.
 
 ## Overview
 
-> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
 BridgeJS allows you to pass Swift arrays as function parameters and return values.
 

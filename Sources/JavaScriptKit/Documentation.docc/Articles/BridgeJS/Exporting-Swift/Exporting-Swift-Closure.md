@@ -4,9 +4,11 @@ Learn how to use closure/function types as parameters and return values in Bridg
 
 ## Overview
 
-> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
-BridgeJS supports typed closure parameters and return values, allowing you to pass functions between Swift and JavaScript with full type safety. This enables functional programming patterns like callbacks, higher-order functions, and function composition across the language boundary.
+BridgeJS supports typed closure parameters and return values, allowing you to pass or return Swift closures to JavaScript with full type safety. **Lifetime is automatic**: you use plain Swift closure types (e.g. `(String) -> String`); the runtime releases them when no longer needed-no manual `release()` required. This enables callbacks, higher-order functions, and function composition across the boundary.
+
+**Recommendation:** When **returning** a closure from Swift to JavaScript, prefer returning a ``JSTypedClosure`` and managing its lifetime explicitly (see <doc:Bringing-Swift-Closures-to-JavaScript>). Explicit `release()` makes cleanup predictable and avoids relying solely on JavaScript garbage collection. Use plain closure types (this article) when you want fully automatic lifetime or when passing closures only as parameters into your exported API.
 
 ## Example
 
@@ -99,6 +101,8 @@ Closures use **reference semantics** when crossing the Swift/JavaScript boundary
 
 This differs from structs and arrays, which use copy semantics and transfer data by value.
 
+When you **return** a closure to JavaScript, we recommend using ``JSTypedClosure`` and calling `release()` when the closure is no longer needed, instead of returning a plain closure type. See <doc:Bringing-Swift-Closures-to-JavaScript>.
+
 ## Supported Features
 
 | Swift Feature | Status |
@@ -113,4 +117,5 @@ This differs from structs and arrays, which use copy semantics and transfer data
 
 ## See Also
 
+- <doc:Bringing-Swift-Closures-to-JavaScript> - passing or returning closures with ``JSTypedClosure`` and explicit `release()`
 - <doc:Supported-Types>

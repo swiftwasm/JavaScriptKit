@@ -48,14 +48,14 @@ _ = document.body.appendChild(button)
 
 BridgeJS provides easy interoperability between Swift and JavaScript/TypeScript. It enables:
 
-- **Exporting Swift APIs to JavaScript**: Make your Swift code callable from JavaScript
-- **Importing TypeScript APIs into Swift**: Use JavaScript APIs with type safety in Swift
+- **Export Swift to JavaScript** – Expose Swift functions, classes, and types to JavaScript; the plugin also generates TypeScript definitions (`.d.ts`) for the exported API.
+- **Import JavaScript into Swift** – Make JavaScript/TypeScript APIs (functions, classes, globals like `document` or `console`) callable from Swift with type-safe bindings. You can declare bindings with macros in Swift or generate them from a TypeScript declaration file (`bridge-js.d.ts`).
 
-For architecture details, see the [BridgeJS Plugin README](Plugins/BridgeJS/README.md).
+For architecture details, see the [BridgeJS Plugin README](Plugins/BridgeJS/README.md). For package and build setup, see [Setting up BridgeJS](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/setting-up-bridgejs) in the documentation.
 
 ### Exporting Swift to JavaScript
 
-Mark Swift code with `@JS` to make it callable from JavaScript:
+Mark Swift code with `@JS` (the ``JS(namespace:enumStyle:)`` attribute) to make it callable from JavaScript:
 
 ```swift
 import JavaScriptKit
@@ -81,32 +81,36 @@ console.log(greeter.greet()); // "Hello, World!"
 
 **Learn more:** [Exporting Swift to JavaScript](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-to-javascript)
 
-### Importing TypeScript into Swift
+### Importing JavaScript into Swift
 
-Define TypeScript interfaces and BridgeJS generates type-safe Swift bindings:
+Declare bindings in Swift with macros such as `@JSFunction`, `@JSClass`, `@JSGetter`, and `@JSSetter`:
 
-```typescript
-// bridge-js.d.ts
-interface Document {
-    title: string;
-    getElementById(id: string): HTMLElement;
-    createElement(tagName: string): HTMLElement;
-}
-
-export function getDocument(): Document;
-```
-
-**Swift usage:**
 ```swift
+import JavaScriptKit
+
+@JSClass struct Document {
+    @JSFunction func getElementById(_ id: String) throws(JSException) -> HTMLElement
+    @JSFunction func createElement(_ tagName: String) throws(JSException) -> HTMLElement
+}
+@JSGetter(from: .global) var document: Document
+
+@JSClass struct HTMLElement {
+    @JSGetter var innerText: String
+    @JSSetter func setInnerText(_ newValue: String) throws(JSException)
+    @JSFunction func appendChild(_ child: HTMLElement) throws(JSException)
+}
+
 @JS func run() throws(JSException) {
-    let document = try getDocument()
-    try document.setTitle("My Swift App")
-    let button = try document.createElement("button")
+    let button = document.createElement("button")!
     try button.setInnerText("Click Me")
+    let container = document.getElementById("app")!
+    container.appendChild(button)
 }
 ```
 
-**Learn more:** [Importing TypeScript into Swift](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/importing-typescript-into-swift)
+You can also generate the same macro-annotated Swift from a TypeScript file (`bridge-js.d.ts`). See [Generating bindings from TypeScript](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/generating-from-typescript) in the documentation.
+
+**Learn more:** [Importing JavaScript into Swift](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/importing-javascript-into-swift)
 
 ### Try It Online
 

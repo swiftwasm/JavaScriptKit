@@ -5,7 +5,7 @@ This example demonstrates how to export Swift functions to JavaScript.
 
 1. Build the project:
    ```sh
-   env JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 swift package --swift-sdk $SWIFT_SDK_ID js --use-cdn
+   swift package --swift-sdk $SWIFT_SDK_ID js --use-cdn
    ```
 
 2. Serve the files:

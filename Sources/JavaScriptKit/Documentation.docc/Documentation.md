@@ -59,14 +59,25 @@ Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Ex
 - <doc:Debugging>
 - <doc:Profiling-Performance-Issues>
 - <doc:Profiling-Memory-Usage>
+- <doc:FAQ>
 
 ### BridgeJS
 
-- <doc:Importing-TypeScript-into-Swift>
+- <doc:Introducing-BridgeJS>
+- <doc:Setting-up-BridgeJS>
 - <doc:Exporting-Swift-to-JavaScript>
+- <doc:Importing-JavaScript-into-Swift>
+- <doc:Generating-from-TypeScript>
+- <doc:Bringing-Swift-Closures-to-JavaScript>
 - <doc:Supported-Types>
 - <doc:BridgeJS-Configuration>
 - <doc:Ahead-of-Time-Code-Generation>
+- <doc:BridgeJS-Internals>
+- ``JS(namespace:enumStyle:)``
+- ``JSFunction(jsName:from:)``
+- ``JSClass(jsName:from:)``
+- ``JSGetter(jsName:from:)``
+- ``JSSetter(jsName:from:)``
 
 ### Core APIs
 

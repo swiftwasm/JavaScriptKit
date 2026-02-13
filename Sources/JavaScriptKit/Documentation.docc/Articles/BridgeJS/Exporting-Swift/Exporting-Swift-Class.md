@@ -4,7 +4,7 @@ Learn how to export Swift classes to JavaScript.
 
 ## Overview
 
-> Tip: You can quickly preview what interfaces will be exposed on the Swift/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
+> Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
 To export a Swift class, mark both the class and any members you want to expose:
 
@@ -51,6 +51,7 @@ cart.addItem("Laptop", 999.99, 1);
 cart.addItem("Mouse", 24.99, 2);
 console.log(`Items in cart: ${cart.getItemCount()}`);
 console.log(`Total: $${cart.getTotal().toFixed(2)}`);
+cart.release(); // Call release() when done; don't rely on FinalizationRegistry as much as possible
 ```
 
 The generated TypeScript declarations for this class would look like:
@@ -83,7 +84,7 @@ Classes use **reference semantics** when crossing the Swift/JavaScript boundary:
 1. **Object Creation**: When you create a class instance (via `new` in JS), the object lives on the Swift heap
 2. **Reference Passing**: JavaScript receives a reference (handle) to the Swift object, not a copy
 3. **Shared State**: Changes made through either Swift or JavaScript affect the same object
-4. **Memory Management**: `FinalizationRegistry` automatically releases Swift objects when they're garbage collected in JavaScript. You can optionally call `release()` for deterministic cleanup.
+4. **Memory Management**: `FinalizationRegistry` can release Swift objects when they're garbage collected in JavaScript, but you should **not rely on it** for cleanup. Call `release()` when an instance is no longer needed so that Swift memory is reclaimed deterministically. This is especially important for **short-lived instances**: GC may run late or not at all for objects that become unreachable quickly, so relying on `FinalizationRegistry` can delay or leak Swift-side resources.
 
 This differs from structs, which use copy semantics and transfer data by value.
 

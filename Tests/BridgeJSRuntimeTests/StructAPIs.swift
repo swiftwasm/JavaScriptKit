@@ -1,4 +1,4 @@
-@_spi(Experimental) import JavaScriptKit
+import JavaScriptKit
 
 @JS struct PointerFields {
     var raw: UnsafeRawPointer

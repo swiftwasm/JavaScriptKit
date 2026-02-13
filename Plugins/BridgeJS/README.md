@@ -1,17 +1,17 @@
 # BridgeJS
 
 > [!IMPORTANT]
-> This feature is still experimental, and the API may change frequently. Use at your own risk with `JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1` environment variable.
+> This feature is still experimental, and the API may change frequently. Use at your own risk.
 
 > [!NOTE]
-> This documentation is intended for JavaScriptKit developers, not JavaScriptKit users. For user documentation, see [Exporting Swift to JavaScript](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-to-javascript) and [Importing TypeScript into Swift](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/importing-typescript-into-swift).
+> This documentation is intended for JavaScriptKit developers, not JavaScriptKit users. For user documentation, see [Introducing BridgeJS](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/introducing-bridgejs), [Setting up BridgeJS](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/setting-up-bridgejs), [Exporting Swift to JavaScript](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-to-javascript), [Importing JavaScript into Swift](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/importing-javascript-into-swift), and [Generating bindings from TypeScript](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/generating-from-typescript).
 
 ## Overview
 
 BridgeJS provides easy interoperability between Swift and JavaScript/TypeScript. It enables:
 
-1. **Importing TypeScript APIs into Swift**: Use TypeScript/JavaScript APIs directly from Swift code
-2. **Exporting Swift APIs to JavaScript**: Make your Swift APIs available to JavaScript code
+1. **Export Swift to JavaScript** – Expose Swift functions, classes, and types to JavaScript; the plugin generates TypeScript definitions (`.d.ts`) for the exported API.
+2. **Import JavaScript into Swift** – Make JavaScript/TypeScript APIs callable from Swift with macro-annotated bindings or bindings generated from a TypeScript declaration file (`bridge-js.d.ts`).
 
 The workflow is:
 
@@ -161,7 +161,7 @@ Return values use direct Wasm returns for primitives, and imported intrinsic fun
 - **Structs/Arrays/Enums**: Copy semantics - data serialized across boundary. No cleanup needed.
 - **Closures**: Boxed on source side, released when GC'd on either side.
 
-For detailed semantics, see the [How It Works sections](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-class#How-It-Works) in the user documentation.
+For detailed semantics, see the [How It Works sections](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-class#how-it-works) in the user documentation.
 
 ## Testing
 

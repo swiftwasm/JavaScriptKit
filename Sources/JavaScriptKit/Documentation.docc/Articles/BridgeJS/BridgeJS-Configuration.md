@@ -42,7 +42,7 @@ Later files override settings from earlier files. This allows teams to commit a 
 
 Controls whether exported Swift APIs are exposed to the JavaScript global namespace (`globalThis`).
 
-When `true`, exported functions, classes, and namespaces are available via `globalThis` in JavaScript. When `false`, they are only available through the exports object returned by `createExports()`. 
+When `true`, exported functions, classes, and namespaces are available via `globalThis` in JavaScript. When `false`, they are only available through the exports object returned by `createExports()`.
 Using Exports provides better module isolation and support multiple WebAssembly instances in the same JavaScript context.
 
 Example:

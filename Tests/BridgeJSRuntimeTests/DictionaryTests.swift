@@ -1,4 +1,4 @@
-@_spi(Experimental) @_spi(BridgeJS) import JavaScriptKit
+@_spi(BridgeJS) import JavaScriptKit
 import XCTest
 
 final class DictionaryTests: XCTestCase {
