@@ -7,7 +7,7 @@ This directory contains performance benchmarks for JavaScriptKit.
 Before running the benchmarks, you need to build the test suite:
 
 ```bash
-JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 swift package --swift-sdk $SWIFT_SDK_ID js -c release
+swift package --swift-sdk $SWIFT_SDK_ID js -c release
 ```
 
 ## Running Benchmarks

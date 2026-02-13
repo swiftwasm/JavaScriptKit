@@ -1,7 +1,7 @@
 # BridgeJS
 
 > [!IMPORTANT]
-> This feature is still experimental, and the API may change frequently. Use at your own risk with `JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1` environment variable.
+> This feature is still experimental, and the API may change frequently. Use at your own risk.
 
 > [!NOTE]
 > This documentation is intended for JavaScriptKit developers, not JavaScriptKit users. For user documentation, see [Exporting Swift to JavaScript](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/exporting-swift-to-javascript) and [Importing TypeScript into Swift](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/importing-typescript-into-swift).

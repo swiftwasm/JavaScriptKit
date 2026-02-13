@@ -589,11 +589,6 @@ struct PackagingPlanner {
         packageInputs.append(packageJsonTask)
 
         if skeletons.count > 0 {
-            if ProcessInfo.processInfo.environment["JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS"] == nil {
-                fatalError(
-                    "BridgeJS is still an experimental feature. Set the environment variable JAVASCRIPTKIT_EXPERIMENTAL_BRIDGEJS=1 to enable."
-                )
-            }
             let bridgeJs = outputDir.appending(path: "bridge-js.js")
             let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
             packageInputs.append(
