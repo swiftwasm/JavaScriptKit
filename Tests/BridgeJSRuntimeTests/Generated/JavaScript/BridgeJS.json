@@ -11132,6 +11132,31 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripPublicPoint",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripPublicPoint",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "point",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "PublicPoint"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "PublicPoint"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripContact",
         "effects" : {
           "isAsync" : false,
@@ -12195,6 +12220,64 @@
           }
         ],
         "swiftCallName" : "DataPoint"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_PublicPoint_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "x",
+              "name" : "x",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "label" : "y",
+              "name" : "y",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "explicitAccessControl" : "public",
+        "methods" : [
+
+        ],
+        "name" : "PublicPoint",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "y",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "PublicPoint"
       },
       {
         "methods" : [

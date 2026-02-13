@@ -2884,6 +2884,62 @@ public func _bjs_DataPoint_init(_ x: Float64, _ y: Float64, _ labelBytes: Int32,
     #endif
 }
 
+extension PublicPoint: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> PublicPoint {
+        let y = Int.bridgeJSLiftParameter()
+        let x = Int.bridgeJSLiftParameter()
+        return PublicPoint(x: x, y: y)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
+        self.x.bridgeJSLowerStackReturn()
+        self.y.bridgeJSLowerStackReturn()
+    }
+
+    public init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_PublicPoint(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSLiftParameter()
+    }
+
+    public func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSLowerReturn()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_PublicPoint()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PublicPoint")
+fileprivate func _bjs_struct_lower_PublicPoint(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_PublicPoint(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_PublicPoint")
+fileprivate func _bjs_struct_lift_PublicPoint() -> Int32
+#else
+fileprivate func _bjs_struct_lift_PublicPoint() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+@_expose(wasm, "bjs_PublicPoint_init")
+@_cdecl("bjs_PublicPoint_init")
+public func _bjs_PublicPoint_init(_ x: Int32, _ y: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = PublicPoint(x: Int.bridgeJSLiftParameter(x), y: Int.bridgeJSLiftParameter(y))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 extension Address: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Address {
         let zipCode = Optional<Int>.bridgeJSLiftParameter()
@@ -5957,6 +6013,17 @@ public func _bjs_nestedCartToJSObject() -> Int32 {
 public func _bjs_roundTripDataPoint() -> Void {
     #if arch(wasm32)
     let ret = roundTripDataPoint(_: DataPoint.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripPublicPoint")
+@_cdecl("bjs_roundTripPublicPoint")
+public func _bjs_roundTripPublicPoint() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripPublicPoint(_: PublicPoint.bridgeJSLiftParameter())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
