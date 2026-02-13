@@ -10,8 +10,8 @@
 
 BridgeJS provides easy interoperability between Swift and JavaScript/TypeScript. It enables:
 
-1. **Export Swift to JavaScript** – Expose Swift functions, classes, and types to JavaScript; the plugin generates TypeScript definitions (`.d.ts`) for the exported API.
-2. **Import JavaScript into Swift** – Make JavaScript/TypeScript APIs callable from Swift with macro-annotated bindings or bindings generated from a TypeScript declaration file (`bridge-js.d.ts`).
+1. **Export Swift to JavaScript** - Expose Swift functions, classes, and types to JavaScript; the plugin generates TypeScript definitions (`.d.ts`) for the exported API.
+2. **Import JavaScript into Swift** - Make JavaScript/TypeScript APIs callable from Swift with macro-annotated bindings or bindings generated from a TypeScript declaration file (`bridge-js.d.ts`).
 
 The workflow is:
 
@@ -174,7 +174,7 @@ For detailed semantics, see the [How It Works sections](https://swiftpackageinde
 `BridgeJSToolInternal` exposes pipeline stages for debugging:
 
 - `emit-skeleton` - Parse Swift files (or `-` for stdin) and print the BridgeJS skeleton as JSON.
-- `emit-swift-thunks` — Read skeleton JSON (from a file or `-` for stdin) and print the generated Swift glue (export and import thunks).
+- `emit-swift-thunks` - Read skeleton JSON (from a file or `-` for stdin) and print the generated Swift glue (export and import thunks).
 - `emit-js` / `emit-dts` - Read skeleton JSON files (or `-` for stdin) and print the .js/.d.ts
 
 Use these to inspect parser output and generated code without running the full generate/link pipeline.

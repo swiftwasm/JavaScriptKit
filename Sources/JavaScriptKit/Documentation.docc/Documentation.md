@@ -72,6 +72,7 @@ Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Ex
 - <doc:Supported-Types>
 - <doc:BridgeJS-Configuration>
 - <doc:Ahead-of-Time-Code-Generation>
+- <doc:Unsupported-Features>
 - <doc:BridgeJS-Internals>
 - ``JS(namespace:enumStyle:)``
 - ``JSFunction(jsName:from:)``

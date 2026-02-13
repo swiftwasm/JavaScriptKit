@@ -9,7 +9,7 @@ Initialization is asynchronous because the runtime must **fetch and instantiate 
 1. **Fetching** the `.wasm` binary (e.g. over the network or from disk).
 2. **Instantiating** it with `WebAssembly.instantiate()` (or `instantiateStreaming()`), which compiles the module and allocates the linear memory and table.
 
-Until that completes, there is no WebAssembly instance to call into, so the entry point that sets up the Swift–JavaScript bridge has to be `async` and must be `await`ed from the JavaScript host (e.g. in your `index.js` or HTML script). This matches the standard WebAssembly JavaScript API, which is promise-based.
+Until that completes, there is no WebAssembly instance to call into, so the entry point that sets up the Swift-JavaScript bridge has to be `async` and must be `await`ed from the JavaScript host (e.g. in your `index.js` or HTML script). This matches the standard WebAssembly JavaScript API, which is promise-based.
 
 ## Why does every imported JavaScript interface via BridgeJS declare `throws(JSException)`?
 
@@ -25,4 +25,4 @@ That can lead to **inconsistent memory state** and **resource leaks**. To avoid 
 - You explicitly decide how to react to JavaScript exceptions (e.g. `try`/`catch`, or propagating `throws`).
 - Epilogues and cleanup run in a well-defined way when you handle the error in Swift.
 
-So the “everything throws” rule is there to keep behavior predictable and safe when crossing the Swift–JavaScript boundary.
+So the “everything throws” rule is there to keep behavior predictable and safe when crossing the Swift-JavaScript boundary.

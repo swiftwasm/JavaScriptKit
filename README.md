@@ -48,14 +48,14 @@ _ = document.body.appendChild(button)
 
 BridgeJS provides easy interoperability between Swift and JavaScript/TypeScript. It enables:
 
-- **Export Swift to JavaScript** – Expose Swift functions, classes, and types to JavaScript; the plugin also generates TypeScript definitions (`.d.ts`) for the exported API.
-- **Import JavaScript into Swift** – Make JavaScript/TypeScript APIs (functions, classes, globals like `document` or `console`) callable from Swift with type-safe bindings. You can declare bindings with macros in Swift or generate them from a TypeScript declaration file (`bridge-js.d.ts`).
+- **Export Swift to JavaScript** - Expose Swift functions, classes, and types to JavaScript; the plugin also generates TypeScript definitions (`.d.ts`) for the exported API.
+- **Import JavaScript into Swift** - Make JavaScript/TypeScript APIs (functions, classes, globals like `document` or `console`) callable from Swift with type-safe bindings. You can declare bindings with macros in Swift or generate them from a TypeScript declaration file (`bridge-js.d.ts`).
 
 For architecture details, see the [BridgeJS Plugin README](Plugins/BridgeJS/README.md). For package and build setup, see [Setting up BridgeJS](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/documentation/javascriptkit/setting-up-bridgejs) in the documentation.
 
 ### Exporting Swift to JavaScript
 
-Mark Swift code with `@JS` (the ``JS(namespace:enumStyle:)`` attribute) to make it callable from JavaScript:
+Mark Swift code with `@JS` to make it callable from JavaScript:
 
 ```swift
 import JavaScriptKit

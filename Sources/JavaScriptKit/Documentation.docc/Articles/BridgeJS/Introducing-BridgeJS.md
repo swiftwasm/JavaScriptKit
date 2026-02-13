@@ -1,10 +1,10 @@
 # Introducing BridgeJS
 
-Faster, easier Swift–JavaScript bridging for WebAssembly.
+Faster, easier Swift-JavaScript bridging for WebAssembly.
 
 ## Overview
 
-**BridgeJS** is a layer underneath JavaScriptKit that makes Swift–JavaScript interop **faster and easier**: you declare the shape of the API in Swift (or in TypeScript, which generates Swift), and the tool generates glue code.
+**BridgeJS** is a layer underneath JavaScriptKit that makes Swift-JavaScript interop **faster and easier**: you declare the shape of the API in Swift (or in TypeScript, which generates Swift), and the tool generates glue code.
 
 Benefits over the dynamic `JSObject` / `JSValue` APIs include:
 
