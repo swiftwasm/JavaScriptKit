@@ -1,13 +1,13 @@
 extension Point: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Point {
-        let y = Int.bridgeJSLiftParameter()
-        let x = Int.bridgeJSLiftParameter()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Point {
+        let y = Int.bridgeJSStackPop()
+        let x = Int.bridgeJSStackPop()
         return Point(x: x, y: y)
     }
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        self.x.bridgeJSLowerStackReturn()
-        self.y.bridgeJSLowerStackReturn()
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.x.bridgeJSStackPush()
+        self.y.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -15,12 +15,12 @@ extension Point: _BridgedSwiftStruct {
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
-        self = Self.bridgeJSLiftParameter()
+        self = Self.bridgeJSStackPop()
     }
 
     func toJSObject() -> JSObject {
         let __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
+        __bjs_self.bridgeJSStackPush()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Point()))
     }
 }

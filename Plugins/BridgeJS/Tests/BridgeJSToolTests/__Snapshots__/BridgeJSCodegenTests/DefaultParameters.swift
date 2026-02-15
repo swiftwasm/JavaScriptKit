@@ -38,17 +38,17 @@ extension Status: _BridgedSwiftCaseEnum {
 }
 
 extension Config: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Config {
-        let enabled = Bool.bridgeJSLiftParameter()
-        let value = Int.bridgeJSLiftParameter()
-        let name = String.bridgeJSLiftParameter()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Config {
+        let enabled = Bool.bridgeJSStackPop()
+        let value = Int.bridgeJSStackPop()
+        let name = String.bridgeJSStackPop()
         return Config(name: name, value: value, enabled: enabled)
     }
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        self.name.bridgeJSLowerStackReturn()
-        self.value.bridgeJSLowerStackReturn()
-        self.enabled.bridgeJSLowerStackReturn()
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.name.bridgeJSStackPush()
+        self.value.bridgeJSStackPush()
+        self.enabled.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -56,12 +56,12 @@ extension Config: _BridgedSwiftStruct {
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
-        self = Self.bridgeJSLiftParameter()
+        self = Self.bridgeJSStackPop()
     }
 
     func toJSObject() -> JSObject {
         let __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
+        __bjs_self.bridgeJSStackPush()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Config()))
     }
 }
@@ -85,13 +85,13 @@ fileprivate func _bjs_struct_lift_Config() -> Int32 {
 #endif
 
 extension MathOperations: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> MathOperations {
-        let baseValue = Double.bridgeJSLiftParameter()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> MathOperations {
+        let baseValue = Double.bridgeJSStackPop()
         return MathOperations(baseValue: baseValue)
     }
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        self.baseValue.bridgeJSLowerStackReturn()
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.baseValue.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -99,12 +99,12 @@ extension MathOperations: _BridgedSwiftStruct {
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
-        self = Self.bridgeJSLiftParameter()
+        self = Self.bridgeJSStackPop()
     }
 
     func toJSObject() -> JSObject {
         let __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
+        __bjs_self.bridgeJSStackPush()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_MathOperations()))
     }
 }
@@ -318,8 +318,8 @@ public func _bjs_testOptionalStructWithValueDefault() -> Void {
 @_cdecl("bjs_testIntArrayDefault")
 public func _bjs_testIntArrayDefault() -> Void {
     #if arch(wasm32)
-    let ret = testIntArrayDefault(values: [Int].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = testIntArrayDefault(values: [Int].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -329,8 +329,8 @@ public func _bjs_testIntArrayDefault() -> Void {
 @_cdecl("bjs_testStringArrayDefault")
 public func _bjs_testStringArrayDefault() -> Void {
     #if arch(wasm32)
-    let ret = testStringArrayDefault(names: [String].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = testStringArrayDefault(names: [String].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -340,8 +340,8 @@ public func _bjs_testStringArrayDefault() -> Void {
 @_cdecl("bjs_testDoubleArrayDefault")
 public func _bjs_testDoubleArrayDefault() -> Void {
     #if arch(wasm32)
-    let ret = testDoubleArrayDefault(values: [Double].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = testDoubleArrayDefault(values: [Double].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -351,8 +351,8 @@ public func _bjs_testDoubleArrayDefault() -> Void {
 @_cdecl("bjs_testBoolArrayDefault")
 public func _bjs_testBoolArrayDefault() -> Void {
     #if arch(wasm32)
-    let ret = testBoolArrayDefault(flags: [Bool].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = testBoolArrayDefault(flags: [Bool].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -362,8 +362,8 @@ public func _bjs_testBoolArrayDefault() -> Void {
 @_cdecl("bjs_testEmptyArrayDefault")
 public func _bjs_testEmptyArrayDefault() -> Void {
     #if arch(wasm32)
-    let ret = testEmptyArrayDefault(items: [Int].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = testEmptyArrayDefault(items: [Int].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -373,7 +373,7 @@ public func _bjs_testEmptyArrayDefault() -> Void {
 @_cdecl("bjs_testMixedWithArrayDefault")
 public func _bjs_testMixedWithArrayDefault(_ nameBytes: Int32, _ nameLength: Int32, _ enabled: Int32) -> Void {
     #if arch(wasm32)
-    let ret = testMixedWithArrayDefault(name: String.bridgeJSLiftParameter(nameBytes, nameLength), values: [Int].bridgeJSLiftParameter(), enabled: Bool.bridgeJSLiftParameter(enabled))
+    let ret = testMixedWithArrayDefault(name: String.bridgeJSLiftParameter(nameBytes, nameLength), values: [Int].bridgeJSStackPop(), enabled: Bool.bridgeJSLiftParameter(enabled))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

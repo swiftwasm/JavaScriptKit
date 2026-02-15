@@ -1,19 +1,19 @@
 extension PointerFields: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> PointerFields {
-        let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter()
-        let ptr = UnsafePointer<UInt8>.bridgeJSLiftParameter()
-        let opaque = OpaquePointer.bridgeJSLiftParameter()
-        let mutRaw = UnsafeMutableRawPointer.bridgeJSLiftParameter()
-        let raw = UnsafeRawPointer.bridgeJSLiftParameter()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> PointerFields {
+        let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSStackPop()
+        let ptr = UnsafePointer<UInt8>.bridgeJSStackPop()
+        let opaque = OpaquePointer.bridgeJSStackPop()
+        let mutRaw = UnsafeMutableRawPointer.bridgeJSStackPop()
+        let raw = UnsafeRawPointer.bridgeJSStackPop()
         return PointerFields(raw: raw, mutRaw: mutRaw, opaque: opaque, ptr: ptr, mutPtr: mutPtr)
     }
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        self.raw.bridgeJSLowerStackReturn()
-        self.mutRaw.bridgeJSLowerStackReturn()
-        self.opaque.bridgeJSLowerStackReturn()
-        self.ptr.bridgeJSLowerStackReturn()
-        self.mutPtr.bridgeJSLowerStackReturn()
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.raw.bridgeJSStackPush()
+        self.mutRaw.bridgeJSStackPush()
+        self.opaque.bridgeJSStackPush()
+        self.ptr.bridgeJSStackPush()
+        self.mutPtr.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -21,12 +21,12 @@ extension PointerFields: _BridgedSwiftStruct {
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
-        self = Self.bridgeJSLiftParameter()
+        self = Self.bridgeJSStackPop()
     }
 
     func toJSObject() -> JSObject {
         let __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
+        __bjs_self.bridgeJSStackPush()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_PointerFields()))
     }
 }

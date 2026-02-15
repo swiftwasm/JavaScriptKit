@@ -24,8 +24,8 @@ public func _bjs_roundTripOptionalJSValue(_ valueIsSome: Int32, _ valueKind: Int
 @_cdecl("bjs_roundTripJSValueArray")
 public func _bjs_roundTripJSValueArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripJSValueArray(_: [JSValue].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = roundTripJSValueArray(_: [JSValue].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -36,7 +36,7 @@ public func _bjs_roundTripJSValueArray() -> Void {
 public func _bjs_roundTripOptionalJSValueArray() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalJSValueArray(_: Optional<[JSValue]>.bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif

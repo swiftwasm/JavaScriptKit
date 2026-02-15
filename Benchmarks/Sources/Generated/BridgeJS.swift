@@ -11,15 +11,15 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter())
+            return .success(String.bridgeJSStackPop())
         case 1:
-            return .failure(Int.bridgeJSLiftParameter())
+            return .failure(Int.bridgeJSStackPop())
         case 2:
-            return .flag(Bool.bridgeJSLiftParameter())
+            return .flag(Bool.bridgeJSStackPop())
         case 3:
-            return .rate(Float.bridgeJSLiftParameter())
+            return .rate(Float.bridgeJSStackPop())
         case 4:
-            return .precise(Double.bridgeJSLiftParameter())
+            return .precise(Double.bridgeJSStackPop())
         case 5:
             return .info
         default:
@@ -30,19 +30,19 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
         switch self {
         case .success(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(0)
         case .failure(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(1)
         case .flag(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(2)
         case .rate(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(3)
         case .precise(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(4)
         case .info:
             return Int32(5)
@@ -54,17 +54,17 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> ComplexResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter())
+            return .success(String.bridgeJSStackPop())
         case 1:
-            return .error(String.bridgeJSLiftParameter(), Int.bridgeJSLiftParameter())
+            return .error(String.bridgeJSStackPop(), Int.bridgeJSStackPop())
         case 2:
-            return .location(Double.bridgeJSLiftParameter(), Double.bridgeJSLiftParameter(), String.bridgeJSLiftParameter())
+            return .location(Double.bridgeJSStackPop(), Double.bridgeJSStackPop(), String.bridgeJSStackPop())
         case 3:
-            return .status(Bool.bridgeJSLiftParameter(), Int.bridgeJSLiftParameter(), String.bridgeJSLiftParameter())
+            return .status(Bool.bridgeJSStackPop(), Int.bridgeJSStackPop(), String.bridgeJSStackPop())
         case 4:
-            return .coordinates(Double.bridgeJSLiftParameter(), Double.bridgeJSLiftParameter(), Double.bridgeJSLiftParameter())
+            return .coordinates(Double.bridgeJSStackPop(), Double.bridgeJSStackPop(), Double.bridgeJSStackPop())
         case 5:
-            return .comprehensive(Bool.bridgeJSLiftParameter(), Bool.bridgeJSLiftParameter(), Int.bridgeJSLiftParameter(), Int.bridgeJSLiftParameter(), Double.bridgeJSLiftParameter(), Double.bridgeJSLiftParameter(), String.bridgeJSLiftParameter(), String.bridgeJSLiftParameter(), String.bridgeJSLiftParameter())
+            return .comprehensive(Bool.bridgeJSStackPop(), Bool.bridgeJSStackPop(), Int.bridgeJSStackPop(), Int.bridgeJSStackPop(), Double.bridgeJSStackPop(), Double.bridgeJSStackPop(), String.bridgeJSStackPop(), String.bridgeJSStackPop(), String.bridgeJSStackPop())
         case 6:
             return .info
         default:
@@ -75,37 +75,37 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
         switch self {
         case .success(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(0)
         case .error(let param0, let param1):
-            param0.bridgeJSLowerStackReturn()
-            param1.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
+            param1.bridgeJSStackPush()
             return Int32(1)
         case .location(let param0, let param1, let param2):
-            param0.bridgeJSLowerStackReturn()
-            param1.bridgeJSLowerStackReturn()
-            param2.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
+            param1.bridgeJSStackPush()
+            param2.bridgeJSStackPush()
             return Int32(2)
         case .status(let param0, let param1, let param2):
-            param0.bridgeJSLowerStackReturn()
-            param1.bridgeJSLowerStackReturn()
-            param2.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
+            param1.bridgeJSStackPush()
+            param2.bridgeJSStackPush()
             return Int32(3)
         case .coordinates(let param0, let param1, let param2):
-            param0.bridgeJSLowerStackReturn()
-            param1.bridgeJSLowerStackReturn()
-            param2.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
+            param1.bridgeJSStackPush()
+            param2.bridgeJSStackPush()
             return Int32(4)
         case .comprehensive(let param0, let param1, let param2, let param3, let param4, let param5, let param6, let param7, let param8):
-            param0.bridgeJSLowerStackReturn()
-            param1.bridgeJSLowerStackReturn()
-            param2.bridgeJSLowerStackReturn()
-            param3.bridgeJSLowerStackReturn()
-            param4.bridgeJSLowerStackReturn()
-            param5.bridgeJSLowerStackReturn()
-            param6.bridgeJSLowerStackReturn()
-            param7.bridgeJSLowerStackReturn()
-            param8.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
+            param1.bridgeJSStackPush()
+            param2.bridgeJSStackPush()
+            param3.bridgeJSStackPush()
+            param4.bridgeJSStackPush()
+            param5.bridgeJSStackPush()
+            param6.bridgeJSStackPush()
+            param7.bridgeJSStackPush()
+            param8.bridgeJSStackPush()
             return Int32(5)
         case .info:
             return Int32(6)
@@ -114,21 +114,21 @@ extension ComplexResult: _BridgedSwiftAssociatedValueEnum {
 }
 
 extension SimpleStruct: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> SimpleStruct {
-        let precise = Double.bridgeJSLiftParameter()
-        let rate = Float.bridgeJSLiftParameter()
-        let flag = Bool.bridgeJSLiftParameter()
-        let count = Int.bridgeJSLiftParameter()
-        let name = String.bridgeJSLiftParameter()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> SimpleStruct {
+        let precise = Double.bridgeJSStackPop()
+        let rate = Float.bridgeJSStackPop()
+        let flag = Bool.bridgeJSStackPop()
+        let count = Int.bridgeJSStackPop()
+        let name = String.bridgeJSStackPop()
         return SimpleStruct(name: name, count: count, flag: flag, rate: rate, precise: precise)
     }
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        self.name.bridgeJSLowerStackReturn()
-        self.count.bridgeJSLowerStackReturn()
-        self.flag.bridgeJSLowerStackReturn()
-        self.rate.bridgeJSLowerStackReturn()
-        self.precise.bridgeJSLowerStackReturn()
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.name.bridgeJSStackPush()
+        self.count.bridgeJSStackPush()
+        self.flag.bridgeJSStackPush()
+        self.rate.bridgeJSStackPush()
+        self.precise.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -136,12 +136,12 @@ extension SimpleStruct: _BridgedSwiftStruct {
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
-        self = Self.bridgeJSLiftParameter()
+        self = Self.bridgeJSStackPop()
     }
 
     func toJSObject() -> JSObject {
         let __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
+        __bjs_self.bridgeJSStackPush()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_SimpleStruct()))
     }
 }
@@ -165,17 +165,17 @@ fileprivate func _bjs_struct_lift_SimpleStruct() -> Int32 {
 #endif
 
 extension Address: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Address {
-        let zipCode = Int.bridgeJSLiftParameter()
-        let city = String.bridgeJSLiftParameter()
-        let street = String.bridgeJSLiftParameter()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Address {
+        let zipCode = Int.bridgeJSStackPop()
+        let city = String.bridgeJSStackPop()
+        let street = String.bridgeJSStackPop()
         return Address(street: street, city: city, zipCode: zipCode)
     }
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        self.street.bridgeJSLowerStackReturn()
-        self.city.bridgeJSLowerStackReturn()
-        self.zipCode.bridgeJSLowerStackReturn()
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.street.bridgeJSStackPush()
+        self.city.bridgeJSStackPush()
+        self.zipCode.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -183,12 +183,12 @@ extension Address: _BridgedSwiftStruct {
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
-        self = Self.bridgeJSLiftParameter()
+        self = Self.bridgeJSStackPop()
     }
 
     func toJSObject() -> JSObject {
         let __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
+        __bjs_self.bridgeJSStackPush()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Address()))
     }
 }
@@ -212,21 +212,21 @@ fileprivate func _bjs_struct_lift_Address() -> Int32 {
 #endif
 
 extension Person: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Person {
-        let email = Optional<String>.bridgeJSLiftParameter()
-        let address = Address.bridgeJSLiftParameter()
-        let age = Int.bridgeJSLiftParameter()
-        let name = String.bridgeJSLiftParameter()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Person {
+        let email = Optional<String>.bridgeJSStackPop()
+        let address = Address.bridgeJSStackPop()
+        let age = Int.bridgeJSStackPop()
+        let name = String.bridgeJSStackPop()
         return Person(name: name, age: age, address: address, email: email)
     }
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        self.name.bridgeJSLowerStackReturn()
-        self.age.bridgeJSLowerStackReturn()
-        self.address.bridgeJSLowerReturn()
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.name.bridgeJSStackPush()
+        self.age.bridgeJSStackPush()
+        self.address.bridgeJSStackPush()
         let __bjs_isSome_email = self.email != nil
         if let __bjs_unwrapped_email = self.email {
-        __bjs_unwrapped_email.bridgeJSLowerStackReturn()
+        __bjs_unwrapped_email.bridgeJSStackPush()
         }
         _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
     }
@@ -236,12 +236,12 @@ extension Person: _BridgedSwiftStruct {
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
-        self = Self.bridgeJSLiftParameter()
+        self = Self.bridgeJSStackPop()
     }
 
     func toJSObject() -> JSObject {
         let __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
+        __bjs_self.bridgeJSStackPush()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Person()))
     }
 }
@@ -265,23 +265,23 @@ fileprivate func _bjs_struct_lift_Person() -> Int32 {
 #endif
 
 extension ComplexStruct: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> ComplexStruct {
-        let metadata = String.bridgeJSLiftParameter()
-        let tags = String.bridgeJSLiftParameter()
-        let score = Double.bridgeJSLiftParameter()
-        let active = Bool.bridgeJSLiftParameter()
-        let title = String.bridgeJSLiftParameter()
-        let id = Int.bridgeJSLiftParameter()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> ComplexStruct {
+        let metadata = String.bridgeJSStackPop()
+        let tags = String.bridgeJSStackPop()
+        let score = Double.bridgeJSStackPop()
+        let active = Bool.bridgeJSStackPop()
+        let title = String.bridgeJSStackPop()
+        let id = Int.bridgeJSStackPop()
         return ComplexStruct(id: id, title: title, active: active, score: score, tags: tags, metadata: metadata)
     }
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        self.id.bridgeJSLowerStackReturn()
-        self.title.bridgeJSLowerStackReturn()
-        self.active.bridgeJSLowerStackReturn()
-        self.score.bridgeJSLowerStackReturn()
-        self.tags.bridgeJSLowerStackReturn()
-        self.metadata.bridgeJSLowerStackReturn()
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.id.bridgeJSStackPush()
+        self.title.bridgeJSStackPush()
+        self.active.bridgeJSStackPush()
+        self.score.bridgeJSStackPush()
+        self.tags.bridgeJSStackPush()
+        self.metadata.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -289,12 +289,12 @@ extension ComplexStruct: _BridgedSwiftStruct {
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
-        self = Self.bridgeJSLiftParameter()
+        self = Self.bridgeJSStackPop()
     }
 
     func toJSObject() -> JSObject {
         let __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
+        __bjs_self.bridgeJSStackPush()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_ComplexStruct()))
     }
 }
@@ -318,15 +318,15 @@ fileprivate func _bjs_struct_lift_ComplexStruct() -> Int32 {
 #endif
 
 extension Point: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> Point {
-        let y = Double.bridgeJSLiftParameter()
-        let x = Double.bridgeJSLiftParameter()
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Point {
+        let y = Double.bridgeJSStackPop()
+        let x = Double.bridgeJSStackPop()
         return Point(x: x, y: y)
     }
 
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {
-        self.x.bridgeJSLowerStackReturn()
-        self.y.bridgeJSLowerStackReturn()
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.x.bridgeJSStackPush()
+        self.y.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -334,12 +334,12 @@ extension Point: _BridgedSwiftStruct {
         defer {
             _swift_js_struct_cleanup(__bjs_cleanupId)
         }
-        self = Self.bridgeJSLiftParameter()
+        self = Self.bridgeJSStackPop()
     }
 
     func toJSObject() -> JSObject {
         let __bjs_self = self
-        __bjs_self.bridgeJSLowerReturn()
+        __bjs_self.bridgeJSStackPush()
         return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Point()))
     }
 }
@@ -1329,7 +1329,7 @@ public func _bjs_ArrayRoundtrip_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_ArrayRoundtrip_takeIntArray")
 public func _bjs_ArrayRoundtrip_takeIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeIntArray(_: [Int].bridgeJSLiftParameter())
+    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeIntArray(_: [Int].bridgeJSStackPop())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1340,7 +1340,7 @@ public func _bjs_ArrayRoundtrip_takeIntArray(_ _self: UnsafeMutableRawPointer) -
 public func _bjs_ArrayRoundtrip_makeIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeIntArray()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1350,8 +1350,8 @@ public func _bjs_ArrayRoundtrip_makeIntArray(_ _self: UnsafeMutableRawPointer) -
 @_cdecl("bjs_ArrayRoundtrip_roundtripIntArray")
 public func _bjs_ArrayRoundtrip_roundtripIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripIntArray(_: [Int].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripIntArray(_: [Int].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1362,7 +1362,7 @@ public func _bjs_ArrayRoundtrip_roundtripIntArray(_ _self: UnsafeMutableRawPoint
 public func _bjs_ArrayRoundtrip_makeIntArrayLarge(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeIntArrayLarge()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1372,7 +1372,7 @@ public func _bjs_ArrayRoundtrip_makeIntArrayLarge(_ _self: UnsafeMutableRawPoint
 @_cdecl("bjs_ArrayRoundtrip_takeDoubleArray")
 public func _bjs_ArrayRoundtrip_takeDoubleArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeDoubleArray(_: [Double].bridgeJSLiftParameter())
+    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeDoubleArray(_: [Double].bridgeJSStackPop())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1383,7 +1383,7 @@ public func _bjs_ArrayRoundtrip_takeDoubleArray(_ _self: UnsafeMutableRawPointer
 public func _bjs_ArrayRoundtrip_makeDoubleArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeDoubleArray()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1393,8 +1393,8 @@ public func _bjs_ArrayRoundtrip_makeDoubleArray(_ _self: UnsafeMutableRawPointer
 @_cdecl("bjs_ArrayRoundtrip_roundtripDoubleArray")
 public func _bjs_ArrayRoundtrip_roundtripDoubleArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripDoubleArray(_: [Double].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripDoubleArray(_: [Double].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1404,7 +1404,7 @@ public func _bjs_ArrayRoundtrip_roundtripDoubleArray(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ArrayRoundtrip_takeStringArray")
 public func _bjs_ArrayRoundtrip_takeStringArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeStringArray(_: [String].bridgeJSLiftParameter())
+    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeStringArray(_: [String].bridgeJSStackPop())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1415,7 +1415,7 @@ public func _bjs_ArrayRoundtrip_takeStringArray(_ _self: UnsafeMutableRawPointer
 public func _bjs_ArrayRoundtrip_makeStringArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeStringArray()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1425,8 +1425,8 @@ public func _bjs_ArrayRoundtrip_makeStringArray(_ _self: UnsafeMutableRawPointer
 @_cdecl("bjs_ArrayRoundtrip_roundtripStringArray")
 public func _bjs_ArrayRoundtrip_roundtripStringArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripStringArray(_: [String].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripStringArray(_: [String].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1436,7 +1436,7 @@ public func _bjs_ArrayRoundtrip_roundtripStringArray(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ArrayRoundtrip_takePointArray")
 public func _bjs_ArrayRoundtrip_takePointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takePointArray(_: [Point].bridgeJSLiftParameter())
+    ArrayRoundtrip.bridgeJSLiftParameter(_self).takePointArray(_: [Point].bridgeJSStackPop())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1447,7 +1447,7 @@ public func _bjs_ArrayRoundtrip_takePointArray(_ _self: UnsafeMutableRawPointer)
 public func _bjs_ArrayRoundtrip_makePointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makePointArray()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1457,8 +1457,8 @@ public func _bjs_ArrayRoundtrip_makePointArray(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_ArrayRoundtrip_roundtripPointArray")
 public func _bjs_ArrayRoundtrip_roundtripPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripPointArray(_: [Point].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripPointArray(_: [Point].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1469,7 +1469,7 @@ public func _bjs_ArrayRoundtrip_roundtripPointArray(_ _self: UnsafeMutableRawPoi
 public func _bjs_ArrayRoundtrip_makePointArrayLarge(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makePointArrayLarge()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1479,7 +1479,7 @@ public func _bjs_ArrayRoundtrip_makePointArrayLarge(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_ArrayRoundtrip_takeNestedIntArray")
 public func _bjs_ArrayRoundtrip_takeNestedIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeNestedIntArray(_: [[Int]].bridgeJSLiftParameter())
+    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeNestedIntArray(_: [[Int]].bridgeJSStackPop())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1490,7 +1490,7 @@ public func _bjs_ArrayRoundtrip_takeNestedIntArray(_ _self: UnsafeMutableRawPoin
 public func _bjs_ArrayRoundtrip_makeNestedIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeNestedIntArray()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1500,8 +1500,8 @@ public func _bjs_ArrayRoundtrip_makeNestedIntArray(_ _self: UnsafeMutableRawPoin
 @_cdecl("bjs_ArrayRoundtrip_roundtripNestedIntArray")
 public func _bjs_ArrayRoundtrip_roundtripNestedIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripNestedIntArray(_: [[Int]].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripNestedIntArray(_: [[Int]].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1511,7 +1511,7 @@ public func _bjs_ArrayRoundtrip_roundtripNestedIntArray(_ _self: UnsafeMutableRa
 @_cdecl("bjs_ArrayRoundtrip_takeNestedPointArray")
 public func _bjs_ArrayRoundtrip_takeNestedPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeNestedPointArray(_: [[Point]].bridgeJSLiftParameter())
+    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeNestedPointArray(_: [[Point]].bridgeJSStackPop())
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1522,7 +1522,7 @@ public func _bjs_ArrayRoundtrip_takeNestedPointArray(_ _self: UnsafeMutableRawPo
 public func _bjs_ArrayRoundtrip_makeNestedPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeNestedPointArray()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1532,8 +1532,8 @@ public func _bjs_ArrayRoundtrip_makeNestedPointArray(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ArrayRoundtrip_roundtripNestedPointArray")
 public func _bjs_ArrayRoundtrip_roundtripNestedPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripNestedPointArray(_: [[Point]].bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripNestedPointArray(_: [[Point]].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1548,7 +1548,7 @@ public func _bjs_ArrayRoundtrip_takeOptionalIntArray(_ _self: UnsafeMutableRawPo
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
         for _ in 0..<__count {
-            __result.append(Optional<Int>.bridgeJSLiftParameter())
+            __result.append(Optional<Int>.bridgeJSStackPop())
         }
         __result.reverse()
         return __result
@@ -1566,7 +1566,7 @@ public func _bjs_ArrayRoundtrip_makeOptionalIntArray(_ _self: UnsafeMutableRawPo
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    __bjs_unwrapped_ret_elem.bridgeJSStackPush()
     }
     _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
     }
@@ -1585,7 +1585,7 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalIntArray(_ _self: UnsafeMutable
         var __result: [Optional<Int>] = []
         __result.reserveCapacity(__count)
         for _ in 0..<__count {
-            __result.append(Optional<Int>.bridgeJSLiftParameter())
+            __result.append(Optional<Int>.bridgeJSStackPop())
         }
         __result.reverse()
         return __result
@@ -1593,7 +1593,7 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalIntArray(_ _self: UnsafeMutable
     for __bjs_elem_ret in ret {
     let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
     if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSLowerStackReturn()
+    __bjs_unwrapped_ret_elem.bridgeJSStackPush()
     }
     _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
     }
@@ -1612,7 +1612,7 @@ public func _bjs_ArrayRoundtrip_takeOptionalPointArray(_ _self: UnsafeMutableRaw
         var __result: [Optional<Point>] = []
         __result.reserveCapacity(__count)
         for _ in 0..<__count {
-            __result.append(Optional<Point>.bridgeJSLiftParameter())
+            __result.append(Optional<Point>.bridgeJSStackPop())
         }
         __result.reverse()
         return __result
@@ -1628,7 +1628,7 @@ public func _bjs_ArrayRoundtrip_makeOptionalPointArray(_ _self: UnsafeMutableRaw
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalPointArray()
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -1645,13 +1645,13 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalPointArray(_ _self: UnsafeMutab
         var __result: [Optional<Point>] = []
         __result.reserveCapacity(__count)
         for _ in 0..<__count {
-            __result.append(Optional<Point>.bridgeJSLiftParameter())
+            __result.append(Optional<Point>.bridgeJSStackPop())
         }
         __result.reverse()
         return __result
     }())
     for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSLowerReturn()
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -1674,7 +1674,7 @@ public func _bjs_ArrayRoundtrip_takeOptionalArray(_ _self: UnsafeMutableRawPoint
 public func _bjs_ArrayRoundtrip_makeOptionalArraySome(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalArraySome()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1685,7 +1685,7 @@ public func _bjs_ArrayRoundtrip_makeOptionalArraySome(_ _self: UnsafeMutableRawP
 public func _bjs_ArrayRoundtrip_makeOptionalArrayNone(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalArrayNone()
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1696,7 +1696,7 @@ public func _bjs_ArrayRoundtrip_makeOptionalArrayNone(_ _self: UnsafeMutableRawP
 public func _bjs_ArrayRoundtrip_roundtripOptionalArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripOptionalArray(_: Optional<[Int]>.bridgeJSLiftParameter())
-    ret.bridgeJSLowerReturn()
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
