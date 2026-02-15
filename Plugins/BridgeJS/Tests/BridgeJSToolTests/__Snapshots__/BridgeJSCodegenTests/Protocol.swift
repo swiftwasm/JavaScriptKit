@@ -366,9 +366,9 @@ extension Result: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> Result {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter())
+            return .success(String.bridgeJSStackPop())
         case 1:
-            return .failure(Int.bridgeJSLiftParameter())
+            return .failure(Int.bridgeJSStackPop())
         default:
             fatalError("Unknown Result case ID: \(caseId)")
         }
@@ -377,10 +377,10 @@ extension Result: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
         switch self {
         case .success(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(0)
         case .failure(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(1)
         }
     }
@@ -393,8 +393,8 @@ extension Priority: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 @_cdecl("bjs_processDelegates")
 public func _bjs_processDelegates() -> Void {
     #if arch(wasm32)
-    let ret = processDelegates(_: [AnyMyViewControllerDelegate].bridgeJSLiftParameter())
-    ret.map { $0 as! AnyMyViewControllerDelegate }.bridgeJSLowerReturn()
+    let ret = processDelegates(_: [AnyMyViewControllerDelegate].bridgeJSStackPop())
+    ret.map { $0 as! AnyMyViewControllerDelegate }.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -611,7 +611,7 @@ fileprivate func _bjs_MyViewController_wrap(_ pointer: UnsafeMutableRawPointer) 
 @_cdecl("bjs_DelegateManager_init")
 public func _bjs_DelegateManager_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = DelegateManager(delegates: [AnyMyViewControllerDelegate].bridgeJSLiftParameter())
+    let ret = DelegateManager(delegates: [AnyMyViewControllerDelegate].bridgeJSStackPop())
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -633,7 +633,7 @@ public func _bjs_DelegateManager_notifyAll(_ _self: UnsafeMutableRawPointer) -> 
 public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = DelegateManager.bridgeJSLiftParameter(_self).delegates
-    ret.map { $0 as! AnyMyViewControllerDelegate }.bridgeJSLowerReturn()
+    ret.map { $0 as! AnyMyViewControllerDelegate }.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -643,7 +643,7 @@ public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_DelegateManager_delegates_set")
 public func _bjs_DelegateManager_delegates_set(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    DelegateManager.bridgeJSLiftParameter(_self).delegates = [AnyMyViewControllerDelegate].bridgeJSLiftParameter()
+    DelegateManager.bridgeJSLiftParameter(_self).delegates = [AnyMyViewControllerDelegate].bridgeJSStackPop()
     #else
     fatalError("Only available on WebAssembly")
     #endif

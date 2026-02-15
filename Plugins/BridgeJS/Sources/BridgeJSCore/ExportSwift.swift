@@ -739,9 +739,9 @@ struct StackCodegen {
         case .string, .int, .uint, .bool, .float, .double,
             .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject, .unsafePointer,
             .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum:
-            return "\(raw: type.swiftType).bridgeJSLiftParameter()"
+            return "\(raw: type.swiftType).bridgeJSStackPop()"
         case .jsObject(let className?):
-            return "\(raw: className)(unsafelyWrapping: JSObject.bridgeJSLiftParameter())"
+            return "\(raw: className)(unsafelyWrapping: JSObject.bridgeJSStackPop())"
         case .nullable(let wrappedType, let kind):
             return liftNullableExpression(wrappedType: wrappedType, kind: kind)
         case .array(let elementType):
@@ -749,7 +749,7 @@ struct StackCodegen {
         case .dictionary(let valueType):
             return liftDictionaryExpression(valueType: valueType)
         case .closure:
-            return "JSObject.bridgeJSLiftParameter()"
+            return "JSObject.bridgeJSStackPop()"
         case .void, .namespaceEnum:
             return "()"
         }
@@ -758,13 +758,13 @@ struct StackCodegen {
     func liftArrayExpression(elementType: BridgeType) -> ExprSyntax {
         switch elementType {
         case .jsObject(let className?) where className != "JSObject":
-            return "[JSObject].bridgeJSLiftParameter().map { \(raw: className)(unsafelyWrapping: $0) }"
+            return "[JSObject].bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
         case .nullable, .closure:
             return liftArrayExpressionInline(elementType: elementType)
         case .void, .namespaceEnum:
             fatalError("Invalid array element type: \(elementType)")
         default:
-            return "[\(raw: elementType.swiftType)].bridgeJSLiftParameter()"
+            return "[\(raw: elementType.swiftType)].bridgeJSStackPop()"
         }
     }
 
@@ -790,7 +790,7 @@ struct StackCodegen {
         case .jsObject(let className?) where className != "JSObject":
             return """
                 {
-                    let __dict = [String: JSObject].bridgeJSLiftParameter()
+                    let __dict = [String: JSObject].bridgeJSStackPop()
                     return __dict.mapValues { \(raw: className)(unsafelyWrapping: $0) }
                 }()
                 """
@@ -799,7 +799,7 @@ struct StackCodegen {
         case .void, .namespaceEnum:
             fatalError("Invalid dictionary value type: \(valueType)")
         default:
-            return "[String: \(raw: valueType.swiftType)].bridgeJSLiftParameter()"
+            return "[String: \(raw: valueType.swiftType)].bridgeJSStackPop()"
         }
     }
 
@@ -813,7 +813,7 @@ struct StackCodegen {
                 __result.reserveCapacity(__count)
                 for _ in 0..<__count {
                     let __value = \(valueLift)
-                    let __key = String.bridgeJSLiftParameter()
+                    let __key = String.bridgeJSStackPop()
                     __result[__key] = __value
                 }
                 return __result
@@ -827,9 +827,9 @@ struct StackCodegen {
         case .string, .int, .uint, .bool, .float, .double, .jsObject(nil), .jsValue,
             .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum,
             .array, .dictionary:
-            return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSLiftParameter()"
+            return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
         case .jsObject(let className?):
-            return "\(raw: typeName)<JSObject>.bridgeJSLiftParameter().map { \(raw: className)(unsafelyWrapping: $0) }"
+            return "\(raw: typeName)<JSObject>.bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
         case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol:
             fatalError("Invalid nullable wrapped type: \(wrappedType)")
         }
@@ -850,13 +850,13 @@ struct StackCodegen {
         case .string, .int, .uint, .bool, .float, .double, .jsValue,
             .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
             .caseEnum, .rawValueEnum:
-            return ["\(raw: accessor).bridgeJSLowerStackReturn()"]
+            return ["\(raw: accessor).bridgeJSStackPush()"]
         case .jsObject(_?):
-            return ["\(raw: accessor).jsObject.bridgeJSLowerStackReturn()"]
+            return ["\(raw: accessor).jsObject.bridgeJSStackPush()"]
         case .swiftProtocol:
-            return ["(\(raw: accessor) as! \(raw: type.swiftType)).bridgeJSLowerStackReturn()"]
+            return ["(\(raw: accessor) as! \(raw: type.swiftType)).bridgeJSStackPush()"]
         case .associatedValueEnum, .swiftStruct:
-            return ["\(raw: accessor).bridgeJSLowerReturn()"]
+            return ["\(raw: accessor).bridgeJSStackPush()"]
         case .nullable(let wrappedType, _):
             return lowerOptionalStatements(wrappedType: wrappedType, accessor: accessor, varPrefix: varPrefix)
         case .void, .namespaceEnum:
@@ -875,9 +875,9 @@ struct StackCodegen {
     ) -> [CodeBlockItemSyntax] {
         switch elementType {
         case .jsObject(let className?) where className != "JSObject":
-            return ["\(raw: accessor).map { $0.jsObject }.bridgeJSLowerReturn()"]
+            return ["\(raw: accessor).map { $0.jsObject }.bridgeJSStackPush()"]
         case .swiftProtocol:
-            return ["\(raw: accessor).map { $0 as! \(raw: elementType.swiftType) }.bridgeJSLowerReturn()"]
+            return ["\(raw: accessor).map { $0 as! \(raw: elementType.swiftType) }.bridgeJSStackPush()"]
         case .nullable, .closure:
             return lowerArrayStatementsInline(
                 elementType: elementType,
@@ -887,7 +887,7 @@ struct StackCodegen {
         case .void, .namespaceEnum:
             fatalError("Invalid array element type: \(elementType)")
         default:
-            return ["\(raw: accessor).bridgeJSLowerReturn()"]
+            return ["\(raw: accessor).bridgeJSStackPush()"]
         }
     }
 
@@ -922,9 +922,9 @@ struct StackCodegen {
     ) -> [CodeBlockItemSyntax] {
         switch valueType {
         case .jsObject(let className?) where className != "JSObject":
-            return ["\(raw: accessor).mapValues { $0.jsObject }.bridgeJSLowerReturn()"]
+            return ["\(raw: accessor).mapValues { $0.jsObject }.bridgeJSStackPush()"]
         case .swiftProtocol:
-            return ["\(raw: accessor).mapValues { $0 as! \(raw: valueType.swiftType) }.bridgeJSLowerReturn()"]
+            return ["\(raw: accessor).mapValues { $0 as! \(raw: valueType.swiftType) }.bridgeJSStackPush()"]
         case .nullable, .closure:
             return lowerDictionaryStatementsInline(
                 valueType: valueType,
@@ -934,7 +934,7 @@ struct StackCodegen {
         case .void, .namespaceEnum:
             fatalError("Invalid dictionary value type: \(valueType)")
         default:
-            return ["\(raw: accessor).bridgeJSLowerReturn()"]
+            return ["\(raw: accessor).bridgeJSStackPush()"]
         }
     }
 
@@ -979,7 +979,7 @@ struct StackCodegen {
     ) -> [CodeBlockItemSyntax] {
         switch wrappedType {
         case .array, .dictionary, .swiftStruct:
-            return ["\(raw: accessor).bridgeJSLowerReturn()"]
+            return ["\(raw: accessor).bridgeJSStackPush()"]
         default:
             break
         }
@@ -1008,13 +1008,13 @@ struct StackCodegen {
     ) -> [CodeBlockItemSyntax] {
         switch wrappedType {
         case .jsObject(_?):
-            return ["\(raw: unwrappedVar).jsObject.bridgeJSLowerStackReturn()"]
+            return ["\(raw: unwrappedVar).jsObject.bridgeJSStackPush()"]
         case .swiftProtocol:
-            return ["(\(raw: unwrappedVar) as! \(raw: wrappedType.swiftType)).bridgeJSLowerStackReturn()"]
+            return ["(\(raw: unwrappedVar) as! \(raw: wrappedType.swiftType)).bridgeJSStackPush()"]
         case .string, .int, .uint, .bool, .float, .double, .jsValue,
             .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
             .caseEnum, .rawValueEnum, .associatedValueEnum:
-            return ["\(raw: unwrappedVar).bridgeJSLowerStackReturn()"]
+            return ["\(raw: unwrappedVar).bridgeJSStackPush()"]
         default:
             return ["preconditionFailure(\"BridgeJS: unsupported optional wrapped type\")"]
         }
@@ -1225,14 +1225,14 @@ struct StructCodegen {
         let printer = CodeFragmentPrinter()
         printer.write("extension \(typeName): _BridgedSwiftStruct {")
         printer.indent {
-            printer.write("@_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter() -> \(typeName) {")
+            printer.write("@_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> \(typeName) {")
             printer.indent {
                 printer.write(lines: generateStructLiftCode(structDef: structDef))
             }
             printer.write("}")
             printer.nextLine()
 
-            printer.write("@_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() {")
+            printer.write("@_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {")
             printer.indent {
                 printer.write(lines: generateStructLowerCode(structDef: structDef))
             }
@@ -1247,7 +1247,7 @@ struct StructCodegen {
                         defer {
                             _swift_js_struct_cleanup(__bjs_cleanupId)
                         }
-                        self = Self.bridgeJSLiftParameter()
+                        self = Self.bridgeJSStackPop()
                     }
                     """
             )
@@ -1257,7 +1257,7 @@ struct StructCodegen {
                 multilineString: """
                     \(accessControl)func toJSObject() -> JSObject {
                         let __bjs_self = self
-                        __bjs_self.bridgeJSLowerReturn()
+                        __bjs_self.bridgeJSStackPush()
                         return JSObject(id: UInt32(bitPattern: \(liftFunctionName)()))
                     }
                     """

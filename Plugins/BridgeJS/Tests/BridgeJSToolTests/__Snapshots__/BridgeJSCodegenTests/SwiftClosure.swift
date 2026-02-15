@@ -1191,15 +1191,15 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> APIResult {
         switch caseId {
         case 0:
-            return .success(String.bridgeJSLiftParameter())
+            return .success(String.bridgeJSStackPop())
         case 1:
-            return .failure(Int.bridgeJSLiftParameter())
+            return .failure(Int.bridgeJSStackPop())
         case 2:
-            return .flag(Bool.bridgeJSLiftParameter())
+            return .flag(Bool.bridgeJSStackPop())
         case 3:
-            return .rate(Float.bridgeJSLiftParameter())
+            return .rate(Float.bridgeJSStackPop())
         case 4:
-            return .precise(Double.bridgeJSLiftParameter())
+            return .precise(Double.bridgeJSStackPop())
         case 5:
             return .info
         default:
@@ -1210,19 +1210,19 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
         switch self {
         case .success(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(0)
         case .failure(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(1)
         case .flag(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(2)
         case .rate(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(3)
         case .precise(let param0):
-            param0.bridgeJSLowerStackReturn()
+            param0.bridgeJSStackPush()
             return Int32(4)
         case .info:
             return Int32(5)
