@@ -226,7 +226,7 @@ import BridgeJSUtilities
                         withIntermediateDirectories: true,
                         attributes: nil
                     )
-                    try outputSwift.write(to: outputSwiftURL, atomically: true, encoding: .utf8)
+                    try writeIfChanged(outputSwift, to: outputSwiftURL)
                 }
             }
 
@@ -241,7 +241,7 @@ import BridgeJSUtilities
                 let encoder = JSONEncoder()
                 encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
                 let skeletonData = try encoder.encode(skeleton)
-                try skeletonData.write(to: outputSkeletonURL)
+                try writeIfChanged(skeletonData, to: outputSkeletonURL)
             }
 
             if skeleton.exported != nil || skeleton.imported != nil {
@@ -281,6 +281,18 @@ private func printStderr(_ message: String) {
 
 private func hasBridgeJSSkipComment(_ content: String) -> Bool {
     BridgeJSGeneratedFile.hasSkipComment(content)
+}
+
+private func writeIfChanged(_ content: String, to url: URL) throws {
+    let existing = try? String(contentsOf: url, encoding: .utf8)
+    guard existing != content else { return }
+    try content.write(to: url, atomically: true, encoding: .utf8)
+}
+
+private func writeIfChanged(_ data: Data, to url: URL) throws {
+    let existing = try? Data(contentsOf: url)
+    guard existing != data else { return }
+    try data.write(to: url)
 }
 
 private func combineGeneratedSwift(_ pieces: [String]) -> String {
