@@ -7,6 +7,7 @@ import { ImportedFoo } from './BridgeJSRuntimeTests/JavaScript/Types.mjs';
 import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
 import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/JavaScript/ClosureSupportTests.mjs';
 import { getImports as getSwiftClassSupportImports } from './BridgeJSRuntimeTests/JavaScript/SwiftClassSupportTests.mjs';
+import { getImports as getOptionalSupportImports } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
 export async function setupOptions(options, context) {
@@ -89,18 +90,6 @@ export async function setupOptions(options, context) {
                 },
                 "jsRoundTripUndefinedDictionary": (dict) => {
                     return dict;
-                },
-                "jsRoundTripOptionalNumberNull": (v) => {
-                    return v ?? null;
-                },
-                "jsRoundTripOptionalNumberUndefined": (v) => {
-                    return v === undefined ? undefined : v;
-                },
-                "jsRoundTripOptionalStringNull": (v) => {
-                    return v ?? null;
-                },
-                "jsRoundTripOptionalStringUndefined": (v) => {
-                    return v === undefined ? undefined : v;
                 },
                 "jsRoundTripJSValue": (v) => {
                     return v;
@@ -215,6 +204,7 @@ export async function setupOptions(options, context) {
                 },
                 ClosureSupportImports: getClosureSupportImports(importsContext),
                 SwiftClassSupportImports: getSwiftClassSupportImports(importsContext),
+                OptionalSupportImports: getOptionalSupportImports(importsContext),
             };
         },
         addToCoreImports(importObject, importsContext) {

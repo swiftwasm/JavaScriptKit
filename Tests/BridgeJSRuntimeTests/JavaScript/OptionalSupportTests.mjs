@@ -16,6 +16,31 @@ import {
 import { ImportedFoo } from './Types.mjs';
 
 /**
+ * @returns {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Imports["OptionalSupportImports"]}
+ */
+export function getImports(importsContext) {
+    return {
+        jsRoundTripOptionalNumberNull: (v) => {
+            return v ?? null;
+        },
+        jsRoundTripOptionalNumberUndefined: (v) => {
+            return v === undefined ? undefined : v;
+        },
+        jsRoundTripOptionalStringNull: (v) => {
+            return v ?? null;
+        },
+        jsRoundTripOptionalStringUndefined: (v) => {
+            return v === undefined ? undefined : v;
+        },
+        runJsOptionalSupportTests: () => {
+            const exports = importsContext.getExports();
+            if (!exports) { throw new Error("No exports!?"); }
+            runJsOptionalSupportTests(exports);
+        },
+    };
+}
+
+/**
  * Optional value bridging coverage for BridgeJS runtime tests.
  * @param {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports
  */
@@ -216,4 +241,6 @@ export function runJsOptionalSupportTests(exports) {
     assert.deepEqual(exports.roundTripOptionalPayloadResultOpt(oatr_empty), oatr_empty);
     assert.equal(exports.roundTripOptionalPayloadResultOpt(null), null);
 
+    exports.takeOptionalJSObject(null);
+    assert.doesNotThrow(() => exports.takeOptionalJSObject({ key: "value" }));
 }

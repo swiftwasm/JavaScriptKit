@@ -5843,6 +5843,16 @@ public func _bjs_roundTripOptionalTypedPayloadResult(_ resultIsSome: Int32, _ re
     #endif
 }
 
+@_expose(wasm, "bjs_takeOptionalJSObject")
+@_cdecl("bjs_takeOptionalJSObject")
+public func _bjs_takeOptionalJSObject(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    takeOptionalJSObject(_: Optional<JSObject>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_compareAPIResults")
 @_cdecl("bjs_compareAPIResults")
 public func _bjs_compareAPIResults(_ r1IsSome: Int32, _ r1CaseId: Int32, _ r2IsSome: Int32, _ r2CaseId: Int32) -> Void {
@@ -10147,91 +10157,91 @@ func _$jsTranslatePoint(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_runJsOptionalSupportTests")
-fileprivate func bjs_runJsOptionalSupportTests() -> Void
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalNumberNull_static")
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalNumberNull_static(_ valueIsSome: Int32, _ valueValue: Int32) -> Void
 #else
-fileprivate func bjs_runJsOptionalSupportTests() -> Void {
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalNumberNull_static(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-
-func _$runJsOptionalSupportTests() throws(JSException) -> Void {
-    bjs_runJsOptionalSupportTests()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-}
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalNumberNull")
-fileprivate func bjs_jsRoundTripOptionalNumberNull(_ valueIsSome: Int32, _ valueValue: Int32) -> Void
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalNumberUndefined_static")
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalNumberUndefined_static(_ valueIsSome: Int32, _ valueValue: Int32) -> Void
 #else
-fileprivate func bjs_jsRoundTripOptionalNumberNull(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalNumberUndefined_static(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
 
-func _$jsRoundTripOptionalNumberNull(_ value: Optional<Int>) throws(JSException) -> Optional<Int> {
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static")
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static(_ nameIsSome: Int32, _ nameValue: Int32) -> Void
+#else
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static(_ nameIsSome: Int32, _ nameValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static")
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static(_ nameIsSome: Int32, _ nameValue: Int32) -> Void
+#else
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static(_ nameIsSome: Int32, _ nameValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_runJsOptionalSupportTests_static")
+fileprivate func bjs_OptionalSupportImports_runJsOptionalSupportTests_static() -> Void
+#else
+fileprivate func bjs_OptionalSupportImports_runJsOptionalSupportTests_static() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$OptionalSupportImports_jsRoundTripOptionalNumberNull(_ value: Optional<Int>) throws(JSException) -> Optional<Int> {
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
-    bjs_jsRoundTripOptionalNumberNull(valueIsSome, valueValue)
+    bjs_OptionalSupportImports_jsRoundTripOptionalNumberNull_static(valueIsSome, valueValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
     return Optional<Int>.bridgeJSLiftReturnFromSideChannel()
 }
 
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalNumberUndefined")
-fileprivate func bjs_jsRoundTripOptionalNumberUndefined(_ valueIsSome: Int32, _ valueValue: Int32) -> Void
-#else
-fileprivate func bjs_jsRoundTripOptionalNumberUndefined(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$jsRoundTripOptionalNumberUndefined(_ value: JSUndefinedOr<Int>) throws(JSException) -> JSUndefinedOr<Int> {
+func _$OptionalSupportImports_jsRoundTripOptionalNumberUndefined(_ value: JSUndefinedOr<Int>) throws(JSException) -> JSUndefinedOr<Int> {
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
-    bjs_jsRoundTripOptionalNumberUndefined(valueIsSome, valueValue)
+    bjs_OptionalSupportImports_jsRoundTripOptionalNumberUndefined_static(valueIsSome, valueValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
     return JSUndefinedOr<Int>.bridgeJSLiftReturnFromSideChannel()
 }
 
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalStringNull")
-fileprivate func bjs_jsRoundTripOptionalStringNull(_ nameIsSome: Int32, _ nameValue: Int32) -> Void
-#else
-fileprivate func bjs_jsRoundTripOptionalStringNull(_ nameIsSome: Int32, _ nameValue: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$jsRoundTripOptionalStringNull(_ name: Optional<String>) throws(JSException) -> Optional<String> {
+func _$OptionalSupportImports_jsRoundTripOptionalStringNull(_ name: Optional<String>) throws(JSException) -> Optional<String> {
     let (nameIsSome, nameValue) = name.bridgeJSLowerParameter()
-    bjs_jsRoundTripOptionalStringNull(nameIsSome, nameValue)
+    bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static(nameIsSome, nameValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
     return Optional<String>.bridgeJSLiftReturnFromSideChannel()
 }
 
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalStringUndefined")
-fileprivate func bjs_jsRoundTripOptionalStringUndefined(_ nameIsSome: Int32, _ nameValue: Int32) -> Void
-#else
-fileprivate func bjs_jsRoundTripOptionalStringUndefined(_ nameIsSome: Int32, _ nameValue: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-func _$jsRoundTripOptionalStringUndefined(_ name: JSUndefinedOr<String>) throws(JSException) -> JSUndefinedOr<String> {
+func _$OptionalSupportImports_jsRoundTripOptionalStringUndefined(_ name: JSUndefinedOr<String>) throws(JSException) -> JSUndefinedOr<String> {
     let (nameIsSome, nameValue) = name.bridgeJSLowerParameter()
-    bjs_jsRoundTripOptionalStringUndefined(nameIsSome, nameValue)
+    bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static(nameIsSome, nameValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
     return JSUndefinedOr<String>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$OptionalSupportImports_runJsOptionalSupportTests() throws(JSException) -> Void {
+    bjs_OptionalSupportImports_runJsOptionalSupportTests_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 #if arch(wasm32)
