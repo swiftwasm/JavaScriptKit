@@ -146,6 +146,7 @@ import BridgeJSUtilities
             var inputFiles = withSpan("Collecting Swift files") {
                 return inputSwiftFiles(targetDirectory: targetDirectory, positionalArguments: positionalArguments)
             }
+
             // BridgeJS.Macros.swift contains imported declarations (@JSFunction, @JSClass, etc.) that need
             // to be processed by SwiftToSkeleton to populate the imported skeleton. The command plugin
             // filters out Generated/ files, so we explicitly add it here after generation.
