@@ -7,6 +7,7 @@
         "ts2swift": "./bin/ts2swift.js"
     },
     "scripts": {
-        "test": "vitest run"
+        "test": "vitest run",
+        "tsc": "tsc --noEmit"
     }
 }

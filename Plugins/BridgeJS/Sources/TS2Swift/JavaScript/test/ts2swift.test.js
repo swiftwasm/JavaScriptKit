@@ -12,7 +12,7 @@ const inputsDir = path.resolve(__dirname, 'fixtures');
 const tsconfigPath = path.join(inputsDir, 'tsconfig.json');
 
 function runTs2Swift(dtsPath) {
-    return run(dtsPath, { tsconfigPath, logLevel: 'error' });
+    return run([dtsPath], { tsconfigPath, logLevel: 'error' });
 }
 
 function collectDtsInputs() {
