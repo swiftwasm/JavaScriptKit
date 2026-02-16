@@ -298,6 +298,9 @@ public struct BridgeJSLink {
                         "const source = \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).getObject(sourceId);"
                     )
                     printer.write(
+                        "\(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).release(sourceId);"
+                    )
+                    printer.write(
                         "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, bytesPtr);"
                     )
                     printer.write("bytes.set(source);")

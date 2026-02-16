@@ -134,9 +134,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Success, cleanup };
                     }
                     case APIResultValues.Tag.Failure: {
@@ -205,9 +203,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: ComplexResultValues.Tag.Success, cleanup };
                     }
                     case ComplexResultValues.Tag.Error: {
@@ -216,9 +212,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: ComplexResultValues.Tag.Error, cleanup };
                     }
                     case ComplexResultValues.Tag.Status: {
@@ -228,9 +222,7 @@ export async function createInstantiator(options, swift) {
                         i32Stack.push(id);
                         i32Stack.push((value.param1 | 0));
                         i32Stack.push(value.param0 ? 1 : 0);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: ComplexResultValues.Tag.Status, cleanup };
                     }
                     case ComplexResultValues.Tag.Coordinates: {
@@ -259,11 +251,7 @@ export async function createInstantiator(options, swift) {
                         i32Stack.push((value.param2 | 0));
                         i32Stack.push(value.param1 ? 1 : 0);
                         i32Stack.push(value.param0 ? 1 : 0);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                            swift.memory.release(id1);
-                            swift.memory.release(id2);
-                        };
+                        const cleanup = undefined;
                         return { caseId: ComplexResultValues.Tag.Comprehensive, cleanup };
                     }
                     case ComplexResultValues.Tag.Info: {
@@ -325,9 +313,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: ResultValues.Tag.Success, cleanup };
                     }
                     case ResultValues.Tag.Failure: {
@@ -336,9 +322,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: ResultValues.Tag.Failure, cleanup };
                     }
                     case ResultValues.Tag.Status: {
@@ -348,9 +332,7 @@ export async function createInstantiator(options, swift) {
                         i32Stack.push(id);
                         i32Stack.push((value.param1 | 0));
                         i32Stack.push(value.param0 ? 1 : 0);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: ResultValues.Tag.Status, cleanup };
                     }
                     default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
@@ -389,9 +371,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: NetworkingResultValues.Tag.Success, cleanup };
                     }
                     case NetworkingResultValues.Tag.Failure: {
@@ -400,9 +380,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: NetworkingResultValues.Tag.Failure, cleanup };
                     }
                     default: throw new Error("Unknown NetworkingResultValues tag: " + String(enumTag));
@@ -443,11 +421,7 @@ export async function createInstantiator(options, swift) {
                             i32Stack.push(0);
                         }
                         i32Stack.push(isSome ? 1 : 0);
-                        const cleanup = () => {
-                            if(id) {
-                                swift.memory.release(id);
-                            }
-                        };
+                        const cleanup = undefined;
                         return { caseId: APIOptionalResultValues.Tag.Success, cleanup };
                     }
                     case APIOptionalResultValues.Tag.Failure: {
@@ -479,11 +453,7 @@ export async function createInstantiator(options, swift) {
                         const isSome2 = value.param0 != null;
                         i32Stack.push(isSome2 ? (value.param0 ? 1 : 0) : 0);
                         i32Stack.push(isSome2 ? 1 : 0);
-                        const cleanup = () => {
-                            if(id) {
-                                swift.memory.release(id);
-                            }
-                        };
+                        const cleanup = undefined;
                         return { caseId: APIOptionalResultValues.Tag.Status, cleanup };
                     }
                     default: throw new Error("Unknown APIOptionalResultValues tag: " + String(enumTag));
@@ -889,6 +859,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }

@@ -50,9 +50,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Success, cleanup };
                     }
                     case APIResultValues.Tag.Failure: {
@@ -93,6 +91,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -335,7 +334,6 @@ export async function createInstantiator(options, swift) {
                             instance.exports.bjs_Utils_String_static_uppercase(textId, textBytes.length);
                             const ret = tmpRetString;
                             tmpRetString = undefined;
-                            swift.memory.release(textId);
                             return ret;
                         },
                     },

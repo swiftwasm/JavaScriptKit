@@ -43,6 +43,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -225,7 +226,6 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_asyncRoundTripString(vId, vBytes.length);
                     const ret1 = swift.memory.getObject(ret);
                     swift.memory.release(ret);
-                    swift.memory.release(vId);
                     return ret1;
                 },
                 asyncRoundTripBool: function bjs_asyncRoundTripBool(v) {

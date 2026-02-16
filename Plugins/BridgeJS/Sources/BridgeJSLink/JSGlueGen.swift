@@ -238,13 +238,12 @@ struct IntrinsicJSFragment: Sendable {
     static let stringLowerParameter = IntrinsicJSFragment(
         parameters: ["value"],
         printCode: { arguments, context in
-            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+            let (scope, printer) = (context.scope, context.printer)
             let argument = arguments[0]
             let bytesLabel = scope.variable("\(argument)Bytes")
             let bytesIdLabel = scope.variable("\(argument)Id")
             printer.write("const \(bytesLabel) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(argument));")
             printer.write("const \(bytesIdLabel) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesLabel));")
-            cleanupCode.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(bytesIdLabel));")
             return [bytesIdLabel, "\(bytesLabel).length"]
         }
     )
@@ -840,12 +839,6 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write("\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));")
                     }
                     printer.write("}")
-                    cleanupCode.write("if (\(idVar) != undefined) {")
-                    cleanupCode.indent {
-                        cleanupCode.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
-                    }
-                    cleanupCode.write("}")
-
                     return ["+\(isSomeVar)", "\(isSomeVar) ? \(idVar) : 0", "\(isSomeVar) ? \(bytesVar).length : 0"]
                 case .jsValue:
                     let lowered = try jsValueLower.printCode([value], context)
@@ -1920,11 +1913,6 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                    cleanup.write("if(\(idVar)) {")
-                    cleanup.indent {
-                        cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
-                    }
-                    cleanup.write("}")
                 case .int, .uint:
                     scope.emitPushI32Parameter("\(isSomeVar) ? (\(value) | 0) : 0", printer: printer)
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
@@ -1964,13 +1952,6 @@ struct IntrinsicJSFragment: Sendable {
                         }
                         printer.write("}")
                         scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                        cleanup.write("if(\(idVar)) {")
-                        cleanup.indent {
-                            cleanup.write(
-                                "\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));"
-                            )
-                        }
-                        cleanup.write("}")
                     case .float:
                         scope.emitPushF32Parameter("\(isSomeVar) ? Math.fround(\(value)) : 0.0", printer: printer)
                         scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
@@ -2554,7 +2535,7 @@ struct IntrinsicJSFragment: Sendable {
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
-                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                    let (scope, printer) = (context.scope, context.printer)
                     let value = arguments[0]
                     let bytesVar = scope.variable("bytes")
                     let idVar = scope.variable("id")
@@ -2562,7 +2543,6 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));")
                     scope.emitPushI32Parameter("\(bytesVar).length", printer: printer)
                     scope.emitPushI32Parameter(idVar, printer: printer)
-                    cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
                     return []
                 }
             )
@@ -2632,7 +2612,7 @@ struct IntrinsicJSFragment: Sendable {
                 return IntrinsicJSFragment(
                     parameters: ["value"],
                     printCode: { arguments, context in
-                        let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                        let (scope, printer) = (context.scope, context.printer)
                         let value = arguments[0]
                         let bytesVar = scope.variable("bytes")
                         let idVar = scope.variable("id")
@@ -2644,7 +2624,6 @@ struct IntrinsicJSFragment: Sendable {
                         )
                         scope.emitPushI32Parameter("\(bytesVar).length", printer: printer)
                         scope.emitPushI32Parameter(idVar, printer: printer)
-                        cleanup.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
                         return []
                     }
                 )
@@ -3088,9 +3067,6 @@ struct IntrinsicJSFragment: Sendable {
                             }
                             printer.write("}")
                             scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                            cleanup.write(
-                                "if(\(idVar) !== undefined) { \(JSGlueVariableScope.reservedSwift).memory.release(\(idVar)); }"
-                            )
                             return [idVar]
                         case .float:
                             printer.write("if (\(isSomeVar)) {")
@@ -3179,9 +3155,6 @@ struct IntrinsicJSFragment: Sendable {
                         }
                         printer.write("}")
                         scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                        cleanup.write(
-                            "if(\(idVar) !== undefined) { \(JSGlueVariableScope.reservedSwift).memory.release(\(idVar)); }"
-                        )
                         return [idVar]
                     } else if case .jsObject = wrappedType {
                         let idVar = scope.variable("id")

@@ -43,6 +43,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -242,7 +243,6 @@ export async function createInstantiator(options, swift) {
                     const stringValueBytes = textEncoder.encode(stringValue);
                     const stringValueId = swift.memory.retain(stringValueBytes);
                     const ret = instance.exports.bjs_PropertyHolder_init(intValue, floatValue, doubleValue, boolValue, stringValueId, stringValueBytes.length, swift.memory.retain(jsObject));
-                    swift.memory.release(stringValueId);
                     return PropertyHolder.__construct(ret);
                 }
                 getAllValues() {
@@ -289,7 +289,6 @@ export async function createInstantiator(options, swift) {
                     const valueBytes = textEncoder.encode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_PropertyHolder_stringValue_set(this.pointer, valueId, valueBytes.length);
-                    swift.memory.release(valueId);
                 }
                 get readonlyInt() {
                     const ret = instance.exports.bjs_PropertyHolder_readonlyInt_get(this.pointer);
@@ -339,7 +338,6 @@ export async function createInstantiator(options, swift) {
                     const valueBytes = textEncoder.encode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_PropertyHolder_lazyValue_set(this.pointer, valueId, valueBytes.length);
-                    swift.memory.release(valueId);
                 }
                 get computedReadonly() {
                     const ret = instance.exports.bjs_PropertyHolder_computedReadonly_get(this.pointer);
@@ -355,7 +353,6 @@ export async function createInstantiator(options, swift) {
                     const valueBytes = textEncoder.encode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_PropertyHolder_computedReadWrite_set(this.pointer, valueId, valueBytes.length);
-                    swift.memory.release(valueId);
                 }
                 get observedProperty() {
                     const ret = instance.exports.bjs_PropertyHolder_observedProperty_get(this.pointer);
@@ -371,7 +368,6 @@ export async function createInstantiator(options, swift) {
                     const stringValueBytes = textEncoder.encode(stringValue);
                     const stringValueId = swift.memory.retain(stringValueBytes);
                     const ret = instance.exports.bjs_createPropertyHolder(intValue, floatValue, doubleValue, boolValue, stringValueId, stringValueBytes.length, swift.memory.retain(jsObject));
-                    swift.memory.release(stringValueId);
                     return PropertyHolder.__construct(ret);
                 },
                 testPropertyHolder: function bjs_testPropertyHolder(holder) {

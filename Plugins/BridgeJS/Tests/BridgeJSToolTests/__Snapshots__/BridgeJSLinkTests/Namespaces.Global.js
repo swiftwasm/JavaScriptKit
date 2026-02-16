@@ -43,6 +43,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -250,7 +251,6 @@ export async function createInstantiator(options, swift) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
                     const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
-                    swift.memory.release(nameId);
                     return Greeter.__construct(ret);
                 }
                 greet() {
