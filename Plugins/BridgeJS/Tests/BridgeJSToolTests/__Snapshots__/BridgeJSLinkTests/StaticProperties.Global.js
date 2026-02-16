@@ -48,6 +48,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -279,7 +280,6 @@ export async function createInstantiator(options, swift) {
                     const valueBytes = textEncoder.encode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_PropertyClass_static_classVariable_set(valueId, valueBytes.length);
-                    swift.memory.release(valueId);
                 }
                 static get computedProperty() {
                     instance.exports.bjs_PropertyClass_static_computedProperty_get();
@@ -291,7 +291,6 @@ export async function createInstantiator(options, swift) {
                     const valueBytes = textEncoder.encode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_PropertyClass_static_computedProperty_set(valueId, valueBytes.length);
-                    swift.memory.release(valueId);
                 }
                 static get readOnlyComputed() {
                     const ret = instance.exports.bjs_PropertyClass_static_readOnlyComputed_get();
@@ -311,9 +310,6 @@ export async function createInstantiator(options, swift) {
                         valueId = swift.memory.retain(valueBytes);
                     }
                     instance.exports.bjs_PropertyClass_static_optionalProperty_set(+isSome, isSome ? valueId : 0, isSome ? valueBytes.length : 0);
-                    if (valueId != undefined) {
-                        swift.memory.release(valueId);
-                    }
                 }
             }
             if (typeof globalThis.PropertyNamespace === 'undefined') {
@@ -336,7 +332,6 @@ export async function createInstantiator(options, swift) {
                         const valueBytes = textEncoder.encode(value);
                         const valueId = swift.memory.retain(valueBytes);
                         instance.exports.bjs_PropertyEnum_static_enumProperty_set(valueId, valueBytes.length);
-                        swift.memory.release(valueId);
                     },
                     get enumConstant() {
                         const ret = instance.exports.bjs_PropertyEnum_static_enumConstant_get();
@@ -352,7 +347,6 @@ export async function createInstantiator(options, swift) {
                         const valueBytes = textEncoder.encode(value);
                         const valueId = swift.memory.retain(valueBytes);
                         instance.exports.bjs_PropertyEnum_static_computedEnum_set(valueId, valueBytes.length);
-                        swift.memory.release(valueId);
                     }
                 },
                 PropertyNamespace: {
@@ -366,7 +360,6 @@ export async function createInstantiator(options, swift) {
                         const valueBytes = textEncoder.encode(value);
                         const valueId = swift.memory.retain(valueBytes);
                         instance.exports.bjs_PropertyNamespace_static_namespaceProperty_set(valueId, valueBytes.length);
-                        swift.memory.release(valueId);
                     },
                     get namespaceConstant() {
                         instance.exports.bjs_PropertyNamespace_static_namespaceConstant_get();

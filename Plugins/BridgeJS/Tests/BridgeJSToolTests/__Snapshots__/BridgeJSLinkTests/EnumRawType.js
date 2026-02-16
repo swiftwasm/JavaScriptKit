@@ -119,6 +119,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -306,7 +307,6 @@ export async function createInstantiator(options, swift) {
                     const themeBytes = textEncoder.encode(theme);
                     const themeId = swift.memory.retain(themeBytes);
                     instance.exports.bjs_setTheme(themeId, themeBytes.length);
-                    swift.memory.release(themeId);
                 },
                 getTheme: function bjs_getTheme() {
                     instance.exports.bjs_getTheme();
@@ -324,16 +324,12 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_roundTripOptionalTheme(+isSome, isSome ? inputId : 0, isSome ? inputBytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (inputId != undefined) {
-                        swift.memory.release(inputId);
-                    }
                     return optResult;
                 },
                 setTSTheme: function bjs_setTSTheme(theme) {
                     const themeBytes = textEncoder.encode(theme);
                     const themeId = swift.memory.retain(themeBytes);
                     instance.exports.bjs_setTSTheme(themeId, themeBytes.length);
-                    swift.memory.release(themeId);
                 },
                 getTSTheme: function bjs_getTSTheme() {
                     instance.exports.bjs_getTSTheme();
@@ -351,16 +347,12 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_roundTripOptionalTSTheme(+isSome, isSome ? inputId : 0, isSome ? inputBytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (inputId != undefined) {
-                        swift.memory.release(inputId);
-                    }
                     return optResult;
                 },
                 setFeatureFlag: function bjs_setFeatureFlag(flag) {
                     const flagBytes = textEncoder.encode(flag);
                     const flagId = swift.memory.retain(flagBytes);
                     instance.exports.bjs_setFeatureFlag(flagId, flagBytes.length);
-                    swift.memory.release(flagId);
                 },
                 getFeatureFlag: function bjs_getFeatureFlag() {
                     instance.exports.bjs_getFeatureFlag();
@@ -378,9 +370,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_roundTripOptionalFeatureFlag(+isSome, isSome ? inputId : 0, isSome ? inputBytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (inputId != undefined) {
-                        swift.memory.release(inputId);
-                    }
                     return optResult;
                 },
                 setHttpStatus: function bjs_setHttpStatus(status) {
@@ -513,7 +502,6 @@ export async function createInstantiator(options, swift) {
                     const themeBytes = textEncoder.encode(theme);
                     const themeId = swift.memory.retain(themeBytes);
                     const ret = instance.exports.bjs_processTheme(themeId, themeBytes.length);
-                    swift.memory.release(themeId);
                     return ret;
                 },
                 convertPriority: function bjs_convertPriority(status) {

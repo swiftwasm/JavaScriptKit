@@ -44,6 +44,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -506,9 +507,6 @@ export async function createInstantiator(options, swift) {
                         nameId = swift.memory.retain(nameBytes);
                     }
                     const ret = instance.exports.bjs_Greeter_init(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
-                    if (nameId != undefined) {
-                        swift.memory.release(nameId);
-                    }
                     return Greeter.__construct(ret);
                 }
                 greet() {
@@ -525,9 +523,6 @@ export async function createInstantiator(options, swift) {
                         nameId = swift.memory.retain(nameBytes);
                     }
                     instance.exports.bjs_Greeter_changeName(this.pointer, +isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
-                    if (nameId != undefined) {
-                        swift.memory.release(nameId);
-                    }
                 }
                 get name() {
                     instance.exports.bjs_Greeter_name_get(this.pointer);
@@ -543,9 +538,6 @@ export async function createInstantiator(options, swift) {
                         valueId = swift.memory.retain(valueBytes);
                     }
                     instance.exports.bjs_Greeter_name_set(this.pointer, +isSome, isSome ? valueId : 0, isSome ? valueBytes.length : 0);
-                    if (valueId != undefined) {
-                        swift.memory.release(valueId);
-                    }
                 }
             }
             class OptionalPropertyHolder extends SwiftHeapObject {
@@ -571,9 +563,6 @@ export async function createInstantiator(options, swift) {
                         valueId = swift.memory.retain(valueBytes);
                     }
                     instance.exports.bjs_OptionalPropertyHolder_optionalName_set(this.pointer, +isSome, isSome ? valueId : 0, isSome ? valueBytes.length : 0);
-                    if (valueId != undefined) {
-                        swift.memory.release(valueId);
-                    }
                 }
                 get optionalAge() {
                     instance.exports.bjs_OptionalPropertyHolder_optionalAge_get(this.pointer);
@@ -626,9 +615,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_roundTripString(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (nameId != undefined) {
-                        swift.memory.release(nameId);
-                    }
                     return optResult;
                 },
                 roundTripInt: function bjs_roundTripInt(value) {
@@ -669,9 +655,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_roundTripSyntax(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (nameId != undefined) {
-                        swift.memory.release(nameId);
-                    }
                     return optResult;
                 },
                 roundTripMixSyntax: function bjs_roundTripMixSyntax(name) {
@@ -684,9 +667,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_roundTripMixSyntax(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (nameId != undefined) {
-                        swift.memory.release(nameId);
-                    }
                     return optResult;
                 },
                 roundTripSwiftSyntax: function bjs_roundTripSwiftSyntax(name) {
@@ -699,9 +679,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_roundTripSwiftSyntax(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (nameId != undefined) {
-                        swift.memory.release(nameId);
-                    }
                     return optResult;
                 },
                 roundTripMixedSwiftSyntax: function bjs_roundTripMixedSwiftSyntax(name) {
@@ -714,9 +691,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_roundTripMixedSwiftSyntax(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (nameId != undefined) {
-                        swift.memory.release(nameId);
-                    }
                     return optResult;
                 },
                 roundTripWithSpaces: function bjs_roundTripWithSpaces(value) {
@@ -743,9 +717,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_roundTripOptionalAlias(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (nameId != undefined) {
-                        swift.memory.release(nameId);
-                    }
                     return optResult;
                 },
                 testMixedOptionals: function bjs_testMixedOptionals(firstName, lastName, age, active) {
@@ -765,12 +736,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_testMixedOptionals(+isSome, isSome ? firstNameId : 0, isSome ? firstNameBytes.length : 0, +isSome1, isSome1 ? lastNameId : 0, isSome1 ? lastNameBytes.length : 0, +isSome2, isSome2 ? age : 0, active);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (firstNameId != undefined) {
-                        swift.memory.release(firstNameId);
-                    }
-                    if (lastNameId != undefined) {
-                        swift.memory.release(lastNameId);
-                    }
                     return optResult;
                 },
             };

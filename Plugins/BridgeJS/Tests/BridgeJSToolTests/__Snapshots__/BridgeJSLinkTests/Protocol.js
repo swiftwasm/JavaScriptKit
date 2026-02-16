@@ -63,9 +63,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: ResultValues.Tag.Success, cleanup };
                     }
                     case ResultValues.Tag.Failure: {
@@ -106,6 +104,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -632,7 +631,6 @@ export async function createInstantiator(options, swift) {
                     const valueBytes = textEncoder.encode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_MyViewController_updateValue(this.pointer, valueId, valueBytes.length);
-                    swift.memory.release(valueId);
                 }
                 updateCount(count) {
                     const ret = instance.exports.bjs_MyViewController_updateCount(this.pointer, count);
@@ -644,8 +642,6 @@ export async function createInstantiator(options, swift) {
                     const suffixBytes = textEncoder.encode(suffix);
                     const suffixId = swift.memory.retain(suffixBytes);
                     instance.exports.bjs_MyViewController_updateLabel(this.pointer, prefixId, prefixBytes.length, suffixId, suffixBytes.length);
-                    swift.memory.release(prefixId);
-                    swift.memory.release(suffixId);
                 }
                 checkEvenCount() {
                     const ret = instance.exports.bjs_MyViewController_checkEvenCount(this.pointer);

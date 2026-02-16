@@ -716,6 +716,12 @@ private func _swift_js_init_memory_extern(_ sourceId: Int32, _ ptr: UnsafeMutabl
 }
 #endif
 
+/// Initializes WebAssembly memory with a Uint8Array referenced by `sourceId` at `ptr`.
+/// Note that the ownership of the source Uint8Array id is taken by the callee, so callers
+/// must not release the source Uint8Array id by themselves.
+///
+/// - Parameter sourceId: The object ID of the source Uint8Array.
+/// - Parameter ptr: The pointer to the WebAssembly memory to initialize.
 @_spi(BridgeJS) @inline(never) public func _swift_js_init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>)
 {
     _swift_js_init_memory_extern(sourceId, ptr)

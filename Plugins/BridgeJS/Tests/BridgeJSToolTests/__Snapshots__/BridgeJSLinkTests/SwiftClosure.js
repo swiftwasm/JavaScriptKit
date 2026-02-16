@@ -94,9 +94,7 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = () => {
-                            swift.memory.release(id);
-                        };
+                        const cleanup = undefined;
                         return { caseId: APIResultValues.Tag.Success, cleanup };
                     }
                     case APIResultValues.Tag.Failure: {
@@ -169,6 +167,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -366,7 +365,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.invoke_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO(boxPtr, param0Id, param0Bytes.length);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
-                    swift.memory.release(param0Id);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
@@ -469,7 +467,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.invoke_swift_closure_TestModule_10TestModuleSS_SS(boxPtr, param0Id, param0Bytes.length);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
-                    swift.memory.release(param0Id);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
@@ -628,9 +625,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.invoke_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(boxPtr, +isSome, isSome ? param0Id : 0, isSome ? param0Bytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (param0Id != undefined) {
-                        swift.memory.release(param0Id);
-                    }
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
@@ -772,9 +766,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.invoke_swift_closure_TestModule_10TestModuleSqSS_SqSS(boxPtr, +isSome, isSome ? param0Id : 0, isSome ? param0Bytes.length : 0);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
-                    if (param0Id != undefined) {
-                        swift.memory.release(param0Id);
-                    }
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
@@ -941,7 +932,6 @@ export async function createInstantiator(options, swift) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
                     const ret = instance.exports.bjs_Person_init(nameId, nameBytes.length);
-                    swift.memory.release(nameId);
                     return Person.__construct(ret);
                 }
             }

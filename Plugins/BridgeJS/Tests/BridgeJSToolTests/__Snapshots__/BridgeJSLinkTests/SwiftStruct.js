@@ -57,10 +57,7 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(0);
                 }
                 i32Stack.push(isSome1 ? 1 : 0);
-                const cleanup = () => {
-                    swift.memory.release(id);
-                };
-                return { cleanup };
+                return { cleanup: undefined };
             },
             lift: () => {
                 const isSome = i32Stack.pop();
@@ -104,11 +101,7 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(0);
                 }
                 i32Stack.push(isSome ? 1 : 0);
-                const cleanup = () => {
-                    swift.memory.release(id);
-                    swift.memory.release(id1);
-                };
-                return { cleanup };
+                return { cleanup: undefined };
             },
             lift: () => {
                 const isSome = i32Stack.pop();
@@ -147,9 +140,7 @@ export async function createInstantiator(options, swift) {
                 }
                 i32Stack.push(isSome ? 1 : 0);
                 const cleanup = () => {
-                    swift.memory.release(id);
                     if (structResult.cleanup) { structResult.cleanup(); }
-                    if(id1 !== undefined) { swift.memory.release(id1); }
                 };
                 return { cleanup };
             },
@@ -287,6 +278,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -563,7 +555,6 @@ export async function createInstantiator(options, swift) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
                     const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
-                    swift.memory.release(nameId);
                     return Greeter.__construct(ret);
                 }
                 greet() {
@@ -582,7 +573,6 @@ export async function createInstantiator(options, swift) {
                     const valueBytes = textEncoder.encode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_Greeter_name_set(this.pointer, valueId, valueBytes.length);
-                    swift.memory.release(valueId);
                 }
             }
             const DataPointHelpers = __bjs_createDataPointHelpers()();
@@ -631,7 +621,6 @@ export async function createInstantiator(options, swift) {
                         const isSome1 = optFlag != null;
                         instance.exports.bjs_DataPoint_init(x, y, labelId, labelBytes.length, +isSome, isSome ? optCount : 0, +isSome1, isSome1 ? optFlag : 0);
                         const structValue = structHelpers.DataPoint.lift();
-                        swift.memory.release(labelId);
                         return structValue;
                     },
                 },
@@ -650,7 +639,6 @@ export async function createInstantiator(options, swift) {
                         const valueBytes = textEncoder.encode(value);
                         const valueId = swift.memory.retain(valueBytes);
                         instance.exports.bjs_ConfigStruct_static_defaultConfig_set(valueId, valueBytes.length);
-                        swift.memory.release(valueId);
                     },
                     get timeout() {
                         const ret = instance.exports.bjs_ConfigStruct_static_timeout_get();

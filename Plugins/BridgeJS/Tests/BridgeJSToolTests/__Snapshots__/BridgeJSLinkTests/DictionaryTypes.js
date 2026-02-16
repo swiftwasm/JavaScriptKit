@@ -44,6 +44,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
+                swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
                 bytes.set(source);
             }
@@ -222,9 +223,6 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        arrayCleanups.push(() => {
-                            swift.memory.release(id);
-                        });
                         f64Stack.push(value);
                     }
                     i32Stack.push(entries.length);
@@ -280,9 +278,6 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        arrayCleanups.push(() => {
-                            swift.memory.release(id);
-                        });
                         i32Stack.push((value | 0));
                     }
                     i32Stack.push(entries.length);
@@ -309,16 +304,10 @@ export async function createInstantiator(options, swift) {
                             const id = swift.memory.retain(bytes);
                             i32Stack.push(bytes.length);
                             i32Stack.push(id);
-                            arrayCleanups.push(() => {
-                                swift.memory.release(id);
-                            });
                             const bytes1 = textEncoder.encode(value);
                             const id1 = swift.memory.retain(bytes1);
                             i32Stack.push(bytes1.length);
                             i32Stack.push(id1);
-                            arrayCleanups.push(() => {
-                                swift.memory.release(id1);
-                            });
                         }
                         i32Stack.push(entries.length);
                         valuesCleanups.push(() => { for (const cleanup of arrayCleanups) { cleanup(); } });
@@ -351,9 +340,6 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        arrayCleanups.push(() => {
-                            swift.memory.release(id);
-                        });
                         const arrayCleanups1 = [];
                         for (const elem of value) {
                             i32Stack.push((elem | 0));
@@ -390,9 +376,6 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        arrayCleanups.push(() => {
-                            swift.memory.release(id);
-                        });
                         ptrStack.push(value.pointer);
                     }
                     i32Stack.push(entries.length);
@@ -417,9 +400,6 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        arrayCleanups.push(() => {
-                            swift.memory.release(id);
-                        });
                         const isSome = value != null ? 1 : 0;
                         if (isSome) {
                             ptrStack.push(value.pointer);
