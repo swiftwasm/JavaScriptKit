@@ -10565,6 +10565,36 @@
         }
       },
       {
+        "abiName" : "bjs_takeOptionalJSObject",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "takeOptionalJSObject",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_compareAPIResults",
         "effects" : {
           "isAsync" : false,

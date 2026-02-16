@@ -241,4 +241,6 @@ export function runJsOptionalSupportTests(exports) {
     assert.deepEqual(exports.roundTripOptionalPayloadResultOpt(oatr_empty), oatr_empty);
     assert.equal(exports.roundTripOptionalPayloadResultOpt(null), null);
 
+    exports.takeOptionalJSObject(null);
+    assert.doesNotThrow(() => exports.takeOptionalJSObject({ key: "value" }));
 }

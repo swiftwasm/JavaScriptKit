@@ -2,12 +2,13 @@ import XCTest
 import JavaScriptKit
 import JavaScriptEventLoop
 
-
 @JSClass struct OptionalSupportImports {
     @JSFunction static func jsRoundTripOptionalNumberNull(_ value: Int?) throws -> Int?
     @JSFunction static func jsRoundTripOptionalNumberUndefined(_ value: JSUndefinedOr<Int>) throws -> JSUndefinedOr<Int>
     @JSFunction static func jsRoundTripOptionalStringNull(_ name: String?) throws -> String?
-    @JSFunction static func jsRoundTripOptionalStringUndefined(_ name: JSUndefinedOr<String>) throws -> JSUndefinedOr<String>
+    @JSFunction static func jsRoundTripOptionalStringUndefined(
+        _ name: JSUndefinedOr<String>
+    ) throws -> JSUndefinedOr<String>
 
     @JSFunction static func runJsOptionalSupportTests() throws(JSException)
 }
@@ -126,6 +127,8 @@ typealias OptionalAge = Int?
 @JS func roundTripOptionalTypedPayloadResult(_ result: TypedPayloadResult?) -> TypedPayloadResult? {
     result
 }
+
+@JS func takeOptionalJSObject(_ value: JSObject?) {}
 
 @JS func compareAPIResults(_ r1: APIResult?, _ r2: APIResult?) -> String {
     let r1Str: String

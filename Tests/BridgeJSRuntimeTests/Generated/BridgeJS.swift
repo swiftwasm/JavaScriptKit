@@ -5843,6 +5843,16 @@ public func _bjs_roundTripOptionalTypedPayloadResult(_ resultIsSome: Int32, _ re
     #endif
 }
 
+@_expose(wasm, "bjs_takeOptionalJSObject")
+@_cdecl("bjs_takeOptionalJSObject")
+public func _bjs_takeOptionalJSObject(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    takeOptionalJSObject(_: Optional<JSObject>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_compareAPIResults")
 @_cdecl("bjs_compareAPIResults")
 public func _bjs_compareAPIResults(_ r1IsSome: Int32, _ r1CaseId: Int32, _ r2IsSome: Int32, _ r2CaseId: Int32) -> Void {
