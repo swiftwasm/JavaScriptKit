@@ -7,7 +7,7 @@ import path from 'path';
 
 class DiagnosticEngine {
     /**
-     * @param {string} level
+     * @param {keyof typeof DiagnosticEngine.LEVELS} level
      */
     constructor(level) {
         const levelInfo = DiagnosticEngine.LEVELS[level];
@@ -73,20 +73,18 @@ class DiagnosticEngine {
 }
 
 function printUsage() {
-    console.error('Usage: ts2swift <d.ts file path> -p <tsconfig.json path> [--global <d.ts>]... [-o output.swift]');
+    console.error('Usage: ts2swift <d.ts file path>... [-p <tsconfig.json path>] [--global <d.ts>]... [-o output.swift]');
 }
 
 /**
  * Run ts2swift for a single input file (programmatic API, no process I/O).
- * @param {string} filePath - Path to the .d.ts file
- * @param {{ tsconfigPath: string, logLevel?: string, globalFiles?: string[] }} options
+ * @param {string[]} filePaths - Paths to the .d.ts files
+ * @param {{ tsconfigPath: string, logLevel?: keyof typeof DiagnosticEngine.LEVELS, globalFiles?: string[] }} options
  * @returns {string} Generated Swift source
  * @throws {Error} on parse/type-check errors (diagnostics are included in the message)
  */
-export function run(filePath, options) {
-    const { tsconfigPath, logLevel = 'info', globalFiles: globalFilesOpt = [] } = options;
-    const globalFiles = Array.isArray(globalFilesOpt) ? globalFilesOpt : (globalFilesOpt ? [globalFilesOpt] : []);
-
+export function run(filePaths, options) {
+    const { tsconfigPath, logLevel = 'info', globalFiles = [] } = options;
     const diagnosticEngine = new DiagnosticEngine(logLevel);
 
     const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
@@ -105,7 +103,7 @@ export function run(filePath, options) {
         throw new Error(`TypeScript config/parse errors:\n${message}`);
     }
 
-    const program = TypeProcessor.createProgram([filePath, ...globalFiles], configParseResult.options);
+    const program = TypeProcessor.createProgram([...filePaths, ...globalFiles], configParseResult.options);
     const diagnostics = program.getSemanticDiagnostics();
     if (diagnostics.length > 0) {
         const message = ts.formatDiagnosticsWithColorAndContext(diagnostics, {
@@ -131,7 +129,7 @@ export function run(filePath, options) {
     /** @type {string[]} */
     const bodies = [];
     const globalFileSet = new Set(globalFiles);
-    for (const inputPath of [filePath, ...globalFiles]) {
+    for (const inputPath of [...filePaths, ...globalFiles]) {
         const processor = new TypeProcessor(program.getTypeChecker(), diagnosticEngine, {
             defaultImportFromGlobal: globalFileSet.has(inputPath),
         });
@@ -169,39 +167,52 @@ export function main(args) {
                 type: 'string',
                 default: 'info',
             },
+            help: {
+                type: 'boolean',
+                short: 'h',
+            },
         },
         allowPositionals: true
     })
+
+    if (options.values.help) {
+        printUsage();
+        process.exit(0);
+    }
 
     if (options.positionals.length !== 1) {
         printUsage();
         process.exit(1);
     }
 
-    const tsconfigPath = options.values.project;
-    if (!tsconfigPath) {
-        printUsage();
-        process.exit(1);
-    }
-
-    const filePath = options.positionals[0];
-    const logLevel = options.values["log-level"] || "info";
-    /** @type {string[]} */
-    const globalFiles = Array.isArray(options.values.global)
-        ? options.values.global
-        : (options.values.global ? [options.values.global] : []);
+    const filePaths = options.positionals;
+    const logLevel = /** @type {keyof typeof DiagnosticEngine.LEVELS} */ ((() => {
+        const logLevel = options.values["log-level"] || "info";
+        if (!Object.keys(DiagnosticEngine.LEVELS).includes(logLevel)) {
+            console.error(`Invalid log level: ${logLevel}. Valid levels are: ${Object.keys(DiagnosticEngine.LEVELS).join(", ")}`);
+            process.exit(1);
+        }
+        return logLevel;
+    })());
+    const globalFiles = options.values.global || [];
+    const tsconfigPath = options.values.project || "tsconfig.json";
 
     const diagnosticEngine = new DiagnosticEngine(logLevel);
-    diagnosticEngine.print("verbose", `Processing ${filePath}...`);
+    diagnosticEngine.print("verbose", `Processing ${filePaths.join(", ")}`);
 
     let swiftOutput;
     try {
-        swiftOutput = run(filePath, { tsconfigPath, logLevel, globalFiles });
-    } catch (err) {
-        console.error(err.message);
+        swiftOutput = run(filePaths, { tsconfigPath, logLevel, globalFiles });
+    } catch (/** @type {unknown} */ err) {
+        if (err instanceof Error) {
+            diagnosticEngine.print("error", err.message);
+        } else {
+            diagnosticEngine.print("error", String(err));
+        }
         process.exit(1);
     }
-    if (options.values.output) {
+    // Write to file or stdout
+    if (options.values.output && options.values.output !== "-") {
         if (swiftOutput.length > 0) {
             fs.mkdirSync(path.dirname(options.values.output), { recursive: true });
             fs.writeFileSync(options.values.output, swiftOutput);

@@ -20,14 +20,13 @@ import ts from 'typescript';
 export class TypeProcessor {
     /**
      * Create a TypeScript program from a d.ts file
-     * @param {string} filePath - Path to the d.ts file
+     * @param {string[]} filePaths - Paths to the d.ts file
      * @param {ts.CompilerOptions} options - Compiler options
      * @returns {ts.Program} TypeScript program object
      */
     static createProgram(filePaths, options) {
         const host = ts.createCompilerHost(options);
-        const roots = Array.isArray(filePaths) ? filePaths : [filePaths];
-        return ts.createProgram(roots, {
+        return ts.createProgram(filePaths, {
             ...options,
             noCheck: true,
             skipLibCheck: true,
@@ -39,14 +38,7 @@ export class TypeProcessor {
      * @param {DiagnosticEngine} diagnosticEngine - Diagnostic engine
      */
     constructor(checker, diagnosticEngine, options = {
-        inheritIterable: true,
-        inheritArraylike: true,
-        inheritPromiselike: true,
-        addAllParentMembersToClass: true,
-        replaceAliasToFunction: true,
-        replaceRankNFunction: true,
-        replaceNewableFunction: true,
-        noExtendsInTyprm: false,
+        defaultImportFromGlobal: false,
     }) {
         this.checker = checker;
         this.diagnosticEngine = diagnosticEngine;
@@ -163,8 +155,12 @@ export class TypeProcessor {
                         }
                     }
                 });
-            } catch (error) {
-                this.diagnosticEngine.print("error", `Error processing ${sourceFile.fileName}: ${error.message}`);
+            } catch (/** @type {unknown} */ error) {
+                if (error instanceof Error) {
+                    this.diagnosticEngine.print("error", `Error processing ${sourceFile.fileName}: ${error.message}`);
+                } else {
+                    this.diagnosticEngine.print("error", `Error processing ${sourceFile.fileName}: ${String(error)}`);
+                }
             }
         }
 
@@ -388,7 +384,7 @@ export class TypeProcessor {
             canBeIntEnum = false;
         }
         const swiftEnumName = this.renderTypeIdentifier(enumName);
-        const dedupeNames = (items) => {
+        const dedupeNames = (/** @type {{ name: string, raw: string | number }[]} */ items) => {
             const seen = new Map();
             return items.map(item => {
                 const count = seen.get(item.name) ?? 0;
@@ -401,6 +397,10 @@ export class TypeProcessor {
         if (canBeStringEnum && stringMembers.length > 0) {
             this.swiftLines.push(`enum ${swiftEnumName}: String {`);
             for (const { name, raw } of dedupeNames(stringMembers)) {
+                if (typeof raw !== "string") {
+                    this.diagnosticEngine.print("warning", `Invalid string literal: ${raw}`, diagnosticNode);
+                    continue;
+                }
                 this.swiftLines.push(`    case ${this.renderIdentifier(name)} = "${raw.replaceAll("\"", "\\\\\"")}"`);
             }
             this.swiftLines.push("}");
@@ -815,7 +815,7 @@ export class TypeProcessor {
     visitType(type, node) {
         const typeArguments = this.getTypeArguments(type);
         if (this.checker.isArrayType(type)) {
-            const typeArgs = this.checker.getTypeArguments(type);
+            const typeArgs = this.checker.getTypeArguments(/** @type {ts.TypeReference} */ (type));
             if (typeArgs && typeArgs.length > 0) {
                 const elementType = this.visitType(typeArgs[0], node);
                 return `[${elementType}]`;
@@ -920,7 +920,7 @@ export class TypeProcessor {
      * Convert a `Record<string, T>` TypeScript type into a Swift dictionary type.
      * Falls back to `JSObject` when keys are not string-compatible or type arguments are missing.
      * @param {ts.Type} type
-     * @param {ts.Type[]} typeArguments
+     * @param {readonly ts.Type[]} typeArguments
      * @param {ts.Node} node
      * @returns {string | null}
      * @private
@@ -952,7 +952,7 @@ export class TypeProcessor {
     /**
      * Retrieve type arguments for a given type, including type alias instantiations.
      * @param {ts.Type} type
-     * @returns {ts.Type[]}
+     * @returns {readonly ts.Type[]}
      * @private
      */
     getTypeArguments(type) {
