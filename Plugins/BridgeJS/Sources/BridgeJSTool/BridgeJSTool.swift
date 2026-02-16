@@ -147,16 +147,6 @@ import BridgeJSUtilities
                 return inputSwiftFiles(targetDirectory: targetDirectory, positionalArguments: positionalArguments)
             }
 
-            let additionalDirs = config.resolveAdditionalSourceDirs(relativeTo: targetDirectory)
-            for dir in additionalDirs {
-                let additionalFiles = recursivelyCollectSwiftFiles(from: dir).map(\.path)
-                    .filter { !inputFiles.contains($0) }
-                if !additionalFiles.isEmpty {
-                    progress.print("Found \(additionalFiles.count) additional Swift files in \(dir.lastPathComponent)")
-                }
-                inputFiles.append(contentsOf: additionalFiles)
-            }
-
             // BridgeJS.Macros.swift contains imported declarations (@JSFunction, @JSClass, etc.) that need
             // to be processed by SwiftToSkeleton to populate the imported skeleton. The command plugin
             // filters out Generated/ files, so we explicitly add it here after generation.
