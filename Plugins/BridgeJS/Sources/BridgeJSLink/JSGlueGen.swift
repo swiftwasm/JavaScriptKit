@@ -931,11 +931,6 @@ struct IntrinsicJSFragment: Sendable {
                             printer.write("\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
                         }
                         printer.write("}")
-                        cleanupCode.write("if (\(idVar) !== undefined) {")
-                        cleanupCode.indent {
-                            cleanupCode.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
-                        }
-                        cleanupCode.write("}")
                         return ["+\(isSomeVar)", "\(isSomeVar) ? \(idVar) : 0"]
                     default:
                         return ["+\(isSomeVar)", "\(isSomeVar) ? \(value) : 0"]
