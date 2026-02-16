@@ -1,9 +1,10 @@
 // @ts-check
 import * as fs from 'fs';
-import { TypeProcessor } from './processor.js';
+import os from 'os';
+import path from 'path';
 import { parseArgs } from 'util';
 import ts from 'typescript';
-import path from 'path';
+import { TypeProcessor } from './processor.js';
 
 class DiagnosticEngine {
     /**
@@ -73,7 +74,24 @@ class DiagnosticEngine {
 }
 
 function printUsage() {
-    console.error('Usage: ts2swift <d.ts file path>... [-p <tsconfig.json path>] [--global <d.ts>]... [-o output.swift]');
+    console.error(`Usage: ts2swift <input> [options]
+
+  <input>    Path to a .d.ts file, or "-" to read from stdin
+
+Options:
+  -o, --output <path>     Write Swift to <path>. Use "-" for stdout (default).
+  -p, --project <path>    Path to tsconfig.json (default: tsconfig.json).
+  --global <path>         Add a .d.ts as a global declaration file (repeatable).
+  --log-level <level>     One of: verbose, info, warning, error (default: info).
+  -h, --help              Show this help.
+
+Examples:
+  ts2swift lib.d.ts
+  ts2swift lib.d.ts -o Generated.swift
+  ts2swift lib.d.ts -p ./tsconfig.build.json -o Sources/Bridge/API.swift
+  cat lib.d.ts | ts2swift - -o Generated.swift
+  ts2swift lib.d.ts --global dom.d.ts --global lib.d.ts
+`);
 }
 
 /**
@@ -185,7 +203,18 @@ export function main(args) {
         process.exit(1);
     }
 
-    const filePaths = options.positionals;
+    /** @type {string[]} */
+    let filePaths = options.positionals;
+    /** @type {(() => void)[]} cleanup functions to run after completion */
+    const cleanups = [];
+
+    if (filePaths[0] === '-') {
+        const content = fs.readFileSync(0, 'utf-8');
+        const stdinTempPath = path.join(os.tmpdir(), `ts2swift-stdin-${process.pid}-${Date.now()}.d.ts`);
+        fs.writeFileSync(stdinTempPath, content);
+        cleanups.push(() => fs.unlinkSync(stdinTempPath));
+        filePaths = [stdinTempPath];
+    }
     const logLevel = /** @type {keyof typeof DiagnosticEngine.LEVELS} */ ((() => {
         const logLevel = options.values["log-level"] || "info";
         if (!Object.keys(DiagnosticEngine.LEVELS).includes(logLevel)) {
@@ -210,6 +239,10 @@ export function main(args) {
             diagnosticEngine.print("error", String(err));
         }
         process.exit(1);
+    } finally {
+        for (const cleanup of cleanups) {
+            cleanup();
+        }
     }
     // Write to file or stdout
     if (options.values.output && options.values.output !== "-") {
