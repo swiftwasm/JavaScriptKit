@@ -200,7 +200,7 @@ export async function createInstantiator(options, swift) {
                 importObject["GlobalModule"] = {};
             }
             importObject["GlobalModule"]["bjs_GlobalClass_wrap"] = function(pointer) {
-                const obj = GlobalClass.__construct(pointer);
+                const obj = _exports['GlobalClass'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             // Wrapper functions for module: PrivateModule
@@ -208,7 +208,7 @@ export async function createInstantiator(options, swift) {
                 importObject["PrivateModule"] = {};
             }
             importObject["PrivateModule"]["bjs_PrivateClass_wrap"] = function(pointer) {
-                const obj = PrivateClass.__construct(pointer);
+                const obj = _exports['PrivateClass'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },

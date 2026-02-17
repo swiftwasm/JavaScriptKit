@@ -201,11 +201,11 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_Greeter_wrap"] = function(pointer) {
-                const obj = Greeter.__construct(pointer);
+                const obj = _exports['Greeter'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_OptionalPropertyHolder_wrap"] = function(pointer) {
-                const obj = OptionalPropertyHolder.__construct(pointer);
+                const obj = _exports['OptionalPropertyHolder'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};

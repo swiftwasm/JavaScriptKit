@@ -201,7 +201,7 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_Box_wrap"] = function(pointer) {
-                const obj = Box.__construct(pointer);
+                const obj = _exports['Box'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};

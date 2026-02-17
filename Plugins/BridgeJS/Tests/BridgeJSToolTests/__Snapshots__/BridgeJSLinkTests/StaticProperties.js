@@ -205,7 +205,7 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_PropertyClass_wrap"] = function(pointer) {
-                const obj = PropertyClass.__construct(pointer);
+                const obj = _exports['PropertyClass'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },

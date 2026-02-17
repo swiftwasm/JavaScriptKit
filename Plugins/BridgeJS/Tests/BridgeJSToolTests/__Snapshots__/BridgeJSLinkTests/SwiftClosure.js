@@ -885,11 +885,11 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_Person_wrap"] = function(pointer) {
-                const obj = Person.__construct(pointer);
+                const obj = _exports['Person'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_TestProcessor_wrap"] = function(pointer) {
-                const obj = TestProcessor.__construct(pointer);
+                const obj = _exports['TestProcessor'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },

@@ -248,7 +248,7 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_MathUtils_wrap"] = function(pointer) {
-                const obj = MathUtils.__construct(pointer);
+                const obj = _exports['MathUtils'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },

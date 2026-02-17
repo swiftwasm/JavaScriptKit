@@ -1027,7 +1027,7 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_User_wrap"] = function(pointer) {
-                const obj = User.__construct(pointer);
+                const obj = _exports['User'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },
