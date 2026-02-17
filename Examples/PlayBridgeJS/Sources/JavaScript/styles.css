@@ -306,6 +306,10 @@ body {
     margin: 0;
     background-color: var(--color-fill-secondary);
     border-bottom: 1px solid var(--color-border);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
 }
 
 .tab-button {
@@ -319,6 +323,8 @@ body {
     transition: all 0.2s ease;
     position: relative;
     border-bottom: 2px solid transparent;
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 .tab-button:hover {
@@ -411,12 +417,10 @@ body {
     }
 
     .tab-group {
-        flex-wrap: wrap;
+        scroll-padding-inline: 12px;
     }
 
     .tab-button {
-        flex: 1;
-        min-width: 0;
         text-align: center;
     }
 
