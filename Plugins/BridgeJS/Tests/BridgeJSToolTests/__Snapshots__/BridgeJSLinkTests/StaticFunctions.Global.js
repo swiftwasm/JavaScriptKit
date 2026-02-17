@@ -34,49 +34,44 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createAPIResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case APIResultValues.Tag.Success: {
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Success, cleanup };
-                    }
-                    case APIResultValues.Tag.Failure: {
-                        i32Stack.push((value.param0 | 0));
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Failure, cleanup };
-                    }
-                    default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
+    const __bjs_createAPIResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case APIResultValues.Tag.Success: {
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return APIResultValues.Tag.Success;
                 }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case APIResultValues.Tag.Success: {
-                        const string = strStack.pop();
-                        return { tag: APIResultValues.Tag.Success, param0: string };
-                    }
-                    case APIResultValues.Tag.Failure: {
-                        const int = i32Stack.pop();
-                        return { tag: APIResultValues.Tag.Failure, param0: int };
-                    }
-                    default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+                case APIResultValues.Tag.Failure: {
+                    i32Stack.push((value.param0 | 0));
+                    return APIResultValues.Tag.Failure;
                 }
+                default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
             }
-        });
-    };
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case APIResultValues.Tag.Success: {
+                    const string = strStack.pop();
+                    return { tag: APIResultValues.Tag.Success, param0: string };
+                }
+                case APIResultValues.Tag.Failure: {
+                    const int = i32Stack.pop();
+                    return { tag: APIResultValues.Tag.Failure, param0: int };
+                }
+                default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
 
     return {
         /**
@@ -124,8 +119,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                const value = textDecoder.decode(bytes);
-                strStack.push(value);
+                strStack.push(textDecoder.decode(bytes));
             }
             bjs["swift_js_pop_i32"] = function() {
                 return i32Stack.pop();
@@ -141,16 +135,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
-            }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -304,7 +288,7 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()();
+            const APIResultHelpers = __bjs_createAPIResultValuesHelpers();
             enumHelpers.APIResult = APIResultHelpers;
 
             if (typeof globalThis.Utils === 'undefined') {
@@ -325,10 +309,9 @@ export async function createInstantiator(options, swift) {
                 APIResult: {
                     ...APIResultValues,
                     roundtrip: function(value) {
-                        const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
+                        const valueCaseId = enumHelpers.APIResult.lower(value);
                         instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
                         const ret = enumHelpers.APIResult.lift(i32Stack.pop());
-                        if (valueCleanup) { valueCleanup(); }
                         return ret;
                     }
                 },

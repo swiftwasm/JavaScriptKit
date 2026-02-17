@@ -251,7 +251,7 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedF32Stack) = [];",
             "let \(JSGlueVariableScope.reservedF64Stack) = [];",
             "let \(JSGlueVariableScope.reservedPointerStack) = [];",
-            "let \(JSGlueVariableScope.reservedTmpStructCleanups) = [];",
+
             "const \(JSGlueVariableScope.reservedEnumHelpers) = {};",
             "const \(JSGlueVariableScope.reservedStructHelpers) = {};",
             "",
@@ -364,8 +364,9 @@ public struct BridgeJSLink {
                     printer.write(
                         "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");"
                     )
-                    printer.write("const value = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);")
-                    printer.write("\(JSGlueVariableScope.reservedStringStack).push(value);")
+                    printer.write(
+                        "\(JSGlueVariableScope.reservedStringStack).push(\(JSGlueVariableScope.reservedTextDecoder).decode(bytes));"
+                    )
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_pop_i32\"] = function() {")
@@ -393,38 +394,13 @@ public struct BridgeJSLink {
                     printer.write("return \(JSGlueVariableScope.reservedPointerStack).pop();")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_struct_cleanup\"] = function(cleanupId) {")
-                printer.indent {
-                    printer.write("if (cleanupId === 0) { return; }")
-                    printer.write("const index = (cleanupId | 0) - 1;")
-                    printer.write("const cleanup = \(JSGlueVariableScope.reservedTmpStructCleanups)[index];")
-                    printer.write("\(JSGlueVariableScope.reservedTmpStructCleanups)[index] = null;")
-                    printer.write("if (cleanup) { cleanup(); }")
-                    printer.write(
-                        "while (\(JSGlueVariableScope.reservedTmpStructCleanups).length > 0 && \(JSGlueVariableScope.reservedTmpStructCleanups)[\(JSGlueVariableScope.reservedTmpStructCleanups).length - 1] == null) {"
-                    )
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedTmpStructCleanups).pop();")
-                    }
-                    printer.write("}")
-                }
-                printer.write("}")
-
                 if !allStructs.isEmpty {
                     for structDef in allStructs {
                         printer.write("bjs[\"swift_js_struct_lower_\(structDef.name)\"] = function(objectId) {")
                         printer.indent {
                             printer.write(
-                                "const { cleanup: cleanup } = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
+                                "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
                             )
-                            printer.write("if (cleanup) {")
-                            printer.indent {
-                                printer.write(
-                                    "return \(JSGlueVariableScope.reservedTmpStructCleanups).push(cleanup);"
-                                )
-                            }
-                            printer.write("}")
-                            printer.write("return 0;")
                         }
                         printer.write("}")
 
@@ -946,14 +922,12 @@ public struct BridgeJSLink {
             for structDef in allStructs {
                 let structPrinter = CodeFragmentPrinter()
                 let structScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-                let structCleanup = CodeFragmentPrinter()
                 let fragment = IntrinsicJSFragment.structHelper(structDefinition: structDef, allStructs: allStructs)
                 _ = try fragment.printCode(
                     [structDef.name],
                     IntrinsicJSFragment.PrintCodeContext(
                         scope: structScope,
-                        printer: structPrinter,
-                        cleanupCode: structCleanup
+                        printer: structPrinter
                     )
                 )
                 bodyPrinter.write(lines: structPrinter.lines)
@@ -965,14 +939,12 @@ public struct BridgeJSLink {
             for enumDef in allAssocEnums {
                 let enumPrinter = CodeFragmentPrinter()
                 let enumScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-                let enumCleanup = CodeFragmentPrinter()
                 let fragment = IntrinsicJSFragment.associatedValueEnumHelperFactory(enumDefinition: enumDef)
                 _ = try fragment.printCode(
                     [enumDef.valuesName],
                     IntrinsicJSFragment.PrintCodeContext(
                         scope: enumScope,
-                        printer: enumPrinter,
-                        cleanupCode: enumCleanup
+                        printer: enumPrinter
                     )
                 )
                 bodyPrinter.write(lines: enumPrinter.lines)
@@ -1068,7 +1040,7 @@ public struct BridgeJSLink {
         for skeleton in skeletons.compactMap(\.exported) {
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
                 printer.write(
-                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers()();"
+                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers();"
                 )
                 printer.write("\(JSGlueVariableScope.reservedEnumHelpers).\(enumDef.name) = \(enumDef.name)Helpers;")
                 printer.nextLine()
@@ -1084,7 +1056,7 @@ public struct BridgeJSLink {
         for skeleton in skeletons.compactMap(\.exported) {
             for structDef in skeleton.structs {
                 printer.write(
-                    "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers()();"
+                    "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers();"
                 )
                 printer.write(
                     "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name) = \(structDef.name)Helpers;"
@@ -1217,7 +1189,6 @@ public struct BridgeJSLink {
 
     class ExportedThunkBuilder {
         var body: CodeFragmentPrinter
-        var cleanupCode: CodeFragmentPrinter
         var parameterForwardings: [String] = []
         let effects: Effects
         let scope: JSGlueVariableScope
@@ -1227,11 +1198,9 @@ public struct BridgeJSLink {
             self.effects = effects
             self.scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
             self.body = CodeFragmentPrinter()
-            self.cleanupCode = CodeFragmentPrinter()
             self.context = IntrinsicJSFragment.PrintCodeContext(
                 scope: scope,
                 printer: body,
-                cleanupCode: cleanupCode,
                 hasDirectAccessToSwiftClass: hasDirectAccessToSwiftClass
             )
         }
@@ -1302,10 +1271,9 @@ public struct BridgeJSLink {
             ]
         }
 
-        /// Renders the thunk body (body code, cleanup, exception handling, and optional return) into a printer.
+        /// Renders the thunk body (body code, exception handling, and optional return) into a printer.
         func renderFunctionBody(into printer: CodeFragmentPrinter, returnExpr: String?) {
             printer.write(contentsOf: body)
-            printer.write(contentsOf: cleanupCode)
             printer.write(lines: checkExceptionLines())
             if let returnExpr = returnExpr {
                 printer.write("return \(returnExpr);")
@@ -1531,22 +1499,13 @@ public struct BridgeJSLink {
         let printer = CodeFragmentPrinter()
         let context = IntrinsicJSFragment.PrintCodeContext(
             scope: scope,
-            printer: printer,
-            cleanupCode: CodeFragmentPrinter()
+            printer: printer
         )
         let enumValuesName = enumDefinition.valuesName
 
         switch enumDefinition.enumType {
-        case .simple:
-            let fragment = IntrinsicJSFragment.simpleEnumHelper(enumDefinition: enumDefinition)
-            _ = try fragment.printCode([enumValuesName], context)
-            jsTopLevelLines.append(contentsOf: printer.lines)
-        case .rawValue:
-            guard enumDefinition.rawType != nil else {
-                throw BridgeJSLinkError(message: "Raw value enum \(enumDefinition.name) is missing rawType")
-            }
-
-            let fragment = IntrinsicJSFragment.rawValueEnumHelper(enumDefinition: enumDefinition)
+        case .simple, .rawValue:
+            let fragment = IntrinsicJSFragment.caseEnumHelper(enumDefinition: enumDefinition)
             _ = try fragment.printCode([enumValuesName], context)
             jsTopLevelLines.append(contentsOf: printer.lines)
         case .associatedValue:
@@ -2117,7 +2076,6 @@ extension BridgeJSLink {
     class ImportedThunkBuilder {
         let body: CodeFragmentPrinter
         let scope: JSGlueVariableScope
-        let cleanupCode: CodeFragmentPrinter
         let context: BridgeContext
         var parameterNames: [String] = []
         var parameterForwardings: [String] = []
@@ -2126,12 +2084,10 @@ extension BridgeJSLink {
         init(context: BridgeContext = .importTS, intrinsicRegistry: JSIntrinsicRegistry) {
             self.body = CodeFragmentPrinter()
             self.scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-            self.cleanupCode = CodeFragmentPrinter()
             self.context = context
             self.printContext = IntrinsicJSFragment.PrintCodeContext(
                 scope: scope,
-                printer: body,
-                cleanupCode: cleanupCode
+                printer: body
             )
         }
 
@@ -2175,7 +2131,7 @@ extension BridgeJSLink {
                 printer.write("} catch (error) {")
                 printer.indent {
                     printer.write("setException(error);")
-                    if let abiReturnType = returnType.abiReturnType {
+                    if !returnType.isOptional, let abiReturnType = returnType.descriptor.wasmReturnType {
                         printer.write("return \(abiReturnType.placeholderValue)")
                     }
                 }
@@ -2250,7 +2206,7 @@ extension BridgeJSLink {
         func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
             let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
             let accessExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
-            if context == .exportSwift, returnType.usesSideChannelForOptionalReturn() {
+            if context == .exportSwift, returnType.usesSideChannelForOptionalReturn {
                 guard case .nullable(let wrappedType, _) = returnType else {
                     fatalError("usesSideChannelForOptionalReturn returned true for non-optional type")
                 }
@@ -2670,7 +2626,6 @@ extension BridgeJSLink {
                 getterPrinter.write("get \(property.name)() {")
                 getterPrinter.indent {
                     getterPrinter.write(contentsOf: getterThunkBuilder.body)
-                    getterPrinter.write(contentsOf: getterThunkBuilder.cleanupCode)
                     getterPrinter.write(lines: getterThunkBuilder.checkExceptionLines())
                     if let returnExpr = getterReturnExpr {
                         getterPrinter.write("return \(returnExpr);")
@@ -2698,7 +2653,6 @@ extension BridgeJSLink {
                     setterPrinter.write("set \(property.name)(value) {")
                     setterPrinter.indent {
                         setterPrinter.write(contentsOf: setterThunkBuilder.body)
-                        setterPrinter.write(contentsOf: setterThunkBuilder.cleanupCode)
                         setterPrinter.write(lines: setterThunkBuilder.checkExceptionLines())
                     }
                     setterPrinter.write("},")

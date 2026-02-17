@@ -1,8 +1,8 @@
 @_expose(wasm, "bjs_roundTripOptionalClass")
 @_cdecl("bjs_roundTripOptionalClass")
-public func _bjs_roundTripOptionalClass(_ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
+public func _bjs_roundTripOptionalClass(_ valueIsSome: Int32, _ valuePointer: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalClass(value: Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    let ret = roundTripOptionalClass(value: Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valuePointer))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -11,9 +11,9 @@ public func _bjs_roundTripOptionalClass(_ valueIsSome: Int32, _ valueValue: Unsa
 
 @_expose(wasm, "bjs_testOptionalPropertyRoundtrip")
 @_cdecl("bjs_testOptionalPropertyRoundtrip")
-public func _bjs_testOptionalPropertyRoundtrip(_ holderIsSome: Int32, _ holderValue: UnsafeMutableRawPointer) -> Void {
+public func _bjs_testOptionalPropertyRoundtrip(_ holderIsSome: Int32, _ holderPointer: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = testOptionalPropertyRoundtrip(_: Optional<OptionalPropertyHolder>.bridgeJSLiftParameter(holderIsSome, holderValue))
+    let ret = testOptionalPropertyRoundtrip(_: Optional<OptionalPropertyHolder>.bridgeJSLiftParameter(holderIsSome, holderPointer))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -307,9 +307,9 @@ public func _bjs_OptionalPropertyHolder_optionalGreeter_get(_ _self: UnsafeMutab
 
 @_expose(wasm, "bjs_OptionalPropertyHolder_optionalGreeter_set")
 @_cdecl("bjs_OptionalPropertyHolder_optionalGreeter_set")
-public func _bjs_OptionalPropertyHolder_optionalGreeter_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
+public func _bjs_OptionalPropertyHolder_optionalGreeter_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valuePointer: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    OptionalPropertyHolder.bridgeJSLiftParameter(_self).optionalGreeter = Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    OptionalPropertyHolder.bridgeJSLiftParameter(_self).optionalGreeter = Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valuePointer)
     #else
     fatalError("Only available on WebAssembly")
     #endif

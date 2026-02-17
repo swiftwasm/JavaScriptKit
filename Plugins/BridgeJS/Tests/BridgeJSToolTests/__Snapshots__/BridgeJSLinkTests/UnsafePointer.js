@@ -23,32 +23,28 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createPointerFieldsHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                ptrStack.push((value.raw | 0));
-                ptrStack.push((value.mutRaw | 0));
-                ptrStack.push((value.opaque | 0));
-                ptrStack.push((value.ptr | 0));
-                ptrStack.push((value.mutPtr | 0));
-                return { cleanup: undefined };
-            },
-            lift: () => {
-                const pointer = ptrStack.pop();
-                const pointer1 = ptrStack.pop();
-                const pointer2 = ptrStack.pop();
-                const pointer3 = ptrStack.pop();
-                const pointer4 = ptrStack.pop();
-                return { raw: pointer4, mutRaw: pointer3, opaque: pointer2, ptr: pointer1, mutPtr: pointer };
-            }
-        });
-    };
+    const __bjs_createPointerFieldsHelpers = () => ({
+        lower: (value) => {
+            ptrStack.push((value.raw | 0));
+            ptrStack.push((value.mutRaw | 0));
+            ptrStack.push((value.opaque | 0));
+            ptrStack.push((value.ptr | 0));
+            ptrStack.push((value.mutPtr | 0));
+        },
+        lift: () => {
+            const pointer = ptrStack.pop();
+            const pointer1 = ptrStack.pop();
+            const pointer2 = ptrStack.pop();
+            const pointer3 = ptrStack.pop();
+            const pointer4 = ptrStack.pop();
+            return { raw: pointer4, mutRaw: pointer3, opaque: pointer2, ptr: pointer1, mutPtr: pointer };
+        }
+    });
 
     return {
         /**
@@ -96,8 +92,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                const value = textDecoder.decode(bytes);
-                strStack.push(value);
+                strStack.push(textDecoder.decode(bytes));
             }
             bjs["swift_js_pop_i32"] = function() {
                 return i32Stack.pop();
@@ -114,22 +109,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
             }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
-            }
             bjs["swift_js_struct_lower_PointerFields"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.PointerFields.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.PointerFields.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_PointerFields"] = function() {
                 const value = structHelpers.PointerFields.lift();
@@ -238,7 +219,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PointerFieldsHelpers = __bjs_createPointerFieldsHelpers()();
+            const PointerFieldsHelpers = __bjs_createPointerFieldsHelpers();
             structHelpers.PointerFields = PointerFieldsHelpers;
 
             const exports = {
@@ -278,10 +259,9 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 roundTripPointerFields: function bjs_roundTripPointerFields(value) {
-                    const { cleanup: cleanup } = structHelpers.PointerFields.lower(value);
+                    structHelpers.PointerFields.lower(value);
                     instance.exports.bjs_roundTripPointerFields();
                     const structValue = structHelpers.PointerFields.lift();
-                    if (cleanup) { cleanup(); }
                     return structValue;
                 },
                 PointerFields: {

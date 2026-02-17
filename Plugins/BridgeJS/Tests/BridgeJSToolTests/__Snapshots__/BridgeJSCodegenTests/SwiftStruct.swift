@@ -28,10 +28,7 @@ extension DataPoint: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_DataPoint(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_DataPoint(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -44,9 +41,9 @@ extension DataPoint: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_DataPoint")
-fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -90,10 +87,7 @@ extension Address: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_Address(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_Address(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -106,9 +100,9 @@ extension Address: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Address")
-fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -143,10 +137,7 @@ extension Person: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_Person(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_Person(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -159,9 +150,9 @@ extension Person: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Person")
-fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -188,10 +179,7 @@ extension Session: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_Session(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_Session(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -204,9 +192,9 @@ extension Session: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Session")
-fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -239,10 +227,7 @@ extension Measurement: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_Measurement(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_Measurement(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -255,9 +240,9 @@ extension Measurement: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Measurement")
-fileprivate func _bjs_struct_lower_Measurement(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_Measurement(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Measurement(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_Measurement(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -280,10 +265,7 @@ extension ConfigStruct: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_ConfigStruct(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_ConfigStruct(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -296,9 +278,9 @@ extension ConfigStruct: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_ConfigStruct")
-fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -404,10 +386,7 @@ extension Container: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_Container(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_Container(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -420,9 +399,9 @@ extension Container: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Container")
-fileprivate func _bjs_struct_lower_Container(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_Container(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Container(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_Container(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif

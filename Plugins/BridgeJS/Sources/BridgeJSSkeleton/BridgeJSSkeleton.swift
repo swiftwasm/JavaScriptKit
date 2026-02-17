@@ -148,6 +148,28 @@ public enum JSOptionalKind: String, Codable, Equatable, Hashable, Sendable {
     }
 }
 
+public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
+    case string = "String"
+    case bool = "Bool"
+    case int = "Int"
+    case int32 = "Int32"
+    case int64 = "Int64"
+    case uint = "UInt"
+    case uint32 = "UInt32"
+    case uint64 = "UInt64"
+    case float = "Float"
+    case double = "Double"
+
+    public init?(_ rawTypeString: String?) {
+        guard let rawTypeString = rawTypeString,
+            let match = Self.allCases.first(where: { $0.rawValue == rawTypeString })
+        else {
+            return nil
+        }
+        self = match
+    }
+}
+
 public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case int, uint, float, double, string, bool, jsObject(String?), jsValue, swiftHeapObject(String), void
     case unsafePointer(UnsafePointerType)
@@ -165,46 +187,25 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
 
 public enum WasmCoreType: String, Codable, Sendable {
     case i32, i64, f32, f64, pointer
-}
 
-public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
-    case string = "String"
-    case bool = "Bool"
-    case int = "Int"
-    case int32 = "Int32"
-    case int64 = "Int64"
-    case uint = "UInt"
-    case uint32 = "UInt32"
-    case uint64 = "UInt64"
-    case float = "Float"
-    case double = "Double"
-
-    public var wasmCoreType: WasmCoreType? {
+    public var jsZeroLiteral: String {
         switch self {
-        case .string:
-            return nil
-        case .bool, .int, .int32, .uint, .uint32:
-            return .i32
-        case .int64, .uint64:
-            return .i64
-        case .float:
-            return .f32
-        case .double:
-            return .f64
+        case .f32, .f64: return "0.0"
+        case .i32, .i64, .pointer: return "0"
         }
     }
 
-    public init?(_ rawTypeString: String?) {
-        guard let rawTypeString = rawTypeString,
-            let match = Self.allCases.first(where: { $0.rawValue == rawTypeString })
-        else {
-            return nil
+    public var swiftReturnPlaceholderStmt: String {
+        switch self {
+        case .i32: return "return 0"
+        case .i64: return "return 0"
+        case .f32: return "return 0.0"
+        case .f64: return "return 0.0"
+        case .pointer: return "return UnsafeMutableRawPointer(bitPattern: -1).unsafelyUnwrapped"
         }
-        self = match
     }
 }
 
-/// Represents a struct field with name and default value for default parameter values
 public struct DefaultValueField: Codable, Equatable, Sendable {
     public let name: String
     public let value: DefaultValue
@@ -222,11 +223,11 @@ public enum DefaultValue: Codable, Equatable, Sendable {
     case double(Double)
     case bool(Bool)
     case null
-    case enumCase(String, String)  // enumName, caseName
-    case object(String)  // className for parameterless constructor
-    case objectWithArguments(String, [DefaultValue])  // className, constructor argument values
-    case structLiteral(String, [DefaultValueField])  // structName, field name/value pairs
-    indirect case array([DefaultValue])  // array literal with element values
+    case enumCase(String, String)
+    case object(String)
+    case objectWithArguments(String, [DefaultValue])
+    case structLiteral(String, [DefaultValueField])
+    indirect case array([DefaultValue])
 }
 
 public struct Parameter: Codable, Equatable, Sendable {
@@ -244,6 +245,510 @@ public struct Parameter: Codable, Equatable, Sendable {
         self.name = name
         self.type = type
         self.defaultValue = defaultValue
+    }
+}
+
+public struct Effects: Codable, Equatable, Sendable {
+    public var isAsync: Bool
+    public var isThrows: Bool
+    public var isStatic: Bool
+
+    public init(isAsync: Bool, isThrows: Bool, isStatic: Bool = false) {
+        self.isAsync = isAsync
+        self.isThrows = isThrows
+        self.isStatic = isStatic
+    }
+}
+
+public enum StaticContext: Codable, Equatable, Sendable {
+    case className(String)
+    case structName(String)
+    case enumName(String)
+    case namespaceEnum(String)
+}
+
+// MARK: - ABI Descriptor
+
+/// How `Optional<T>` is represented at the WASM ABI boundary.
+///
+/// The convention is derived from T's descriptor and determines how codegen
+/// handles nullable values in both the parameter and return directions.
+/// Stack ABI is the general-purpose fallback that works for any T.
+public enum OptionalConvention: Sendable, Equatable {
+    /// Everything goes through the stack (isSome flag + payload pushed/popped).
+    /// Used for types whose base representation already uses the stack (struct, array, dictionary).
+    /// This is also the default fallback for unknown types.
+    case stackABI
+
+    /// isSome is passed as an inline WASM parameter alongside T's normal parameters.
+    /// For returns, T's return type carries the value (no side channel needed).
+    /// Used for types with compact representations where the value space has no sentinel
+    /// (bool, jsValue, closure, caseEnum, associatedValueEnum).
+    case inlineFlag
+
+    /// Return value goes through a side-channel storage variable; WASM function returns void.
+    /// For parameters, behaves like `.inlineFlag` (isSome + T's params as direct WASM params).
+    /// Used for scalar types where Optional return needs disambiguation (int, string, jsObject, etc.).
+    case sideChannelReturn(OptionalSideChannel)
+}
+
+public enum OptionalSideChannel: Sendable, Equatable {
+    case none
+    case storage
+    case retainedObject
+}
+
+/// A bit pattern that is never a valid value for a type, usable to represent `nil`
+/// without an extra `isSome` flag. Inspired by Swift's "extra inhabitant" concept.
+///
+/// Types with a nil sentinel can encode Optional<T> in T's own return slot:
+/// the sentinel value means absent, any other value means present.
+/// Types without a sentinel need either an inline isSome flag or a side channel.
+public enum NilSentinel: Sendable, Equatable {
+    /// No sentinel exists - all bit patterns are valid values.
+    case none
+    /// A specific i32 value is never valid (e.g. 0 for object IDs, -1 for enum tags).
+    case i32(Int32)
+    /// A null pointer (0) is the sentinel.
+    case pointer
+
+    public var jsLiteral: String {
+        switch self {
+        case .none: fatalError("No sentinel value for .none")
+        case .i32(let value): return "\(value)"
+        case .pointer: return "0"
+        }
+    }
+
+    public var hasSentinel: Bool {
+        self != .none
+    }
+}
+
+/// Identifies which typed optional-return storage slot a scalar type uses.
+///
+/// On the Swift -> JS path, Swift calls `swift_js_return_optional_<kind>(isSome, value)`
+/// which writes to the corresponding `tmpRetOptional<Kind>` variable in JS.
+/// On the JS -> Swift path (protocol returns), the same storage and intrinsic are used
+/// unless the type has a nil sentinel (in which case the sentinel path is taken instead).
+public enum OptionalScalarKind: String, Sendable {
+    case bool, int, float, double
+
+    public var storageName: String { "tmpRetOptional\(rawValue.prefix(1).uppercased())\(rawValue.dropFirst())" }
+    public var funcName: String { "swift_js_return_optional_\(rawValue)" }
+}
+
+/// JS-side coercion info for simple single-value ABI types.
+/// Coercion strings use `$0` as a placeholder for the value expression.
+/// Grouped within the type descriptor to avoid duplicate per-BridgeType switching.
+public struct JSCoercion: Sendable {
+    public let liftCoerce: String?
+    public let lowerCoerce: String?
+    public let stackLowerCoerce: String?
+    public let varHint: String
+    public let optionalScalarKind: OptionalScalarKind?
+
+    public init(
+        liftCoerce: String? = nil,
+        lowerCoerce: String? = nil,
+        stackLowerCoerce: String? = nil,
+        varHint: String,
+        optionalScalarKind: OptionalScalarKind? = nil
+    ) {
+        self.liftCoerce = liftCoerce
+        self.lowerCoerce = lowerCoerce
+        self.stackLowerCoerce = stackLowerCoerce
+        self.varHint = varHint
+        self.optionalScalarKind = optionalScalarKind
+    }
+
+    public var effectiveStackLowerCoerce: String? {
+        stackLowerCoerce ?? lowerCoerce
+    }
+}
+
+/// Captures the WASM ABI shape for a ``BridgeType`` so codegen can read descriptor fields
+/// instead of switching on every concrete type.
+///
+/// `wasmReturnType` is for the export direction (Swift->JS), `importReturnType` for import
+/// (JS->Swift). They differ for types like `string` and `associatedValueEnum` where the
+/// import side returns a pointer/ID while the export side uses the stack.
+public struct BridgeTypeDescriptor: Sendable {
+    public let wasmParams: [(name: String, type: WasmCoreType)]
+    public let importParams: [(name: String, type: WasmCoreType)]
+    public let wasmReturnType: WasmCoreType?
+    public let importReturnType: WasmCoreType?
+    public let optionalConvention: OptionalConvention
+    public let nilSentinel: NilSentinel
+    public let usesStackLifting: Bool
+    public let accessorTransform: AccessorTransform
+    public let lowerMethod: LowerMethod
+    public let jsCoercion: JSCoercion?
+
+    public init(
+        wasmParams: [(name: String, type: WasmCoreType)],
+        importParams: [(name: String, type: WasmCoreType)]? = nil,
+        wasmReturnType: WasmCoreType?,
+        importReturnType: WasmCoreType? = nil,
+        optionalConvention: OptionalConvention,
+        nilSentinel: NilSentinel = .none,
+        usesStackLifting: Bool = false,
+        accessorTransform: AccessorTransform,
+        lowerMethod: LowerMethod,
+        jsCoercion: JSCoercion? = nil
+    ) {
+        self.wasmParams = wasmParams
+        self.importParams = importParams ?? wasmParams
+        self.wasmReturnType = wasmReturnType
+        self.importReturnType = importReturnType ?? wasmReturnType
+        self.optionalConvention = optionalConvention
+        self.nilSentinel = nilSentinel
+        self.usesStackLifting = usesStackLifting
+        self.accessorTransform = accessorTransform
+        self.lowerMethod = lowerMethod
+        self.jsCoercion = jsCoercion
+    }
+}
+
+/// Describes how to transform a Swift accessor expression before passing it to bridge methods.
+///
+/// Most types use `.identity` - the value is passed as-is. Two patterns require transformation:
+/// - `@JSClass` types expose their underlying `JSObject` via a `.jsObject` member.
+/// - `@JS protocol` wrapper types require a downcast from the existential to the concrete wrapper.
+///
+/// Codegen uses this instead of switching on `jsObject(className)` / `swiftProtocol` cases.
+public enum AccessorTransform: Sendable, Equatable {
+    /// Pass the value unchanged (e.g. `ret`).
+    case identity
+    /// Access a member on the value (e.g. `ret.jsObject`). Used by `@JSClass` types.
+    case member(String)
+    /// Downcast the value (e.g. `(ret as! AnyDrawable)`). Used by `@JS protocol` types.
+    case cast(String)
+
+    /// Applies the transform to an accessor expression string.
+    public func apply(_ accessor: String) -> String {
+        switch self {
+        case .identity: return accessor
+        case .member(let member): return "\(accessor).\(member)"
+        case .cast(let typeName): return "(\(accessor) as! \(typeName))"
+        }
+    }
+
+    public var mapClosure: String? {
+        switch self {
+        case .identity: return nil
+        case .member(let member): return "$0.\(member)"
+        case .cast(let typeName): return "$0 as! \(typeName)"
+        }
+    }
+
+    public var flatMapClosure: String? {
+        switch self {
+        case .identity: return nil
+        case .member(let member): return "$0.\(member)"
+        case .cast(let typeName): return "$0 as? \(typeName)"
+        }
+    }
+
+    public func applyToReturnBinding(_ expr: String, isOptional: Bool) -> String {
+        switch self {
+        case .cast:
+            if isOptional {
+                return "let ret = (\(expr)).flatMap { \(flatMapClosure!) }"
+            }
+            return "let ret = \(apply(expr))"
+        case .identity, .member:
+            return "let ret = \(expr)"
+        }
+    }
+}
+
+/// Which bridge protocol method the codegen calls to lower a value in the export direction.
+public enum LowerMethod: Sendable, Equatable {
+    /// Calls `bridgeJSLowerStackReturn()` - pushes a scalar onto the stack (used within composites like optionals, struct fields).
+    case stackReturn
+    /// Calls `bridgeJSLowerReturn()` - serializes the entire value onto the stack (struct, array, dictionary).
+    case fullReturn
+    /// Calls `bridgeJSLowerParameter()` and pushes the i32 result. Used by associated value enums (tag + stack payload).
+    case pushParameter
+    /// No lowering (void, namespace enums).
+    case none
+}
+
+extension BridgeType {
+    /// The ABI descriptor for this type's non-optional representation.
+    ///
+    /// This is the single source of truth for how each `BridgeType` maps to WASM ABI.
+    /// Codegen reads descriptor fields rather than switching on individual types.
+    /// For `.nullable`, returns the wrapped type's descriptor.
+    public var descriptor: BridgeTypeDescriptor {
+        switch self {
+        case .bool:
+            return BridgeTypeDescriptor(
+                wasmParams: [("value", .i32)],
+                wasmReturnType: .i32,
+                optionalConvention: .inlineFlag,
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn,
+                jsCoercion: JSCoercion(
+                    liftCoerce: "$0 !== 0",
+                    lowerCoerce: "$0 ? 1 : 0",
+                    varHint: "bool",
+                    optionalScalarKind: .bool
+                )
+            )
+        case .int:
+            return BridgeTypeDescriptor(
+                wasmParams: [("value", .i32)],
+                wasmReturnType: .i32,
+                optionalConvention: .sideChannelReturn(.none),
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn,
+                jsCoercion: JSCoercion(
+                    stackLowerCoerce: "($0 | 0)",
+                    varHint: "int",
+                    optionalScalarKind: .int
+                )
+            )
+        case .uint:
+            return BridgeTypeDescriptor(
+                wasmParams: [("value", .i32)],
+                wasmReturnType: .i32,
+                optionalConvention: .sideChannelReturn(.none),
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn,
+                jsCoercion: JSCoercion(
+                    liftCoerce: "$0 >>> 0",
+                    stackLowerCoerce: "($0 | 0)",
+                    varHint: "int",
+                    optionalScalarKind: .int
+                )
+            )
+        case .float:
+            return BridgeTypeDescriptor(
+                wasmParams: [("value", .f32)],
+                wasmReturnType: .f32,
+                optionalConvention: .sideChannelReturn(.none),
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn,
+                jsCoercion: JSCoercion(
+                    stackLowerCoerce: "Math.fround($0)",
+                    varHint: "f32",
+                    optionalScalarKind: .float
+                )
+            )
+        case .double:
+            return BridgeTypeDescriptor(
+                wasmParams: [("value", .f64)],
+                wasmReturnType: .f64,
+                optionalConvention: .sideChannelReturn(.none),
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn,
+                jsCoercion: JSCoercion(
+                    varHint: "f64",
+                    optionalScalarKind: .double
+                )
+            )
+        case .string:
+            return BridgeTypeDescriptor(
+                wasmParams: [("bytes", .i32), ("length", .i32)],
+                importParams: [("value", .i32)],
+                wasmReturnType: nil,
+                importReturnType: .i32,
+                optionalConvention: .sideChannelReturn(.storage),
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn
+            )
+        case .jsObject(let className):
+            let transform: AccessorTransform =
+                if let className, className != "JSObject" { .member("jsObject") } else { .identity }
+            return BridgeTypeDescriptor(
+                wasmParams: [("value", .i32)],
+                wasmReturnType: .i32,
+                optionalConvention: .sideChannelReturn(.retainedObject),
+                nilSentinel: .i32(0),
+                accessorTransform: transform,
+                lowerMethod: .stackReturn
+            )
+        case .jsValue:
+            return BridgeTypeDescriptor(
+                wasmParams: [("kind", .i32), ("payload1", .i32), ("payload2", .f64)],
+                wasmReturnType: nil,
+                optionalConvention: .inlineFlag,
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn
+            )
+        case .swiftHeapObject:
+            return BridgeTypeDescriptor(
+                wasmParams: [("pointer", .pointer)],
+                wasmReturnType: .pointer,
+                optionalConvention: .inlineFlag,
+                nilSentinel: .pointer,
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn
+            )
+        case .unsafePointer:
+            return BridgeTypeDescriptor(
+                wasmParams: [("pointer", .pointer)],
+                wasmReturnType: .pointer,
+                optionalConvention: .inlineFlag,
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn,
+                jsCoercion: JSCoercion(stackLowerCoerce: "($0 | 0)", varHint: "pointer")
+            )
+        case .swiftProtocol(let protocolName):
+            return BridgeTypeDescriptor(
+                wasmParams: [("value", .i32)],
+                wasmReturnType: .i32,
+                optionalConvention: .sideChannelReturn(.retainedObject),
+                nilSentinel: .i32(0),
+                accessorTransform: .cast("Any\(protocolName)"),
+                lowerMethod: .stackReturn
+            )
+        case .caseEnum:
+            return BridgeTypeDescriptor(
+                wasmParams: [("value", .i32)],
+                wasmReturnType: .i32,
+                optionalConvention: .inlineFlag,
+                nilSentinel: .i32(-1),
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn,
+                jsCoercion: JSCoercion(
+                    stackLowerCoerce: "($0 | 0)",
+                    varHint: "caseId",
+                    optionalScalarKind: .int
+                )
+            )
+        case .rawValueEnum(_, let rawType):
+            switch rawType {
+            case .string:
+                return BridgeTypeDescriptor(
+                    wasmParams: [("bytes", .i32), ("length", .i32)],
+                    importParams: [("value", .i32)],
+                    wasmReturnType: nil,
+                    importReturnType: .i32,
+                    optionalConvention: .sideChannelReturn(.storage),
+                    accessorTransform: .identity,
+                    lowerMethod: .stackReturn
+                )
+            case .float:
+                return BridgeTypeDescriptor(
+                    wasmParams: [("value", .f32)],
+                    wasmReturnType: .f32,
+                    optionalConvention: .sideChannelReturn(.none),
+                    accessorTransform: .identity,
+                    lowerMethod: .stackReturn,
+                    jsCoercion: JSCoercion(
+                        stackLowerCoerce: "Math.fround($0)",
+                        varHint: "rawValue",
+                        optionalScalarKind: .float
+                    )
+                )
+            case .double:
+                return BridgeTypeDescriptor(
+                    wasmParams: [("value", .f64)],
+                    wasmReturnType: .f64,
+                    optionalConvention: .sideChannelReturn(.none),
+                    accessorTransform: .identity,
+                    lowerMethod: .stackReturn,
+                    jsCoercion: JSCoercion(
+                        varHint: "rawValue",
+                        optionalScalarKind: .double
+                    )
+                )
+            case .bool:
+                return BridgeTypeDescriptor(
+                    wasmParams: [("value", .i32)],
+                    wasmReturnType: .i32,
+                    optionalConvention: .inlineFlag,
+                    accessorTransform: .identity,
+                    lowerMethod: .stackReturn,
+                    jsCoercion: JSCoercion(
+                        liftCoerce: "$0 !== 0",
+                        lowerCoerce: "$0 ? 1 : 0",
+                        stackLowerCoerce: "$0 ? 1 : 0",
+                        varHint: "rawValue",
+                        optionalScalarKind: .bool
+                    )
+                )
+            case .int, .int32, .int64, .uint, .uint32, .uint64:
+                return BridgeTypeDescriptor(
+                    wasmParams: [("value", .i32)],
+                    wasmReturnType: .i32,
+                    optionalConvention: .sideChannelReturn(.none),
+                    accessorTransform: .identity,
+                    lowerMethod: .stackReturn,
+                    jsCoercion: JSCoercion(
+                        stackLowerCoerce: "($0 | 0)",
+                        varHint: "rawValue",
+                        optionalScalarKind: .int
+                    )
+                )
+            }
+        case .associatedValueEnum:
+            return BridgeTypeDescriptor(
+                wasmParams: [("caseId", .i32)],
+                wasmReturnType: nil,
+                importReturnType: .i32,
+                optionalConvention: .inlineFlag,
+                nilSentinel: .i32(-1),
+                usesStackLifting: true,
+                accessorTransform: .identity,
+                lowerMethod: .pushParameter
+            )
+        case .closure(_, _):
+            return BridgeTypeDescriptor(
+                wasmParams: [("funcRef", .i32)],
+                wasmReturnType: .i32,
+                optionalConvention: .inlineFlag,
+                accessorTransform: .identity,
+                lowerMethod: .stackReturn
+            )
+        case .swiftStruct:
+            return BridgeTypeDescriptor(
+                wasmParams: [],
+                importParams: [("objectId", .i32)],
+                wasmReturnType: nil,
+                importReturnType: .i32,
+                optionalConvention: .stackABI,
+                usesStackLifting: true,
+                accessorTransform: .identity,
+                lowerMethod: .fullReturn
+            )
+        case .array:
+            return BridgeTypeDescriptor(
+                wasmParams: [],
+                wasmReturnType: nil,
+                optionalConvention: .stackABI,
+                usesStackLifting: true,
+                accessorTransform: .identity,
+                lowerMethod: .fullReturn
+            )
+        case .dictionary:
+            return BridgeTypeDescriptor(
+                wasmParams: [],
+                wasmReturnType: nil,
+                optionalConvention: .stackABI,
+                accessorTransform: .identity,
+                lowerMethod: .fullReturn
+            )
+        case .void, .namespaceEnum:
+            return BridgeTypeDescriptor(
+                wasmParams: [],
+                wasmReturnType: nil,
+                optionalConvention: .stackABI,
+                accessorTransform: .identity,
+                lowerMethod: .none
+            )
+        case .nullable(let wrapped, _):
+            return wrapped.descriptor
+        }
+    }
+
+    public var needsInlineCollectionHandling: Bool {
+        if case .nullable = self { return true }
+        if case .closure = self { return true }
+        return false
     }
 }
 
@@ -379,38 +884,19 @@ public struct BridgeTypeWalker<Visitor: BridgeTypeVisitor> {
     }
 }
 
-public struct Effects: Codable, Equatable, Sendable {
-    public var isAsync: Bool
-    public var isThrows: Bool
-    public var isStatic: Bool
+public struct ClosureSignatureCollectorVisitor: BridgeTypeVisitor {
+    public var signatures: Set<ClosureSignature> = []
 
-    public init(isAsync: Bool, isThrows: Bool, isStatic: Bool = false) {
-        self.isAsync = isAsync
-        self.isThrows = isThrows
-        self.isStatic = isStatic
+    public init(signatures: Set<ClosureSignature> = []) {
+        self.signatures = signatures
     }
-}
 
-// MARK: - Static Function Context
-
-public enum StaticContext: Codable, Equatable, Sendable {
-    case className(String)
-    case structName(String)
-    case enumName(String)
-    case namespaceEnum(String)
+    public mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool) {
+        signatures.insert(signature)
+    }
 }
 
 // MARK: - Struct Skeleton
-
-public struct StructField: Codable, Equatable, Sendable {
-    public let name: String
-    public let type: BridgeType
-
-    public init(name: String, type: BridgeType) {
-        self.name = name
-        self.type = type
-    }
-}
 
 public struct ExportedStruct: Codable, Equatable, Sendable {
     public let name: String
@@ -749,15 +1235,6 @@ public struct ExportedSkeleton: Codable {
         self.exposeToGlobal = exposeToGlobal
     }
 
-    public mutating func append(_ other: ExportedSkeleton) {
-        self.functions.append(contentsOf: other.functions)
-        self.classes.append(contentsOf: other.classes)
-        self.enums.append(contentsOf: other.enums)
-        self.structs.append(contentsOf: other.structs)
-        self.protocols.append(contentsOf: other.protocols)
-        assert(self.exposeToGlobal == other.exposeToGlobal)
-    }
-
     public var isEmpty: Bool {
         functions.isEmpty && classes.isEmpty && enums.isEmpty && structs.isEmpty && protocols.isEmpty
     }
@@ -1005,20 +1482,6 @@ public struct ImportedModuleSkeleton: Codable {
     }
 }
 
-// MARK: - Closure signature collection visitor
-
-public struct ClosureSignatureCollectorVisitor: BridgeTypeVisitor {
-    public var signatures: Set<ClosureSignature> = []
-
-    public init(signatures: Set<ClosureSignature> = []) {
-        self.signatures = signatures
-    }
-
-    public mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool) {
-        signatures.insert(signature)
-    }
-}
-
 // MARK: - Unified Skeleton
 
 /// Unified skeleton containing both exported and imported API definitions
@@ -1034,7 +1497,7 @@ public struct BridgeJSSkeleton: Codable {
     }
 }
 
-// MARK: - BridgeType extension
+// MARK: - BridgeType Extension
 
 extension BridgeType {
     /// Maps Swift primitive type names to BridgeType. Returns nil for unknown types.
@@ -1065,49 +1528,6 @@ extension BridgeType {
         case "OpaquePointer":
             self = .unsafePointer(.init(kind: .opaquePointer))
         default:
-            return nil
-        }
-    }
-
-    public var abiReturnType: WasmCoreType? {
-        switch self {
-        case .void: return nil
-        case .bool: return .i32
-        case .int, .uint: return .i32
-        case .float: return .f32
-        case .double: return .f64
-        case .string: return nil
-        case .jsObject: return .i32
-        case .jsValue: return nil
-        case .swiftHeapObject:
-            // UnsafeMutableRawPointer is returned as an i32 pointer
-            return .pointer
-        case .unsafePointer:
-            return .pointer
-        case .nullable:
-            return nil
-        case .caseEnum:
-            return .i32
-        case .rawValueEnum(_, let rawType):
-            return rawType.wasmCoreType
-        case .associatedValueEnum:
-            return nil
-        case .namespaceEnum:
-            return nil
-        case .swiftProtocol:
-            // Protocols pass JSObject IDs as Int32
-            return .i32
-        case .swiftStruct:
-            // Structs use stack-based return (no direct WASM return type)
-            return nil
-        case .closure:
-            // Closures pass callback ID as Int32
-            return .i32
-        case .array:
-            // Arrays use stack-based return with length prefix (no direct WASM return type)
-            return nil
-        case .dictionary:
-            // Dictionaries use stack-based return with entry count (no direct WASM return type)
             return nil
         }
     }
@@ -1180,42 +1600,9 @@ extension BridgeType {
         }
     }
 
-    /// Determines if an optional type requires side-channel communication for protocol property returns
-    ///
-    /// Side channels are needed when the wrapped type cannot be directly returned via WASM,
-    /// or when we need to distinguish null from absent value for certain primitives.
-    public func usesSideChannelForOptionalReturn() -> Bool {
-        guard case .nullable(let wrappedType, _) = self else {
-            return false
-        }
-
-        switch wrappedType {
-        case .string, .int, .float, .double, .jsObject, .swiftProtocol:
-            return true
-        case .rawValueEnum(_, let rawType):
-            switch rawType {
-            case .string, .int, .float, .double:
-                return true
-            default:
-                return false
-            }
-        case .bool, .caseEnum, .swiftHeapObject, .associatedValueEnum:
-            return false
-        default:
-            return false
-        }
-    }
-}
-
-extension WasmCoreType {
-    /// Returns a Swift statement that returns a placeholder value for this Wasm core type.
-    public var swiftReturnPlaceholderStmt: String {
-        switch self {
-        case .i32: return "return 0"
-        case .i64: return "return 0"
-        case .f32: return "return 0.0"
-        case .f64: return "return 0.0"
-        case .pointer: return "return UnsafeMutableRawPointer(bitPattern: -1).unsafelyUnwrapped"
-        }
+    public var usesSideChannelForOptionalReturn: Bool {
+        guard case .nullable = self else { return false }
+        if case .sideChannelReturn = descriptor.optionalConvention { return true }
+        return false
     }
 }

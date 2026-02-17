@@ -23,26 +23,22 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createPointHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                i32Stack.push((value.x | 0));
-                i32Stack.push((value.y | 0));
-                return { cleanup: undefined };
-            },
-            lift: () => {
-                const int = i32Stack.pop();
-                const int1 = i32Stack.pop();
-                return { x: int1, y: int };
-            }
-        });
-    };
+    const __bjs_createPointHelpers = () => ({
+        lower: (value) => {
+            i32Stack.push((value.x | 0));
+            i32Stack.push((value.y | 0));
+        },
+        lift: () => {
+            const int = i32Stack.pop();
+            const int1 = i32Stack.pop();
+            return { x: int1, y: int };
+        }
+    });
 
     return {
         /**
@@ -91,8 +87,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                const value = textDecoder.decode(bytes);
-                strStack.push(value);
+                strStack.push(textDecoder.decode(bytes));
             }
             bjs["swift_js_pop_i32"] = function() {
                 return i32Stack.pop();
@@ -109,22 +104,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
             }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
-            }
             bjs["swift_js_struct_lower_Point"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Point.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Point.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Point"] = function() {
                 const value = structHelpers.Point.lift();
@@ -244,7 +225,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PointHelpers = __bjs_createPointHelpers()();
+            const PointHelpers = __bjs_createPointHelpers();
             structHelpers.Point = PointHelpers;
 
             const exports = {

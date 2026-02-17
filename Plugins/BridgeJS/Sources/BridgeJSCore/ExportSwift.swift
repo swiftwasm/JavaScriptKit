@@ -20,23 +20,17 @@ import BridgeJSUtilities
 public class ExportSwift {
     let progress: ProgressReporting
     let moduleName: String
-    private let exposeToGlobal: Bool
     private var skeleton: ExportedSkeleton
-    private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
 
     public init(progress: ProgressReporting, moduleName: String, skeleton: ExportedSkeleton) {
         self.progress = progress
         self.moduleName = moduleName
-        self.exposeToGlobal = skeleton.exposeToGlobal
         self.skeleton = skeleton
     }
 
     /// Finalizes the export process and generates the bridge code
     ///
-    /// - Parameters:
-    ///   - exposeToGlobal: Whether to expose exported APIs to the global namespace (default: false)
-    /// - Returns: A tuple containing the generated Swift code and a skeleton
-    /// describing the exported APIs
+    /// - Returns: The generated Swift glue code, or nil if skeleton is empty
     public func finalize() throws -> String? {
         guard let outputSwift = try renderSwiftGlue() else {
             return nil
@@ -101,7 +95,6 @@ public class ExportSwift {
         var parameters: [Parameter] = []
         var abiParameterSignatures: [(name: String, type: WasmCoreType)] = []
         var abiReturnType: WasmCoreType?
-        var externDecls: [DeclSyntax] = []
         let effects: Effects
 
         init(effects: Effects) {
@@ -119,12 +112,12 @@ public class ExportSwift {
 
         func liftParameter(param: Parameter) throws {
             parameters.append(param)
-            let liftingInfo = try param.type.liftParameterInfo()
+            let liftingParams = try param.type.liftParameterInfo()
             let argumentsToLift: [String]
-            if liftingInfo.parameters.count == 1 {
+            if liftingParams.count == 1 {
                 argumentsToLift = [param.name]
             } else {
-                argumentsToLift = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
+                argumentsToLift = liftingParams.map { (name, _) in param.name + name.capitalizedFirstLetter }
             }
 
             let typeNameForIntrinsic: String
@@ -134,47 +127,34 @@ public class ExportSwift {
             case .closure(let signature, _):
                 typeNameForIntrinsic = param.type.swiftType
                 liftingExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.name))")
-            case .swiftStruct(let structName):
-                typeNameForIntrinsic = structName
-                liftingExpr = ExprSyntax("\(raw: structName).bridgeJSLiftParameter()")
             case .array:
                 typeNameForIntrinsic = param.type.swiftType
                 liftingExpr = StackCodegen().liftExpression(for: param.type)
             case .nullable(let wrappedType, let kind):
-                let optionalSwiftType: String
-                if case .null = kind {
-                    optionalSwiftType = "Optional"
-                } else {
-                    optionalSwiftType = "JSUndefinedOr"
-                }
-                typeNameForIntrinsic = "\(optionalSwiftType)<\(wrappedType.swiftType)>"
+                let optionalSwiftType: String =
+                    if case .null = kind { "Optional" } else { "JSUndefinedOr" }
+                let wrappedName: String =
+                    if case .cast(let name) = wrappedType.descriptor.accessorTransform { name } else {
+                        wrappedType.swiftType
+                    }
+                typeNameForIntrinsic = "\(optionalSwiftType)<\(wrappedName)>"
                 liftingExpr = ExprSyntax(
                     "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
             default:
-                typeNameForIntrinsic = param.type.swiftType
+                if case .cast(let name) = param.type.descriptor.accessorTransform {
+                    typeNameForIntrinsic = name
+                } else {
+                    typeNameForIntrinsic = param.type.swiftType
+                }
                 liftingExpr = ExprSyntax(
                     "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
             }
 
             liftedParameterExprs.append(liftingExpr)
-            for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
+            for (name, type) in zip(argumentsToLift, liftingParams.map { $0.type }) {
                 abiParameterSignatures.append((name, type))
-            }
-        }
-
-        private func protocolCastSuffix(for returnType: BridgeType) -> (prefix: String, suffix: String) {
-            switch returnType {
-            case .swiftProtocol:
-                return ("", " as! \(returnType.swiftType)")
-            case .nullable(let wrappedType, _):
-                if case .swiftProtocol = wrappedType {
-                    return ("(", ").flatMap { $0 as? \(wrappedType.swiftType) }")
-                }
-                return ("", "")
-            default:
-                return ("", "")
             }
         }
 
@@ -211,10 +191,9 @@ public class ExportSwift {
             if returnType == .void {
                 return CodeBlockItemSyntax(item: .init(ExpressionStmtSyntax(expression: callExpr)))
             } else {
-                let (prefix, suffix) = protocolCastSuffix(for: returnType)
-                return CodeBlockItemSyntax(
-                    item: .init(DeclSyntax("let ret = \(raw: prefix)\(raw: callExpr)\(raw: suffix)"))
-                )
+                let binding = returnType.descriptor.accessorTransform
+                    .applyToReturnBinding("\(callExpr)", isOptional: returnType.isOptional)
+                return CodeBlockItemSyntax(item: .init(DeclSyntax("\(raw: binding)")))
             }
         }
 
@@ -228,8 +207,9 @@ public class ExportSwift {
             if returnType == .void {
                 append("\(raw: name)")
             } else {
-                let (prefix, suffix) = protocolCastSuffix(for: returnType)
-                append("let ret = \(raw: prefix)\(raw: name)\(raw: suffix)")
+                let binding = returnType.descriptor.accessorTransform
+                    .applyToReturnBinding(name, isOptional: returnType.isOptional)
+                append("\(raw: binding)")
             }
         }
 
@@ -246,14 +226,7 @@ public class ExportSwift {
         /// Generates intermediate variables for stack-using parameters if needed for LIFO compatibility
         private func generateParameterLifting() {
             let stackParamIndices = parameters.enumerated().compactMap { index, param -> Int? in
-                switch param.type {
-                case .swiftStruct, .nullable(.swiftStruct, _),
-                    .associatedValueEnum, .nullable(.associatedValueEnum, _),
-                    .array:
-                    return index
-                default:
-                    return nil
-                }
+                param.type.descriptor.usesStackLifting ? index : nil
             }
 
             guard stackParamIndices.count > 1 else { return }
@@ -270,11 +243,13 @@ public class ExportSwift {
 
         func callPropertyGetter(propertyName: String, returnType: BridgeType) {
             let (_, selfExpr) = removeFirstLiftedParameter()
+            let expr = "\(selfExpr).\(propertyName)"
             if returnType == .void {
-                append("\(raw: selfExpr).\(raw: propertyName)")
+                append("\(raw: expr)")
             } else {
-                let (prefix, suffix) = protocolCastSuffix(for: returnType)
-                append("let ret = \(raw: prefix)\(raw: selfExpr).\(raw: propertyName)\(raw: suffix)")
+                let binding = returnType.descriptor.accessorTransform
+                    .applyToReturnBinding(expr, isOptional: returnType.isOptional)
+                append("\(raw: binding)")
             }
         }
 
@@ -299,8 +274,7 @@ public class ExportSwift {
         }
 
         private func _lowerReturnValue(returnType: BridgeType) throws {
-            let loweringInfo = try returnType.loweringReturnInfo()
-            abiReturnType = loweringInfo.returnType
+            abiReturnType = try returnType.loweringReturnInfo()
             if returnType == .void {
                 return
             }
@@ -736,10 +710,6 @@ struct StackCodegen {
     /// - Returns: An ExprSyntax representing the lift expression
     func liftExpression(for type: BridgeType) -> ExprSyntax {
         switch type {
-        case .string, .int, .uint, .bool, .float, .double,
-            .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject, .unsafePointer,
-            .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum:
-            return "\(raw: type.swiftType).bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: className)(unsafelyWrapping: JSObject.bridgeJSStackPop())"
         case .nullable(let wrappedType, let kind):
@@ -748,24 +718,38 @@ struct StackCodegen {
             return liftArrayExpression(elementType: elementType)
         case .dictionary(let valueType):
             return liftDictionaryExpression(valueType: valueType)
-        case .closure:
-            return "JSObject.bridgeJSStackPop()"
         case .void, .namespaceEnum:
             return "()"
+        default:
+            return "\(raw: type.swiftType).bridgeJSStackPop()"
         }
     }
 
     func liftArrayExpression(elementType: BridgeType) -> ExprSyntax {
-        switch elementType {
-        case .jsObject(let className?) where className != "JSObject":
+        if case .jsObject(let className?) = elementType, className != "JSObject" {
             return "[JSObject].bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
-        case .nullable, .closure:
-            return liftArrayExpressionInline(elementType: elementType)
-        case .void, .namespaceEnum:
-            fatalError("Invalid array element type: \(elementType)")
-        default:
-            return "[\(raw: elementType.swiftType)].bridgeJSStackPop()"
         }
+        if elementType.needsInlineCollectionHandling {
+            return liftArrayExpressionInline(elementType: elementType)
+        }
+        return "[\(raw: elementType.swiftType)].bridgeJSStackPop()"
+    }
+
+    func liftDictionaryExpression(valueType: BridgeType) -> ExprSyntax {
+        if case .jsObject(let className?) = valueType, className != "JSObject" {
+            return """
+                {
+                    let __dict = [String: JSObject].bridgeJSStackPop()
+                    return __dict.mapValues { \(raw: className)(unsafelyWrapping: $0) }
+                }()
+                """
+        }
+        if valueType.needsInlineCollectionHandling {
+            return liftDictionaryExpressionInline(valueType: valueType)
+        }
+        if case .void = valueType { fatalError("Invalid dictionary value type: \(valueType)") }
+        if case .namespaceEnum = valueType { fatalError("Invalid dictionary value type: \(valueType)") }
+        return "[String: \(raw: valueType.swiftType)].bridgeJSStackPop()"
     }
 
     private func liftArrayExpressionInline(elementType: BridgeType) -> ExprSyntax {
@@ -783,24 +767,6 @@ struct StackCodegen {
                 return __result
             }()
             """
-    }
-
-    func liftDictionaryExpression(valueType: BridgeType) -> ExprSyntax {
-        switch valueType {
-        case .jsObject(let className?) where className != "JSObject":
-            return """
-                {
-                    let __dict = [String: JSObject].bridgeJSStackPop()
-                    return __dict.mapValues { \(raw: className)(unsafelyWrapping: $0) }
-                }()
-                """
-        case .nullable, .closure:
-            return liftDictionaryExpressionInline(valueType: valueType)
-        case .void, .namespaceEnum:
-            fatalError("Invalid dictionary value type: \(valueType)")
-        default:
-            return "[String: \(raw: valueType.swiftType)].bridgeJSStackPop()"
-        }
     }
 
     private func liftDictionaryExpressionInline(valueType: BridgeType) -> ExprSyntax {
@@ -824,14 +790,10 @@ struct StackCodegen {
     private func liftNullableExpression(wrappedType: BridgeType, kind: JSOptionalKind) -> ExprSyntax {
         let typeName = kind == .null ? "Optional" : "JSUndefinedOr"
         switch wrappedType {
-        case .string, .int, .uint, .bool, .float, .double, .jsObject(nil), .jsValue,
-            .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum,
-            .array, .dictionary:
-            return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
-        case .jsObject(let className?):
+        case .jsObject(let className?) where className != "JSObject":
             return "\(raw: typeName)<JSObject>.bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
-        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol:
-            fatalError("Invalid nullable wrapped type: \(wrappedType)")
+        default:
+            return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
         }
     }
 
@@ -847,24 +809,23 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch type {
-        case .string, .int, .uint, .bool, .float, .double, .jsValue,
-            .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
-            .caseEnum, .rawValueEnum:
-            return ["\(raw: accessor).bridgeJSStackPush()"]
-        case .jsObject(_?):
-            return ["\(raw: accessor).jsObject.bridgeJSStackPush()"]
-        case .swiftProtocol:
-            return ["(\(raw: accessor) as! \(raw: type.swiftType)).bridgeJSStackPush()"]
-        case .associatedValueEnum, .swiftStruct:
-            return ["\(raw: accessor).bridgeJSStackPush()"]
         case .nullable(let wrappedType, _):
             return lowerOptionalStatements(wrappedType: wrappedType, accessor: accessor, varPrefix: varPrefix)
-        case .void, .namespaceEnum:
-            return []
         case .array(let elementType):
             return lowerArrayStatements(elementType: elementType, accessor: accessor, varPrefix: varPrefix)
         case .dictionary(let valueType):
             return lowerDictionaryStatements(valueType: valueType, accessor: accessor, varPrefix: varPrefix)
+        default:
+            break
+        }
+
+        let desc = type.descriptor
+        let transformed = desc.accessorTransform.apply(accessor)
+        switch desc.lowerMethod {
+        case .stackReturn, .fullReturn, .pushParameter:
+            return ["\(raw: transformed).bridgeJSStackPush()"]
+        case .none:
+            return []
         }
     }
 
@@ -873,22 +834,32 @@ struct StackCodegen {
         accessor: String,
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
-        switch elementType {
-        case .jsObject(let className?) where className != "JSObject":
-            return ["\(raw: accessor).map { $0.jsObject }.bridgeJSStackPush()"]
-        case .swiftProtocol:
-            return ["\(raw: accessor).map { $0 as! \(raw: elementType.swiftType) }.bridgeJSStackPush()"]
-        case .nullable, .closure:
-            return lowerArrayStatementsInline(
-                elementType: elementType,
-                accessor: accessor,
-                varPrefix: varPrefix
-            )
-        case .void, .namespaceEnum:
-            fatalError("Invalid array element type: \(elementType)")
-        default:
-            return ["\(raw: accessor).bridgeJSStackPush()"]
+        if elementType.needsInlineCollectionHandling {
+            return lowerArrayStatementsInline(elementType: elementType, accessor: accessor, varPrefix: varPrefix)
         }
+        return lowerCollectionSimple(elementType: elementType, accessor: accessor, mapMethod: "map")
+    }
+
+    private func lowerDictionaryStatements(
+        valueType: BridgeType,
+        accessor: String,
+        varPrefix: String
+    ) -> [CodeBlockItemSyntax] {
+        if valueType.needsInlineCollectionHandling {
+            return lowerDictionaryStatementsInline(valueType: valueType, accessor: accessor, varPrefix: varPrefix)
+        }
+        return lowerCollectionSimple(elementType: valueType, accessor: accessor, mapMethod: "mapValues")
+    }
+
+    private func lowerCollectionSimple(
+        elementType: BridgeType,
+        accessor: String,
+        mapMethod: String
+    ) -> [CodeBlockItemSyntax] {
+        if let mapClosure = elementType.descriptor.accessorTransform.mapClosure {
+            return ["\(raw: accessor).\(raw: mapMethod) { \(raw: mapClosure) }.bridgeJSStackPush()"]
+        }
+        return ["\(raw: accessor).bridgeJSStackPush()"]
     }
 
     private func lowerArrayStatementsInline(
@@ -913,29 +884,6 @@ struct StackCodegen {
         statements.append("_swift_js_push_i32(Int32(\(accessor).count))")
         let parsed: CodeBlockItemListSyntax = "\(raw: statements.joined(separator: "\n"))"
         return Array(parsed)
-    }
-
-    private func lowerDictionaryStatements(
-        valueType: BridgeType,
-        accessor: String,
-        varPrefix: String
-    ) -> [CodeBlockItemSyntax] {
-        switch valueType {
-        case .jsObject(let className?) where className != "JSObject":
-            return ["\(raw: accessor).mapValues { $0.jsObject }.bridgeJSStackPush()"]
-        case .swiftProtocol:
-            return ["\(raw: accessor).mapValues { $0 as! \(raw: valueType.swiftType) }.bridgeJSStackPush()"]
-        case .nullable, .closure:
-            return lowerDictionaryStatementsInline(
-                valueType: valueType,
-                accessor: accessor,
-                varPrefix: varPrefix
-            )
-        case .void, .namespaceEnum:
-            fatalError("Invalid dictionary value type: \(valueType)")
-        default:
-            return ["\(raw: accessor).bridgeJSStackPush()"]
-        }
     }
 
     private func lowerDictionaryStatementsInline(
@@ -977,11 +925,8 @@ struct StackCodegen {
         accessor: String,
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
-        switch wrappedType {
-        case .array, .dictionary, .swiftStruct:
+        if wrappedType.descriptor.optionalConvention == .stackABI {
             return ["\(raw: accessor).bridgeJSStackPush()"]
-        default:
-            break
         }
 
         var statements: [String] = []
@@ -1006,16 +951,12 @@ struct StackCodegen {
         wrappedType: BridgeType,
         unwrappedVar: String
     ) -> [CodeBlockItemSyntax] {
-        switch wrappedType {
-        case .jsObject(_?):
-            return ["\(raw: unwrappedVar).jsObject.bridgeJSStackPush()"]
-        case .swiftProtocol:
-            return ["(\(raw: unwrappedVar) as! \(raw: wrappedType.swiftType)).bridgeJSStackPush()"]
-        case .string, .int, .uint, .bool, .float, .double, .jsValue,
-            .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
-            .caseEnum, .rawValueEnum, .associatedValueEnum:
-            return ["\(raw: unwrappedVar).bridgeJSStackPush()"]
-        default:
+        let desc = wrappedType.descriptor
+        let transformed = desc.accessorTransform.apply(unwrappedVar)
+        switch desc.lowerMethod {
+        case .stackReturn, .fullReturn, .pushParameter:
+            return ["\(raw: transformed).bridgeJSStackPush()"]
+        case .none:
             return ["preconditionFailure(\"BridgeJS: unsupported optional wrapped type\")"]
         }
     }
@@ -1243,10 +1184,7 @@ struct StructCodegen {
             printer.write(
                 multilineString: """
                     \(accessControl)init(unsafelyCopying jsObject: JSObject) {
-                        let __bjs_cleanupId = \(lowerFunctionName)(jsObject.bridgeJSLowerParameter())
-                        defer {
-                            _swift_js_struct_cleanup(__bjs_cleanupId)
-                        }
+                        \(lowerFunctionName)(jsObject.bridgeJSLowerParameter())
                         self = Self.bridgeJSStackPop()
                     }
                     """
@@ -1274,7 +1212,7 @@ struct StructCodegen {
             functionName: lowerFunctionName,
             signature: SwiftSignatureBuilder.buildABIFunctionSignature(
                 abiParameters: [("objectId", .i32)],
-                returnType: .i32
+                returnType: nil
             )
         )
         let liftExternDeclPrinter = CodeFragmentPrinter()
@@ -1603,137 +1541,31 @@ extension BridgeType {
         }
     }
 
-    var isClosureType: Bool {
-        if case .closure = self { return true }
-        return false
-    }
-
-    struct LiftingIntrinsicInfo: Sendable {
-        let parameters: [(name: String, type: WasmCoreType)]
-
-        static let bool = LiftingIntrinsicInfo(parameters: [("value", .i32)])
-        static let int = LiftingIntrinsicInfo(parameters: [("value", .i32)])
-        static let float = LiftingIntrinsicInfo(parameters: [("value", .f32)])
-        static let double = LiftingIntrinsicInfo(parameters: [("value", .f64)])
-        static let string = LiftingIntrinsicInfo(parameters: [("bytes", .i32), ("length", .i32)])
-        static let jsObject = LiftingIntrinsicInfo(parameters: [("value", .i32)])
-        static let jsValue = LiftingIntrinsicInfo(parameters: [("kind", .i32), ("payload1", .i32), ("payload2", .f64)])
-        static let swiftHeapObject = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
-        static let unsafePointer = LiftingIntrinsicInfo(parameters: [("pointer", .pointer)])
-        static let void = LiftingIntrinsicInfo(parameters: [])
-        static let caseEnum = LiftingIntrinsicInfo(parameters: [("value", .i32)])
-        static let associatedValueEnum = LiftingIntrinsicInfo(parameters: [
-            ("caseId", .i32)
-        ])
-    }
-
-    func liftParameterInfo() throws -> LiftingIntrinsicInfo {
+    func liftParameterInfo() throws -> [(name: String, type: WasmCoreType)] {
         switch self {
-        case .bool: return .bool
-        case .int, .uint: return .int
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        case .jsObject: return .jsObject
-        case .jsValue: return .jsValue
-        case .swiftHeapObject: return .swiftHeapObject
-        case .unsafePointer: return .unsafePointer
-        case .swiftProtocol: return .jsObject
-        case .void: return .void
         case .nullable(let wrappedType, _):
-            let wrappedInfo = try wrappedType.liftParameterInfo()
-            if wrappedInfo.parameters.isEmpty {
-                return LiftingIntrinsicInfo(parameters: [])
+            let wrappedParams = try wrappedType.liftParameterInfo()
+            if wrappedParams.isEmpty {
+                return []
             }
             var optionalParams: [(name: String, type: WasmCoreType)] = [("isSome", .i32)]
-            optionalParams.append(contentsOf: wrappedInfo.parameters)
-            return LiftingIntrinsicInfo(parameters: optionalParams)
-        case .caseEnum: return .caseEnum
-        case .rawValueEnum(_, let rawType):
-            return rawType.liftingIntrinsicInfo
-        case .associatedValueEnum:
-            return .associatedValueEnum
-        case .swiftStruct:
-            return LiftingIntrinsicInfo(parameters: [])
+            optionalParams.append(contentsOf: wrappedParams)
+            return optionalParams
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
-        case .closure:
-            return LiftingIntrinsicInfo(parameters: [("callbackId", .i32)])
-        case .array, .dictionary:
-            return LiftingIntrinsicInfo(parameters: [])
+        default:
+            return descriptor.wasmParams
         }
     }
 
-    struct LoweringIntrinsicInfo: Sendable {
-        let returnType: WasmCoreType?
-
-        static let bool = LoweringIntrinsicInfo(returnType: .i32)
-        static let int = LoweringIntrinsicInfo(returnType: .i32)
-        static let float = LoweringIntrinsicInfo(returnType: .f32)
-        static let double = LoweringIntrinsicInfo(returnType: .f64)
-        static let string = LoweringIntrinsicInfo(returnType: nil)
-        static let jsObject = LoweringIntrinsicInfo(returnType: .i32)
-        static let jsValue = LoweringIntrinsicInfo(returnType: nil)
-        static let swiftHeapObject = LoweringIntrinsicInfo(returnType: .pointer)
-        static let unsafePointer = LoweringIntrinsicInfo(returnType: .pointer)
-        static let void = LoweringIntrinsicInfo(returnType: nil)
-        static let caseEnum = LoweringIntrinsicInfo(returnType: .i32)
-        static let rawValueEnum = LoweringIntrinsicInfo(returnType: .i32)
-        static let associatedValueEnum = LoweringIntrinsicInfo(returnType: nil)
-        static let swiftStruct = LoweringIntrinsicInfo(returnType: nil)
-        static let optional = LoweringIntrinsicInfo(returnType: nil)
-        static let array = LoweringIntrinsicInfo(returnType: nil)
-    }
-
-    func loweringReturnInfo() throws -> LoweringIntrinsicInfo {
+    func loweringReturnInfo() throws -> WasmCoreType? {
         switch self {
-        case .bool: return .bool
-        case .int, .uint: return .int
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        case .jsObject: return .jsObject
-        case .jsValue: return .jsValue
-        case .swiftHeapObject: return .swiftHeapObject
-        case .unsafePointer: return .unsafePointer
-        case .swiftProtocol: return .jsObject
-        case .void: return .void
-        case .nullable: return .optional
-        case .caseEnum: return .caseEnum
-        case .rawValueEnum(_, let rawType):
-            return rawType.loweringIntrinsicInfo
-        case .associatedValueEnum:
-            return .associatedValueEnum
-        case .swiftStruct:
-            return .swiftStruct
+        case .nullable:
+            return nil
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
-        case .closure:
-            return .jsObject
-        case .array, .dictionary:
-            return .array
-        }
-    }
-}
-
-extension SwiftEnumRawType {
-    var liftingIntrinsicInfo: BridgeType.LiftingIntrinsicInfo {
-        switch self {
-        case .bool: return .bool
-        case .int, .int32, .int64, .uint, .uint32, .uint64: return .int
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        }
-    }
-
-    var loweringIntrinsicInfo: BridgeType.LoweringIntrinsicInfo {
-        switch self {
-        case .bool: return .bool
-        case .int, .int32, .int64, .uint, .uint32, .uint64: return .int
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
+        default:
+            return descriptor.wasmReturnType
         }
     }
 }
@@ -1765,17 +1597,6 @@ extension DeclModifierSyntax {
         }
     }
 
-    var isAtLeastPackage: Bool {
-        switch self.name.tokenKind {
-        case .keyword(.private): false
-        case .keyword(.fileprivate): false
-        case .keyword(.internal): true
-        case .keyword(.package): true
-        case .keyword(.public): true
-        case .keyword(.open): true
-        default: false
-        }
-    }
 }
 
 extension WithModifiersSyntax {

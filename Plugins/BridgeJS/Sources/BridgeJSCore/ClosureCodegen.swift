@@ -123,23 +123,23 @@ public struct ClosureCodegen {
 
         for (index, paramType) in signature.parameters.enumerated() {
             let paramName = "param\(index)"
-            let liftInfo = try paramType.liftParameterInfo()
+            let liftParams = try paramType.liftParameterInfo()
 
-            for (argName, wasmType) in liftInfo.parameters {
+            for (argName, wasmType) in liftParams {
                 let fullName =
-                    liftInfo.parameters.count > 1 ? "\(paramName)\(argName.capitalizedFirstLetter)" : paramName
+                    liftParams.count > 1 ? "\(paramName)\(argName.capitalizedFirstLetter)" : paramName
                 abiParams.append((fullName, wasmType))
             }
 
-            let argNames = liftInfo.parameters.map { (argName, _) in
-                liftInfo.parameters.count > 1 ? "\(paramName)\(argName.capitalizedFirstLetter)" : paramName
+            let argNames = liftParams.map { (argName, _) in
+                liftParams.count > 1 ? "\(paramName)\(argName.capitalizedFirstLetter)" : paramName
             }
             liftedParams.append("\(paramType.swiftType).bridgeJSLiftParameter(\(argNames.joined(separator: ", ")))")
         }
 
         let closureCallExpr = ExprSyntax("closure(\(raw: liftedParams.joined(separator: ", ")))")
 
-        let abiReturnWasmType = try signature.returnType.loweringReturnInfo().returnType
+        let abiReturnWasmType = try signature.returnType.loweringReturnInfo()
 
         // Build signature using SwiftSignatureBuilder
         let funcSignature = SwiftSignatureBuilder.buildABIFunctionSignature(

@@ -23,7 +23,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -166,8 +165,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                const value = textDecoder.decode(bytes);
-                strStack.push(value);
+                strStack.push(textDecoder.decode(bytes));
             }
             bjs["swift_js_pop_i32"] = function() {
                 return i32Stack.pop();
@@ -183,16 +181,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
-            }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -319,7 +307,6 @@ export async function createInstantiator(options, swift) {
                     }
                     arrayResult.reverse();
                     let ret = imports.jsEchoJSValueArray(arrayResult);
-                    const arrayCleanups = [];
                     for (const elem of ret) {
                         const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
                         i32Stack.push(elemKind);
@@ -370,15 +357,39 @@ export async function createInstantiator(options, swift) {
                 constructor(value, optionalValue) {
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     const isSome = optionalValue != null;
-                    const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
-                    const ret = instance.exports.bjs_JSValueHolder_init(valueKind, valuePayload1, valuePayload2, +isSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2);
+                    let result;
+                    let result1;
+                    let result2;
+                    if (isSome) {
+                        const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
+                        result = optionalValueKind;
+                        result1 = optionalValuePayload1;
+                        result2 = optionalValuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    const ret = instance.exports.bjs_JSValueHolder_init(valueKind, valuePayload1, valuePayload2, +isSome, result, result1, result2);
                     return JSValueHolder.__construct(ret);
                 }
                 update(value, optionalValue) {
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     const isSome = optionalValue != null;
-                    const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
-                    instance.exports.bjs_JSValueHolder_update(this.pointer, valueKind, valuePayload1, valuePayload2, +isSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2);
+                    let result;
+                    let result1;
+                    let result2;
+                    if (isSome) {
+                        const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
+                        result = optionalValueKind;
+                        result1 = optionalValuePayload1;
+                        result2 = optionalValuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    instance.exports.bjs_JSValueHolder_update(this.pointer, valueKind, valuePayload1, valuePayload2, +isSome, result, result1, result2);
                 }
                 echo(value) {
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
@@ -391,8 +402,20 @@ export async function createInstantiator(options, swift) {
                 }
                 echoOptional(value) {
                     const isSome = value != null;
-                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
-                    instance.exports.bjs_JSValueHolder_echoOptional(this.pointer, +isSome, valueKind, valuePayload1, valuePayload2);
+                    let result;
+                    let result1;
+                    let result2;
+                    if (isSome) {
+                        const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
+                        result = valueKind;
+                        result1 = valuePayload1;
+                        result2 = valuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    instance.exports.bjs_JSValueHolder_echoOptional(this.pointer, +isSome, result, result1, result2);
                     const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
@@ -435,8 +458,20 @@ export async function createInstantiator(options, swift) {
                 }
                 set optionalValue(value) {
                     const isSome = value != null;
-                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
-                    instance.exports.bjs_JSValueHolder_optionalValue_set(this.pointer, +isSome, valueKind, valuePayload1, valuePayload2);
+                    let result;
+                    let result1;
+                    let result2;
+                    if (isSome) {
+                        const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
+                        result = valueKind;
+                        result1 = valuePayload1;
+                        result2 = valuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    instance.exports.bjs_JSValueHolder_optionalValue_set(this.pointer, +isSome, result, result1, result2);
                 }
             }
             const exports = {
@@ -452,8 +487,20 @@ export async function createInstantiator(options, swift) {
                 },
                 roundTripOptionalJSValue: function bjs_roundTripOptionalJSValue(value) {
                     const isSome = value != null;
-                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
-                    instance.exports.bjs_roundTripOptionalJSValue(+isSome, valueKind, valuePayload1, valuePayload2);
+                    let result;
+                    let result1;
+                    let result2;
+                    if (isSome) {
+                        const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
+                        result = valueKind;
+                        result1 = valuePayload1;
+                        result2 = valuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    instance.exports.bjs_roundTripOptionalJSValue(+isSome, result, result1, result2);
                     const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
@@ -468,7 +515,6 @@ export async function createInstantiator(options, swift) {
                     return optResult;
                 },
                 roundTripJSValueArray: function bjs_roundTripJSValueArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
                         i32Stack.push(elemKind);
@@ -487,14 +533,11 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(jsValue);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 roundTripOptionalJSValueArray: function bjs_roundTripOptionalJSValueArray(values) {
                     const isSome = values != null;
-                    const valuesCleanups = [];
                     if (isSome) {
-                        const arrayCleanups = [];
                         for (const elem of values) {
                             const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
                             i32Stack.push(elemKind);
@@ -502,7 +545,6 @@ export async function createInstantiator(options, swift) {
                             f64Stack.push(elemPayload2);
                         }
                         i32Stack.push(values.length);
-                        valuesCleanups.push(() => { for (const cleanup of arrayCleanups) { cleanup(); } });
                     }
                     i32Stack.push(+isSome);
                     instance.exports.bjs_roundTripOptionalJSValueArray();
@@ -523,7 +565,6 @@ export async function createInstantiator(options, swift) {
                     } else {
                         optResult = null;
                     }
-                    for (const cleanup of valuesCleanups) { cleanup(); }
                     return optResult;
                 },
             };

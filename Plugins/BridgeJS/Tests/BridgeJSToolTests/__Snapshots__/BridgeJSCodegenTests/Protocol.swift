@@ -544,7 +544,7 @@ public func _bjs_MyViewController_sendHelper(_ _self: UnsafeMutableRawPointer, _
 @_cdecl("bjs_MyViewController_delegate_get")
 public func _bjs_MyViewController_delegate_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = MyViewController.bridgeJSLiftParameter(_self).delegate as! AnyMyViewControllerDelegate
+    let ret = (MyViewController.bridgeJSLiftParameter(_self).delegate as! AnyMyViewControllerDelegate)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

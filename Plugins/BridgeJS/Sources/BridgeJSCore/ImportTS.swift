@@ -103,31 +103,27 @@ public struct ImportTS {
         }
 
         func lowerParameter(param: Parameter) throws {
-            let loweringInfo = try param.type.loweringParameterInfo(context: context)
+            let loweredParams = try param.type.loweringParameterInfo(context: context)
 
             switch param.type {
             case .closure(let signature, useJSTypedClosure: false):
                 let jsTypedClosureType = BridgeType.closure(signature, useJSTypedClosure: true).swiftType
                 body.write("let \(param.name) = \(jsTypedClosureType)(\(param.name))")
-                // The just created JSObject is not owned by the caller unlike those passed in parameters,
-                // so we need to extend its lifetime during the call to ensure the JSObject.id is valid.
                 valuesToExtendLifetimeDuringCall.append(param.name)
             default:
                 break
             }
             let initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
 
-            if loweringInfo.loweredParameters.isEmpty {
+            if loweredParams.isEmpty {
                 stackLoweringStmts.insert("let _ = \(initializerExpr)", at: 0)
                 return
             }
 
-            // Generate destructured variable names for all lowered parameters
-            let destructuredNames = loweringInfo.loweredParameters.map {
+            let destructuredNames = loweredParams.map {
                 "\(param.name)\($0.name.capitalizedFirstLetter)"
             }
 
-            // Always add destructuring statement to body (unified for single and multiple)
             let pattern: String
             if destructuredNames.count == 1 {
                 pattern = destructuredNames[0]
@@ -138,31 +134,26 @@ public struct ImportTS {
             body.write("let \(pattern) = \(initializerExpr)")
             destructuredVarNames.append(contentsOf: destructuredNames)
 
-            // Add to signatures and forwardings (unified for both single and multiple)
-            for (index, (paramName, type)) in loweringInfo.loweredParameters.enumerated() {
-                // For single parameter, use param.name; for multiple, use constructed name
+            for (index, (paramName, type)) in loweredParams.enumerated() {
                 let abiParamName: String
-                if loweringInfo.loweredParameters.count == 1 {
+                if loweredParams.count == 1 {
                     abiParamName = param.name
                 } else {
                     abiParamName = "\(param.name)\(paramName.capitalizedFirstLetter)"
                 }
                 abiParameterSignatures.append((abiParamName, type))
-
-                // Always use destructured variable in call without labels
-                // Swift allows omitting labels when they match parameter names
                 abiParameterForwardings.append(destructuredNames[index])
             }
         }
 
         func call(returnType: BridgeType) throws {
-            let liftingInfo: BridgeType.LiftingReturnInfo = try returnType.liftingReturnInfo(context: context)
+            let liftingReturn = try returnType.liftingReturnType(context: context)
             for stmt in stackLoweringStmts {
                 body.write(stmt.description)
             }
 
             let assign =
-                (returnType == .void || returnType.usesSideChannelForOptionalReturn() || liftingInfo.valueToLift == nil)
+                (returnType == .void || returnType.usesSideChannelForOptionalReturn || liftingReturn == nil)
                 ? "" : "let ret = "
             let callExpr = "\(abiName)(\(abiParameterForwardings.joined(separator: ", ")))"
 
@@ -185,25 +176,24 @@ public struct ImportTS {
         }
 
         func liftReturnValue(returnType: BridgeType) throws {
-            let liftingInfo = try returnType.liftingReturnInfo(context: context)
+            let liftingReturn = try returnType.liftingReturnType(context: context)
 
             if returnType == .void {
                 abiReturnType = nil
                 return
             }
 
-            if returnType.usesSideChannelForOptionalReturn() {
-                // Side channel returns: extern function returns Void, value is retrieved via side channel
+            if returnType.usesSideChannelForOptionalReturn {
                 abiReturnType = nil
                 body.write("return \(returnType.swiftType).bridgeJSLiftReturnFromSideChannel()")
             } else {
-                abiReturnType = liftingInfo.valueToLift
+                abiReturnType = liftingReturn
                 let liftExpr: String
                 switch returnType {
                 case .closure(let signature, _):
                     liftExpr = "_BJS_Closure_\(signature.mangleName).bridgeJSLift(ret)"
                 default:
-                    if liftingInfo.valueToLift != nil {
+                    if liftingReturn != nil {
                         liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn(ret)"
                     } else {
                         liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn()"
@@ -693,145 +683,42 @@ enum SwiftCodePattern {
 }
 
 extension BridgeType {
-    struct LoweringParameterInfo {
-        let loweredParameters: [(name: String, type: WasmCoreType)]
-
-        static let bool = LoweringParameterInfo(loweredParameters: [("value", .i32)])
-        static let int = LoweringParameterInfo(loweredParameters: [("value", .i32)])
-        static let float = LoweringParameterInfo(loweredParameters: [("value", .f32)])
-        static let double = LoweringParameterInfo(loweredParameters: [("value", .f64)])
-        static let string = LoweringParameterInfo(loweredParameters: [("value", .i32)])
-        static let jsObject = LoweringParameterInfo(loweredParameters: [("value", .i32)])
-        static let jsValue = LoweringParameterInfo(loweredParameters: [
-            ("kind", .i32),
-            ("payload1", .i32),
-            ("payload2", .f64),
-        ])
-        static let void = LoweringParameterInfo(loweredParameters: [])
-    }
-
-    func loweringParameterInfo(context: BridgeContext = .importTS) throws -> LoweringParameterInfo {
+    func loweringParameterInfo(context: BridgeContext = .importTS) throws -> [(name: String, type: WasmCoreType)] {
         switch self {
-        case .bool: return .bool
-        case .int, .uint: return .int
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        case .jsObject: return .jsObject
-        case .jsValue: return .jsValue
-        case .void: return .void
-        case .closure:
-            // Swift closure is passed to JS as a JS function reference.
-            return LoweringParameterInfo(loweredParameters: [("funcRef", .i32)])
-        case .unsafePointer:
-            return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
-        case .swiftHeapObject:
-            return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
-        case .swiftProtocol:
-            throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
-        case .caseEnum:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                return LoweringParameterInfo(loweredParameters: [("value", .i32)])
-            }
-        case .rawValueEnum(_, let rawType):
-            let wasmType = rawType.wasmCoreType ?? .i32
-            return LoweringParameterInfo(loweredParameters: [("value", wasmType)])
-        case .associatedValueEnum:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                return LoweringParameterInfo(loweredParameters: [("caseId", .i32)])
-            }
-        case .swiftStruct:
-            switch context {
-            case .importTS:
-                // Swift structs are bridged as JS objects (object IDs) in imported signatures.
-                return LoweringParameterInfo(loweredParameters: [("objectId", .i32)])
-            case .exportSwift:
-                return LoweringParameterInfo(loweredParameters: [])
-            }
+        case .nullable(let wrappedType, _):
+            let wrappedParams = try wrappedType.loweringParameterInfo(context: context)
+            return [("isSome", WasmCoreType.i32)] + wrappedParams
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
-        case .nullable(let wrappedType, _):
-            let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
-            var params = [("isSome", WasmCoreType.i32)]
-            params.append(contentsOf: wrappedInfo.loweredParameters)
-            return LoweringParameterInfo(loweredParameters: params)
-        case .array, .dictionary:
-            return LoweringParameterInfo(loweredParameters: [])
+        case .swiftProtocol:
+            throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
+        case .caseEnum, .associatedValueEnum:
+            if context == .importTS {
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+            }
+            fallthrough
+        default:
+            return descriptor.importParams
         }
     }
 
-    struct LiftingReturnInfo {
-        let valueToLift: WasmCoreType?
-
-        static let bool = LiftingReturnInfo(valueToLift: .i32)
-        static let int = LiftingReturnInfo(valueToLift: .i32)
-        static let float = LiftingReturnInfo(valueToLift: .f32)
-        static let double = LiftingReturnInfo(valueToLift: .f64)
-        static let string = LiftingReturnInfo(valueToLift: .i32)
-        static let jsObject = LiftingReturnInfo(valueToLift: .i32)
-        static let jsValue = LiftingReturnInfo(valueToLift: nil)
-        static let void = LiftingReturnInfo(valueToLift: nil)
-    }
-
-    func liftingReturnInfo(
+    func liftingReturnType(
         context: BridgeContext = .importTS
-    ) throws -> LiftingReturnInfo {
+    ) throws -> WasmCoreType? {
         switch self {
-        case .bool: return .bool
-        case .int, .uint: return .int
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        case .jsObject: return .jsObject
-        case .jsValue: return .jsValue
-        case .void: return .void
-        case .closure:
-            // JS returns a callback ID for closures, which Swift lifts to a typed closure.
-            return LiftingReturnInfo(valueToLift: .i32)
-        case .unsafePointer:
-            return LiftingReturnInfo(valueToLift: .pointer)
-        case .swiftHeapObject:
-            return LiftingReturnInfo(valueToLift: .pointer)
-        case .swiftProtocol:
-            throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
-        case .caseEnum:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                return LiftingReturnInfo(valueToLift: .i32)
-            }
-        case .rawValueEnum(_, let rawType):
-            let wasmType = rawType.wasmCoreType ?? .i32
-            return LiftingReturnInfo(valueToLift: wasmType)
-        case .associatedValueEnum:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                return LiftingReturnInfo(valueToLift: .i32)
-            }
-        case .swiftStruct:
-            switch context {
-            case .importTS:
-                // Swift structs are bridged as JS objects (object IDs) in imported signatures.
-                return LiftingReturnInfo(valueToLift: .i32)
-            case .exportSwift:
-                return LiftingReturnInfo(valueToLift: nil)
-            }
+        case .nullable(let wrappedType, _):
+            return try wrappedType.liftingReturnType(context: context)
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as return values")
-        case .nullable(let wrappedType, _):
-            let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
-            return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
-        case .array, .dictionary:
-            return LiftingReturnInfo(valueToLift: nil)
+        case .swiftProtocol:
+            throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
+        case .caseEnum, .associatedValueEnum:
+            if context == .importTS {
+                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
+            }
+            fallthrough
+        default:
+            return descriptor.importReturnType
         }
     }
 }

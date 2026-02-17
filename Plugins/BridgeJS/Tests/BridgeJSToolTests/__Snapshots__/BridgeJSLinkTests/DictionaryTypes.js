@@ -23,7 +23,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -77,8 +76,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                const value = textDecoder.decode(bytes);
-                strStack.push(value);
+                strStack.push(textDecoder.decode(bytes));
             }
             bjs["swift_js_pop_i32"] = function() {
                 return i32Stack.pop();
@@ -94,16 +92,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
-            }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -215,7 +203,6 @@ export async function createInstantiator(options, swift) {
                         dictResult[string] = f64;
                     }
                     let ret = imports.importMirrorDictionary(dictResult);
-                    const arrayCleanups = [];
                     const entries = Object.entries(ret);
                     for (const entry of entries) {
                         const [key, value] = entry;
@@ -270,7 +257,6 @@ export async function createInstantiator(options, swift) {
             const exports = {
                 Box,
                 mirrorDictionary: function bjs_mirrorDictionary(values) {
-                    const arrayCleanups = [];
                     const entries = Object.entries(values);
                     for (const entry of entries) {
                         const [key, value] = entry;
@@ -289,14 +275,11 @@ export async function createInstantiator(options, swift) {
                         const string = strStack.pop();
                         dictResult[string] = int;
                     }
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return dictResult;
                 },
                 optionalDictionary: function bjs_optionalDictionary(values) {
                     const isSome = values != null;
-                    const valuesCleanups = [];
                     if (isSome) {
-                        const arrayCleanups = [];
                         const entries = Object.entries(values);
                         for (const entry of entries) {
                             const [key, value] = entry;
@@ -310,7 +293,6 @@ export async function createInstantiator(options, swift) {
                             i32Stack.push(id1);
                         }
                         i32Stack.push(entries.length);
-                        valuesCleanups.push(() => { for (const cleanup of arrayCleanups) { cleanup(); } });
                     }
                     i32Stack.push(+isSome);
                     instance.exports.bjs_optionalDictionary();
@@ -328,11 +310,9 @@ export async function createInstantiator(options, swift) {
                     } else {
                         optResult = null;
                     }
-                    for (const cleanup of valuesCleanups) { cleanup(); }
                     return optResult;
                 },
                 nestedDictionary: function bjs_nestedDictionary(values) {
-                    const arrayCleanups = [];
                     const entries = Object.entries(values);
                     for (const entry of entries) {
                         const [key, value] = entry;
@@ -340,14 +320,10 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const arrayCleanups1 = [];
                         for (const elem of value) {
                             i32Stack.push((elem | 0));
                         }
                         i32Stack.push(value.length);
-                        arrayCleanups.push(() => {
-                            for (const cleanup of arrayCleanups1) { cleanup(); }
-                        });
                     }
                     i32Stack.push(entries.length);
                     instance.exports.bjs_nestedDictionary();
@@ -364,11 +340,9 @@ export async function createInstantiator(options, swift) {
                         const string = strStack.pop();
                         dictResult[string] = arrayResult;
                     }
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return dictResult;
                 },
                 boxDictionary: function bjs_boxDictionary(boxes) {
-                    const arrayCleanups = [];
                     const entries = Object.entries(boxes);
                     for (const entry of entries) {
                         const [key, value] = entry;
@@ -388,11 +362,9 @@ export async function createInstantiator(options, swift) {
                         const string = strStack.pop();
                         dictResult[string] = obj;
                     }
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return dictResult;
                 },
                 optionalBoxDictionary: function bjs_optionalBoxDictionary(boxes) {
-                    const arrayCleanups = [];
                     const entries = Object.entries(boxes);
                     for (const entry of entries) {
                         const [key, value] = entry;
@@ -425,7 +397,6 @@ export async function createInstantiator(options, swift) {
                         const string = strStack.pop();
                         dictResult[string] = optValue;
                     }
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return dictResult;
                 },
             };

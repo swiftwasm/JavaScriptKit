@@ -729,10 +729,10 @@ extension JSTypedClosure where Signature == (Optional<Person>) -> Optional<Perso
 
 @_expose(wasm, "invoke_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC")
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC")
-public func _invoke_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: UnsafeMutableRawPointer) -> Void {
+public func _invoke_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Pointer: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Person>) -> Optional<Person>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<Person>.bridgeJSLiftParameter(param0IsSome, param0Value))
+    let result = closure(Optional<Person>.bridgeJSLiftParameter(param0IsSome, param0Pointer))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

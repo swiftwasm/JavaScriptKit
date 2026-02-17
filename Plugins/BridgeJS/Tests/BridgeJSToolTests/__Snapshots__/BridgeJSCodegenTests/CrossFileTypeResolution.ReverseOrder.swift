@@ -11,9 +11,9 @@ public func _bjs_ClassA_linkedB_get(_ _self: UnsafeMutableRawPointer) -> Void {
 
 @_expose(wasm, "bjs_ClassA_linkedB_set")
 @_cdecl("bjs_ClassA_linkedB_set")
-public func _bjs_ClassA_linkedB_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
+public func _bjs_ClassA_linkedB_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valuePointer: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ClassA.bridgeJSLiftParameter(_self).linkedB = Optional<ClassB>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    ClassA.bridgeJSLiftParameter(_self).linkedB = Optional<ClassB>.bridgeJSLiftParameter(valueIsSome, valuePointer)
     #else
     fatalError("Only available on WebAssembly")
     #endif

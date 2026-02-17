@@ -53,7 +53,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -84,75 +83,67 @@ export async function createInstantiator(options, swift) {
         return swift.memory.retain(real);
     };
 
-    const __bjs_createAPIResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case APIResultValues.Tag.Success: {
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Success, cleanup };
-                    }
-                    case APIResultValues.Tag.Failure: {
-                        i32Stack.push((value.param0 | 0));
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Failure, cleanup };
-                    }
-                    case APIResultValues.Tag.Flag: {
-                        i32Stack.push(value.param0 ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Flag, cleanup };
-                    }
-                    case APIResultValues.Tag.Rate: {
-                        f32Stack.push(Math.fround(value.param0));
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Rate, cleanup };
-                    }
-                    case APIResultValues.Tag.Precise: {
-                        f64Stack.push(value.param0);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Precise, cleanup };
-                    }
-                    case APIResultValues.Tag.Info: {
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Info, cleanup };
-                    }
-                    default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
+    const __bjs_createAPIResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case APIResultValues.Tag.Success: {
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return APIResultValues.Tag.Success;
                 }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case APIResultValues.Tag.Success: {
-                        const string = strStack.pop();
-                        return { tag: APIResultValues.Tag.Success, param0: string };
-                    }
-                    case APIResultValues.Tag.Failure: {
-                        const int = i32Stack.pop();
-                        return { tag: APIResultValues.Tag.Failure, param0: int };
-                    }
-                    case APIResultValues.Tag.Flag: {
-                        const bool = i32Stack.pop() !== 0;
-                        return { tag: APIResultValues.Tag.Flag, param0: bool };
-                    }
-                    case APIResultValues.Tag.Rate: {
-                        const f32 = f32Stack.pop();
-                        return { tag: APIResultValues.Tag.Rate, param0: f32 };
-                    }
-                    case APIResultValues.Tag.Precise: {
-                        const f64 = f64Stack.pop();
-                        return { tag: APIResultValues.Tag.Precise, param0: f64 };
-                    }
-                    case APIResultValues.Tag.Info: return { tag: APIResultValues.Tag.Info };
-                    default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+                case APIResultValues.Tag.Failure: {
+                    i32Stack.push((value.param0 | 0));
+                    return APIResultValues.Tag.Failure;
                 }
+                case APIResultValues.Tag.Flag: {
+                    i32Stack.push(value.param0 ? 1 : 0);
+                    return APIResultValues.Tag.Flag;
+                }
+                case APIResultValues.Tag.Rate: {
+                    f32Stack.push(Math.fround(value.param0));
+                    return APIResultValues.Tag.Rate;
+                }
+                case APIResultValues.Tag.Precise: {
+                    f64Stack.push(value.param0);
+                    return APIResultValues.Tag.Precise;
+                }
+                case APIResultValues.Tag.Info: {
+                    return APIResultValues.Tag.Info;
+                }
+                default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
             }
-        });
-    };
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case APIResultValues.Tag.Success: {
+                    const string = strStack.pop();
+                    return { tag: APIResultValues.Tag.Success, param0: string };
+                }
+                case APIResultValues.Tag.Failure: {
+                    const int = i32Stack.pop();
+                    return { tag: APIResultValues.Tag.Failure, param0: int };
+                }
+                case APIResultValues.Tag.Flag: {
+                    const bool = i32Stack.pop() !== 0;
+                    return { tag: APIResultValues.Tag.Flag, param0: bool };
+                }
+                case APIResultValues.Tag.Rate: {
+                    const f32 = f32Stack.pop();
+                    return { tag: APIResultValues.Tag.Rate, param0: f32 };
+                }
+                case APIResultValues.Tag.Precise: {
+                    const f64 = f64Stack.pop();
+                    return { tag: APIResultValues.Tag.Precise, param0: f64 };
+                }
+                case APIResultValues.Tag.Info: return { tag: APIResultValues.Tag.Info };
+                default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
 
     return {
         /**
@@ -200,8 +191,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                const value = textDecoder.decode(bytes);
-                strStack.push(value);
+                strStack.push(textDecoder.decode(bytes));
             }
             bjs["swift_js_pop_i32"] = function() {
                 return i32Stack.pop();
@@ -217,16 +207,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
-            }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -403,7 +383,7 @@ export async function createInstantiator(options, swift) {
                     const callback = swift.memory.getObject(callbackId);
                     const enumValue = enumHelpers.APIResult.lift(param0);
                     let ret = callback(enumValue);
-                    const { caseId: caseId, cleanup: cleanup } = enumHelpers.APIResult.lower(ret);
+                    const caseId = enumHelpers.APIResult.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -411,10 +391,9 @@ export async function createInstantiator(options, swift) {
             }
             bjs["make_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModule9APIResultO_9APIResultO = function(param0) {
-                    const { caseId: param0CaseId, cleanup: param0Cleanup } = enumHelpers.APIResult.lower(param0);
+                    const param0CaseId = enumHelpers.APIResult.lower(param0);
                     instance.exports.invoke_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO(boxPtr, param0CaseId);
                     const ret = enumHelpers.APIResult.lift(i32Stack.pop());
-                    if (param0Cleanup) { param0Cleanup(); }
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
@@ -595,21 +574,20 @@ export async function createInstantiator(options, swift) {
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO);
             }
-            bjs["invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO"] = function(callbackId, param0IsSome, param0WrappedValue) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO"] = function(callbackId, param0IsSome, param0ObjectId) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    let obj;
+                    let optResult;
                     if (param0IsSome) {
-                        obj = swift.memory.getObject(param0WrappedValue);
-                        swift.memory.release(param0WrappedValue);
-                    }
-                    let ret = callback(param0IsSome ? obj : null);
-                    const isSome = ret != null;
-                    if (isSome) {
-                        tmpRetString = ret;
+                        const param0ObjectIdObject = swift.memory.getObject(param0ObjectId);
+                        swift.memory.release(param0ObjectId);
+                        optResult = param0ObjectIdObject;
                     } else {
-                        tmpRetString = null;
+                        optResult = null;
                     }
+                    let ret = callback(optResult);
+                    const isSome = ret != null;
+                    tmpRetString = isSome ? ret : null;
                 } catch (error) {
                     setException(error);
                 }
@@ -617,12 +595,18 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO = function(param0) {
                     const isSome = param0 != null;
-                    let param0Id, param0Bytes;
+                    let result;
+                    let result1;
                     if (isSome) {
-                        param0Bytes = textEncoder.encode(param0);
-                        param0Id = swift.memory.retain(param0Bytes);
+                        const param0Bytes = textEncoder.encode(param0);
+                        const param0Id = swift.memory.retain(param0Bytes);
+                        result = param0Id;
+                        result1 = param0Bytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(boxPtr, +isSome, isSome ? param0Id : 0, isSome ? param0Bytes.length : 0);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(boxPtr, +isSome, result, result1);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
                     if (tmpRetException) {
@@ -635,10 +619,10 @@ export async function createInstantiator(options, swift) {
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO);
             }
-            bjs["invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC"] = function(callbackId, param0IsSome, param0WrappedValue) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC"] = function(callbackId, param0IsSome, param0Pointer) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    let ret = callback(param0IsSome ? _exports['Person'].__construct(param0WrappedValue) : null);
+                    let ret = callback(param0IsSome ? _exports['Person'].__construct(param0Pointer) : null);
                     const isSome = ret != null;
                     return isSome ? ret.pointer : 0;
                 } catch (error) {
@@ -648,7 +632,13 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC = function(param0) {
                     const isSome = param0 != null;
-                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC(boxPtr, +isSome, isSome ? param0.pointer : 0);
+                    let result;
+                    if (isSome) {
+                        result = param0.pointer;
+                    } else {
+                        result = 0;
+                    }
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC(boxPtr, +isSome, result);
                     const pointer = tmpRetOptionalHeapObject;
                     tmpRetOptionalHeapObject = undefined;
                     const optResult = pointer === null ? null : _exports['Person'].__construct(pointer);
@@ -662,17 +652,20 @@ export async function createInstantiator(options, swift) {
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC);
             }
-            bjs["invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO"] = function(callbackId, param0IsSome, param0WrappedValue) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO"] = function(callbackId, param0IsSome, param0CaseId) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    let enumValue;
+                    let optResult;
                     if (param0IsSome) {
-                        enumValue = enumHelpers.APIResult.lift(param0WrappedValue);
+                        const enumValue = enumHelpers.APIResult.lift(param0CaseId);
+                        optResult = enumValue;
+                    } else {
+                        optResult = null;
                     }
-                    let ret = callback(param0IsSome ? enumValue : null);
+                    let ret = callback(optResult);
                     const isSome = ret != null;
                     if (isSome) {
-                        const { caseId: caseId, cleanup: cleanup } = enumHelpers.APIResult.lower(ret);
+                        const caseId = enumHelpers.APIResult.lower(ret);
                         return caseId;
                     } else {
                         return -1;
@@ -684,22 +677,16 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO = function(param0) {
                     const isSome = param0 != null;
-                    let param0CaseId, param0Cleanup;
+                    let result;
                     if (isSome) {
-                        const enumResult = enumHelpers.APIResult.lower(param0);
-                        param0CaseId = enumResult.caseId;
-                        param0Cleanup = enumResult.cleanup;
-                    }
-                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(boxPtr, +isSome, isSome ? param0CaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const param0CaseId = enumHelpers.APIResult.lower(param0);
+                        result = param0CaseId;
                     } else {
-                        optResult = enumHelpers.APIResult.lift(tag);
+                        result = 0;
                     }
-                    if (param0Cleanup) { param0Cleanup(); }
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(boxPtr, +isSome, result);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.APIResult.lift(tag);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
@@ -715,7 +702,7 @@ export async function createInstantiator(options, swift) {
                     const callback = swift.memory.getObject(callbackId);
                     let ret = callback(param0IsSome ? param0WrappedValue : null);
                     const isSome = ret != null;
-                    return isSome ? (ret | 0) : -1;
+                    return isSome ? ret : -1;
                 } catch (error) {
                     setException(error);
                 }
@@ -736,21 +723,20 @@ export async function createInstantiator(options, swift) {
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO);
             }
-            bjs["invoke_js_callback_TestModule_10TestModuleSqSS_SqSS"] = function(callbackId, param0IsSome, param0WrappedValue) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSqSS_SqSS"] = function(callbackId, param0IsSome, param0ObjectId) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    let obj;
+                    let optResult;
                     if (param0IsSome) {
-                        obj = swift.memory.getObject(param0WrappedValue);
-                        swift.memory.release(param0WrappedValue);
-                    }
-                    let ret = callback(param0IsSome ? obj : null);
-                    const isSome = ret != null;
-                    if (isSome) {
-                        tmpRetString = ret;
+                        const param0ObjectIdObject = swift.memory.getObject(param0ObjectId);
+                        swift.memory.release(param0ObjectId);
+                        optResult = param0ObjectIdObject;
                     } else {
-                        tmpRetString = null;
+                        optResult = null;
                     }
+                    let ret = callback(optResult);
+                    const isSome = ret != null;
+                    tmpRetString = isSome ? ret : null;
                 } catch (error) {
                     setException(error);
                 }
@@ -758,12 +744,18 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModuleSqSS_SqSS"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSqSS_SqSS = function(param0) {
                     const isSome = param0 != null;
-                    let param0Id, param0Bytes;
+                    let result;
+                    let result1;
                     if (isSome) {
-                        param0Bytes = textEncoder.encode(param0);
-                        param0Id = swift.memory.retain(param0Bytes);
+                        const param0Bytes = textEncoder.encode(param0);
+                        const param0Id = swift.memory.retain(param0Bytes);
+                        result = param0Id;
+                        result1 = param0Bytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSqSS_SqSS(boxPtr, +isSome, isSome ? param0Id : 0, isSome ? param0Bytes.length : 0);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSqSS_SqSS(boxPtr, +isSome, result, result1);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
                     if (tmpRetException) {
@@ -789,7 +781,7 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModuleSqSb_SqSb"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSqSb_SqSb = function(param0) {
                     const isSome = param0 != null;
-                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSqSb_SqSb(boxPtr, +isSome, isSome ? param0 : 0);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSqSb_SqSb(boxPtr, +isSome, isSome ? param0 ? 1 : 0 : 0);
                     const optResult = tmpRetOptionalBool;
                     tmpRetOptionalBool = undefined;
                     if (tmpRetException) {
@@ -815,7 +807,7 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModuleSqSd_SqSd"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSqSd_SqSd = function(param0) {
                     const isSome = param0 != null;
-                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSqSd_SqSd(boxPtr, +isSome, isSome ? param0 : 0);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSqSd_SqSd(boxPtr, +isSome, isSome ? param0 : 0.0);
                     const optResult = tmpRetOptionalDouble;
                     tmpRetOptionalDouble = undefined;
                     if (tmpRetException) {
@@ -841,7 +833,7 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModuleSqSf_SqSf"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSqSf_SqSf = function(param0) {
                     const isSome = param0 != null;
-                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSqSf_SqSf(boxPtr, +isSome, isSome ? param0 : 0);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSqSf_SqSf(boxPtr, +isSome, isSome ? param0 : 0.0);
                     const optResult = tmpRetOptionalFloat;
                     tmpRetOptionalFloat = undefined;
                     if (tmpRetException) {
@@ -946,7 +938,7 @@ export async function createInstantiator(options, swift) {
                     return TestProcessor.__construct(ret);
                 }
             }
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()();
+            const APIResultHelpers = __bjs_createAPIResultValuesHelpers();
             enumHelpers.APIResult = APIResultHelpers;
 
             const exports = {

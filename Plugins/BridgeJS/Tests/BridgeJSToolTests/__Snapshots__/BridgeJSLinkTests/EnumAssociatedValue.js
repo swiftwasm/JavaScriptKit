@@ -104,573 +104,645 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createPointHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                f64Stack.push(value.x);
-                f64Stack.push(value.y);
-                return { cleanup: undefined };
-            },
-            lift: () => {
-                const f64 = f64Stack.pop();
-                const f641 = f64Stack.pop();
-                return { x: f641, y: f64 };
-            }
-        });
-    };
-    const __bjs_createAPIResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case APIResultValues.Tag.Success: {
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Success, cleanup };
-                    }
-                    case APIResultValues.Tag.Failure: {
-                        i32Stack.push((value.param0 | 0));
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Failure, cleanup };
-                    }
-                    case APIResultValues.Tag.Flag: {
-                        i32Stack.push(value.param0 ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Flag, cleanup };
-                    }
-                    case APIResultValues.Tag.Rate: {
-                        f32Stack.push(Math.fround(value.param0));
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Rate, cleanup };
-                    }
-                    case APIResultValues.Tag.Precise: {
-                        f64Stack.push(value.param0);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Precise, cleanup };
-                    }
-                    case APIResultValues.Tag.Info: {
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Info, cleanup };
-                    }
-                    default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
+    const __bjs_createPointHelpers = () => ({
+        lower: (value) => {
+            f64Stack.push(value.x);
+            f64Stack.push(value.y);
+        },
+        lift: () => {
+            const f64 = f64Stack.pop();
+            const f641 = f64Stack.pop();
+            return { x: f641, y: f64 };
+        }
+    });
+    const __bjs_createAPIResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case APIResultValues.Tag.Success: {
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return APIResultValues.Tag.Success;
                 }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case APIResultValues.Tag.Success: {
-                        const string = strStack.pop();
-                        return { tag: APIResultValues.Tag.Success, param0: string };
-                    }
-                    case APIResultValues.Tag.Failure: {
-                        const int = i32Stack.pop();
-                        return { tag: APIResultValues.Tag.Failure, param0: int };
-                    }
-                    case APIResultValues.Tag.Flag: {
-                        const bool = i32Stack.pop() !== 0;
-                        return { tag: APIResultValues.Tag.Flag, param0: bool };
-                    }
-                    case APIResultValues.Tag.Rate: {
-                        const f32 = f32Stack.pop();
-                        return { tag: APIResultValues.Tag.Rate, param0: f32 };
-                    }
-                    case APIResultValues.Tag.Precise: {
-                        const f64 = f64Stack.pop();
-                        return { tag: APIResultValues.Tag.Precise, param0: f64 };
-                    }
-                    case APIResultValues.Tag.Info: return { tag: APIResultValues.Tag.Info };
-                    default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+                case APIResultValues.Tag.Failure: {
+                    i32Stack.push((value.param0 | 0));
+                    return APIResultValues.Tag.Failure;
                 }
+                case APIResultValues.Tag.Flag: {
+                    i32Stack.push(value.param0 ? 1 : 0);
+                    return APIResultValues.Tag.Flag;
+                }
+                case APIResultValues.Tag.Rate: {
+                    f32Stack.push(Math.fround(value.param0));
+                    return APIResultValues.Tag.Rate;
+                }
+                case APIResultValues.Tag.Precise: {
+                    f64Stack.push(value.param0);
+                    return APIResultValues.Tag.Precise;
+                }
+                case APIResultValues.Tag.Info: {
+                    return APIResultValues.Tag.Info;
+                }
+                default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
             }
-        });
-    };
-    const __bjs_createComplexResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case ComplexResultValues.Tag.Success: {
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case APIResultValues.Tag.Success: {
+                    const string = strStack.pop();
+                    return { tag: APIResultValues.Tag.Success, param0: string };
+                }
+                case APIResultValues.Tag.Failure: {
+                    const int = i32Stack.pop();
+                    return { tag: APIResultValues.Tag.Failure, param0: int };
+                }
+                case APIResultValues.Tag.Flag: {
+                    const bool = i32Stack.pop() !== 0;
+                    return { tag: APIResultValues.Tag.Flag, param0: bool };
+                }
+                case APIResultValues.Tag.Rate: {
+                    const f32 = f32Stack.pop();
+                    return { tag: APIResultValues.Tag.Rate, param0: f32 };
+                }
+                case APIResultValues.Tag.Precise: {
+                    const f64 = f64Stack.pop();
+                    return { tag: APIResultValues.Tag.Precise, param0: f64 };
+                }
+                case APIResultValues.Tag.Info: return { tag: APIResultValues.Tag.Info };
+                default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
+    const __bjs_createComplexResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case ComplexResultValues.Tag.Success: {
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return ComplexResultValues.Tag.Success;
+                }
+                case ComplexResultValues.Tag.Error: {
+                    i32Stack.push((value.param1 | 0));
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return ComplexResultValues.Tag.Error;
+                }
+                case ComplexResultValues.Tag.Status: {
+                    const bytes = textEncoder.encode(value.param2);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    i32Stack.push((value.param1 | 0));
+                    i32Stack.push(value.param0 ? 1 : 0);
+                    return ComplexResultValues.Tag.Status;
+                }
+                case ComplexResultValues.Tag.Coordinates: {
+                    f64Stack.push(value.param2);
+                    f64Stack.push(value.param1);
+                    f64Stack.push(value.param0);
+                    return ComplexResultValues.Tag.Coordinates;
+                }
+                case ComplexResultValues.Tag.Comprehensive: {
+                    const bytes = textEncoder.encode(value.param8);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    const bytes1 = textEncoder.encode(value.param7);
+                    const id1 = swift.memory.retain(bytes1);
+                    i32Stack.push(bytes1.length);
+                    i32Stack.push(id1);
+                    const bytes2 = textEncoder.encode(value.param6);
+                    const id2 = swift.memory.retain(bytes2);
+                    i32Stack.push(bytes2.length);
+                    i32Stack.push(id2);
+                    f64Stack.push(value.param5);
+                    f64Stack.push(value.param4);
+                    i32Stack.push((value.param3 | 0));
+                    i32Stack.push((value.param2 | 0));
+                    i32Stack.push(value.param1 ? 1 : 0);
+                    i32Stack.push(value.param0 ? 1 : 0);
+                    return ComplexResultValues.Tag.Comprehensive;
+                }
+                case ComplexResultValues.Tag.Info: {
+                    return ComplexResultValues.Tag.Info;
+                }
+                default: throw new Error("Unknown ComplexResultValues tag: " + String(enumTag));
+            }
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case ComplexResultValues.Tag.Success: {
+                    const string = strStack.pop();
+                    return { tag: ComplexResultValues.Tag.Success, param0: string };
+                }
+                case ComplexResultValues.Tag.Error: {
+                    const int = i32Stack.pop();
+                    const string = strStack.pop();
+                    return { tag: ComplexResultValues.Tag.Error, param0: string, param1: int };
+                }
+                case ComplexResultValues.Tag.Status: {
+                    const string = strStack.pop();
+                    const int = i32Stack.pop();
+                    const bool = i32Stack.pop() !== 0;
+                    return { tag: ComplexResultValues.Tag.Status, param0: bool, param1: int, param2: string };
+                }
+                case ComplexResultValues.Tag.Coordinates: {
+                    const f64 = f64Stack.pop();
+                    const f641 = f64Stack.pop();
+                    const f642 = f64Stack.pop();
+                    return { tag: ComplexResultValues.Tag.Coordinates, param0: f642, param1: f641, param2: f64 };
+                }
+                case ComplexResultValues.Tag.Comprehensive: {
+                    const string = strStack.pop();
+                    const string1 = strStack.pop();
+                    const string2 = strStack.pop();
+                    const f64 = f64Stack.pop();
+                    const f641 = f64Stack.pop();
+                    const int = i32Stack.pop();
+                    const int1 = i32Stack.pop();
+                    const bool = i32Stack.pop() !== 0;
+                    const bool1 = i32Stack.pop() !== 0;
+                    return { tag: ComplexResultValues.Tag.Comprehensive, param0: bool1, param1: bool, param2: int1, param3: int, param4: f641, param5: f64, param6: string2, param7: string1, param8: string };
+                }
+                case ComplexResultValues.Tag.Info: return { tag: ComplexResultValues.Tag.Info };
+                default: throw new Error("Unknown ComplexResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
+    const __bjs_createResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case ResultValues.Tag.Success: {
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return ResultValues.Tag.Success;
+                }
+                case ResultValues.Tag.Failure: {
+                    i32Stack.push((value.param1 | 0));
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return ResultValues.Tag.Failure;
+                }
+                case ResultValues.Tag.Status: {
+                    const bytes = textEncoder.encode(value.param2);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    i32Stack.push((value.param1 | 0));
+                    i32Stack.push(value.param0 ? 1 : 0);
+                    return ResultValues.Tag.Status;
+                }
+                default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
+            }
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case ResultValues.Tag.Success: {
+                    const string = strStack.pop();
+                    return { tag: ResultValues.Tag.Success, param0: string };
+                }
+                case ResultValues.Tag.Failure: {
+                    const int = i32Stack.pop();
+                    const string = strStack.pop();
+                    return { tag: ResultValues.Tag.Failure, param0: string, param1: int };
+                }
+                case ResultValues.Tag.Status: {
+                    const string = strStack.pop();
+                    const int = i32Stack.pop();
+                    const bool = i32Stack.pop() !== 0;
+                    return { tag: ResultValues.Tag.Status, param0: bool, param1: int, param2: string };
+                }
+                default: throw new Error("Unknown ResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
+    const __bjs_createNetworkingResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case NetworkingResultValues.Tag.Success: {
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return NetworkingResultValues.Tag.Success;
+                }
+                case NetworkingResultValues.Tag.Failure: {
+                    i32Stack.push((value.param1 | 0));
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return NetworkingResultValues.Tag.Failure;
+                }
+                default: throw new Error("Unknown NetworkingResultValues tag: " + String(enumTag));
+            }
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case NetworkingResultValues.Tag.Success: {
+                    const string = strStack.pop();
+                    return { tag: NetworkingResultValues.Tag.Success, param0: string };
+                }
+                case NetworkingResultValues.Tag.Failure: {
+                    const int = i32Stack.pop();
+                    const string = strStack.pop();
+                    return { tag: NetworkingResultValues.Tag.Failure, param0: string, param1: int };
+                }
+                default: throw new Error("Unknown NetworkingResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
+    const __bjs_createAPIOptionalResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case APIOptionalResultValues.Tag.Success: {
+                    const isSome = value.param0 != null;
+                    if (isSome) {
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: ComplexResultValues.Tag.Success, cleanup };
+                    } else {
+                        i32Stack.push(0);
+                        i32Stack.push(0);
                     }
-                    case ComplexResultValues.Tag.Error: {
-                        i32Stack.push((value.param1 | 0));
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: ComplexResultValues.Tag.Error, cleanup };
-                    }
-                    case ComplexResultValues.Tag.Status: {
+                    i32Stack.push(isSome ? 1 : 0);
+                    return APIOptionalResultValues.Tag.Success;
+                }
+                case APIOptionalResultValues.Tag.Failure: {
+                    const isSome = value.param1 != null;
+                    i32Stack.push(isSome ? (value.param1 ? 1 : 0) : 0);
+                    i32Stack.push(isSome ? 1 : 0);
+                    const isSome1 = value.param0 != null;
+                    i32Stack.push(isSome1 ? (value.param0 | 0) : 0);
+                    i32Stack.push(isSome1 ? 1 : 0);
+                    return APIOptionalResultValues.Tag.Failure;
+                }
+                case APIOptionalResultValues.Tag.Status: {
+                    const isSome = value.param2 != null;
+                    if (isSome) {
                         const bytes = textEncoder.encode(value.param2);
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        i32Stack.push((value.param1 | 0));
-                        i32Stack.push(value.param0 ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: ComplexResultValues.Tag.Status, cleanup };
+                    } else {
+                        i32Stack.push(0);
+                        i32Stack.push(0);
                     }
-                    case ComplexResultValues.Tag.Coordinates: {
-                        f64Stack.push(value.param2);
-                        f64Stack.push(value.param1);
-                        f64Stack.push(value.param0);
-                        const cleanup = undefined;
-                        return { caseId: ComplexResultValues.Tag.Coordinates, cleanup };
-                    }
-                    case ComplexResultValues.Tag.Comprehensive: {
-                        const bytes = textEncoder.encode(value.param8);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const bytes1 = textEncoder.encode(value.param7);
-                        const id1 = swift.memory.retain(bytes1);
-                        i32Stack.push(bytes1.length);
-                        i32Stack.push(id1);
-                        const bytes2 = textEncoder.encode(value.param6);
-                        const id2 = swift.memory.retain(bytes2);
-                        i32Stack.push(bytes2.length);
-                        i32Stack.push(id2);
-                        f64Stack.push(value.param5);
-                        f64Stack.push(value.param4);
-                        i32Stack.push((value.param3 | 0));
-                        i32Stack.push((value.param2 | 0));
-                        i32Stack.push(value.param1 ? 1 : 0);
-                        i32Stack.push(value.param0 ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: ComplexResultValues.Tag.Comprehensive, cleanup };
-                    }
-                    case ComplexResultValues.Tag.Info: {
-                        const cleanup = undefined;
-                        return { caseId: ComplexResultValues.Tag.Info, cleanup };
-                    }
-                    default: throw new Error("Unknown ComplexResultValues tag: " + String(enumTag));
+                    i32Stack.push(isSome ? 1 : 0);
+                    const isSome1 = value.param1 != null;
+                    i32Stack.push(isSome1 ? (value.param1 | 0) : 0);
+                    i32Stack.push(isSome1 ? 1 : 0);
+                    const isSome2 = value.param0 != null;
+                    i32Stack.push(isSome2 ? (value.param0 ? 1 : 0) : 0);
+                    i32Stack.push(isSome2 ? 1 : 0);
+                    return APIOptionalResultValues.Tag.Status;
                 }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case ComplexResultValues.Tag.Success: {
+                default: throw new Error("Unknown APIOptionalResultValues tag: " + String(enumTag));
+            }
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case APIOptionalResultValues.Tag.Success: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
                         const string = strStack.pop();
-                        return { tag: ComplexResultValues.Tag.Success, param0: string };
+                        optional = string;
+                    } else {
+                        optional = null;
                     }
-                    case ComplexResultValues.Tag.Error: {
-                        const int = i32Stack.pop();
-                        const string = strStack.pop();
-                        return { tag: ComplexResultValues.Tag.Error, param0: string, param1: int };
-                    }
-                    case ComplexResultValues.Tag.Status: {
-                        const string = strStack.pop();
-                        const int = i32Stack.pop();
+                    return { tag: APIOptionalResultValues.Tag.Success, param0: optional };
+                }
+                case APIOptionalResultValues.Tag.Failure: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
                         const bool = i32Stack.pop() !== 0;
-                        return { tag: ComplexResultValues.Tag.Status, param0: bool, param1: int, param2: string };
+                        optional = bool;
+                    } else {
+                        optional = null;
                     }
-                    case ComplexResultValues.Tag.Coordinates: {
-                        const f64 = f64Stack.pop();
-                        const f641 = f64Stack.pop();
-                        const f642 = f64Stack.pop();
-                        return { tag: ComplexResultValues.Tag.Coordinates, param0: f642, param1: f641, param2: f64 };
-                    }
-                    case ComplexResultValues.Tag.Comprehensive: {
-                        const string = strStack.pop();
-                        const string1 = strStack.pop();
-                        const string2 = strStack.pop();
-                        const f64 = f64Stack.pop();
-                        const f641 = f64Stack.pop();
+                    const isSome1 = i32Stack.pop();
+                    let optional1;
+                    if (isSome1) {
                         const int = i32Stack.pop();
-                        const int1 = i32Stack.pop();
+                        optional1 = int;
+                    } else {
+                        optional1 = null;
+                    }
+                    return { tag: APIOptionalResultValues.Tag.Failure, param0: optional1, param1: optional };
+                }
+                case APIOptionalResultValues.Tag.Status: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
+                        const string = strStack.pop();
+                        optional = string;
+                    } else {
+                        optional = null;
+                    }
+                    const isSome1 = i32Stack.pop();
+                    let optional1;
+                    if (isSome1) {
+                        const int = i32Stack.pop();
+                        optional1 = int;
+                    } else {
+                        optional1 = null;
+                    }
+                    const isSome2 = i32Stack.pop();
+                    let optional2;
+                    if (isSome2) {
                         const bool = i32Stack.pop() !== 0;
-                        const bool1 = i32Stack.pop() !== 0;
-                        return { tag: ComplexResultValues.Tag.Comprehensive, param0: bool1, param1: bool, param2: int1, param3: int, param4: f641, param5: f64, param6: string2, param7: string1, param8: string };
+                        optional2 = bool;
+                    } else {
+                        optional2 = null;
                     }
-                    case ComplexResultValues.Tag.Info: return { tag: ComplexResultValues.Tag.Info };
-                    default: throw new Error("Unknown ComplexResultValues tag returned from Swift: " + String(tag));
+                    return { tag: APIOptionalResultValues.Tag.Status, param0: optional2, param1: optional1, param2: optional };
                 }
+                default: throw new Error("Unknown APIOptionalResultValues tag returned from Swift: " + String(tag));
             }
-        });
-    };
-    const __bjs_createResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case ResultValues.Tag.Success: {
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: ResultValues.Tag.Success, cleanup };
-                    }
-                    case ResultValues.Tag.Failure: {
-                        i32Stack.push((value.param1 | 0));
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: ResultValues.Tag.Failure, cleanup };
-                    }
-                    case ResultValues.Tag.Status: {
-                        const bytes = textEncoder.encode(value.param2);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        i32Stack.push((value.param1 | 0));
-                        i32Stack.push(value.param0 ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: ResultValues.Tag.Status, cleanup };
-                    }
-                    default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
+        }
+    });
+    const __bjs_createTypedPayloadResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case TypedPayloadResultValues.Tag.Precision: {
+                    f32Stack.push(Math.fround(value.param0));
+                    return TypedPayloadResultValues.Tag.Precision;
                 }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case ResultValues.Tag.Success: {
-                        const string = strStack.pop();
-                        return { tag: ResultValues.Tag.Success, param0: string };
-                    }
-                    case ResultValues.Tag.Failure: {
-                        const int = i32Stack.pop();
-                        const string = strStack.pop();
-                        return { tag: ResultValues.Tag.Failure, param0: string, param1: int };
-                    }
-                    case ResultValues.Tag.Status: {
-                        const string = strStack.pop();
-                        const int = i32Stack.pop();
-                        const bool = i32Stack.pop() !== 0;
-                        return { tag: ResultValues.Tag.Status, param0: bool, param1: int, param2: string };
-                    }
-                    default: throw new Error("Unknown ResultValues tag returned from Swift: " + String(tag));
+                case TypedPayloadResultValues.Tag.Direction: {
+                    i32Stack.push((value.param0 | 0));
+                    return TypedPayloadResultValues.Tag.Direction;
                 }
+                case TypedPayloadResultValues.Tag.OptPrecision: {
+                    const isSome = value.param0 != null;
+                    f32Stack.push(isSome ? Math.fround(value.param0) : 0.0);
+                    i32Stack.push(isSome ? 1 : 0);
+                    return TypedPayloadResultValues.Tag.OptPrecision;
+                }
+                case TypedPayloadResultValues.Tag.OptDirection: {
+                    const isSome = value.param0 != null;
+                    i32Stack.push(isSome ? (value.param0 | 0) : 0);
+                    i32Stack.push(isSome ? 1 : 0);
+                    return TypedPayloadResultValues.Tag.OptDirection;
+                }
+                case TypedPayloadResultValues.Tag.Empty: {
+                    return TypedPayloadResultValues.Tag.Empty;
+                }
+                default: throw new Error("Unknown TypedPayloadResultValues tag: " + String(enumTag));
             }
-        });
-    };
-    const __bjs_createNetworkingResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case NetworkingResultValues.Tag.Success: {
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: NetworkingResultValues.Tag.Success, cleanup };
-                    }
-                    case NetworkingResultValues.Tag.Failure: {
-                        i32Stack.push((value.param1 | 0));
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: NetworkingResultValues.Tag.Failure, cleanup };
-                    }
-                    default: throw new Error("Unknown NetworkingResultValues tag: " + String(enumTag));
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case TypedPayloadResultValues.Tag.Precision: {
+                    const rawValue = f32Stack.pop();
+                    return { tag: TypedPayloadResultValues.Tag.Precision, param0: rawValue };
                 }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case NetworkingResultValues.Tag.Success: {
-                        const string = strStack.pop();
-                        return { tag: NetworkingResultValues.Tag.Success, param0: string };
-                    }
-                    case NetworkingResultValues.Tag.Failure: {
-                        const int = i32Stack.pop();
-                        const string = strStack.pop();
-                        return { tag: NetworkingResultValues.Tag.Failure, param0: string, param1: int };
-                    }
-                    default: throw new Error("Unknown NetworkingResultValues tag returned from Swift: " + String(tag));
+                case TypedPayloadResultValues.Tag.Direction: {
+                    const caseId = i32Stack.pop();
+                    return { tag: TypedPayloadResultValues.Tag.Direction, param0: caseId };
                 }
-            }
-        });
-    };
-    const __bjs_createAPIOptionalResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case APIOptionalResultValues.Tag.Success: {
-                        const isSome = value.param0 != null;
-                        let id;
-                        if (isSome) {
-                            let bytes = textEncoder.encode(value.param0);
-                            id = swift.memory.retain(bytes);
-                            i32Stack.push(bytes.length);
-                            i32Stack.push(id);
-                        } else {
-                            i32Stack.push(0);
-                            i32Stack.push(0);
-                        }
-                        i32Stack.push(isSome ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: APIOptionalResultValues.Tag.Success, cleanup };
-                    }
-                    case APIOptionalResultValues.Tag.Failure: {
-                        const isSome = value.param1 != null;
-                        i32Stack.push(isSome ? (value.param1 ? 1 : 0) : 0);
-                        i32Stack.push(isSome ? 1 : 0);
-                        const isSome1 = value.param0 != null;
-                        i32Stack.push(isSome1 ? (value.param0 | 0) : 0);
-                        i32Stack.push(isSome1 ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: APIOptionalResultValues.Tag.Failure, cleanup };
-                    }
-                    case APIOptionalResultValues.Tag.Status: {
-                        const isSome = value.param2 != null;
-                        let id;
-                        if (isSome) {
-                            let bytes = textEncoder.encode(value.param2);
-                            id = swift.memory.retain(bytes);
-                            i32Stack.push(bytes.length);
-                            i32Stack.push(id);
-                        } else {
-                            i32Stack.push(0);
-                            i32Stack.push(0);
-                        }
-                        i32Stack.push(isSome ? 1 : 0);
-                        const isSome1 = value.param1 != null;
-                        i32Stack.push(isSome1 ? (value.param1 | 0) : 0);
-                        i32Stack.push(isSome1 ? 1 : 0);
-                        const isSome2 = value.param0 != null;
-                        i32Stack.push(isSome2 ? (value.param0 ? 1 : 0) : 0);
-                        i32Stack.push(isSome2 ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: APIOptionalResultValues.Tag.Status, cleanup };
-                    }
-                    default: throw new Error("Unknown APIOptionalResultValues tag: " + String(enumTag));
-                }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case APIOptionalResultValues.Tag.Success: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const string = strStack.pop();
-                            optional = string;
-                        } else {
-                            optional = null;
-                        }
-                        return { tag: APIOptionalResultValues.Tag.Success, param0: optional };
-                    }
-                    case APIOptionalResultValues.Tag.Failure: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const bool = i32Stack.pop() !== 0;
-                            optional = bool;
-                        } else {
-                            optional = null;
-                        }
-                        const isSome1 = i32Stack.pop();
-                        let optional1;
-                        if (isSome1) {
-                            const int = i32Stack.pop();
-                            optional1 = int;
-                        } else {
-                            optional1 = null;
-                        }
-                        return { tag: APIOptionalResultValues.Tag.Failure, param0: optional1, param1: optional };
-                    }
-                    case APIOptionalResultValues.Tag.Status: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const string = strStack.pop();
-                            optional = string;
-                        } else {
-                            optional = null;
-                        }
-                        const isSome1 = i32Stack.pop();
-                        let optional1;
-                        if (isSome1) {
-                            const int = i32Stack.pop();
-                            optional1 = int;
-                        } else {
-                            optional1 = null;
-                        }
-                        const isSome2 = i32Stack.pop();
-                        let optional2;
-                        if (isSome2) {
-                            const bool = i32Stack.pop() !== 0;
-                            optional2 = bool;
-                        } else {
-                            optional2 = null;
-                        }
-                        return { tag: APIOptionalResultValues.Tag.Status, param0: optional2, param1: optional1, param2: optional };
-                    }
-                    default: throw new Error("Unknown APIOptionalResultValues tag returned from Swift: " + String(tag));
-                }
-            }
-        });
-    };
-    const __bjs_createTypedPayloadResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case TypedPayloadResultValues.Tag.Precision: {
-                        f32Stack.push(Math.fround(value.param0));
-                        const cleanup = undefined;
-                        return { caseId: TypedPayloadResultValues.Tag.Precision, cleanup };
-                    }
-                    case TypedPayloadResultValues.Tag.Direction: {
-                        i32Stack.push((value.param0 | 0));
-                        const cleanup = undefined;
-                        return { caseId: TypedPayloadResultValues.Tag.Direction, cleanup };
-                    }
-                    case TypedPayloadResultValues.Tag.OptPrecision: {
-                        const isSome = value.param0 != null;
-                        f32Stack.push(isSome ? Math.fround(value.param0) : 0.0);
-                        i32Stack.push(isSome ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: TypedPayloadResultValues.Tag.OptPrecision, cleanup };
-                    }
-                    case TypedPayloadResultValues.Tag.OptDirection: {
-                        const isSome = value.param0 != null;
-                        i32Stack.push(isSome ? (value.param0 | 0) : 0);
-                        i32Stack.push(isSome ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: TypedPayloadResultValues.Tag.OptDirection, cleanup };
-                    }
-                    case TypedPayloadResultValues.Tag.Empty: {
-                        const cleanup = undefined;
-                        return { caseId: TypedPayloadResultValues.Tag.Empty, cleanup };
-                    }
-                    default: throw new Error("Unknown TypedPayloadResultValues tag: " + String(enumTag));
-                }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case TypedPayloadResultValues.Tag.Precision: {
+                case TypedPayloadResultValues.Tag.OptPrecision: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
                         const rawValue = f32Stack.pop();
-                        return { tag: TypedPayloadResultValues.Tag.Precision, param0: rawValue };
+                        optional = rawValue;
+                    } else {
+                        optional = null;
                     }
-                    case TypedPayloadResultValues.Tag.Direction: {
-                        const caseId = i32Stack.pop();
-                        return { tag: TypedPayloadResultValues.Tag.Direction, param0: caseId };
-                    }
-                    case TypedPayloadResultValues.Tag.OptPrecision: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const rawValue = f32Stack.pop();
-                            optional = rawValue;
-                        } else {
-                            optional = null;
-                        }
-                        return { tag: TypedPayloadResultValues.Tag.OptPrecision, param0: optional };
-                    }
-                    case TypedPayloadResultValues.Tag.OptDirection: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const caseId = i32Stack.pop();
-                            optional = caseId;
-                        } else {
-                            optional = null;
-                        }
-                        return { tag: TypedPayloadResultValues.Tag.OptDirection, param0: optional };
-                    }
-                    case TypedPayloadResultValues.Tag.Empty: return { tag: TypedPayloadResultValues.Tag.Empty };
-                    default: throw new Error("Unknown TypedPayloadResultValues tag returned from Swift: " + String(tag));
+                    return { tag: TypedPayloadResultValues.Tag.OptPrecision, param0: optional };
                 }
+                case TypedPayloadResultValues.Tag.OptDirection: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
+                        const caseId = i32Stack.pop();
+                        optional = caseId;
+                    } else {
+                        optional = null;
+                    }
+                    return { tag: TypedPayloadResultValues.Tag.OptDirection, param0: optional };
+                }
+                case TypedPayloadResultValues.Tag.Empty: return { tag: TypedPayloadResultValues.Tag.Empty };
+                default: throw new Error("Unknown TypedPayloadResultValues tag returned from Swift: " + String(tag));
             }
-        });
-    };
-    const __bjs_createAllTypesResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case AllTypesResultValues.Tag.StructPayload: {
-                        const { cleanup: structCleanup } = structHelpers.Point.lower(value.param0);
-                        const cleanup = () => {
-                            if (structCleanup) { structCleanup(); }
-                        };
-                        return { caseId: AllTypesResultValues.Tag.StructPayload, cleanup };
+        }
+    });
+    const __bjs_createAllTypesResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case AllTypesResultValues.Tag.StructPayload: {
+                    structHelpers.Point.lower(value.param0);
+                    return AllTypesResultValues.Tag.StructPayload;
+                }
+                case AllTypesResultValues.Tag.ClassPayload: {
+                    ptrStack.push(value.param0.pointer);
+                    return AllTypesResultValues.Tag.ClassPayload;
+                }
+                case AllTypesResultValues.Tag.JsObjectPayload: {
+                    const objId = swift.memory.retain(value.param0);
+                    i32Stack.push(objId);
+                    return AllTypesResultValues.Tag.JsObjectPayload;
+                }
+                case AllTypesResultValues.Tag.NestedEnum: {
+                    const caseId = enumHelpers.APIResult.lower(value.param0);
+                    i32Stack.push(caseId);
+                    return AllTypesResultValues.Tag.NestedEnum;
+                }
+                case AllTypesResultValues.Tag.ArrayPayload: {
+                    for (const elem of value.param0) {
+                        i32Stack.push((elem | 0));
                     }
-                    case AllTypesResultValues.Tag.ClassPayload: {
+                    i32Stack.push(value.param0.length);
+                    return AllTypesResultValues.Tag.ArrayPayload;
+                }
+                case AllTypesResultValues.Tag.Empty: {
+                    return AllTypesResultValues.Tag.Empty;
+                }
+                default: throw new Error("Unknown AllTypesResultValues tag: " + String(enumTag));
+            }
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case AllTypesResultValues.Tag.StructPayload: {
+                    const struct = structHelpers.Point.lift();
+                    return { tag: AllTypesResultValues.Tag.StructPayload, param0: struct };
+                }
+                case AllTypesResultValues.Tag.ClassPayload: {
+                    const ptr = ptrStack.pop();
+                    const obj = _exports['User'].__construct(ptr);
+                    return { tag: AllTypesResultValues.Tag.ClassPayload, param0: obj };
+                }
+                case AllTypesResultValues.Tag.JsObjectPayload: {
+                    const objId = i32Stack.pop();
+                    const obj = swift.memory.getObject(objId);
+                    swift.memory.release(objId);
+                    return { tag: AllTypesResultValues.Tag.JsObjectPayload, param0: obj };
+                }
+                case AllTypesResultValues.Tag.NestedEnum: {
+                    const enumValue = enumHelpers.APIResult.lift(i32Stack.pop());
+                    return { tag: AllTypesResultValues.Tag.NestedEnum, param0: enumValue };
+                }
+                case AllTypesResultValues.Tag.ArrayPayload: {
+                    const arrayLen = i32Stack.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const int = i32Stack.pop();
+                        arrayResult.push(int);
+                    }
+                    arrayResult.reverse();
+                    return { tag: AllTypesResultValues.Tag.ArrayPayload, param0: arrayResult };
+                }
+                case AllTypesResultValues.Tag.Empty: return { tag: AllTypesResultValues.Tag.Empty };
+                default: throw new Error("Unknown AllTypesResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
+    const __bjs_createOptionalAllTypesResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case OptionalAllTypesResultValues.Tag.OptStruct: {
+                    const isSome = value.param0 != null;
+                    if (isSome) {
+                        structHelpers.Point.lower(value.param0);
+                    }
+                    i32Stack.push(isSome ? 1 : 0);
+                    return OptionalAllTypesResultValues.Tag.OptStruct;
+                }
+                case OptionalAllTypesResultValues.Tag.OptClass: {
+                    const isSome = value.param0 != null;
+                    if (isSome) {
                         ptrStack.push(value.param0.pointer);
-                        const cleanup = undefined;
-                        return { caseId: AllTypesResultValues.Tag.ClassPayload, cleanup };
+                    } else {
+                        ptrStack.push(0);
                     }
-                    case AllTypesResultValues.Tag.JsObjectPayload: {
+                    i32Stack.push(isSome ? 1 : 0);
+                    return OptionalAllTypesResultValues.Tag.OptClass;
+                }
+                case OptionalAllTypesResultValues.Tag.OptJSObject: {
+                    const isSome = value.param0 != null;
+                    if (isSome) {
                         const objId = swift.memory.retain(value.param0);
                         i32Stack.push(objId);
-                        const cleanup = undefined;
-                        return { caseId: AllTypesResultValues.Tag.JsObjectPayload, cleanup };
+                    } else {
+                        i32Stack.push(0);
                     }
-                    case AllTypesResultValues.Tag.NestedEnum: {
-                        const { caseId: caseId, cleanup: enumCleanup } = enumHelpers.APIResult.lower(value.param0);
+                    i32Stack.push(isSome ? 1 : 0);
+                    return OptionalAllTypesResultValues.Tag.OptJSObject;
+                }
+                case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
+                    const isSome = value.param0 != null;
+                    if (isSome) {
+                        const caseId = enumHelpers.APIResult.lower(value.param0);
                         i32Stack.push(caseId);
-                        const cleanup = () => {
-                            if (enumCleanup) { enumCleanup(); }
-                        };
-                        return { caseId: AllTypesResultValues.Tag.NestedEnum, cleanup };
+                    } else {
+                        i32Stack.push(0);
                     }
-                    case AllTypesResultValues.Tag.ArrayPayload: {
-                        const arrayCleanups = [];
+                    i32Stack.push(isSome ? 1 : 0);
+                    return OptionalAllTypesResultValues.Tag.OptNestedEnum;
+                }
+                case OptionalAllTypesResultValues.Tag.OptArray: {
+                    const isSome = value.param0 != null;
+                    if (isSome) {
                         for (const elem of value.param0) {
                             i32Stack.push((elem | 0));
                         }
                         i32Stack.push(value.param0.length);
-                        const cleanup = () => {
-                            for (const cleanup of arrayCleanups) { cleanup(); }
-                        };
-                        return { caseId: AllTypesResultValues.Tag.ArrayPayload, cleanup };
                     }
-                    case AllTypesResultValues.Tag.Empty: {
-                        const cleanup = undefined;
-                        return { caseId: AllTypesResultValues.Tag.Empty, cleanup };
-                    }
-                    default: throw new Error("Unknown AllTypesResultValues tag: " + String(enumTag));
+                    i32Stack.push(isSome ? 1 : 0);
+                    return OptionalAllTypesResultValues.Tag.OptArray;
                 }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case AllTypesResultValues.Tag.StructPayload: {
+                case OptionalAllTypesResultValues.Tag.Empty: {
+                    return OptionalAllTypesResultValues.Tag.Empty;
+                }
+                default: throw new Error("Unknown OptionalAllTypesResultValues tag: " + String(enumTag));
+            }
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case OptionalAllTypesResultValues.Tag.OptStruct: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
                         const struct = structHelpers.Point.lift();
-                        return { tag: AllTypesResultValues.Tag.StructPayload, param0: struct };
+                        optional = struct;
+                    } else {
+                        optional = null;
                     }
-                    case AllTypesResultValues.Tag.ClassPayload: {
+                    return { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: optional };
+                }
+                case OptionalAllTypesResultValues.Tag.OptClass: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
                         const ptr = ptrStack.pop();
                         const obj = _exports['User'].__construct(ptr);
-                        return { tag: AllTypesResultValues.Tag.ClassPayload, param0: obj };
+                        optional = obj;
+                    } else {
+                        optional = null;
                     }
-                    case AllTypesResultValues.Tag.JsObjectPayload: {
+                    return { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: optional };
+                }
+                case OptionalAllTypesResultValues.Tag.OptJSObject: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
                         const objId = i32Stack.pop();
                         const obj = swift.memory.getObject(objId);
                         swift.memory.release(objId);
-                        return { tag: AllTypesResultValues.Tag.JsObjectPayload, param0: obj };
+                        optional = obj;
+                    } else {
+                        optional = null;
                     }
-                    case AllTypesResultValues.Tag.NestedEnum: {
-                        const enumValue = enumHelpers.APIResult.lift(i32Stack.pop(), );
-                        return { tag: AllTypesResultValues.Tag.NestedEnum, param0: enumValue };
+                    return { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: optional };
+                }
+                case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
+                        const caseId = i32Stack.pop();
+                        optional = enumHelpers.APIResult.lift(caseId);
+                    } else {
+                        optional = null;
                     }
-                    case AllTypesResultValues.Tag.ArrayPayload: {
+                    return { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: optional };
+                }
+                case OptionalAllTypesResultValues.Tag.OptArray: {
+                    const isSome = i32Stack.pop();
+                    let optional;
+                    if (isSome) {
                         const arrayLen = i32Stack.pop();
                         const arrayResult = [];
                         for (let i = 0; i < arrayLen; i++) {
@@ -678,173 +750,17 @@ export async function createInstantiator(options, swift) {
                             arrayResult.push(int);
                         }
                         arrayResult.reverse();
-                        return { tag: AllTypesResultValues.Tag.ArrayPayload, param0: arrayResult };
+                        optional = arrayResult;
+                    } else {
+                        optional = null;
                     }
-                    case AllTypesResultValues.Tag.Empty: return { tag: AllTypesResultValues.Tag.Empty };
-                    default: throw new Error("Unknown AllTypesResultValues tag returned from Swift: " + String(tag));
+                    return { tag: OptionalAllTypesResultValues.Tag.OptArray, param0: optional };
                 }
+                case OptionalAllTypesResultValues.Tag.Empty: return { tag: OptionalAllTypesResultValues.Tag.Empty };
+                default: throw new Error("Unknown OptionalAllTypesResultValues tag returned from Swift: " + String(tag));
             }
-        });
-    };
-    const __bjs_createOptionalAllTypesResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case OptionalAllTypesResultValues.Tag.OptStruct: {
-                        const isSome = value.param0 != null;
-                        let nestedCleanup;
-                        if (isSome) {
-                            const structResult = structHelpers.Point.lower(value.param0);
-                            nestedCleanup = structResult.cleanup;
-                        }
-                        i32Stack.push(isSome ? 1 : 0);
-                        const cleanup = () => {
-                            if (nestedCleanup) { nestedCleanup(); }
-                        };
-                        return { caseId: OptionalAllTypesResultValues.Tag.OptStruct, cleanup };
-                    }
-                    case OptionalAllTypesResultValues.Tag.OptClass: {
-                        const isSome = value.param0 != null;
-                        if (isSome) {
-                            ptrStack.push(value.param0.pointer);
-                        } else {
-                            ptrStack.push(0);
-                        }
-                        i32Stack.push(isSome ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: OptionalAllTypesResultValues.Tag.OptClass, cleanup };
-                    }
-                    case OptionalAllTypesResultValues.Tag.OptJSObject: {
-                        const isSome = value.param0 != null;
-                        let id;
-                        if (isSome) {
-                            id = swift.memory.retain(value.param0);
-                            i32Stack.push(id);
-                        } else {
-                            id = undefined;
-                            i32Stack.push(0);
-                        }
-                        i32Stack.push(isSome ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: OptionalAllTypesResultValues.Tag.OptJSObject, cleanup };
-                    }
-                    case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                        const isSome = value.param0 != null;
-                        let enumCaseId, enumCleanup;
-                        if (isSome) {
-                            const enumResult = enumHelpers.APIResult.lower(value.param0);
-                            enumCaseId = enumResult.caseId;
-                            enumCleanup = enumResult.cleanup;
-                            i32Stack.push(enumCaseId);
-                        } else {
-                            i32Stack.push(0);
-                        }
-                        i32Stack.push(isSome ? 1 : 0);
-                        const cleanup = () => {
-                            if (enumCleanup) { enumCleanup(); }
-                        };
-                        return { caseId: OptionalAllTypesResultValues.Tag.OptNestedEnum, cleanup };
-                    }
-                    case OptionalAllTypesResultValues.Tag.OptArray: {
-                        const isSome = value.param0 != null;
-                        let arrCleanup;
-                        if (isSome) {
-                            const arrayCleanups = [];
-                            for (const elem of value.param0) {
-                                i32Stack.push((elem | 0));
-                            }
-                            i32Stack.push(value.param0.length);
-                            arrCleanup = () => {
-                                for (const cleanup of arrayCleanups) { cleanup(); }
-                            };
-                        }
-                        i32Stack.push(isSome ? 1 : 0);
-                        const cleanup = () => {
-                            if (arrCleanup) { arrCleanup(); }
-                        };
-                        return { caseId: OptionalAllTypesResultValues.Tag.OptArray, cleanup };
-                    }
-                    case OptionalAllTypesResultValues.Tag.Empty: {
-                        const cleanup = undefined;
-                        return { caseId: OptionalAllTypesResultValues.Tag.Empty, cleanup };
-                    }
-                    default: throw new Error("Unknown OptionalAllTypesResultValues tag: " + String(enumTag));
-                }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case OptionalAllTypesResultValues.Tag.OptStruct: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const struct = structHelpers.Point.lift();
-                            optional = struct;
-                        } else {
-                            optional = null;
-                        }
-                        return { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: optional };
-                    }
-                    case OptionalAllTypesResultValues.Tag.OptClass: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const ptr = ptrStack.pop();
-                            const obj = _exports['User'].__construct(ptr);
-                            optional = obj;
-                        } else {
-                            optional = null;
-                        }
-                        return { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: optional };
-                    }
-                    case OptionalAllTypesResultValues.Tag.OptJSObject: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            optional = obj;
-                        } else {
-                            optional = null;
-                        }
-                        return { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: optional };
-                    }
-                    case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const caseId = i32Stack.pop();
-                            optional = enumHelpers.APIResult.lift(caseId);
-                        } else {
-                            optional = null;
-                        }
-                        return { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: optional };
-                    }
-                    case OptionalAllTypesResultValues.Tag.OptArray: {
-                        const isSome = i32Stack.pop();
-                        let optional;
-                        if (isSome) {
-                            const arrayLen = i32Stack.pop();
-                            const arrayResult = [];
-                            for (let i = 0; i < arrayLen; i++) {
-                                const int = i32Stack.pop();
-                                arrayResult.push(int);
-                            }
-                            arrayResult.reverse();
-                            optional = arrayResult;
-                        } else {
-                            optional = null;
-                        }
-                        return { tag: OptionalAllTypesResultValues.Tag.OptArray, param0: optional };
-                    }
-                    case OptionalAllTypesResultValues.Tag.Empty: return { tag: OptionalAllTypesResultValues.Tag.Empty };
-                    default: throw new Error("Unknown OptionalAllTypesResultValues tag returned from Swift: " + String(tag));
-                }
-            }
-        });
-    };
+        }
+    });
 
     return {
         /**
@@ -892,8 +808,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
                 const bytes = new Uint8Array(memory.buffer, ptr, len);
-                const value = textDecoder.decode(bytes);
-                strStack.push(value);
+                strStack.push(textDecoder.decode(bytes));
             }
             bjs["swift_js_pop_i32"] = function() {
                 return i32Stack.pop();
@@ -910,22 +825,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
             }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
-            }
             bjs["swift_js_struct_lower_Point"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Point.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Point.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Point"] = function() {
                 const value = structHelpers.Point.lift();
@@ -1067,39 +968,38 @@ export async function createInstantiator(options, swift) {
                 }
 
             }
-            const PointHelpers = __bjs_createPointHelpers()();
+            const PointHelpers = __bjs_createPointHelpers();
             structHelpers.Point = PointHelpers;
 
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()();
+            const APIResultHelpers = __bjs_createAPIResultValuesHelpers();
             enumHelpers.APIResult = APIResultHelpers;
 
-            const ComplexResultHelpers = __bjs_createComplexResultValuesHelpers()();
+            const ComplexResultHelpers = __bjs_createComplexResultValuesHelpers();
             enumHelpers.ComplexResult = ComplexResultHelpers;
 
-            const ResultHelpers = __bjs_createResultValuesHelpers()();
+            const ResultHelpers = __bjs_createResultValuesHelpers();
             enumHelpers.Result = ResultHelpers;
 
-            const NetworkingResultHelpers = __bjs_createNetworkingResultValuesHelpers()();
+            const NetworkingResultHelpers = __bjs_createNetworkingResultValuesHelpers();
             enumHelpers.NetworkingResult = NetworkingResultHelpers;
 
-            const APIOptionalResultHelpers = __bjs_createAPIOptionalResultValuesHelpers()();
+            const APIOptionalResultHelpers = __bjs_createAPIOptionalResultValuesHelpers();
             enumHelpers.APIOptionalResult = APIOptionalResultHelpers;
 
-            const TypedPayloadResultHelpers = __bjs_createTypedPayloadResultValuesHelpers()();
+            const TypedPayloadResultHelpers = __bjs_createTypedPayloadResultValuesHelpers();
             enumHelpers.TypedPayloadResult = TypedPayloadResultHelpers;
 
-            const AllTypesResultHelpers = __bjs_createAllTypesResultValuesHelpers()();
+            const AllTypesResultHelpers = __bjs_createAllTypesResultValuesHelpers();
             enumHelpers.AllTypesResult = AllTypesResultHelpers;
 
-            const OptionalAllTypesResultHelpers = __bjs_createOptionalAllTypesResultValuesHelpers()();
+            const OptionalAllTypesResultHelpers = __bjs_createOptionalAllTypesResultValuesHelpers();
             enumHelpers.OptionalAllTypesResult = OptionalAllTypesResultHelpers;
 
             const exports = {
                 User,
                 handle: function bjs_handle(result) {
-                    const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.APIResult.lower(result);
+                    const resultCaseId = enumHelpers.APIResult.lower(result);
                     instance.exports.bjs_handle(resultCaseId);
-                    if (resultCleanup) { resultCleanup(); }
                 },
                 getResult: function bjs_getResult() {
                     instance.exports.bjs_getResult();
@@ -1107,36 +1007,28 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 roundtripAPIResult: function bjs_roundtripAPIResult(result) {
-                    const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.APIResult.lower(result);
+                    const resultCaseId = enumHelpers.APIResult.lower(result);
                     instance.exports.bjs_roundtripAPIResult(resultCaseId);
                     const ret = enumHelpers.APIResult.lift(i32Stack.pop());
-                    if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
                 roundTripOptionalAPIResult: function bjs_roundTripOptionalAPIResult(result) {
                     const isSome = result != null;
-                    let resultCaseId, resultCleanup;
+                    let result1;
                     if (isSome) {
-                        const enumResult = enumHelpers.APIResult.lower(result);
-                        resultCaseId = enumResult.caseId;
-                        resultCleanup = enumResult.cleanup;
-                    }
-                    instance.exports.bjs_roundTripOptionalAPIResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const resultCaseId = enumHelpers.APIResult.lower(result);
+                        result1 = resultCaseId;
                     } else {
-                        optResult = enumHelpers.APIResult.lift(tag);
+                        result1 = 0;
                     }
-                    if (resultCleanup) { resultCleanup(); }
+                    instance.exports.bjs_roundTripOptionalAPIResult(+isSome, result1);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.APIResult.lift(tag);
                     return optResult;
                 },
                 handleComplex: function bjs_handleComplex(result) {
-                    const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.ComplexResult.lower(result);
+                    const resultCaseId = enumHelpers.ComplexResult.lower(result);
                     instance.exports.bjs_handleComplex(resultCaseId);
-                    if (resultCleanup) { resultCleanup(); }
                 },
                 getComplexResult: function bjs_getComplexResult() {
                     instance.exports.bjs_getComplexResult();
@@ -1144,199 +1036,147 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 roundtripComplexResult: function bjs_roundtripComplexResult(result) {
-                    const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.ComplexResult.lower(result);
+                    const resultCaseId = enumHelpers.ComplexResult.lower(result);
                     instance.exports.bjs_roundtripComplexResult(resultCaseId);
                     const ret = enumHelpers.ComplexResult.lift(i32Stack.pop());
-                    if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
                 roundTripOptionalComplexResult: function bjs_roundTripOptionalComplexResult(result) {
                     const isSome = result != null;
-                    let resultCaseId, resultCleanup;
+                    let result1;
                     if (isSome) {
-                        const enumResult = enumHelpers.ComplexResult.lower(result);
-                        resultCaseId = enumResult.caseId;
-                        resultCleanup = enumResult.cleanup;
-                    }
-                    instance.exports.bjs_roundTripOptionalComplexResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const resultCaseId = enumHelpers.ComplexResult.lower(result);
+                        result1 = resultCaseId;
                     } else {
-                        optResult = enumHelpers.ComplexResult.lift(tag);
+                        result1 = 0;
                     }
-                    if (resultCleanup) { resultCleanup(); }
+                    instance.exports.bjs_roundTripOptionalComplexResult(+isSome, result1);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.ComplexResult.lift(tag);
                     return optResult;
                 },
                 roundTripOptionalUtilitiesResult: function bjs_roundTripOptionalUtilitiesResult(result) {
                     const isSome = result != null;
-                    let resultCaseId, resultCleanup;
+                    let result1;
                     if (isSome) {
-                        const enumResult = enumHelpers.Result.lower(result);
-                        resultCaseId = enumResult.caseId;
-                        resultCleanup = enumResult.cleanup;
-                    }
-                    instance.exports.bjs_roundTripOptionalUtilitiesResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const resultCaseId = enumHelpers.Result.lower(result);
+                        result1 = resultCaseId;
                     } else {
-                        optResult = enumHelpers.Result.lift(tag);
+                        result1 = 0;
                     }
-                    if (resultCleanup) { resultCleanup(); }
+                    instance.exports.bjs_roundTripOptionalUtilitiesResult(+isSome, result1);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.Result.lift(tag);
                     return optResult;
                 },
                 roundTripOptionalNetworkingResult: function bjs_roundTripOptionalNetworkingResult(result) {
                     const isSome = result != null;
-                    let resultCaseId, resultCleanup;
+                    let result1;
                     if (isSome) {
-                        const enumResult = enumHelpers.NetworkingResult.lower(result);
-                        resultCaseId = enumResult.caseId;
-                        resultCleanup = enumResult.cleanup;
-                    }
-                    instance.exports.bjs_roundTripOptionalNetworkingResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const resultCaseId = enumHelpers.NetworkingResult.lower(result);
+                        result1 = resultCaseId;
                     } else {
-                        optResult = enumHelpers.NetworkingResult.lift(tag);
+                        result1 = 0;
                     }
-                    if (resultCleanup) { resultCleanup(); }
+                    instance.exports.bjs_roundTripOptionalNetworkingResult(+isSome, result1);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.NetworkingResult.lift(tag);
                     return optResult;
                 },
                 roundTripOptionalAPIOptionalResult: function bjs_roundTripOptionalAPIOptionalResult(result) {
                     const isSome = result != null;
-                    let resultCaseId, resultCleanup;
+                    let result1;
                     if (isSome) {
-                        const enumResult = enumHelpers.APIOptionalResult.lower(result);
-                        resultCaseId = enumResult.caseId;
-                        resultCleanup = enumResult.cleanup;
-                    }
-                    instance.exports.bjs_roundTripOptionalAPIOptionalResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const resultCaseId = enumHelpers.APIOptionalResult.lower(result);
+                        result1 = resultCaseId;
                     } else {
-                        optResult = enumHelpers.APIOptionalResult.lift(tag);
+                        result1 = 0;
                     }
-                    if (resultCleanup) { resultCleanup(); }
+                    instance.exports.bjs_roundTripOptionalAPIOptionalResult(+isSome, result1);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.APIOptionalResult.lift(tag);
                     return optResult;
                 },
                 compareAPIResults: function bjs_compareAPIResults(result1, result2) {
                     const isSome = result1 != null;
-                    let result1CaseId, result1Cleanup;
+                    let result;
                     if (isSome) {
-                        const enumResult = enumHelpers.APIOptionalResult.lower(result1);
-                        result1CaseId = enumResult.caseId;
-                        result1Cleanup = enumResult.cleanup;
+                        const result1CaseId = enumHelpers.APIOptionalResult.lower(result1);
+                        result = result1CaseId;
+                    } else {
+                        result = 0;
                     }
                     const isSome1 = result2 != null;
-                    let result2CaseId, result2Cleanup;
+                    let result3;
                     if (isSome1) {
-                        const enumResult1 = enumHelpers.APIOptionalResult.lower(result2);
-                        result2CaseId = enumResult1.caseId;
-                        result2Cleanup = enumResult1.cleanup;
-                    }
-                    instance.exports.bjs_compareAPIResults(+isSome, isSome ? result1CaseId : 0, +isSome1, isSome1 ? result2CaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const result2CaseId = enumHelpers.APIOptionalResult.lower(result2);
+                        result3 = result2CaseId;
                     } else {
-                        optResult = enumHelpers.APIOptionalResult.lift(tag);
+                        result3 = 0;
                     }
-                    if (result1Cleanup) { result1Cleanup(); }
-                    if (result2Cleanup) { result2Cleanup(); }
+                    instance.exports.bjs_compareAPIResults(+isSome, result, +isSome1, result3);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.APIOptionalResult.lift(tag);
                     return optResult;
                 },
                 roundTripTypedPayloadResult: function bjs_roundTripTypedPayloadResult(result) {
-                    const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.TypedPayloadResult.lower(result);
+                    const resultCaseId = enumHelpers.TypedPayloadResult.lower(result);
                     instance.exports.bjs_roundTripTypedPayloadResult(resultCaseId);
                     const ret = enumHelpers.TypedPayloadResult.lift(i32Stack.pop());
-                    if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
                 roundTripOptionalTypedPayloadResult: function bjs_roundTripOptionalTypedPayloadResult(result) {
                     const isSome = result != null;
-                    let resultCaseId, resultCleanup;
+                    let result1;
                     if (isSome) {
-                        const enumResult = enumHelpers.TypedPayloadResult.lower(result);
-                        resultCaseId = enumResult.caseId;
-                        resultCleanup = enumResult.cleanup;
-                    }
-                    instance.exports.bjs_roundTripOptionalTypedPayloadResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const resultCaseId = enumHelpers.TypedPayloadResult.lower(result);
+                        result1 = resultCaseId;
                     } else {
-                        optResult = enumHelpers.TypedPayloadResult.lift(tag);
+                        result1 = 0;
                     }
-                    if (resultCleanup) { resultCleanup(); }
+                    instance.exports.bjs_roundTripOptionalTypedPayloadResult(+isSome, result1);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.TypedPayloadResult.lift(tag);
                     return optResult;
                 },
                 roundTripAllTypesResult: function bjs_roundTripAllTypesResult(result) {
-                    const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.AllTypesResult.lower(result);
+                    const resultCaseId = enumHelpers.AllTypesResult.lower(result);
                     instance.exports.bjs_roundTripAllTypesResult(resultCaseId);
                     const ret = enumHelpers.AllTypesResult.lift(i32Stack.pop());
-                    if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
                 roundTripOptionalAllTypesResult: function bjs_roundTripOptionalAllTypesResult(result) {
                     const isSome = result != null;
-                    let resultCaseId, resultCleanup;
+                    let result1;
                     if (isSome) {
-                        const enumResult = enumHelpers.AllTypesResult.lower(result);
-                        resultCaseId = enumResult.caseId;
-                        resultCleanup = enumResult.cleanup;
-                    }
-                    instance.exports.bjs_roundTripOptionalAllTypesResult(+isSome, isSome ? resultCaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const resultCaseId = enumHelpers.AllTypesResult.lower(result);
+                        result1 = resultCaseId;
                     } else {
-                        optResult = enumHelpers.AllTypesResult.lift(tag);
+                        result1 = 0;
                     }
-                    if (resultCleanup) { resultCleanup(); }
+                    instance.exports.bjs_roundTripOptionalAllTypesResult(+isSome, result1);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.AllTypesResult.lift(tag);
                     return optResult;
                 },
                 roundTripOptionalPayloadResult: function bjs_roundTripOptionalPayloadResult(result) {
-                    const { caseId: resultCaseId, cleanup: resultCleanup } = enumHelpers.OptionalAllTypesResult.lower(result);
+                    const resultCaseId = enumHelpers.OptionalAllTypesResult.lower(result);
                     instance.exports.bjs_roundTripOptionalPayloadResult(resultCaseId);
                     const ret = enumHelpers.OptionalAllTypesResult.lift(i32Stack.pop());
-                    if (resultCleanup) { resultCleanup(); }
                     return ret;
                 },
                 roundTripOptionalPayloadResultOpt: function bjs_roundTripOptionalPayloadResultOpt(result) {
                     const isSome = result != null;
-                    let resultCaseId, resultCleanup;
+                    let result1;
                     if (isSome) {
-                        const enumResult = enumHelpers.OptionalAllTypesResult.lower(result);
-                        resultCaseId = enumResult.caseId;
-                        resultCleanup = enumResult.cleanup;
-                    }
-                    instance.exports.bjs_roundTripOptionalPayloadResultOpt(+isSome, isSome ? resultCaseId : 0);
-                    const tag = i32Stack.pop();
-                    const isNull = (tag === -1);
-                    let optResult;
-                    if (isNull) {
-                        optResult = null;
+                        const resultCaseId = enumHelpers.OptionalAllTypesResult.lower(result);
+                        result1 = resultCaseId;
                     } else {
-                        optResult = enumHelpers.OptionalAllTypesResult.lift(tag);
+                        result1 = 0;
                     }
-                    if (resultCleanup) { resultCleanup(); }
+                    instance.exports.bjs_roundTripOptionalPayloadResultOpt(+isSome, result1);
+                    const tag = i32Stack.pop();
+                    const optResult = tag === -1 ? null : enumHelpers.OptionalAllTypesResult.lift(tag);
                     return optResult;
                 },
                 APIResult: APIResultValues,
