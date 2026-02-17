@@ -7,6 +7,153 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
+extension PlayBridgeJSOutput: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> PlayBridgeJSOutput {
+        let swiftGlue = String.bridgeJSStackPop()
+        let importSwiftMacroDecls = String.bridgeJSStackPop()
+        let outputDts = String.bridgeJSStackPop()
+        let outputJs = String.bridgeJSStackPop()
+        return PlayBridgeJSOutput(outputJs: outputJs, outputDts: outputDts, importSwiftMacroDecls: importSwiftMacroDecls, swiftGlue: swiftGlue)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.outputJs.bridgeJSStackPush()
+        self.outputDts.bridgeJSStackPush()
+        self.importSwiftMacroDecls.bridgeJSStackPush()
+        self.swiftGlue.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_PlayBridgeJSOutput(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_PlayBridgeJSOutput()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PlayBridgeJSOutput")
+fileprivate func _bjs_struct_lower_PlayBridgeJSOutput(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_PlayBridgeJSOutput(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_PlayBridgeJSOutput")
+fileprivate func _bjs_struct_lift_PlayBridgeJSOutput() -> Int32
+#else
+fileprivate func _bjs_struct_lift_PlayBridgeJSOutput() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+extension PlayBridgeJSDiagnostic: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> PlayBridgeJSDiagnostic {
+        let endColumn = Int.bridgeJSStackPop()
+        let endLine = Int.bridgeJSStackPop()
+        let startColumn = Int.bridgeJSStackPop()
+        let startLine = Int.bridgeJSStackPop()
+        let message = String.bridgeJSStackPop()
+        let file = String.bridgeJSStackPop()
+        return PlayBridgeJSDiagnostic(file: file, message: message, startLine: startLine, startColumn: startColumn, endLine: endLine, endColumn: endColumn)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.file.bridgeJSStackPush()
+        self.message.bridgeJSStackPush()
+        self.startLine.bridgeJSStackPush()
+        self.startColumn.bridgeJSStackPush()
+        self.endLine.bridgeJSStackPush()
+        self.endColumn.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_PlayBridgeJSDiagnostic(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_PlayBridgeJSDiagnostic()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PlayBridgeJSDiagnostic")
+fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_PlayBridgeJSDiagnostic")
+fileprivate func _bjs_struct_lift_PlayBridgeJSDiagnostic() -> Int32
+#else
+fileprivate func _bjs_struct_lift_PlayBridgeJSDiagnostic() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+extension PlayBridgeJSResult: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> PlayBridgeJSResult {
+        let diagnostics = [PlayBridgeJSDiagnostic].bridgeJSStackPop()
+        let output = Optional<PlayBridgeJSOutput>.bridgeJSStackPop()
+        return PlayBridgeJSResult(output: output, diagnostics: diagnostics)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.output.bridgeJSStackPush()
+        self.diagnostics.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        let __bjs_cleanupId = _bjs_struct_lower_PlayBridgeJSResult(jsObject.bridgeJSLowerParameter())
+        defer {
+            _swift_js_struct_cleanup(__bjs_cleanupId)
+        }
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_PlayBridgeJSResult()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PlayBridgeJSResult")
+fileprivate func _bjs_struct_lower_PlayBridgeJSResult(_ objectId: Int32) -> Int32
+#else
+fileprivate func _bjs_struct_lower_PlayBridgeJSResult(_ objectId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_PlayBridgeJSResult")
+fileprivate func _bjs_struct_lift_PlayBridgeJSResult() -> Int32
+#else
+fileprivate func _bjs_struct_lift_PlayBridgeJSResult() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
 @_expose(wasm, "bjs_PlayBridgeJS_init")
 @_cdecl("bjs_PlayBridgeJS_init")
 public func _bjs_PlayBridgeJS_init() -> UnsafeMutableRawPointer {
@@ -18,12 +165,12 @@ public func _bjs_PlayBridgeJS_init() -> UnsafeMutableRawPointer {
     #endif
 }
 
-@_expose(wasm, "bjs_PlayBridgeJS_update")
-@_cdecl("bjs_PlayBridgeJS_update")
-public func _bjs_PlayBridgeJS_update(_ _self: UnsafeMutableRawPointer, _ swiftSourceBytes: Int32, _ swiftSourceLength: Int32, _ dtsSourceBytes: Int32, _ dtsSourceLength: Int32) -> UnsafeMutableRawPointer {
+@_expose(wasm, "bjs_PlayBridgeJS_updateDetailed")
+@_cdecl("bjs_PlayBridgeJS_updateDetailed")
+public func _bjs_PlayBridgeJS_updateDetailed(_ _self: UnsafeMutableRawPointer, _ swiftSourceBytes: Int32, _ swiftSourceLength: Int32, _ dtsSourceBytes: Int32, _ dtsSourceLength: Int32) -> Void {
     #if arch(wasm32)
     do {
-        let ret = try PlayBridgeJS.bridgeJSLiftParameter(_self).update(swiftSource: String.bridgeJSLiftParameter(swiftSourceBytes, swiftSourceLength), dtsSource: String.bridgeJSLiftParameter(dtsSourceBytes, dtsSourceLength))
+        let ret = try PlayBridgeJS.bridgeJSLiftParameter(_self).updateDetailed(swiftSource: String.bridgeJSLiftParameter(swiftSourceBytes, swiftSourceLength), dtsSource: String.bridgeJSLiftParameter(dtsSourceBytes, dtsSourceLength))
         return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
@@ -36,7 +183,7 @@ public func _bjs_PlayBridgeJS_update(_ _self: UnsafeMutableRawPointer, _ swiftSo
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         }
-        return UnsafeMutableRawPointer(bitPattern: -1).unsafelyUnwrapped
+        return
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -64,75 +211,6 @@ extension PlayBridgeJS: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 fileprivate func _bjs_PlayBridgeJS_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
 fileprivate func _bjs_PlayBridgeJS_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-
-@_expose(wasm, "bjs_PlayBridgeJSOutput_outputJs")
-@_cdecl("bjs_PlayBridgeJSOutput_outputJs")
-public func _bjs_PlayBridgeJSOutput_outputJs(_ _self: UnsafeMutableRawPointer) -> Void {
-    #if arch(wasm32)
-    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).outputJs()
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_PlayBridgeJSOutput_outputDts")
-@_cdecl("bjs_PlayBridgeJSOutput_outputDts")
-public func _bjs_PlayBridgeJSOutput_outputDts(_ _self: UnsafeMutableRawPointer) -> Void {
-    #if arch(wasm32)
-    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).outputDts()
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_PlayBridgeJSOutput_importSwiftMacroDecls")
-@_cdecl("bjs_PlayBridgeJSOutput_importSwiftMacroDecls")
-public func _bjs_PlayBridgeJSOutput_importSwiftMacroDecls(_ _self: UnsafeMutableRawPointer) -> Void {
-    #if arch(wasm32)
-    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).importSwiftMacroDecls()
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_PlayBridgeJSOutput_swiftGlue")
-@_cdecl("bjs_PlayBridgeJSOutput_swiftGlue")
-public func _bjs_PlayBridgeJSOutput_swiftGlue(_ _self: UnsafeMutableRawPointer) -> Void {
-    #if arch(wasm32)
-    let ret = PlayBridgeJSOutput.bridgeJSLiftParameter(_self).swiftGlue()
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_PlayBridgeJSOutput_deinit")
-@_cdecl("bjs_PlayBridgeJSOutput_deinit")
-public func _bjs_PlayBridgeJSOutput_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
-    #if arch(wasm32)
-    Unmanaged<PlayBridgeJSOutput>.fromOpaque(pointer).release()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-extension PlayBridgeJSOutput: ConvertibleToJSValue, _BridgedSwiftHeapObject {
-    var jsValue: JSValue {
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_PlayBridgeJSOutput_wrap(Unmanaged.passRetained(self).toOpaque()))))
-    }
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJSOutput_wrap")
-fileprivate func _bjs_PlayBridgeJSOutput_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
-#else
-fileprivate func _bjs_PlayBridgeJSOutput_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif

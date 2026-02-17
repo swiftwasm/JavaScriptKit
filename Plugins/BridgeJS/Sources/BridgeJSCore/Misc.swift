@@ -136,12 +136,12 @@ private enum JSON {
 import SwiftSyntax
 import class Foundation.ProcessInfo
 
-struct DiagnosticError: Error {
-    let node: Syntax
-    let message: String
-    let hint: String?
+public struct DiagnosticError: Error {
+    public let node: Syntax
+    public let message: String
+    public let hint: String?
 
-    init(node: some SyntaxProtocol, message: String, hint: String? = nil) {
+    public init(node: some SyntaxProtocol, message: String, hint: String? = nil) {
         self.node = Syntax(node)
         self.message = message
         self.hint = hint
@@ -153,7 +153,7 @@ struct DiagnosticError: Error {
     ///   - fileName: The name of the file to display in the output.
     ///   - colorize: Whether to colorize the output with ANSI escape sequences.
     /// - Returns: The formatted diagnostic error string.
-    func formattedDescription(fileName: String, colorize: Bool = Self.shouldColorize) -> String {
+    public func formattedDescription(fileName: String, colorize: Bool = Self.shouldColorize) -> String {
         let displayFileName = fileName == "-" ? "<stdin>" : fileName
         let converter = SourceLocationConverter(fileName: displayFileName, tree: node.root)
         let startLocation = converter.location(for: node.positionAfterSkippingLeadingTrivia)
@@ -273,7 +273,7 @@ struct DiagnosticError: Error {
         return "\(gutter) | \(text)"
     }
 
-    private static var shouldColorize: Bool {
+    public static var shouldColorize: Bool {
         let env = ProcessInfo.processInfo.environment
         let termIsDumb = env["TERM"] == "dumb"
         return env["NO_COLOR"] == nil && !termIsDumb
@@ -284,6 +284,20 @@ struct DiagnosticError: Error {
         let utf8Index = line.utf8.index(line.utf8.startIndex, offsetBy: clamped)
         // String.Index initializer is guaranteed to succeed because the UTF8 index comes from the same string.
         return String.Index(utf8Index, within: line)!
+    }
+}
+/// Carries the diagnostics produced during SwiftToSkeleton.
+public struct BridgeJSCoreDiagnosticError: Swift.Error, CustomStringConvertible {
+    public let diagnostics: [(file: String, diagnostic: DiagnosticError)]
+
+    public init(diagnostics: [(file: String, diagnostic: DiagnosticError)]) {
+        self.diagnostics = diagnostics
+    }
+
+    public var description: String {
+        diagnostics
+            .map { (file, diag) in diag.formattedDescription(fileName: file, colorize: false) }
+            .joined(separator: "\n")
     }
 }
 

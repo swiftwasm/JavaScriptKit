@@ -15,13 +15,13 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_PlayBridgeJS_update",
+            "abiName" : "bjs_PlayBridgeJS_updateDetailed",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
               "isThrows" : true
             },
-            "name" : "update",
+            "name" : "updateDetailed",
             "parameters" : [
               {
                 "label" : "swiftSource",
@@ -43,8 +43,8 @@
               }
             ],
             "returnType" : {
-              "swiftHeapObject" : {
-                "_0" : "PlayBridgeJSOutput"
+              "swiftStruct" : {
+                "_0" : "PlayBridgeJSResult"
               }
             }
           }
@@ -54,83 +54,6 @@
 
         ],
         "swiftCallName" : "PlayBridgeJS"
-      },
-      {
-        "methods" : [
-          {
-            "abiName" : "bjs_PlayBridgeJSOutput_outputJs",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : false
-            },
-            "name" : "outputJs",
-            "parameters" : [
-
-            ],
-            "returnType" : {
-              "string" : {
-
-              }
-            }
-          },
-          {
-            "abiName" : "bjs_PlayBridgeJSOutput_outputDts",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : false
-            },
-            "name" : "outputDts",
-            "parameters" : [
-
-            ],
-            "returnType" : {
-              "string" : {
-
-              }
-            }
-          },
-          {
-            "abiName" : "bjs_PlayBridgeJSOutput_importSwiftMacroDecls",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : false
-            },
-            "name" : "importSwiftMacroDecls",
-            "parameters" : [
-
-            ],
-            "returnType" : {
-              "string" : {
-
-              }
-            }
-          },
-          {
-            "abiName" : "bjs_PlayBridgeJSOutput_swiftGlue",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : false
-            },
-            "name" : "swiftGlue",
-            "parameters" : [
-
-            ],
-            "returnType" : {
-              "string" : {
-
-              }
-            }
-          }
-        ],
-        "name" : "PlayBridgeJSOutput",
-        "properties" : [
-
-        ],
-        "swiftCallName" : "PlayBridgeJSOutput"
       }
     ],
     "enums" : [
@@ -144,7 +67,162 @@
 
     ],
     "structs" : [
+      {
+        "methods" : [
 
+        ],
+        "name" : "PlayBridgeJSOutput",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "outputJs",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "outputDts",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "importSwiftMacroDecls",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "swiftGlue",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "PlayBridgeJSOutput"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "PlayBridgeJSDiagnostic",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "file",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "message",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "startLine",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "startColumn",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "endLine",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "endColumn",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "PlayBridgeJSDiagnostic"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "PlayBridgeJSResult",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "output",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "PlayBridgeJSOutput"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "diagnostics",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "PlayBridgeJSDiagnostic"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "PlayBridgeJSResult"
+      }
     ]
   },
   "imported" : {

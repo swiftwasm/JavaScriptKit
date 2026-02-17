@@ -1,14 +1,40 @@
 import JavaScriptEventLoop
 import JavaScriptKit
 import SwiftParser
+import SwiftSyntax
 import class Foundation.JSONDecoder
 
 @JS class PlayBridgeJS {
     @JS init() {}
 
-    @JS func update(swiftSource: String, dtsSource: String) throws(JSException) -> PlayBridgeJSOutput {
+    /// Structured entry point used by the playground so JS doesn't need to parse diagnostics.
+    @JS func updateDetailed(swiftSource: String, dtsSource: String) throws(JSException) -> PlayBridgeJSResult {
         do {
-            return try _update(swiftSource: swiftSource, dtsSource: dtsSource)
+            let output = try _update(swiftSource: swiftSource, dtsSource: dtsSource)
+            return PlayBridgeJSResult(output: output, diagnostics: [])
+        } catch let error as BridgeJSCoreDiagnosticError {
+            let diagnostics = error.diagnostics.map { diag -> PlayBridgeJSDiagnostic in
+                let converter = SourceLocationConverter(fileName: diag.file, tree: diag.diagnostic.node.root)
+                let start = converter.location(for: diag.diagnostic.node.positionAfterSkippingLeadingTrivia)
+                let end = converter.location(for: diag.diagnostic.node.endPositionBeforeTrailingTrivia)
+
+                let startLine = start.line
+                let startColumn = start.column
+                let endLine = end.line
+                let endColumn = max(startColumn + 1, end.column)
+
+                return PlayBridgeJSDiagnostic(
+                    file: diag.file,
+                    message: diag.diagnostic.message,
+                    startLine: startLine,
+                    startColumn: startColumn,
+                    endLine: endLine,
+                    endColumn: endColumn
+                )
+            }
+            return PlayBridgeJSResult(output: nil, diagnostics: diagnostics)
+        } catch let error as BridgeJSCoreError {
+            throw JSException(message: error.description)
         } catch let error as JSException {
             throw error
         } catch {
@@ -49,23 +75,26 @@ import class Foundation.JSONDecoder
             swiftGlue: (importResult ?? "") + "\n\n" + (exportResult ?? "")
         )
     }
+
 }
 
-@JS class PlayBridgeJSOutput {
-    let _outputJs: String
-    let _outputDts: String
-    let _importSwiftMacroDecls: String
-    let _swiftGlue: String
+@JS struct PlayBridgeJSOutput {
+    let outputJs: String
+    let outputDts: String
+    let importSwiftMacroDecls: String
+    let swiftGlue: String
+}
 
-    init(outputJs: String, outputDts: String, importSwiftMacroDecls: String, swiftGlue: String) {
-        self._outputJs = outputJs
-        self._outputDts = outputDts
-        self._importSwiftMacroDecls = importSwiftMacroDecls
-        self._swiftGlue = swiftGlue
-    }
+@JS struct PlayBridgeJSDiagnostic {
+    let file: String
+    let message: String
+    let startLine: Int
+    let startColumn: Int
+    let endLine: Int
+    let endColumn: Int
+}
 
-    @JS func outputJs() -> String { self._outputJs }
-    @JS func outputDts() -> String { self._outputDts }
-    @JS func importSwiftMacroDecls() -> String { self._importSwiftMacroDecls }
-    @JS func swiftGlue() -> String { self._swiftGlue }
+@JS struct PlayBridgeJSResult {
+    let output: PlayBridgeJSOutput?
+    let diagnostics: [PlayBridgeJSDiagnostic]
 }
