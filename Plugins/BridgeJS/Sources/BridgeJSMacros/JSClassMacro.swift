@@ -47,6 +47,21 @@ extension JSClassMacro: MemberMacro {
         }
 
         var members: [DeclSyntax] = []
+        guard let structDecl = declaration.as(StructDeclSyntax.self) else { return members }
+
+        if let accessLevel = accessLevel(from: structDecl.modifiers),
+            accessLevel == .private || accessLevel == .fileprivate
+        {
+            context.diagnose(
+                Diagnostic(
+                    node: Syntax(structDecl),
+                    message: JSMacroMessage.jsClassRequiresAtLeastInternal
+                )
+            )
+            return []
+        }
+
+        let memberAccessModifier = synthesizedMemberAccessModifier(for: declaration).map { "\($0) " } ?? ""
 
         let existingMembers = declaration.memberBlock.members
         let hasJSObjectProperty = existingMembers.contains { member in
@@ -57,7 +72,7 @@ extension JSClassMacro: MemberMacro {
         }
 
         if !hasJSObjectProperty {
-            members.append(DeclSyntax("let jsObject: JSObject"))
+            members.append(DeclSyntax("\(raw: memberAccessModifier)let jsObject: JSObject"))
         }
 
         let hasUnsafelyWrappingInit = existingMembers.contains { member in
@@ -73,7 +88,7 @@ extension JSClassMacro: MemberMacro {
             members.append(
                 DeclSyntax(
                     """
-                    init(unsafelyWrapping jsObject: JSObject) {
+                    \(raw: memberAccessModifier)init(unsafelyWrapping jsObject: JSObject) {
                         self.jsObject = jsObject
                     }
                     """
@@ -95,6 +110,11 @@ extension JSClassMacro: ExtensionMacro {
     ) throws -> [ExtensionDeclSyntax] {
         guard let structDecl = declaration.as(StructDeclSyntax.self) else { return [] }
         guard !protocols.isEmpty else { return [] }
+        if let accessLevel = accessLevel(from: structDecl.modifiers),
+            accessLevel == .private || accessLevel == .fileprivate
+        {
+            return []
+        }
 
         // Do not add extension if the struct already conforms to _JSBridgedClass
         if let clause = structDecl.inheritanceClause,
@@ -107,5 +127,38 @@ extension JSClassMacro: ExtensionMacro {
         return [
             try ExtensionDeclSyntax("extension \(type.trimmed): \(raw: conformanceList) {}")
         ]
+    }
+
+    private static func synthesizedMemberAccessModifier(for declaration: some DeclGroupSyntax) -> String? {
+        guard let structDecl = declaration.as(StructDeclSyntax.self) else { return nil }
+        switch accessLevel(from: structDecl.modifiers) {
+        case .public: return "public"
+        case .package: return "package"
+        case .internal: return "internal"
+        case .fileprivate, .private, .none: return nil
+        }
+    }
+
+    private enum AccessLevel {
+        case `public`
+        case package
+        case `internal`
+        case `fileprivate`
+        case `private`
+    }
+
+    private static func accessLevel(from modifiers: DeclModifierListSyntax?) -> AccessLevel? {
+        guard let modifiers else { return nil }
+        for modifier in modifiers {
+            switch modifier.name.tokenKind {
+            case .keyword(.public): return .public
+            case .keyword(.package): return .package
+            case .keyword(.internal): return .internal
+            case .keyword(.fileprivate): return .fileprivate
+            case .keyword(.private): return .private
+            default: continue
+            }
+        }
+        return nil
     }
 }

@@ -370,4 +370,102 @@ import BridgeJSMacros
             indentationWidth: indentationWidth
         )
     }
+
+    @Test func publicStructSynthesizesPublicMembers() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            public struct MyClass {
+            }
+            """,
+            expandedSource: """
+                public struct MyClass {
+
+                    public let jsObject: JSObject
+
+                    public init(unsafelyWrapping jsObject: JSObject) {
+                        self.jsObject = jsObject
+                    }
+                }
+
+                extension MyClass: _JSBridgedClass {
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth
+        )
+    }
+
+    @Test func packageStructSynthesizesPackageMembers() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            package struct MyClass {
+            }
+            """,
+            expandedSource: """
+                package struct MyClass {
+
+                    package let jsObject: JSObject
+
+                    package init(unsafelyWrapping jsObject: JSObject) {
+                        self.jsObject = jsObject
+                    }
+                }
+
+                extension MyClass: _JSBridgedClass {
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth
+        )
+    }
+
+    @Test func privateStructIsRejected() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            private struct MyClass {
+            }
+            """,
+            expandedSource: """
+                private struct MyClass {
+                }
+                """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message:
+                        "@JSClass does not support private/fileprivate access level. Use internal, package, or public.",
+                    line: 1,
+                    column: 1
+                )
+            ],
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth
+        )
+    }
+
+    @Test func fileprivateStructIsRejected() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            fileprivate struct MyClass {
+            }
+            """,
+            expandedSource: """
+                fileprivate struct MyClass {
+                }
+                """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message:
+                        "@JSClass does not support private/fileprivate access level. Use internal, package, or public.",
+                    line: 1,
+                    column: 1
+                )
+            ],
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth
+        )
+    }
 }
