@@ -15300,6 +15300,138 @@
         ],
         "types" : [
           {
+            "constructor" : {
+              "parameters" : [
+
+              ]
+            },
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "MyJSClassInternal",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "constructor" : {
+              "parameters" : [
+
+              ]
+            },
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "MyJSClassPublic",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "constructor" : {
+              "parameters" : [
+
+              ]
+            },
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "MyJSClassPackage",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+          {
+            "name" : "jsFunctionWithPackageAccess",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsFunctionWithPublicAccess",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsFunctionWithInternalAccess",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsFunctionWithFilePrivateAccess",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsFunctionWithPrivateAccess",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
             "getters" : [
 
             ],

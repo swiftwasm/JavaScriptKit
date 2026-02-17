@@ -10157,6 +10157,137 @@ func _$jsTranslatePoint(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_MyJSClassInternal_init")
+fileprivate func bjs_MyJSClassInternal_init() -> Int32
+#else
+fileprivate func bjs_MyJSClassInternal_init() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$MyJSClassInternal_init() throws(JSException) -> JSObject {
+    let ret = bjs_MyJSClassInternal_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_MyJSClassPublic_init")
+fileprivate func bjs_MyJSClassPublic_init() -> Int32
+#else
+fileprivate func bjs_MyJSClassPublic_init() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$MyJSClassPublic_init() throws(JSException) -> JSObject {
+    let ret = bjs_MyJSClassPublic_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_MyJSClassPackage_init")
+fileprivate func bjs_MyJSClassPackage_init() -> Int32
+#else
+fileprivate func bjs_MyJSClassPackage_init() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$MyJSClassPackage_init() throws(JSException) -> JSObject {
+    let ret = bjs_MyJSClassPackage_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsFunctionWithPackageAccess")
+fileprivate func bjs_jsFunctionWithPackageAccess() -> Void
+#else
+fileprivate func bjs_jsFunctionWithPackageAccess() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsFunctionWithPackageAccess() throws(JSException) -> Void {
+    bjs_jsFunctionWithPackageAccess()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsFunctionWithPublicAccess")
+fileprivate func bjs_jsFunctionWithPublicAccess() -> Void
+#else
+fileprivate func bjs_jsFunctionWithPublicAccess() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsFunctionWithPublicAccess() throws(JSException) -> Void {
+    bjs_jsFunctionWithPublicAccess()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsFunctionWithInternalAccess")
+fileprivate func bjs_jsFunctionWithInternalAccess() -> Void
+#else
+fileprivate func bjs_jsFunctionWithInternalAccess() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsFunctionWithInternalAccess() throws(JSException) -> Void {
+    bjs_jsFunctionWithInternalAccess()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsFunctionWithFilePrivateAccess")
+fileprivate func bjs_jsFunctionWithFilePrivateAccess() -> Void
+#else
+fileprivate func bjs_jsFunctionWithFilePrivateAccess() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsFunctionWithFilePrivateAccess() throws(JSException) -> Void {
+    bjs_jsFunctionWithFilePrivateAccess()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsFunctionWithPrivateAccess")
+fileprivate func bjs_jsFunctionWithPrivateAccess() -> Void
+#else
+fileprivate func bjs_jsFunctionWithPrivateAccess() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$jsFunctionWithPrivateAccess() throws(JSException) -> Void {
+    bjs_jsFunctionWithPrivateAccess()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalNumberNull_static")
 fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalNumberNull_static(_ valueIsSome: Int32, _ valueValue: Int32) -> Void
 #else

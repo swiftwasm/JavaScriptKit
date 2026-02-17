@@ -14,6 +14,10 @@ enum JSMacroMessage: String, DiagnosticMessage {
     case setterRequiresThrows = "@JSSetter function must declare throws(JSException)."
     case jsFunctionRequiresThrows = "@JSFunction throws must be declared as throws(JSException)."
     case requiresJSClass = "JavaScript members must be declared inside a @JSClass struct."
+    case jsClassRequiresAtLeastInternal =
+        "@JSClass does not support private/fileprivate access level. Use internal, package, or public."
+    case jsClassMemberRequiresAtLeastInternal =
+        "@JSClass requires jsObject and init(unsafelyWrapping:) to be at least internal."
 
     var message: String { rawValue }
     var diagnosticID: MessageID { MessageID(domain: "JavaScriptKitMacros", id: rawValue) }
