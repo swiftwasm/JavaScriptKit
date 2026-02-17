@@ -119,6 +119,16 @@ jobs:
         env:
           DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer/
 
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npx prettier --check Runtime/src
+
   format:
     runs-on: ubuntu-latest
     container:

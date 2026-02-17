@@ -1,6 +1,6 @@
 /// Memory lifetime of closures in Swift are managed by Swift side
 class SwiftClosureDeallocator {
-    constructor(exports) {
+    constructor(exports$1) {
         if (typeof FinalizationRegistry === "undefined") {
             throw new Error("The Swift part of JavaScriptKit was configured to require " +
                 "the availability of JavaScript WeakRefs. Please build " +
@@ -8,7 +8,7 @@ class SwiftClosureDeallocator {
                 "disable features that use WeakRefs.");
         }
         this.functionRegistry = new FinalizationRegistry((id) => {
-            exports.swjs_free_host_function(id);
+            exports$1.swjs_free_host_function(id);
         });
     }
     track(func, func_ref) {
@@ -126,12 +126,12 @@ class ITCInterface {
     }
     send(sendingObject, transferringObjects, sendingContext) {
         const object = this.memory.getObject(sendingObject);
-        const transfer = transferringObjects.map(ref => this.memory.getObject(ref));
+        const transfer = transferringObjects.map((ref) => this.memory.getObject(ref));
         return { object, sendingContext, transfer };
     }
     sendObjects(sendingObjects, transferringObjects, sendingContext) {
-        const objects = sendingObjects.map(ref => this.memory.getObject(ref));
-        const transfer = transferringObjects.map(ref => this.memory.getObject(ref));
+        const objects = sendingObjects.map((ref) => this.memory.getObject(ref));
+        const transfer = transferringObjects.map((ref) => this.memory.getObject(ref));
         return { object: objects, sendingContext, transfer };
     }
     release(objectRef) {
@@ -168,7 +168,9 @@ class MessageBroker {
             this.handlers.onResponse(message);
             return;
         }
-        const transfer = message.data.response.ok ? message.data.response.value.transfer : [];
+        const transfer = message.data.response.ok
+            ? message.data.response.value.transfer
+            : [];
         if ("postMessageToWorkerThread" in this.threadChannel) {
             // The response is for another worker thread sent from the main thread
             this.threadChannel.postMessageToWorkerThread(message.data.sourceTid, message, transfer);
@@ -186,7 +188,7 @@ class MessageBroker {
             this.handlers.onRequest(message);
         }
         else if ("postMessageToWorkerThread" in this.threadChannel) {
-            // Receive a request from a worker thread to other worker on main thread. 
+            // Receive a request from a worker thread to other worker on main thread.
             // Proxy the request to the target worker thread.
             this.threadChannel.postMessageToWorkerThread(message.data.targetTid, message, []);
         }
@@ -202,7 +204,9 @@ class MessageBroker {
         else if ("postMessageToWorkerThread" in this.threadChannel) {
             // Receive a response from a worker thread to other worker on main thread.
             // Proxy the response to the target worker thread.
-            const transfer = message.data.response.ok ? message.data.response.value.transfer : [];
+            const transfer = message.data.response.ok
+                ? message.data.response.value.transfer
+                : [];
             this.threadChannel.postMessageToWorkerThread(message.data.sourceTid, message, transfer);
         }
         else if ("postMessageToMainThread" in this.threadChannel) {
@@ -213,7 +217,14 @@ class MessageBroker {
 }
 function serializeError(error) {
     if (error instanceof Error) {
-        return { isError: true, value: { message: error.message, name: error.name, stack: error.stack } };
+        return {
+            isError: true,
+            value: {
+                message: error.message,
+                name: error.name,
+                stack: error.stack,
+            },
+        };
     }
     return { isError: false, value: error };
 }
@@ -224,19 +235,7 @@ function deserializeError(error) {
     return error.value;
 }
 
-let globalVariable;
-if (typeof globalThis !== "undefined") {
-    globalVariable = globalThis;
-}
-else if (typeof window !== "undefined") {
-    globalVariable = window;
-}
-else if (typeof global !== "undefined") {
-    globalVariable = global;
-}
-else if (typeof self !== "undefined") {
-    globalVariable = self;
-}
+const globalVariable = globalThis;
 
 class JSObjectSpace {
     constructor() {
@@ -312,7 +311,8 @@ class SwiftRuntime {
             // 1. It may not be available in the global scope if the context is not cross-origin isolated.
             // 2. The underlying buffer may be still backed by SAB even if the context is not cross-origin
             //    isolated (e.g. localhost on Chrome on Android).
-            if (Object.getPrototypeOf(wasmMemory.buffer).constructor.name === "SharedArrayBuffer") {
+            if (Object.getPrototypeOf(wasmMemory.buffer).constructor.name ===
+                "SharedArrayBuffer") {
                 // When the wasm memory is backed by a SharedArrayBuffer, growing the memory
                 // doesn't invalidate the data view by setting the byte length to 0. Instead,
                 // the data view points to an old buffer after growing the memory. So we have
@@ -463,7 +463,10 @@ class SwiftRuntime {
                         returnValue = { ok: true, value: result };
                     }
                     catch (error) {
-                        returnValue = { ok: false, error: serializeError(error) };
+                        returnValue = {
+                            ok: false,
+                            error: serializeError(error),
+                        };
                     }
                     const responseMessage = {
                         type: "response",
@@ -479,7 +482,7 @@ class SwiftRuntime {
                     catch (error) {
                         responseMessage.data.response = {
                             ok: false,
-                            error: serializeError(new TypeError(`Failed to serialize message: ${error}`))
+                            error: serializeError(new TypeError(`Failed to serialize message: ${error}`)),
                         };
                         newBroker.reply(responseMessage);
                     }
@@ -494,7 +497,7 @@ class SwiftRuntime {
                         const errorObject = this.memory.retain(error);
                         this.exports.swjs_receive_error(errorObject, message.data.context);
                     }
-                }
+                },
             });
             broker = newBroker;
             return newBroker;
@@ -532,21 +535,19 @@ class SwiftRuntime {
                 this.getDataView().setUint32(bytes_ptr_result, bytes_ptr, true);
                 return bytes.length;
             },
-            swjs_decode_string: (
+            swjs_decode_string: 
             // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
             this.options.sharedMemory == true
-                ? ((bytes_ptr, length) => {
-                    const bytes = this.getUint8Array()
-                        .slice(bytes_ptr, bytes_ptr + length);
+                ? (bytes_ptr, length) => {
+                    const bytes = this.getUint8Array().slice(bytes_ptr, bytes_ptr + length);
                     const string = this.textDecoder.decode(bytes);
                     return this.memory.retain(string);
-                })
-                : ((bytes_ptr, length) => {
-                    const bytes = this.getUint8Array()
-                        .subarray(bytes_ptr, bytes_ptr + length);
+                }
+                : (bytes_ptr, length) => {
+                    const bytes = this.getUint8Array().subarray(bytes_ptr, bytes_ptr + length);
                     const string = this.textDecoder.decode(bytes);
                     return this.memory.retain(string);
-                })),
+                },
             swjs_load_string: (ref, buffer) => {
                 const bytes = this.memory.getObject(ref);
                 this.getUint8Array().set(bytes, buffer);
@@ -658,7 +659,9 @@ class SwiftRuntime {
                 // Call `.slice()` to copy the memory
                 return this.memory.retain(array.slice());
             },
-            swjs_create_object: () => { return this.memory.retain({}); },
+            swjs_create_object: () => {
+                return this.memory.retain({});
+            },
             swjs_load_typed_array: (ref, buffer) => {
                 const memory = this.memory;
                 const typedArray = memory.getObject(ref);
@@ -683,8 +686,8 @@ class SwiftRuntime {
                         request: {
                             method: "release",
                             parameters: [ref],
-                        }
-                    }
+                        },
+                    },
                 });
             },
             swjs_i64_to_bigint: (value, signed) => {
@@ -708,17 +711,23 @@ class SwiftRuntime {
             swjs_i64_to_bigint_slow: (lower, upper, signed) => {
                 const value = BigInt.asUintN(32, BigInt(lower)) +
                     (BigInt.asUintN(32, BigInt(upper)) << BigInt(32));
-                return this.memory.retain(signed ? BigInt.asIntN(64, value) : BigInt.asUintN(64, value));
+                return this.memory.retain(signed
+                    ? BigInt.asIntN(64, value)
+                    : BigInt.asUintN(64, value));
             },
             swjs_unsafe_event_loop_yield: () => {
                 throw new UnsafeEventLoopYield();
             },
             swjs_send_job_to_main_thread: (unowned_job) => {
-                this.postMessageToMainThread({ type: "job", data: unowned_job });
+                this.postMessageToMainThread({
+                    type: "job",
+                    data: unowned_job,
+                });
             },
             swjs_listen_message_from_main_thread: () => {
                 const threadChannel = this.options.threadChannel;
-                if (!(threadChannel && "listenMessageFromMainThread" in threadChannel)) {
+                if (!(threadChannel &&
+                    "listenMessageFromMainThread" in threadChannel)) {
                     throw new Error("listenMessageFromMainThread is not set in options given to SwiftRuntime. Please set it to listen to wake events from the main thread.");
                 }
                 const broker = getMessageBroker(threadChannel);
@@ -746,7 +755,8 @@ class SwiftRuntime {
             },
             swjs_listen_message_from_worker_thread: (tid) => {
                 const threadChannel = this.options.threadChannel;
-                if (!(threadChannel && "listenMessageFromWorkerThread" in threadChannel)) {
+                if (!(threadChannel &&
+                    "listenMessageFromWorkerThread" in threadChannel)) {
                     throw new Error("listenMessageFromWorkerThread is not set in options given to SwiftRuntime. Please set it to listen to jobs from worker threads.");
                 }
                 const broker = getMessageBroker(threadChannel);
@@ -795,9 +805,13 @@ class SwiftRuntime {
                         context: sending_context,
                         request: {
                             method: "send",
-                            parameters: [sending_object, transferringObjects, sending_context],
-                        }
-                    }
+                            parameters: [
+                                sending_object,
+                                transferringObjects,
+                                sending_context,
+                            ],
+                        },
+                    },
                 });
             },
             swjs_request_sending_objects: (sending_objects, sending_objects_count, transferring_objects, transferring_objects_count, object_source_tid, sending_context) => {
@@ -817,9 +831,13 @@ class SwiftRuntime {
                         context: sending_context,
                         request: {
                             method: "sendObjects",
-                            parameters: [sendingObjects, transferringObjects, sending_context],
-                        }
-                    }
+                            parameters: [
+                                sendingObjects,
+                                transferringObjects,
+                                sending_context,
+                            ],
+                        },
+                    },
                 });
             },
         };

@@ -51,7 +51,7 @@ export class JSObjectSpace {
         const value = this._heapValueById.get(ref);
         if (value === undefined) {
             throw new ReferenceError(
-                "Attempted to read invalid reference " + ref
+                "Attempted to read invalid reference " + ref,
             );
         }
         return value;
