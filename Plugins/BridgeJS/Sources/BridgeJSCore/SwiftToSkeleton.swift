@@ -78,10 +78,10 @@ public final class SwiftToSkeleton {
         }
 
         if !perSourceErrors.isEmpty {
-            let allErrors = perSourceErrors.flatMap { inputFilePath, errors in
-                errors.map { $0.formattedDescription(fileName: inputFilePath) }
+            let diagnostics = perSourceErrors.flatMap { inputFilePath, errors in
+                errors.map { (file: inputFilePath, diagnostic: $0) }
             }
-            throw BridgeJSCoreError(allErrors.joined(separator: "\n"))
+            throw BridgeJSCoreDiagnosticError(diagnostics: diagnostics)
         }
         let importedSkeleton: ImportedModuleSkeleton? = {
             let module = ImportedModuleSkeleton(children: importedFiles)

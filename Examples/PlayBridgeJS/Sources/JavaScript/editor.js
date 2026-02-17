@@ -43,7 +43,7 @@ export class EditorSystem {
                     language: 'swift',
                     placeholder: '// Import Swift Macros will appear here...',
                     readOnly: true,
-                    modelUri: 'BridgeJS.Macros.swift'
+                    modelUri: 'Playground.Macros.swift'
                 },
                 {
                     key: 'swift-glue',
@@ -206,10 +206,10 @@ export class EditorSystem {
 
     updateOutputs(result) {
         const outputMap = {
-            'swift-glue': () => result.swiftGlue(),
-            'swift-import-macros': () => result.importSwiftMacroDecls(),
-            'js-generated': () => result.outputJs(),
-            'dts-generated': () => result.outputDts()
+            'swift-glue': () => result.swiftGlue,
+            'swift-import-macros': () => result.importSwiftMacroDecls,
+            'js-generated': () => result.outputJs,
+            'dts-generated': () => result.outputDts
         };
 
         Object.entries(outputMap).forEach(([key, getContent]) => {
@@ -228,6 +228,63 @@ export class EditorSystem {
                 editor.onDidChangeModelContent(callback);
             }
         });
+    }
+
+    clearDiagnostics() {
+        // Remove all diagnostics owned by the playground.
+        this.editors.forEach(editor => {
+            const model = editor.getModel();
+            if (!model || typeof monaco === 'undefined') return;
+            monaco.editor.setModelMarkers(model, 'bridgejs', []);
+        });
+    }
+
+    /**
+     * @param {{file: string, startLineNumber: number, startColumn: number, endLineNumber?: number, endColumn?: number, message: string}[]} diagnostics
+     */
+    showDiagnostics(diagnostics) {
+        if (typeof monaco === 'undefined') return;
+
+        // Group diagnostics per model so we can set markers in batches.
+        const markersByModel = new Map();
+
+        diagnostics.forEach(diag => {
+            const model = this.findModelForFile(diag.file);
+            if (!model) return;
+
+            const markers = markersByModel.get(model) ?? [];
+            const lineLength = model.getLineMaxColumn(diag.startLineNumber);
+            const endLine = diag.endLineNumber ?? diag.startLineNumber;
+            const endColumn = Math.min(lineLength, diag.endColumn ?? diag.startColumn + 1);
+
+            markers.push({
+                severity: monaco.MarkerSeverity.Error,
+                message: diag.message,
+                startLineNumber: diag.startLineNumber,
+                startColumn: diag.startColumn,
+                endLineNumber: endLine,
+                endColumn
+            });
+
+            markersByModel.set(model, markers);
+        });
+
+        markersByModel.forEach((markers, model) => {
+            monaco.editor.setModelMarkers(model, 'bridgejs', markers);
+        });
+    }
+
+    findModelForFile(fileName) {
+        const normalized = fileName.startsWith('/') ? fileName.slice(1) : fileName;
+        for (const editor of this.editors.values()) {
+            const model = editor.getModel();
+            if (!model) continue;
+            const uriPath = model.uri.path.startsWith('/') ? model.uri.path.slice(1) : model.uri.path;
+            if (uriPath === normalized || uriPath.endsWith('/' + normalized)) {
+                return model;
+            }
+        }
+        return null;
     }
 
     // Utility methods

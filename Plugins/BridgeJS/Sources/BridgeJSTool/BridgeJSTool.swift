@@ -61,7 +61,13 @@ import BridgeJSUtilities
                 try run()
             }
         } catch {
-            printStderr("error: \(error)")
+            if let diagError = error as? BridgeJSCoreDiagnosticError {
+                diagError.diagnostics.forEach { file, diagnostic in
+                    printStderr(diagnostic.formattedDescription(fileName: file))
+                }
+            } else {
+                printStderr("error: \(error)")
+            }
             exit(1)
         }
     }

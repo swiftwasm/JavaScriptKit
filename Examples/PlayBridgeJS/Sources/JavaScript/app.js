@@ -268,19 +268,38 @@ export class BridgeJSPlayground {
 
         try {
             this.hideError();
+            this.editorSystem.clearDiagnostics();
 
             const inputs = this.editorSystem.getInputs();
             const swiftCode = inputs.swift;
             const dtsCode = inputs.dts;
 
             // Process the code and get PlayBridgeJSOutput
-            const result = this.playBridgeJS.update(swiftCode, dtsCode);
+            const result = this.playBridgeJS.updateDetailed(swiftCode, dtsCode);
 
-            // Update outputs using the PlayBridgeJSOutput object
-            this.editorSystem.updateOutputs(result);
+            const diagnostics = result.diagnostics;
+            if (diagnostics && diagnostics.length > 0) {
+                const mapped = diagnostics.map(d => ({
+                    file: d.file,
+                    startLineNumber: d.startLine,
+                    startColumn: d.startColumn,
+                    endLineNumber: d.endLine,
+                    endColumn: d.endColumn,
+                    message: d.message
+                }));
+                this.editorSystem.showDiagnostics(mapped);
+                return;
+            }
 
-            console.log('Code generated successfully');
-
+            const output = result.output;
+            if (output) {
+                // Update outputs using the PlayBridgeJSOutput object
+                this.editorSystem.updateOutputs(output);
+                this.hideError();
+                console.log('Code generated successfully');
+            } else {
+                this.showError('No output produced.');
+            }
         } catch (error) {
             console.error('Error generating code:', error);
             this.showError('Error generating code: ' + error.message);
