@@ -4,17 +4,17 @@ import { SwiftRuntime } from "./runtime.js"
 export const MODULE_PATH = "@PACKAGE_TO_JS_MODULE_PATH@";
 /* #if USE_SHARED_MEMORY */
 export const MEMORY_TYPE = {
-    // @ts-ignore
+    // @ts-expect-error Substituted by PackageToJS preprocessor
     initial: import.meta.PACKAGE_TO_JS_MEMORY_INITIAL,
-    // @ts-ignore
+    // @ts-expect-error Substituted by PackageToJS preprocessor
     maximum: import.meta.PACKAGE_TO_JS_MEMORY_MAXIMUM,
-    // @ts-ignore
+    // @ts-expect-error Substituted by PackageToJS preprocessor
     shared: import.meta.PACKAGE_TO_JS_MEMORY_SHARED,
 }
 /* #endif */
 
 /* #if HAS_BRIDGE */
-// @ts-ignore
+// @ts-expect-error Substituted by PackageToJS preprocessor
 import { createInstantiator } from "./bridge-js.js"
 /* #else */
 /**
