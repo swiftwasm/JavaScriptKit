@@ -97,7 +97,7 @@ export class EditorSystem {
             scrollbar: { vertical: 'visible', horizontal: 'visible' },
             fixedOverflowWidgets: true,
             renderWhitespace: 'none',
-            wordWrap: 'on'
+            wordWrap: 'off'
         };
 
         // Create all editors from config
