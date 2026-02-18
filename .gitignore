@@ -14,3 +14,19 @@ Plugins/BridgeJS/Sources/TS2Swift/JavaScript/package-lock.json
 Plugins/BridgeJS/Tests/BridgeJSToolTests/__Snapshots__/**/*.actual
 bridge-js.config.local.json
 _site/
+
+# AI coding agent config files
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.claude/
+.opencode/
+.cursor/
+.cursorrules
+.codex/
+.aider*
+.cline/
+.clinerules
+.windsurf/
+.windsurfrules
+.codeiumignore
