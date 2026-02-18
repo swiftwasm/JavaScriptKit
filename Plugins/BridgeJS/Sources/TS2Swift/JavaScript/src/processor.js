@@ -261,6 +261,7 @@ export class TypeProcessor {
         if (!isExported) return;
 
         const fromArg = this.renderDefaultJSImportFromArgument();
+        const isConst = (node.declarationList.flags & ts.NodeFlags.Const) !== 0;
 
         for (const decl of node.declarationList.declarations) {
             if (!ts.isIdentifier(decl.name)) continue;
@@ -278,7 +279,7 @@ export class TypeProcessor {
             if (fromArg) args.push(fromArg);
             const callSignatures = type.getCallSignatures();
 
-            if (callSignatures.length > 0) {
+            if (isConst && callSignatures.length > 0) {
                 const signature = callSignatures[0];
                 const parameters = signature.getParameters();
                 const parameterNameMap = this.buildParameterNameMap(parameters);
