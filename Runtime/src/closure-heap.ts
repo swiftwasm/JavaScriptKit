@@ -10,7 +10,7 @@ export class SwiftClosureDeallocator {
                 "The Swift part of JavaScriptKit was configured to require " +
                     "the availability of JavaScript WeakRefs. Please build " +
                     "with `-Xswiftc -DJAVASCRIPTKIT_WITHOUT_WEAKREFS` to " +
-                    "disable features that use WeakRefs."
+                    "disable features that use WeakRefs.",
             );
         }
 
