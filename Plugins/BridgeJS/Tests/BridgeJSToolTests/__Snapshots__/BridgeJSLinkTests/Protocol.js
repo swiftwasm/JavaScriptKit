@@ -52,41 +52,39 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case ResultValues.Tag.Success: {
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        return ResultValues.Tag.Success;
-                    }
-                    case ResultValues.Tag.Failure: {
-                        i32Stack.push((value.param0 | 0));
-                        return ResultValues.Tag.Failure;
-                    }
-                    default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
+    const __bjs_createResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case ResultValues.Tag.Success: {
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return ResultValues.Tag.Success;
                 }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case ResultValues.Tag.Success: {
-                        const string = strStack.pop();
-                        return { tag: ResultValues.Tag.Success, param0: string };
-                    }
-                    case ResultValues.Tag.Failure: {
-                        const int = i32Stack.pop();
-                        return { tag: ResultValues.Tag.Failure, param0: int };
-                    }
-                    default: throw new Error("Unknown ResultValues tag returned from Swift: " + String(tag));
+                case ResultValues.Tag.Failure: {
+                    i32Stack.push((value.param0 | 0));
+                    return ResultValues.Tag.Failure;
                 }
+                default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
             }
-        });
-    };
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case ResultValues.Tag.Success: {
+                    const string = strStack.pop();
+                    return { tag: ResultValues.Tag.Success, param0: string };
+                }
+                case ResultValues.Tag.Failure: {
+                    const int = i32Stack.pop();
+                    return { tag: ResultValues.Tag.Failure, param0: int };
+                }
+                default: throw new Error("Unknown ResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
 
     return {
         /**
@@ -293,14 +291,17 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_optionalName_set"] = function bjs_MyViewControllerDelegate_optionalName_set(self, valueIsSome, valueWrappedValue) {
+            TestModule["bjs_MyViewControllerDelegate_optionalName_set"] = function bjs_MyViewControllerDelegate_optionalName_set(self, valueIsSome, valueObjectId) {
                 try {
-                    let obj;
+                    let optResult;
                     if (valueIsSome) {
-                        obj = swift.memory.getObject(valueWrappedValue);
-                        swift.memory.release(valueWrappedValue);
+                        const valueObjectIdObject = swift.memory.getObject(valueObjectId);
+                        swift.memory.release(valueObjectId);
+                        optResult = valueObjectIdObject;
+                    } else {
+                        optResult = null;
                     }
-                    swift.memory.getObject(self).optionalName = valueIsSome ? obj : null;
+                    swift.memory.getObject(self).optionalName = optResult;
                 } catch (error) {
                     setException(error);
                 }
@@ -313,14 +314,17 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_optionalRawEnum_set"] = function bjs_MyViewControllerDelegate_optionalRawEnum_set(self, valueIsSome, valueWrappedValue) {
+            TestModule["bjs_MyViewControllerDelegate_optionalRawEnum_set"] = function bjs_MyViewControllerDelegate_optionalRawEnum_set(self, valueIsSome, valueObjectId) {
                 try {
-                    let obj;
+                    let optResult;
                     if (valueIsSome) {
-                        obj = swift.memory.getObject(valueWrappedValue);
-                        swift.memory.release(valueWrappedValue);
+                        const valueObjectIdObject = swift.memory.getObject(valueObjectId);
+                        swift.memory.release(valueObjectId);
+                        optResult = valueObjectIdObject;
+                    } else {
+                        optResult = null;
                     }
-                    swift.memory.getObject(self).optionalRawEnum = valueIsSome ? obj : null;
+                    swift.memory.getObject(self).optionalRawEnum = optResult;
                 } catch (error) {
                     setException(error);
                 }
@@ -374,13 +378,16 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_optionalResult_set"] = function bjs_MyViewControllerDelegate_optionalResult_set(self, valueIsSome, valueWrappedValue) {
+            TestModule["bjs_MyViewControllerDelegate_optionalResult_set"] = function bjs_MyViewControllerDelegate_optionalResult_set(self, valueIsSome, valueCaseId) {
                 try {
-                    let enumValue;
+                    let optResult;
                     if (valueIsSome) {
-                        enumValue = enumHelpers.Result.lift(valueWrappedValue);
+                        const enumValue = enumHelpers.Result.lift(valueCaseId);
+                        optResult = enumValue;
+                    } else {
+                        optResult = null;
                     }
-                    swift.memory.getObject(self).optionalResult = valueIsSome ? enumValue : null;
+                    swift.memory.getObject(self).optionalResult = optResult;
                 } catch (error) {
                     setException(error);
                 }
@@ -405,7 +412,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     let ret = swift.memory.getObject(self).directionOptional;
                     const isSome = ret != null;
-                    return isSome ? (ret | 0) : -1;
+                    return isSome ? ret : -1;
                 } catch (error) {
                     setException(error);
                 }
@@ -509,9 +516,9 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_onOptionalHelperUpdated"] = function bjs_MyViewControllerDelegate_onOptionalHelperUpdated(self, helperIsSome, helperWrappedValue) {
+            TestModule["bjs_MyViewControllerDelegate_onOptionalHelperUpdated"] = function bjs_MyViewControllerDelegate_onOptionalHelperUpdated(self, helperIsSome, helperPointer) {
                 try {
-                    swift.memory.getObject(self).onOptionalHelperUpdated(helperIsSome ? _exports['Helper'].__construct(helperWrappedValue) : null);
+                    swift.memory.getObject(self).onOptionalHelperUpdated(helperIsSome ? _exports['Helper'].__construct(helperPointer) : null);
                 } catch (error) {
                     setException(error);
                 }
@@ -664,7 +671,13 @@ export async function createInstantiator(options, swift) {
                 }
                 set secondDelegate(value) {
                     const isSome = value != null;
-                    instance.exports.bjs_MyViewController_secondDelegate_set(this.pointer, +isSome, isSome ? swift.memory.retain(value) : 0);
+                    let result;
+                    if (isSome) {
+                        result = swift.memory.retain(value);
+                    } else {
+                        result = 0;
+                    }
+                    instance.exports.bjs_MyViewController_secondDelegate_set(this.pointer, +isSome, result);
                 }
             }
             class DelegateManager extends SwiftHeapObject {
@@ -706,7 +719,7 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_DelegateManager_delegates_set(this.pointer);
                 }
             }
-            const ResultHelpers = __bjs_createResultValuesHelpers()();
+            const ResultHelpers = __bjs_createResultValuesHelpers();
             enumHelpers.Result = ResultHelpers;
 
             const exports = {

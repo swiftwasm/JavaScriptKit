@@ -305,12 +305,17 @@ export async function createInstantiator(options, swift) {
                 },
                 roundTripOptionalTheme: function bjs_roundTripOptionalTheme(input) {
                     const isSome = input != null;
-                    let inputId, inputBytes;
+                    let result, result1;
                     if (isSome) {
-                        inputBytes = textEncoder.encode(input);
-                        inputId = swift.memory.retain(inputBytes);
+                        const inputBytes = textEncoder.encode(input);
+                        const inputId = swift.memory.retain(inputBytes);
+                        result = inputId;
+                        result1 = inputBytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    instance.exports.bjs_roundTripOptionalTheme(+isSome, isSome ? inputId : 0, isSome ? inputBytes.length : 0);
+                    instance.exports.bjs_roundTripOptionalTheme(+isSome, result, result1);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
                     return optResult;
@@ -328,12 +333,17 @@ export async function createInstantiator(options, swift) {
                 },
                 roundTripOptionalTSTheme: function bjs_roundTripOptionalTSTheme(input) {
                     const isSome = input != null;
-                    let inputId, inputBytes;
+                    let result, result1;
                     if (isSome) {
-                        inputBytes = textEncoder.encode(input);
-                        inputId = swift.memory.retain(inputBytes);
+                        const inputBytes = textEncoder.encode(input);
+                        const inputId = swift.memory.retain(inputBytes);
+                        result = inputId;
+                        result1 = inputBytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    instance.exports.bjs_roundTripOptionalTSTheme(+isSome, isSome ? inputId : 0, isSome ? inputBytes.length : 0);
+                    instance.exports.bjs_roundTripOptionalTSTheme(+isSome, result, result1);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
                     return optResult;
@@ -351,12 +361,17 @@ export async function createInstantiator(options, swift) {
                 },
                 roundTripOptionalFeatureFlag: function bjs_roundTripOptionalFeatureFlag(input) {
                     const isSome = input != null;
-                    let inputId, inputBytes;
+                    let result, result1;
                     if (isSome) {
-                        inputBytes = textEncoder.encode(input);
-                        inputId = swift.memory.retain(inputBytes);
+                        const inputBytes = textEncoder.encode(input);
+                        const inputId = swift.memory.retain(inputBytes);
+                        result = inputId;
+                        result1 = inputBytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    instance.exports.bjs_roundTripOptionalFeatureFlag(+isSome, isSome ? inputId : 0, isSome ? inputBytes.length : 0);
+                    instance.exports.bjs_roundTripOptionalFeatureFlag(+isSome, result, result1);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
                     return optResult;
@@ -468,7 +483,7 @@ export async function createInstantiator(options, swift) {
                 },
                 roundTripOptionalPrecision: function bjs_roundTripOptionalPrecision(input) {
                     const isSome = input != null;
-                    instance.exports.bjs_roundTripOptionalPrecision(+isSome, isSome ? input : 0);
+                    instance.exports.bjs_roundTripOptionalPrecision(+isSome, isSome ? input : 0.0);
                     const optResult = tmpRetOptionalFloat;
                     tmpRetOptionalFloat = undefined;
                     return optResult;
@@ -482,7 +497,7 @@ export async function createInstantiator(options, swift) {
                 },
                 roundTripOptionalRatio: function bjs_roundTripOptionalRatio(input) {
                     const isSome = input != null;
-                    instance.exports.bjs_roundTripOptionalRatio(+isSome, isSome ? input : 0);
+                    instance.exports.bjs_roundTripOptionalRatio(+isSome, isSome ? input : 0.0);
                     const optResult = tmpRetOptionalDouble;
                     tmpRetOptionalDouble = undefined;
                     return optResult;

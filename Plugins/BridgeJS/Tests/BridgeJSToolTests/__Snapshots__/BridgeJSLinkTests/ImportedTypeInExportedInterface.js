@@ -28,55 +28,56 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createFooContainerHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                let id;
-                if (value.foo != null) {
-                    id = swift.memory.retain(value.foo);
-                } else {
-                    id = undefined;
-                }
-                i32Stack.push(id !== undefined ? id : 0);
-                const isSome = value.optionalFoo != null;
+    const __bjs_createFooContainerHelpers = () => ({
+        lower: (value) => {
+            let id;
+            if (value.foo != null) {
+                id = swift.memory.retain(value.foo);
+            } else {
+                id = undefined;
+            }
+            i32Stack.push(id !== undefined ? id : 0);
+            const isSome = value.optionalFoo != null;
+            if (isSome) {
                 let id1;
-                if (isSome) {
+                if (value.optionalFoo != null) {
                     id1 = swift.memory.retain(value.optionalFoo);
-                    i32Stack.push(id1);
                 } else {
                     id1 = undefined;
-                    i32Stack.push(0);
                 }
-                i32Stack.push(isSome ? 1 : 0);
-            },
-            lift: () => {
-                const isSome = i32Stack.pop();
-                let optional;
-                if (isSome) {
-                    const objectId = i32Stack.pop();
-                    let value;
-                    if (objectId !== 0) {
-                        value = swift.memory.getObject(objectId);
-                        swift.memory.release(objectId);
-                    } else {
-                        value = null;
-                    }
-                    optional = value;
-                } else {
-                    optional = null;
-                }
-                const objectId1 = i32Stack.pop();
-                let value1;
-                if (objectId1 !== 0) {
-                    value1 = swift.memory.getObject(objectId1);
-                    swift.memory.release(objectId1);
-                } else {
-                    value1 = null;
-                }
-                return { foo: value1, optionalFoo: optional };
+                i32Stack.push(id1 !== undefined ? id1 : 0);
+            } else {
+                i32Stack.push(0);
             }
-        });
-    };
+            i32Stack.push(isSome ? 1 : 0);
+        },
+        lift: () => {
+            const isSome = i32Stack.pop();
+            let optional;
+            if (isSome) {
+                const objectId = i32Stack.pop();
+                let value;
+                if (objectId !== 0) {
+                    value = swift.memory.getObject(objectId);
+                    swift.memory.release(objectId);
+                } else {
+                    value = null;
+                }
+                optional = value;
+            } else {
+                optional = null;
+            }
+            const objectId1 = i32Stack.pop();
+            let value1;
+            if (objectId1 !== 0) {
+                value1 = swift.memory.getObject(objectId1);
+                swift.memory.release(objectId1);
+            } else {
+                value1 = null;
+            }
+            return { foo: value1, optionalFoo: optional };
+        }
+    });
 
     return {
         /**
@@ -262,7 +263,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const FooContainerHelpers = __bjs_createFooContainerHelpers()();
+            const FooContainerHelpers = __bjs_createFooContainerHelpers();
             structHelpers.FooContainer = FooContainerHelpers;
 
             const exports = {

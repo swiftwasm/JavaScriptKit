@@ -28,19 +28,17 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createPointHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                i32Stack.push((value.x | 0));
-                i32Stack.push((value.y | 0));
-            },
-            lift: () => {
-                const int = i32Stack.pop();
-                const int1 = i32Stack.pop();
-                return { x: int1, y: int };
-            }
-        });
-    };
+    const __bjs_createPointHelpers = () => ({
+        lower: (value) => {
+            i32Stack.push((value.x | 0));
+            i32Stack.push((value.y | 0));
+        },
+        lift: () => {
+            const int = i32Stack.pop();
+            const int1 = i32Stack.pop();
+            return { x: int1, y: int };
+        }
+    });
 
     return {
         /**
@@ -228,7 +226,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PointHelpers = __bjs_createPointHelpers()();
+            const PointHelpers = __bjs_createPointHelpers();
             structHelpers.Point = PointHelpers;
 
             const exports = {

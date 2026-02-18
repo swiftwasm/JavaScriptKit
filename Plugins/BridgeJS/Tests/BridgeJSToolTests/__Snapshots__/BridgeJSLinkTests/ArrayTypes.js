@@ -41,19 +41,17 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createPointHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                f64Stack.push(value.x);
-                f64Stack.push(value.y);
-            },
-            lift: () => {
-                const f64 = f64Stack.pop();
-                const f641 = f64Stack.pop();
-                return { x: f641, y: f64 };
-            }
-        });
-    };
+    const __bjs_createPointHelpers = () => ({
+        lower: (value) => {
+            f64Stack.push(value.x);
+            f64Stack.push(value.y);
+        },
+        lift: () => {
+            const f64 = f64Stack.pop();
+            const f641 = f64Stack.pop();
+            return { x: f641, y: f64 };
+        }
+    });
 
     return {
         /**
@@ -370,7 +368,7 @@ export async function createInstantiator(options, swift) {
                 }
 
             }
-            const PointHelpers = __bjs_createPointHelpers()();
+            const PointHelpers = __bjs_createPointHelpers();
             structHelpers.Point = PointHelpers;
 
             const exports = {
@@ -638,7 +636,6 @@ export async function createInstantiator(options, swift) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
                             structHelpers.Point.lower(elem);
-                        } else {
                         }
                         i32Stack.push(isSome);
                     }

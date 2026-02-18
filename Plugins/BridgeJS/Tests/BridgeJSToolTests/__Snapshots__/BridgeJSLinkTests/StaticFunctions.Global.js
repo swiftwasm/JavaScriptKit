@@ -39,41 +39,39 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createAPIResultValuesHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const enumTag = value.tag;
-                switch (enumTag) {
-                    case APIResultValues.Tag.Success: {
-                        const bytes = textEncoder.encode(value.param0);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        return APIResultValues.Tag.Success;
-                    }
-                    case APIResultValues.Tag.Failure: {
-                        i32Stack.push((value.param0 | 0));
-                        return APIResultValues.Tag.Failure;
-                    }
-                    default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
+    const __bjs_createAPIResultValuesHelpers = () => ({
+        lower: (value) => {
+            const enumTag = value.tag;
+            switch (enumTag) {
+                case APIResultValues.Tag.Success: {
+                    const bytes = textEncoder.encode(value.param0);
+                    const id = swift.memory.retain(bytes);
+                    i32Stack.push(bytes.length);
+                    i32Stack.push(id);
+                    return APIResultValues.Tag.Success;
                 }
-            },
-            lift: (tag) => {
-                tag = tag | 0;
-                switch (tag) {
-                    case APIResultValues.Tag.Success: {
-                        const string = strStack.pop();
-                        return { tag: APIResultValues.Tag.Success, param0: string };
-                    }
-                    case APIResultValues.Tag.Failure: {
-                        const int = i32Stack.pop();
-                        return { tag: APIResultValues.Tag.Failure, param0: int };
-                    }
-                    default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+                case APIResultValues.Tag.Failure: {
+                    i32Stack.push((value.param0 | 0));
+                    return APIResultValues.Tag.Failure;
                 }
+                default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
             }
-        });
-    };
+        },
+        lift: (tag) => {
+            tag = tag | 0;
+            switch (tag) {
+                case APIResultValues.Tag.Success: {
+                    const string = strStack.pop();
+                    return { tag: APIResultValues.Tag.Success, param0: string };
+                }
+                case APIResultValues.Tag.Failure: {
+                    const int = i32Stack.pop();
+                    return { tag: APIResultValues.Tag.Failure, param0: int };
+                }
+                default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
+            }
+        }
+    });
 
     return {
         /**
@@ -301,7 +299,7 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers()();
+            const APIResultHelpers = __bjs_createAPIResultValuesHelpers();
             enumHelpers.APIResult = APIResultHelpers;
 
             if (typeof globalThis.Utils === 'undefined') {

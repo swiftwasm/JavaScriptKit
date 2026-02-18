@@ -303,12 +303,17 @@ export async function createInstantiator(options, swift) {
                 }
                 static set optionalProperty(value) {
                     const isSome = value != null;
-                    let valueId, valueBytes;
+                    let result, result1;
                     if (isSome) {
-                        valueBytes = textEncoder.encode(value);
-                        valueId = swift.memory.retain(valueBytes);
+                        const valueBytes = textEncoder.encode(value);
+                        const valueId = swift.memory.retain(valueBytes);
+                        result = valueId;
+                        result1 = valueBytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    instance.exports.bjs_PropertyClass_static_optionalProperty_set(+isSome, isSome ? valueId : 0, isSome ? valueBytes.length : 0);
+                    instance.exports.bjs_PropertyClass_static_optionalProperty_set(+isSome, result, result1);
                 }
             }
             const exports = {

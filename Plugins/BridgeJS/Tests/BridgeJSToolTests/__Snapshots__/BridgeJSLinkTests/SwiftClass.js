@@ -211,9 +211,9 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_jsRoundTripOptionalGreeter"] = function bjs_jsRoundTripOptionalGreeter(greeterIsSome, greeterWrappedValue) {
+            TestModule["bjs_jsRoundTripOptionalGreeter"] = function bjs_jsRoundTripOptionalGreeter(greeterIsSome, greeterPointer) {
                 try {
-                    let ret = imports.jsRoundTripOptionalGreeter(greeterIsSome ? _exports['Greeter'].__construct(greeterWrappedValue) : null);
+                    let ret = imports.jsRoundTripOptionalGreeter(greeterIsSome ? _exports['Greeter'].__construct(greeterPointer) : null);
                     const isSome = ret != null;
                     return isSome ? ret.pointer : 0;
                 } catch (error) {

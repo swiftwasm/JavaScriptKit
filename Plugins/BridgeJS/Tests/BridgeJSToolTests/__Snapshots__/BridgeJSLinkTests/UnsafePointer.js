@@ -28,25 +28,23 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createPointerFieldsHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                ptrStack.push((value.raw | 0));
-                ptrStack.push((value.mutRaw | 0));
-                ptrStack.push((value.opaque | 0));
-                ptrStack.push((value.ptr | 0));
-                ptrStack.push((value.mutPtr | 0));
-            },
-            lift: () => {
-                const pointer = ptrStack.pop();
-                const pointer1 = ptrStack.pop();
-                const pointer2 = ptrStack.pop();
-                const pointer3 = ptrStack.pop();
-                const pointer4 = ptrStack.pop();
-                return { raw: pointer4, mutRaw: pointer3, opaque: pointer2, ptr: pointer1, mutPtr: pointer };
-            }
-        });
-    };
+    const __bjs_createPointerFieldsHelpers = () => ({
+        lower: (value) => {
+            ptrStack.push((value.raw | 0));
+            ptrStack.push((value.mutRaw | 0));
+            ptrStack.push((value.opaque | 0));
+            ptrStack.push((value.ptr | 0));
+            ptrStack.push((value.mutPtr | 0));
+        },
+        lift: () => {
+            const pointer = ptrStack.pop();
+            const pointer1 = ptrStack.pop();
+            const pointer2 = ptrStack.pop();
+            const pointer3 = ptrStack.pop();
+            const pointer4 = ptrStack.pop();
+            return { raw: pointer4, mutRaw: pointer3, opaque: pointer2, ptr: pointer1, mutPtr: pointer };
+        }
+    });
 
     return {
         /**
@@ -222,7 +220,7 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PointerFieldsHelpers = __bjs_createPointerFieldsHelpers()();
+            const PointerFieldsHelpers = __bjs_createPointerFieldsHelpers();
             structHelpers.PointerFields = PointerFieldsHelpers;
 
             const exports = {
