@@ -422,7 +422,10 @@ struct PackagingPlanner {
         wasmFilename: String,
         configuration: String,
         triple: String,
-        selfPath: BuildPath = BuildPath(absolute: #filePath),
+        // NOTE: We should use `ProcessInfo.processInfo.arguments[0]` instead of `CommandLine.arguments[0]`
+        // because the latter may not always be the full executable path (e.g. when invoked through PATH lookup).
+        // https://github.com/swiftlang/swift-foundation/blob/f5143f96d01cdb6d280665de8221b75fc8631d95/Sources/FoundationEssentials/ProcessInfo/ProcessInfo.swift#L47
+        selfPath: BuildPath = BuildPath(absolute: ProcessInfo.processInfo.arguments[0]),
         system: any PackagingSystem
     ) {
         self.options = options
@@ -592,7 +595,7 @@ struct PackagingPlanner {
             let bridgeJs = outputDir.appending(path: "bridge-js.js")
             let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
             packageInputs.append(
-                make.addTask(inputFiles: skeletons, output: bridgeJs) { _, scope in
+                make.addTask(inputFiles: skeletons + [selfPath], output: bridgeJs) { _, scope in
                     var link = BridgeJSLink(
                         sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
                     )
