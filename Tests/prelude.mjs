@@ -337,6 +337,11 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(g2.prefix, "Hello");
     g2.release();
 
+    // release should be idempotent
+    const g3 = new exports.Greeter("Idempotent");
+    g3.release();
+    g3.release();
+
     g.release();
 
     const foo = exports.makeImportedFoo("hello");

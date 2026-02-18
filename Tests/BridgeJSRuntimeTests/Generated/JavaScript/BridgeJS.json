@@ -15572,7 +15572,18 @@
       },
       {
         "functions" : [
+          {
+            "from" : "global",
+            "name" : "gc",
+            "parameters" : [
 
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
         ],
         "types" : [
           {

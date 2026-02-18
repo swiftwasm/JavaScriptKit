@@ -223,23 +223,33 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
+            const swiftHeapObjectFinalizationRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
+                if (state.hasReleased) {
+                    return;
+                }
+                state.hasReleased = true;
+                state.deinit(state.pointer);
+            });
+
             /// Represents a Swift heap object like a class instance or an actor instance.
             class SwiftHeapObject {
                 static __wrap(pointer, deinit, prototype) {
                     const obj = Object.create(prototype);
+                    const state = { pointer, deinit, hasReleased: false };
                     obj.pointer = pointer;
-                    obj.hasReleased = false;
-                    obj.deinit = deinit;
-                    obj.registry = new FinalizationRegistry((pointer) => {
-                        deinit(pointer);
-                    });
-                    obj.registry.register(this, obj.pointer);
+                    obj.__swiftHeapObjectState = state;
+                    swiftHeapObjectFinalizationRegistry.register(obj, state, state);
                     return obj;
                 }
 
                 release() {
-                    this.registry.unregister(this);
-                    this.deinit(this.pointer);
+                    const state = this.__swiftHeapObjectState;
+                    if (state.hasReleased) {
+                        return;
+                    }
+                    state.hasReleased = true;
+                    swiftHeapObjectFinalizationRegistry.unregister(state);
+                    state.deinit(state.pointer);
                 }
             }
             class Greeter extends SwiftHeapObject {
