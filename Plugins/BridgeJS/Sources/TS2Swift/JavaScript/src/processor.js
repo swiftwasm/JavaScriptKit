@@ -57,6 +57,9 @@ export class TypeProcessor {
         /** @type {Set<string>} */
         this.emittedStringLiteralUnionNames = new Set();
 
+        /** @type {Set<ts.Node>} */
+        this.warnedExportNodes = new Set();
+
         /** @type {Set<string>} */
         this.visitedDeclarationKeys = new Set();
 
@@ -192,6 +195,8 @@ export class TypeProcessor {
             this.visitEnumDeclaration(node);
         } else if (ts.isExportDeclaration(node)) {
             this.visitExportDeclaration(node);
+        } else if (ts.isExportAssignment(node)) {
+            this.visitExportAssignment(node);
         }
     }
 
@@ -239,6 +244,7 @@ export class TypeProcessor {
             }
         } else {
             // export * as ns from "..." is not currently supported by BridgeJS imports.
+            this.warnExportSkip(node, "Skipping namespace re-export (export * as ns) which is not supported");
             return;
         }
 
@@ -254,6 +260,19 @@ export class TypeProcessor {
                 this.visitNode(declaration);
             }
         }
+
+        if (targetSymbols.length === 0) {
+            this.warnExportSkip(node, "Export declaration resolved to no symbols; nothing was generated");
+        }
+    }
+
+    /**
+     * Handle `export default foo;` style assignments.
+     * @param {ts.ExportAssignment} node
+     */
+    visitExportAssignment(node) {
+        // BridgeJS does not currently model default export assignments (they may point to expressions).
+        this.warnExportSkip(node, "Skipping export assignment (export default ...) which is not supported");
     }
 
     /**
@@ -271,7 +290,10 @@ export class TypeProcessor {
         const isConst = (node.declarationList.flags & ts.NodeFlags.Const) !== 0;
 
         for (const decl of node.declarationList.declarations) {
-            if (!ts.isIdentifier(decl.name)) continue;
+            if (!ts.isIdentifier(decl.name)) {
+                this.warnExportSkip(decl, "Skipping exported variable with a non-identifier name");
+                continue;
+            }
 
             const jsName = decl.name.text;
             const swiftName = this.swiftTypeName(jsName);
@@ -399,7 +421,12 @@ export class TypeProcessor {
      */
     visitEnumDeclaration(node) {
         const name = node.name?.text;
-        if (!name) return;
+        if (!name) {
+            if (this.isExported(node)) {
+                this.warnExportSkip(node, "Skipping exported enum without a name");
+            }
+            return;
+        }
         this.emitEnumFromDeclaration(name, node, node);
     }
 
@@ -532,7 +559,12 @@ export class TypeProcessor {
      * @private
      */
     visitFunctionDeclaration(node) {
-        if (!node.name) return;
+        if (!node.name) {
+            if (this.isExported(node)) {
+                this.warnExportSkip(node, "Skipping exported function without a name");
+            }
+            return;
+        }
         const jsName = node.name.text;
         const swiftName = this.swiftTypeName(jsName);
         const fromArg = this.renderDefaultJSImportFromArgument();
@@ -774,7 +806,12 @@ export class TypeProcessor {
      * @private
      */
     visitClassDecl(node) {
-        if (!node.name) return;
+        if (!node.name) {
+            if (this.isExported(node)) {
+                this.warnExportSkip(node, "Skipping exported class without a name");
+            }
+            return;
+        }
 
         const jsName = node.name.text;
         if (this.emittedStructuredTypeNames.has(jsName)) return;
@@ -1242,6 +1279,28 @@ export class TypeProcessor {
         }
         parts.push("throws(JSException)");
         return parts.join(" ");
+    }
+
+    /**
+     * @param {ts.Node} node
+     * @returns {boolean}
+     */
+    isExported(node) {
+        const hasExportModifier = /** @type {ts.ModifierLike[] | undefined} */ (node.modifiers)?.some(
+            (m) => m.kind === ts.SyntaxKind.ExportKeyword
+        ) ?? false;
+        return hasExportModifier || ts.isExportAssignment(node);
+    }
+
+    /**
+     * Emit a single warning per node when an exported declaration cannot be generated.
+     * @param {ts.Node} node
+     * @param {string} reason
+     */
+    warnExportSkip(node, reason) {
+        if (this.warnedExportNodes.has(node)) return;
+        this.warnedExportNodes.add(node);
+        this.diagnosticEngine.print("warning", `${reason}. Swift binding not generated`, node);
     }
 
     /**
