@@ -272,15 +272,15 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_ConstructorDefaults_wrap"] = function(pointer) {
-                const obj = ConstructorDefaults.__construct(pointer);
+                const obj = _exports['ConstructorDefaults'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_DefaultGreeter_wrap"] = function(pointer) {
-                const obj = DefaultGreeter.__construct(pointer);
+                const obj = _exports['DefaultGreeter'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_EmptyGreeter_wrap"] = function(pointer) {
-                const obj = EmptyGreeter.__construct(pointer);
+                const obj = _exports['EmptyGreeter'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },

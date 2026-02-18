@@ -1122,7 +1122,7 @@ public struct BridgeJSLink {
             for klass in classes.sorted(by: { $0.name < $1.name }) {
                 let wrapperFunctionName = "bjs_\(klass.name)_wrap"
                 wrapperLines.append("importObject[\"\(moduleName)\"][\"\(wrapperFunctionName)\"] = function(pointer) {")
-                wrapperLines.append("    const obj = \(klass.name).__construct(pointer);")
+                wrapperLines.append("    const obj = _exports['\(klass.name)'].__construct(pointer);")
                 wrapperLines.append("    return \(JSGlueVariableScope.reservedSwift).memory.retain(obj);")
                 wrapperLines.append("};")
             }

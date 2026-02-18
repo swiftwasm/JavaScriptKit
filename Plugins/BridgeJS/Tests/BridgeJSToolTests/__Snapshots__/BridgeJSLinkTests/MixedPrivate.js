@@ -200,7 +200,7 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_PrivateClass_wrap"] = function(pointer) {
-                const obj = PrivateClass.__construct(pointer);
+                const obj = _exports['PrivateClass'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },

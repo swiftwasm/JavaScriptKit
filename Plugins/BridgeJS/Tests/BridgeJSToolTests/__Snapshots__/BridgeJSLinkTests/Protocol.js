@@ -261,15 +261,15 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_DelegateManager_wrap"] = function(pointer) {
-                const obj = DelegateManager.__construct(pointer);
+                const obj = _exports['DelegateManager'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_Helper_wrap"] = function(pointer) {
-                const obj = Helper.__construct(pointer);
+                const obj = _exports['Helper'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_MyViewController_wrap"] = function(pointer) {
-                const obj = MyViewController.__construct(pointer);
+                const obj = _exports['MyViewController'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};

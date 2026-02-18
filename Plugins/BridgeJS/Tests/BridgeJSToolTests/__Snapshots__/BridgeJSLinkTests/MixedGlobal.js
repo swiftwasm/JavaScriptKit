@@ -200,7 +200,7 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_GlobalClass_wrap"] = function(pointer) {
-                const obj = GlobalClass.__construct(pointer);
+                const obj = _exports['GlobalClass'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },
