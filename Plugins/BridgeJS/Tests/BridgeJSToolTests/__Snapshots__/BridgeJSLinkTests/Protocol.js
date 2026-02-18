@@ -47,7 +47,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -63,13 +62,11 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: ResultValues.Tag.Success, cleanup };
+                        return ResultValues.Tag.Success;
                     }
                     case ResultValues.Tag.Failure: {
                         i32Stack.push((value.param0 | 0));
-                        const cleanup = undefined;
-                        return { caseId: ResultValues.Tag.Failure, cleanup };
+                        return ResultValues.Tag.Failure;
                     }
                     default: throw new Error("Unknown ResultValues tag: " + String(enumTag));
                 }
@@ -154,16 +151,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
-            }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -359,7 +346,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_MyViewControllerDelegate_result_get"] = function bjs_MyViewControllerDelegate_result_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).result;
-                    const { caseId: caseId, cleanup: cleanup } = enumHelpers.Result.lower(ret);
+                    const caseId = enumHelpers.Result.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -378,7 +365,7 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).optionalResult;
                     const isSome = ret != null;
                     if (isSome) {
-                        const { caseId: caseId, cleanup: cleanup } = enumHelpers.Result.lower(ret);
+                        const caseId = enumHelpers.Result.lower(ret);
                         return caseId;
                     } else {
                         return -1;
@@ -558,7 +545,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_MyViewControllerDelegate_getResult"] = function bjs_MyViewControllerDelegate_getResult(self) {
                 try {
                     let ret = swift.memory.getObject(self).getResult();
-                    const { caseId: caseId, cleanup: cleanup } = enumHelpers.Result.lower(ret);
+                    const caseId = enumHelpers.Result.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -686,14 +673,12 @@ export async function createInstantiator(options, swift) {
                 }
 
                 constructor(delegates) {
-                    const arrayCleanups = [];
                     for (const elem of delegates) {
                         const objId = swift.memory.retain(elem);
                         i32Stack.push(objId);
                     }
                     i32Stack.push(delegates.length);
                     const ret = instance.exports.bjs_DelegateManager_init();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return DelegateManager.__construct(ret);
                 }
                 notifyAll() {
@@ -713,14 +698,12 @@ export async function createInstantiator(options, swift) {
                     return arrayResult;
                 }
                 set delegates(value) {
-                    const arrayCleanups = [];
                     for (const elem of value) {
                         const objId = swift.memory.retain(elem);
                         i32Stack.push(objId);
                     }
                     i32Stack.push(value.length);
                     instance.exports.bjs_DelegateManager_delegates_set(this.pointer);
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                 }
             }
             const ResultHelpers = __bjs_createResultValuesHelpers()();
@@ -731,7 +714,6 @@ export async function createInstantiator(options, swift) {
                 MyViewController,
                 DelegateManager,
                 processDelegates: function bjs_processDelegates(delegates) {
-                    const arrayCleanups = [];
                     for (const elem of delegates) {
                         const objId = swift.memory.retain(elem);
                         i32Stack.push(objId);
@@ -747,7 +729,6 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(obj);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 Direction: DirectionValues,

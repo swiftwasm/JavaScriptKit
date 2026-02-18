@@ -53,7 +53,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -94,32 +93,26 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Success, cleanup };
+                        return APIResultValues.Tag.Success;
                     }
                     case APIResultValues.Tag.Failure: {
                         i32Stack.push((value.param0 | 0));
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Failure, cleanup };
+                        return APIResultValues.Tag.Failure;
                     }
                     case APIResultValues.Tag.Flag: {
                         i32Stack.push(value.param0 ? 1 : 0);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Flag, cleanup };
+                        return APIResultValues.Tag.Flag;
                     }
                     case APIResultValues.Tag.Rate: {
                         f32Stack.push(Math.fround(value.param0));
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Rate, cleanup };
+                        return APIResultValues.Tag.Rate;
                     }
                     case APIResultValues.Tag.Precise: {
                         f64Stack.push(value.param0);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Precise, cleanup };
+                        return APIResultValues.Tag.Precise;
                     }
                     case APIResultValues.Tag.Info: {
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Info, cleanup };
+                        return APIResultValues.Tag.Info;
                     }
                     default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
                 }
@@ -217,16 +210,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
-            }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -403,7 +386,7 @@ export async function createInstantiator(options, swift) {
                     const callback = swift.memory.getObject(callbackId);
                     const enumValue = enumHelpers.APIResult.lift(param0);
                     let ret = callback(enumValue);
-                    const { caseId: caseId, cleanup: cleanup } = enumHelpers.APIResult.lower(ret);
+                    const caseId = enumHelpers.APIResult.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -411,10 +394,9 @@ export async function createInstantiator(options, swift) {
             }
             bjs["make_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModule9APIResultO_9APIResultO = function(param0) {
-                    const { caseId: param0CaseId, cleanup: param0Cleanup } = enumHelpers.APIResult.lower(param0);
+                    const param0CaseId = enumHelpers.APIResult.lower(param0);
                     instance.exports.invoke_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO(boxPtr, param0CaseId);
                     const ret = enumHelpers.APIResult.lift(i32Stack.pop());
-                    if (param0Cleanup) { param0Cleanup(); }
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
@@ -672,7 +654,7 @@ export async function createInstantiator(options, swift) {
                     let ret = callback(param0IsSome ? enumValue : null);
                     const isSome = ret != null;
                     if (isSome) {
-                        const { caseId: caseId, cleanup: cleanup } = enumHelpers.APIResult.lower(ret);
+                        const caseId = enumHelpers.APIResult.lower(ret);
                         return caseId;
                     } else {
                         return -1;
@@ -684,11 +666,9 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO = function(param0) {
                     const isSome = param0 != null;
-                    let param0CaseId, param0Cleanup;
+                    let param0CaseId;
                     if (isSome) {
-                        const enumResult = enumHelpers.APIResult.lower(param0);
-                        param0CaseId = enumResult.caseId;
-                        param0Cleanup = enumResult.cleanup;
+                        param0CaseId = enumHelpers.APIResult.lower(param0);
                     }
                     instance.exports.invoke_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(boxPtr, +isSome, isSome ? param0CaseId : 0);
                     const tag = i32Stack.pop();
@@ -699,7 +679,6 @@ export async function createInstantiator(options, swift) {
                     } else {
                         optResult = enumHelpers.APIResult.lift(tag);
                     }
-                    if (param0Cleanup) { param0Cleanup(); }
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);

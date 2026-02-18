@@ -23,7 +23,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -34,7 +33,6 @@ export async function createInstantiator(options, swift) {
             lower: (value) => {
                 i32Stack.push((value.x | 0));
                 i32Stack.push((value.y | 0));
-                return { cleanup: undefined };
             },
             lift: () => {
                 const int = i32Stack.pop();
@@ -109,22 +107,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
             }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
-            }
             bjs["swift_js_struct_lower_Point"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Point.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Point.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Point"] = function() {
                 const value = structHelpers.Point.lift();

@@ -24,10 +24,7 @@ extension PlayBridgeJSOutput: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_PlayBridgeJSOutput(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_PlayBridgeJSOutput(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -40,9 +37,9 @@ extension PlayBridgeJSOutput: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PlayBridgeJSOutput")
-fileprivate func _bjs_struct_lower_PlayBridgeJSOutput(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_PlayBridgeJSOutput(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_PlayBridgeJSOutput(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_PlayBridgeJSOutput(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -77,10 +74,7 @@ extension PlayBridgeJSDiagnostic: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_PlayBridgeJSDiagnostic(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_PlayBridgeJSDiagnostic(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -93,9 +87,9 @@ extension PlayBridgeJSDiagnostic: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PlayBridgeJSDiagnostic")
-fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
@@ -122,10 +116,7 @@ extension PlayBridgeJSResult: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_PlayBridgeJSResult(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_PlayBridgeJSResult(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -138,9 +129,9 @@ extension PlayBridgeJSResult: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PlayBridgeJSResult")
-fileprivate func _bjs_struct_lower_PlayBridgeJSResult(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_PlayBridgeJSResult(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_PlayBridgeJSResult(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_PlayBridgeJSResult(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif

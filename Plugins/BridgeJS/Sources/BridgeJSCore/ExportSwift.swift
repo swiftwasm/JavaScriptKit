@@ -1243,10 +1243,7 @@ struct StructCodegen {
             printer.write(
                 multilineString: """
                     \(accessControl)init(unsafelyCopying jsObject: JSObject) {
-                        let __bjs_cleanupId = \(lowerFunctionName)(jsObject.bridgeJSLowerParameter())
-                        defer {
-                            _swift_js_struct_cleanup(__bjs_cleanupId)
-                        }
+                        \(lowerFunctionName)(jsObject.bridgeJSLowerParameter())
                         self = Self.bridgeJSStackPop()
                     }
                     """
@@ -1274,7 +1271,7 @@ struct StructCodegen {
             functionName: lowerFunctionName,
             signature: SwiftSignatureBuilder.buildABIFunctionSignature(
                 abiParameters: [("objectId", .i32)],
-                returnType: .i32
+                returnType: nil
             )
         )
         let liftExternDeclPrinter = CodeFragmentPrinter()

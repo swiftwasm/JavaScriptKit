@@ -11,10 +11,7 @@ extension Point: _BridgedSwiftStruct {
     }
 
     init(unsafelyCopying jsObject: JSObject) {
-        let __bjs_cleanupId = _bjs_struct_lower_Point(jsObject.bridgeJSLowerParameter())
-        defer {
-            _swift_js_struct_cleanup(__bjs_cleanupId)
-        }
+        _bjs_struct_lower_Point(jsObject.bridgeJSLowerParameter())
         self = Self.bridgeJSStackPop()
     }
 
@@ -27,9 +24,9 @@ extension Point: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Point")
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Int32
+fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Int32 {
+fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
