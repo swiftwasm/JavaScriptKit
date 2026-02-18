@@ -355,12 +355,6 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
 
 @JSFunction func takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void
 
-enum FeatureFlag: String {
-    case foo = "foo"
-    case bar = "bar"
-}
-extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
-
 @JSFunction func returnsFeatureFlag() throws(JSException) -> FeatureFlag
 "
 `;

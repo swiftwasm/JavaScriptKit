@@ -56,8 +56,6 @@ export class TypeProcessor {
         this.emittedStructuredTypeNames = new Set();
         /** @type {Set<string>} */
         this.emittedStringLiteralUnionNames = new Set();
-        /** @type {Set<string>} */
-        this.emittedStringLiteralUnionNames = new Set();
 
         /** @type {Set<string>} */
         this.visitedDeclarationKeys = new Set();
@@ -324,6 +322,11 @@ export class TypeProcessor {
      */
     getStringLiteralUnionLiterals(type) {
         if ((type.flags & ts.TypeFlags.Union) === 0) return null;
+        const symbol = type.getSymbol() ?? type.aliasSymbol;
+        // Skip enums so we don't double-generate real enum declarations.
+        if (symbol && (symbol.flags & ts.SymbolFlags.Enum) !== 0) {
+            return null;
+        }
         /** @type {ts.UnionType} */
         // @ts-ignore
         const unionType = type;
