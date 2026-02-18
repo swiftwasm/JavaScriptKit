@@ -16,11 +16,7 @@ final class JSGlueVariableScope {
     static let reservedStorageToReturnString = "tmpRetString"
     static let reservedStorageToReturnBytes = "tmpRetBytes"
     static let reservedStorageToReturnException = "tmpRetException"
-    static let reservedStorageToReturnOptionalBool = "tmpRetOptionalBool"
-    static let reservedStorageToReturnOptionalInt = "tmpRetOptionalInt"
-    static let reservedStorageToReturnOptionalFloat = "tmpRetOptionalFloat"
-    static let reservedStorageToReturnOptionalDouble = "tmpRetOptionalDouble"
-    static let reservedStorageToReturnOptionalHeapObject = "tmpRetOptionalHeapObject"
+    static let reservedSlot = "slot"
     static let reservedTextEncoder = "textEncoder"
     static let reservedTextDecoder = "textDecoder"
     static let reservedStringStack = "strStack"
@@ -44,11 +40,7 @@ final class JSGlueVariableScope {
         reservedStorageToReturnString,
         reservedStorageToReturnBytes,
         reservedStorageToReturnException,
-        reservedStorageToReturnOptionalBool,
-        reservedStorageToReturnOptionalInt,
-        reservedStorageToReturnOptionalFloat,
-        reservedStorageToReturnOptionalDouble,
-        reservedStorageToReturnOptionalHeapObject,
+        reservedSlot,
         reservedTextEncoder,
         reservedTextDecoder,
         reservedStringStack,
@@ -944,30 +936,21 @@ struct IntrinsicJSFragment: Sendable {
                 let (scope, printer) = (context.scope, context.printer)
                 let resultVar = scope.variable("optResult")
                 switch wrappedType {
-                case .bool:
-                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalBool);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = undefined;")
-                case .int, .uint:
-                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
-                case .float:
-                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = undefined;")
-                case .double:
-                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = undefined;")
+                case .bool, .int, .uint, .float, .double, .caseEnum:
+                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedSlot);")
+                    printer.write("\(JSGlueVariableScope.reservedSlot) = undefined;")
                 case .string:
-                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnString);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
+                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedSlot);")
+                    printer.write("\(JSGlueVariableScope.reservedSlot) = undefined;")
                 case .jsObject, .swiftProtocol:
-                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnString);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
+                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedSlot);")
+                    printer.write("\(JSGlueVariableScope.reservedSlot) = undefined;")
                 case .swiftHeapObject(let className):
                     let pointerVar = scope.variable("pointer")
                     printer.write(
-                        "const \(pointerVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);"
+                        "const \(pointerVar) = \(JSGlueVariableScope.reservedSlot);"
                     )
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = undefined;")
+                    printer.write("\(JSGlueVariableScope.reservedSlot) = undefined;")
                     let constructExpr =
                         context.hasDirectAccessToSwiftClass
                         ? "\(className).__construct(\(pointerVar))"
@@ -975,32 +958,14 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write(
                         "const \(resultVar) = \(pointerVar) === null ? \(absenceLiteral) : \(constructExpr);"
                     )
-                case .caseEnum:
-                    printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
                 case .rawValueEnum(_, let rawType):
                     switch rawType {
                     case .string:
-                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnString);")
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
-                    case .bool:
-                        printer.write(
-                            "const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalBool);"
-                        )
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = undefined;")
-                    case .float:
-                        printer.write(
-                            "const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);"
-                        )
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = undefined;")
-                    case .double:
-                        printer.write(
-                            "const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);"
-                        )
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = undefined;")
+                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedSlot);")
+                        printer.write("\(JSGlueVariableScope.reservedSlot) = undefined;")
                     default:
-                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
+                        printer.write("const \(resultVar) = \(JSGlueVariableScope.reservedSlot);")
+                        printer.write("\(JSGlueVariableScope.reservedSlot) = undefined;")
                     }
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
@@ -1113,33 +1078,17 @@ struct IntrinsicJSFragment: Sendable {
 
                 switch wrappedType {
                 case .bool:
-                    printer.write(
-                        "bjs[\"swift_js_return_optional_bool\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) ? 1 : 0) : 0);"
-                    )
+                    printer.write("if (\(isSomeVar)) { bjs[\"swift_js_set_i32\"](\(value) ? 1 : 0); } else { bjs[\"swift_js_set_null\"](); }")
                 case .int, .uint:
-                    printer.write(
-                        "bjs[\"swift_js_return_optional_int\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) | 0) : 0);"
-                    )
+                    printer.write("if (\(isSomeVar)) { bjs[\"swift_js_set_i32\"](\(value) | 0); } else { bjs[\"swift_js_set_null\"](); }")
                 case .caseEnum:
                     printer.write("return \(isSomeVar) ? (\(value) | 0) : -1;")
                 case .float:
-                    printer.write(
-                        "bjs[\"swift_js_return_optional_float\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? Math.fround(\(value)) : 0.0);"
-                    )
+                    printer.write("if (\(isSomeVar)) { bjs[\"swift_js_set_f32\"](Math.fround(\(value))); } else { bjs[\"swift_js_set_null\"](); }")
                 case .double:
-                    printer.write(
-                        "bjs[\"swift_js_return_optional_double\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? \(value) : 0.0);"
-                    )
+                    printer.write("if (\(isSomeVar)) { bjs[\"swift_js_set_f64\"](\(value)); } else { bjs[\"swift_js_set_null\"](); }")
                 case .string:
-                    printer.write("if (\(isSomeVar)) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(value);")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
-                    }
-                    printer.write("}")
+                    printer.write("if (\(isSomeVar)) { \(JSGlueVariableScope.reservedSlot) = \(value); } else { bjs[\"swift_js_set_null\"](); }")
                 case .jsObject, .swiftProtocol:
                     let idVar = scope.variable("id")
                     printer.write("let \(idVar) = 0;")
@@ -1148,7 +1097,7 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write("\(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));")
                     }
                     printer.write("}")
-                    printer.write("bjs[\"swift_js_return_optional_object\"](\(isSomeVar) ? 1 : 0, \(idVar));")
+                    printer.write("if (\(isSomeVar)) { bjs[\"swift_js_set_object\"](\(idVar)); } else { bjs[\"swift_js_set_null\"](); }")
                 case .jsValue:
                     if value != "undefined" {
                         let lowered = try jsValueLower.printCode([value], context)
@@ -1182,34 +1131,15 @@ struct IntrinsicJSFragment: Sendable {
                 case .rawValueEnum(_, let rawType):
                     switch rawType {
                     case .string:
-                        printer.write("if (\(isSomeVar)) {")
-                        printer.indent {
-                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(value);")
-                        }
-                        printer.write("} else {")
-                        printer.indent {
-                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
-                        }
-                        printer.write("}")
+                        printer.write("if (\(isSomeVar)) { \(JSGlueVariableScope.reservedSlot) = \(value); } else { bjs[\"swift_js_set_null\"](); }")
+                    case .bool:
+                        printer.write("if (\(isSomeVar)) { bjs[\"swift_js_set_i32\"](\(value) ? 1 : 0); } else { bjs[\"swift_js_set_null\"](); }")
+                    case .float:
+                        printer.write("if (\(isSomeVar)) { bjs[\"swift_js_set_f32\"](Math.fround(\(value))); } else { bjs[\"swift_js_set_null\"](); }")
+                    case .double:
+                        printer.write("if (\(isSomeVar)) { bjs[\"swift_js_set_f64\"](\(value)); } else { bjs[\"swift_js_set_null\"](); }")
                     default:
-                        switch rawType {
-                        case .bool:
-                            printer.write(
-                                "bjs[\"swift_js_return_optional_bool\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) ? 1 : 0) : 0);"
-                            )
-                        case .float:
-                            printer.write(
-                                "bjs[\"swift_js_return_optional_float\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? Math.fround(\(value)) : 0.0);"
-                            )
-                        case .double:
-                            printer.write(
-                                "bjs[\"swift_js_return_optional_double\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? \(value) : 0.0);"
-                            )
-                        default:
-                            printer.write(
-                                "bjs[\"swift_js_return_optional_int\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? (\(value) | 0) : 0);"
-                            )
-                        }
+                        printer.write("if (\(isSomeVar)) { bjs[\"swift_js_set_i32\"](\(value) | 0); } else { bjs[\"swift_js_set_null\"](); }")
                     }
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
@@ -1318,20 +1248,8 @@ struct IntrinsicJSFragment: Sendable {
                 let printer = context.printer
                 let value = arguments[0]
 
-                switch wrappedType {
-                case .string, .rawValueEnum(_, .string):
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(value);")
-                case .int, .rawValueEnum(_, .int):
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = \(value);")
-                case .float, .rawValueEnum(_, .float):
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = \(value);")
-                case .double, .rawValueEnum(_, .double):
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = \(value);")
-                case .jsObject, .swiftProtocol:
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = \(value);")
-                default:
-                    fatalError("Unsupported type in protocolPropertyOptionalToSideChannel: \(wrappedType)")
-                }
+                // Write to the shared slot — Swift will read via is_null + get_*
+                printer.write("\(JSGlueVariableScope.reservedSlot) = \(value);")
 
                 return []
             }

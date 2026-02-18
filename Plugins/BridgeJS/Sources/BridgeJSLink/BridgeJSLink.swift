@@ -241,11 +241,7 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedStorageToReturnString);",
             "let \(JSGlueVariableScope.reservedStorageToReturnBytes);",
             "let \(JSGlueVariableScope.reservedStorageToReturnException);",
-            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalBool);",
-            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);",
-            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);",
-            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);",
-            "let \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);",
+            "let \(JSGlueVariableScope.reservedSlot);",
             "let \(JSGlueVariableScope.reservedStringStack) = [];",
             "let \(JSGlueVariableScope.reservedI32Stack) = [];",
             "let \(JSGlueVariableScope.reservedF32Stack) = [];",
@@ -439,166 +435,44 @@ public struct BridgeJSLink {
                     }
                 }
 
-                printer.write("bjs[\"swift_js_return_optional_bool\"] = function(isSome, value) {")
+                // Single shared slot for all optional return values
+                printer.write("bjs[\"swift_js_set_null\"] = function() { \(JSGlueVariableScope.reservedSlot) = null; }")
+                printer.write("bjs[\"swift_js_is_null\"] = function() { return \(JSGlueVariableScope.reservedSlot) == null ? 1 : 0; }")
+                printer.write("bjs[\"swift_js_set_i32\"] = function(v) { \(JSGlueVariableScope.reservedSlot) = v | 0; }")
+                printer.write("bjs[\"swift_js_get_i32\"] = function() { const v = \(JSGlueVariableScope.reservedSlot); \(JSGlueVariableScope.reservedSlot) = undefined; return v | 0; }")
+                printer.write("bjs[\"swift_js_set_f32\"] = function(v) { \(JSGlueVariableScope.reservedSlot) = Math.fround(v); }")
+                printer.write("bjs[\"swift_js_get_f32\"] = function() { const v = \(JSGlueVariableScope.reservedSlot); \(JSGlueVariableScope.reservedSlot) = undefined; return Math.fround(v); }")
+                printer.write("bjs[\"swift_js_set_f64\"] = function(v) { \(JSGlueVariableScope.reservedSlot) = +v; }")
+                printer.write("bjs[\"swift_js_get_f64\"] = function() { const v = \(JSGlueVariableScope.reservedSlot); \(JSGlueVariableScope.reservedSlot) = undefined; return +v; }")
+                printer.write("bjs[\"swift_js_set_string\"] = function(ptr, len) {")
                 printer.indent {
-                    printer.write("if (isSome === 0) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = value !== 0;")
-                    }
-                    printer.write("}")
+                    printer.write("const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");")
+                    printer.write("\(JSGlueVariableScope.reservedSlot) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_int\"] = function(isSome, value) {")
+                printer.write("bjs[\"swift_js_get_string\"] = function() {")
                 printer.indent {
-                    printer.write("if (isSome === 0) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = value | 0;")
-                    }
-                    printer.write("}")
+                    printer.write("const str = \(JSGlueVariableScope.reservedSlot);")
+                    printer.write("\(JSGlueVariableScope.reservedSlot) = undefined;")
+                    printer.write("const bytes = \(JSGlueVariableScope.reservedTextEncoder).encode(str);")
+                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = bytes;")
+                    printer.write("return bytes.length;")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_float\"] = function(isSome, value) {")
+                printer.write("bjs[\"swift_js_set_object\"] = function(objectId) {")
                 printer.indent {
-                    printer.write("if (isSome === 0) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write(
-                            "\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = Math.fround(value);"
-                        )
-                    }
-                    printer.write("}")
+                    printer.write("\(JSGlueVariableScope.reservedSlot) = \(JSGlueVariableScope.reservedSwift).memory.getObject(objectId);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_double\"] = function(isSome, value) {")
+                printer.write("bjs[\"swift_js_get_object\"] = function() {")
                 printer.indent {
-                    printer.write("if (isSome === 0) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = value;")
-                    }
-                    printer.write("}")
+                    printer.write("const obj = \(JSGlueVariableScope.reservedSlot);")
+                    printer.write("\(JSGlueVariableScope.reservedSlot) = undefined;")
+                    printer.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(obj);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_string\"] = function(isSome, ptr, len) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write(lines: [
-                            "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len);",
-                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);",
-                        ])
-                    }
-                    printer.write("}")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_object\"] = function(isSome, objectId) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write(
-                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedSwift).memory.getObject(objectId);"
-                        )
-                    }
-                    printer.write("}")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_heap_object\"] = function(isSome, pointer) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = pointer;")
-                    }
-                    printer.write("}")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_int_presence\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedStorageToReturnOptionalInt) != null ? 1 : 0;")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_int_value\"] = function() {")
-                printer.indent {
-                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
-                    printer.write("return value;")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_string\"] = function() {")
-                printer.indent {
-                    printer.write("const str = \(JSGlueVariableScope.reservedStorageToReturnString);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
-                    printer.write("if (str == null) {")
-                    printer.indent {
-                        printer.write("return -1;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("const bytes = \(JSGlueVariableScope.reservedTextEncoder).encode(str);")
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = bytes;")
-                        printer.write("return bytes.length;")
-                    }
-                    printer.write("}")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_float_presence\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) != null ? 1 : 0;")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_float_value\"] = function() {")
-                printer.indent {
-                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = undefined;")
-                    printer.write("return value;")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_double_presence\"] = function() {")
-                printer.indent {
-                    printer.write(
-                        "return \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) != null ? 1 : 0;"
-                    )
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_double_value\"] = function() {")
-                printer.indent {
-                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = undefined;")
-                    printer.write("return value;")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_heap_object_pointer\"] = function() {")
-                printer.indent {
-                    printer.write("const pointer = \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = undefined;")
-                    printer.write("return pointer || 0;")
-                }
-                printer.write("}")
+                printer.write("bjs[\"swift_js_set_heap_object\"] = function(pointer) { \(JSGlueVariableScope.reservedSlot) = pointer; }")
+                printer.write("bjs[\"swift_js_get_heap_object\"] = function() { const p = \(JSGlueVariableScope.reservedSlot); \(JSGlueVariableScope.reservedSlot) = undefined; return p || 0; }")
                 // Always provide swift_js_closure_unregister as a no-op by default.
                 // The @_extern(wasm) declaration in BridgeJSIntrinsics.swift is unconditional,
                 // so the WASM binary always imports this symbol. When closures ARE used,
