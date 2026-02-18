@@ -29,7 +29,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -44,7 +43,6 @@ export async function createInstantiator(options, swift) {
                 i32Stack.push(id);
                 i32Stack.push((value.value | 0));
                 i32Stack.push(value.enabled ? 1 : 0);
-                return { cleanup: undefined };
             },
             lift: () => {
                 const bool = i32Stack.pop() !== 0;
@@ -58,21 +56,18 @@ export async function createInstantiator(options, swift) {
         return () => ({
             lower: (value) => {
                 f64Stack.push(value.baseValue);
-                return { cleanup: undefined };
             },
             lift: () => {
                 const f64 = f64Stack.pop();
                 const instance1 = { baseValue: f64 };
                 instance1.add = function(a, b = 10.0) {
-                    const { cleanup: structCleanup } = structHelpers.MathOperations.lower(this);
+                    structHelpers.MathOperations.lower(this);
                     const ret = instance.exports.bjs_MathOperations_add(a, b);
-                    if (structCleanup) { structCleanup(); }
                     return ret;
                 }.bind(instance1);
                 instance1.multiply = function(a, b) {
-                    const { cleanup: structCleanup } = structHelpers.MathOperations.lower(this);
+                    structHelpers.MathOperations.lower(this);
                     const ret = instance.exports.bjs_MathOperations_multiply(a, b);
-                    if (structCleanup) { structCleanup(); }
                     return ret;
                 }.bind(instance1);
                 return instance1;
@@ -144,33 +139,15 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
             }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
-            }
             bjs["swift_js_struct_lower_Config"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Config.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Config.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Config"] = function() {
                 const value = structHelpers.Config.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_MathOperations"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.MathOperations.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.MathOperations.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_MathOperations"] = function() {
                 const value = structHelpers.MathOperations.lift();
@@ -502,10 +479,8 @@ export async function createInstantiator(options, swift) {
                 },
                 testOptionalStructDefault: function bjs_testOptionalStructDefault(point = null) {
                     const isSome = point != null;
-                    let pointCleanup;
                     if (isSome) {
-                        const structResult = structHelpers.Config.lower(point);
-                        pointCleanup = structResult.cleanup;
+                        structHelpers.Config.lower(point);
                     }
                     i32Stack.push(+isSome);
                     instance.exports.bjs_testOptionalStructDefault();
@@ -516,15 +491,12 @@ export async function createInstantiator(options, swift) {
                     } else {
                         optResult = null;
                     }
-                    if (pointCleanup) { pointCleanup(); }
                     return optResult;
                 },
                 testOptionalStructWithValueDefault: function bjs_testOptionalStructWithValueDefault(point = { name: "default", value: 42, enabled: true }) {
                     const isSome = point != null;
-                    let pointCleanup;
                     if (isSome) {
-                        const structResult = structHelpers.Config.lower(point);
-                        pointCleanup = structResult.cleanup;
+                        structHelpers.Config.lower(point);
                     }
                     i32Stack.push(+isSome);
                     instance.exports.bjs_testOptionalStructWithValueDefault();
@@ -535,11 +507,9 @@ export async function createInstantiator(options, swift) {
                     } else {
                         optResult = null;
                     }
-                    if (pointCleanup) { pointCleanup(); }
                     return optResult;
                 },
                 testIntArrayDefault: function bjs_testIntArrayDefault(values = [1, 2, 3]) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         i32Stack.push((elem | 0));
                     }
@@ -552,11 +522,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(int);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 testStringArrayDefault: function bjs_testStringArrayDefault(names = ["a", "b", "c"]) {
-                    const arrayCleanups = [];
                     for (const elem of names) {
                         const bytes = textEncoder.encode(elem);
                         const id = swift.memory.retain(bytes);
@@ -572,11 +540,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(string);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 testDoubleArrayDefault: function bjs_testDoubleArrayDefault(values = [1.5, 2.5, 3.5]) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         f64Stack.push(elem);
                     }
@@ -589,11 +555,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(f64);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 testBoolArrayDefault: function bjs_testBoolArrayDefault(flags = [true, false, true]) {
-                    const arrayCleanups = [];
                     for (const elem of flags) {
                         i32Stack.push(elem ? 1 : 0);
                     }
@@ -606,11 +570,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(bool);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 testEmptyArrayDefault: function bjs_testEmptyArrayDefault(items = []) {
-                    const arrayCleanups = [];
                     for (const elem of items) {
                         i32Stack.push((elem | 0));
                     }
@@ -623,13 +585,11 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(int);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 testMixedWithArrayDefault: function bjs_testMixedWithArrayDefault(name = "test", values = [10, 20, 30], enabled = true) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         i32Stack.push((elem | 0));
                     }
@@ -637,7 +597,6 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_testMixedWithArrayDefault(nameId, nameBytes.length, enabled);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return ret;
                 },
                 Status: StatusValues,

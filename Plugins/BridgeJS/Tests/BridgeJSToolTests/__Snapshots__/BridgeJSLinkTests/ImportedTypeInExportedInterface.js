@@ -23,7 +23,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -49,7 +48,6 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(0);
                 }
                 i32Stack.push(isSome ? 1 : 0);
-                return { cleanup: undefined };
             },
             lift: () => {
                 const isSome = i32Stack.pop();
@@ -145,22 +143,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
             }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
-            }
             bjs["swift_js_struct_lower_FooContainer"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.FooContainer.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.FooContainer.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_FooContainer"] = function() {
                 const value = structHelpers.FooContainer.lift();
@@ -295,7 +279,6 @@ export async function createInstantiator(options, swift) {
                     return ret1;
                 },
                 processFooArray: function bjs_processFooArray(foos) {
-                    const arrayCleanups = [];
                     for (const elem of foos) {
                         const objId = swift.memory.retain(elem);
                         i32Stack.push(objId);
@@ -311,11 +294,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(obj);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processOptionalFooArray: function bjs_processOptionalFooArray(foos) {
-                    const arrayCleanups = [];
                     for (const elem of foos) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
@@ -344,14 +325,12 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(optValue);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 roundtripFooContainer: function bjs_roundtripFooContainer(container) {
-                    const { cleanup: cleanup } = structHelpers.FooContainer.lower(container);
+                    structHelpers.FooContainer.lower(container);
                     instance.exports.bjs_roundtripFooContainer();
                     const structValue = structHelpers.FooContainer.lift();
-                    if (cleanup) { cleanup(); }
                     return structValue;
                 },
             };

@@ -818,21 +818,6 @@ private func _swift_js_pop_f64_extern() -> Float64 {
     _swift_js_pop_f64_extern()
 }
 
-// MARK: Struct bridging helpers (JS-side lowering/raising)
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_cleanup")
-private func _swift_js_struct_cleanup_extern(_ cleanupId: Int32)
-#else
-private func _swift_js_struct_cleanup_extern(_ cleanupId: Int32) {
-    _onlyAvailableOnWasm()
-}
-#endif
-
-@_spi(BridgeJS) @inline(never) public func _swift_js_struct_cleanup(_ cleanupId: Int32) {
-    _swift_js_struct_cleanup_extern(cleanupId)
-}
-
 // MARK: Wasm externs used by type lowering/lifting
 
 #if arch(wasm32)

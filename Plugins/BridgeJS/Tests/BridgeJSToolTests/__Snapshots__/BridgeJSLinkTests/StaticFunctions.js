@@ -34,7 +34,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -50,13 +49,11 @@ export async function createInstantiator(options, swift) {
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Success, cleanup };
+                        return APIResultValues.Tag.Success;
                     }
                     case APIResultValues.Tag.Failure: {
                         i32Stack.push((value.param0 | 0));
-                        const cleanup = undefined;
-                        return { caseId: APIResultValues.Tag.Failure, cleanup };
+                        return APIResultValues.Tag.Failure;
                     }
                     default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
                 }
@@ -141,16 +138,6 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
-            }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -329,10 +316,9 @@ export async function createInstantiator(options, swift) {
                 APIResult: {
                     ...APIResultValues,
                     roundtrip: function(value) {
-                        const { caseId: valueCaseId, cleanup: valueCleanup } = enumHelpers.APIResult.lower(value);
+                        const valueCaseId = enumHelpers.APIResult.lower(value);
                         instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
                         const ret = enumHelpers.APIResult.lift(i32Stack.pop());
-                        if (valueCleanup) { valueCleanup(); }
                         return ret;
                     }
                 },

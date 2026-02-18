@@ -28,7 +28,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -57,7 +56,6 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(0);
                 }
                 i32Stack.push(isSome1 ? 1 : 0);
-                return { cleanup: undefined };
             },
             lift: () => {
                 const isSome = i32Stack.pop();
@@ -101,7 +99,6 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(0);
                 }
                 i32Stack.push(isSome ? 1 : 0);
-                return { cleanup: undefined };
             },
             lift: () => {
                 const isSome = i32Stack.pop();
@@ -126,7 +123,7 @@ export async function createInstantiator(options, swift) {
                 i32Stack.push(bytes.length);
                 i32Stack.push(id);
                 i32Stack.push((value.age | 0));
-                const structResult = structHelpers.Address.lower(value.address);
+                structHelpers.Address.lower(value.address);
                 const isSome = value.email != null;
                 let id1;
                 if (isSome) {
@@ -139,10 +136,6 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(0);
                 }
                 i32Stack.push(isSome ? 1 : 0);
-                const cleanup = () => {
-                    if (structResult.cleanup) { structResult.cleanup(); }
-                };
-                return { cleanup };
             },
             lift: () => {
                 const isSome = i32Stack.pop();
@@ -165,7 +158,6 @@ export async function createInstantiator(options, swift) {
             lower: (value) => {
                 i32Stack.push((value.id | 0));
                 ptrStack.push(value.owner.pointer);
-                return { cleanup: undefined };
             },
             lift: () => {
                 const ptr = ptrStack.pop();
@@ -187,7 +179,6 @@ export async function createInstantiator(options, swift) {
                     f32Stack.push(0.0);
                 }
                 i32Stack.push(isSome ? 1 : 0);
-                return { cleanup: undefined };
             },
             lift: () => {
                 const isSome = i32Stack.pop();
@@ -207,7 +198,6 @@ export async function createInstantiator(options, swift) {
     const __bjs_createConfigStructHelpers = () => {
         return () => ({
             lower: (value) => {
-                return { cleanup: undefined };
             },
             lift: () => {
                 return {  };
@@ -234,7 +224,6 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(0);
                 }
                 i32Stack.push(isSome ? 1 : 0);
-                return { cleanup: undefined };
             },
             lift: () => {
                 const isSome = i32Stack.pop();
@@ -329,88 +318,50 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
             }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
-            }
             bjs["swift_js_struct_lower_DataPoint"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.DataPoint.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.DataPoint.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_DataPoint"] = function() {
                 const value = structHelpers.DataPoint.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Address"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Address.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Address.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Address"] = function() {
                 const value = structHelpers.Address.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Person"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Person.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Person.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Person"] = function() {
                 const value = structHelpers.Person.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Session"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Session.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Session.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Session"] = function() {
                 const value = structHelpers.Session.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Measurement"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Measurement.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Measurement.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Measurement"] = function() {
                 const value = structHelpers.Measurement.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_ConfigStruct"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.ConfigStruct.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.ConfigStruct.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_ConfigStruct"] = function() {
                 const value = structHelpers.ConfigStruct.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Container"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Container.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Container.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Container"] = function() {
                 const value = structHelpers.Container.lift();
@@ -609,17 +560,15 @@ export async function createInstantiator(options, swift) {
             const exports = {
                 Greeter,
                 roundtrip: function bjs_roundtrip(session) {
-                    const { cleanup: cleanup } = structHelpers.Person.lower(session);
+                    structHelpers.Person.lower(session);
                     instance.exports.bjs_roundtrip();
                     const structValue = structHelpers.Person.lift();
-                    if (cleanup) { cleanup(); }
                     return structValue;
                 },
                 roundtripContainer: function bjs_roundtripContainer(container) {
-                    const { cleanup: cleanup } = structHelpers.Container.lower(container);
+                    structHelpers.Container.lower(container);
                     instance.exports.bjs_roundtripContainer();
                     const structValue = structHelpers.Container.lift();
-                    if (cleanup) { cleanup(); }
                     return structValue;
                 },
                 Precision: PrecisionValues,

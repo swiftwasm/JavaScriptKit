@@ -36,7 +36,6 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
-    let tmpStructCleanups = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -47,7 +46,6 @@ export async function createInstantiator(options, swift) {
             lower: (value) => {
                 f64Stack.push(value.x);
                 f64Stack.push(value.y);
-                return { cleanup: undefined };
             },
             lift: () => {
                 const f64 = f64Stack.pop();
@@ -122,22 +120,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
             }
-            bjs["swift_js_struct_cleanup"] = function(cleanupId) {
-                if (cleanupId === 0) { return; }
-                const index = (cleanupId | 0) - 1;
-                const cleanup = tmpStructCleanups[index];
-                tmpStructCleanups[index] = null;
-                if (cleanup) { cleanup(); }
-                while (tmpStructCleanups.length > 0 && tmpStructCleanups[tmpStructCleanups.length - 1] == null) {
-                    tmpStructCleanups.pop();
-                }
-            }
             bjs["swift_js_struct_lower_Point"] = function(objectId) {
-                const { cleanup: cleanup } = structHelpers.Point.lower(swift.memory.getObject(objectId));
-                if (cleanup) {
-                    return tmpStructCleanups.push(cleanup);
-                }
-                return 0;
+                structHelpers.Point.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Point"] = function() {
                 const value = structHelpers.Point.lift();
@@ -274,7 +258,6 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_importGetNumbers"] = function bjs_importGetNumbers() {
                 try {
                     let ret = imports.importGetNumbers();
-                    const arrayCleanups = [];
                     for (const elem of ret) {
                         f64Stack.push(elem);
                     }
@@ -293,7 +276,6 @@ export async function createInstantiator(options, swift) {
                     }
                     arrayResult.reverse();
                     let ret = imports.importTransformNumbers(arrayResult);
-                    const arrayCleanups = [];
                     for (const elem of ret) {
                         f64Stack.push(elem);
                     }
@@ -312,7 +294,6 @@ export async function createInstantiator(options, swift) {
                     }
                     arrayResult.reverse();
                     let ret = imports.importProcessStrings(arrayResult);
-                    const arrayCleanups = [];
                     for (const elem of ret) {
                         const bytes = textEncoder.encode(elem);
                         const id = swift.memory.retain(bytes);
@@ -334,7 +315,6 @@ export async function createInstantiator(options, swift) {
                     }
                     arrayResult.reverse();
                     let ret = imports.importProcessBooleans(arrayResult);
-                    const arrayCleanups = [];
                     for (const elem of ret) {
                         i32Stack.push(elem ? 1 : 0);
                     }
@@ -396,7 +376,6 @@ export async function createInstantiator(options, swift) {
             const exports = {
                 Item,
                 processIntArray: function bjs_processIntArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         i32Stack.push((elem | 0));
                     }
@@ -409,11 +388,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(int);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processStringArray: function bjs_processStringArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         const bytes = textEncoder.encode(elem);
                         const id = swift.memory.retain(bytes);
@@ -429,11 +406,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(string);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processDoubleArray: function bjs_processDoubleArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         f64Stack.push(elem);
                     }
@@ -446,11 +421,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(f64);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processBoolArray: function bjs_processBoolArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         i32Stack.push(elem ? 1 : 0);
                     }
@@ -463,16 +436,11 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(bool);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processPointArray: function bjs_processPointArray(points) {
-                    const arrayCleanups = [];
                     for (const elem of points) {
-                        const { cleanup: structCleanup } = structHelpers.Point.lower(elem);
-                        arrayCleanups.push(() => {
-                            if (structCleanup) { structCleanup(); }
-                        });
+                        structHelpers.Point.lower(elem);
                     }
                     i32Stack.push(points.length);
                     instance.exports.bjs_processPointArray();
@@ -483,11 +451,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(struct);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processDirectionArray: function bjs_processDirectionArray(directions) {
-                    const arrayCleanups = [];
                     for (const elem of directions) {
                         i32Stack.push((elem | 0));
                     }
@@ -500,11 +466,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(caseId);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processStatusArray: function bjs_processStatusArray(statuses) {
-                    const arrayCleanups = [];
                     for (const elem of statuses) {
                         i32Stack.push((elem | 0));
                     }
@@ -517,37 +481,28 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(rawValue);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 sumIntArray: function bjs_sumIntArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         i32Stack.push((elem | 0));
                     }
                     i32Stack.push(values.length);
                     const ret = instance.exports.bjs_sumIntArray();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return ret;
                 },
                 findFirstPoint: function bjs_findFirstPoint(points, matching) {
-                    const arrayCleanups = [];
                     for (const elem of points) {
-                        const { cleanup: structCleanup } = structHelpers.Point.lower(elem);
-                        arrayCleanups.push(() => {
-                            if (structCleanup) { structCleanup(); }
-                        });
+                        structHelpers.Point.lower(elem);
                     }
                     i32Stack.push(points.length);
                     const matchingBytes = textEncoder.encode(matching);
                     const matchingId = swift.memory.retain(matchingBytes);
                     instance.exports.bjs_findFirstPoint(matchingId, matchingBytes.length);
                     const structValue = structHelpers.Point.lift();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return structValue;
                 },
                 processUnsafeRawPointerArray: function bjs_processUnsafeRawPointerArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         ptrStack.push((elem | 0));
                     }
@@ -560,11 +515,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(pointer);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processUnsafeMutableRawPointerArray: function bjs_processUnsafeMutableRawPointerArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         ptrStack.push((elem | 0));
                     }
@@ -577,11 +530,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(pointer);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processOpaquePointerArray: function bjs_processOpaquePointerArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         ptrStack.push((elem | 0));
                     }
@@ -594,11 +545,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(pointer);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processOptionalIntArray: function bjs_processOptionalIntArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
@@ -624,11 +573,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(optValue);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processOptionalStringArray: function bjs_processOptionalStringArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
@@ -658,19 +605,15 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(optValue);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processOptionalArray: function bjs_processOptionalArray(values) {
                     const isSome = values != null;
-                    const valuesCleanups = [];
                     if (isSome) {
-                        const arrayCleanups = [];
                         for (const elem of values) {
                             i32Stack.push((elem | 0));
                         }
                         i32Stack.push(values.length);
-                        valuesCleanups.push(() => { for (const cleanup of arrayCleanups) { cleanup(); } });
                     }
                     i32Stack.push(+isSome);
                     instance.exports.bjs_processOptionalArray();
@@ -688,16 +631,13 @@ export async function createInstantiator(options, swift) {
                     } else {
                         optResult = null;
                     }
-                    for (const cleanup of valuesCleanups) { cleanup(); }
                     return optResult;
                 },
                 processOptionalPointArray: function bjs_processOptionalPointArray(points) {
-                    const arrayCleanups = [];
                     for (const elem of points) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
-                            const { cleanup: structCleanup } = structHelpers.Point.lower(elem);
-                            arrayCleanups.push(() => { if (structCleanup) { structCleanup(); } });
+                            structHelpers.Point.lower(elem);
                         } else {
                         }
                         i32Stack.push(isSome);
@@ -718,11 +658,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(optValue);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processOptionalDirectionArray: function bjs_processOptionalDirectionArray(directions) {
-                    const arrayCleanups = [];
                     for (const elem of directions) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
@@ -748,11 +686,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(optValue);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processOptionalStatusArray: function bjs_processOptionalStatusArray(statuses) {
-                    const arrayCleanups = [];
                     for (const elem of statuses) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
@@ -778,20 +714,14 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(optValue);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processNestedIntArray: function bjs_processNestedIntArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
-                        const arrayCleanups1 = [];
                         for (const elem1 of elem) {
                             i32Stack.push((elem1 | 0));
                         }
                         i32Stack.push(elem.length);
-                        arrayCleanups.push(() => {
-                            for (const cleanup of arrayCleanups1) { cleanup(); }
-                        });
                     }
                     i32Stack.push(values.length);
                     instance.exports.bjs_processNestedIntArray();
@@ -808,13 +738,10 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(arrayResult1);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processNestedStringArray: function bjs_processNestedStringArray(values) {
-                    const arrayCleanups = [];
                     for (const elem of values) {
-                        const arrayCleanups1 = [];
                         for (const elem1 of elem) {
                             const bytes = textEncoder.encode(elem1);
                             const id = swift.memory.retain(bytes);
@@ -822,9 +749,6 @@ export async function createInstantiator(options, swift) {
                             i32Stack.push(id);
                         }
                         i32Stack.push(elem.length);
-                        arrayCleanups.push(() => {
-                            for (const cleanup of arrayCleanups1) { cleanup(); }
-                        });
                     }
                     i32Stack.push(values.length);
                     instance.exports.bjs_processNestedStringArray();
@@ -841,23 +765,14 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(arrayResult1);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processNestedPointArray: function bjs_processNestedPointArray(points) {
-                    const arrayCleanups = [];
                     for (const elem of points) {
-                        const arrayCleanups1 = [];
                         for (const elem1 of elem) {
-                            const { cleanup: structCleanup } = structHelpers.Point.lower(elem1);
-                            arrayCleanups1.push(() => {
-                                if (structCleanup) { structCleanup(); }
-                            });
+                            structHelpers.Point.lower(elem1);
                         }
                         i32Stack.push(elem.length);
-                        arrayCleanups.push(() => {
-                            for (const cleanup of arrayCleanups1) { cleanup(); }
-                        });
                     }
                     i32Stack.push(points.length);
                     instance.exports.bjs_processNestedPointArray();
@@ -874,11 +789,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(arrayResult1);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processItemArray: function bjs_processItemArray(items) {
-                    const arrayCleanups = [];
                     for (const elem of items) {
                         ptrStack.push(elem.pointer);
                     }
@@ -892,20 +805,14 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(obj);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processNestedItemArray: function bjs_processNestedItemArray(items) {
-                    const arrayCleanups = [];
                     for (const elem of items) {
-                        const arrayCleanups1 = [];
                         for (const elem1 of elem) {
                             ptrStack.push(elem1.pointer);
                         }
                         i32Stack.push(elem.length);
-                        arrayCleanups.push(() => {
-                            for (const cleanup of arrayCleanups1) { cleanup(); }
-                        });
                     }
                     i32Stack.push(items.length);
                     instance.exports.bjs_processNestedItemArray();
@@ -923,11 +830,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(arrayResult1);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processJSObjectArray: function bjs_processJSObjectArray(objects) {
-                    const arrayCleanups = [];
                     for (const elem of objects) {
                         const objId = swift.memory.retain(elem);
                         i32Stack.push(objId);
@@ -943,11 +848,9 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(obj);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processOptionalJSObjectArray: function bjs_processOptionalJSObjectArray(objects) {
-                    const arrayCleanups = [];
                     for (const elem of objects) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
@@ -976,21 +879,15 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(optValue);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 processNestedJSObjectArray: function bjs_processNestedJSObjectArray(objects) {
-                    const arrayCleanups = [];
                     for (const elem of objects) {
-                        const arrayCleanups1 = [];
                         for (const elem1 of elem) {
                             const objId = swift.memory.retain(elem1);
                             i32Stack.push(objId);
                         }
                         i32Stack.push(elem.length);
-                        arrayCleanups.push(() => {
-                            for (const cleanup of arrayCleanups1) { cleanup(); }
-                        });
                     }
                     i32Stack.push(objects.length);
                     instance.exports.bjs_processNestedJSObjectArray();
@@ -1009,7 +906,6 @@ export async function createInstantiator(options, swift) {
                         arrayResult.push(arrayResult1);
                     }
                     arrayResult.reverse();
-                    for (const cleanup of arrayCleanups) { cleanup(); }
                     return arrayResult;
                 },
                 Direction: DirectionValues,

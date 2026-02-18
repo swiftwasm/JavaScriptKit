@@ -28,7 +28,6 @@ final class JSGlueVariableScope {
     static let reservedF32Stack = "f32Stack"
     static let reservedF64Stack = "f64Stack"
     static let reservedPointerStack = "ptrStack"
-    static let reservedTmpStructCleanups = "tmpStructCleanups"
     static let reservedEnumHelpers = "enumHelpers"
     static let reservedStructHelpers = "structHelpers"
     static let reservedSwiftClosureRegistry = "swiftClosureRegistry"
@@ -56,7 +55,6 @@ final class JSGlueVariableScope {
         reservedF32Stack,
         reservedF64Stack,
         reservedPointerStack,
-        reservedTmpStructCleanups,
         reservedEnumHelpers,
         reservedStructHelpers,
         reservedSwiftClosureRegistry,
@@ -147,8 +145,6 @@ struct IntrinsicJSFragment: Sendable {
         var scope: JSGlueVariableScope
         /// The printer to print the main fragment code.
         var printer: CodeFragmentPrinter
-        /// The printer to print the code that is expected to be executed at the end of the caller of the fragment.
-        var cleanupCode: CodeFragmentPrinter
         /// Whether the fragment has direct access to the SwiftHeapObject classes.
         /// If false, the fragment needs to use `_exports["<class name>"]` to access the class.
         var hasDirectAccessToSwiftClass: Bool = true
@@ -250,7 +246,7 @@ struct IntrinsicJSFragment: Sendable {
     static let stringLiftReturn = IntrinsicJSFragment(
         parameters: [],
         printCode: { arguments, context in
-            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+            let (scope, printer) = (context.scope, context.printer)
             let resultLabel = scope.variable("ret")
             printer.write("const \(resultLabel) = \(JSGlueVariableScope.reservedStorageToReturnString);")
             printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
@@ -260,7 +256,7 @@ struct IntrinsicJSFragment: Sendable {
     static let stringLiftParameter = IntrinsicJSFragment(
         parameters: ["objectId"],
         printCode: { arguments, context in
-            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+            let (scope, printer) = (context.scope, context.printer)
             let objectId = arguments[0]
             let objectLabel = scope.variable("\(objectId)Object")
             // TODO: Implement "take" operation
@@ -272,7 +268,7 @@ struct IntrinsicJSFragment: Sendable {
     static let stringLowerReturn = IntrinsicJSFragment(
         parameters: ["value"],
         printCode: { arguments, context in
-            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+            let (scope, printer) = (context.scope, context.printer)
             printer.write(
                 "\(JSGlueVariableScope.reservedStorageToReturnBytes) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(arguments[0]));"
             )
@@ -289,7 +285,7 @@ struct IntrinsicJSFragment: Sendable {
     static let jsObjectLiftReturn = IntrinsicJSFragment(
         parameters: ["retId"],
         printCode: { arguments, context in
-            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+            let (scope, printer) = (context.scope, context.printer)
             // TODO: Implement "take" operation
             let resultLabel = scope.variable("ret")
             let retId = arguments[0]
@@ -301,7 +297,7 @@ struct IntrinsicJSFragment: Sendable {
     static let jsObjectLiftRetainedObjectId = IntrinsicJSFragment(
         parameters: ["objectId"],
         printCode: { arguments, context in
-            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+            let (scope, printer) = (context.scope, context.printer)
             let resultLabel = scope.variable("value")
             let objectId = arguments[0]
             printer.write(
@@ -446,7 +442,7 @@ struct IntrinsicJSFragment: Sendable {
     static let jsValueLower = IntrinsicJSFragment(
         parameters: ["value"],
         printCode: { arguments, context in
-            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+            let (scope, printer) = (context.scope, context.printer)
             let value = arguments[0]
             let kindVar = scope.variable("\(value)Kind")
             let payload1Var = scope.variable("\(value)Payload1")
@@ -572,7 +568,7 @@ struct IntrinsicJSFragment: Sendable {
     static let jsValueLift = IntrinsicJSFragment(
         parameters: [],
         printCode: { _, context in
-            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+            let (scope, printer) = (context.scope, context.printer)
             let payload2 = scope.variable("jsValuePayload2")
             let payload1 = scope.variable("jsValuePayload1")
             let kind = scope.variable("jsValueKind")
@@ -590,7 +586,7 @@ struct IntrinsicJSFragment: Sendable {
     static let jsValueLiftParameter = IntrinsicJSFragment(
         parameters: ["kind", "payload1", "payload2"],
         printCode: { arguments, context in
-            let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+            let (scope, printer) = (context.scope, context.printer)
             let resultVar = scope.variable("jsValue")
             registerJSValueHelpers(scope: scope)
             printer.write(
@@ -635,14 +631,12 @@ struct IntrinsicJSFragment: Sendable {
         IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let (printer, cleanup) = (context.printer, context.cleanupCode)
+                let (scope, printer) = (context.scope, context.printer)
                 let value = arguments[0]
-                let caseIdName = "\(value)CaseId"
-                let cleanupName = "\(value)Cleanup"
+                let caseIdName = scope.variable("\(value)CaseId")
                 printer.write(
-                    "const { caseId: \(caseIdName), cleanup: \(cleanupName) } = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lower(\(value));"
+                    "const \(caseIdName) = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lower(\(value));"
                 )
-                cleanup.write("if (\(cleanupName)) { \(cleanupName)(); }")
                 return [caseIdName]
             }
         )
@@ -806,7 +800,7 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+                let (scope, printer) = (context.scope, context.printer)
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
                 printer.write("const \(isSomeVar) = \(value) != null;")
@@ -814,18 +808,13 @@ struct IntrinsicJSFragment: Sendable {
                 switch wrappedType {
                 case .swiftStruct(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
-                    let cleanupVar = scope.variable("\(value)Cleanup")
-                    printer.write("let \(cleanupVar);")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
-                        let resultVar = scope.variable("structResult")
                         printer.write(
-                            "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(base).lower(\(value));"
+                            "\(JSGlueVariableScope.reservedStructHelpers).\(base).lower(\(value));"
                         )
-                        printer.write("\(cleanupVar) = \(resultVar).cleanup;")
                     }
                     printer.write("}")
-                    cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                     printer.write("\(JSGlueVariableScope.reservedI32Stack).push(+\(isSomeVar));")
                     return []
                 case .string, .rawValueEnum(_, .string):
@@ -846,65 +835,42 @@ struct IntrinsicJSFragment: Sendable {
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let caseIdVar = scope.variable("\(value)CaseId")
-                    let cleanupVar = scope.variable("\(value)Cleanup")
 
-                    printer.write("let \(caseIdVar), \(cleanupVar);")
+                    printer.write("let \(caseIdVar);")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
-                        let resultVar = scope.variable("enumResult")
                         printer.write(
-                            "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
+                            "\(caseIdVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
                         )
-                        printer.write("\(caseIdVar) = \(resultVar).caseId;")
-                        printer.write("\(cleanupVar) = \(resultVar).cleanup;")
                     }
                     printer.write("}")
-                    cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
 
                     return ["+\(isSomeVar)", "\(isSomeVar) ? \(caseIdVar) : 0"]
                 case .rawValueEnum:
                     // Raw value enums with optional - falls through to handle based on raw type
                     return ["+\(isSomeVar)", "\(isSomeVar) ? \(value) : 0"]
                 case .array(let elementType):
-                    let cleanupArrayVar = scope.variable("\(value)Cleanups")
-                    printer.write("const \(cleanupArrayVar) = [];")
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {
                         let arrayLowerFragment = try arrayLower(elementType: elementType)
-                        let arrayCleanup = CodeFragmentPrinter()
                         let _ = try arrayLowerFragment.printCode(
                             [value],
-                            context.with(\.cleanupCode, arrayCleanup)
+                            context
                         )
-                        if !arrayCleanup.lines.isEmpty {
-                            for line in arrayCleanup.lines {
-                                printer.write("\(cleanupArrayVar).push(() => { \(line) });")
-                            }
-                        }
                     }
                     printer.write("}")
-                    cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
                     printer.write("\(JSGlueVariableScope.reservedI32Stack).push(+\(isSomeVar));")
                     return []
                 case .dictionary(let valueType):
-                    let cleanupArrayVar = scope.variable("\(value)Cleanups")
-                    printer.write("const \(cleanupArrayVar) = [];")
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {
                         let dictLowerFragment = try dictionaryLower(valueType: valueType)
-                        let dictCleanup = CodeFragmentPrinter()
                         let _ = try dictLowerFragment.printCode(
                             [value],
-                            context.with(\.cleanupCode, dictCleanup)
+                            context
                         )
-                        if !dictCleanup.lines.isEmpty {
-                            for line in dictCleanup.lines {
-                                printer.write("\(cleanupArrayVar).push(() => { \(line) });")
-                            }
-                        }
                     }
                     printer.write("}")
-                    cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
                     printer.write("\(JSGlueVariableScope.reservedI32Stack).push(+\(isSomeVar));")
                     return []
                 default:
@@ -1105,7 +1071,7 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+                let (scope, printer) = (context.scope, context.printer)
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
                 let presenceExpr = kind.presenceCheck(value: value)
@@ -1166,16 +1132,10 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {
                         let arrayLowerFragment = try arrayLower(elementType: elementType)
-                        let arrayCleanup = CodeFragmentPrinter()
                         let _ = try arrayLowerFragment.printCode(
                             [value],
-                            context.with(\.cleanupCode, arrayCleanup)
+                            context
                         )
-                        if !arrayCleanup.lines.isEmpty {
-                            for line in arrayCleanup.lines {
-                                printer.write(line)
-                            }
-                        }
                     }
                     printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
@@ -1214,11 +1174,10 @@ struct IntrinsicJSFragment: Sendable {
                 case .associatedValueEnum(let fullName):
                     let base = fullName.components(separatedBy: ".").last ?? fullName
                     let caseIdVar = scope.variable("caseId")
-                    let cleanupVar = scope.variable("cleanup")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
                         printer.write(
-                            "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
+                            "const \(caseIdVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
                         )
                         printer.write("return \(caseIdVar);")
                     }
@@ -1227,14 +1186,11 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write("return -1;")
                     }
                     printer.write("}")
-                    cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                 case .dictionary(let valueType):
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {
-                        let cleanupArrayVar = scope.variable("arrayCleanups")
                         let entriesVar = scope.variable("entries")
                         let entryVar = scope.variable("entry")
-                        printer.write("const \(cleanupArrayVar) = [];")
                         printer.write("const \(entriesVar) = Object.entries(\(value));")
                         printer.write("for (const \(entryVar) of \(entriesVar)) {")
                         try printer.indent {
@@ -1243,40 +1199,19 @@ struct IntrinsicJSFragment: Sendable {
                             printer.write("const [\(keyVar), \(valueVar)] = \(entryVar);")
 
                             let keyFragment = try stackLowerFragment(elementType: .string)
-                            let keyCleanup = CodeFragmentPrinter()
                             let _ = try keyFragment.printCode(
                                 [keyVar],
-                                context.with(\.cleanupCode, keyCleanup)
+                                context
                             )
-                            if !keyCleanup.lines.isEmpty {
-                                printer.write("\(cleanupArrayVar).push(() => {")
-                                printer.indent {
-                                    for line in keyCleanup.lines {
-                                        printer.write(line)
-                                    }
-                                }
-                                printer.write("});")
-                            }
 
                             let valueFragment = try stackLowerFragment(elementType: valueType)
-                            let valueCleanup = CodeFragmentPrinter()
                             let _ = try valueFragment.printCode(
                                 [valueVar],
-                                context.with(\.cleanupCode, valueCleanup)
+                                context
                             )
-                            if !valueCleanup.lines.isEmpty {
-                                printer.write("\(cleanupArrayVar).push(() => {")
-                                printer.indent {
-                                    for line in valueCleanup.lines {
-                                        printer.write(line)
-                                    }
-                                }
-                                printer.write("});")
-                            }
                         }
                         printer.write("}")
                         scope.emitPushI32Parameter("\(entriesVar).length", printer: printer)
-                        cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
                     }
                     printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
@@ -1594,14 +1529,12 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+                let (scope, printer) = (context.scope, context.printer)
                 let value = arguments[0]
                 let caseIdVar = scope.variable("caseId")
-                let cleanupVar = scope.variable("cleanup")
                 printer.write(
-                    "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
+                    "const \(caseIdVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
                 )
-                cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                 printer.write("return \(caseIdVar);")
                 return []
             }
@@ -1662,15 +1595,10 @@ struct IntrinsicJSFragment: Sendable {
                         for enumCase in enumDefinition.cases {
                             let caseName = enumCase.name.capitalizedFirstLetter
                             let caseScope = scope.makeChildScope()
-                            let caseCleanup = CodeFragmentPrinter()
-                            caseCleanup.indent()
                             let fragment = IntrinsicJSFragment.associatedValuePushPayload(enumCase: enumCase)
                             _ = try fragment.printCode(
                                 ["value", enumName, caseName],
-                                context.with(\.scope, caseScope).with(\.printer, lowerPrinter).with(
-                                    \.cleanupCode,
-                                    caseCleanup
-                                )
+                                context.with(\.scope, caseScope).with(\.printer, lowerPrinter)
                             )
                         }
 
@@ -1696,15 +1624,11 @@ struct IntrinsicJSFragment: Sendable {
                         for enumCase in enumDefinition.cases {
                             let caseName = enumCase.name.capitalizedFirstLetter
                             let caseScope = scope.makeChildScope()
-                            let caseCleanup = CodeFragmentPrinter()
 
                             let fragment = IntrinsicJSFragment.associatedValuePopPayload(enumCase: enumCase)
                             _ = try fragment.printCode(
                                 [enumName, caseName],
-                                context.with(\.scope, caseScope).with(\.printer, liftPrinter).with(
-                                    \.cleanupCode,
-                                    caseCleanup
-                                )
+                                context.with(\.scope, caseScope).with(\.printer, liftPrinter)
                             )
                         }
 
@@ -1783,7 +1707,7 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value", "enumName", "caseName"],
             printCode: { arguments, context in
-                let (printer, cleanup) = (context.printer, context.cleanupCode)
+                let printer = context.printer
                 let enumName = arguments[1]
                 let caseName = arguments[2]
 
@@ -1791,8 +1715,7 @@ struct IntrinsicJSFragment: Sendable {
 
                 try printer.indent {
                     if enumCase.associatedValues.isEmpty {
-                        printer.write("const cleanup = undefined;")
-                        printer.write("return { caseId: \(enumName).Tag.\(caseName), cleanup };")
+                        printer.write("return \(enumName).Tag.\(caseName);")
                     } else {
                         // Process associated values in reverse order (to match the order they'll be popped)
                         let reversedValues = enumCase.associatedValues.enumerated().reversed()
@@ -1806,14 +1729,7 @@ struct IntrinsicJSFragment: Sendable {
                             _ = try fragment.printCode(["value.\(prop)"], context)
                         }
 
-                        if cleanup.lines.isEmpty {
-                            printer.write("const cleanup = undefined;")
-                        } else {
-                            printer.write("const cleanup = () => {")
-                            printer.write(contentsOf: cleanup)
-                            printer.write("};")
-                        }
-                        printer.write("return { caseId: \(enumName).Tag.\(caseName), cleanup };")
+                        printer.write("return \(enumName).Tag.\(caseName);")
                     }
                 }
 
@@ -1882,7 +1798,7 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                let (scope, printer) = (context.scope, context.printer)
                 let value = arguments[0]
                 let isSomeVar = scope.variable("isSome")
                 printer.write("const \(isSomeVar) = \(kind.presenceCheck(value: value));")
@@ -1959,19 +1875,14 @@ struct IntrinsicJSFragment: Sendable {
                     }
                 case .swiftStruct(let structName):
                     let structBase = structName.components(separatedBy: ".").last ?? structName
-                    let nestedCleanupVar = scope.variable("nestedCleanup")
-                    printer.write("let \(nestedCleanupVar);")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
-                        let structResultVar = scope.variable("structResult")
                         printer.write(
-                            "const \(structResultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
+                            "\(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
                         )
-                        printer.write("\(nestedCleanupVar) = \(structResultVar).cleanup;")
                     }
                     printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                    cleanup.write("if (\(nestedCleanupVar)) { \(nestedCleanupVar)(); }")
                 case .swiftHeapObject:
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
@@ -2001,16 +1912,12 @@ struct IntrinsicJSFragment: Sendable {
                 case .associatedValueEnum(let enumName):
                     let base = enumName.components(separatedBy: ".").last ?? enumName
                     let caseIdVar = scope.variable("enumCaseId")
-                    let enumCleanupVar = scope.variable("enumCleanup")
-                    printer.write("let \(caseIdVar), \(enumCleanupVar);")
+                    printer.write("let \(caseIdVar);")
                     printer.write("if (\(isSomeVar)) {")
                     printer.indent {
-                        let enumResultVar = scope.variable("enumResult")
                         printer.write(
-                            "const \(enumResultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
+                            "\(caseIdVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
                         )
-                        printer.write("\(caseIdVar) = \(enumResultVar).caseId;")
-                        printer.write("\(enumCleanupVar) = \(enumResultVar).cleanup;")
                         scope.emitPushI32Parameter(caseIdVar, printer: printer)
                     }
                     printer.write("} else {")
@@ -2019,36 +1926,17 @@ struct IntrinsicJSFragment: Sendable {
                     }
                     printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                    cleanup.write("if (\(enumCleanupVar)) { \(enumCleanupVar)(); }")
                 case .array(let elementType):
-                    // Array cleanup references variables declared inside the if block,
-                    // so capture cleanup into a variable declared at the outer scope.
-                    let arrCleanupVar = scope.variable("arrCleanup")
-                    printer.write("let \(arrCleanupVar);")
                     printer.write("if (\(isSomeVar)) {")
                     try printer.indent {
-                        let localCleanup = CodeFragmentPrinter()
                         let arrFragment = try arrayLower(elementType: elementType)
                         _ = try arrFragment.printCode(
                             [value],
-                            context.with(\.cleanupCode, localCleanup)
+                            context
                         )
-                        let cleanupLines = localCleanup.lines.filter {
-                            !$0.trimmingCharacters(in: .whitespaces).isEmpty
-                        }
-                        if !cleanupLines.isEmpty {
-                            printer.write("\(arrCleanupVar) = () => {")
-                            printer.indent {
-                                for line in cleanupLines {
-                                    printer.write(line)
-                                }
-                            }
-                            printer.write("};")
-                        }
                     }
                     printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                    cleanup.write("if (\(arrCleanupVar)) { \(arrCleanupVar)(); }")
                 default:
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
                 }
@@ -2117,13 +2005,11 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+                let printer = context.printer
                 let value = arguments[0]
-                let cleanupVar = scope.variable("cleanup")
                 printer.write(
-                    "const { cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedStructHelpers).\(base).lower(\(value));"
+                    "\(JSGlueVariableScope.reservedStructHelpers).\(base).lower(\(value));"
                 )
-                cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                 return []
             }
         )
@@ -2133,13 +2019,11 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+                let printer = context.printer
                 let value = arguments[0]
-                let cleanupVar = scope.variable("cleanup")
                 printer.write(
-                    "const { cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
+                    "\(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
                 )
-                cleanupCode.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                 return []
             }
         )
@@ -2166,33 +2050,20 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["arr"],
             printCode: { arguments, context in
-                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+                let (scope, printer) = (context.scope, context.printer)
                 let arr = arguments[0]
-                let cleanupArrayVar = scope.variable("arrayCleanups")
 
-                printer.write("const \(cleanupArrayVar) = [];")
                 let elemVar = scope.variable("elem")
                 printer.write("for (const \(elemVar) of \(arr)) {")
                 try printer.indent {
                     let elementFragment = try stackLowerFragment(elementType: elementType)
-                    let elementCleanup = CodeFragmentPrinter()
                     let _ = try elementFragment.printCode(
                         [elemVar],
-                        context.with(\.cleanupCode, elementCleanup)
+                        context
                     )
-                    if !elementCleanup.lines.isEmpty {
-                        printer.write("\(cleanupArrayVar).push(() => {")
-                        printer.indent {
-                            for line in elementCleanup.lines {
-                                printer.write(line)
-                            }
-                        }
-                        printer.write("});")
-                    }
                 }
                 printer.write("}")
                 scope.emitPushI32Parameter("\(arr).length", printer: printer)
-                cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
                 return []
             }
         )
@@ -2203,11 +2074,9 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["dict"],
             printCode: { arguments, context in
-                let (scope, printer, cleanupCode) = (context.scope, context.printer, context.cleanupCode)
+                let (scope, printer) = (context.scope, context.printer)
                 let dict = arguments[0]
-                let cleanupArrayVar = scope.variable("arrayCleanups")
 
-                printer.write("const \(cleanupArrayVar) = [];")
                 let entriesVar = scope.variable("entries")
                 let entryVar = scope.variable("entry")
                 printer.write("const \(entriesVar) = Object.entries(\(dict));")
@@ -2218,40 +2087,19 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("const [\(keyVar), \(valueVar)] = \(entryVar);")
 
                     let keyFragment = try stackLowerFragment(elementType: .string)
-                    let keyCleanup = CodeFragmentPrinter()
                     let _ = try keyFragment.printCode(
                         [keyVar],
-                        context.with(\.cleanupCode, keyCleanup)
+                        context
                     )
-                    if !keyCleanup.lines.isEmpty {
-                        printer.write("\(cleanupArrayVar).push(() => {")
-                        printer.indent {
-                            for line in keyCleanup.lines {
-                                printer.write(line)
-                            }
-                        }
-                        printer.write("});")
-                    }
 
                     let valueFragment = try stackLowerFragment(elementType: valueType)
-                    let valueCleanup = CodeFragmentPrinter()
                     let _ = try valueFragment.printCode(
                         [valueVar],
-                        context.with(\.cleanupCode, valueCleanup)
+                        context
                     )
-                    if !valueCleanup.lines.isEmpty {
-                        printer.write("\(cleanupArrayVar).push(() => {")
-                        printer.indent {
-                            for line in valueCleanup.lines {
-                                printer.write(line)
-                            }
-                        }
-                        printer.write("});")
-                    }
                 }
                 printer.write("}")
                 scope.emitPushI32Parameter("\(entriesVar).length", printer: printer)
-                cleanupCode.write("for (const cleanup of \(cleanupArrayVar)) { cleanup(); }")
                 return []
             }
         )
@@ -2582,13 +2430,11 @@ struct IntrinsicJSFragment: Sendable {
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
-                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                    let printer = context.printer
                     let value = arguments[0]
-                    let cleanupVar = scope.variable("structCleanup")
                     printer.write(
-                        "const { cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
+                        "\(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
                     )
-                    cleanup.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                     return []
                 }
             )
@@ -2655,15 +2501,13 @@ struct IntrinsicJSFragment: Sendable {
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
-                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                    let (scope, printer) = (context.scope, context.printer)
                     let value = arguments[0]
                     let caseIdVar = scope.variable("caseId")
-                    let cleanupVar = scope.variable("enumCleanup")
                     printer.write(
-                        "const { caseId: \(caseIdVar), cleanup: \(cleanupVar) } = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
+                        "const \(caseIdVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
                     )
                     scope.emitPushI32Parameter(caseIdVar, printer: printer)
-                    cleanup.write("if (\(cleanupVar)) { \(cleanupVar)(); }")
                     return []
                 }
             )
@@ -2772,22 +2616,13 @@ struct IntrinsicJSFragment: Sendable {
 
                 let presenceExpr = kind.presenceCheck(value: value)
                 printer.write("const \(isSomeVar) = \(presenceExpr) ? 1 : 0;")
-                // Cleanup is written inside the if block so retained id is in scope
-                let localCleanupWriter = CodeFragmentPrinter()
                 printer.write("if (\(isSomeVar)) {")
                 try printer.indent {
                     let innerFragment = try stackLowerFragment(elementType: wrappedType)
                     let _ = try innerFragment.printCode(
                         [value],
-                        context.with(\.cleanupCode, localCleanupWriter)
+                        context
                     )
-                    let localCleanupLines = localCleanupWriter.lines.filter {
-                        !$0.trimmingCharacters(in: .whitespaces).isEmpty
-                    }
-                    if !localCleanupLines.isEmpty {
-                        let localCleanupCode = localCleanupLines.joined(separator: " ")
-                        printer.write("arrayCleanups.push(() => { \(localCleanupCode) });")
-                    }
                 }
                 printer.write("} else {")
                 printer.indent {
@@ -2877,8 +2712,6 @@ struct IntrinsicJSFragment: Sendable {
         let (scope, printer) = (context.scope, context.printer)
         let lowerPrinter = CodeFragmentPrinter()
         let lowerScope = scope.makeChildScope()
-        let lowerCleanup = CodeFragmentPrinter()
-        lowerCleanup.indent()
 
         let instanceProps = structDef.properties.filter { !$0.isStatic }
         for property in instanceProps {
@@ -2886,21 +2719,12 @@ struct IntrinsicJSFragment: Sendable {
             let fieldValue = "value.\(property.name)"
             _ = try fragment.printCode(
                 [fieldValue],
-                context.with(\.scope, lowerScope).with(\.printer, lowerPrinter).with(\.cleanupCode, lowerCleanup)
+                context.with(\.scope, lowerScope).with(\.printer, lowerPrinter)
             )
         }
 
         for line in lowerPrinter.lines {
             printer.write(line)
-        }
-
-        if !lowerCleanup.lines.isEmpty {
-            printer.write("const cleanup = () => {")
-            printer.write(contentsOf: lowerCleanup)
-            printer.write("};")
-            printer.write("return { cleanup };")
-        } else {
-            printer.write("return { cleanup: undefined };")
         }
     }
 
@@ -2944,12 +2768,8 @@ struct IntrinsicJSFragment: Sendable {
                     "\(instanceVar).\(method.name) = function(\(paramList)) {"
                 )
                 try printer.indent {
-                    let methodScope = scope.makeChildScope()
-                    let methodCleanup = CodeFragmentPrinter()
-
-                    let structCleanupVar = methodScope.variable("structCleanup")
                     printer.write(
-                        "const { cleanup: \(structCleanupVar) } = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lower(this);"
+                        "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lower(this);"
                     )
 
                     var paramForwardings: [String] = []
@@ -2965,10 +2785,6 @@ struct IntrinsicJSFragment: Sendable {
                     } else {
                         printer.write("const ret = \(callExpr);")
                     }
-
-                    // Cleanup
-                    printer.write("if (\(structCleanupVar)) { \(structCleanupVar)(); }")
-                    printer.write(contentsOf: methodCleanup)
 
                     // Lift return value if needed
                     if method.returnType != .void {
@@ -3021,7 +2837,7 @@ struct IntrinsicJSFragment: Sendable {
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
-                    let (scope, printer, cleanup) = (context.scope, context.printer, context.cleanupCode)
+                    let (scope, printer) = (context.scope, context.printer)
                     let value = arguments[0]
                     let isSomeVar = scope.variable("isSome")
                     printer.write("const \(isSomeVar) = \(kind.presenceCheck(value: value));")
@@ -3116,19 +2932,14 @@ struct IntrinsicJSFragment: Sendable {
                         scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
                         return []
                     } else if case .swiftStruct(let structName) = wrappedType {
-                        let nestedCleanupVar = scope.variable("nestedCleanup")
-                        printer.write("let \(nestedCleanupVar);")
                         printer.write("if (\(isSomeVar)) {")
                         printer.indent {
-                            let structResultVar = scope.variable("structResult")
                             printer.write(
-                                "const \(structResultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(structName).lower(\(value));"
+                                "\(JSGlueVariableScope.reservedStructHelpers).\(structName).lower(\(value));"
                             )
-                            printer.write("\(nestedCleanupVar) = \(structResultVar).cleanup;")
                         }
                         printer.write("}")
                         scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                        cleanup.write("if (\(nestedCleanupVar)) { \(nestedCleanupVar)(); }")
                         return []
                     } else if case .string = wrappedType {
                         let idVar = scope.variable("id")
@@ -3212,16 +3023,12 @@ struct IntrinsicJSFragment: Sendable {
                         case .associatedValueEnum(let enumName):
                             let base = enumName.components(separatedBy: ".").last ?? enumName
                             let caseIdVar = scope.variable("enumCaseId")
-                            let enumCleanupVar = scope.variable("enumCleanup")
-                            printer.write("let \(caseIdVar), \(enumCleanupVar);")
+                            printer.write("let \(caseIdVar);")
                             printer.write("if (\(isSomeVar)) {")
                             printer.indent {
-                                let enumResultVar = scope.variable("enumResult")
                                 printer.write(
-                                    "const \(enumResultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
+                                    "\(caseIdVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
                                 )
-                                printer.write("\(caseIdVar) = \(enumResultVar).caseId;")
-                                printer.write("\(enumCleanupVar) = \(enumResultVar).cleanup;")
                                 scope.emitPushI32Parameter(caseIdVar, printer: printer)
                             }
                             printer.write("} else {")
@@ -3230,7 +3037,6 @@ struct IntrinsicJSFragment: Sendable {
                             }
                             printer.write("}")
                             scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                            cleanup.write("if (\(enumCleanupVar)) { \(enumCleanupVar)(); }")
                         default:
                             let wrappedFragment = try structFieldLowerFragment(
                                 field: ExportedProperty(
@@ -3242,10 +3048,9 @@ struct IntrinsicJSFragment: Sendable {
                                 allStructs: allStructs
                             )
                             let guardedPrinter = CodeFragmentPrinter()
-                            let guardedCleanup = CodeFragmentPrinter()
                             _ = try wrappedFragment.printCode(
                                 [value],
-                                context.with(\.printer, guardedPrinter).with(\.cleanupCode, guardedCleanup)
+                                context.with(\.printer, guardedPrinter)
                             )
                             var loweredLines = guardedPrinter.lines
                             var hoistedCleanupVar: String?
@@ -3267,13 +3072,6 @@ struct IntrinsicJSFragment: Sendable {
                                 for line in loweredLines {
                                     printer.write(line)
                                 }
-                                if !guardedCleanup.lines.isEmpty {
-                                    cleanup.write("if (\(isSomeVar)) {")
-                                    cleanup.indent {
-                                        cleanup.write(contentsOf: guardedCleanup)
-                                    }
-                                    cleanup.write("}")
-                                }
                             }
                             printer.write("}")
                             scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
@@ -3286,13 +3084,11 @@ struct IntrinsicJSFragment: Sendable {
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
+                    let printer = context.printer
                     let value = arguments[0]
-                    let structResultVar = scope.variable("structResult")
                     printer.write(
-                        "const \(structResultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(nestedName).lower(\(value));"
+                        "\(JSGlueVariableScope.reservedStructHelpers).\(nestedName).lower(\(value));"
                     )
-                    context.cleanupCode.write("if (\(structResultVar).cleanup) { \(structResultVar).cleanup(); }")
                     return []
                 }
             )
