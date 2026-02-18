@@ -57,7 +57,10 @@ exports[`ts2swift > snapshots Swift output for CallableConst.d.ts > CallableCons
 
 @_spi(BridgeJS) import JavaScriptKit
 
-@JSFunction func fetch(_ url: String) throws(JSException) -> JSPromise
+@JSFunction func fetch(_ url: String) throws(JSException) -> Response
+
+@JSClass struct Response {
+}
 "
 `;
 
