@@ -355,7 +355,34 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
 
 @JSFunction func takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void
 
+enum FeatureFlag: String {
+    case foo = "foo"
+    case bar = "bar"
+}
+extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
+
 @JSFunction func returnsFeatureFlag() throws(JSException) -> FeatureFlag
+"
+`;
+
+exports[`ts2swift > snapshots Swift output for StringLiteralUnion.d.ts > StringLiteralUnion 1`] = `
+"// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
+// DO NOT EDIT.
+//
+// To update this file, just rebuild your project or run
+// \`swift package bridge-js\`.
+
+@_spi(BridgeJS) import JavaScriptKit
+
+@JSFunction func move(_ direction: Direction) throws(JSException) -> Void
+
+enum Direction: String {
+    case up = "up"
+    case down = "down"
+    case left = "left"
+    case right = "right"
+}
+extension Direction: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
 "
 `;
 
