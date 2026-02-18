@@ -122,14 +122,30 @@ export function run(filePaths, options) {
     }
 
     const program = TypeProcessor.createProgram([...filePaths, ...globalFiles], configParseResult.options);
-    const diagnostics = program.getSemanticDiagnostics();
-    if (diagnostics.length > 0) {
+
+    const formatDiagnostics = (diagnostics, kind) => {
+        if (diagnostics.length === 0) return null;
         const message = ts.formatDiagnosticsWithColorAndContext(diagnostics, {
             getCanonicalFileName: (fileName) => fileName,
             getNewLine: () => ts.sys.newLine,
             getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
         });
-        throw new Error(`TypeScript semantic errors:\n${message}`);
+        return `${kind} errors:\n${message}`;
+    };
+
+    const syntaxErrors = formatDiagnostics(program.getSyntacticDiagnostics(), "TypeScript syntax");
+    if (syntaxErrors) {
+        throw new Error(syntaxErrors);
+    }
+
+    const optionErrors = formatDiagnostics(program.getOptionsDiagnostics(), "TypeScript option");
+    if (optionErrors) {
+        throw new Error(optionErrors);
+    }
+
+    const semanticErrors = formatDiagnostics(program.getSemanticDiagnostics(), "TypeScript semantic");
+    if (semanticErrors) {
+        throw new Error(semanticErrors);
     }
 
     const prelude = [
@@ -243,6 +259,13 @@ export function main(args) {
         for (const cleanup of cleanups) {
             cleanup();
         }
+    }
+
+    if (swiftOutput.length === 0) {
+        diagnosticEngine.print(
+            "warning",
+            "No Swift declarations were generated. This usually means the .d.ts contained constructs that BridgeJS cannot import."
+        );
     }
     // Write to file or stdout
     if (options.values.output && options.values.output !== "-") {
