@@ -30,6 +30,7 @@ const decode = (kind, payload1, payload2, objectSpace) => {
                 case 1:
                     return true;
             }
+        // falls through
         case 2 /* Kind.Number */:
             return payload2;
         case 1 /* Kind.String */:
@@ -555,7 +556,7 @@ class SwiftRuntime {
             swjs_call_function: (ref, argv, argc, payload1_ptr, payload2_ptr) => {
                 const memory = this.memory;
                 const func = memory.getObject(ref);
-                let result = undefined;
+                let result;
                 try {
                     const args = decodeArray(argv, argc, this.getDataView(), memory);
                     result = func(...args);
@@ -590,9 +591,8 @@ class SwiftRuntime {
                 const memory = this.memory;
                 const obj = memory.getObject(obj_ref);
                 const func = memory.getObject(func_ref);
-                let result = undefined;
                 const args = decodeArray(argv, argc, this.getDataView(), memory);
-                result = func.apply(obj, args);
+                const result = func.apply(obj, args);
                 return writeAndReturnKindBits(result, payload1_ptr, payload2_ptr, false, this.getDataView(), this.memory);
             },
             swjs_call_new: (ref, argv, argc) => {
@@ -744,9 +744,10 @@ class SwiftRuntime {
                             broker.onReceivingResponse(message);
                             break;
                         }
-                        default:
+                        default: {
                             const unknownMessage = message;
                             throw new Error(`Unknown message type: ${unknownMessage}`);
+                        }
                     }
                 });
             },
@@ -773,9 +774,10 @@ class SwiftRuntime {
                             broker.onReceivingResponse(message);
                             break;
                         }
-                        default:
+                        default: {
                             const unknownMessage = message;
                             throw new Error(`Unknown message type: ${unknownMessage}`);
+                        }
                     }
                 });
             },
