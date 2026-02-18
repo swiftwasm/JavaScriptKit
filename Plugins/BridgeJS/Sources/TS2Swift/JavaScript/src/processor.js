@@ -54,6 +54,8 @@ export class TypeProcessor {
         this.emittedEnumNames = new Set();
         /** @type {Set<string>} */
         this.emittedStructuredTypeNames = new Set();
+        /** @type {Set<string>} */
+        this.emittedStringLiteralUnionNames = new Set();
 
         /** @type {Set<string>} */
         this.visitedDeclarationKeys = new Set();
@@ -145,6 +147,11 @@ export class TypeProcessor {
 
                     for (const [type, node] of this.seenTypes) {
                         this.seenTypes.delete(type);
+                        const stringLiteralUnion = this.getStringLiteralUnionLiterals(type);
+                        if (stringLiteralUnion && stringLiteralUnion.length > 0) {
+                            this.emitStringLiteralUnion(type, node);
+                            continue;
+                        }
                         if (this.isEnumType(type)) {
                             this.visitEnumType(type, node);
                             continue;
@@ -312,6 +319,78 @@ export class TypeProcessor {
         const symbol = type.getSymbol() ?? type.aliasSymbol;
         if (!symbol) return false;
         return (symbol.flags & ts.SymbolFlags.Enum) !== 0;
+    }
+
+    dedupeSwiftEnumCaseNames(items) {
+        const seen = new Map();
+        return items.map(item => {
+            const count = seen.get(item.name) ?? 0;
+            seen.set(item.name, count + 1);
+            if (count === 0) return item;
+            return { ...item, name: `${item.name}_${count + 1}` };
+        });
+    }
+
+    /**
+     * Extract string literal values if the type is a union containing only string literals.
+     * Returns null when any member is not a string literal.
+     * @param {ts.Type} type
+     * @returns {string[] | null}
+     * @private
+     */
+    getStringLiteralUnionLiterals(type) {
+        if ((type.flags & ts.TypeFlags.Union) === 0) return null;
+        const symbol = type.getSymbol() ?? type.aliasSymbol;
+        // Skip enums so we don't double-generate real enum declarations.
+        if (symbol && (symbol.flags & ts.SymbolFlags.Enum) !== 0) {
+            return null;
+        }
+        /** @type {ts.UnionType} */
+        // @ts-ignore
+        const unionType = type;
+        /** @type {string[]} */
+        const literals = [];
+        const seen = new Set();
+        for (const member of unionType.types) {
+            if ((member.flags & ts.TypeFlags.StringLiteral) === 0) {
+                return null;
+            }
+            // @ts-ignore value exists for string literal types
+            const value = String(member.value);
+            if (seen.has(value)) continue;
+            seen.add(value);
+            literals.push(value);
+        }
+        return literals;
+    }
+
+    /**
+     * @param {ts.Type} type
+     * @param {ts.Node} diagnosticNode
+     * @private
+     */
+    emitStringLiteralUnion(type, diagnosticNode) {
+        const typeName = this.deriveTypeName(type);
+        if (!typeName) return;
+        if (this.emittedStringLiteralUnionNames.has(typeName)) return;
+        this.emittedStringLiteralUnionNames.add(typeName);
+
+        const literals = this.getStringLiteralUnionLiterals(type);
+        if (!literals || literals.length === 0) return;
+
+        const swiftEnumName = this.renderTypeIdentifier(typeName);
+        /** @type {{ name: string, raw: string }[]} */
+        const members = literals.map(raw => ({ name: makeValidSwiftIdentifier(String(raw), { emptyFallback: "_case" }), raw: String(raw) }));
+        const deduped = this.dedupeSwiftEnumCaseNames(members);
+
+        this.emitDocComment(diagnosticNode, { indent: "" });
+        this.swiftLines.push(`enum ${swiftEnumName}: String {`);
+        for (const { name, raw } of deduped) {
+            this.swiftLines.push(`    case ${this.renderIdentifier(name)} = "${raw.replaceAll("\"", "\\\"")}"`);
+        }
+        this.swiftLines.push("}");
+        this.swiftLines.push(`extension ${swiftEnumName}: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}`);
+        this.swiftLines.push("");
     }
 
     /**
@@ -860,6 +939,7 @@ export class TypeProcessor {
          * @returns {string}
          */
         const convert = (type) => {
+            const originalType = type;
             // Handle nullable/undefined unions (e.g. T | null, T | undefined)
             const isUnionType = (type.flags & ts.TypeFlags.Union) !== 0;
             if (isUnionType) {
@@ -881,6 +961,15 @@ export class TypeProcessor {
                         return `Optional<${wrapped}>`;
                     }
                     return `JSUndefinedOr<${wrapped}>`;
+                }
+
+                const stringLiteralUnion = this.getStringLiteralUnionLiterals(type);
+                if (stringLiteralUnion && stringLiteralUnion.length > 0) {
+                    const typeName = this.deriveTypeName(originalType) ?? this.deriveTypeName(type);
+                    if (typeName) {
+                        this.seenTypes.set(originalType, node);
+                        return this.renderTypeIdentifier(typeName);
+                    }
                 }
             }
 
@@ -909,6 +998,12 @@ export class TypeProcessor {
                 const typeName = symbol.name;
                 this.seenTypes.set(type, node);
                 return this.renderTypeIdentifier(typeName);
+            }
+
+            const stringLiteralUnion = this.getStringLiteralUnionLiterals(type);
+            if (stringLiteralUnion && stringLiteralUnion.length > 0) {
+                this.seenTypes.set(type, node);
+                return this.renderTypeIdentifier(this.deriveTypeName(type) ?? this.checker.typeToString(type));
             }
 
             if (this.checker.isTupleType(type) || type.getCallSignatures().length > 0) {
