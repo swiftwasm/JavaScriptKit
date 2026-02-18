@@ -19,4 +19,10 @@ final class SwiftClassSupportTests: XCTestCase {
         let greeter2 = try SwiftClassSupportImports.jsRoundTripOptionalGreeter(Greeter(name: "Hello"))
         XCTAssertEqual(greeter2?.name, "Hello")
     }
+
+    func testSwiftClassToJSObject() throws {
+        let greeter = Greeter(name: "BridgeJS")
+        let jsGreeter = try XCTUnwrap(greeter.jsValue.object)
+        XCTAssertEqual(jsGreeter["name"].string, "BridgeJS")
+    }
 }
