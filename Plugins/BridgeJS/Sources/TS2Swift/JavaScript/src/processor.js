@@ -270,13 +270,30 @@ export class TypeProcessor {
             const swiftVarName = this.renderIdentifier(swiftName);
 
             const type = this.checker.getTypeAtLocation(decl);
-            const swiftType = this.visitType(type, decl);
 
             /** @type {string[]} */
             const args = [];
             const jsNameArg = this.renderOptionalJSNameArg(jsName, swiftName);
             if (jsNameArg) args.push(jsNameArg);
             if (fromArg) args.push(fromArg);
+            const callSignatures = type.getCallSignatures();
+
+            if (callSignatures.length > 0) {
+                const signature = callSignatures[0];
+                const parameters = signature.getParameters();
+                const parameterNameMap = this.buildParameterNameMap(parameters);
+                const params = this.renderParameters(parameters, decl);
+                const returnType = this.visitType(signature.getReturnType(), decl);
+                const effects = this.renderEffects({ isAsync: false });
+                const annotation = this.renderMacroAnnotation("JSFunction", args);
+
+                this.emitDocComment(decl, { indent: "", parameterNameMap });
+                this.swiftLines.push(`${annotation} func ${swiftVarName}(${params}) ${effects} -> ${returnType}`);
+                this.swiftLines.push("");
+                continue;
+            }
+
+            const swiftType = this.visitType(type, decl);
             const annotation = this.renderMacroAnnotation("JSGetter", args);
 
             this.emitDocComment(decl, { indent: "" });
