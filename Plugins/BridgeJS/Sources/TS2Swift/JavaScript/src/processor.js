@@ -654,7 +654,7 @@ export class TypeProcessor {
     /**
      * Visit a property declaration and extract metadata
      * @param {ts.PropertyDeclaration | ts.PropertySignature} node
-     * @returns {{ jsName: string, swiftName: string, type: string, isReadonly: boolean } | null}
+     * @returns {{ jsName: string, swiftName: string, type: string, isReadonly: boolean, isStatic: boolean } | null}
      */
     visitPropertyDecl(node) {
         if (!node.name) return null;
@@ -674,7 +674,8 @@ export class TypeProcessor {
         const type = this.checker.getTypeAtLocation(node)
         const swiftType = this.visitType(type, node);
         const isReadonly = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ReadonlyKeyword) ?? false;
-        return { jsName, swiftName, type: swiftType, isReadonly };
+        const isStatic = node.modifiers?.some(m => m.kind === ts.SyntaxKind.StaticKeyword) ?? false;
+        return { jsName, swiftName, type: swiftType, isReadonly, isStatic };
     }
 
     /**
@@ -1011,6 +1012,7 @@ export class TypeProcessor {
 
         const type = property.type;
         const swiftName = this.renderIdentifier(property.swiftName);
+        const isStatic = property.isStatic;
         const needsJSGetterName = property.jsName !== property.swiftName;
         // Note: `from: .global` is only meaningful for top-level imports and constructors.
         // Instance member access always comes from the JS object itself.
@@ -1020,10 +1022,11 @@ export class TypeProcessor {
         if (needsJSGetterName) getterArgs.push(`jsName: "${this.escapeForSwiftStringLiteral(property.jsName)}"`);
         if (fromArg) getterArgs.push(fromArg);
         const getterAnnotation = this.renderMacroAnnotation("JSGetter", getterArgs);
+        const staticKeyword = isStatic ? "static " : "";
 
         // Always render getter
         this.emitDocComment(node, { indent: "    " });
-        this.swiftLines.push(`    ${getterAnnotation} var ${swiftName}: ${type}`);
+        this.swiftLines.push(`    ${getterAnnotation} ${staticKeyword}var ${swiftName}: ${type}`);
 
         // Render setter if not readonly
         if (!property.isReadonly) {
@@ -1036,7 +1039,7 @@ export class TypeProcessor {
             if (needsJSNameField) setterArgs.push(`jsName: "${this.escapeForSwiftStringLiteral(property.jsName)}"`);
             if (fromArg) setterArgs.push(fromArg);
             const annotation = this.renderMacroAnnotation("JSSetter", setterArgs);
-            this.swiftLines.push(`    ${annotation} func ${this.renderIdentifier(setterName)}(_ value: ${type}) ${this.renderEffects({ isAsync: false })}`);
+            this.swiftLines.push(`    ${annotation} ${staticKeyword}func ${this.renderIdentifier(setterName)}(_ value: ${type}) ${this.renderEffects({ isAsync: false })}`);
         }
     }
 
