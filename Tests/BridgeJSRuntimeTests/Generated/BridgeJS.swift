@@ -10376,6 +10376,22 @@ func _$OptionalSupportImports_runJsOptionalSupportTests() throws(JSException) ->
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_gc")
+fileprivate func bjs_gc() -> Void
+#else
+fileprivate func bjs_gc() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+
+func _$gc() throws(JSException) -> Void {
+    bjs_gc()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SwiftClassSupportImports_jsRoundTripGreeter_static")
 fileprivate func bjs_SwiftClassSupportImports_jsRoundTripGreeter_static(_ greeter: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
 #else
