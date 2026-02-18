@@ -1,8 +1,9 @@
 // @ts-check
 import { describe, it, expect } from 'vitest';
-import { readdirSync } from 'fs';
+import { readdirSync, mkdtempSync, writeFileSync, rmSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import os from 'os';
 import { run } from '../src/cli.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,4 +39,15 @@ describe('ts2swift', () => {
             expect(swiftOutput).toMatchSnapshot(name);
         });
     }
+
+    it('reports TypeScript syntax errors via thrown message', () => {
+        const tmpDir = mkdtempSync(path.join(os.tmpdir(), 'ts2swift-invalid-'));
+        const invalidPath = path.join(tmpDir, 'invalid.d.ts');
+        writeFileSync(invalidPath, 'function foo(x');
+        try {
+            expect(() => runTs2Swift(invalidPath)).toThrowError(/TypeScript syntax errors/);
+        } finally {
+            rmSync(tmpDir, { recursive: true, force: true });
+        }
+    });
 });
