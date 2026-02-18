@@ -31,6 +31,7 @@ export const decode = (
                 case 1:
                     return true;
             }
+        // falls through
         case Kind.Number:
             return payload2;
 

@@ -430,7 +430,7 @@ export class SwiftRuntime {
             ) => {
                 const memory = this.memory;
                 const func = memory.getObject(ref);
-                let result = undefined;
+                let result: any;
                 try {
                     const args = JSValue.decodeArray(
                         argv,
@@ -534,14 +534,13 @@ export class SwiftRuntime {
                 const memory = this.memory;
                 const obj = memory.getObject(obj_ref);
                 const func = memory.getObject(func_ref);
-                let result = undefined;
                 const args = JSValue.decodeArray(
                     argv,
                     argc,
                     this.getDataView(),
                     memory,
                 );
-                result = func.apply(obj, args);
+                const result = func.apply(obj, args);
                 return JSValue.writeAndReturnKindBits(
                     result,
                     payload1_ptr,
@@ -799,11 +798,12 @@ export class SwiftRuntime {
                             broker.onReceivingResponse(message);
                             break;
                         }
-                        default:
+                        default: {
                             const unknownMessage: never = message;
                             throw new Error(
                                 `Unknown message type: ${unknownMessage}`,
                             );
+                        }
                     }
                 });
             },
@@ -838,11 +838,12 @@ export class SwiftRuntime {
                             broker.onReceivingResponse(message);
                             break;
                         }
-                        default:
+                        default: {
                             const unknownMessage: never = message;
                             throw new Error(
                                 `Unknown message type: ${unknownMessage}`,
                             );
+                        }
                     }
                 });
             },
