@@ -15643,6 +15643,24 @@
                     "_1" : "null"
                   }
                 }
+              },
+              {
+                "name" : "jsSabotageAndReleaseGreeter",
+                "parameters" : [
+                  {
+                    "name" : "greeter",
+                    "type" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
               }
             ]
           }

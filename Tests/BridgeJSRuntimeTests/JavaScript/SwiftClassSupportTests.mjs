@@ -9,5 +9,11 @@ export function getImports(importsContext) {
         jsRoundTripOptionalGreeter: (greeter) => {
             return greeter;
         },
+        jsSabotageAndReleaseGreeter: (greeter) => {
+            greeter.__swiftHeapObjectState.deinit = () => {
+                throw new WebAssembly.RuntimeError("simulated Wasm teardown");
+            };
+            greeter.release();
+        },
     };
 }

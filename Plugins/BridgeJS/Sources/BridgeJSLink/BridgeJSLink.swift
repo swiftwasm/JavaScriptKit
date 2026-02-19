@@ -50,13 +50,19 @@ public struct BridgeJSLink {
         }
         """
 
+    // Both the FinalizationRegistry callback and release() wrap state.deinit() in try/catch
+    // because either can fire during process shutdown after the Wasm instance is already torn
+    // down. Calling into Wasm at that point throws RuntimeError (memory access / table index
+    // out of bounds). There's nothing to do but swallow it - the process is exiting anyway.
     let swiftHeapObjectClassJs = """
         const swiftHeapObjectFinalizationRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
             if (state.hasReleased) {
                 return;
             }
             state.hasReleased = true;
-            state.deinit(state.pointer);
+            try {
+                state.deinit(state.pointer);
+            } catch {}
         });
 
         /// Represents a Swift heap object like a class instance or an actor instance.
@@ -77,7 +83,9 @@ public struct BridgeJSLink {
                 }
                 state.hasReleased = true;
                 swiftHeapObjectFinalizationRegistry.unregister(state);
-                state.deinit(state.pointer);
+                try {
+                    state.deinit(state.pointer);
+                } catch {}
             }
         }
         """

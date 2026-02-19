@@ -568,7 +568,9 @@ export async function createInstantiator(options, swift) {
                     return;
                 }
                 state.hasReleased = true;
-                state.deinit(state.pointer);
+                try {
+                    state.deinit(state.pointer);
+                } catch {}
             });
 
             /// Represents a Swift heap object like a class instance or an actor instance.
@@ -589,7 +591,9 @@ export async function createInstantiator(options, swift) {
                     }
                     state.hasReleased = true;
                     swiftHeapObjectFinalizationRegistry.unregister(state);
-                    state.deinit(state.pointer);
+                    try {
+                        state.deinit(state.pointer);
+                    } catch {}
                 }
             }
             class Helper extends SwiftHeapObject {

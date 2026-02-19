@@ -4,6 +4,7 @@ import JavaScriptKit
 @JSClass struct SwiftClassSupportImports {
     @JSFunction static func jsRoundTripGreeter(_ greeter: Greeter) throws(JSException) -> Greeter
     @JSFunction static func jsRoundTripOptionalGreeter(_ greeter: Greeter?) throws(JSException) -> Greeter?
+    @JSFunction static func jsSabotageAndReleaseGreeter(_ greeter: Greeter) throws(JSException)
 }
 
 @JSFunction(from: .global) func gc() throws(JSException) -> Void
@@ -26,6 +27,15 @@ final class SwiftClassSupportTests: XCTestCase {
         let greeter = Greeter(name: "BridgeJS")
         let jsGreeter = try XCTUnwrap(greeter.jsValue.object)
         XCTAssertEqual(jsGreeter["name"].string, "BridgeJS")
+    }
+
+    func testReleaseHandlesThrowingDeinit() throws {
+        // Verify that release() catches errors from deinit. The JS side replaces the
+        // wrapper's deinit to throw WebAssembly.RuntimeError after calling the real one
+        // (same error as calling into torn-down Wasm memory). Without the try/catch
+        // guard in release(), this crashes the process.
+        let greeter = Greeter(name: "Test")
+        try SwiftClassSupportImports.jsSabotageAndReleaseGreeter(greeter)
     }
 
     func testJSWrapperIsDeallocatedAfterFinalization() async throws {
