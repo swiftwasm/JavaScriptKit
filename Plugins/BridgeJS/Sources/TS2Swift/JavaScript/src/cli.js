@@ -97,13 +97,13 @@ Examples:
 /**
  * Run ts2swift for a single input file (programmatic API, no process I/O).
  * @param {string[]} filePaths - Paths to the .d.ts files
- * @param {{ tsconfigPath: string, logLevel?: keyof typeof DiagnosticEngine.LEVELS, globalFiles?: string[] }} options
+ * @param {{ tsconfigPath: string, logLevel?: keyof typeof DiagnosticEngine.LEVELS, globalFiles?: string[], diagnosticEngine?: DiagnosticEngine }} options
  * @returns {string} Generated Swift source
  * @throws {Error} on parse/type-check errors (diagnostics are included in the message)
  */
 export function run(filePaths, options) {
-    const { tsconfigPath, logLevel = 'info', globalFiles = [] } = options;
-    const diagnosticEngine = new DiagnosticEngine(logLevel);
+    const { tsconfigPath, logLevel = 'info', globalFiles = [], diagnosticEngine } = options;
+    const engine = diagnosticEngine ?? new DiagnosticEngine(logLevel);
 
     const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
     const configParseResult = ts.parseJsonConfigFileContent(
@@ -164,7 +164,7 @@ export function run(filePaths, options) {
     const bodies = [];
     const globalFileSet = new Set(globalFiles);
     for (const inputPath of [...filePaths, ...globalFiles]) {
-        const processor = new TypeProcessor(program.getTypeChecker(), diagnosticEngine, {
+        const processor = new TypeProcessor(program.getTypeChecker(), engine, {
             defaultImportFromGlobal: globalFileSet.has(inputPath),
         });
         const result = processor.processTypeDeclarations(program, inputPath);
@@ -247,7 +247,7 @@ export function main(args) {
 
     let swiftOutput;
     try {
-        swiftOutput = run(filePaths, { tsconfigPath, logLevel, globalFiles });
+        swiftOutput = run(filePaths, { tsconfigPath, logLevel, globalFiles, diagnosticEngine });
     } catch (/** @type {unknown} */ err) {
         if (err instanceof Error) {
             diagnosticEngine.print("error", err.message);

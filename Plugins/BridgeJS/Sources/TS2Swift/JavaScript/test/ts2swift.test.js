@@ -50,4 +50,18 @@ describe('ts2swift', () => {
             rmSync(tmpDir, { recursive: true, force: true });
         }
     });
+
+    it('emits a warning when export assignments cannot be generated', () => {
+        const dtsPath = path.join(inputsDir, 'ExportAssignment.d.ts');
+        /** @type {{ level: string, message: string }[]} */
+        const diagnostics = [];
+        const diagnosticEngine = {
+            print: (level, message) => diagnostics.push({ level, message }),
+        };
+        run([dtsPath], { tsconfigPath, logLevel: 'warning', diagnosticEngine });
+        const messages = diagnostics.map((d) => d.message).join('\n');
+        expect(messages).toMatch(/Skipping export assignment/);
+        const occurrences = (messages.match(/Skipping export assignment/g) || []).length;
+        expect(occurrences).toBe(1);
+    });
 });
