@@ -695,18 +695,14 @@ public class ExportSwift {
             }
             """
         // Build common function signature
-        let funcSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
-            abiParameters: [("pointer", .pointer)],
-            returnType: .i32
-        )
-
         let externDeclPrinter = CodeFragmentPrinter()
         SwiftCodePattern.buildExternFunctionDecl(
             printer: externDeclPrinter,
             moduleName: moduleName,
             abiName: externFunctionName,
             functionName: wrapFunctionName,
-            signature: funcSignature
+            abiParameters: [("pointer", .pointer)],
+            returnType: .i32
         )
         let externDecl: DeclSyntax = "\(raw: externDeclPrinter.lines.joined(separator: "\n"))"
         return [extensionDecl, externDecl]
@@ -1251,45 +1247,28 @@ struct StructCodegen {
         let bridgedStructExtension: DeclSyntax = "\(raw: printer.lines.joined(separator: "\n"))"
 
         let lowerExternDeclPrinter = CodeFragmentPrinter()
-        Self.renderStructExtern(
+        SwiftCodePattern.buildExternFunctionDecl(
             printer: lowerExternDeclPrinter,
-            externName: lowerExternName,
+            moduleName: "bjs",
+            abiName: lowerExternName,
             functionName: lowerFunctionName,
-            signature: SwiftSignatureBuilder.buildABIFunctionSignature(
-                abiParameters: [("objectId", .i32)],
-                returnType: nil
-            )
+            abiParameters: [("objectId", .i32)],
+            returnType: nil
         )
         let liftExternDeclPrinter = CodeFragmentPrinter()
-        Self.renderStructExtern(
+        SwiftCodePattern.buildExternFunctionDecl(
             printer: liftExternDeclPrinter,
-            externName: liftExternName,
+            moduleName: "bjs",
+            abiName: liftExternName,
             functionName: liftFunctionName,
-            signature: SwiftSignatureBuilder.buildABIFunctionSignature(
-                abiParameters: [],
-                returnType: .i32
-            )
+            abiParameters: [],
+            returnType: .i32
         )
 
         return [
             bridgedStructExtension, "\(raw: lowerExternDeclPrinter.lines.joined(separator: "\n"))",
             "\(raw: liftExternDeclPrinter.lines.joined(separator: "\n"))",
         ]
-    }
-
-    private static func renderStructExtern(
-        printer: CodeFragmentPrinter,
-        externName: String,
-        functionName: String,
-        signature: String
-    ) {
-        SwiftCodePattern.buildExternFunctionDecl(
-            printer: printer,
-            moduleName: "bjs",
-            abiName: externName,
-            functionName: functionName,
-            signature: signature
-        )
     }
 
     private func generateStructLiftCode(structDef: ExportedStruct) -> [String] {
@@ -1357,17 +1336,14 @@ struct ProtocolCodegen {
             )
 
             // Build extern declaration using helper function
-            let externSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
-                abiParameters: builder.abiParameterSignatures,
-                returnType: builder.abiReturnType
-            )
             let externDeclPrinter = CodeFragmentPrinter()
             SwiftCodePattern.buildExternFunctionDecl(
                 printer: externDeclPrinter,
                 moduleName: moduleName,
                 abiName: method.abiName,
                 functionName: "_extern_\(method.name)",
-                signature: externSignature
+                abiParameters: builder.abiParameterSignatures,
+                returnType: builder.abiReturnType
             )
             externDecls.append(DeclSyntax("\(raw: externDeclPrinter.lines.joined(separator: "\n"))"))
             let methodImplPrinter = CodeFragmentPrinter()
@@ -1448,17 +1424,14 @@ struct ProtocolCodegen {
         try getterBuilder.liftReturnValue(returnType: property.type)
 
         // Build getter extern declaration using helper function
-        let getterExternSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
-            abiParameters: getterBuilder.abiParameterSignatures,
-            returnType: getterBuilder.abiReturnType
-        )
         let getterExternDeclPrinter = CodeFragmentPrinter()
         SwiftCodePattern.buildExternFunctionDecl(
             printer: getterExternDeclPrinter,
             moduleName: moduleName,
             abiName: getterAbiName,
             functionName: getterAbiName,
-            signature: getterExternSignature
+            abiParameters: getterBuilder.abiParameterSignatures,
+            returnType: getterBuilder.abiReturnType
         )
         let getterExternDecl = DeclSyntax("\(raw: getterExternDeclPrinter.lines.joined(separator: "\n"))")
         var externDecls: [DeclSyntax] = [getterExternDecl]
@@ -1483,17 +1456,14 @@ struct ProtocolCodegen {
             try setterBuilder.call(returnType: .void)
 
             // Build setter extern declaration using helper function
-            let setterExternSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
-                abiParameters: setterBuilder.abiParameterSignatures,
-                returnType: setterBuilder.abiReturnType
-            )
             let setterExternDeclPrinter = CodeFragmentPrinter()
             SwiftCodePattern.buildExternFunctionDecl(
                 printer: setterExternDeclPrinter,
                 moduleName: moduleName,
                 abiName: setterAbiName,
                 functionName: setterAbiName,
-                signature: setterExternSignature
+                abiParameters: setterBuilder.abiParameterSignatures,
+                returnType: setterBuilder.abiReturnType
             )
             let setterExternDecl = DeclSyntax("\(raw: setterExternDeclPrinter.lines.joined(separator: "\n"))")
             externDecls.append(setterExternDecl)

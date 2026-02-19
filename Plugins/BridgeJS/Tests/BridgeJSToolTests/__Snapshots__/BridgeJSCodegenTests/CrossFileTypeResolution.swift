@@ -27,12 +27,15 @@ extension ClassB: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_ClassB_wrap")
-fileprivate func _bjs_ClassB_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ClassB_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ClassB_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ClassB_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_ClassB_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ClassB_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_ClassA_linkedB_get")
 @_cdecl("bjs_ClassA_linkedB_get")
@@ -73,9 +76,12 @@ extension ClassA: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_ClassA_wrap")
-fileprivate func _bjs_ClassA_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ClassA_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ClassA_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ClassA_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_ClassA_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ClassA_wrap_extern(pointer)
+}

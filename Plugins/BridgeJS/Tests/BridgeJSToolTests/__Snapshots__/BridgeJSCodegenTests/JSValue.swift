@@ -145,21 +145,27 @@ extension JSValueHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_JSValueHolder_wrap")
-fileprivate func _bjs_JSValueHolder_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_JSValueHolder_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_JSValueHolder_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_JSValueHolder_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_JSValueHolder_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_JSValueHolder_wrap_extern(pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_jsEchoJSValue")
-fileprivate func bjs_jsEchoJSValue(_ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void
+fileprivate func bjs_jsEchoJSValue_extern(_ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void
 #else
-fileprivate func bjs_jsEchoJSValue(_ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
+fileprivate func bjs_jsEchoJSValue_extern(_ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_jsEchoJSValue(_ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
+    return bjs_jsEchoJSValue_extern(valueKind, valuePayload1, valuePayload2)
+}
 
 func _$jsEchoJSValue(_ value: JSValue) throws(JSException) -> JSValue {
     let (valueKind, valuePayload1, valuePayload2) = value.bridgeJSLowerParameter()
@@ -172,12 +178,15 @@ func _$jsEchoJSValue(_ value: JSValue) throws(JSException) -> JSValue {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_jsEchoJSValueArray")
-fileprivate func bjs_jsEchoJSValueArray() -> Void
+fileprivate func bjs_jsEchoJSValueArray_extern() -> Void
 #else
-fileprivate func bjs_jsEchoJSValueArray() -> Void {
+fileprivate func bjs_jsEchoJSValueArray_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_jsEchoJSValueArray() -> Void {
+    return bjs_jsEchoJSValueArray_extern()
+}
 
 func _$jsEchoJSValueArray(_ values: [JSValue]) throws(JSException) -> [JSValue] {
     let _ = values.bridgeJSLowerParameter()

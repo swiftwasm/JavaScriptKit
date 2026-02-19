@@ -41,21 +41,27 @@ extension DataPoint: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_DataPoint")
-fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_DataPoint_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_DataPoint_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_DataPoint(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_DataPoint_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_DataPoint")
-fileprivate func _bjs_struct_lift_DataPoint() -> Int32
+fileprivate func _bjs_struct_lift_DataPoint_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_DataPoint() -> Int32 {
+fileprivate func _bjs_struct_lift_DataPoint_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_DataPoint() -> Int32 {
+    return _bjs_struct_lift_DataPoint_extern()
+}
 
 @_expose(wasm, "bjs_DataPoint_init")
 @_cdecl("bjs_DataPoint_init")
@@ -100,21 +106,27 @@ extension Address: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Address")
-fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Address_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Address_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Address_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Address")
-fileprivate func _bjs_struct_lift_Address() -> Int32
+fileprivate func _bjs_struct_lift_Address_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Address() -> Int32 {
+fileprivate func _bjs_struct_lift_Address_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Address() -> Int32 {
+    return _bjs_struct_lift_Address_extern()
+}
 
 extension Person: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Person {
@@ -150,21 +162,27 @@ extension Person: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Person")
-fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Person_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Person_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Person_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Person")
-fileprivate func _bjs_struct_lift_Person() -> Int32
+fileprivate func _bjs_struct_lift_Person_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Person() -> Int32 {
+fileprivate func _bjs_struct_lift_Person_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Person() -> Int32 {
+    return _bjs_struct_lift_Person_extern()
+}
 
 extension Session: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Session {
@@ -192,21 +210,27 @@ extension Session: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Session")
-fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Session_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Session_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Session(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Session_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Session")
-fileprivate func _bjs_struct_lift_Session() -> Int32
+fileprivate func _bjs_struct_lift_Session_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Session() -> Int32 {
+fileprivate func _bjs_struct_lift_Session_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Session() -> Int32 {
+    return _bjs_struct_lift_Session_extern()
+}
 
 extension Measurement: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Measurement {
@@ -240,21 +264,27 @@ extension Measurement: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Measurement")
-fileprivate func _bjs_struct_lower_Measurement(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Measurement_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Measurement(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Measurement_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Measurement(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Measurement_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Measurement")
-fileprivate func _bjs_struct_lift_Measurement() -> Int32
+fileprivate func _bjs_struct_lift_Measurement_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Measurement() -> Int32 {
+fileprivate func _bjs_struct_lift_Measurement_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Measurement() -> Int32 {
+    return _bjs_struct_lift_Measurement_extern()
+}
 
 extension ConfigStruct: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> ConfigStruct {
@@ -278,21 +308,27 @@ extension ConfigStruct: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_ConfigStruct")
-fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_ConfigStruct_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_ConfigStruct_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_ConfigStruct(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_ConfigStruct_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_ConfigStruct")
-fileprivate func _bjs_struct_lift_ConfigStruct() -> Int32
+fileprivate func _bjs_struct_lift_ConfigStruct_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_ConfigStruct() -> Int32 {
+fileprivate func _bjs_struct_lift_ConfigStruct_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_ConfigStruct() -> Int32 {
+    return _bjs_struct_lift_ConfigStruct_extern()
+}
 
 @_expose(wasm, "bjs_ConfigStruct_static_maxRetries_get")
 @_cdecl("bjs_ConfigStruct_static_maxRetries_get")
@@ -399,21 +435,27 @@ extension Container: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Container")
-fileprivate func _bjs_struct_lower_Container(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Container_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Container(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Container_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Container(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Container_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Container")
-fileprivate func _bjs_struct_lift_Container() -> Int32
+fileprivate func _bjs_struct_lift_Container_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Container() -> Int32 {
+fileprivate func _bjs_struct_lift_Container_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Container() -> Int32 {
+    return _bjs_struct_lift_Container_extern()
+}
 
 @_expose(wasm, "bjs_roundtrip")
 @_cdecl("bjs_roundtrip")
@@ -498,9 +540,12 @@ extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
-fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_Greeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Greeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Greeter_wrap_extern(pointer)
+}

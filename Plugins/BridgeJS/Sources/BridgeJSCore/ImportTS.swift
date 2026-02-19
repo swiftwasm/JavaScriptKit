@@ -222,18 +222,14 @@ public struct ImportTS {
         }
 
         func renderImportDecl() -> DeclSyntax {
-            let signature = SwiftSignatureBuilder.buildABIFunctionSignature(
-                abiParameters: abiParameterSignatures,
-                returnType: abiReturnType
-            )
-
             let printer = CodeFragmentPrinter()
             SwiftCodePattern.buildExternFunctionDecl(
                 printer: printer,
                 moduleName: moduleName,
                 abiName: abiName,
                 functionName: abiName,
-                signature: signature
+                abiParameters: abiParameterSignatures,
+                returnType: abiReturnType
             )
             return "\(raw: printer.lines.joined(separator: "\n"))"
         }
@@ -634,6 +630,27 @@ enum SwiftCodePattern {
         elseDecl(printer)
         printer.write("#endif")
     }
+    static func buildExternFunctionDecl(
+        printer: CodeFragmentPrinter,
+        moduleName: String,
+        abiName: String,
+        functionName: String,
+        abiParameters: [(name: String, type: WasmCoreType)],
+        returnType: WasmCoreType?
+    ) {
+        let signature = SwiftSignatureBuilder.buildABIFunctionSignature(
+            abiParameters: abiParameters,
+            returnType: returnType
+        )
+        buildExternFunctionDecl(
+            printer: printer,
+            moduleName: moduleName,
+            abiName: abiName,
+            functionName: functionName,
+            signature: signature,
+            parameterNames: abiParameters.map { $0.name }
+        )
+    }
 
     /// Builds the @_extern attribute for WebAssembly extern function declarations
     /// Builds an @_extern function declaration (no body, just the declaration)
@@ -642,22 +659,31 @@ enum SwiftCodePattern {
         moduleName: String,
         abiName: String,
         functionName: String,
-        signature: String
+        signature: String,
+        parameterNames: [String],
     ) {
+        // NOTE: Due to a Swift compiler issue, we can't declare possibly inlined functions as @_extern
+        // https://github.com/swiftlang/swift/pull/87250
+        let inModuleDeclName = "\(functionName)_extern"
         buildWasmConditionalCompilationDecls(
             printer: printer,
             wasmDecl: { printer in
                 printer.write(buildExternAttribute(moduleName: moduleName, abiName: abiName))
-                printer.write("fileprivate func \(functionName)\(signature)")
+                printer.write("fileprivate func \(inModuleDeclName)\(signature)")
             },
             elseDecl: { printer in
-                printer.write("fileprivate func \(functionName)\(signature) {")
+                printer.write("fileprivate func \(inModuleDeclName)\(signature) {")
                 printer.indent {
                     printer.write("fatalError(\"Only available on WebAssembly\")")
                 }
                 printer.write("}")
             }
         )
+        printer.write("@inline(never) fileprivate func \(functionName)\(signature) {")
+        printer.indent {
+            printer.write("return \(inModuleDeclName)(\(parameterNames.joined(separator: ", ")))")
+        }
+        printer.write("}")
     }
 
     /// Builds the standard @_expose and @_cdecl attributes for WebAssembly-exposed functions

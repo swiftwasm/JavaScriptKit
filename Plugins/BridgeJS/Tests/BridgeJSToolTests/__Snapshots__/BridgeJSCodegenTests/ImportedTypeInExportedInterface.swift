@@ -28,21 +28,27 @@ extension FooContainer: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_FooContainer")
-fileprivate func _bjs_struct_lower_FooContainer(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_FooContainer_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_FooContainer(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_FooContainer_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_FooContainer(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_FooContainer_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_FooContainer")
-fileprivate func _bjs_struct_lift_FooContainer() -> Int32
+fileprivate func _bjs_struct_lift_FooContainer_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_FooContainer() -> Int32 {
+fileprivate func _bjs_struct_lift_FooContainer_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_FooContainer() -> Int32 {
+    return _bjs_struct_lift_FooContainer_extern()
+}
 
 @_expose(wasm, "bjs_makeFoo")
 @_cdecl("bjs_makeFoo")
@@ -120,12 +126,15 @@ public func _bjs_roundtripFooContainer() -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Foo_init")
-fileprivate func bjs_Foo_init() -> Int32
+fileprivate func bjs_Foo_init_extern() -> Int32
 #else
-fileprivate func bjs_Foo_init() -> Int32 {
+fileprivate func bjs_Foo_init_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_Foo_init() -> Int32 {
+    return bjs_Foo_init_extern()
+}
 
 func _$Foo_init() throws(JSException) -> JSObject {
     let ret = bjs_Foo_init()

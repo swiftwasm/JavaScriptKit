@@ -70,21 +70,27 @@ extension Point: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Point")
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Point_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Point_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Point_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Point")
-fileprivate func _bjs_struct_lift_Point() -> Int32
+fileprivate func _bjs_struct_lift_Point_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Point() -> Int32 {
+fileprivate func _bjs_struct_lift_Point_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Point() -> Int32 {
+    return _bjs_struct_lift_Point_extern()
+}
 
 @_expose(wasm, "bjs_processIntArray")
 @_cdecl("bjs_processIntArray")
@@ -482,21 +488,27 @@ extension Item: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Item_wrap")
-fileprivate func _bjs_Item_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_Item_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_Item_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Item_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_Item_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Item_wrap_extern(pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_checkArray")
-fileprivate func bjs_checkArray(_ a: Int32) -> Void
+fileprivate func bjs_checkArray_extern(_ a: Int32) -> Void
 #else
-fileprivate func bjs_checkArray(_ a: Int32) -> Void {
+fileprivate func bjs_checkArray_extern(_ a: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_checkArray(_ a: Int32) -> Void {
+    return bjs_checkArray_extern(a)
+}
 
 func _$checkArray(_ a: JSObject) throws(JSException) -> Void {
     let aValue = a.bridgeJSLowerParameter()
@@ -508,12 +520,15 @@ func _$checkArray(_ a: JSObject) throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_checkArrayWithLength")
-fileprivate func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) -> Void
+fileprivate func bjs_checkArrayWithLength_extern(_ a: Int32, _ b: Float64) -> Void
 #else
-fileprivate func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) -> Void {
+fileprivate func bjs_checkArrayWithLength_extern(_ a: Int32, _ b: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_checkArrayWithLength(_ a: Int32, _ b: Float64) -> Void {
+    return bjs_checkArrayWithLength_extern(a, b)
+}
 
 func _$checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void {
     let aValue = a.bridgeJSLowerParameter()
@@ -526,12 +541,15 @@ func _$checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> V
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_importProcessNumbers")
-fileprivate func bjs_importProcessNumbers() -> Void
+fileprivate func bjs_importProcessNumbers_extern() -> Void
 #else
-fileprivate func bjs_importProcessNumbers() -> Void {
+fileprivate func bjs_importProcessNumbers_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_importProcessNumbers() -> Void {
+    return bjs_importProcessNumbers_extern()
+}
 
 func _$importProcessNumbers(_ values: [Double]) throws(JSException) -> Void {
     let _ = values.bridgeJSLowerParameter()
@@ -543,12 +561,15 @@ func _$importProcessNumbers(_ values: [Double]) throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_importGetNumbers")
-fileprivate func bjs_importGetNumbers() -> Void
+fileprivate func bjs_importGetNumbers_extern() -> Void
 #else
-fileprivate func bjs_importGetNumbers() -> Void {
+fileprivate func bjs_importGetNumbers_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_importGetNumbers() -> Void {
+    return bjs_importGetNumbers_extern()
+}
 
 func _$importGetNumbers() throws(JSException) -> [Double] {
     bjs_importGetNumbers()
@@ -560,12 +581,15 @@ func _$importGetNumbers() throws(JSException) -> [Double] {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_importTransformNumbers")
-fileprivate func bjs_importTransformNumbers() -> Void
+fileprivate func bjs_importTransformNumbers_extern() -> Void
 #else
-fileprivate func bjs_importTransformNumbers() -> Void {
+fileprivate func bjs_importTransformNumbers_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_importTransformNumbers() -> Void {
+    return bjs_importTransformNumbers_extern()
+}
 
 func _$importTransformNumbers(_ values: [Double]) throws(JSException) -> [Double] {
     let _ = values.bridgeJSLowerParameter()
@@ -578,12 +602,15 @@ func _$importTransformNumbers(_ values: [Double]) throws(JSException) -> [Double
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_importProcessStrings")
-fileprivate func bjs_importProcessStrings() -> Void
+fileprivate func bjs_importProcessStrings_extern() -> Void
 #else
-fileprivate func bjs_importProcessStrings() -> Void {
+fileprivate func bjs_importProcessStrings_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_importProcessStrings() -> Void {
+    return bjs_importProcessStrings_extern()
+}
 
 func _$importProcessStrings(_ values: [String]) throws(JSException) -> [String] {
     let _ = values.bridgeJSLowerParameter()
@@ -596,12 +623,15 @@ func _$importProcessStrings(_ values: [String]) throws(JSException) -> [String] 
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_importProcessBooleans")
-fileprivate func bjs_importProcessBooleans() -> Void
+fileprivate func bjs_importProcessBooleans_extern() -> Void
 #else
-fileprivate func bjs_importProcessBooleans() -> Void {
+fileprivate func bjs_importProcessBooleans_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_importProcessBooleans() -> Void {
+    return bjs_importProcessBooleans_extern()
+}
 
 func _$importProcessBooleans(_ values: [Bool]) throws(JSException) -> [Bool] {
     let _ = values.bridgeJSLowerParameter()

@@ -53,7 +53,8 @@ public struct ClosureCodegen {
             moduleName: "bjs",
             abiName: externABIName,
             functionName: externABIName,
-            signature: "(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32"
+            signature: "(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32",
+            parameterNames: ["boxPtr", "file", "line"]
         )
         let makeClosureExternDecl: DeclSyntax = "\(raw: externDeclPrinter.lines.joined(separator: "\n"))"
 

@@ -234,12 +234,15 @@ extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
-fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_Greeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Greeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Greeter_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_OptionalPropertyHolder_init")
 @_cdecl("bjs_OptionalPropertyHolder_init")
@@ -333,237 +336,315 @@ extension OptionalPropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject 
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_OptionalPropertyHolder_wrap")
-fileprivate func _bjs_OptionalPropertyHolder_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_OptionalPropertyHolder_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_OptionalPropertyHolder_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_OptionalPropertyHolder_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_OptionalPropertyHolder_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_OptionalPropertyHolder_wrap_extern(pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_init")
-fileprivate func bjs_WithOptionalJSClass_init(_ valueOrNullIsSome: Int32, _ valueOrNullValue: Int32, _ valueOrUndefinedIsSome: Int32, _ valueOrUndefinedValue: Int32) -> Int32
+fileprivate func bjs_WithOptionalJSClass_init_extern(_ valueOrNullIsSome: Int32, _ valueOrNullValue: Int32, _ valueOrUndefinedIsSome: Int32, _ valueOrUndefinedValue: Int32) -> Int32
 #else
-fileprivate func bjs_WithOptionalJSClass_init(_ valueOrNullIsSome: Int32, _ valueOrNullValue: Int32, _ valueOrUndefinedIsSome: Int32, _ valueOrUndefinedValue: Int32) -> Int32 {
+fileprivate func bjs_WithOptionalJSClass_init_extern(_ valueOrNullIsSome: Int32, _ valueOrNullValue: Int32, _ valueOrUndefinedIsSome: Int32, _ valueOrUndefinedValue: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_init(_ valueOrNullIsSome: Int32, _ valueOrNullValue: Int32, _ valueOrUndefinedIsSome: Int32, _ valueOrUndefinedValue: Int32) -> Int32 {
+    return bjs_WithOptionalJSClass_init_extern(valueOrNullIsSome, valueOrNullValue, valueOrUndefinedIsSome, valueOrUndefinedValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_stringOrNull_get")
-fileprivate func bjs_WithOptionalJSClass_stringOrNull_get(_ self: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_stringOrNull_get_extern(_ self: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_stringOrNull_get(_ self: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_stringOrNull_get_extern(_ self: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_stringOrNull_get(_ self: Int32) -> Void {
+    return bjs_WithOptionalJSClass_stringOrNull_get_extern(self)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_stringOrUndefined_get")
-fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_get(_ self: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_get_extern(_ self: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_get(_ self: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_get_extern(_ self: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_get(_ self: Int32) -> Void {
+    return bjs_WithOptionalJSClass_stringOrUndefined_get_extern(self)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_doubleOrNull_get")
-fileprivate func bjs_WithOptionalJSClass_doubleOrNull_get(_ self: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_doubleOrNull_get_extern(_ self: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_doubleOrNull_get(_ self: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_doubleOrNull_get_extern(_ self: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_doubleOrNull_get(_ self: Int32) -> Void {
+    return bjs_WithOptionalJSClass_doubleOrNull_get_extern(self)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_doubleOrUndefined_get")
-fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_get(_ self: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_get_extern(_ self: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_get(_ self: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_get_extern(_ self: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_get(_ self: Int32) -> Void {
+    return bjs_WithOptionalJSClass_doubleOrUndefined_get_extern(self)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_boolOrNull_get")
-fileprivate func bjs_WithOptionalJSClass_boolOrNull_get(_ self: Int32) -> Int32
+fileprivate func bjs_WithOptionalJSClass_boolOrNull_get_extern(_ self: Int32) -> Int32
 #else
-fileprivate func bjs_WithOptionalJSClass_boolOrNull_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_WithOptionalJSClass_boolOrNull_get_extern(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_boolOrNull_get(_ self: Int32) -> Int32 {
+    return bjs_WithOptionalJSClass_boolOrNull_get_extern(self)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_boolOrUndefined_get")
-fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_get(_ self: Int32) -> Int32
+fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_get_extern(_ self: Int32) -> Int32
 #else
-fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_get(_ self: Int32) -> Int32 {
+fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_get_extern(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_get(_ self: Int32) -> Int32 {
+    return bjs_WithOptionalJSClass_boolOrUndefined_get_extern(self)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_intOrNull_get")
-fileprivate func bjs_WithOptionalJSClass_intOrNull_get(_ self: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_intOrNull_get_extern(_ self: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_intOrNull_get(_ self: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_intOrNull_get_extern(_ self: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_intOrNull_get(_ self: Int32) -> Void {
+    return bjs_WithOptionalJSClass_intOrNull_get_extern(self)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_intOrUndefined_get")
-fileprivate func bjs_WithOptionalJSClass_intOrUndefined_get(_ self: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_intOrUndefined_get_extern(_ self: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_intOrUndefined_get(_ self: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_intOrUndefined_get_extern(_ self: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_intOrUndefined_get(_ self: Int32) -> Void {
+    return bjs_WithOptionalJSClass_intOrUndefined_get_extern(self)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_stringOrNull_set")
-fileprivate func bjs_WithOptionalJSClass_stringOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_stringOrNull_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_stringOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_stringOrNull_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_stringOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_stringOrNull_set_extern(self, newValueIsSome, newValueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_stringOrUndefined_set")
-fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_stringOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_stringOrUndefined_set_extern(self, newValueIsSome, newValueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_doubleOrNull_set")
-fileprivate func bjs_WithOptionalJSClass_doubleOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void
+fileprivate func bjs_WithOptionalJSClass_doubleOrNull_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_doubleOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void {
+fileprivate func bjs_WithOptionalJSClass_doubleOrNull_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_doubleOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void {
+    return bjs_WithOptionalJSClass_doubleOrNull_set_extern(self, newValueIsSome, newValueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_doubleOrUndefined_set")
-fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void
+fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void {
+fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_doubleOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Float64) -> Void {
+    return bjs_WithOptionalJSClass_doubleOrUndefined_set_extern(self, newValueIsSome, newValueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_boolOrNull_set")
-fileprivate func bjs_WithOptionalJSClass_boolOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_boolOrNull_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_boolOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_boolOrNull_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_boolOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_boolOrNull_set_extern(self, newValueIsSome, newValueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_boolOrUndefined_set")
-fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_boolOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_boolOrUndefined_set_extern(self, newValueIsSome, newValueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_intOrNull_set")
-fileprivate func bjs_WithOptionalJSClass_intOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_intOrNull_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_intOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_intOrNull_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_intOrNull_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_intOrNull_set_extern(self, newValueIsSome, newValueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_intOrUndefined_set")
-fileprivate func bjs_WithOptionalJSClass_intOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_intOrUndefined_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_intOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_intOrUndefined_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_intOrUndefined_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_intOrUndefined_set_extern(self, newValueIsSome, newValueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripStringOrNull")
-fileprivate func bjs_WithOptionalJSClass_roundTripStringOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_roundTripStringOrNull_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_roundTripStringOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_roundTripStringOrNull_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_roundTripStringOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_roundTripStringOrNull_extern(self, valueIsSome, valueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripStringOrUndefined")
-fileprivate func bjs_WithOptionalJSClass_roundTripStringOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_roundTripStringOrUndefined_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_roundTripStringOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_roundTripStringOrUndefined_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_roundTripStringOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_roundTripStringOrUndefined_extern(self, valueIsSome, valueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripDoubleOrNull")
-fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void
+fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrNull_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
+fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrNull_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
+    return bjs_WithOptionalJSClass_roundTripDoubleOrNull_extern(self, valueIsSome, valueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripDoubleOrUndefined")
-fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void
+fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrUndefined_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
+fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrUndefined_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_roundTripDoubleOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Float64) -> Void {
+    return bjs_WithOptionalJSClass_roundTripDoubleOrUndefined_extern(self, valueIsSome, valueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripBoolOrNull")
-fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32
+fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrNull_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32
 #else
-fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32 {
+fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrNull_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32 {
+    return bjs_WithOptionalJSClass_roundTripBoolOrNull_extern(self, valueIsSome, valueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripBoolOrUndefined")
-fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32
+fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrUndefined_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32
 #else
-fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32 {
+fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrUndefined_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_roundTripBoolOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Int32 {
+    return bjs_WithOptionalJSClass_roundTripBoolOrUndefined_extern(self, valueIsSome, valueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripIntOrNull")
-fileprivate func bjs_WithOptionalJSClass_roundTripIntOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_roundTripIntOrNull_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_roundTripIntOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_roundTripIntOrNull_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_roundTripIntOrNull(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_roundTripIntOrNull_extern(self, valueIsSome, valueValue)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WithOptionalJSClass_roundTripIntOrUndefined")
-fileprivate func bjs_WithOptionalJSClass_roundTripIntOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+fileprivate func bjs_WithOptionalJSClass_roundTripIntOrUndefined_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
 #else
-fileprivate func bjs_WithOptionalJSClass_roundTripIntOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+fileprivate func bjs_WithOptionalJSClass_roundTripIntOrUndefined_extern(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_WithOptionalJSClass_roundTripIntOrUndefined(_ self: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    return bjs_WithOptionalJSClass_roundTripIntOrUndefined_extern(self, valueIsSome, valueValue)
+}
 
 func _$WithOptionalJSClass_init(_ valueOrNull: Optional<String>, _ valueOrUndefined: JSUndefinedOr<String>) throws(JSException) -> JSObject {
     let (valueOrNullIsSome, valueOrNullValue) = valueOrNull.bridgeJSLowerParameter()

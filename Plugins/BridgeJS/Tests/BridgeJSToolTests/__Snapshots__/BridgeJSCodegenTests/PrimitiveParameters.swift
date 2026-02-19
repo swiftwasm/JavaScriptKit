@@ -10,12 +10,15 @@ public func _bjs_check(_ a: Int32, _ b: Int32, _ c: Float32, _ d: Float64, _ e: 
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_check")
-fileprivate func bjs_check(_ a: Float64, _ b: Int32) -> Void
+fileprivate func bjs_check_extern(_ a: Float64, _ b: Int32) -> Void
 #else
-fileprivate func bjs_check(_ a: Float64, _ b: Int32) -> Void {
+fileprivate func bjs_check_extern(_ a: Float64, _ b: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_check(_ a: Float64, _ b: Int32) -> Void {
+    return bjs_check_extern(a, b)
+}
 
 func _$check(_ a: Double, _ b: Bool) throws(JSException) -> Void {
     let aValue = a.bridgeJSLowerParameter()
