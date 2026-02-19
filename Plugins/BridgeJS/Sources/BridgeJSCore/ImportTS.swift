@@ -228,26 +228,12 @@ public struct ImportTS {
             )
 
             let printer = CodeFragmentPrinter()
-            SwiftCodePattern.buildWasmConditionalCompilationDecls(
+            SwiftCodePattern.buildExternFunctionDecl(
                 printer: printer,
-                wasmDecl: { printer in
-                    SwiftCodePattern.buildExternFunctionDecl(
-                        printer: printer,
-                        moduleName: moduleName,
-                        abiName: abiName,
-                        functionName: abiName,
-                        signature: signature
-                    )
-                },
-                elseDecl: { printer in
-                    printer.write(
-                        multilineString: """
-                            fileprivate func \(abiName)\(signature) {
-                                fatalError("Only available on WebAssembly")
-                            }
-                            """
-                    )
-                }
+                moduleName: moduleName,
+                abiName: abiName,
+                functionName: abiName,
+                signature: signature
             )
             return "\(raw: printer.lines.joined(separator: "\n"))"
         }
@@ -658,8 +644,20 @@ enum SwiftCodePattern {
         functionName: String,
         signature: String
     ) {
-        printer.write(buildExternAttribute(moduleName: moduleName, abiName: abiName))
-        printer.write("fileprivate func \(functionName)\(signature)")
+        buildWasmConditionalCompilationDecls(
+            printer: printer,
+            wasmDecl: { printer in
+                printer.write(buildExternAttribute(moduleName: moduleName, abiName: abiName))
+                printer.write("fileprivate func \(functionName)\(signature)")
+            },
+            elseDecl: { printer in
+                printer.write("fileprivate func \(functionName)\(signature) {")
+                printer.indent {
+                    printer.write("fatalError(\"Only available on WebAssembly\")")
+                }
+                printer.write("}")
+            }
+        )
     }
 
     /// Builds the standard @_expose and @_cdecl attributes for WebAssembly-exposed functions

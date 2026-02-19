@@ -217,104 +217,302 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
     }
 }
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onSomethingHappened")
 fileprivate func _extern_onSomethingHappened(_ jsObject: Int32) -> Void
+#else
+fileprivate func _extern_onSomethingHappened(_ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onValueChanged")
 fileprivate func _extern_onValueChanged(_ jsObject: Int32, _ value: Int32) -> Void
+#else
+fileprivate func _extern_onValueChanged(_ jsObject: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onCountUpdated")
 fileprivate func _extern_onCountUpdated(_ jsObject: Int32, _ count: Int32) -> Int32
+#else
+fileprivate func _extern_onCountUpdated(_ jsObject: Int32, _ count: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onLabelUpdated")
 fileprivate func _extern_onLabelUpdated(_ jsObject: Int32, _ prefix: Int32, _ suffix: Int32) -> Void
+#else
+fileprivate func _extern_onLabelUpdated(_ jsObject: Int32, _ prefix: Int32, _ suffix: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_isCountEven")
 fileprivate func _extern_isCountEven(_ jsObject: Int32) -> Int32
+#else
+fileprivate func _extern_isCountEven(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onHelperUpdated")
 fileprivate func _extern_onHelperUpdated(_ jsObject: Int32, _ helper: UnsafeMutableRawPointer) -> Void
+#else
+fileprivate func _extern_onHelperUpdated(_ jsObject: Int32, _ helper: UnsafeMutableRawPointer) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_createHelper")
 fileprivate func _extern_createHelper(_ jsObject: Int32) -> UnsafeMutableRawPointer
+#else
+fileprivate func _extern_createHelper(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onOptionalHelperUpdated")
 fileprivate func _extern_onOptionalHelperUpdated(_ jsObject: Int32, _ helperIsSome: Int32, _ helperPointer: UnsafeMutableRawPointer) -> Void
+#else
+fileprivate func _extern_onOptionalHelperUpdated(_ jsObject: Int32, _ helperIsSome: Int32, _ helperPointer: UnsafeMutableRawPointer) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_createOptionalHelper")
 fileprivate func _extern_createOptionalHelper(_ jsObject: Int32) -> UnsafeMutableRawPointer
+#else
+fileprivate func _extern_createOptionalHelper(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_createEnum")
 fileprivate func _extern_createEnum(_ jsObject: Int32) -> Int32
+#else
+fileprivate func _extern_createEnum(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_handleResult")
 fileprivate func _extern_handleResult(_ jsObject: Int32, _ result: Int32) -> Void
+#else
+fileprivate func _extern_handleResult(_ jsObject: Int32, _ result: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_getResult")
 fileprivate func _extern_getResult(_ jsObject: Int32) -> Int32
+#else
+fileprivate func _extern_getResult(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_eventCount_get")
 fileprivate func bjs_MyViewControllerDelegate_eventCount_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_MyViewControllerDelegate_eventCount_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_eventCount_set")
 fileprivate func bjs_MyViewControllerDelegate_eventCount_set(_ jsObject: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_eventCount_set(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_delegateName_get")
 fileprivate func bjs_MyViewControllerDelegate_delegateName_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_MyViewControllerDelegate_delegateName_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_get")
 fileprivate func bjs_MyViewControllerDelegate_optionalName_get(_ jsObject: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_optionalName_get(_ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_set")
 fileprivate func bjs_MyViewControllerDelegate_optionalName_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_optionalName_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalRawEnum_get")
 fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_get(_ jsObject: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_get(_ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalRawEnum_set")
 fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_rawStringEnum_get")
 fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_rawStringEnum_set")
 fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_set(_ jsObject: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_set(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_result_get")
 fileprivate func bjs_MyViewControllerDelegate_result_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_MyViewControllerDelegate_result_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_result_set")
 fileprivate func bjs_MyViewControllerDelegate_result_set(_ jsObject: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_result_set(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalResult_get")
 fileprivate func bjs_MyViewControllerDelegate_optionalResult_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_MyViewControllerDelegate_optionalResult_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalResult_set")
 fileprivate func bjs_MyViewControllerDelegate_optionalResult_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueCaseId: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_optionalResult_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueCaseId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_direction_get")
 fileprivate func bjs_MyViewControllerDelegate_direction_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_MyViewControllerDelegate_direction_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_direction_set")
 fileprivate func bjs_MyViewControllerDelegate_direction_set(_ jsObject: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_direction_set(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_directionOptional_get")
 fileprivate func bjs_MyViewControllerDelegate_directionOptional_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_MyViewControllerDelegate_directionOptional_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_directionOptional_set")
 fileprivate func bjs_MyViewControllerDelegate_directionOptional_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_directionOptional_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priority_get")
 fileprivate func bjs_MyViewControllerDelegate_priority_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_MyViewControllerDelegate_priority_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priority_set")
 fileprivate func bjs_MyViewControllerDelegate_priority_set(_ jsObject: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_priority_set(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priorityOptional_get")
 fileprivate func bjs_MyViewControllerDelegate_priorityOptional_get(_ jsObject: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_priorityOptional_get(_ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_priorityOptional_set")
 fileprivate func bjs_MyViewControllerDelegate_priorityOptional_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_MyViewControllerDelegate_priorityOptional_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension Direction: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {

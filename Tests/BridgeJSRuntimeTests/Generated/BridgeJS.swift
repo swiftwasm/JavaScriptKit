@@ -1689,95 +1689,275 @@ struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
     }
 }
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_increment")
 fileprivate func _extern_increment(_ jsObject: Int32, _ amount: Int32) -> Void
+#else
+fileprivate func _extern_increment(_ jsObject: Int32, _ amount: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getValue")
 fileprivate func _extern_getValue(_ jsObject: Int32) -> Int32
+#else
+fileprivate func _extern_getValue(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_setLabelElements")
 fileprivate func _extern_setLabelElements(_ jsObject: Int32, _ labelPrefix: Int32, _ labelSuffix: Int32) -> Void
+#else
+fileprivate func _extern_setLabelElements(_ jsObject: Int32, _ labelPrefix: Int32, _ labelSuffix: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getLabel")
 fileprivate func _extern_getLabel(_ jsObject: Int32) -> Int32
+#else
+fileprivate func _extern_getLabel(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_isEven")
 fileprivate func _extern_isEven(_ jsObject: Int32) -> Int32
+#else
+fileprivate func _extern_isEven(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_processGreeter")
 fileprivate func _extern_processGreeter(_ jsObject: Int32, _ greeter: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _extern_processGreeter(_ jsObject: Int32, _ greeter: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_createGreeter")
 fileprivate func _extern_createGreeter(_ jsObject: Int32) -> UnsafeMutableRawPointer
+#else
+fileprivate func _extern_createGreeter(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_processOptionalGreeter")
 fileprivate func _extern_processOptionalGreeter(_ jsObject: Int32, _ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _extern_processOptionalGreeter(_ jsObject: Int32, _ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_createOptionalGreeter")
 fileprivate func _extern_createOptionalGreeter(_ jsObject: Int32) -> UnsafeMutableRawPointer
+#else
+fileprivate func _extern_createOptionalGreeter(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_handleAPIResult")
 fileprivate func _extern_handleAPIResult(_ jsObject: Int32, _ resultIsSome: Int32, _ resultCaseId: Int32) -> Void
+#else
+fileprivate func _extern_handleAPIResult(_ jsObject: Int32, _ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getAPIResult")
 fileprivate func _extern_getAPIResult(_ jsObject: Int32) -> Int32
+#else
+fileprivate func _extern_getAPIResult(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_count_get")
 fileprivate func bjs_DataProcessor_count_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_count_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_count_set")
 fileprivate func bjs_DataProcessor_count_set(_ jsObject: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_count_set(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_name_get")
 fileprivate func bjs_DataProcessor_name_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_name_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalTag_get")
 fileprivate func bjs_DataProcessor_optionalTag_get(_ jsObject: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_optionalTag_get(_ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalTag_set")
 fileprivate func bjs_DataProcessor_optionalTag_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_optionalTag_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalCount_get")
 fileprivate func bjs_DataProcessor_optionalCount_get(_ jsObject: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_optionalCount_get(_ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalCount_set")
 fileprivate func bjs_DataProcessor_optionalCount_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_optionalCount_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_direction_get")
 fileprivate func bjs_DataProcessor_direction_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_direction_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_direction_set")
 fileprivate func bjs_DataProcessor_direction_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_direction_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalTheme_get")
 fileprivate func bjs_DataProcessor_optionalTheme_get(_ jsObject: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_optionalTheme_get(_ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalTheme_set")
 fileprivate func bjs_DataProcessor_optionalTheme_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_optionalTheme_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_httpStatus_get")
 fileprivate func bjs_DataProcessor_httpStatus_get(_ jsObject: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_httpStatus_get(_ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_httpStatus_set")
 fileprivate func bjs_DataProcessor_httpStatus_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_httpStatus_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_apiResult_get")
 fileprivate func bjs_DataProcessor_apiResult_get(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_apiResult_get(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_apiResult_set")
 fileprivate func bjs_DataProcessor_apiResult_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueCaseId: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_apiResult_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueCaseId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_helper_get")
 fileprivate func bjs_DataProcessor_helper_get(_ jsObject: Int32) -> UnsafeMutableRawPointer
+#else
+fileprivate func bjs_DataProcessor_helper_get(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_helper_set")
 fileprivate func bjs_DataProcessor_helper_set(_ jsObject: Int32, _ newValue: UnsafeMutableRawPointer) -> Void
+#else
+fileprivate func bjs_DataProcessor_helper_set(_ jsObject: Int32, _ newValue: UnsafeMutableRawPointer) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalHelper_get")
 fileprivate func bjs_DataProcessor_optionalHelper_get(_ jsObject: Int32) -> UnsafeMutableRawPointer
+#else
+fileprivate func bjs_DataProcessor_optionalHelper_get(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalHelper_set")
 fileprivate func bjs_DataProcessor_optionalHelper_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValuePointer: UnsafeMutableRawPointer) -> Void
+#else
+fileprivate func bjs_DataProcessor_optionalHelper_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValuePointer: UnsafeMutableRawPointer) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
 
 extension Direction: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {

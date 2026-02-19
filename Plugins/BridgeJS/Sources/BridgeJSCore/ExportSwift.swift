@@ -701,26 +701,12 @@ public class ExportSwift {
         )
 
         let externDeclPrinter = CodeFragmentPrinter()
-        SwiftCodePattern.buildWasmConditionalCompilationDecls(
+        SwiftCodePattern.buildExternFunctionDecl(
             printer: externDeclPrinter,
-            wasmDecl: { printer in
-                SwiftCodePattern.buildExternFunctionDecl(
-                    printer: printer,
-                    moduleName: moduleName,
-                    abiName: externFunctionName,
-                    functionName: wrapFunctionName,
-                    signature: funcSignature
-                )
-            },
-            elseDecl: { printer in
-                printer.write(
-                    multilineString: """
-                        fileprivate func \(wrapFunctionName)\(funcSignature) {
-                            fatalError("Only available on WebAssembly")
-                        }
-                        """
-                )
-            }
+            moduleName: moduleName,
+            abiName: externFunctionName,
+            functionName: wrapFunctionName,
+            signature: funcSignature
         )
         let externDecl: DeclSyntax = "\(raw: externDeclPrinter.lines.joined(separator: "\n"))"
         return [extensionDecl, externDecl]
@@ -1297,26 +1283,12 @@ struct StructCodegen {
         functionName: String,
         signature: String
     ) {
-        SwiftCodePattern.buildWasmConditionalCompilationDecls(
+        SwiftCodePattern.buildExternFunctionDecl(
             printer: printer,
-            wasmDecl: { printer in
-                SwiftCodePattern.buildExternFunctionDecl(
-                    printer: printer,
-                    moduleName: "bjs",
-                    abiName: externName,
-                    functionName: functionName,
-                    signature: signature
-                )
-            },
-            elseDecl: { printer in
-                printer.write(
-                    multilineString: """
-                        fileprivate func \(functionName)\(signature) {
-                            fatalError("Only available on WebAssembly")
-                        }
-                        """
-                )
-            }
+            moduleName: "bjs",
+            abiName: externName,
+            functionName: functionName,
+            signature: signature
         )
     }
 
