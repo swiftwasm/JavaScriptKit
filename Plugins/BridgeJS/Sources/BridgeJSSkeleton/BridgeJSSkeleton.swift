@@ -1208,7 +1208,6 @@ extension BridgeType {
 }
 
 extension WasmCoreType {
-    /// Returns a Swift statement that returns a placeholder value for this Wasm core type.
     public var swiftReturnPlaceholderStmt: String {
         switch self {
         case .i32: return "return 0"

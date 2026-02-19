@@ -1048,7 +1048,7 @@ public struct BridgeJSLink {
         for skeleton in skeletons.compactMap(\.exported) {
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
                 printer.write(
-                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers()();"
+                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers();"
                 )
                 printer.write("\(JSGlueVariableScope.reservedEnumHelpers).\(enumDef.name) = \(enumDef.name)Helpers;")
                 printer.nextLine()
@@ -1064,7 +1064,7 @@ public struct BridgeJSLink {
         for skeleton in skeletons.compactMap(\.exported) {
             for structDef in skeleton.structs {
                 printer.write(
-                    "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers()();"
+                    "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers();"
                 )
                 printer.write(
                     "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name) = \(structDef.name)Helpers;"
@@ -1219,7 +1219,8 @@ public struct BridgeJSLink {
                 loweringFragment.parameters.count == 1,
                 "Lowering fragment should have exactly one parameter to lower"
             )
-            let loweredValues = try loweringFragment.printCode([param.name], context)
+            let paramName = scope.variable(param.name)
+            let loweredValues = try loweringFragment.printCode([paramName], context)
             parameterForwardings.append(contentsOf: loweredValues)
         }
 
@@ -1513,7 +1514,7 @@ public struct BridgeJSLink {
 
         switch enumDefinition.enumType {
         case .simple:
-            let fragment = IntrinsicJSFragment.simpleEnumHelper(enumDefinition: enumDefinition)
+            let fragment = IntrinsicJSFragment.caseEnumHelper(enumDefinition: enumDefinition)
             _ = try fragment.printCode([enumValuesName], context)
             jsTopLevelLines.append(contentsOf: printer.lines)
         case .rawValue:
@@ -1521,7 +1522,7 @@ public struct BridgeJSLink {
                 throw BridgeJSLinkError(message: "Raw value enum \(enumDefinition.name) is missing rawType")
             }
 
-            let fragment = IntrinsicJSFragment.rawValueEnumHelper(enumDefinition: enumDefinition)
+            let fragment = IntrinsicJSFragment.caseEnumHelper(enumDefinition: enumDefinition)
             _ = try fragment.printCode([enumValuesName], context)
             jsTopLevelLines.append(contentsOf: printer.lines)
         case .associatedValue:

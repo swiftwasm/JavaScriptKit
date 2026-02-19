@@ -34,46 +34,42 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createConfigHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                const bytes = textEncoder.encode(value.name);
-                const id = swift.memory.retain(bytes);
-                i32Stack.push(bytes.length);
-                i32Stack.push(id);
-                i32Stack.push((value.value | 0));
-                i32Stack.push(value.enabled ? 1 : 0);
-            },
-            lift: () => {
-                const bool = i32Stack.pop() !== 0;
-                const int = i32Stack.pop();
-                const string = strStack.pop();
-                return { name: string, value: int, enabled: bool };
-            }
-        });
-    };
-    const __bjs_createMathOperationsHelpers = () => {
-        return () => ({
-            lower: (value) => {
-                f64Stack.push(value.baseValue);
-            },
-            lift: () => {
-                const f64 = f64Stack.pop();
-                const instance1 = { baseValue: f64 };
-                instance1.add = function(a, b = 10.0) {
-                    structHelpers.MathOperations.lower(this);
-                    const ret = instance.exports.bjs_MathOperations_add(a, b);
-                    return ret;
-                }.bind(instance1);
-                instance1.multiply = function(a, b) {
-                    structHelpers.MathOperations.lower(this);
-                    const ret = instance.exports.bjs_MathOperations_multiply(a, b);
-                    return ret;
-                }.bind(instance1);
-                return instance1;
-            }
-        });
-    };
+    const __bjs_createConfigHelpers = () => ({
+        lower: (value) => {
+            const bytes = textEncoder.encode(value.name);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+            i32Stack.push((value.value | 0));
+            i32Stack.push(value.enabled ? 1 : 0);
+        },
+        lift: () => {
+            const bool = i32Stack.pop() !== 0;
+            const int = i32Stack.pop();
+            const string = strStack.pop();
+            return { name: string, value: int, enabled: bool };
+        }
+    });
+    const __bjs_createMathOperationsHelpers = () => ({
+        lower: (value) => {
+            f64Stack.push(value.baseValue);
+        },
+        lift: () => {
+            const f64 = f64Stack.pop();
+            const instance1 = { baseValue: f64 };
+            instance1.add = function(a, b = 10.0) {
+                structHelpers.MathOperations.lower(this);
+                const ret = instance.exports.bjs_MathOperations_add(a, b);
+                return ret;
+            }.bind(instance1);
+            instance1.multiply = function(a, b) {
+                structHelpers.MathOperations.lower(this);
+                const ret = instance.exports.bjs_MathOperations_multiply(a, b);
+                return ret;
+            }.bind(instance1);
+            return instance1;
+        }
+    });
 
     return {
         /**
@@ -343,12 +339,17 @@ export async function createInstantiator(options, swift) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
                     const isSome = tag != null;
-                    let tagId, tagBytes;
+                    let result, result1;
                     if (isSome) {
-                        tagBytes = textEncoder.encode(tag);
-                        tagId = swift.memory.retain(tagBytes);
+                        const tagBytes = textEncoder.encode(tag);
+                        const tagId = swift.memory.retain(tagBytes);
+                        result = tagId;
+                        result1 = tagBytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    const ret = instance.exports.bjs_ConstructorDefaults_init(nameId, nameBytes.length, count, enabled, status, +isSome, isSome ? tagId : 0, isSome ? tagBytes.length : 0);
+                    const ret = instance.exports.bjs_ConstructorDefaults_init(nameId, nameBytes.length, count, enabled, status, +isSome, result, result1);
                     return ConstructorDefaults.__construct(ret);
                 }
                 get name() {
@@ -391,18 +392,23 @@ export async function createInstantiator(options, swift) {
                 }
                 set tag(value) {
                     const isSome = value != null;
-                    let valueId, valueBytes;
+                    let result, result1;
                     if (isSome) {
-                        valueBytes = textEncoder.encode(value);
-                        valueId = swift.memory.retain(valueBytes);
+                        const valueBytes = textEncoder.encode(value);
+                        const valueId = swift.memory.retain(valueBytes);
+                        result = valueId;
+                        result1 = valueBytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    instance.exports.bjs_ConstructorDefaults_tag_set(this.pointer, +isSome, isSome ? valueId : 0, isSome ? valueBytes.length : 0);
+                    instance.exports.bjs_ConstructorDefaults_tag_set(this.pointer, +isSome, result, result1);
                 }
             }
-            const ConfigHelpers = __bjs_createConfigHelpers()();
+            const ConfigHelpers = __bjs_createConfigHelpers();
             structHelpers.Config = ConfigHelpers;
 
-            const MathOperationsHelpers = __bjs_createMathOperationsHelpers()();
+            const MathOperationsHelpers = __bjs_createMathOperationsHelpers();
             structHelpers.MathOperations = MathOperationsHelpers;
 
             const exports = {
@@ -435,24 +441,34 @@ export async function createInstantiator(options, swift) {
                 },
                 testOptionalDefault: function bjs_testOptionalDefault(name = null) {
                     const isSome = name != null;
-                    let nameId, nameBytes;
+                    let result, result1;
                     if (isSome) {
-                        nameBytes = textEncoder.encode(name);
-                        nameId = swift.memory.retain(nameBytes);
+                        const nameBytes = textEncoder.encode(name);
+                        const nameId = swift.memory.retain(nameBytes);
+                        result = nameId;
+                        result1 = nameBytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    instance.exports.bjs_testOptionalDefault(+isSome, isSome ? nameId : 0, isSome ? nameBytes.length : 0);
+                    instance.exports.bjs_testOptionalDefault(+isSome, result, result1);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
                     return optResult;
                 },
                 testOptionalStringDefault: function bjs_testOptionalStringDefault(greeting = "Hi") {
                     const isSome = greeting != null;
-                    let greetingId, greetingBytes;
+                    let result, result1;
                     if (isSome) {
-                        greetingBytes = textEncoder.encode(greeting);
-                        greetingId = swift.memory.retain(greetingBytes);
+                        const greetingBytes = textEncoder.encode(greeting);
+                        const greetingId = swift.memory.retain(greetingBytes);
+                        result = greetingId;
+                        result1 = greetingBytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
                     }
-                    instance.exports.bjs_testOptionalStringDefault(+isSome, isSome ? greetingId : 0, isSome ? greetingBytes.length : 0);
+                    instance.exports.bjs_testOptionalStringDefault(+isSome, result, result1);
                     const optResult = tmpRetString;
                     tmpRetString = undefined;
                     return optResult;
@@ -485,12 +501,7 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(+isSome);
                     instance.exports.bjs_testOptionalStructDefault();
                     const isSome1 = i32Stack.pop();
-                    let optResult;
-                    if (isSome1) {
-                        optResult = structHelpers.Config.lift();
-                    } else {
-                        optResult = null;
-                    }
+                    const optResult = isSome1 ? structHelpers.Config.lift() : null;
                     return optResult;
                 },
                 testOptionalStructWithValueDefault: function bjs_testOptionalStructWithValueDefault(point = { name: "default", value: 42, enabled: true }) {
@@ -501,12 +512,7 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(+isSome);
                     instance.exports.bjs_testOptionalStructWithValueDefault();
                     const isSome1 = i32Stack.pop();
-                    let optResult;
-                    if (isSome1) {
-                        optResult = structHelpers.Config.lift();
-                    } else {
-                        optResult = null;
-                    }
+                    const optResult = isSome1 ? structHelpers.Config.lift() : null;
                     return optResult;
                 },
                 testIntArrayDefault: function bjs_testIntArrayDefault(values = [1, 2, 3]) {

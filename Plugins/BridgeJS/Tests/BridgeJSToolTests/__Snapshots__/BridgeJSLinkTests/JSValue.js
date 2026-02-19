@@ -368,15 +368,35 @@ export async function createInstantiator(options, swift) {
                 constructor(value, optionalValue) {
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     const isSome = optionalValue != null;
-                    const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
-                    const ret = instance.exports.bjs_JSValueHolder_init(valueKind, valuePayload1, valuePayload2, +isSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2);
+                    let result, result1, result2;
+                    if (isSome) {
+                        const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
+                        result = optionalValueKind;
+                        result1 = optionalValuePayload1;
+                        result2 = optionalValuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    const ret = instance.exports.bjs_JSValueHolder_init(valueKind, valuePayload1, valuePayload2, +isSome, result, result1, result2);
                     return JSValueHolder.__construct(ret);
                 }
                 update(value, optionalValue) {
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     const isSome = optionalValue != null;
-                    const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
-                    instance.exports.bjs_JSValueHolder_update(this.pointer, valueKind, valuePayload1, valuePayload2, +isSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2);
+                    let result, result1, result2;
+                    if (isSome) {
+                        const [optionalValueKind, optionalValuePayload1, optionalValuePayload2] = __bjs_jsValueLower(optionalValue);
+                        result = optionalValueKind;
+                        result1 = optionalValuePayload1;
+                        result2 = optionalValuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    instance.exports.bjs_JSValueHolder_update(this.pointer, valueKind, valuePayload1, valuePayload2, +isSome, result, result1, result2);
                 }
                 echo(value) {
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
@@ -389,8 +409,18 @@ export async function createInstantiator(options, swift) {
                 }
                 echoOptional(value) {
                     const isSome = value != null;
-                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
-                    instance.exports.bjs_JSValueHolder_echoOptional(this.pointer, +isSome, valueKind, valuePayload1, valuePayload2);
+                    let result, result1, result2;
+                    if (isSome) {
+                        const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
+                        result = valueKind;
+                        result1 = valuePayload1;
+                        result2 = valuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    instance.exports.bjs_JSValueHolder_echoOptional(this.pointer, +isSome, result, result1, result2);
                     const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
@@ -433,8 +463,18 @@ export async function createInstantiator(options, swift) {
                 }
                 set optionalValue(value) {
                     const isSome = value != null;
-                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
-                    instance.exports.bjs_JSValueHolder_optionalValue_set(this.pointer, +isSome, valueKind, valuePayload1, valuePayload2);
+                    let result, result1, result2;
+                    if (isSome) {
+                        const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
+                        result = valueKind;
+                        result1 = valuePayload1;
+                        result2 = valuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    instance.exports.bjs_JSValueHolder_optionalValue_set(this.pointer, +isSome, result, result1, result2);
                 }
             }
             const exports = {
@@ -450,8 +490,18 @@ export async function createInstantiator(options, swift) {
                 },
                 roundTripOptionalJSValue: function bjs_roundTripOptionalJSValue(value) {
                     const isSome = value != null;
-                    const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
-                    instance.exports.bjs_roundTripOptionalJSValue(+isSome, valueKind, valuePayload1, valuePayload2);
+                    let result, result1, result2;
+                    if (isSome) {
+                        const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
+                        result = valueKind;
+                        result1 = valuePayload1;
+                        result2 = valuePayload2;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                        result2 = 0.0;
+                    }
+                    instance.exports.bjs_roundTripOptionalJSValue(+isSome, result, result1, result2);
                     const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
