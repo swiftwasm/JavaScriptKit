@@ -8,6 +8,8 @@ import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/Opt
 import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/JavaScript/ClosureSupportTests.mjs';
 import { getImports as getSwiftClassSupportImports } from './BridgeJSRuntimeTests/JavaScript/SwiftClassSupportTests.mjs';
 import { getImports as getOptionalSupportImports } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
+import { getImports as getArraySupportImports } from './BridgeJSRuntimeTests/JavaScript/ArraySupportTests.mjs';
+import { getImports as getJSClassSupportImports, JSClassWithArrayMembers } from './BridgeJSRuntimeTests/JavaScript/JSClassSupportTests.mjs';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
 export async function setupOptions(options, context) {
@@ -38,22 +40,6 @@ export async function setupOptions(options, context) {
     return {
         ...options,
         getImports: (importsContext) => {
-            const ArrayHost = class {
-                constructor(numbers, labels) {
-                    this.numbers = numbers;
-                    this.labels = labels;
-                }
-                concatNumbers(values) {
-                    return [...this.numbers, ...values];
-                }
-                concatLabels(values) {
-                    return [...this.labels, ...values];
-                }
-                firstLabel(values) {
-                    const merged = [...values, ...this.labels];
-                    return merged.length > 0 ? merged[0] : "";
-                }
-            };
             return {
                 "jsRoundTripVoid": () => {
                     return;
@@ -94,18 +80,6 @@ export async function setupOptions(options, context) {
                 "jsRoundTripJSValue": (v) => {
                     return v;
                 },
-                "jsRoundTripJSValueArray": (values) => {
-                    return values;
-                },
-                "jsRoundTripOptionalJSValueArray": (values) => {
-                    return values ?? null;
-                },
-                "jsRoundTripIntArray": (items) => {
-                    return items;
-                },
-                "jsArrayLength": (items) => {
-                    return items.length;
-                },
                 "jsThrowOrVoid": (shouldThrow) => {
                     if (shouldThrow) {
                         throw new Error("TestError");
@@ -138,10 +112,7 @@ export async function setupOptions(options, context) {
                 "$jsWeirdFunction": () => {
                     return 42;
                 },
-                ArrayHost,
-                makeArrayHost: (numbers, labels) => {
-                    return new ArrayHost(numbers, labels);
-                },
+                JSClassWithArrayMembers,
                 JsGreeter: class {
                     /**
                      * @param {string} name
@@ -179,21 +150,6 @@ export async function setupOptions(options, context) {
                 jsTranslatePoint: (point, dx, dy) => {
                     return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
                 },
-                jsRoundTripNumberArray: (values) => {
-                    return values;
-                },
-                jsRoundTripStringArray: (values) => {
-                    return values;
-                },
-                jsRoundTripBoolArray: (values) => {
-                    return values;
-                },
-                jsSumNumberArray: (values) => {
-                    return values.reduce((a, b) => a + b, 0);
-                },
-                jsCreateNumberArray: () => {
-                    return [1, 2, 3, 4, 5];
-                },
                 roundTripArrayMembers: (value) => {
                     return value;
                 },
@@ -205,6 +161,8 @@ export async function setupOptions(options, context) {
                 ClosureSupportImports: getClosureSupportImports(importsContext),
                 SwiftClassSupportImports: getSwiftClassSupportImports(importsContext),
                 OptionalSupportImports: getOptionalSupportImports(importsContext),
+                ArraySupportImports: getArraySupportImports(importsContext),
+                JSClassSupportImports: getJSClassSupportImports(importsContext),
             };
         },
         addToCoreImports(importObject, importsContext) {

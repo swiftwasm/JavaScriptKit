@@ -53,32 +53,6 @@ class ImportAPITests: XCTestCase {
         }
     }
 
-    func testRoundTripJSValueArray() throws {
-        let object = JSObject.global
-        let symbol = JSSymbol("array")
-        let bigInt = JSBigInt(_slowBridge: Int64(42))
-        let values: [JSValue] = [
-            .boolean(false),
-            .number(123.5),
-            .string(JSString("hello")),
-            .object(object),
-            .null,
-            .undefined,
-            .symbol(symbol),
-            .bigInt(bigInt),
-        ]
-        let roundTripped = try jsRoundTripJSValueArray(values)
-        XCTAssertEqual(roundTripped, values)
-        XCTAssertEqual(try jsRoundTripJSValueArray([]), [])
-    }
-
-    func testRoundTripOptionalJSValueArray() throws {
-        XCTAssertNil(try jsRoundTripOptionalJSValueArray(nil))
-        let values: [JSValue] = [.number(1), .undefined, .null]
-        let result = try jsRoundTripOptionalJSValueArray(values)
-        XCTAssertEqual(result, values)
-    }
-
     func testRoundTripFeatureFlag() throws {
         for v in [FeatureFlag.foo, .bar] {
             try XCTAssertEqual(jsRoundTripFeatureFlag(v), v)
@@ -135,33 +109,6 @@ class ImportAPITests: XCTestCase {
         XCTAssertEqual(try greeter.prefix, "Hello")
     }
 
-    func testRoundTripIntArray() throws {
-        let values = [1, 2, 3, 4, 5]
-        let result = try jsRoundTripIntArray(values)
-        XCTAssertEqual(result, values)
-        XCTAssertEqual(try jsArrayLength(values), values.count)
-        XCTAssertEqual(try jsRoundTripIntArray([]), [])
-    }
-
-    func testJSClassArrayMembers() throws {
-        let numbers = [1, 2, 3]
-        let labels = ["alpha", "beta"]
-        let host = try makeArrayHost(numbers, labels)
-
-        XCTAssertEqual(try host.numbers, numbers)
-        XCTAssertEqual(try host.labels, labels)
-
-        try host.setNumbers([10, 20])
-        try host.setLabels(["gamma"])
-        XCTAssertEqual(try host.numbers, [10, 20])
-        XCTAssertEqual(try host.labels, ["gamma"])
-
-        XCTAssertEqual(try host.concatNumbers([30, 40]), [10, 20, 30, 40])
-        XCTAssertEqual(try host.concatLabels(["delta", "epsilon"]), ["gamma", "delta", "epsilon"])
-        XCTAssertEqual(try host.firstLabel([]), "gamma")
-        XCTAssertEqual(try host.firstLabel(["zeta"]), "zeta")
-    }
-
     func testJSNameFunctionAndClass() throws {
         XCTAssertEqual(try _jsWeirdFunction(), 42)
 
@@ -180,39 +127,5 @@ class ImportAPITests: XCTestCase {
 
         let dashed = try StaticBox.with_dashes()
         XCTAssertEqual(try dashed.value(), 7)
-    }
-
-    func testRoundTripNumberArray() throws {
-        let input: [Double] = [1.0, 2.5, 3.0, -4.5]
-        let result = try jsRoundTripNumberArray(input)
-        XCTAssertEqual(result, input)
-        XCTAssertEqual(try jsRoundTripNumberArray([]), [])
-        XCTAssertEqual(try jsRoundTripNumberArray([42.0]), [42.0])
-    }
-
-    func testRoundTripStringArray() throws {
-        let input = ["Hello", "World", "🎉"]
-        let result = try jsRoundTripStringArray(input)
-        XCTAssertEqual(result, input)
-        XCTAssertEqual(try jsRoundTripStringArray([]), [])
-        XCTAssertEqual(try jsRoundTripStringArray(["", "a", ""]), ["", "a", ""])
-    }
-
-    func testRoundTripBoolArray() throws {
-        let input = [true, false, true, false]
-        let result = try jsRoundTripBoolArray(input)
-        XCTAssertEqual(result, input)
-        XCTAssertEqual(try jsRoundTripBoolArray([]), [])
-    }
-
-    func testSumNumberArray() throws {
-        XCTAssertEqual(try jsSumNumberArray([1.0, 2.0, 3.0, 4.0]), 10.0)
-        XCTAssertEqual(try jsSumNumberArray([]), 0.0)
-        XCTAssertEqual(try jsSumNumberArray([42.0]), 42.0)
-    }
-
-    func testCreateNumberArray() throws {
-        let result = try jsCreateNumberArray()
-        XCTAssertEqual(result, [1.0, 2.0, 3.0, 4.0, 5.0])
     }
 }

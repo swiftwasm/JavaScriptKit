@@ -9230,6 +9230,194 @@ fileprivate func _bjs_LeakCheck_wrap_extern(_ pointer: UnsafeMutableRawPointer) 
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsIntArrayLength_static")
+fileprivate func bjs_ArraySupportImports_jsIntArrayLength_static_extern() -> Int32
+#else
+fileprivate func bjs_ArraySupportImports_jsIntArrayLength_static_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsIntArrayLength_static() -> Int32 {
+    return bjs_ArraySupportImports_jsIntArrayLength_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripIntArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripIntArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripIntArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripIntArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripIntArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripNumberArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripNumberArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripNumberArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripNumberArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripNumberArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripStringArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripStringArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripStringArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripStringArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripStringArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripBoolArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripBoolArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripBoolArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripBoolArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripBoolArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripJSValueArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripJSValueArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripJSValueArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripJSValueArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripJSValueArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern(_ v: Int32) -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern(_ v: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static(_ v: Int32) -> Void {
+    return bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsSumNumberArray_static")
+fileprivate func bjs_ArraySupportImports_jsSumNumberArray_static_extern() -> Float64
+#else
+fileprivate func bjs_ArraySupportImports_jsSumNumberArray_static_extern() -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsSumNumberArray_static() -> Float64 {
+    return bjs_ArraySupportImports_jsSumNumberArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsCreateNumberArray_static")
+fileprivate func bjs_ArraySupportImports_jsCreateNumberArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsCreateNumberArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsCreateNumberArray_static() -> Void {
+    return bjs_ArraySupportImports_jsCreateNumberArray_static_extern()
+}
+
+func _$ArraySupportImports_jsIntArrayLength(_ items: [Int]) throws(JSException) -> Int {
+    let _ = items.bridgeJSLowerParameter()
+    let ret = bjs_ArraySupportImports_jsIntArrayLength_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$ArraySupportImports_jsRoundTripIntArray(_ items: [Int]) throws(JSException) -> [Int] {
+    let _ = items.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripIntArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Int].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripNumberArray(_ values: [Double]) throws(JSException) -> [Double] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripNumberArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Double].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripStringArray(_ values: [String]) throws(JSException) -> [String] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripStringArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [String].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripBoolArray(_ values: [Bool]) throws(JSException) -> [Bool] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripBoolArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Bool].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripJSValueArray(_ v: [JSValue]) throws(JSException) -> [JSValue] {
+    let _ = v.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripJSValueArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [JSValue].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripOptionalJSValueArray(_ v: Optional<[JSValue]>) throws(JSException) -> Optional<[JSValue]> {
+    let vIsSome = v.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static(vIsSome)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<[JSValue]>.bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsSumNumberArray(_ values: [Double]) throws(JSException) -> Double {
+    let _ = values.bridgeJSLowerParameter()
+    let ret = bjs_ArraySupportImports_jsSumNumberArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$ArraySupportImports_jsCreateNumberArray() throws(JSException) -> [Double] {
+    bjs_ArraySupportImports_jsCreateNumberArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Double].bridgeJSLiftReturn()
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsApplyVoid_static")
 fileprivate func bjs_ClosureSupportImports_jsApplyVoid_static_extern(_ callback: Int32) -> Void
 #else
@@ -9939,48 +10127,6 @@ func _$jsRoundTripJSValue(_ v: JSValue) throws(JSException) -> JSValue {
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripJSValueArray")
-fileprivate func bjs_jsRoundTripJSValueArray_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripJSValueArray_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripJSValueArray() -> Void {
-    return bjs_jsRoundTripJSValueArray_extern()
-}
-
-func _$jsRoundTripJSValueArray(_ v: [JSValue]) throws(JSException) -> [JSValue] {
-    let _ = v.bridgeJSLowerParameter()
-    bjs_jsRoundTripJSValueArray()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [JSValue].bridgeJSLiftReturn()
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalJSValueArray")
-fileprivate func bjs_jsRoundTripOptionalJSValueArray_extern(_ v: Int32) -> Void
-#else
-fileprivate func bjs_jsRoundTripOptionalJSValueArray_extern(_ v: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripOptionalJSValueArray(_ v: Int32) -> Void {
-    return bjs_jsRoundTripOptionalJSValueArray_extern(v)
-}
-
-func _$jsRoundTripOptionalJSValueArray(_ v: Optional<[JSValue]>) throws(JSException) -> Optional<[JSValue]> {
-    let vIsSome = v.bridgeJSLowerParameter()
-    bjs_jsRoundTripOptionalJSValueArray(vIsSome)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return Optional<[JSValue]>.bridgeJSLiftReturn()
-}
-
-#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsThrowOrVoid")
 fileprivate func bjs_jsThrowOrVoid_extern(_ shouldThrow: Int32) -> Void
 #else
@@ -10122,110 +10268,6 @@ func _$_jsWeirdFunction() throws(JSException) -> Double {
         throw error
     }
     return Double.bridgeJSLiftReturn(ret)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripNumberArray")
-fileprivate func bjs_jsRoundTripNumberArray_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripNumberArray_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripNumberArray() -> Void {
-    return bjs_jsRoundTripNumberArray_extern()
-}
-
-func _$jsRoundTripNumberArray(_ values: [Double]) throws(JSException) -> [Double] {
-    let _ = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripNumberArray()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [Double].bridgeJSLiftReturn()
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripStringArray")
-fileprivate func bjs_jsRoundTripStringArray_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripStringArray_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripStringArray() -> Void {
-    return bjs_jsRoundTripStringArray_extern()
-}
-
-func _$jsRoundTripStringArray(_ values: [String]) throws(JSException) -> [String] {
-    let _ = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripStringArray()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [String].bridgeJSLiftReturn()
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripBoolArray")
-fileprivate func bjs_jsRoundTripBoolArray_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripBoolArray_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripBoolArray() -> Void {
-    return bjs_jsRoundTripBoolArray_extern()
-}
-
-func _$jsRoundTripBoolArray(_ values: [Bool]) throws(JSException) -> [Bool] {
-    let _ = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripBoolArray()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [Bool].bridgeJSLiftReturn()
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsSumNumberArray")
-fileprivate func bjs_jsSumNumberArray_extern() -> Float64
-#else
-fileprivate func bjs_jsSumNumberArray_extern() -> Float64 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsSumNumberArray() -> Float64 {
-    return bjs_jsSumNumberArray_extern()
-}
-
-func _$jsSumNumberArray(_ values: [Double]) throws(JSException) -> Double {
-    let _ = values.bridgeJSLowerParameter()
-    let ret = bjs_jsSumNumberArray()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return Double.bridgeJSLiftReturn(ret)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsCreateNumberArray")
-fileprivate func bjs_jsCreateNumberArray_extern() -> Void
-#else
-fileprivate func bjs_jsCreateNumberArray_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsCreateNumberArray() -> Void {
-    return bjs_jsCreateNumberArray_extern()
-}
-
-func _$jsCreateNumberArray() throws(JSException) -> [Double] {
-    bjs_jsCreateNumberArray()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [Double].bridgeJSLiftReturn()
 }
 
 #if arch(wasm32)
@@ -10732,242 +10774,6 @@ func _$Animal_getIsCat(_ self: JSObject) throws(JSException) -> Bool {
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripIntArray")
-fileprivate func bjs_jsRoundTripIntArray_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripIntArray_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripIntArray() -> Void {
-    return bjs_jsRoundTripIntArray_extern()
-}
-
-func _$jsRoundTripIntArray(_ items: [Int]) throws(JSException) -> [Int] {
-    let _ = items.bridgeJSLowerParameter()
-    bjs_jsRoundTripIntArray()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [Int].bridgeJSLiftReturn()
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsArrayLength")
-fileprivate func bjs_jsArrayLength_extern() -> Int32
-#else
-fileprivate func bjs_jsArrayLength_extern() -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsArrayLength() -> Int32 {
-    return bjs_jsArrayLength_extern()
-}
-
-func _$jsArrayLength(_ items: [Int]) throws(JSException) -> Int {
-    let _ = items.bridgeJSLowerParameter()
-    let ret = bjs_jsArrayLength()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return Int.bridgeJSLiftReturn(ret)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_makeArrayHost")
-fileprivate func bjs_makeArrayHost_extern() -> Int32
-#else
-fileprivate func bjs_makeArrayHost_extern() -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_makeArrayHost() -> Int32 {
-    return bjs_makeArrayHost_extern()
-}
-
-func _$makeArrayHost(_ numbers: [Int], _ labels: [String]) throws(JSException) -> ArrayHost {
-    let _ = labels.bridgeJSLowerParameter()
-    let _ = numbers.bridgeJSLowerParameter()
-    let ret = bjs_makeArrayHost()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return ArrayHost.bridgeJSLiftReturn(ret)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayHost_init")
-fileprivate func bjs_ArrayHost_init_extern() -> Int32
-#else
-fileprivate func bjs_ArrayHost_init_extern() -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_ArrayHost_init() -> Int32 {
-    return bjs_ArrayHost_init_extern()
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayHost_numbers_get")
-fileprivate func bjs_ArrayHost_numbers_get_extern(_ self: Int32) -> Void
-#else
-fileprivate func bjs_ArrayHost_numbers_get_extern(_ self: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_ArrayHost_numbers_get(_ self: Int32) -> Void {
-    return bjs_ArrayHost_numbers_get_extern(self)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayHost_labels_get")
-fileprivate func bjs_ArrayHost_labels_get_extern(_ self: Int32) -> Void
-#else
-fileprivate func bjs_ArrayHost_labels_get_extern(_ self: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_ArrayHost_labels_get(_ self: Int32) -> Void {
-    return bjs_ArrayHost_labels_get_extern(self)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayHost_numbers_set")
-fileprivate func bjs_ArrayHost_numbers_set_extern(_ self: Int32) -> Void
-#else
-fileprivate func bjs_ArrayHost_numbers_set_extern(_ self: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_ArrayHost_numbers_set(_ self: Int32) -> Void {
-    return bjs_ArrayHost_numbers_set_extern(self)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayHost_labels_set")
-fileprivate func bjs_ArrayHost_labels_set_extern(_ self: Int32) -> Void
-#else
-fileprivate func bjs_ArrayHost_labels_set_extern(_ self: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_ArrayHost_labels_set(_ self: Int32) -> Void {
-    return bjs_ArrayHost_labels_set_extern(self)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayHost_concatNumbers")
-fileprivate func bjs_ArrayHost_concatNumbers_extern(_ self: Int32) -> Void
-#else
-fileprivate func bjs_ArrayHost_concatNumbers_extern(_ self: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_ArrayHost_concatNumbers(_ self: Int32) -> Void {
-    return bjs_ArrayHost_concatNumbers_extern(self)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayHost_concatLabels")
-fileprivate func bjs_ArrayHost_concatLabels_extern(_ self: Int32) -> Void
-#else
-fileprivate func bjs_ArrayHost_concatLabels_extern(_ self: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_ArrayHost_concatLabels(_ self: Int32) -> Void {
-    return bjs_ArrayHost_concatLabels_extern(self)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayHost_firstLabel")
-fileprivate func bjs_ArrayHost_firstLabel_extern(_ self: Int32) -> Int32
-#else
-fileprivate func bjs_ArrayHost_firstLabel_extern(_ self: Int32) -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_ArrayHost_firstLabel(_ self: Int32) -> Int32 {
-    return bjs_ArrayHost_firstLabel_extern(self)
-}
-
-func _$ArrayHost_init(_ numbers: [Int], _ labels: [String]) throws(JSException) -> JSObject {
-    let _ = labels.bridgeJSLowerParameter()
-    let _ = numbers.bridgeJSLowerParameter()
-    let ret = bjs_ArrayHost_init()
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return JSObject.bridgeJSLiftReturn(ret)
-}
-
-func _$ArrayHost_numbers_get(_ self: JSObject) throws(JSException) -> [Int] {
-    let selfValue = self.bridgeJSLowerParameter()
-    bjs_ArrayHost_numbers_get(selfValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [Int].bridgeJSLiftReturn()
-}
-
-func _$ArrayHost_labels_get(_ self: JSObject) throws(JSException) -> [String] {
-    let selfValue = self.bridgeJSLowerParameter()
-    bjs_ArrayHost_labels_get(selfValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [String].bridgeJSLiftReturn()
-}
-
-func _$ArrayHost_numbers_set(_ self: JSObject, _ newValue: [Int]) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
-    let _ = newValue.bridgeJSLowerParameter()
-    bjs_ArrayHost_numbers_set(selfValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-}
-
-func _$ArrayHost_labels_set(_ self: JSObject, _ newValue: [String]) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
-    let _ = newValue.bridgeJSLowerParameter()
-    bjs_ArrayHost_labels_set(selfValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-}
-
-func _$ArrayHost_concatNumbers(_ self: JSObject, _ values: [Int]) throws(JSException) -> [Int] {
-    let selfValue = self.bridgeJSLowerParameter()
-    let _ = values.bridgeJSLowerParameter()
-    bjs_ArrayHost_concatNumbers(selfValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [Int].bridgeJSLiftReturn()
-}
-
-func _$ArrayHost_concatLabels(_ self: JSObject, _ values: [String]) throws(JSException) -> [String] {
-    let selfValue = self.bridgeJSLowerParameter()
-    let _ = values.bridgeJSLowerParameter()
-    bjs_ArrayHost_concatLabels(selfValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return [String].bridgeJSLiftReturn()
-}
-
-func _$ArrayHost_firstLabel(_ self: JSObject, _ values: [String]) throws(JSException) -> String {
-    let selfValue = self.bridgeJSLowerParameter()
-    let _ = values.bridgeJSLowerParameter()
-    let ret = bjs_ArrayHost_firstLabel(selfValue)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return String.bridgeJSLiftReturn(ret)
-}
-
-#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsTranslatePoint")
 fileprivate func bjs_jsTranslatePoint_extern(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32
 #else
@@ -10988,6 +10794,200 @@ func _$jsTranslatePoint(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException
         throw error
     }
     return Point.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSClassWithArrayMembers_init")
+fileprivate func bjs_JSClassWithArrayMembers_init_extern() -> Int32
+#else
+fileprivate func bjs_JSClassWithArrayMembers_init_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSClassWithArrayMembers_init() -> Int32 {
+    return bjs_JSClassWithArrayMembers_init_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSClassWithArrayMembers_numbers_get")
+fileprivate func bjs_JSClassWithArrayMembers_numbers_get_extern(_ self: Int32) -> Void
+#else
+fileprivate func bjs_JSClassWithArrayMembers_numbers_get_extern(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSClassWithArrayMembers_numbers_get(_ self: Int32) -> Void {
+    return bjs_JSClassWithArrayMembers_numbers_get_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSClassWithArrayMembers_labels_get")
+fileprivate func bjs_JSClassWithArrayMembers_labels_get_extern(_ self: Int32) -> Void
+#else
+fileprivate func bjs_JSClassWithArrayMembers_labels_get_extern(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSClassWithArrayMembers_labels_get(_ self: Int32) -> Void {
+    return bjs_JSClassWithArrayMembers_labels_get_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSClassWithArrayMembers_numbers_set")
+fileprivate func bjs_JSClassWithArrayMembers_numbers_set_extern(_ self: Int32) -> Void
+#else
+fileprivate func bjs_JSClassWithArrayMembers_numbers_set_extern(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSClassWithArrayMembers_numbers_set(_ self: Int32) -> Void {
+    return bjs_JSClassWithArrayMembers_numbers_set_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSClassWithArrayMembers_labels_set")
+fileprivate func bjs_JSClassWithArrayMembers_labels_set_extern(_ self: Int32) -> Void
+#else
+fileprivate func bjs_JSClassWithArrayMembers_labels_set_extern(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSClassWithArrayMembers_labels_set(_ self: Int32) -> Void {
+    return bjs_JSClassWithArrayMembers_labels_set_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSClassWithArrayMembers_concatNumbers")
+fileprivate func bjs_JSClassWithArrayMembers_concatNumbers_extern(_ self: Int32) -> Void
+#else
+fileprivate func bjs_JSClassWithArrayMembers_concatNumbers_extern(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSClassWithArrayMembers_concatNumbers(_ self: Int32) -> Void {
+    return bjs_JSClassWithArrayMembers_concatNumbers_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSClassWithArrayMembers_concatLabels")
+fileprivate func bjs_JSClassWithArrayMembers_concatLabels_extern(_ self: Int32) -> Void
+#else
+fileprivate func bjs_JSClassWithArrayMembers_concatLabels_extern(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSClassWithArrayMembers_concatLabels(_ self: Int32) -> Void {
+    return bjs_JSClassWithArrayMembers_concatLabels_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSClassWithArrayMembers_firstLabel")
+fileprivate func bjs_JSClassWithArrayMembers_firstLabel_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_JSClassWithArrayMembers_firstLabel_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSClassWithArrayMembers_firstLabel(_ self: Int32) -> Int32 {
+    return bjs_JSClassWithArrayMembers_firstLabel_extern(self)
+}
+
+func _$JSClassWithArrayMembers_init(_ numbers: [Int], _ labels: [String]) throws(JSException) -> JSObject {
+    let _ = labels.bridgeJSLowerParameter()
+    let _ = numbers.bridgeJSLowerParameter()
+    let ret = bjs_JSClassWithArrayMembers_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$JSClassWithArrayMembers_numbers_get(_ self: JSObject) throws(JSException) -> [Int] {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_JSClassWithArrayMembers_numbers_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Int].bridgeJSLiftReturn()
+}
+
+func _$JSClassWithArrayMembers_labels_get(_ self: JSObject) throws(JSException) -> [String] {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_JSClassWithArrayMembers_labels_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [String].bridgeJSLiftReturn()
+}
+
+func _$JSClassWithArrayMembers_numbers_set(_ self: JSObject, _ newValue: [Int]) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let _ = newValue.bridgeJSLowerParameter()
+    bjs_JSClassWithArrayMembers_numbers_set(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$JSClassWithArrayMembers_labels_set(_ self: JSObject, _ newValue: [String]) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let _ = newValue.bridgeJSLowerParameter()
+    bjs_JSClassWithArrayMembers_labels_set(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$JSClassWithArrayMembers_concatNumbers(_ self: JSObject, _ values: [Int]) throws(JSException) -> [Int] {
+    let selfValue = self.bridgeJSLowerParameter()
+    let _ = values.bridgeJSLowerParameter()
+    bjs_JSClassWithArrayMembers_concatNumbers(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Int].bridgeJSLiftReturn()
+}
+
+func _$JSClassWithArrayMembers_concatLabels(_ self: JSObject, _ values: [String]) throws(JSException) -> [String] {
+    let selfValue = self.bridgeJSLowerParameter()
+    let _ = values.bridgeJSLowerParameter()
+    bjs_JSClassWithArrayMembers_concatLabels(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [String].bridgeJSLiftReturn()
+}
+
+func _$JSClassWithArrayMembers_firstLabel(_ self: JSObject, _ values: [String]) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let _ = values.bridgeJSLowerParameter()
+    let ret = bjs_JSClassWithArrayMembers_firstLabel(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSClassSupportImports_makeJSClassWithArrayMembers_static")
+fileprivate func bjs_JSClassSupportImports_makeJSClassWithArrayMembers_static_extern() -> Int32
+#else
+fileprivate func bjs_JSClassSupportImports_makeJSClassWithArrayMembers_static_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSClassSupportImports_makeJSClassWithArrayMembers_static() -> Int32 {
+    return bjs_JSClassSupportImports_makeJSClassWithArrayMembers_static_extern()
+}
+
+func _$JSClassSupportImports_makeJSClassWithArrayMembers(_ numbers: [Int], _ labels: [String]) throws(JSException) -> JSClassWithArrayMembers {
+    let _ = labels.bridgeJSLowerParameter()
+    let _ = numbers.bridgeJSLowerParameter()
+    let ret = bjs_JSClassSupportImports_makeJSClassWithArrayMembers_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSClassWithArrayMembers.bridgeJSLiftReturn(ret)
 }
 
 #if arch(wasm32)
