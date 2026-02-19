@@ -4,6 +4,8 @@ import JavaScriptKit
 @JSClass struct SwiftClassSupportImports {
     @JSFunction static func jsRoundTripGreeter(_ greeter: Greeter) throws(JSException) -> Greeter
     @JSFunction static func jsRoundTripOptionalGreeter(_ greeter: Greeter?) throws(JSException) -> Greeter?
+    @JSFunction static func jsConsumeLeakCheck(_ value: LeakCheck) throws(JSException) -> Void
+    @JSFunction static func jsConsumeOptionalLeakCheck(_ value: LeakCheck?) throws(JSException) -> Void
 }
 
 @JSFunction(from: .global) func gc() throws(JSException) -> Void
@@ -56,5 +58,40 @@ final class SwiftClassSupportTests: XCTestCase {
         }
         // Here, the greeter should be deallocated
         XCTAssertNil(weakGreeter)
+    }
+
+    func testJSReleaseDoesNotOverReleaseHeapObject() throws {
+        LeakCheck.deinits = 0
+        var obj: LeakCheck? = LeakCheck()
+
+        try SwiftClassSupportImports.jsConsumeLeakCheck(obj!)
+        XCTAssertEqual(LeakCheck.deinits, 0)
+
+        obj = nil
+        XCTAssertEqual(LeakCheck.deinits, 1)
+    }
+
+    func testJSReleaseOptionalDoesNotOverReleaseHeapObject() throws {
+        LeakCheck.deinits = 0
+
+        try SwiftClassSupportImports.jsConsumeOptionalLeakCheck(nil)
+        XCTAssertEqual(LeakCheck.deinits, 0)
+
+        var obj: LeakCheck? = LeakCheck()
+        try SwiftClassSupportImports.jsConsumeOptionalLeakCheck(obj)
+        XCTAssertEqual(LeakCheck.deinits, 0)
+
+        obj = nil
+        XCTAssertEqual(LeakCheck.deinits, 1)
+    }
+}
+
+@JS public class LeakCheck {
+    nonisolated(unsafe) public static var deinits: Int = 0
+
+    @JS public init() {}
+
+    deinit {
+        Self.deinits += 1
     }
 }

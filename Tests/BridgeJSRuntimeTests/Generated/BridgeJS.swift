@@ -9190,6 +9190,45 @@ fileprivate func _bjs_Container_wrap_extern(_ pointer: UnsafeMutableRawPointer) 
     return _bjs_Container_wrap_extern(pointer)
 }
 
+@_expose(wasm, "bjs_LeakCheck_init")
+@_cdecl("bjs_LeakCheck_init")
+public func _bjs_LeakCheck_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = LeakCheck()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_LeakCheck_deinit")
+@_cdecl("bjs_LeakCheck_deinit")
+public func _bjs_LeakCheck_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<LeakCheck>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension LeakCheck: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    public var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_LeakCheck_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_LeakCheck_wrap")
+fileprivate func _bjs_LeakCheck_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_LeakCheck_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_LeakCheck_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_LeakCheck_wrap_extern(pointer)
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsApplyVoid_static")
 fileprivate func bjs_ClosureSupportImports_jsApplyVoid_static_extern(_ callback: Int32) -> Void
@@ -11252,6 +11291,30 @@ fileprivate func bjs_SwiftClassSupportImports_jsRoundTripOptionalGreeter_static_
     return bjs_SwiftClassSupportImports_jsRoundTripOptionalGreeter_static_extern(greeterIsSome, greeterPointer)
 }
 
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SwiftClassSupportImports_jsConsumeLeakCheck_static")
+fileprivate func bjs_SwiftClassSupportImports_jsConsumeLeakCheck_static_extern(_ value: UnsafeMutableRawPointer) -> Void
+#else
+fileprivate func bjs_SwiftClassSupportImports_jsConsumeLeakCheck_static_extern(_ value: UnsafeMutableRawPointer) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SwiftClassSupportImports_jsConsumeLeakCheck_static(_ value: UnsafeMutableRawPointer) -> Void {
+    return bjs_SwiftClassSupportImports_jsConsumeLeakCheck_static_extern(value)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SwiftClassSupportImports_jsConsumeOptionalLeakCheck_static")
+fileprivate func bjs_SwiftClassSupportImports_jsConsumeOptionalLeakCheck_static_extern(_ valueIsSome: Int32, _ valuePointer: UnsafeMutableRawPointer) -> Void
+#else
+fileprivate func bjs_SwiftClassSupportImports_jsConsumeOptionalLeakCheck_static_extern(_ valueIsSome: Int32, _ valuePointer: UnsafeMutableRawPointer) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SwiftClassSupportImports_jsConsumeOptionalLeakCheck_static(_ valueIsSome: Int32, _ valuePointer: UnsafeMutableRawPointer) -> Void {
+    return bjs_SwiftClassSupportImports_jsConsumeOptionalLeakCheck_static_extern(valueIsSome, valuePointer)
+}
+
 func _$SwiftClassSupportImports_jsRoundTripGreeter(_ greeter: Greeter) throws(JSException) -> Greeter {
     let greeterPointer = greeter.bridgeJSLowerParameter()
     let ret = bjs_SwiftClassSupportImports_jsRoundTripGreeter_static(greeterPointer)
@@ -11268,4 +11331,20 @@ func _$SwiftClassSupportImports_jsRoundTripOptionalGreeter(_ greeter: Optional<G
         throw error
     }
     return Optional<Greeter>.bridgeJSLiftReturn(ret)
+}
+
+func _$SwiftClassSupportImports_jsConsumeLeakCheck(_ value: LeakCheck) throws(JSException) -> Void {
+    let valuePointer = value.bridgeJSLowerParameter()
+    bjs_SwiftClassSupportImports_jsConsumeLeakCheck_static(valuePointer)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$SwiftClassSupportImports_jsConsumeOptionalLeakCheck(_ value: Optional<LeakCheck>) throws(JSException) -> Void {
+    let (valueIsSome, valuePointer) = value.bridgeJSLowerParameter()
+    bjs_SwiftClassSupportImports_jsConsumeOptionalLeakCheck_static(valueIsSome, valuePointer)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }

@@ -3626,6 +3626,28 @@
           }
         ],
         "swiftCallName" : "Container"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_LeakCheck_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "explicitAccessControl" : "public",
+        "methods" : [
+
+        ],
+        "name" : "LeakCheck",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "LeakCheck"
       }
     ],
     "enums" : [
@@ -15641,6 +15663,47 @@
                       }
                     },
                     "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "jsConsumeLeakCheck",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "swiftHeapObject" : {
+                        "_0" : "LeakCheck"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsConsumeOptionalLeakCheck",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "swiftHeapObject" : {
+                            "_0" : "LeakCheck"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
                   }
                 }
               }

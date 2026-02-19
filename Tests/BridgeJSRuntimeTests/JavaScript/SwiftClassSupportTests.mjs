@@ -9,5 +9,14 @@ export function getImports(importsContext) {
         jsRoundTripOptionalGreeter: (greeter) => {
             return greeter;
         },
+        jsConsumeLeakCheck: (value) => {
+            // Explicitly release on JS side to mimic user cleanup.
+            value.release();
+        },
+        jsConsumeOptionalLeakCheck: (value) => {
+            if (value) {
+                value.release();
+            }
+        },
     };
 }
