@@ -1219,7 +1219,8 @@ public struct BridgeJSLink {
                 loweringFragment.parameters.count == 1,
                 "Lowering fragment should have exactly one parameter to lower"
             )
-            let loweredValues = try loweringFragment.printCode([param.name], context)
+            let paramName = scope.variable(param.name)
+            let loweredValues = try loweringFragment.printCode([paramName], context)
             parameterForwardings.append(contentsOf: loweredValues)
         }
 

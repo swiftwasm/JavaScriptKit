@@ -90,11 +90,6 @@ final class JSGlueVariableScope {
         JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
     }
 
-    fileprivate func reserveNames(_ names: [String]) {
-        for name in names {
-            variables.insert(name)
-        }
-    }
 }
 
 extension JSGlueVariableScope {
@@ -738,7 +733,6 @@ struct IntrinsicJSFragment: Sendable {
             printCode: { arguments, context in
                 let (scope, printer) = (context.scope, context.printer)
                 let value = arguments[0]
-                scope.reserveNames(arguments)
                 let isSomeVar = scope.variable("isSome")
                 printer.write("const \(isSomeVar) = \(kind.presenceCheck(value: value));")
 
