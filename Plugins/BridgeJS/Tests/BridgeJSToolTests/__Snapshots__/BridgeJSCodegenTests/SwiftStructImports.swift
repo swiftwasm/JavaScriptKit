@@ -24,30 +24,39 @@ extension Point: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Point")
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Point_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Point_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Point_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Point")
-fileprivate func _bjs_struct_lift_Point() -> Int32
+fileprivate func _bjs_struct_lift_Point_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Point() -> Int32 {
+fileprivate func _bjs_struct_lift_Point_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Point() -> Int32 {
+    return _bjs_struct_lift_Point_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_translate")
-fileprivate func bjs_translate(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32
+fileprivate func bjs_translate_extern(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32
 #else
-fileprivate func bjs_translate(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32 {
+fileprivate func bjs_translate_extern(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_translate(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32 {
+    return bjs_translate_extern(point, dx, dy)
+}
 
 func _$translate(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException) -> Point {
     let pointObjectId = point.bridgeJSLowerParameter()

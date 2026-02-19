@@ -55,12 +55,15 @@ public func _bjs_checkBool() -> Int32 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_checkNumber")
-fileprivate func bjs_checkNumber() -> Float64
+fileprivate func bjs_checkNumber_extern() -> Float64
 #else
-fileprivate func bjs_checkNumber() -> Float64 {
+fileprivate func bjs_checkNumber_extern() -> Float64 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_checkNumber() -> Float64 {
+    return bjs_checkNumber_extern()
+}
 
 func _$checkNumber() throws(JSException) -> Double {
     let ret = bjs_checkNumber()
@@ -72,12 +75,15 @@ func _$checkNumber() throws(JSException) -> Double {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_checkBoolean")
-fileprivate func bjs_checkBoolean() -> Int32
+fileprivate func bjs_checkBoolean_extern() -> Int32
 #else
-fileprivate func bjs_checkBoolean() -> Int32 {
+fileprivate func bjs_checkBoolean_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_checkBoolean() -> Int32 {
+    return bjs_checkBoolean_extern()
+}
 
 func _$checkBoolean() throws(JSException) -> Bool {
     let ret = bjs_checkBoolean()

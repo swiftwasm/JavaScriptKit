@@ -1,20 +1,26 @@
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModule10HttpStatusO_10HttpStatusO")
-fileprivate func invoke_js_callback_TestModule_10TestModule10HttpStatusO_10HttpStatusO(_ callback: Int32, _ param0: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModule10HttpStatusO_10HttpStatusO_extern(_ callback: Int32, _ param0: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModule10HttpStatusO_10HttpStatusO(_ callback: Int32, _ param0: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModule10HttpStatusO_10HttpStatusO_extern(_ callback: Int32, _ param0: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModule10HttpStatusO_10HttpStatusO(_ callback: Int32, _ param0: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModule10HttpStatusO_10HttpStatusO_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO")
-fileprivate func make_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModule10HttpStatusO_10HttpStatusO {
     static func bridgeJSLift(_ callbackId: Int32) -> (HttpStatus) -> HttpStatus {
@@ -57,21 +63,27 @@ public func _invoke_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpSta
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO")
-fileprivate func invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO(_ callback: Int32, _ param0: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO_extern(_ callback: Int32, _ param0: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO(_ callback: Int32, _ param0: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO_extern(_ callback: Int32, _ param0: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO(_ callback: Int32, _ param0: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO")
-fileprivate func make_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModule5ThemeO_5ThemeO {
     static func bridgeJSLift(_ callbackId: Int32) -> (Theme) -> Theme {
@@ -114,21 +126,27 @@ public func _invoke_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO(_ boxPt
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC")
-fileprivate func invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC(_ callback: Int32, _ param0: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
+fileprivate func invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC_extern(_ callback: Int32, _ param0: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC(_ callback: Int32, _ param0: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+fileprivate func invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC_extern(_ callback: Int32, _ param0: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC(_ callback: Int32, _ param0: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    return invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModule6PersonC_6PersonC")
-fileprivate func make_swift_closure_TestModule_10TestModule6PersonC_6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModule6PersonC_6PersonC_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModule6PersonC_6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModule6PersonC_6PersonC_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModule6PersonC_6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModule6PersonC_6PersonC_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModule6PersonC_6PersonC {
     static func bridgeJSLift(_ callbackId: Int32) -> (Person) -> Person {
@@ -171,21 +189,27 @@ public func _invoke_swift_closure_TestModule_10TestModule6PersonC_6PersonC(_ box
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModule9APIResultO_9APIResultO")
-fileprivate func invoke_js_callback_TestModule_10TestModule9APIResultO_9APIResultO(_ callback: Int32, _ param0: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModule9APIResultO_9APIResultO_extern(_ callback: Int32, _ param0: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModule9APIResultO_9APIResultO(_ callback: Int32, _ param0: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModule9APIResultO_9APIResultO_extern(_ callback: Int32, _ param0: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModule9APIResultO_9APIResultO(_ callback: Int32, _ param0: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModule9APIResultO_9APIResultO_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO")
-fileprivate func make_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModule9APIResultO_9APIResultO {
     static func bridgeJSLift(_ callbackId: Int32) -> (APIResult) -> APIResult {
@@ -228,21 +252,27 @@ public func _invoke_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModule9DirectionO_9DirectionO")
-fileprivate func invoke_js_callback_TestModule_10TestModule9DirectionO_9DirectionO(_ callback: Int32, _ param0: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModule9DirectionO_9DirectionO_extern(_ callback: Int32, _ param0: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModule9DirectionO_9DirectionO(_ callback: Int32, _ param0: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModule9DirectionO_9DirectionO_extern(_ callback: Int32, _ param0: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModule9DirectionO_9DirectionO(_ callback: Int32, _ param0: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModule9DirectionO_9DirectionO_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO")
-fileprivate func make_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModule9DirectionO_9DirectionO {
     static func bridgeJSLift(_ callbackId: Int32) -> (Direction) -> Direction {
@@ -285,21 +315,27 @@ public func _invoke_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSS_SS")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSS_SS(_ callback: Int32, _ param0: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModuleSS_SS_extern(_ callback: Int32, _ param0: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSS_SS(_ callback: Int32, _ param0: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSS_SS_extern(_ callback: Int32, _ param0: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSS_SS(_ callback: Int32, _ param0: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModuleSS_SS_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSS_SS")
-fileprivate func make_swift_closure_TestModule_10TestModuleSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSS_SS_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSS_SS_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSS_SS_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSS_SS {
     static func bridgeJSLift(_ callbackId: Int32) -> (String) -> String {
@@ -342,21 +378,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSS_SS(_ boxPtr: UnsafeM
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSb_Sb")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSb_Sb(_ callback: Int32, _ param0: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModuleSb_Sb_extern(_ callback: Int32, _ param0: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSb_Sb(_ callback: Int32, _ param0: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSb_Sb_extern(_ callback: Int32, _ param0: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSb_Sb(_ callback: Int32, _ param0: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModuleSb_Sb_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSb_Sb")
-fileprivate func make_swift_closure_TestModule_10TestModuleSb_Sb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSb_Sb_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSb_Sb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSb_Sb_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSb_Sb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSb_Sb_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSb_Sb {
     static func bridgeJSLift(_ callbackId: Int32) -> (Bool) -> Bool {
@@ -399,21 +441,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSb_Sb(_ boxPtr: UnsafeM
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSd_Sd")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSd_Sd(_ callback: Int32, _ param0: Float64) -> Float64
+fileprivate func invoke_js_callback_TestModule_10TestModuleSd_Sd_extern(_ callback: Int32, _ param0: Float64) -> Float64
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSd_Sd(_ callback: Int32, _ param0: Float64) -> Float64 {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSd_Sd_extern(_ callback: Int32, _ param0: Float64) -> Float64 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSd_Sd(_ callback: Int32, _ param0: Float64) -> Float64 {
+    return invoke_js_callback_TestModule_10TestModuleSd_Sd_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSd_Sd")
-fileprivate func make_swift_closure_TestModule_10TestModuleSd_Sd(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSd_Sd_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSd_Sd(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSd_Sd_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSd_Sd(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSd_Sd_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSd_Sd {
     static func bridgeJSLift(_ callbackId: Int32) -> (Double) -> Double {
@@ -456,21 +504,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSd_Sd(_ boxPtr: UnsafeM
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSf_Sf")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSf_Sf(_ callback: Int32, _ param0: Float32) -> Float32
+fileprivate func invoke_js_callback_TestModule_10TestModuleSf_Sf_extern(_ callback: Int32, _ param0: Float32) -> Float32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSf_Sf(_ callback: Int32, _ param0: Float32) -> Float32 {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSf_Sf_extern(_ callback: Int32, _ param0: Float32) -> Float32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSf_Sf(_ callback: Int32, _ param0: Float32) -> Float32 {
+    return invoke_js_callback_TestModule_10TestModuleSf_Sf_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSf_Sf")
-fileprivate func make_swift_closure_TestModule_10TestModuleSf_Sf(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSf_Sf_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSf_Sf(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSf_Sf_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSf_Sf(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSf_Sf_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSf_Sf {
     static func bridgeJSLift(_ callbackId: Int32) -> (Float) -> Float {
@@ -513,21 +567,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSf_Sf(_ boxPtr: UnsafeM
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSi_Si")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSi_Si(_ callback: Int32, _ param0: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModuleSi_Si_extern(_ callback: Int32, _ param0: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSi_Si(_ callback: Int32, _ param0: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSi_Si_extern(_ callback: Int32, _ param0: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSi_Si(_ callback: Int32, _ param0: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModuleSi_Si_extern(callback, param0)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSi_Si")
-fileprivate func make_swift_closure_TestModule_10TestModuleSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSi_Si_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSi_Si_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSi_Si_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSi_Si {
     static func bridgeJSLift(_ callbackId: Int32) -> (Int) -> Int {
@@ -570,21 +630,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSi_Si(_ boxPtr: UnsafeM
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    return invoke_js_callback_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO_extern(callback, param0IsSome, param0Value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO")
-fileprivate func make_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSq10HttpStatusO_Sq10HttpStatusO {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<HttpStatus>) -> Optional<HttpStatus> {
@@ -627,21 +693,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10Htt
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    return invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO_extern(callback, param0IsSome, param0Value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO")
-fileprivate func make_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSq5ThemeO_Sq5ThemeO {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Theme>) -> Optional<Theme> {
@@ -684,21 +756,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(_ b
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_ callback: Int32, _ param0IsSome: Int32, _ param0Pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_ callback: Int32, _ param0IsSome: Int32, _ param0Pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_ callback: Int32, _ param0IsSome: Int32, _ param0Pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    return invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC_extern(callback, param0IsSome, param0Pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC")
-fileprivate func make_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSq6PersonC_Sq6PersonC {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Person>) -> Optional<Person> {
@@ -741,21 +819,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO_extern(callback, param0IsSome, param0CaseId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO")
-fileprivate func make_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSq9APIResultO_Sq9APIResultO {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<APIResult>) -> Optional<APIResult> {
@@ -798,21 +882,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIRes
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO_extern(callback, param0IsSome, param0Value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO")
-fileprivate func make_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSq9DirectionO_Sq9DirectionO {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Direction>) -> Optional<Direction> {
@@ -855,21 +945,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9Direct
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSqSS_SqSS")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSS_SqSS(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSS_SqSS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSS_SqSS(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSS_SqSS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSqSS_SqSS(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    return invoke_js_callback_TestModule_10TestModuleSqSS_SqSS_extern(callback, param0IsSome, param0Value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSqSS_SqSS")
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSS_SqSS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSS_SqSS_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSS_SqSS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSS_SqSS_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSqSS_SqSS(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSqSS_SqSS_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSqSS_SqSS {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<String>) -> Optional<String> {
@@ -912,21 +1008,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSqSS_SqSS(_ boxPtr: Uns
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSqSb_SqSb")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSb_SqSb(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSb_SqSb_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSb_SqSb(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32 {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSb_SqSb_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSqSb_SqSb(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32 {
+    return invoke_js_callback_TestModule_10TestModuleSqSb_SqSb_extern(callback, param0IsSome, param0Value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSqSb_SqSb")
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSb_SqSb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSb_SqSb_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSb_SqSb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSb_SqSb_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSqSb_SqSb(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSqSb_SqSb_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSqSb_SqSb {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Bool>) -> Optional<Bool> {
@@ -969,21 +1071,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSqSb_SqSb(_ boxPtr: Uns
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSqSd_SqSd")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSd_SqSd(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float64) -> Void
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSd_SqSd_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float64) -> Void
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSd_SqSd(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float64) -> Void {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSd_SqSd_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSqSd_SqSd(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float64) -> Void {
+    return invoke_js_callback_TestModule_10TestModuleSqSd_SqSd_extern(callback, param0IsSome, param0Value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSqSd_SqSd")
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSd_SqSd(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSd_SqSd_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSd_SqSd(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSd_SqSd_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSqSd_SqSd(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSqSd_SqSd_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSqSd_SqSd {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Double>) -> Optional<Double> {
@@ -1026,21 +1134,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSqSd_SqSd(_ boxPtr: Uns
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSqSf_SqSf")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSf_SqSf(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float32) -> Void
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSf_SqSf_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float32) -> Void
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSf_SqSf(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float32) -> Void {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSf_SqSf_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSqSf_SqSf(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Float32) -> Void {
+    return invoke_js_callback_TestModule_10TestModuleSqSf_SqSf_extern(callback, param0IsSome, param0Value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSqSf_SqSf")
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSf_SqSf(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSf_SqSf_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSf_SqSf(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSf_SqSf_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSqSf_SqSf(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSqSf_SqSf_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSqSf_SqSf {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Float>) -> Optional<Float> {
@@ -1083,21 +1197,27 @@ public func _invoke_swift_closure_TestModule_10TestModuleSqSf_SqSf(_ boxPtr: Uns
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSqSi_SqSi")
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSi_SqSi(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSi_SqSi_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModuleSqSi_SqSi(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+fileprivate func invoke_js_callback_TestModule_10TestModuleSqSi_SqSi_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSqSi_SqSi(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    return invoke_js_callback_TestModule_10TestModuleSqSi_SqSi_extern(callback, param0IsSome, param0Value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSqSi_SqSi")
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSi_SqSi(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSi_SqSi_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
 #else
-fileprivate func make_swift_closure_TestModule_10TestModuleSqSi_SqSi(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+fileprivate func make_swift_closure_TestModule_10TestModuleSqSi_SqSi_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSqSi_SqSi(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSqSi_SqSi_extern(boxPtr, file, line)
+}
 
 private enum _BJS_Closure_10TestModuleSqSi_SqSi {
     static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Int>) -> Optional<Int> {
@@ -1490,12 +1610,15 @@ extension Person: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Person_wrap")
-fileprivate func _bjs_Person_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_Person_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_Person_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Person_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_Person_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Person_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_TestProcessor_init")
 @_cdecl("bjs_TestProcessor_init")
@@ -1526,9 +1649,12 @@ extension TestProcessor: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_TestProcessor_wrap")
-fileprivate func _bjs_TestProcessor_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_TestProcessor_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_TestProcessor_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_TestProcessor_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_TestProcessor_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_TestProcessor_wrap_extern(pointer)
+}

@@ -453,12 +453,15 @@ public func _bjs_validateSession(_ session: Int32) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_takesFeatureFlag")
-fileprivate func bjs_takesFeatureFlag(_ flag: Int32) -> Void
+fileprivate func bjs_takesFeatureFlag_extern(_ flag: Int32) -> Void
 #else
-fileprivate func bjs_takesFeatureFlag(_ flag: Int32) -> Void {
+fileprivate func bjs_takesFeatureFlag_extern(_ flag: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_takesFeatureFlag(_ flag: Int32) -> Void {
+    return bjs_takesFeatureFlag_extern(flag)
+}
 
 func _$takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void {
     let flagValue = flag.bridgeJSLowerParameter()
@@ -470,12 +473,15 @@ func _$takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_returnsFeatureFlag")
-fileprivate func bjs_returnsFeatureFlag() -> Int32
+fileprivate func bjs_returnsFeatureFlag_extern() -> Int32
 #else
-fileprivate func bjs_returnsFeatureFlag() -> Int32 {
+fileprivate func bjs_returnsFeatureFlag_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_returnsFeatureFlag() -> Int32 {
+    return bjs_returnsFeatureFlag_extern()
+}
 
 func _$returnsFeatureFlag() throws(JSException) -> FeatureFlag {
     let ret = bjs_returnsFeatureFlag()

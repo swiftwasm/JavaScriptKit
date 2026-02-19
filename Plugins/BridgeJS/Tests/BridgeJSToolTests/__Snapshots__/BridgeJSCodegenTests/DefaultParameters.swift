@@ -65,21 +65,27 @@ extension Config: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Config")
-fileprivate func _bjs_struct_lower_Config(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Config_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Config(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Config_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Config(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Config_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Config")
-fileprivate func _bjs_struct_lift_Config() -> Int32
+fileprivate func _bjs_struct_lift_Config_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Config() -> Int32 {
+fileprivate func _bjs_struct_lift_Config_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Config() -> Int32 {
+    return _bjs_struct_lift_Config_extern()
+}
 
 extension MathOperations: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> MathOperations {
@@ -105,21 +111,27 @@ extension MathOperations: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_MathOperations")
-fileprivate func _bjs_struct_lower_MathOperations(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_MathOperations_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_MathOperations(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_MathOperations_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_MathOperations(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_MathOperations_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_MathOperations")
-fileprivate func _bjs_struct_lift_MathOperations() -> Int32
+fileprivate func _bjs_struct_lift_MathOperations_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_MathOperations() -> Int32 {
+fileprivate func _bjs_struct_lift_MathOperations_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_MathOperations() -> Int32 {
+    return _bjs_struct_lift_MathOperations_extern()
+}
 
 @_expose(wasm, "bjs_MathOperations_init")
 @_cdecl("bjs_MathOperations_init")
@@ -424,12 +436,15 @@ extension DefaultGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_DefaultGreeter_wrap")
-fileprivate func _bjs_DefaultGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_DefaultGreeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_DefaultGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_DefaultGreeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_DefaultGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_DefaultGreeter_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_EmptyGreeter_init")
 @_cdecl("bjs_EmptyGreeter_init")
@@ -460,12 +475,15 @@ extension EmptyGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_EmptyGreeter_wrap")
-fileprivate func _bjs_EmptyGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_EmptyGreeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_EmptyGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_EmptyGreeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_EmptyGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_EmptyGreeter_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_ConstructorDefaults_init")
 @_cdecl("bjs_ConstructorDefaults_init")
@@ -601,9 +619,12 @@ extension ConstructorDefaults: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_ConstructorDefaults_wrap")
-fileprivate func _bjs_ConstructorDefaults_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ConstructorDefaults_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ConstructorDefaults_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ConstructorDefaults_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_ConstructorDefaults_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ConstructorDefaults_wrap_extern(pointer)
+}

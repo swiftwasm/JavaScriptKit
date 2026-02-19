@@ -215,12 +215,15 @@ extension GlobalNetworking.API.TestHTTPServer: ConvertibleToJSValue, _BridgedSwi
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSGlobalTests", name: "bjs_TestHTTPServer_wrap")
-fileprivate func _bjs_TestHTTPServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_TestHTTPServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_TestHTTPServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_TestHTTPServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_TestHTTPServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_TestHTTPServer_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_TestInternalServer_init")
 @_cdecl("bjs_TestInternalServer_init")
@@ -261,12 +264,15 @@ extension Internal.TestInternalServer: ConvertibleToJSValue, _BridgedSwiftHeapOb
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSGlobalTests", name: "bjs_TestInternalServer_wrap")
-fileprivate func _bjs_TestInternalServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_TestInternalServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_TestInternalServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_TestInternalServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_TestInternalServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_TestInternalServer_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_PublicConverter_init")
 @_cdecl("bjs_PublicConverter_init")
@@ -308,9 +314,12 @@ extension GlobalUtils.PublicConverter: ConvertibleToJSValue, _BridgedSwiftHeapOb
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSGlobalTests", name: "bjs_PublicConverter_wrap")
-fileprivate func _bjs_PublicConverter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_PublicConverter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_PublicConverter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_PublicConverter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_PublicConverter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_PublicConverter_wrap_extern(pointer)
+}

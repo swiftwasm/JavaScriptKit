@@ -37,21 +37,27 @@ extension PlayBridgeJSOutput: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PlayBridgeJSOutput")
-fileprivate func _bjs_struct_lower_PlayBridgeJSOutput(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_PlayBridgeJSOutput_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_PlayBridgeJSOutput(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_PlayBridgeJSOutput_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_PlayBridgeJSOutput(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_PlayBridgeJSOutput_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_PlayBridgeJSOutput")
-fileprivate func _bjs_struct_lift_PlayBridgeJSOutput() -> Int32
+fileprivate func _bjs_struct_lift_PlayBridgeJSOutput_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_PlayBridgeJSOutput() -> Int32 {
+fileprivate func _bjs_struct_lift_PlayBridgeJSOutput_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_PlayBridgeJSOutput() -> Int32 {
+    return _bjs_struct_lift_PlayBridgeJSOutput_extern()
+}
 
 extension PlayBridgeJSDiagnostic: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> PlayBridgeJSDiagnostic {
@@ -87,21 +93,27 @@ extension PlayBridgeJSDiagnostic: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PlayBridgeJSDiagnostic")
-fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_PlayBridgeJSDiagnostic(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_PlayBridgeJSDiagnostic_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_PlayBridgeJSDiagnostic")
-fileprivate func _bjs_struct_lift_PlayBridgeJSDiagnostic() -> Int32
+fileprivate func _bjs_struct_lift_PlayBridgeJSDiagnostic_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_PlayBridgeJSDiagnostic() -> Int32 {
+fileprivate func _bjs_struct_lift_PlayBridgeJSDiagnostic_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_PlayBridgeJSDiagnostic() -> Int32 {
+    return _bjs_struct_lift_PlayBridgeJSDiagnostic_extern()
+}
 
 extension PlayBridgeJSResult: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> PlayBridgeJSResult {
@@ -129,21 +141,27 @@ extension PlayBridgeJSResult: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_PlayBridgeJSResult")
-fileprivate func _bjs_struct_lower_PlayBridgeJSResult(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_PlayBridgeJSResult_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_PlayBridgeJSResult(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_PlayBridgeJSResult_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_PlayBridgeJSResult(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_PlayBridgeJSResult_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_PlayBridgeJSResult")
-fileprivate func _bjs_struct_lift_PlayBridgeJSResult() -> Int32
+fileprivate func _bjs_struct_lift_PlayBridgeJSResult_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_PlayBridgeJSResult() -> Int32 {
+fileprivate func _bjs_struct_lift_PlayBridgeJSResult_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_PlayBridgeJSResult() -> Int32 {
+    return _bjs_struct_lift_PlayBridgeJSResult_extern()
+}
 
 @_expose(wasm, "bjs_PlayBridgeJS_init")
 @_cdecl("bjs_PlayBridgeJS_init")
@@ -199,21 +217,27 @@ extension PlayBridgeJS: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "PlayBridgeJS", name: "bjs_PlayBridgeJS_wrap")
-fileprivate func _bjs_PlayBridgeJS_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_PlayBridgeJS_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_PlayBridgeJS_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_PlayBridgeJS_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_PlayBridgeJS_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_PlayBridgeJS_wrap_extern(pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "PlayBridgeJS", name: "bjs_createTS2Swift")
-fileprivate func bjs_createTS2Swift() -> Int32
+fileprivate func bjs_createTS2Swift_extern() -> Int32
 #else
-fileprivate func bjs_createTS2Swift() -> Int32 {
+fileprivate func bjs_createTS2Swift_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_createTS2Swift() -> Int32 {
+    return bjs_createTS2Swift_extern()
+}
 
 func _$createTS2Swift() throws(JSException) -> TS2Swift {
     let ret = bjs_createTS2Swift()
@@ -225,12 +249,15 @@ func _$createTS2Swift() throws(JSException) -> TS2Swift {
 
 #if arch(wasm32)
 @_extern(wasm, module: "PlayBridgeJS", name: "bjs_TS2Swift_convert")
-fileprivate func bjs_TS2Swift_convert(_ self: Int32, _ ts: Int32) -> Int32
+fileprivate func bjs_TS2Swift_convert_extern(_ self: Int32, _ ts: Int32) -> Int32
 #else
-fileprivate func bjs_TS2Swift_convert(_ self: Int32, _ ts: Int32) -> Int32 {
+fileprivate func bjs_TS2Swift_convert_extern(_ self: Int32, _ ts: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_TS2Swift_convert(_ self: Int32, _ ts: Int32) -> Int32 {
+    return bjs_TS2Swift_convert_extern(self, ts)
+}
 
 func _$TS2Swift_convert(_ self: JSObject, _ ts: String) throws(JSException) -> String {
     let selfValue = self.bridgeJSLowerParameter()

@@ -49,9 +49,12 @@ extension GlobalClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_GlobalClass_wrap")
-fileprivate func _bjs_GlobalClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_GlobalClass_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_GlobalClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_GlobalClass_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_GlobalClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_GlobalClass_wrap_extern(pointer)
+}

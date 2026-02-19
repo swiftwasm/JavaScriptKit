@@ -79,12 +79,15 @@ extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Greeter_wrap")
-fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_Greeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Greeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Greeter_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_PublicGreeter_deinit")
 @_cdecl("bjs_PublicGreeter_deinit")
@@ -104,12 +107,15 @@ extension PublicGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_PublicGreeter_wrap")
-fileprivate func _bjs_PublicGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_PublicGreeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_PublicGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_PublicGreeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_PublicGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_PublicGreeter_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_PackageGreeter_deinit")
 @_cdecl("bjs_PackageGreeter_deinit")
@@ -129,21 +135,27 @@ extension PackageGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_PackageGreeter_wrap")
-fileprivate func _bjs_PackageGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_PackageGreeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_PackageGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_PackageGreeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_PackageGreeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_PackageGreeter_wrap_extern(pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_jsRoundTripGreeter")
-fileprivate func bjs_jsRoundTripGreeter(_ greeter: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
+fileprivate func bjs_jsRoundTripGreeter_extern(_ greeter: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
 #else
-fileprivate func bjs_jsRoundTripGreeter(_ greeter: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+fileprivate func bjs_jsRoundTripGreeter_extern(_ greeter: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_jsRoundTripGreeter(_ greeter: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    return bjs_jsRoundTripGreeter_extern(greeter)
+}
 
 func _$jsRoundTripGreeter(_ greeter: Greeter) throws(JSException) -> Greeter {
     let greeterPointer = greeter.bridgeJSLowerParameter()
@@ -156,12 +168,15 @@ func _$jsRoundTripGreeter(_ greeter: Greeter) throws(JSException) -> Greeter {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_jsRoundTripOptionalGreeter")
-fileprivate func bjs_jsRoundTripOptionalGreeter(_ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
+fileprivate func bjs_jsRoundTripOptionalGreeter_extern(_ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
 #else
-fileprivate func bjs_jsRoundTripOptionalGreeter(_ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+fileprivate func bjs_jsRoundTripOptionalGreeter_extern(_ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_jsRoundTripOptionalGreeter(_ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    return bjs_jsRoundTripOptionalGreeter_extern(greeterIsSome, greeterPointer)
+}
 
 func _$jsRoundTripOptionalGreeter(_ greeter: Optional<Greeter>) throws(JSException) -> Optional<Greeter> {
     let (greeterIsSome, greeterPointer) = greeter.bridgeJSLowerParameter()

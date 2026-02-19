@@ -71,21 +71,27 @@ extension Box: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Box_wrap")
-fileprivate func _bjs_Box_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_Box_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_Box_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Box_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_Box_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Box_wrap_extern(pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_importMirrorDictionary")
-fileprivate func bjs_importMirrorDictionary() -> Void
+fileprivate func bjs_importMirrorDictionary_extern() -> Void
 #else
-fileprivate func bjs_importMirrorDictionary() -> Void {
+fileprivate func bjs_importMirrorDictionary_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_importMirrorDictionary() -> Void {
+    return bjs_importMirrorDictionary_extern()
+}
 
 func _$importMirrorDictionary(_ values: [String: Double]) throws(JSException) -> [String: Double] {
     let _ = values.bridgeJSLowerParameter()

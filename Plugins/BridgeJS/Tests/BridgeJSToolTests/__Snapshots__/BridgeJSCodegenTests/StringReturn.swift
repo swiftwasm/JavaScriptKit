@@ -11,12 +11,15 @@ public func _bjs_checkString() -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_checkString")
-fileprivate func bjs_checkString() -> Int32
+fileprivate func bjs_checkString_extern() -> Int32
 #else
-fileprivate func bjs_checkString() -> Int32 {
+fileprivate func bjs_checkString_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_checkString() -> Int32 {
+    return bjs_checkString_extern()
+}
 
 func _$checkString() throws(JSException) -> String {
     let ret = bjs_checkString()

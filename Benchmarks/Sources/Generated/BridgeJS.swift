@@ -145,21 +145,27 @@ extension SimpleStruct: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_SimpleStruct")
-fileprivate func _bjs_struct_lower_SimpleStruct(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_SimpleStruct_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_SimpleStruct(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_SimpleStruct_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_SimpleStruct(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_SimpleStruct_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_SimpleStruct")
-fileprivate func _bjs_struct_lift_SimpleStruct() -> Int32
+fileprivate func _bjs_struct_lift_SimpleStruct_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_SimpleStruct() -> Int32 {
+fileprivate func _bjs_struct_lift_SimpleStruct_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_SimpleStruct() -> Int32 {
+    return _bjs_struct_lift_SimpleStruct_extern()
+}
 
 extension Address: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Address {
@@ -189,21 +195,27 @@ extension Address: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Address")
-fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Address_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Address_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Address(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Address_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Address")
-fileprivate func _bjs_struct_lift_Address() -> Int32
+fileprivate func _bjs_struct_lift_Address_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Address() -> Int32 {
+fileprivate func _bjs_struct_lift_Address_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Address() -> Int32 {
+    return _bjs_struct_lift_Address_extern()
+}
 
 extension Person: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Person {
@@ -239,21 +251,27 @@ extension Person: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Person")
-fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Person_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Person_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Person(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Person_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Person")
-fileprivate func _bjs_struct_lift_Person() -> Int32
+fileprivate func _bjs_struct_lift_Person_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Person() -> Int32 {
+fileprivate func _bjs_struct_lift_Person_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Person() -> Int32 {
+    return _bjs_struct_lift_Person_extern()
+}
 
 extension ComplexStruct: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> ComplexStruct {
@@ -289,21 +307,27 @@ extension ComplexStruct: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_ComplexStruct")
-fileprivate func _bjs_struct_lower_ComplexStruct(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_ComplexStruct_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_ComplexStruct(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_ComplexStruct_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_ComplexStruct(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_ComplexStruct_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_ComplexStruct")
-fileprivate func _bjs_struct_lift_ComplexStruct() -> Int32
+fileprivate func _bjs_struct_lift_ComplexStruct_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_ComplexStruct() -> Int32 {
+fileprivate func _bjs_struct_lift_ComplexStruct_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_ComplexStruct() -> Int32 {
+    return _bjs_struct_lift_ComplexStruct_extern()
+}
 
 extension Point: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Point {
@@ -331,21 +355,27 @@ extension Point: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Point")
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Point_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Point_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Point_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Point")
-fileprivate func _bjs_struct_lift_Point() -> Int32
+fileprivate func _bjs_struct_lift_Point_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Point() -> Int32 {
+fileprivate func _bjs_struct_lift_Point_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Point() -> Int32 {
+    return _bjs_struct_lift_Point_extern()
+}
 
 @_expose(wasm, "bjs_run")
 @_cdecl("bjs_run")
@@ -473,12 +503,15 @@ extension EnumRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_EnumRoundtrip_wrap")
-fileprivate func _bjs_EnumRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_EnumRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_EnumRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_EnumRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_EnumRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_EnumRoundtrip_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_ComplexResultRoundtrip_init")
 @_cdecl("bjs_ComplexResultRoundtrip_init")
@@ -607,12 +640,15 @@ extension ComplexResultRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject 
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_ComplexResultRoundtrip_wrap")
-fileprivate func _bjs_ComplexResultRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ComplexResultRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ComplexResultRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ComplexResultRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_ComplexResultRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ComplexResultRoundtrip_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_StringRoundtrip_init")
 @_cdecl("bjs_StringRoundtrip_init")
@@ -664,12 +700,15 @@ extension StringRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_StringRoundtrip_wrap")
-fileprivate func _bjs_StringRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_StringRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_StringRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_StringRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_StringRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_StringRoundtrip_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_OptionalReturnRoundtrip_init")
 @_cdecl("bjs_OptionalReturnRoundtrip_init")
@@ -788,12 +827,15 @@ extension OptionalReturnRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_OptionalReturnRoundtrip_wrap")
-fileprivate func _bjs_OptionalReturnRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_OptionalReturnRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_OptionalReturnRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_OptionalReturnRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_OptionalReturnRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_OptionalReturnRoundtrip_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_StructRoundtrip_init")
 @_cdecl("bjs_StructRoundtrip_init")
@@ -952,12 +994,15 @@ extension StructRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_StructRoundtrip_wrap")
-fileprivate func _bjs_StructRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_StructRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_StructRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_StructRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_StructRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_StructRoundtrip_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_SimpleClass_init")
 @_cdecl("bjs_SimpleClass_init")
@@ -1093,12 +1138,15 @@ extension SimpleClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_SimpleClass_wrap")
-fileprivate func _bjs_SimpleClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_SimpleClass_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_SimpleClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_SimpleClass_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_SimpleClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_SimpleClass_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_AddressClass_init")
 @_cdecl("bjs_AddressClass_init")
@@ -1192,12 +1240,15 @@ extension AddressClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_AddressClass_wrap")
-fileprivate func _bjs_AddressClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_AddressClass_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_AddressClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_AddressClass_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_AddressClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_AddressClass_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_ClassRoundtrip_init")
 @_cdecl("bjs_ClassRoundtrip_init")
@@ -1292,12 +1343,15 @@ extension ClassRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_ClassRoundtrip_wrap")
-fileprivate func _bjs_ClassRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ClassRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ClassRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ClassRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_ClassRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ClassRoundtrip_wrap_extern(pointer)
+}
 
 @_expose(wasm, "bjs_ArrayRoundtrip_init")
 @_cdecl("bjs_ArrayRoundtrip_init")
@@ -1705,21 +1759,27 @@ extension ArrayRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_ArrayRoundtrip_wrap")
-fileprivate func _bjs_ArrayRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_ArrayRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_ArrayRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_ArrayRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_ArrayRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ArrayRoundtrip_wrap_extern(pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoop")
-fileprivate func bjs_benchmarkHelperNoop() -> Void
+fileprivate func bjs_benchmarkHelperNoop_extern() -> Void
 #else
-fileprivate func bjs_benchmarkHelperNoop() -> Void {
+fileprivate func bjs_benchmarkHelperNoop_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_benchmarkHelperNoop() -> Void {
+    return bjs_benchmarkHelperNoop_extern()
+}
 
 func _$benchmarkHelperNoop() throws(JSException) -> Void {
     bjs_benchmarkHelperNoop()
@@ -1730,12 +1790,15 @@ func _$benchmarkHelperNoop() throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkHelperNoopWithNumber")
-fileprivate func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void
+fileprivate func bjs_benchmarkHelperNoopWithNumber_extern(_ n: Float64) -> Void
 #else
-fileprivate func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void {
+fileprivate func bjs_benchmarkHelperNoopWithNumber_extern(_ n: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_benchmarkHelperNoopWithNumber(_ n: Float64) -> Void {
+    return bjs_benchmarkHelperNoopWithNumber_extern(n)
+}
 
 func _$benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
     let nValue = n.bridgeJSLowerParameter()
@@ -1747,12 +1810,15 @@ func _$benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkRunner")
-fileprivate func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void
+fileprivate func bjs_benchmarkRunner_extern(_ name: Int32, _ body: Int32) -> Void
 #else
-fileprivate func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void {
+fileprivate func bjs_benchmarkRunner_extern(_ name: Int32, _ body: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func bjs_benchmarkRunner(_ name: Int32, _ body: Int32) -> Void {
+    return bjs_benchmarkRunner_extern(name, body)
+}
 
 func _$benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Void {
     let nameValue = name.bridgeJSLowerParameter()

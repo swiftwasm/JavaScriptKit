@@ -426,21 +426,27 @@ extension Point: _BridgedSwiftStruct {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Point")
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void
+fileprivate func _bjs_struct_lower_Point_extern(_ objectId: Int32) -> Void
 #else
-fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void {
+fileprivate func _bjs_struct_lower_Point_extern(_ objectId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lower_Point(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Point_extern(objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Point")
-fileprivate func _bjs_struct_lift_Point() -> Int32
+fileprivate func _bjs_struct_lift_Point_extern() -> Int32
 #else
-fileprivate func _bjs_struct_lift_Point() -> Int32 {
+fileprivate func _bjs_struct_lift_Point_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_struct_lift_Point() -> Int32 {
+    return _bjs_struct_lift_Point_extern()
+}
 
 @_expose(wasm, "bjs_handle")
 @_cdecl("bjs_handle")
@@ -658,9 +664,12 @@ extension User: ConvertibleToJSValue, _BridgedSwiftHeapObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_User_wrap")
-fileprivate func _bjs_User_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func _bjs_User_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_User_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_User_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
+@inline(never) fileprivate func _bjs_User_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_User_wrap_extern(pointer)
+}

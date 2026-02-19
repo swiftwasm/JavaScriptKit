@@ -46,17 +46,17 @@ public struct ClosureCodegen {
 
         // Generate extern declaration using CallJSEmission
         let externDecl = builder.renderImportDecl()
-
-        let makeClosureExternDecl: DeclSyntax = """
-            #if arch(wasm32)
-            @_extern(wasm, module: "bjs", name: "make_swift_closure_\(raw: signature.moduleName)_\(raw: signature.mangleName)")
-            fileprivate func make_swift_closure_\(raw: signature.moduleName)_\(raw: signature.mangleName)(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
-            #else
-            fileprivate func make_swift_closure_\(raw: signature.moduleName)_\(raw: signature.mangleName)(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
-                fatalError("Only available on WebAssembly")
-            }
-            #endif
-            """
+        let externABIName = "make_swift_closure_\(signature.moduleName)_\(signature.mangleName)"
+        let externDeclPrinter = CodeFragmentPrinter()
+        SwiftCodePattern.buildExternFunctionDecl(
+            printer: externDeclPrinter,
+            moduleName: "bjs",
+            abiName: externABIName,
+            functionName: externABIName,
+            signature: "(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32",
+            parameterNames: ["boxPtr", "file", "line"]
+        )
+        let makeClosureExternDecl: DeclSyntax = "\(raw: externDeclPrinter.lines.joined(separator: "\n"))"
 
         let helperEnumDeclPrinter = CodeFragmentPrinter()
         helperEnumDeclPrinter.write("private enum \(helperName) {")
@@ -98,7 +98,7 @@ public struct ClosureCodegen {
             extension JSTypedClosure where Signature == \(raw: swiftClosureType) {
                 init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping \(raw: swiftClosureType)) {
                     self.init(
-                        makeClosure: make_swift_closure_\(raw: signature.moduleName)_\(raw: signature.mangleName),
+                        makeClosure: \(raw: externABIName),
                         body: body,
                         fileID: fileID,
                         line: line
