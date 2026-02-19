@@ -16,7 +16,7 @@ extension JSBridgedType {
 /// A protocol that Swift classes that are exposed to JavaScript via `@JS class` conform to.
 ///
 /// The conformance is automatically synthesized by `@JSClass` for BridgeJS-generated declarations.
-public protocol _JSBridgedClass {
+public protocol _JSBridgedClass: Equatable, _BridgedSwiftStackType {
     /// The JavaScript object wrapped by this instance.
     /// You may assume that `jsObject instanceof Self.constructor == true`
     var jsObject: JSObject { get }
@@ -24,6 +24,12 @@ public protocol _JSBridgedClass {
     /// Create an instance wrapping the given JavaScript object.
     /// You may assume that `jsObject instanceof Self.constructor`
     init(unsafelyWrapping jsObject: JSObject)
+}
+
+extension _JSBridgedClass {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.jsObject == rhs.jsObject
+    }
 }
 
 /// Conform to this protocol when your Swift class wraps a JavaScript class.

@@ -1,5 +1,11 @@
 // @ts-check
 
+export class ArrayElementObject {
+    constructor(id) {
+        this.id = id;
+    }
+}
+
 /**
  * @returns {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Imports["ArraySupportImports"]}
  */
@@ -31,6 +37,12 @@ export function getImports(importsContext) {
         },
         jsCreateNumberArray: function () {
             return [1, 2, 3, 4, 5];
-        }
+        },
+        jsRoundTripJSObjectArray: (values) => {
+            return values;
+        },
+        jsRoundTripJSClassArray: (values) => {
+            return values;
+        },
     };
 }

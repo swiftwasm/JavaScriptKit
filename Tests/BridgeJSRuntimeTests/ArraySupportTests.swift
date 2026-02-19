@@ -1,6 +1,12 @@
 import XCTest
 import JavaScriptKit
 
+@JSClass struct ArrayElementObject {
+    @JSGetter var id: String
+
+    @JSFunction init(id: String) throws(JSException)
+}
+
 @JSClass struct ArraySupportImports {
     @JSFunction static func jsIntArrayLength(_ items: [Int]) throws(JSException) -> Int
 
@@ -10,7 +16,15 @@ import JavaScriptKit
     @JSFunction static func jsRoundTripBoolArray(_ values: [Bool]) throws(JSException) -> [Bool]
 
     @JSFunction static func jsRoundTripJSValueArray(_ v: [JSValue]) throws(JSException) -> [JSValue]
-    @JSFunction static func jsRoundTripOptionalJSValueArray(_ v: Optional<[JSValue]>) throws(JSException) -> Optional<[JSValue]>
+    @JSFunction static func jsRoundTripOptionalJSValueArray(
+        _ v: Optional<[JSValue]>
+    ) throws(JSException) -> Optional<[JSValue]>
+
+    @JSFunction static func jsRoundTripJSObjectArray(_ values: [JSObject]) throws(JSException) -> [JSObject]
+
+    @JSFunction static func jsRoundTripJSClassArray(
+        _ values: [ArrayElementObject]
+    ) throws(JSException) -> [ArrayElementObject]
 
     @JSFunction static func jsSumNumberArray(_ values: [Double]) throws(JSException) -> Double
     @JSFunction static func jsCreateNumberArray() throws(JSException) -> [Double]
@@ -84,5 +98,22 @@ final class ArraySupportTests: XCTestCase {
         let values: [JSValue] = [.number(1), .undefined, .null]
         let result = try ArraySupportImports.jsRoundTripOptionalJSValueArray(values)
         XCTAssertEqual(result, values)
+    }
+
+    func testRoundTripJSObjectArray() throws {
+        let values: [JSObject] = [.global, JSObject(), ["a": 1, "b": 2]]
+        let result = try ArraySupportImports.jsRoundTripJSObjectArray(values)
+        XCTAssertEqual(result, values)
+    }
+
+    func testRoundTripJSClassArray() throws {
+        let values = try [ArrayElementObject(id: "1"), ArrayElementObject(id: "2"), ArrayElementObject(id: "3")]
+        let result = try ArraySupportImports.jsRoundTripJSClassArray(values)
+        XCTAssertEqual(result, values)
+        XCTAssertEqual(try result[0].id, "1")
+        XCTAssertEqual(try result[1].id, "2")
+        XCTAssertEqual(try result[2].id, "3")
+
+        XCTAssertEqual(try ArraySupportImports.jsRoundTripJSClassArray([]), [])
     }
 }

@@ -8,7 +8,7 @@ import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/Opt
 import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/JavaScript/ClosureSupportTests.mjs';
 import { getImports as getSwiftClassSupportImports } from './BridgeJSRuntimeTests/JavaScript/SwiftClassSupportTests.mjs';
 import { getImports as getOptionalSupportImports } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
-import { getImports as getArraySupportImports } from './BridgeJSRuntimeTests/JavaScript/ArraySupportTests.mjs';
+import { getImports as getArraySupportImports, ArrayElementObject } from './BridgeJSRuntimeTests/JavaScript/ArraySupportTests.mjs';
 import { getImports as getJSClassSupportImports, JSClassWithArrayMembers } from './BridgeJSRuntimeTests/JavaScript/JSClassSupportTests.mjs';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -112,6 +112,7 @@ export async function setupOptions(options, context) {
                 "$jsWeirdFunction": () => {
                     return 42;
                 },
+                ArrayElementObject,
                 JSClassWithArrayMembers,
                 JsGreeter: class {
                     /**

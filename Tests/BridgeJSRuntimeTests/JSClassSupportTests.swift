@@ -13,7 +13,10 @@ import JavaScriptKit
 }
 
 @JSClass struct JSClassSupportImports {
-    @JSFunction static func makeJSClassWithArrayMembers(_ numbers: [Int], _ labels: [String]) throws(JSException) -> JSClassWithArrayMembers
+    @JSFunction static func makeJSClassWithArrayMembers(
+        _ numbers: [Int],
+        _ labels: [String]
+    ) throws(JSException) -> JSClassWithArrayMembers
 }
 
 final class JSClassSupportTests: XCTestCase {

@@ -13380,6 +13380,40 @@
         ],
         "types" : [
           {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "id",
+                  "type" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+              {
+                "name" : "id",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+
+            ],
+            "name" : "ArrayElementObject",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
             "getters" : [
 
             ],
@@ -13576,6 +13610,58 @@
                       }
                     },
                     "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripJSObjectArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "jsObject" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "jsObject" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripJSClassArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "jsObject" : {
+                            "_0" : "ArrayElementObject"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "jsObject" : {
+                        "_0" : "ArrayElementObject"
+                      }
+                    }
                   }
                 }
               },

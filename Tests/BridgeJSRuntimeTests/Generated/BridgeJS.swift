@@ -9230,6 +9230,48 @@ fileprivate func _bjs_LeakCheck_wrap_extern(_ pointer: UnsafeMutableRawPointer) 
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayElementObject_init")
+fileprivate func bjs_ArrayElementObject_init_extern(_ id: Int32) -> Int32
+#else
+fileprivate func bjs_ArrayElementObject_init_extern(_ id: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArrayElementObject_init(_ id: Int32) -> Int32 {
+    return bjs_ArrayElementObject_init_extern(id)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayElementObject_id_get")
+fileprivate func bjs_ArrayElementObject_id_get_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_ArrayElementObject_id_get_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArrayElementObject_id_get(_ self: Int32) -> Int32 {
+    return bjs_ArrayElementObject_id_get_extern(self)
+}
+
+func _$ArrayElementObject_init(_ id: String) throws(JSException) -> JSObject {
+    let idValue = id.bridgeJSLowerParameter()
+    let ret = bjs_ArrayElementObject_init(idValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$ArrayElementObject_id_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_ArrayElementObject_id_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsIntArrayLength_static")
 fileprivate func bjs_ArraySupportImports_jsIntArrayLength_static_extern() -> Int32
 #else
@@ -9311,6 +9353,30 @@ fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_
 #endif
 @inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static(_ v: Int32) -> Void {
     return bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripJSObjectArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripJSObjectArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripJSObjectArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripJSObjectArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripJSObjectArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripJSClassArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripJSClassArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripJSClassArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripJSClassArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripJSClassArray_static_extern()
 }
 
 #if arch(wasm32)
@@ -9398,6 +9464,24 @@ func _$ArraySupportImports_jsRoundTripOptionalJSValueArray(_ v: Optional<[JSValu
         throw error
     }
     return Optional<[JSValue]>.bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripJSObjectArray(_ values: [JSObject]) throws(JSException) -> [JSObject] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripJSObjectArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [JSObject].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripJSClassArray(_ values: [ArrayElementObject]) throws(JSException) -> [ArrayElementObject] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripJSClassArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [ArrayElementObject].bridgeJSLiftReturn()
 }
 
 func _$ArraySupportImports_jsSumNumberArray(_ values: [Double]) throws(JSException) -> Double {

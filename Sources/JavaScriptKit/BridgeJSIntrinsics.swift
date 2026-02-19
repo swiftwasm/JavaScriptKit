@@ -510,12 +510,13 @@ extension _JSBridgedClass {
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ id: Int32) -> Self {
         Self(unsafelyWrapping: JSObject.bridgeJSLiftParameter(id))
     }
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        bridgeJSLiftParameter(_swift_js_pop_i32())
-    }
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 { jsObject.bridgeJSLowerReturn() }
-    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
-        _swift_js_push_i32(bridgeJSLowerReturn())
+
+    public static func bridgeJSStackPop() -> Self {
+        Self(unsafelyWrapping: JSObject.bridgeJSStackPop())
+    }
+    public consuming func bridgeJSStackPush() {
+        jsObject.bridgeJSStackPush()
     }
 }
 
