@@ -1,5 +1,5 @@
 // @ts-check
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { readdirSync, mkdtempSync, writeFileSync, rmSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -53,16 +53,15 @@ describe('ts2swift', () => {
 
     it('emits a warning when export assignments cannot be generated', () => {
         const dtsPath = path.join(inputsDir, 'ExportAssignment.d.ts');
-        const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
-        try {
-            run([dtsPath], { tsconfigPath, logLevel: 'warning' });
-            const combined = stderrSpy.mock.calls.map(args => String(args[0])).join('');
-            expect(combined).toMatch(/Skipping export assignment/);
-            // Only warn once for the export assignment node
-            const occurrences = (combined.match(/Skipping export assignment/g) || []).length;
-            expect(occurrences).toBe(1);
-        } finally {
-            stderrSpy.mockRestore();
-        }
+        /** @type {{ level: string, message: string }[]} */
+        const diagnostics = [];
+        const diagnosticEngine = {
+            print: (level, message) => diagnostics.push({ level, message }),
+        };
+        run([dtsPath], { tsconfigPath, logLevel: 'warning', diagnosticEngine });
+        const messages = diagnostics.map((d) => d.message).join('\n');
+        expect(messages).toMatch(/Skipping export assignment/);
+        const occurrences = (messages.match(/Skipping export assignment/g) || []).length;
+        expect(occurrences).toBe(1);
     });
 });
