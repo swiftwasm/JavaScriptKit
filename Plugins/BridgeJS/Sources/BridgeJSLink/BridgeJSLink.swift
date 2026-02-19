@@ -10,12 +10,16 @@ import BridgeJSUtilities
 public struct BridgeJSLink {
     var skeletons: [BridgeJSSkeleton] = []
     let sharedMemory: Bool
+    /// Whether to track the lifetime of Swift objects.
+    ///
+    /// This is useful for debugging memory issues.
+    let enableLifetimeTracking: Bool = false
     private let namespaceBuilder = NamespaceBuilder()
     private let intrinsicRegistry = JSIntrinsicRegistry()
 
     public init(
         skeletons: [BridgeJSSkeleton] = [],
-        sharedMemory: Bool
+        sharedMemory: Bool = false
     ) {
         self.skeletons = skeletons
         self.sharedMemory = sharedMemory
@@ -50,37 +54,76 @@ public struct BridgeJSLink {
         }
         """
 
-    let swiftHeapObjectClassJs = """
-        const swiftHeapObjectFinalizationRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
-            if (state.hasReleased) {
-                return;
+    let lifetimeTrackingClassJs = """
+        const TRACKING = {
+            wrap: (pointer, deinit, prototype, state) => {
+                console.log(JSON.stringify({ DEBUG: true, event: "WRP", class: prototype.constructor.name, state }));
+            },
+            release: (obj) => {
+                console.log(JSON.stringify({ DEBUG: true, event: "REL", class: obj.constructor.name, state: obj.__swiftHeapObjectState }));
+            },
+            finalization: (state) => {
+                console.log(JSON.stringify({ DEBUG: true, event: "FIN", state }));
             }
-            state.hasReleased = true;
-            state.deinit(state.pointer);
-        });
+        };
+        """
 
-        /// Represents a Swift heap object like a class instance or an actor instance.
-        class SwiftHeapObject {
-            static __wrap(pointer, deinit, prototype) {
-                const obj = Object.create(prototype);
-                const state = { pointer, deinit, hasReleased: false };
-                obj.pointer = pointer;
-                obj.__swiftHeapObjectState = state;
-                swiftHeapObjectFinalizationRegistry.register(obj, state, state);
-                return obj;
-            }
+    var swiftHeapObjectClassJs: String {
+        var output = ""
+        if enableLifetimeTracking {
+            output += lifetimeTrackingClassJs + "\n"
+        }
+        output += """
+            const swiftHeapObjectFinalizationRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
 
-            release() {
-                const state = this.__swiftHeapObjectState;
+            """
+        if enableLifetimeTracking {
+            output += "        TRACKING.finalization(state);\n"
+        }
+        output += """
                 if (state.hasReleased) {
                     return;
                 }
                 state.hasReleased = true;
-                swiftHeapObjectFinalizationRegistry.unregister(state);
                 state.deinit(state.pointer);
-            }
+            });
+
+            /// Represents a Swift heap object like a class instance or an actor instance.
+            class SwiftHeapObject {
+                static __wrap(pointer, deinit, prototype) {
+                    const obj = Object.create(prototype);
+                    const state = { pointer, deinit, hasReleased: false };
+
+            """
+        if enableLifetimeTracking {
+            output += "        TRACKING.wrap(pointer, deinit, prototype, state);\n"
         }
-        """
+        output += """
+                    obj.pointer = pointer;
+                    obj.__swiftHeapObjectState = state;
+                    swiftHeapObjectFinalizationRegistry.register(obj, state, state);
+                    return obj;
+                }
+
+                release() {
+
+            """
+        if enableLifetimeTracking {
+            output += "        TRACKING.release(this);\n"
+        }
+        output += """
+                    const state = this.__swiftHeapObjectState;
+                    if (state.hasReleased) {
+                        return;
+                    }
+                    state.hasReleased = true;
+                    swiftHeapObjectFinalizationRegistry.unregister(state);
+                    state.deinit(state.pointer);
+                }
+            }
+            """
+        return output
+    }
 
     fileprivate struct LinkData {
         var exportsLines: [String] = []
