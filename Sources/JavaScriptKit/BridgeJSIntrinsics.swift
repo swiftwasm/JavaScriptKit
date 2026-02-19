@@ -124,7 +124,6 @@ internal func _swift_js_closure_unregister(_ id: Int32) {
 // - `func bridgeJSStackPush()`: push the value onto the return stack (used by _BridgedSwiftStackType for array elements)
 //
 // Optional types (ExportSwift only) additionally define:
-// - `func bridgeJSLowerParameterWithRetain()`: lower optional heap object with ownership transfer for escaping closures
 // - `func bridgeJSLiftReturnFromSideChannel()`: lift optional from side-channel storage for protocol property getters
 //
 // See JSGlueGen.swift in BridgeJSLink for JS-side lowering/lifting implementation.
@@ -467,9 +466,10 @@ public protocol _BridgedSwiftHeapObject: AnyObject, _BridgedSwiftStackType {}
 extension _BridgedSwiftHeapObject {
 
     // MARK: ImportTS
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
-        // For protocol parameters, we pass the unretained pointer since JS already has a reference
-        return Unmanaged.passUnretained(self).toOpaque()
+    @_spi(BridgeJS) @_transparent public func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
+        // Transfer ownership to JS for imported SwiftHeapObject parameters.
+        // JS side must eventually release (via release() or FinalizationRegistry).
+        return Unmanaged.passRetained(self).toOpaque()
     }
     @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer) -> Self {
         // For protocol returns, take an unretained value since JS manages the lifetime
@@ -1489,11 +1489,10 @@ extension Optional where Wrapped: _BridgedSwiftHeapObject {
     // MARK: ExportSwift
     /// Lowers optional Swift heap object as (isSome, pointer) tuple for protocol parameters.
     ///
-    /// This method uses `passUnretained()` because the caller (JavaScript protocol implementation)
-    /// already owns the object and will not retain it. The pointer is only valid for the
-    /// duration of the call.
+    /// Transfer ownership to JavaScript for imported optional heap-object parameters; JS must
+    /// release via `release()` or finalizer.
     ///
-    /// - Returns: A tuple containing presence flag (0 for nil, 1 for some) and unretained pointer
+    /// - Returns: A tuple containing presence flag (0 for nil, 1 for some) and retained pointer
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
         isSome: Int32, pointer: UnsafeMutableRawPointer
     ) {
@@ -1502,25 +1501,6 @@ extension Optional where Wrapped: _BridgedSwiftHeapObject {
             return (isSome: 0, pointer: UnsafeMutableRawPointer(bitPattern: 1)!)
         case .some(let value):
             return (isSome: 1, pointer: value.bridgeJSLowerParameter())
-        }
-    }
-
-    /// Lowers optional Swift heap object with ownership transfer for escaping closures.
-    ///
-    /// This method uses `passRetained()` to transfer ownership to JavaScript, ensuring the
-    /// object remains valid even if the JavaScript closure escapes and stores the parameter.
-    /// JavaScript must wrap the pointer with `__construct()` to create a managed reference
-    /// that will be cleaned up via FinalizationRegistry.
-    ///
-    /// - Returns: A tuple containing presence flag (0 for nil, 1 for some) and retained pointer
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameterWithRetain() -> (
-        isSome: Int32, pointer: UnsafeMutableRawPointer
-    ) {
-        switch consume self {
-        case .none:
-            return (isSome: 0, pointer: UnsafeMutableRawPointer(bitPattern: 1)!)
-        case .some(let value):
-            return (isSome: 1, pointer: Unmanaged.passRetained(value).toOpaque())
         }
     }
 
@@ -2006,12 +1986,6 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftHeapObject {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, pointer: UnsafeMutableRawPointer)
     {
         asOptional.bridgeJSLowerParameter()
-    }
-
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameterWithRetain() -> (
-        isSome: Int32, pointer: UnsafeMutableRawPointer
-    ) {
-        asOptional.bridgeJSLowerParameterWithRetain()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(
