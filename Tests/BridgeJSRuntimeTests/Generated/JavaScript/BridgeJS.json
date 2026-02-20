@@ -13380,6 +13380,338 @@
         ],
         "types" : [
           {
+            "constructor" : {
+              "parameters" : [
+                {
+                  "name" : "id",
+                  "type" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+              {
+                "name" : "id",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+
+            ],
+            "name" : "ArrayElementObject",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "ArraySupportImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "name" : "jsIntArrayLength",
+                "parameters" : [
+                  {
+                    "name" : "items",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripIntArray",
+                "parameters" : [
+                  {
+                    "name" : "items",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripNumberArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripStringArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripBoolArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "bool" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripJSValueArray",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "jsValue" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "jsValue" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripOptionalJSValueArray",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "array" : {
+                            "_0" : {
+                              "jsValue" : {
+
+                              }
+                            }
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "jsValue" : {
+
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripJSObjectArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "jsObject" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "jsObject" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripJSClassArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "jsObject" : {
+                            "_0" : "ArrayElementObject"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "jsObject" : {
+                        "_0" : "ArrayElementObject"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsSumNumberArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "jsCreateNumberArray",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
             "getters" : [
 
             ],
@@ -14378,68 +14710,6 @@
             }
           },
           {
-            "name" : "jsRoundTripJSValueArray",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "jsValue" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "array" : {
-                "_0" : {
-                  "jsValue" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripOptionalJSValueArray",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "nullable" : {
-                    "_0" : {
-                      "array" : {
-                        "_0" : {
-                          "jsValue" : {
-
-                          }
-                        }
-                      }
-                    },
-                    "_1" : "null"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "nullable" : {
-                "_0" : {
-                  "array" : {
-                    "_0" : {
-                      "jsValue" : {
-
-                      }
-                    }
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          },
-          {
             "name" : "jsThrowOrVoid",
             "parameters" : [
               {
@@ -14551,121 +14821,6 @@
             "returnType" : {
               "double" : {
 
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripNumberArray",
-            "parameters" : [
-              {
-                "name" : "values",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "double" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "array" : {
-                "_0" : {
-                  "double" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripStringArray",
-            "parameters" : [
-              {
-                "name" : "values",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "string" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "array" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripBoolArray",
-            "parameters" : [
-              {
-                "name" : "values",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "bool" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "array" : {
-                "_0" : {
-                  "bool" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsSumNumberArray",
-            "parameters" : [
-              {
-                "name" : "values",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "double" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "double" : {
-
-              }
-            }
-          },
-          {
-            "name" : "jsCreateNumberArray",
-            "parameters" : [
-
-            ],
-            "returnType" : {
-              "array" : {
-                "_0" : {
-                  "double" : {
-
-                  }
-                }
               }
             }
           },
@@ -15026,87 +15181,47 @@
       {
         "functions" : [
           {
-            "name" : "jsRoundTripIntArray",
+            "name" : "jsTranslatePoint",
             "parameters" : [
               {
-                "name" : "items",
+                "name" : "point",
                 "type" : {
-                  "array" : {
-                    "_0" : {
-                      "int" : {
-
-                      }
-                    }
+                  "swiftStruct" : {
+                    "_0" : "Point"
                   }
                 }
-              }
-            ],
-            "returnType" : {
-              "array" : {
-                "_0" : {
+              },
+              {
+                "name" : "dx",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "dy",
+                "type" : {
                   "int" : {
 
                   }
                 }
               }
-            }
-          },
-          {
-            "name" : "jsArrayLength",
-            "parameters" : [
-              {
-                "name" : "items",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "int" : {
-
-                      }
-                    }
-                  }
-                }
-              }
             ],
             "returnType" : {
-              "int" : {
-
-              }
-            }
-          },
-          {
-            "name" : "makeArrayHost",
-            "parameters" : [
-              {
-                "name" : "numbers",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "int" : {
-
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "name" : "labels",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "string" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "jsObject" : {
-                "_0" : "ArrayHost"
+              "swiftStruct" : {
+                "_0" : "Point"
               }
             }
           }
+        ],
+        "types" : [
+
+        ]
+      },
+      {
+        "functions" : [
+
         ],
         "types" : [
           {
@@ -15240,7 +15355,7 @@
                 }
               }
             ],
-            "name" : "ArrayHost",
+            "name" : "JSClassWithArrayMembers",
             "setters" : [
               {
                 "functionName" : "numbers_set",
@@ -15272,48 +15387,55 @@
             "staticMethods" : [
 
             ]
-          }
-        ]
-      },
-      {
-        "functions" : [
+          },
           {
-            "name" : "jsTranslatePoint",
-            "parameters" : [
-              {
-                "name" : "point",
-                "type" : {
-                  "swiftStruct" : {
-                    "_0" : "Point"
-                  }
-                }
-              },
-              {
-                "name" : "dx",
-                "type" : {
-                  "int" : {
+            "getters" : [
 
-                  }
-                }
-              },
-              {
-                "name" : "dy",
-                "type" : {
-                  "int" : {
-
-                  }
-                }
-              }
             ],
-            "returnType" : {
-              "swiftStruct" : {
-                "_0" : "Point"
-              }
-            }
-          }
-        ],
-        "types" : [
+            "methods" : [
 
+            ],
+            "name" : "JSClassSupportImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "name" : "makeJSClassWithArrayMembers",
+                "parameters" : [
+                  {
+                    "name" : "numbers",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "labels",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "JSClassWithArrayMembers"
+                  }
+                }
+              }
+            ]
+          }
         ]
       },
       {

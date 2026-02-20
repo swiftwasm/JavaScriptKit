@@ -16,10 +16,6 @@
 
 @JSFunction func jsRoundTripJSValue(_ v: JSValue) throws(JSException) -> JSValue
 
-@JSFunction func jsRoundTripJSValueArray(_ v: [JSValue]) throws(JSException) -> [JSValue]
-
-@JSFunction func jsRoundTripOptionalJSValueArray(_ v: Optional<[JSValue]>) throws(JSException) -> Optional<[JSValue]>
-
 @JSFunction func jsThrowOrVoid(_ shouldThrow: Bool) throws(JSException) -> Void
 
 @JSFunction func jsThrowOrNumber(_ shouldThrow: Bool) throws(JSException) -> Double
@@ -62,16 +58,6 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
     @JSFunction static func makeDefault() throws(JSException) -> StaticBox
     @JSFunction(jsName: "with-dashes") static func with_dashes() throws(JSException) -> StaticBox
 }
-
-@JSFunction func jsRoundTripNumberArray(_ values: [Double]) throws(JSException) -> [Double]
-
-@JSFunction func jsRoundTripStringArray(_ values: [String]) throws(JSException) -> [String]
-
-@JSFunction func jsRoundTripBoolArray(_ values: [Bool]) throws(JSException) -> [Bool]
-
-@JSFunction func jsSumNumberArray(_ values: [Double]) throws(JSException) -> Double
-
-@JSFunction func jsCreateNumberArray() throws(JSException) -> [Double]
 
 @JSFunction(from: .global) func parseInt(_ string: String) throws(JSException) -> Double
 
