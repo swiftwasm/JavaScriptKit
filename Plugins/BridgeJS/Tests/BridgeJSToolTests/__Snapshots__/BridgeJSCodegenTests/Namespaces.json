@@ -128,6 +128,75 @@
 
         ],
         "swiftCallName" : "UUID"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Container_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Container_getItems",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "getItems",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Container_addItem",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "addItem",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "item",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Container",
+        "namespace" : [
+          "Collections"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Container"
       }
     ],
     "enums" : [

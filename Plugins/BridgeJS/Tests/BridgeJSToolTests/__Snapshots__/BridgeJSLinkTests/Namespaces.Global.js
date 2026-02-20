@@ -188,16 +188,20 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
+            importObject["TestModule"]["bjs_Container_wrap"] = function(pointer) {
+                const obj = _exports.Collections.Container.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
             importObject["TestModule"]["bjs_Converter_wrap"] = function(pointer) {
-                const obj = _exports['Converter'].__construct(pointer);
+                const obj = _exports.Utils.Converters.Converter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_Greeter_wrap"] = function(pointer) {
-                const obj = _exports['Greeter'].__construct(pointer);
+                const obj = _exports.__Swift.Foundation.Greeter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_UUID_wrap"] = function(pointer) {
-                const obj = _exports['UUID'].__construct(pointer);
+                const obj = _exports.__Swift.Foundation.UUID.__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },
@@ -287,6 +291,34 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
+            class Container extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Container_deinit, Container.prototype);
+                }
+
+                constructor() {
+                    const ret = instance.exports.bjs_Container_init();
+                    return Container.__construct(ret);
+                }
+                getItems() {
+                    instance.exports.bjs_Container_getItems(this.pointer);
+                    const arrayLen = i32Stack.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const ptr = ptrStack.pop();
+                        const obj = Greeter.__construct(ptr);
+                        arrayResult.push(obj);
+                    }
+                    arrayResult.reverse();
+                    return arrayResult;
+                }
+                addItem(item) {
+                    instance.exports.bjs_Container_addItem(this.pointer, item.pointer);
+                }
+            }
+            if (typeof globalThis.Collections === 'undefined') {
+                globalThis.Collections = {};
+            }
             if (typeof globalThis.MyModule === 'undefined') {
                 globalThis.MyModule = {};
             }
@@ -311,6 +343,9 @@ export async function createInstantiator(options, swift) {
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
+                },
+                Collections: {
+                    Container,
                 },
                 MyModule: {
                     Utils: {
@@ -338,6 +373,7 @@ export async function createInstantiator(options, swift) {
             globalThis.__Swift.Foundation.Greeter = exports.__Swift.Foundation.Greeter;
             globalThis.Utils.Converters.Converter = exports.Utils.Converters.Converter;
             globalThis.__Swift.Foundation.UUID = exports.__Swift.Foundation.UUID;
+            globalThis.Collections.Container = exports.Collections.Container;
             globalThis.MyModule.Utils.namespacedFunction = exports.MyModule.Utils.namespacedFunction;
             return exports;
         },

@@ -233,15 +233,15 @@ export async function createInstantiator(options, swift) {
                 importObject["TestModule"] = {};
             }
             importObject["TestModule"]["bjs_Converter_wrap"] = function(pointer) {
-                const obj = _exports['Converter'].__construct(pointer);
+                const obj = _exports.Utils.Converter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_HTTPServer_wrap"] = function(pointer) {
-                const obj = _exports['HTTPServer'].__construct(pointer);
+                const obj = _exports.Networking.API.HTTPServer.__construct(pointer);
                 return swift.memory.retain(obj);
             };
             importObject["TestModule"]["bjs_TestServer_wrap"] = function(pointer) {
-                const obj = _exports['TestServer'].__construct(pointer);
+                const obj = _exports.Networking.APIV2.Internal.TestServer.__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },

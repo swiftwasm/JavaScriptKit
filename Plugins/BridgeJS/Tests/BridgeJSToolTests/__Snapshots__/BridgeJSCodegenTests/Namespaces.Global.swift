@@ -158,3 +158,63 @@ fileprivate func _bjs_UUID_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> In
 @inline(never) fileprivate func _bjs_UUID_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_UUID_wrap_extern(pointer)
 }
+
+@_expose(wasm, "bjs_Container_init")
+@_cdecl("bjs_Container_init")
+public func _bjs_Container_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Container()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Container_getItems")
+@_cdecl("bjs_Container_getItems")
+public func _bjs_Container_getItems(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = Container.bridgeJSLiftParameter(_self).getItems()
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Container_addItem")
+@_cdecl("bjs_Container_addItem")
+public func _bjs_Container_addItem(_ _self: UnsafeMutableRawPointer, _ item: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Container.bridgeJSLiftParameter(_self).addItem(_: Greeter.bridgeJSLiftParameter(item))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Container_deinit")
+@_cdecl("bjs_Container_deinit")
+public func _bjs_Container_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<Container>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension Container: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Container_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_Container_wrap")
+fileprivate func _bjs_Container_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_Container_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_Container_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Container_wrap_extern(pointer)
+}

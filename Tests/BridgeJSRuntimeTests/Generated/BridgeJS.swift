@@ -5086,6 +5086,72 @@ public func _bjs_getTSTheme() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_createConverter")
+@_cdecl("bjs_createConverter")
+public func _bjs_createConverter() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = createConverter()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_useConverter")
+@_cdecl("bjs_useConverter")
+public func _bjs_useConverter(_ converter: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = useConverter(converter: Utils.Converter.bridgeJSLiftParameter(converter), value: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripConverterArray")
+@_cdecl("bjs_roundTripConverterArray")
+public func _bjs_roundTripConverterArray() -> Void {
+    #if arch(wasm32)
+    let ret = roundTripConverterArray(_: [Utils.Converter].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_createHTTPServer")
+@_cdecl("bjs_createHTTPServer")
+public func _bjs_createHTTPServer() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = createHTTPServer()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_createUUID")
+@_cdecl("bjs_createUUID")
+public func _bjs_createUUID(_ valueBytes: Int32, _ valueLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = createUUID(value: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripUUID")
+@_cdecl("bjs_roundTripUUID")
+public func _bjs_roundTripUUID(_ uuid: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = roundTripUUID(_: UUID.bridgeJSLiftParameter(uuid))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundtripNetworkingAPIMethod")
 @_cdecl("bjs_roundtripNetworkingAPIMethod")
 public func _bjs_roundtripNetworkingAPIMethod(_ method: Int32) -> Int32 {
@@ -7124,6 +7190,56 @@ fileprivate func _bjs_HTTPServer_wrap_extern(_ pointer: UnsafeMutableRawPointer)
 #endif
 @inline(never) fileprivate func _bjs_HTTPServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_HTTPServer_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_UUID_init")
+@_cdecl("bjs_UUID_init")
+public func _bjs_UUID_init(_ valueBytes: Int32, _ valueLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = UUID(value: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_UUID_uuidString")
+@_cdecl("bjs_UUID_uuidString")
+public func _bjs_UUID_uuidString(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = UUID.bridgeJSLiftParameter(_self).uuidString()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_UUID_deinit")
+@_cdecl("bjs_UUID_deinit")
+public func _bjs_UUID_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<UUID>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension UUID: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_UUID_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_UUID_wrap")
+fileprivate func _bjs_UUID_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_UUID_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_UUID_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_UUID_wrap_extern(pointer)
 }
 
 @_expose(wasm, "bjs_TestServer_init")
@@ -11364,6 +11480,18 @@ fileprivate func bjs_SwiftClassSupportImports_jsRoundTripGreeter_static_extern(_
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SwiftClassSupportImports_jsRoundTripUUID_static")
+fileprivate func bjs_SwiftClassSupportImports_jsRoundTripUUID_static_extern(_ uuid: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
+#else
+fileprivate func bjs_SwiftClassSupportImports_jsRoundTripUUID_static_extern(_ uuid: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SwiftClassSupportImports_jsRoundTripUUID_static(_ uuid: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    return bjs_SwiftClassSupportImports_jsRoundTripUUID_static_extern(uuid)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SwiftClassSupportImports_jsRoundTripOptionalGreeter_static")
 fileprivate func bjs_SwiftClassSupportImports_jsRoundTripOptionalGreeter_static_extern(_ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
 #else
@@ -11406,6 +11534,15 @@ func _$SwiftClassSupportImports_jsRoundTripGreeter(_ greeter: Greeter) throws(JS
         throw error
     }
     return Greeter.bridgeJSLiftReturn(ret)
+}
+
+func _$SwiftClassSupportImports_jsRoundTripUUID(_ uuid: UUID) throws(JSException) -> UUID {
+    let uuidPointer = uuid.bridgeJSLowerParameter()
+    let ret = bjs_SwiftClassSupportImports_jsRoundTripUUID_static(uuidPointer)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UUID.bridgeJSLiftReturn(ret)
 }
 
 func _$SwiftClassSupportImports_jsRoundTripOptionalGreeter(_ greeter: Optional<Greeter>) throws(JSException) -> Optional<Greeter> {

@@ -5,6 +5,7 @@ import BridgeJSUtilities
 /// Registry for JS helper intrinsics used during code generation.
 final class JSIntrinsicRegistry {
     private var entries: [String: [String]] = [:]
+    var classNamespaces: [String: [String]] = [:]
 
     var isEmpty: Bool {
         entries.isEmpty
@@ -19,6 +20,7 @@ final class JSIntrinsicRegistry {
 
     func reset() {
         entries.removeAll()
+        classNamespaces.removeAll()
     }
 
     func emitLines() -> [String] {

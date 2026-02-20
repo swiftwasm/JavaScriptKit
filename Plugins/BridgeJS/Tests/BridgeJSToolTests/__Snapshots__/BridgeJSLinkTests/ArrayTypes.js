@@ -798,7 +798,7 @@ export async function createInstantiator(options, swift) {
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
                         const ptr = ptrStack.pop();
-                        const obj = _exports['Item'].__construct(ptr);
+                        const obj = Item.__construct(ptr);
                         arrayResult.push(obj);
                     }
                     arrayResult.reverse();
@@ -820,7 +820,7 @@ export async function createInstantiator(options, swift) {
                         const arrayResult1 = [];
                         for (let i1 = 0; i1 < arrayLen1; i1++) {
                             const ptr = ptrStack.pop();
-                            const obj = _exports['Item'].__construct(ptr);
+                            const obj = Item.__construct(ptr);
                             arrayResult1.push(obj);
                         }
                         arrayResult1.reverse();

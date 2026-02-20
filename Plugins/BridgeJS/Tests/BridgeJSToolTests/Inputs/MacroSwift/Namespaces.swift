@@ -32,3 +32,19 @@ class UUID {
         Foundation.UUID().uuidString
     }
 }
+
+@JS(namespace: "Collections") class Container {
+    var items: [Greeter]
+
+    @JS init() {
+        self.items = []
+    }
+
+    @JS func getItems() -> [Greeter] {
+        return items
+    }
+
+    @JS func addItem(_ item: Greeter) {
+        items.append(item)
+    }
+}
