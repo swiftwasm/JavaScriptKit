@@ -3,6 +3,7 @@ import JavaScriptKit
 
 @JSClass struct SwiftClassSupportImports {
     @JSFunction static func jsRoundTripGreeter(_ greeter: Greeter) throws(JSException) -> Greeter
+    @JSFunction static func jsRoundTripUUID(_ uuid: UUID) throws(JSException) -> UUID
     @JSFunction static func jsRoundTripOptionalGreeter(_ greeter: Greeter?) throws(JSException) -> Greeter?
     @JSFunction static func jsConsumeLeakCheck(_ value: LeakCheck) throws(JSException) -> Void
     @JSFunction static func jsConsumeOptionalLeakCheck(_ value: LeakCheck?) throws(JSException) -> Void
@@ -22,6 +23,11 @@ final class SwiftClassSupportTests: XCTestCase {
 
         let greeter2 = try SwiftClassSupportImports.jsRoundTripOptionalGreeter(Greeter(name: "Hello"))
         XCTAssertEqual(greeter2?.name, "Hello")
+    }
+
+    func testRoundTripUUID() throws {
+        let uuid = try SwiftClassSupportImports.jsRoundTripUUID(UUID(value: "11111111-2222-3333-4444-555555555555"))
+        XCTAssertEqual(uuid.uuidString(), "11111111-2222-3333-4444-555555555555")
     }
 
     func testSwiftClassToJSObject() throws {

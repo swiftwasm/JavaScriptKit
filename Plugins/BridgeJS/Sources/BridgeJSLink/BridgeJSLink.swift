@@ -978,7 +978,9 @@ public struct BridgeJSLink {
                     [structDef.name],
                     IntrinsicJSFragment.PrintCodeContext(
                         scope: structScope,
-                        printer: structPrinter
+                        printer: structPrinter,
+                        hasDirectAccessToSwiftClass: false,
+                        classNamespaces: intrinsicRegistry.classNamespaces
                     )
                 )
                 bodyPrinter.write(lines: structPrinter.lines)
@@ -995,7 +997,9 @@ public struct BridgeJSLink {
                     [enumDef.valuesName],
                     IntrinsicJSFragment.PrintCodeContext(
                         scope: enumScope,
-                        printer: enumPrinter
+                        printer: enumPrinter,
+                        hasDirectAccessToSwiftClass: false,
+                        classNamespaces: intrinsicRegistry.classNamespaces
                     )
                 )
                 bodyPrinter.write(lines: enumPrinter.lines)
@@ -1079,6 +1083,14 @@ public struct BridgeJSLink {
 
     public func link() throws -> (outputJs: String, outputDts: String) {
         intrinsicRegistry.reset()
+        intrinsicRegistry.classNamespaces = skeletons.reduce(into: [:]) { result, unified in
+            guard let skeleton = unified.exported else { return }
+            for klass in skeleton.classes {
+                if let namespace = klass.namespace {
+                    result[klass.name] = namespace
+                }
+            }
+        }
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
         let outputDts = generateTypeScript(data: data)
@@ -1144,8 +1156,11 @@ public struct BridgeJSLink {
 
             for klass in classes.sorted(by: { $0.name < $1.name }) {
                 let wrapperFunctionName = "bjs_\(klass.name)_wrap"
+                let namespacePath = (klass.namespace ?? []).map { ".\($0)" }.joined()
+                let exportsPath =
+                    namespacePath.isEmpty ? "_exports['\(klass.name)']" : "_exports\(namespacePath).\(klass.name)"
                 wrapperLines.append("importObject[\"\(moduleName)\"][\"\(wrapperFunctionName)\"] = function(pointer) {")
-                wrapperLines.append("    const obj = _exports['\(klass.name)'].__construct(pointer);")
+                wrapperLines.append("    const obj = \(exportsPath).__construct(pointer);")
                 wrapperLines.append("    return \(JSGlueVariableScope.reservedSwift).memory.retain(obj);")
                 wrapperLines.append("};")
             }
@@ -1252,7 +1267,8 @@ public struct BridgeJSLink {
             self.context = IntrinsicJSFragment.PrintCodeContext(
                 scope: scope,
                 printer: body,
-                hasDirectAccessToSwiftClass: hasDirectAccessToSwiftClass
+                hasDirectAccessToSwiftClass: hasDirectAccessToSwiftClass,
+                classNamespaces: intrinsicRegistry.classNamespaces
             )
         }
 
@@ -2147,7 +2163,9 @@ extension BridgeJSLink {
             self.context = context
             self.printContext = IntrinsicJSFragment.PrintCodeContext(
                 scope: scope,
-                printer: body
+                printer: body,
+                hasDirectAccessToSwiftClass: false,
+                classNamespaces: intrinsicRegistry.classNamespaces
             )
         }
 

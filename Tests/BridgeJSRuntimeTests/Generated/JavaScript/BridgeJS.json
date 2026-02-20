@@ -773,6 +773,55 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_UUID_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_UUID_uuidString",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "uuidString",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "UUID",
+        "namespace" : [
+          "__Swift",
+          "Foundation"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "UUID"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_TestServer_init",
           "effects" : {
             "isAsync" : false,
@@ -6914,6 +6963,157 @@
           "rawValueEnum" : {
             "_0" : "TSTheme",
             "_1" : "String"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_createConverter",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "createConverter",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "Utils.Converter"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_useConverter",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "useConverter",
+        "parameters" : [
+          {
+            "label" : "converter",
+            "name" : "converter",
+            "type" : {
+              "swiftHeapObject" : {
+                "_0" : "Utils.Converter"
+              }
+            }
+          },
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripConverterArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripConverterArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "converters",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Utils.Converter"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "swiftHeapObject" : {
+                "_0" : "Utils.Converter"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_createHTTPServer",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "createHTTPServer",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "Networking.API.HTTPServer"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_createUUID",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "createUUID",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "UUID"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUUID",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUUID",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "uuid",
+            "type" : {
+              "swiftHeapObject" : {
+                "_0" : "UUID"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "UUID"
           }
         }
       },
@@ -15757,6 +15957,24 @@
                 "returnType" : {
                   "swiftHeapObject" : {
                     "_0" : "Greeter"
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripUUID",
+                "parameters" : [
+                  {
+                    "name" : "uuid",
+                    "type" : {
+                      "swiftHeapObject" : {
+                        "_0" : "UUID"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "swiftHeapObject" : {
+                    "_0" : "UUID"
                   }
                 }
               },

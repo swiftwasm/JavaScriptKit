@@ -369,7 +369,7 @@ export async function createInstantiator(options, swift) {
                     const dictResult = {};
                     for (let i = 0; i < dictLen; i++) {
                         const ptr = ptrStack.pop();
-                        const obj = _exports['Box'].__construct(ptr);
+                        const obj = Box.__construct(ptr);
                         const string = strStack.pop();
                         dictResult[string] = obj;
                     }
@@ -402,7 +402,7 @@ export async function createInstantiator(options, swift) {
                             optValue = null;
                         } else {
                             const ptr = ptrStack.pop();
-                            const obj = _exports['Box'].__construct(ptr);
+                            const obj = Box.__construct(ptr);
                             optValue = obj;
                         }
                         const string = strStack.pop();

@@ -137,13 +137,35 @@ struct IntrinsicJSFragment: Sendable {
         /// The printer to print the main fragment code.
         var printer: CodeFragmentPrinter
         /// Whether the fragment has direct access to the SwiftHeapObject classes.
-        /// If false, the fragment needs to use `_exports["<class name>"]` to access the class.
+        /// If false, the fragment needs to use `_exports` to access the class.
         var hasDirectAccessToSwiftClass: Bool = true
+        /// Maps class names to their namespace path components for resolving `_exports` access.
+        var classNamespaces: [String: [String]] = [:]
 
         func with<T>(_ keyPath: WritableKeyPath<PrintCodeContext, T>, _ value: T) -> PrintCodeContext {
             var new = self
             new[keyPath: keyPath] = value
             return new
+        }
+
+        private func unqualifiedClassName(for qualifiedName: String) -> String {
+            qualifiedName.split(separator: ".").last.map(String.init) ?? qualifiedName
+        }
+
+        private func exportsAccess(forClass name: String) -> String {
+            if let namespace = classNamespaces[name], !namespace.isEmpty {
+                let path = namespace.map { ".\($0)" }.joined()
+                return "_exports\(path).\(name)"
+            }
+            return "_exports['\(name)']"
+        }
+
+        func classReference(forQualifiedName qualifiedName: String) -> String {
+            if hasDirectAccessToSwiftClass {
+                return unqualifiedClassName(for: qualifiedName)
+            }
+            let unqualified = unqualifiedClassName(for: qualifiedName)
+            return exportsAccess(forClass: unqualified)
         }
     }
 
@@ -555,8 +577,9 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
+                let classRef = context.classReference(forQualifiedName: name)
                 return [
-                    "\(context.hasDirectAccessToSwiftClass ? name : "_exports['\(name)']").__construct(\(arguments[0]))"
+                    "\(classRef).__construct(\(arguments[0]))"
                 ]
             }
         )
@@ -565,7 +588,8 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["pointer"],
             printCode: { arguments, context in
-                return ["_exports['\(name)'].__construct(\(arguments[0]))"]
+                let classRef = context.classReference(forQualifiedName: name)
+                return ["\(classRef).__construct(\(arguments[0]))"]
             }
         )
     }
@@ -874,10 +898,8 @@ struct IntrinsicJSFragment: Sendable {
                 printer.write(
                     "\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = undefined;"
                 )
-                let constructExpr =
-                    context.hasDirectAccessToSwiftClass
-                    ? "\(className).__construct(\(pointerVar))"
-                    : "_exports['\(className)'].__construct(\(pointerVar))"
+                let classRef = context.classReference(forQualifiedName: className)
+                let constructExpr = "\(classRef).__construct(\(pointerVar))"
                 printer.write(
                     "const \(resultVar) = \(pointerVar) === null ? \(absenceLiteral) : \(constructExpr);"
                 )
@@ -2075,8 +2097,9 @@ struct IntrinsicJSFragment: Sendable {
                     let (scope, printer) = (context.scope, context.printer)
                     let ptrVar = scope.variable("ptr")
                     let objVar = scope.variable("obj")
+                    let classRef = context.classReference(forQualifiedName: className)
                     printer.write("const \(ptrVar) = \(scope.popPointer());")
-                    printer.write("const \(objVar) = _exports['\(className)'].__construct(\(ptrVar));")
+                    printer.write("const \(objVar) = \(classRef).__construct(\(ptrVar));")
                     return [objVar]
                 }
             )

@@ -611,6 +611,32 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(converter.toString(123), "123");
     converter.release();
 
+    const createdConverter = exports.createConverter();
+    assert.equal(createdConverter.toString(99), "99");
+    assert.equal(exports.useConverter(createdConverter, 55), "55");
+    createdConverter.release();
+
+    const c1 = exports.createConverter();
+    const c2 = exports.createConverter();
+    const converterArray = exports.roundTripConverterArray([c1, c2]);
+    assert.equal(converterArray.length, 2);
+    assert.equal(converterArray[0].toString(10), "10");
+    assert.equal(converterArray[1].toString(20), "20");
+    c1.release();
+    c2.release();
+    converterArray.forEach((c) => c.release());
+
+    const uuid = exports.createUUID("11111111-2222-3333-4444-555555555555");
+    assert.equal(uuid.uuidString(), "11111111-2222-3333-4444-555555555555");
+    const roundTrippedUUID = exports.roundTripUUID(uuid);
+    assert.equal(roundTrippedUUID.uuidString(), "11111111-2222-3333-4444-555555555555");
+    roundTrippedUUID.release();
+    uuid.release();
+
+    const createdServer = exports.createHTTPServer();
+    createdServer.call(exports.Networking.API.Method.Get);
+    createdServer.release();
+
     assert.equal(exports.Utils.StringUtils.uppercase("hello"), "HELLO");
     assert.equal(exports.Utils.StringUtils.uppercase(""), "");
     assert.equal(exports.Utils.StringUtils.lowercase("WORLD"), "world");

@@ -20,8 +20,17 @@ export interface Converter extends SwiftHeapObject {
 export interface UUID extends SwiftHeapObject {
     uuidString(): string;
 }
+export interface Container extends SwiftHeapObject {
+    getItems(): Greeter[];
+    addItem(item: Greeter): void;
+}
 export type Exports = {
     plainFunction(): string;
+    Collections: {
+        Container: {
+            new(): Container;
+        }
+    },
     MyModule: {
         Utils: {
             namespacedFunction(): string;

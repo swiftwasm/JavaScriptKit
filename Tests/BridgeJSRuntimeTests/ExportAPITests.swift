@@ -361,6 +361,43 @@ struct TestError: Error {
     }
 }
 
+@JS func createConverter() -> Utils.Converter {
+    return Utils.Converter()
+}
+
+@JS func useConverter(converter: Utils.Converter, value: Int) -> String {
+    return converter.toString(value: value)
+}
+
+@JS func roundTripConverterArray(_ converters: [Utils.Converter]) -> [Utils.Converter] {
+    return converters
+}
+
+@JS func createHTTPServer() -> Networking.API.HTTPServer {
+    return Networking.API.HTTPServer()
+}
+
+@JS(namespace: "__Swift.Foundation")
+class UUID {
+    let value: String
+
+    @JS init(value: String) {
+        self.value = value
+    }
+
+    @JS func uuidString() -> String {
+        return value
+    }
+}
+
+@JS func createUUID(value: String) -> UUID {
+    return UUID(value: value)
+}
+
+@JS func roundTripUUID(_ uuid: UUID) -> UUID {
+    return uuid
+}
+
 @JS(namespace: "Networking.APIV2")
 enum Internal {
     @JS enum SupportedMethod {
