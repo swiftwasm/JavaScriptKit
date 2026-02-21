@@ -67,8 +67,12 @@ public func _bjs_release_swift_closure(_ pointer: UnsafeMutableRawPointer) {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_closure_unregister")
-internal func _swift_js_closure_unregister(_ id: Int32)
+private func _swift_js_closure_unregister_extern(_ id: Int32)
 #else
+private func _swift_js_closure_unregister_extern(_ id: Int32) {
+    _onlyAvailableOnWasm()
+}
+#endif
 /// Unregisters a Swift closure from the FinalizationRegistry
 ///
 /// - Parameter id: The JavaScriptObjectRef of the JS closure object created by
@@ -82,10 +86,9 @@ internal func _swift_js_closure_unregister(_ id: Int32)
 ///         This means that the finalization callback should be tolerant of the
 ///         object being already collected.
 ///         See: https://tc39.es/ecma262/multipage/managing-memory.html#sec-finalization-registry.prototype.unregister
-internal func _swift_js_closure_unregister(_ id: Int32) {
-    _onlyAvailableOnWasm()
+@inline(never) internal func _swift_js_closure_unregister(_ id: Int32) {
+    _swift_js_closure_unregister_extern(id)
 }
-#endif
 
 // MARK: Type lowering/lifting
 //
@@ -823,186 +826,243 @@ private func _swift_js_pop_f64_extern() -> Float64 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_make_js_string")
-func _swift_js_make_js_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32
+private func _swift_js_make_js_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32
 #else
 /// Creates a JavaScript string from UTF-8 data in WebAssembly memory
-func _swift_js_make_js_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32 {
+private func _swift_js_make_js_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_make_js_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32 {
+    _swift_js_make_js_string_extern(ptr, len)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_init_memory_with_result")
-func _swift_js_init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+private func _swift_js_init_memory_with_result_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
 #else
 /// Initializes WebAssembly memory with result data of JavaScript function call
-func _swift_js_init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+private func _swift_js_init_memory_with_result_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_init_memory_with_result(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+    _swift_js_init_memory_with_result_extern(ptr, len)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_string")
-func _swift_js_return_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+private func _swift_js_return_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
 #else
 /// Write a string to reserved string storage to be returned to JavaScript
-func _swift_js_return_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+private func _swift_js_return_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_return_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+    _swift_js_return_string_extern(ptr, len)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_retain")
-func _swift_js_retain(_ id: Int32) -> Int32
+private func _swift_js_retain_extern(_ id: Int32) -> Int32
 #else
 /// Retains a JavaScript object reference to ensure the object id
 /// remains valid after the function returns
-func _swift_js_retain(_ id: Int32) -> Int32 {
+private func _swift_js_retain_extern(_ id: Int32) -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_retain(_ id: Int32) -> Int32 {
+    _swift_js_retain_extern(id)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_optional_bool")
-func _swift_js_return_optional_bool(_ isSome: Int32, _ value: Int32)
+private func _swift_js_return_optional_bool_extern(_ isSome: Int32, _ value: Int32)
 #else
 /// Sets the optional bool for return value storage
-func _swift_js_return_optional_bool(_ isSome: Int32, _ value: Int32) {
+private func _swift_js_return_optional_bool_extern(_ isSome: Int32, _ value: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_return_optional_bool(_ isSome: Int32, _ value: Int32) {
+    _swift_js_return_optional_bool_extern(isSome, value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_get_optional_int_presence")
-func _swift_js_get_optional_int_presence() -> Int32
+private func _swift_js_get_optional_int_presence_extern() -> Int32
 #else
-func _swift_js_get_optional_int_presence() -> Int32 {
+private func _swift_js_get_optional_int_presence_extern() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_get_optional_int_presence() -> Int32 {
+    _swift_js_get_optional_int_presence_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_get_optional_int_value")
-func _swift_js_get_optional_int_value() -> Int32
+private func _swift_js_get_optional_int_value_extern() -> Int32
 #else
-func _swift_js_get_optional_int_value() -> Int32 {
+private func _swift_js_get_optional_int_value_extern() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_get_optional_int_value() -> Int32 {
+    _swift_js_get_optional_int_value_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_optional_int")
-func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32)
+private func _swift_js_return_optional_int_extern(_ isSome: Int32, _ value: Int32)
 #else
 /// Sets the optional int for return value storage
-func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32) {
+private func _swift_js_return_optional_int_extern(_ isSome: Int32, _ value: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_return_optional_int(_ isSome: Int32, _ value: Int32) {
+    _swift_js_return_optional_int_extern(isSome, value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_get_optional_string")
-func _swift_js_get_optional_string() -> Int32
+private func _swift_js_get_optional_string_extern() -> Int32
 #else
-func _swift_js_get_optional_string() -> Int32 {
+private func _swift_js_get_optional_string_extern() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_get_optional_string() -> Int32 {
+    _swift_js_get_optional_string_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_optional_string")
-func _swift_js_return_optional_string(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+private func _swift_js_return_optional_string_extern(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32)
 #else
 /// Write an optional string to reserved string storage to be returned to JavaScript
-func _swift_js_return_optional_string(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+private func _swift_js_return_optional_string_extern(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_return_optional_string(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+    _swift_js_return_optional_string_extern(isSome, ptr, len)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_optional_object")
-func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32)
+private func _swift_js_return_optional_object_extern(_ isSome: Int32, _ objectId: Int32)
 #else
 /// Write an optional JSObject to reserved storage to be returned to JavaScript
-func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32) {
+private func _swift_js_return_optional_object_extern(_ isSome: Int32, _ objectId: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32) {
+    _swift_js_return_optional_object_extern(isSome, objectId)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_get_optional_heap_object_pointer")
-func _swift_js_get_optional_heap_object_pointer() -> UnsafeMutableRawPointer
+private func _swift_js_get_optional_heap_object_pointer_extern() -> UnsafeMutableRawPointer
 #else
-func _swift_js_get_optional_heap_object_pointer() -> UnsafeMutableRawPointer {
+private func _swift_js_get_optional_heap_object_pointer_extern() -> UnsafeMutableRawPointer {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_get_optional_heap_object_pointer() -> UnsafeMutableRawPointer {
+    _swift_js_get_optional_heap_object_pointer_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_optional_heap_object")
-func _swift_js_return_optional_heap_object(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer?)
+private func _swift_js_return_optional_heap_object_extern(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer?)
 #else
 /// Write an optional Swift heap object to reserved storage to be returned to JavaScript
-func _swift_js_return_optional_heap_object(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer?) {
+private func _swift_js_return_optional_heap_object_extern(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer?) {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_return_optional_heap_object(_ isSome: Int32, _ pointer: UnsafeMutableRawPointer?) {
+    _swift_js_return_optional_heap_object_extern(isSome, pointer)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_get_optional_float_presence")
-func _swift_js_get_optional_float_presence() -> Int32
+private func _swift_js_get_optional_float_presence_extern() -> Int32
 #else
-func _swift_js_get_optional_float_presence() -> Int32 {
+private func _swift_js_get_optional_float_presence_extern() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_get_optional_float_presence() -> Int32 {
+    _swift_js_get_optional_float_presence_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_get_optional_float_value")
-func _swift_js_get_optional_float_value() -> Float32
+private func _swift_js_get_optional_float_value_extern() -> Float32
 #else
-func _swift_js_get_optional_float_value() -> Float32 {
+private func _swift_js_get_optional_float_value_extern() -> Float32 {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_get_optional_float_value() -> Float32 {
+    _swift_js_get_optional_float_value_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_optional_float")
-func _swift_js_return_optional_float(_ isSome: Int32, _ value: Float32)
+private func _swift_js_return_optional_float_extern(_ isSome: Int32, _ value: Float32)
 #else
 /// Sets the optional float for return value storage
-func _swift_js_return_optional_float(_ isSome: Int32, _ value: Float32) {
+private func _swift_js_return_optional_float_extern(_ isSome: Int32, _ value: Float32) {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_return_optional_float(_ isSome: Int32, _ value: Float32) {
+    _swift_js_return_optional_float_extern(isSome, value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_get_optional_double_presence")
-func _swift_js_get_optional_double_presence() -> Int32
+private func _swift_js_get_optional_double_presence_extern() -> Int32
 #else
-func _swift_js_get_optional_double_presence() -> Int32 {
+private func _swift_js_get_optional_double_presence_extern() -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_get_optional_double_presence() -> Int32 {
+    _swift_js_get_optional_double_presence_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_get_optional_double_value")
-func _swift_js_get_optional_double_value() -> Float64
+private func _swift_js_get_optional_double_value_extern() -> Float64
 #else
-func _swift_js_get_optional_double_value() -> Float64 {
+private func _swift_js_get_optional_double_value_extern() -> Float64 {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_get_optional_double_value() -> Float64 {
+    _swift_js_get_optional_double_value_extern()
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_optional_double")
-func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64)
+private func _swift_js_return_optional_double_extern(_ isSome: Int32, _ value: Float64)
 #else
 /// Sets the optional double for return value storage
-func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64) {
+private func _swift_js_return_optional_double_extern(_ isSome: Int32, _ value: Float64) {
     _onlyAvailableOnWasm()
 }
 #endif
+@inline(never) func _swift_js_return_optional_double(_ isSome: Int32, _ value: Float64) {
+    _swift_js_return_optional_double_extern(isSome, value)
+}
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_push_pointer")
