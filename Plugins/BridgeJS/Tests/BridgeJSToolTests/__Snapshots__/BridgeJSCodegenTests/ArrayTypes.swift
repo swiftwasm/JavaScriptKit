@@ -470,6 +470,32 @@ public func _bjs_processNestedJSObjectArray() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_multiArrayParams")
+@_cdecl("bjs_multiArrayParams")
+public func _bjs_multiArrayParams() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_strs = [String].bridgeJSStackPop()
+    let _tmp_nums = [Int].bridgeJSStackPop()
+    let ret = multiArrayParams(nums: _tmp_nums, strs: _tmp_strs)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_multiOptionalArrayParams")
+@_cdecl("bjs_multiOptionalArrayParams")
+public func _bjs_multiOptionalArrayParams() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_b = Optional<[String]>.bridgeJSLiftParameter()
+    let _tmp_a = Optional<[Int]>.bridgeJSLiftParameter()
+    let ret = multiOptionalArrayParams(a: _tmp_a, b: _tmp_b)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Item_deinit")
 @_cdecl("bjs_Item_deinit")
 public func _bjs_Item_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
@@ -496,6 +522,69 @@ fileprivate func _bjs_Item_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> In
 #endif
 @inline(never) fileprivate func _bjs_Item_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_Item_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_MultiArrayContainer_init")
+@_cdecl("bjs_MultiArrayContainer_init")
+public func _bjs_MultiArrayContainer_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let _tmp_strs = [String].bridgeJSStackPop()
+    let _tmp_nums = [Int].bridgeJSStackPop()
+    let ret = MultiArrayContainer(nums: _tmp_nums, strs: _tmp_strs)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MultiArrayContainer_numbers_get")
+@_cdecl("bjs_MultiArrayContainer_numbers_get")
+public func _bjs_MultiArrayContainer_numbers_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = MultiArrayContainer.bridgeJSLiftParameter(_self).numbers
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MultiArrayContainer_strings_get")
+@_cdecl("bjs_MultiArrayContainer_strings_get")
+public func _bjs_MultiArrayContainer_strings_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = MultiArrayContainer.bridgeJSLiftParameter(_self).strings
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MultiArrayContainer_deinit")
+@_cdecl("bjs_MultiArrayContainer_deinit")
+public func _bjs_MultiArrayContainer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<MultiArrayContainer>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension MultiArrayContainer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_MultiArrayContainer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_MultiArrayContainer_wrap")
+fileprivate func _bjs_MultiArrayContainer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_MultiArrayContainer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_MultiArrayContainer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_MultiArrayContainer_wrap_extern(pointer)
 }
 
 #if arch(wasm32)

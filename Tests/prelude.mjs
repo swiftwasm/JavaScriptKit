@@ -1373,6 +1373,17 @@ function testArraySupport(exports) {
     assert.equal(optFooResult[0].value, "first");
     assert.equal(optFooResult[1], null);
     assert.equal(optFooResult[2].value, "second");
+
+    // Multiple stack-based parameters (regression test for LIFO ordering)
+    assert.deepEqual(exports.multiArrayFirstNums([1, 2, 3], ["a", "b"]), [1, 2, 3]);
+    assert.deepEqual(exports.multiArrayFirstStrs([1, 2, 3], ["a", "b"]), ["a", "b"]);
+
+    assert.deepEqual(exports.multiOptionalArrayFirstA([10, 20], ["x"]), [10, 20]);
+    assert.deepEqual(exports.multiOptionalArrayFirstB([10, 20], ["x"]), ["x"]);
+    assert.equal(exports.multiOptionalArrayFirstA(null, ["y"]), null);
+    assert.deepEqual(exports.multiOptionalArrayFirstB(null, ["y"]), ["y"]);
+    assert.deepEqual(exports.multiOptionalArrayFirstA([5], null), [5]);
+    assert.equal(exports.multiOptionalArrayFirstB([5], null), null);
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

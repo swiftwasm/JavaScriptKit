@@ -246,14 +246,7 @@ public class ExportSwift {
         /// Generates intermediate variables for stack-using parameters if needed for LIFO compatibility
         private func generateParameterLifting() {
             let stackParamIndices = parameters.enumerated().compactMap { index, param -> Int? in
-                switch param.type {
-                case .swiftStruct, .nullable(.swiftStruct, _),
-                    .associatedValueEnum, .nullable(.associatedValueEnum, _),
-                    .array:
-                    return index
-                default:
-                    return nil
-                }
+                param.type.isStackUsingParameter ? index : nil
             }
 
             guard stackParamIndices.count > 1 else { return }
@@ -1545,6 +1538,17 @@ extension BridgeType {
     var isClosureType: Bool {
         if case .closure = self { return true }
         return false
+    }
+
+    var isStackUsingParameter: Bool {
+        switch self {
+        case .swiftStruct, .array, .dictionary, .associatedValueEnum:
+            return true
+        case .nullable(let wrapped, _):
+            return wrapped.isStackUsingParameter
+        default:
+            return false
+        }
     }
 
     struct LiftingIntrinsicInfo: Sendable {

@@ -224,6 +224,10 @@ export async function createInstantiator(options, swift) {
                 const obj = _exports['Item'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
+            importObject["TestModule"]["bjs_MultiArrayContainer_wrap"] = function(pointer) {
+                const obj = _exports['MultiArrayContainer'].__construct(pointer);
+                return swift.memory.retain(obj);
+            };
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_checkArray"] = function bjs_checkArray(a) {
                 try {
@@ -368,11 +372,55 @@ export async function createInstantiator(options, swift) {
                 }
 
             }
+            class MultiArrayContainer extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_MultiArrayContainer_deinit, MultiArrayContainer.prototype);
+                }
+
+                constructor(nums, strs) {
+                    for (const elem of nums) {
+                        i32Stack.push((elem | 0));
+                    }
+                    i32Stack.push(nums.length);
+                    for (const elem1 of strs) {
+                        const bytes = textEncoder.encode(elem1);
+                        const id = swift.memory.retain(bytes);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
+                    }
+                    i32Stack.push(strs.length);
+                    const ret = instance.exports.bjs_MultiArrayContainer_init();
+                    return MultiArrayContainer.__construct(ret);
+                }
+                get numbers() {
+                    instance.exports.bjs_MultiArrayContainer_numbers_get(this.pointer);
+                    const arrayLen = i32Stack.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const int = i32Stack.pop();
+                        arrayResult.push(int);
+                    }
+                    arrayResult.reverse();
+                    return arrayResult;
+                }
+                get strings() {
+                    instance.exports.bjs_MultiArrayContainer_strings_get(this.pointer);
+                    const arrayLen = i32Stack.pop();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const string = strStack.pop();
+                        arrayResult.push(string);
+                    }
+                    arrayResult.reverse();
+                    return arrayResult;
+                }
+            }
             const PointHelpers = __bjs_createPointHelpers();
             structHelpers.Point = PointHelpers;
 
             const exports = {
                 Item,
+                MultiArrayContainer,
                 processIntArray: function bjs_processIntArray(values) {
                     for (const elem of values) {
                         i32Stack.push((elem | 0));
@@ -904,6 +952,44 @@ export async function createInstantiator(options, swift) {
                     }
                     arrayResult.reverse();
                     return arrayResult;
+                },
+                multiArrayParams: function bjs_multiArrayParams(nums, strs) {
+                    for (const elem of nums) {
+                        i32Stack.push((elem | 0));
+                    }
+                    i32Stack.push(nums.length);
+                    for (const elem1 of strs) {
+                        const bytes = textEncoder.encode(elem1);
+                        const id = swift.memory.retain(bytes);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
+                    }
+                    i32Stack.push(strs.length);
+                    const ret = instance.exports.bjs_multiArrayParams();
+                    return ret;
+                },
+                multiOptionalArrayParams: function bjs_multiOptionalArrayParams(a, b) {
+                    const isSome = a != null;
+                    if (isSome) {
+                        for (const elem of a) {
+                            i32Stack.push((elem | 0));
+                        }
+                        i32Stack.push(a.length);
+                    }
+                    i32Stack.push(+isSome);
+                    const isSome1 = b != null;
+                    if (isSome1) {
+                        for (const elem1 of b) {
+                            const bytes = textEncoder.encode(elem1);
+                            const id = swift.memory.retain(bytes);
+                            i32Stack.push(bytes.length);
+                            i32Stack.push(id);
+                        }
+                        i32Stack.push(b.length);
+                    }
+                    i32Stack.push(+isSome1);
+                    const ret = instance.exports.bjs_multiOptionalArrayParams();
+                    return ret;
                 },
                 Direction: DirectionValues,
                 Status: StatusValues,

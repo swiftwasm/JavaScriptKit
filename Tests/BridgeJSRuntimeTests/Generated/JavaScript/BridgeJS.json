@@ -10151,6 +10151,220 @@
         }
       },
       {
+        "abiName" : "bjs_multiArrayFirstNums",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "multiArrayFirstNums",
+        "parameters" : [
+          {
+            "label" : "nums",
+            "name" : "nums",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "strs",
+            "name" : "strs",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "int" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_multiArrayFirstStrs",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "multiArrayFirstStrs",
+        "parameters" : [
+          {
+            "label" : "nums",
+            "name" : "nums",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "strs",
+            "name" : "strs",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "string" : {
+
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_multiOptionalArrayFirstA",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "multiOptionalArrayFirstA",
+        "parameters" : [
+          {
+            "label" : "a",
+            "name" : "a",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "label" : "b",
+            "name" : "b",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_multiOptionalArrayFirstB",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "multiOptionalArrayFirstB",
+        "parameters" : [
+          {
+            "label" : "a",
+            "name" : "a",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "label" : "b",
+            "name" : "b",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripOptionalString",
         "effects" : {
           "isAsync" : false,
