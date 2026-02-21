@@ -612,7 +612,7 @@ export async function createInstantiator(options, swift) {
                         const structValue = structHelpers.MathOperations.lift();
                         return structValue;
                     },
-                    subtract: function(a, b) {
+                    subtract: function(a, b = 5.0) {
                         const ret = instance.exports.bjs_MathOperations_static_subtract(a, b);
                         return ret;
                     },

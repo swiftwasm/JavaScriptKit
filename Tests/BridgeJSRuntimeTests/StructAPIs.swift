@@ -118,7 +118,7 @@ import JavaScriptKit
         return a * b
     }
 
-    @JS static func subtract(a: Double, b: Double) -> Double {
+    @JS static func subtract(a: Double, b: Double = 5.0) -> Double {
         return a - b
     }
 }

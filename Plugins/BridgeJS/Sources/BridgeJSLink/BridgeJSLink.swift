@@ -1834,7 +1834,7 @@ extension BridgeJSLink {
         let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
 
         let printer = CodeFragmentPrinter()
-        printer.write("\(function.name)(\(function.parameters.map { $0.name }.joined(separator: ", "))) {")
+        printer.write("\(function.name)(\(DefaultValueUtils.formatParameterList(function.parameters))) {")
         printer.indent {
             thunkBuilder.renderFunctionBody(into: printer, returnExpr: returnExpr)
         }
@@ -1891,7 +1891,7 @@ extension BridgeJSLink {
 
         let methodPrinter = CodeFragmentPrinter()
         methodPrinter.write(
-            "\(method.name): function(\(method.parameters.map { $0.name }.joined(separator: ", "))) {"
+            "\(method.name): function(\(DefaultValueUtils.formatParameterList(method.parameters))) {"
         )
         methodPrinter.indent {
             thunkBuilder.renderFunctionBody(into: methodPrinter, returnExpr: returnExpr)
@@ -2932,8 +2932,12 @@ extension BridgeJSLink {
                             printer.write("class \(klass.name) {")
                             printer.indent {
                                 if let constructor = klass.constructor {
+                                    let paramSignatures = constructor.parameters.map { param in
+                                        let optional = param.hasDefault ? "?" : ""
+                                        return "\(param.name)\(optional): \(param.type.tsType)"
+                                    }
                                     let constructorSignature =
-                                        "constructor(\(constructor.parameters.map { "\($0.name): \($0.type.tsType)" }.joined(separator: ", ")));"
+                                        "constructor(\(paramSignatures.joined(separator: ", ")));"
                                     printer.write(constructorSignature)
                                 }
 

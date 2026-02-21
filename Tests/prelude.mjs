@@ -975,6 +975,7 @@ function testStructSupport(exports) {
     assert.deepEqual(exports.roundTripAdvancedConfig(advancedConfig2), advancedConfig2);
 
     assert.equal(exports.MathOperations.subtract(10.0, 4.0), 6.0);
+    assert.equal(exports.MathOperations.subtract(10.0), 5.0);
     const mathOps = exports.MathOperations.init();
     assert.equal(mathOps.baseValue, 0.0);
     assert.equal(mathOps.add(5.0, 3.0), 8.0);

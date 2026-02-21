@@ -13108,6 +13108,11 @@
                 }
               },
               {
+                "defaultValue" : {
+                  "double" : {
+                    "_0" : 5
+                  }
+                },
                 "label" : "b",
                 "name" : "b",
                 "type" : {
