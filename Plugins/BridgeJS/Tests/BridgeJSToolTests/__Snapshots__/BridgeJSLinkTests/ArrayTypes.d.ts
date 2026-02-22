@@ -36,8 +36,15 @@ export interface SwiftHeapObject {
 }
 export interface Item extends SwiftHeapObject {
 }
+export interface MultiArrayContainer extends SwiftHeapObject {
+    readonly numbers: number[];
+    readonly strings: string[];
+}
 export type Exports = {
     Item: {
+    }
+    MultiArrayContainer: {
+        new(nums: number[], strs: string[]): MultiArrayContainer;
     }
     processIntArray(values: number[]): number[];
     processStringArray(values: string[]): string[];
@@ -65,6 +72,8 @@ export type Exports = {
     processJSObjectArray(objects: any[]): any[];
     processOptionalJSObjectArray(objects: (any | null)[]): (any | null)[];
     processNestedJSObjectArray(objects: any[][]): any[][];
+    multiArrayParams(nums: number[], strs: string[]): number;
+    multiOptionalArrayParams(a: number[] | null, b: string[] | null): number;
     Direction: DirectionObject
     Status: StatusObject
 }

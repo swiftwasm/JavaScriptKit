@@ -67,3 +67,19 @@
 @JSFunction func importTransformNumbers(_ values: [Double]) throws(JSException) -> [Double]
 @JSFunction func importProcessStrings(_ values: [String]) throws(JSException) -> [String]
 @JSFunction func importProcessBooleans(_ values: [Bool]) throws(JSException) -> [Bool]
+
+@JS func multiArrayParams(nums: [Int], strs: [String]) -> Int
+@JS func multiOptionalArrayParams(a: [Int]?, b: [String]?) -> Int
+
+@JS class MultiArrayContainer {
+    var nums: [Int]
+    var strs: [String]
+
+    @JS init(nums: [Int], strs: [String]) {
+        self.nums = nums
+        self.strs = strs
+    }
+
+    @JS var numbers: [Int] { nums }
+    @JS var strings: [String] { strs }
+}

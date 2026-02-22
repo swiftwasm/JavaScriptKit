@@ -1423,6 +1423,24 @@ enum GraphOperations {
     return foos
 }
 
+// MARK: - Multiple stack-based parameters (regression test for LIFO ordering)
+
+@JS func multiArrayFirstNums(nums: [Int], strs: [String]) -> [Int] {
+    return nums
+}
+
+@JS func multiArrayFirstStrs(nums: [Int], strs: [String]) -> [String] {
+    return strs
+}
+
+@JS func multiOptionalArrayFirstA(a: [Int]?, b: [String]?) -> [Int]? {
+    return a
+}
+
+@JS func multiOptionalArrayFirstB(a: [Int]?, b: [String]?) -> [String]? {
+    return b
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

@@ -10,6 +10,79 @@
 
         ],
         "swiftCallName" : "Item"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_MultiArrayContainer_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "nums",
+              "name" : "nums",
+              "type" : {
+                "array" : {
+                  "_0" : {
+                    "int" : {
+
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "label" : "strs",
+              "name" : "strs",
+              "type" : {
+                "array" : {
+                  "_0" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "MultiArrayContainer",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "numbers",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "strings",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "MultiArrayContainer"
       }
     ],
     "enums" : [
@@ -1072,6 +1145,100 @@
                 }
               }
             }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_multiArrayParams",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "multiArrayParams",
+        "parameters" : [
+          {
+            "label" : "nums",
+            "name" : "nums",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "strs",
+            "name" : "strs",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "int" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_multiOptionalArrayParams",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "multiOptionalArrayParams",
+        "parameters" : [
+          {
+            "label" : "a",
+            "name" : "a",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "label" : "b",
+            "name" : "b",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "int" : {
+
           }
         }
       }

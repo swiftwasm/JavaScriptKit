@@ -6194,6 +6194,58 @@ public func _bjs_roundTripOptionalFooArray() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_multiArrayFirstNums")
+@_cdecl("bjs_multiArrayFirstNums")
+public func _bjs_multiArrayFirstNums() -> Void {
+    #if arch(wasm32)
+    let _tmp_strs = [String].bridgeJSStackPop()
+    let _tmp_nums = [Int].bridgeJSStackPop()
+    let ret = multiArrayFirstNums(nums: _tmp_nums, strs: _tmp_strs)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_multiArrayFirstStrs")
+@_cdecl("bjs_multiArrayFirstStrs")
+public func _bjs_multiArrayFirstStrs() -> Void {
+    #if arch(wasm32)
+    let _tmp_strs = [String].bridgeJSStackPop()
+    let _tmp_nums = [Int].bridgeJSStackPop()
+    let ret = multiArrayFirstStrs(nums: _tmp_nums, strs: _tmp_strs)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_multiOptionalArrayFirstA")
+@_cdecl("bjs_multiOptionalArrayFirstA")
+public func _bjs_multiOptionalArrayFirstA() -> Void {
+    #if arch(wasm32)
+    let _tmp_b = Optional<[String]>.bridgeJSLiftParameter()
+    let _tmp_a = Optional<[Int]>.bridgeJSLiftParameter()
+    let ret = multiOptionalArrayFirstA(a: _tmp_a, b: _tmp_b)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_multiOptionalArrayFirstB")
+@_cdecl("bjs_multiOptionalArrayFirstB")
+public func _bjs_multiOptionalArrayFirstB() -> Void {
+    #if arch(wasm32)
+    let _tmp_b = Optional<[String]>.bridgeJSLiftParameter()
+    let _tmp_a = Optional<[Int]>.bridgeJSLiftParameter()
+    let ret = multiOptionalArrayFirstB(a: _tmp_a, b: _tmp_b)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripOptionalString")
 @_cdecl("bjs_roundTripOptionalString")
 public func _bjs_roundTripOptionalString(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
