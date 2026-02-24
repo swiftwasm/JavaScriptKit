@@ -1,0 +1,10 @@
+{
+  "name": "bridgejs-fuzz",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "fuzz": "node src/cli.mjs run",
+    "serve": "node src/cli.mjs serve"
+  }
+}

@@ -1,0 +1,23 @@
+#!/bin/bash
+# Hook script invoked on each new (non-duplicate) failure.
+# Arguments:
+#   $1 = path to failure directory (e.g. FailCases/001-runtime-trap)
+#   $2 = failure phase (compile-error, link-error, runtime-trap, runtime-error, wrong-result)
+#   $3 = fingerprint hash
+# stdin = metadata.json
+
+FAIL_DIR="$1"
+PHASE="$2"
+FINGERPRINT="$3"
+
+echo "New failure: $PHASE in $FAIL_DIR (fingerprint: $FINGERPRINT)"
+
+# Example: file a GitHub issue
+# gh issue create \
+#   --title "BridgeJS fuzz: $PHASE in ${FAIL_DIR##*/}" \
+#   --body-file "$FAIL_DIR/error.txt" \
+#   --label "fuzz,bridgejs"
+
+# Example: start a fix agent
+# shelley --slug "fix-fuzz-${FINGERPRINT:0:8}" \
+#   "Fix BridgeJS bug found by fuzzer. Repro in $FAIL_DIR. Error: $(cat $FAIL_DIR/error.txt)"
