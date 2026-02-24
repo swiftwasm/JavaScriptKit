@@ -13,6 +13,9 @@ import class Dispatch.DispatchSource
 import SwiftParser
 import SwiftSyntax
 
+#if os(Windows)
+import WinSDK
+#endif
 #if canImport(BridgeJSCore)
 import BridgeJSCore
 #endif
@@ -141,7 +144,11 @@ extension Foundation.Process {
         let signalSource = DispatchSource.makeSignalSource(signal: signalNo)
         signalSource.setEventHandler { [self] in
             signalSource.cancel()
+            #if os(Windows)
+            _ = TerminateProcess(processHandle, 0)
+            #else
             kill(processIdentifier, signalNo)
+            #endif
         }
         signalSource.resume()
         return signalSource

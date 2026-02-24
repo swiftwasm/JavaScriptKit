@@ -1,4 +1,7 @@
 #if canImport(PackagePlugin)
+#if os(Windows)
+import WinSDK
+#endif
 import PackagePlugin
 @preconcurrency import Foundation
 
@@ -180,7 +183,11 @@ extension Foundation.Process {
         let signalSource = DispatchSource.makeSignalSource(signal: signalNo)
         signalSource.setEventHandler { [self] in
             signalSource.cancel()
+            #if os(Windows)
+            _ = TerminateProcess(processHandle, 0)
+            #else
             kill(processIdentifier, signalNo)
+            #endif
         }
         signalSource.resume()
         return signalSource
