@@ -1,5 +1,8 @@
 import Foundation
 
+#if os(Windows)
+import WinSDK
+#endif
 struct PackageToJS {
     struct PackageOptions {
         enum Platform: String, CaseIterable {
@@ -785,7 +788,11 @@ extension Foundation.Process {
         let signalSource = DispatchSource.makeSignalSource(signal: signalNo)
         signalSource.setEventHandler { [self] in
             signalSource.cancel()
+            #if os(Windows)
+            _ = TerminateProcess(processHandle, 0)
+            #else
             kill(processIdentifier, signalNo)
+            #endif
         }
         signalSource.resume()
         return signalSource
