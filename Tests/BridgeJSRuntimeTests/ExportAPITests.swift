@@ -1174,21 +1174,6 @@ enum GraphOperations {
     }
 }
 
-// MARK: - Array Tests
-
-// Optional arrays
-@JS func roundTripOptionalIntArrayType(_ values: [Int]?) -> [Int]? {
-    return values
-}
-
-@JS func roundTripOptionalStringArrayType(_ values: [String]?) -> [String]? {
-    return values
-}
-
-@JS func roundTripOptionalGreeterArrayType(_ greeters: [Greeter]?) -> [Greeter]? {
-    return greeters
-}
-
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

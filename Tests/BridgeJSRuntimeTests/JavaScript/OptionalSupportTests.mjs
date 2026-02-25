@@ -48,9 +48,11 @@ export function getImports(importsContext) {
 
 /**
  * Optional value bridging coverage for BridgeJS runtime tests.
- * @param {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports
+ * @param {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} rootExports
  */
-export function runJsOptionalSupportTests(exports) {
+export function runJsOptionalSupportTests(rootExports) {
+    const exports = rootExports.OptionalSupportExports;
+    const { Status, Theme, HttpStatus, Networking, ComplexResult, APIResult, Greeter, OptionalPropertyHolder, TypedPayloadResult, Direction } = rootExports;
     assert.equal(exports.roundTripOptionalString(null), null);
     assert.equal(exports.roundTripOptionalInt(null), null);
     assert.equal(exports.roundTripOptionalBool(null), null);
@@ -65,47 +67,45 @@ export function runJsOptionalSupportTests(exports) {
 
     assert.equal(exports.roundTripOptionalSyntax(null), null);
     assert.equal(exports.roundTripOptionalSyntax('Test'), 'Test');
-    assert.equal(exports.roundTripOptionalMixSyntax(null), null);
-    assert.equal(exports.roundTripOptionalMixSyntax('Mix'), 'Mix');
-    assert.equal(exports.roundTripOptionalSwiftSyntax(null), null);
-    assert.equal(exports.roundTripOptionalSwiftSyntax('Swift'), 'Swift');
-    assert.equal(exports.roundTripOptionalWithSpaces(null), null);
-    assert.equal(exports.roundTripOptionalWithSpaces(1.618), 1.618);
-    assert.equal(exports.roundTripOptionalTypeAlias(null), null);
-    assert.equal(exports.roundTripOptionalTypeAlias(25), 25);
-    assert.equal(exports.roundTripOptionalStatus(exports.Status.Success), StatusValues.Success);
-    assert.equal(exports.roundTripOptionalTheme(exports.Theme.Light), ThemeValues.Light);
-    assert.equal(exports.roundTripOptionalHttpStatus(exports.HttpStatus.Ok), HttpStatusValues.Ok);
-    assert.equal(exports.roundTripOptionalTSDirection(TSDirection.North), TSDirection.North);
-    assert.equal(exports.roundTripOptionalTSTheme(TSTheme.Light), TSTheme.Light);
-    assert.equal(exports.roundTripOptionalNetworkingAPIMethod(exports.Networking.API.Method.Get), exports.Networking.API.Method.Get);
+    assert.equal(exports.roundTripOptionalCaseEnum(Status.Success), StatusValues.Success);
+    assert.equal(exports.roundTripOptionalStringRawValueEnum(Theme.Light), ThemeValues.Light);
+    assert.equal(exports.roundTripOptionalIntRawValueEnum(HttpStatus.Ok), HttpStatusValues.Ok);
+    assert.equal(exports.roundTripOptionalTSEnum(TSDirection.North), TSDirection.North);
+    assert.equal(exports.roundTripOptionalTSStringEnum(TSTheme.Light), TSTheme.Light);
+    assert.equal(exports.roundTripOptionalNamespacedEnum(Networking.API.Method.Get), Networking.API.Method.Get);
+
+    // Optional arrays
+    assert.deepEqual(exports.roundTripOptionalIntArray([1, 2, 3]), [1, 2, 3]);
+    assert.equal(exports.roundTripOptionalIntArray(null), null);
+    assert.deepEqual(exports.roundTripOptionalStringArray(["a", "b"]), ["a", "b"]);
+    assert.equal(exports.roundTripOptionalStringArray(null), null);
 
     const pVal = 3.141592653589793;
     const p1 = { tag: APIResultValues.Tag.Precise, param0: pVal };
-    const cl1 = { tag: exports.ComplexResult.Tag.Location, param0: 37.7749, param1: -122.4194, param2: 'San Francisco' };
+    const cl1 = { tag: ComplexResult.Tag.Location, param0: 37.7749, param1: -122.4194, param2: 'San Francisco' };
 
     assert.deepEqual(exports.roundTripOptionalAPIResult(p1), p1);
     assert.deepEqual(exports.roundTripOptionalComplexResult(cl1), cl1);
 
-    const apiSuccess = { tag: exports.APIResult.Tag.Success, param0: 'test success' };
-    const apiFailure = { tag: exports.APIResult.Tag.Failure, param0: 404 };
-    const apiInfo = { tag: exports.APIResult.Tag.Info };
+    const apiSuccess = { tag: APIResult.Tag.Success, param0: 'test success' };
+    const apiFailure = { tag: APIResult.Tag.Failure, param0: 404 };
+    const apiInfo = { tag: APIResult.Tag.Info };
 
     assert.equal(exports.compareAPIResults(apiSuccess, apiFailure), 'r1:success:test success,r2:failure:404');
     assert.equal(exports.compareAPIResults(null, apiInfo), 'r1:nil,r2:info');
     assert.equal(exports.compareAPIResults(apiFailure, null), 'r1:failure:404,r2:nil');
     assert.equal(exports.compareAPIResults(null, null), 'r1:nil,r2:nil');
 
-    const optionalGreeter = new exports.Greeter('Schrödinger');
-    const optionalGreeter2 = exports.roundTripOptionalClass(optionalGreeter);
+    const optionalGreeter = new Greeter('Schrödinger');
+    const optionalGreeter2 = exports.roundTripOptionalSwiftClass(optionalGreeter);
     assert.equal(optionalGreeter2?.greet() ?? '', 'Hello, Schrödinger!');
     assert.equal(optionalGreeter2?.name ?? '', 'Schrödinger');
     assert.equal(optionalGreeter2?.prefix ?? '', 'Hello');
-    assert.equal(exports.roundTripOptionalClass(null), null);
+    assert.equal(exports.roundTripOptionalSwiftClass(null), null);
     optionalGreeter.release();
     optionalGreeter2?.release();
 
-    const optionalsHolder = new exports.OptionalPropertyHolder(null);
+    const optionalsHolder = new OptionalPropertyHolder(null);
 
     assert.equal(optionalsHolder.optionalName, null);
     assert.equal(optionalsHolder.optionalAge, null);
@@ -116,7 +116,7 @@ export function runJsOptionalSupportTests(exports) {
     assert.equal(optionalsHolder.optionalName, 'Alice');
     assert.equal(optionalsHolder.optionalAge, 25);
 
-    const testPropertyGreeter = new exports.Greeter('Bob');
+    const testPropertyGreeter = new Greeter('Bob');
     optionalsHolder.optionalGreeter = testPropertyGreeter;
     assert.equal(optionalsHolder.optionalGreeter.greet(), 'Hello, Bob!');
     assert.equal(optionalsHolder.optionalGreeter.name, 'Bob');
@@ -130,14 +130,14 @@ export function runJsOptionalSupportTests(exports) {
     testPropertyGreeter.release();
     optionalsHolder.release();
 
-    const optGreeter = new exports.Greeter('Optionaly');
-    assert.equal(exports.roundTripOptionalGreeter(null), null);
-    const optGreeterReturned = exports.roundTripOptionalGreeter(optGreeter);
-    assert.equal(optGreeterReturned.name, 'Optionaly');
-    assert.equal(optGreeterReturned.greet(), 'Hello, Optionaly!');
+    const optGreeter = new Greeter('Optionaly');
+    assert.equal(exports.roundTripOptionalSwiftClass(null), null);
+    const optGreeterReturned = exports.roundTripOptionalSwiftClass(optGreeter);
+    assert.equal(optGreeterReturned?.name, 'Optionaly');
+    assert.equal(optGreeterReturned?.greet(), 'Hello, Optionaly!');
 
     const appliedOptional = exports.applyOptionalGreeter(null, (g) => g ?? optGreeter);
-    assert.equal(appliedOptional.name, 'Optionaly');
+    assert.equal(appliedOptional?.name, 'Optionaly');
 
     const holderOpt = exports.makeOptionalHolder(null, undefined);
     assert.equal(holderOpt.nullableGreeter, null);
@@ -147,7 +147,7 @@ export function runJsOptionalSupportTests(exports) {
     assert.equal(holderOpt.nullableGreeter.name, 'Optionaly');
     assert.equal(holderOpt.undefinedNumber, 123.5);
     holderOpt.release();
-    optGreeterReturned.release();
+    optGreeterReturned?.release();
     optGreeter.release();
 
     const aor1 = { tag: APIOptionalResultValues.Tag.Success, param0: 'hello world' };
@@ -174,15 +174,25 @@ export function runJsOptionalSupportTests(exports) {
     assert.equal(exports.roundTripOptionalAPIOptionalResult(null), null);
 
     // Optional TypedPayloadResult roundtrip
-    const tpr_precision = { tag: exports.TypedPayloadResult.Tag.Precision, param0: Math.fround(0.1) };
+    /**
+     * @typedef {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').TypedPayloadResultTag} TypedPayloadResultTag
+     * @typedef {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').PrecisionTag} PrecisionTag
+     */
+
+    /** @type {TypedPayloadResultTag} */
+    const tpr_precision = { tag: TypedPayloadResult.Tag.Precision, param0: /** @type {PrecisionTag} */ (Math.fround(0.1)) };
     assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_precision), tpr_precision);
-    const tpr_direction = { tag: exports.TypedPayloadResult.Tag.Direction, param0: exports.Direction.North };
+    /** @type {TypedPayloadResultTag} */
+    const tpr_direction = { tag: TypedPayloadResult.Tag.Direction, param0: Direction.North };
     assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_direction), tpr_direction);
-    const tpr_optPrecisionSome = { tag: exports.TypedPayloadResult.Tag.OptPrecision, param0: Math.fround(0.001) };
+    /** @type {TypedPayloadResultTag} */
+    const tpr_optPrecisionSome = { tag: TypedPayloadResult.Tag.OptPrecision, param0: /** @type {PrecisionTag} */ (Math.fround(0.001)) };
     assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_optPrecisionSome), tpr_optPrecisionSome);
-    const tpr_optPrecisionNull = { tag: exports.TypedPayloadResult.Tag.OptPrecision, param0: null };
+    /** @type {TypedPayloadResultTag} */
+    const tpr_optPrecisionNull = { tag: TypedPayloadResult.Tag.OptPrecision, param0: null };
     assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_optPrecisionNull), tpr_optPrecisionNull);
-    const tpr_empty = { tag: exports.TypedPayloadResult.Tag.Empty };
+    /** @type {TypedPayloadResultTag} */
+    const tpr_empty = { tag: TypedPayloadResult.Tag.Empty };
     assert.deepEqual(exports.roundTripOptionalTypedPayloadResult(tpr_empty), tpr_empty);
     assert.equal(exports.roundTripOptionalTypedPayloadResult(null), null);
 
@@ -202,10 +212,12 @@ export function runJsOptionalSupportTests(exports) {
     const oatr_structNone = { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: null };
     assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_structNone), oatr_structNone);
 
-    const oatr_classSome = { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: new exports.Greeter("OptEnumUser") };
+    const oatr_classSome = { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: new Greeter("OptEnumUser") };
     const oatr_classSome_result = exports.roundTripOptionalPayloadResult(oatr_classSome);
     assert.equal(oatr_classSome_result.tag, OptionalAllTypesResultValues.Tag.OptClass);
-    assert.equal(oatr_classSome_result.param0.name, "OptEnumUser");
+    if (oatr_classSome_result.tag === OptionalAllTypesResultValues.Tag.OptClass) {
+        assert.equal(oatr_classSome_result.param0?.name, "OptEnumUser");
+    }
 
     const oatr_classNone = { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: null };
     assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_classNone), oatr_classNone);
@@ -213,7 +225,9 @@ export function runJsOptionalSupportTests(exports) {
     const oatr_jsObjectSome = { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: { key: "value" } };
     const oatr_jsObjectSome_result = exports.roundTripOptionalPayloadResult(oatr_jsObjectSome);
     assert.equal(oatr_jsObjectSome_result.tag, OptionalAllTypesResultValues.Tag.OptJSObject);
-    assert.equal(oatr_jsObjectSome_result.param0.key, "value");
+    if (oatr_jsObjectSome_result.tag === OptionalAllTypesResultValues.Tag.OptJSObject) {
+        assert.equal(oatr_jsObjectSome_result.param0?.key, "value");
+    }
 
     const oatr_jsObjectNone = { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: null };
     assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_jsObjectNone), oatr_jsObjectNone);
@@ -233,7 +247,9 @@ export function runJsOptionalSupportTests(exports) {
     const oatr_jsClassSome = { tag: OptionalAllTypesResultValues.Tag.OptJsClass, param0: new ImportedFoo("optEnumFoo") };
     const oatr_jsClassSome_result = exports.roundTripOptionalPayloadResult(oatr_jsClassSome);
     assert.equal(oatr_jsClassSome_result.tag, OptionalAllTypesResultValues.Tag.OptJsClass);
-    assert.equal(oatr_jsClassSome_result.param0.value, "optEnumFoo");
+    if (oatr_jsClassSome_result.tag === OptionalAllTypesResultValues.Tag.OptJsClass) {
+        assert.equal(oatr_jsClassSome_result.param0?.value, "optEnumFoo");
+    }
 
     const oatr_jsClassNone = { tag: OptionalAllTypesResultValues.Tag.OptJsClass, param0: null };
     assert.deepEqual(exports.roundTripOptionalPayloadResult(oatr_jsClassNone), oatr_jsClassNone);
