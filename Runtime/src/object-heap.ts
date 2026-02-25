@@ -28,14 +28,8 @@ export class JSObjectSpace {
             this._rcById[id]++;
             return id;
         }
-        if (this._freeStack.length > 0) {
-            const newId = this._freeStack.pop()!;
-            this._values[newId] = value;
-            this._rcById[newId] = 1;
-            this._valueMap.set(value, newId);
-            return newId;
-        }
-        const newId = this._values.length;
+
+        const newId = this._freeStack.length > 0 ? this._freeStack.pop()! : this._values.length;
         this._values[newId] = value;
         this._rcById[newId] = 1;
         this._valueMap.set(value, newId);
