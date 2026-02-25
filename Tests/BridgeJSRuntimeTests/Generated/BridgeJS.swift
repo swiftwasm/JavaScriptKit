@@ -9992,171 +9992,129 @@ func _$DefaultArgumentImports_runJsDefaultArgumentTests() throws(JSException) ->
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripDictionary")
-fileprivate func bjs_jsRoundTripDictionary_extern() -> Void
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DictionarySupportImports_jsRoundTripDictionaryInt_static")
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryInt_static_extern() -> Void
 #else
-fileprivate func bjs_jsRoundTripDictionary_extern() -> Void {
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryInt_static_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsRoundTripDictionary() -> Void {
-    return bjs_jsRoundTripDictionary_extern()
+@inline(never) fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryInt_static() -> Void {
+    return bjs_DictionarySupportImports_jsRoundTripDictionaryInt_static_extern()
 }
 
-func _$jsRoundTripDictionary(_ values: [String: Int]) throws(JSException) -> [String: Int] {
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DictionarySupportImports_jsRoundTripDictionaryBool_static")
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryBool_static_extern() -> Void
+#else
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryBool_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryBool_static() -> Void {
+    return bjs_DictionarySupportImports_jsRoundTripDictionaryBool_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DictionarySupportImports_jsRoundTripDictionaryDouble_static")
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryDouble_static_extern() -> Void
+#else
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryDouble_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryDouble_static() -> Void {
+    return bjs_DictionarySupportImports_jsRoundTripDictionaryDouble_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DictionarySupportImports_jsRoundTripDictionaryJSObject_static")
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryJSObject_static_extern() -> Void
+#else
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryJSObject_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryJSObject_static() -> Void {
+    return bjs_DictionarySupportImports_jsRoundTripDictionaryJSObject_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DictionarySupportImports_jsRoundTripDictionaryJSValue_static")
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryJSValue_static_extern() -> Void
+#else
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryJSValue_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryJSValue_static() -> Void {
+    return bjs_DictionarySupportImports_jsRoundTripDictionaryJSValue_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DictionarySupportImports_jsRoundTripDictionaryDoubleArray_static")
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryDoubleArray_static_extern() -> Void
+#else
+fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryDoubleArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_DictionarySupportImports_jsRoundTripDictionaryDoubleArray_static() -> Void {
+    return bjs_DictionarySupportImports_jsRoundTripDictionaryDoubleArray_static_extern()
+}
+
+func _$DictionarySupportImports_jsRoundTripDictionaryInt(_ values: [String: Int]) throws(JSException) -> [String: Int] {
     let _ = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripDictionary()
+    bjs_DictionarySupportImports_jsRoundTripDictionaryInt_static()
     if let error = _swift_js_take_exception() {
         throw error
     }
     return [String: Int].bridgeJSLiftReturn()
 }
 
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripDictionaryBool")
-fileprivate func bjs_jsRoundTripDictionaryBool_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripDictionaryBool_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripDictionaryBool() -> Void {
-    return bjs_jsRoundTripDictionaryBool_extern()
-}
-
-func _$jsRoundTripDictionaryBool(_ values: [String: Bool]) throws(JSException) -> [String: Bool] {
+func _$DictionarySupportImports_jsRoundTripDictionaryBool(_ values: [String: Bool]) throws(JSException) -> [String: Bool] {
     let _ = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripDictionaryBool()
+    bjs_DictionarySupportImports_jsRoundTripDictionaryBool_static()
     if let error = _swift_js_take_exception() {
         throw error
     }
     return [String: Bool].bridgeJSLiftReturn()
 }
 
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripDictionaryDouble")
-fileprivate func bjs_jsRoundTripDictionaryDouble_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripDictionaryDouble_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripDictionaryDouble() -> Void {
-    return bjs_jsRoundTripDictionaryDouble_extern()
-}
-
-func _$jsRoundTripDictionaryDouble(_ values: [String: Double]) throws(JSException) -> [String: Double] {
+func _$DictionarySupportImports_jsRoundTripDictionaryDouble(_ values: [String: Double]) throws(JSException) -> [String: Double] {
     let _ = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripDictionaryDouble()
+    bjs_DictionarySupportImports_jsRoundTripDictionaryDouble_static()
     if let error = _swift_js_take_exception() {
         throw error
     }
     return [String: Double].bridgeJSLiftReturn()
 }
 
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripDictionaryJSObject")
-fileprivate func bjs_jsRoundTripDictionaryJSObject_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripDictionaryJSObject_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripDictionaryJSObject() -> Void {
-    return bjs_jsRoundTripDictionaryJSObject_extern()
-}
-
-func _$jsRoundTripDictionaryJSObject(_ values: [String: JSObject]) throws(JSException) -> [String: JSObject] {
+func _$DictionarySupportImports_jsRoundTripDictionaryJSObject(_ values: [String: JSObject]) throws(JSException) -> [String: JSObject] {
     let _ = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripDictionaryJSObject()
+    bjs_DictionarySupportImports_jsRoundTripDictionaryJSObject_static()
     if let error = _swift_js_take_exception() {
         throw error
     }
     return [String: JSObject].bridgeJSLiftReturn()
 }
 
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripDictionaryJSValue")
-fileprivate func bjs_jsRoundTripDictionaryJSValue_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripDictionaryJSValue_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripDictionaryJSValue() -> Void {
-    return bjs_jsRoundTripDictionaryJSValue_extern()
-}
-
-func _$jsRoundTripDictionaryJSValue(_ values: [String: JSValue]) throws(JSException) -> [String: JSValue] {
+func _$DictionarySupportImports_jsRoundTripDictionaryJSValue(_ values: [String: JSValue]) throws(JSException) -> [String: JSValue] {
     let _ = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripDictionaryJSValue()
+    bjs_DictionarySupportImports_jsRoundTripDictionaryJSValue_static()
     if let error = _swift_js_take_exception() {
         throw error
     }
     return [String: JSValue].bridgeJSLiftReturn()
 }
 
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripNestedDictionary")
-fileprivate func bjs_jsRoundTripNestedDictionary_extern() -> Void
-#else
-fileprivate func bjs_jsRoundTripNestedDictionary_extern() -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripNestedDictionary() -> Void {
-    return bjs_jsRoundTripNestedDictionary_extern()
-}
-
-func _$jsRoundTripNestedDictionary(_ values: [String: [Double]]) throws(JSException) -> [String: [Double]] {
+func _$DictionarySupportImports_jsRoundTripDictionaryDoubleArray(_ values: [String: [Double]]) throws(JSException) -> [String: [Double]] {
     let _ = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripNestedDictionary()
+    bjs_DictionarySupportImports_jsRoundTripDictionaryDoubleArray_static()
     if let error = _swift_js_take_exception() {
         throw error
     }
     return [String: [Double]].bridgeJSLiftReturn()
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalDictionary")
-fileprivate func bjs_jsRoundTripOptionalDictionary_extern(_ values: Int32) -> Void
-#else
-fileprivate func bjs_jsRoundTripOptionalDictionary_extern(_ values: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripOptionalDictionary(_ values: Int32) -> Void {
-    return bjs_jsRoundTripOptionalDictionary_extern(values)
-}
-
-func _$jsRoundTripOptionalDictionary(_ values: Optional<[String: String]>) throws(JSException) -> Optional<[String: String]> {
-    let valuesIsSome = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripOptionalDictionary(valuesIsSome)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return Optional<[String: String]>.bridgeJSLiftReturn()
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripUndefinedDictionary")
-fileprivate func bjs_jsRoundTripUndefinedDictionary_extern(_ values: Int32) -> Void
-#else
-fileprivate func bjs_jsRoundTripUndefinedDictionary_extern(_ values: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_jsRoundTripUndefinedDictionary(_ values: Int32) -> Void {
-    return bjs_jsRoundTripUndefinedDictionary_extern(values)
-}
-
-func _$jsRoundTripUndefinedDictionary(_ values: JSUndefinedOr<[String: Int]>) throws(JSException) -> JSUndefinedOr<[String: Int]> {
-    let valuesIsSome = values.bridgeJSLowerParameter()
-    bjs_jsRoundTripUndefinedDictionary(valuesIsSome)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return JSUndefinedOr<[String: Int]>.bridgeJSLiftReturn()
 }
 
 #if arch(wasm32)
@@ -11404,6 +11362,18 @@ fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static")
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static_extern(_ v: Int32) -> Void
+#else
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static_extern(_ v: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static(_ v: Int32) -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static_extern(v)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static")
 fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern(_ v: Int32) -> Void
 #else
@@ -11413,6 +11383,18 @@ fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDic
 #endif
 @inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static(_ v: Int32) -> Void {
     return bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static")
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static_extern(_ v: Int32) -> Void
+#else
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static_extern(_ v: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static(_ v: Int32) -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static_extern(v)
 }
 
 #if arch(wasm32)
@@ -11472,6 +11454,15 @@ func _$OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull(_ v: Optional<
     return Optional<[JSValue]>.bridgeJSLiftReturn()
 }
 
+func _$OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined(_ v: JSUndefinedOr<[JSValue]>) throws(JSException) -> JSUndefinedOr<[JSValue]> {
+    let vIsSome = v.bridgeJSLowerParameter()
+    bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static(vIsSome)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<[JSValue]>.bridgeJSLiftReturn()
+}
+
 func _$OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull(_ v: Optional<[String: String]>) throws(JSException) -> Optional<[String: String]> {
     let vIsSome = v.bridgeJSLowerParameter()
     bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static(vIsSome)
@@ -11479,6 +11470,15 @@ func _$OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull(_ 
         throw error
     }
     return Optional<[String: String]>.bridgeJSLiftReturn()
+}
+
+func _$OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined(_ v: JSUndefinedOr<[String: String]>) throws(JSException) -> JSUndefinedOr<[String: String]> {
+    let vIsSome = v.bridgeJSLowerParameter()
+    bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static(vIsSome)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUndefinedOr<[String: String]>.bridgeJSLiftReturn()
 }
 
 func _$OptionalSupportImports_runJsOptionalSupportTests() throws(JSException) -> Void {

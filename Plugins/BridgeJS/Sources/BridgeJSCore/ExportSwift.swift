@@ -713,55 +713,17 @@ struct StackCodegen {
         switch type {
         case .string, .int, .uint, .bool, .float, .double,
             .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject, .unsafePointer,
-            .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum, .array:
+            .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum, .array, .dictionary:
             return "\(raw: type.swiftType).bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: className)(unsafelyWrapping: JSObject.bridgeJSStackPop())"
         case .nullable(let wrappedType, let kind):
             return liftNullableExpression(wrappedType: wrappedType, kind: kind)
-        case .dictionary(let valueType):
-            return liftDictionaryExpression(valueType: valueType)
         case .closure:
             return "JSObject.bridgeJSStackPop()"
         case .void, .namespaceEnum:
             return "()"
         }
-    }
-
-    func liftDictionaryExpression(valueType: BridgeType) -> ExprSyntax {
-        switch valueType {
-        case .jsObject(let className?) where className != "JSObject":
-            return """
-                {
-                    let __dict = [String: JSObject].bridgeJSStackPop()
-                    return __dict.mapValues { \(raw: className)(unsafelyWrapping: $0) }
-                }()
-                """
-        case .nullable, .closure:
-            return liftDictionaryExpressionInline(valueType: valueType)
-        case .void, .namespaceEnum:
-            fatalError("Invalid dictionary value type: \(valueType)")
-        default:
-            return "[String: \(raw: valueType.swiftType)].bridgeJSStackPop()"
-        }
-    }
-
-    private func liftDictionaryExpressionInline(valueType: BridgeType) -> ExprSyntax {
-        let valueLift = liftExpression(for: valueType)
-        let swiftTypeName = valueType.swiftType
-        return """
-            {
-                let __count = Int(_swift_js_pop_i32())
-                var __result: [String: \(raw: swiftTypeName)] = [:]
-                __result.reserveCapacity(__count)
-                for _ in 0..<__count {
-                    let __value = \(valueLift)
-                    let __key = String.bridgeJSStackPop()
-                    __result[__key] = __value
-                }
-                return __result
-            }()
-            """
     }
 
     private func liftNullableExpression(wrappedType: BridgeType, kind: JSOptionalKind) -> ExprSyntax {

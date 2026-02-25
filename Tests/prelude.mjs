@@ -9,6 +9,7 @@ import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/J
 import { getImports as getSwiftClassSupportImports } from './BridgeJSRuntimeTests/JavaScript/SwiftClassSupportTests.mjs';
 import { getImports as getOptionalSupportImports } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
 import { getImports as getArraySupportImports, ArrayElementObject } from './BridgeJSRuntimeTests/JavaScript/ArraySupportTests.mjs';
+import { getImports as getDictionarySupportImports } from './BridgeJSRuntimeTests/JavaScript/DictionarySupportTests.mjs';
 import { getImports as getDefaultArgumentImports } from './BridgeJSRuntimeTests/JavaScript/DefaultArgumentTests.mjs';
 import { getImports as getJSClassSupportImports, JSClassWithArrayMembers } from './BridgeJSRuntimeTests/JavaScript/JSClassSupportTests.mjs';
 
@@ -53,30 +54,6 @@ export async function setupOptions(options, context) {
                 },
                 "jsRoundTripString": (v) => {
                     return v;
-                },
-                "jsRoundTripDictionary": (dict) => {
-                    return { ...dict };
-                },
-                "jsRoundTripDictionaryBool": (dict) => {
-                    return { ...dict };
-                },
-                "jsRoundTripDictionaryDouble": (dict) => {
-                    return { ...dict };
-                },
-                "jsRoundTripDictionaryJSObject": (dict) => {
-                    return dict;
-                },
-                "jsRoundTripDictionaryJSValue": (dict) => {
-                    return dict;
-                },
-                "jsRoundTripNestedDictionary": (dict) => {
-                    return Object.fromEntries(Object.entries(dict).map(([k, v]) => [k, [...v]]));
-                },
-                "jsRoundTripOptionalDictionary": (dict) => {
-                    return dict ?? null;
-                },
-                "jsRoundTripUndefinedDictionary": (dict) => {
-                    return dict;
                 },
                 "jsRoundTripJSValue": (v) => {
                     return v;
@@ -164,6 +141,7 @@ export async function setupOptions(options, context) {
                 SwiftClassSupportImports: getSwiftClassSupportImports(importsContext),
                 OptionalSupportImports: getOptionalSupportImports(importsContext),
                 ArraySupportImports: getArraySupportImports(importsContext),
+                DictionarySupportImports: getDictionarySupportImports(importsContext),
                 DefaultArgumentImports: getDefaultArgumentImports(importsContext),
                 JSClassSupportImports: getJSClassSupportImports(importsContext),
             };
