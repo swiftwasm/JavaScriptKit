@@ -29,7 +29,10 @@ export class JSObjectSpace {
             return id;
         }
 
-        const newId = this._freeSlotStack.length > 0 ? this._freeSlotStack.pop()! : this._values.length;
+        const newId =
+            this._freeSlotStack.length > 0
+                ? this._freeSlotStack.pop()!
+                : this._values.length;
         this._values[newId] = value;
         this._refCounts[newId] = 1;
         this._valueRefMap.set(value, newId);
