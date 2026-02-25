@@ -2,56 +2,56 @@ import { globalVariable } from "./find-global.js";
 import { ref } from "./types.js";
 
 export class JSObjectSpace {
-    private _valueMap: Map<any, number>;
+    private _valueRefMap: Map<any, number>;
     private _values: (any | undefined)[];
-    private _rcById: number[];
-    private _freeStack: number[];
+    private _refCounts: number[];
+    private _freeSlotStack: number[];
 
     constructor() {
         this._values = [];
         this._values[0] = undefined;
         this._values[1] = globalVariable;
 
-        this._valueMap = new Map();
-        this._valueMap.set(globalVariable, 1);
+        this._valueRefMap = new Map();
+        this._valueRefMap.set(globalVariable, 1);
 
-        this._rcById = [];
-        this._rcById[0] = 0;
-        this._rcById[1] = 1;
+        this._refCounts = [];
+        this._refCounts[0] = 0;
+        this._refCounts[1] = 1;
 
-        this._freeStack = [];
+        this._freeSlotStack = [];
     }
 
     retain(value: any) {
-        const id = this._valueMap.get(value);
+        const id = this._valueRefMap.get(value);
         if (id !== undefined) {
-            this._rcById[id]++;
+            this._refCounts[id]++;
             return id;
         }
 
-        const newId = this._freeStack.length > 0 ? this._freeStack.pop()! : this._values.length;
+        const newId = this._freeSlotStack.length > 0 ? this._freeSlotStack.pop()! : this._values.length;
         this._values[newId] = value;
-        this._rcById[newId] = 1;
-        this._valueMap.set(value, newId);
+        this._refCounts[newId] = 1;
+        this._valueRefMap.set(value, newId);
         return newId;
     }
 
     retainByRef(ref: ref) {
-        this._rcById[ref]++;
+        this._refCounts[ref]++;
         return ref;
     }
 
     release(ref: ref) {
-        if (--this._rcById[ref] !== 0) return;
+        if (--this._refCounts[ref] !== 0) return;
 
         const value = this._values[ref];
-        this._valueMap.delete(value);
+        this._valueRefMap.delete(value);
         if (ref === this._values.length - 1) {
             this._values.length = ref;
-            this._rcById.length = ref;
+            this._refCounts.length = ref;
         } else {
             this._values[ref] = undefined;
-            this._freeStack.push(ref);
+            this._freeSlotStack.push(ref);
         }
     }
 
