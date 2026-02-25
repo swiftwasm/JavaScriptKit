@@ -1920,25 +1920,9 @@ extension Array: _BridgedSwiftStackType where Element: _BridgedSwiftStackType, E
 
 // MARK: - Dictionary Support
 
-public protocol _BridgedSwiftDictionaryStackType: _BridgedSwiftTypeLoweredIntoVoidType,
-    _BridgedSwiftStackType
-where StackLiftResult == Self {
-    associatedtype DictionaryValue: _BridgedSwiftStackType
-    where DictionaryValue.StackLiftResult == DictionaryValue
-}
-
 extension Dictionary: _BridgedSwiftStackType
 where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
     public typealias StackLiftResult = [String: Value]
-    // Lowering/return use stack-based encoding, so dictionary also behaves like a void-lowered type.
-    // Optional/JSUndefinedOr wrappers rely on this conformance to push an isSome flag and
-    // then delegate to the stack-based lowering defined below.
-    // swiftlint:disable:next type_name
-}
-
-extension Dictionary: _BridgedSwiftTypeLoweredIntoVoidType, _BridgedSwiftDictionaryStackType
-where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
-    public typealias DictionaryValue = Value
 
     @_spi(BridgeJS) public static func bridgeJSStackPop() -> [String: Value] {
         let count = Int(_swift_js_pop_i32())
@@ -1960,7 +1944,10 @@ where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Val
         }
         _swift_js_push_i32(count)
     }
+}
 
+extension Dictionary: _BridgedSwiftTypeLoweredIntoVoidType
+where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
     @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> [String: Value] {
         bridgeJSStackPop()
     }
@@ -1975,10 +1962,9 @@ where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Val
     }
 }
 
-extension _BridgedAsOptional where Wrapped: _BridgedSwiftDictionaryStackType {
-    typealias DictionaryValue = Wrapped.DictionaryValue
-
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+extension _BridgedAsOptional {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter<Value>() -> Int32
+    where Wrapped == Dictionary<String, Value>, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
         switch asOptional {
         case .none:
             return 0
@@ -1988,22 +1974,25 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftDictionaryStackType {
         }
     }
 
-    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32) -> Self {
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter<Value>(_ isSome: Int32) -> Self
+    where Wrapped == Dictionary<String, Value>, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
         if isSome == 0 {
             return Self(optional: nil)
         }
-        return Self(optional: (Dictionary<String, Wrapped.DictionaryValue>.bridgeJSStackPop() as! Wrapped))
+        return Self(optional: Dictionary<String, Value>.bridgeJSStackPop())
     }
 
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> Self {
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn<Value>() -> Self
+    where Wrapped == Dictionary<String, Value>, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
         let isSome = _swift_js_pop_i32()
         if isSome == 0 {
             return Self(optional: nil)
         }
-        return Self(optional: (Dictionary<String, Wrapped.DictionaryValue>.bridgeJSStackPop() as! Wrapped))
+        return Self(optional: Dictionary<String, Value>.bridgeJSStackPop())
     }
 
-    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn<Value>() -> Void
+    where Wrapped == Dictionary<String, Value>, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
         Wrapped.bridgeJSStackPushAsOptional(asOptional)
     }
 }
