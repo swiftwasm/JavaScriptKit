@@ -75,8 +75,8 @@ public func _bjs_makeFoo() -> Int32 {
 @_cdecl("bjs_processFooArray")
 public func _bjs_processFooArray() -> Void {
     #if arch(wasm32)
-    let ret = processFooArray(_: [JSObject].bridgeJSStackPop().map { Foo(unsafelyWrapping: $0) })
-    ret.map { $0.jsObject }.bridgeJSStackPush()
+    let ret = processFooArray(_: [Foo].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -86,20 +86,8 @@ public func _bjs_processFooArray() -> Void {
 @_cdecl("bjs_processOptionalFooArray")
 public func _bjs_processOptionalFooArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalFooArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Optional<Foo>] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Optional<JSObject>.bridgeJSStackPop().map { Foo(unsafelyWrapping: $0) })
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = processOptionalFooArray(_: [Optional<Foo>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif

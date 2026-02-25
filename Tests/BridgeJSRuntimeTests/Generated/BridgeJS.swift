@@ -5692,20 +5692,8 @@ public func _bjs_roundTripGreeterArray() -> Void {
 @_cdecl("bjs_roundTripOptionalIntArray")
 public func _bjs_roundTripOptionalIntArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalIntArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Optional<Int>] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Optional<Int>.bridgeJSStackPop())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripOptionalIntArray(_: [Optional<Int>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5715,20 +5703,8 @@ public func _bjs_roundTripOptionalIntArray() -> Void {
 @_cdecl("bjs_roundTripOptionalStringArray")
 public func _bjs_roundTripOptionalStringArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalStringArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Optional<String>] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Optional<String>.bridgeJSStackPop())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripOptionalStringArray(_: [Optional<String>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5738,20 +5714,8 @@ public func _bjs_roundTripOptionalStringArray() -> Void {
 @_cdecl("bjs_roundTripOptionalDataPointArray")
 public func _bjs_roundTripOptionalDataPointArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalDataPointArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Optional<DataPoint>] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Optional<DataPoint>.bridgeJSStackPop())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripOptionalDataPointArray(_: [Optional<DataPoint>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5761,20 +5725,8 @@ public func _bjs_roundTripOptionalDataPointArray() -> Void {
 @_cdecl("bjs_roundTripOptionalDirectionArray")
 public func _bjs_roundTripOptionalDirectionArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalDirectionArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Optional<Direction>] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Optional<Direction>.bridgeJSStackPop())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripOptionalDirectionArray(_: [Optional<Direction>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -5784,20 +5736,8 @@ public func _bjs_roundTripOptionalDirectionArray() -> Void {
 @_cdecl("bjs_roundTripOptionalStatusArray")
 public func _bjs_roundTripOptionalStatusArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalStatusArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Optional<Status>] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Optional<Status>.bridgeJSStackPop())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripOptionalStatusArray(_: [Optional<Status>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6005,20 +5945,8 @@ public func _bjs_roundTripJSObjectArray() -> Void {
 @_cdecl("bjs_roundTripOptionalJSObjectArray")
 public func _bjs_roundTripOptionalJSObjectArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalJSObjectArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Optional<JSObject>] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Optional<JSObject>.bridgeJSStackPop())
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripOptionalJSObjectArray(_: [Optional<JSObject>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6028,8 +5956,8 @@ public func _bjs_roundTripOptionalJSObjectArray() -> Void {
 @_cdecl("bjs_roundTripFooArray")
 public func _bjs_roundTripFooArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripFooArray(_: [JSObject].bridgeJSStackPop().map { Foo(unsafelyWrapping: $0) })
-    ret.map { $0.jsObject }.bridgeJSStackPush()
+    let ret = roundTripFooArray(_: [Foo].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6039,20 +5967,8 @@ public func _bjs_roundTripFooArray() -> Void {
 @_cdecl("bjs_roundTripOptionalFooArray")
 public func _bjs_roundTripOptionalFooArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalFooArray(_: {
-        let __count = Int(_swift_js_pop_i32())
-        var __result: [Optional<Foo>] = []
-        __result.reserveCapacity(__count)
-        for _ in 0..<__count {
-            __result.append(Optional<JSObject>.bridgeJSStackPop().map { Foo(unsafelyWrapping: $0) })
-        }
-        __result.reverse()
-        return __result
-    }())
-    for __bjs_elem_ret in ret {
-    __bjs_elem_ret.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(Int32(ret.count))
+    let ret = roundTripOptionalFooArray(_: [Optional<Foo>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
     #endif

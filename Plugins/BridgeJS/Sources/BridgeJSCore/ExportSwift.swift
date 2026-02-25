@@ -713,14 +713,12 @@ struct StackCodegen {
         switch type {
         case .string, .int, .uint, .bool, .float, .double,
             .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject, .unsafePointer,
-            .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum:
+            .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum, .array:
             return "\(raw: type.swiftType).bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: className)(unsafelyWrapping: JSObject.bridgeJSStackPop())"
         case .nullable(let wrappedType, let kind):
             return liftNullableExpression(wrappedType: wrappedType, kind: kind)
-        case .array(let elementType):
-            return liftArrayExpression(elementType: elementType)
         case .dictionary(let valueType):
             return liftDictionaryExpression(valueType: valueType)
         case .closure:
@@ -728,36 +726,6 @@ struct StackCodegen {
         case .void, .namespaceEnum:
             return "()"
         }
-    }
-
-    func liftArrayExpression(elementType: BridgeType) -> ExprSyntax {
-        switch elementType {
-        case .jsObject(let className?) where className != "JSObject":
-            return "[JSObject].bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
-        case .nullable, .closure:
-            return liftArrayExpressionInline(elementType: elementType)
-        case .void, .namespaceEnum:
-            fatalError("Invalid array element type: \(elementType)")
-        default:
-            return "[\(raw: elementType.swiftType)].bridgeJSStackPop()"
-        }
-    }
-
-    private func liftArrayExpressionInline(elementType: BridgeType) -> ExprSyntax {
-        let elementLift = liftExpression(for: elementType)
-        let swiftTypeName = elementType.swiftType
-        return """
-            {
-                let __count = Int(_swift_js_pop_i32())
-                var __result: [\(raw: swiftTypeName)] = []
-                __result.reserveCapacity(__count)
-                for _ in 0..<__count {
-                    __result.append(\(elementLift))
-                }
-                __result.reverse()
-                return __result
-            }()
-            """
     }
 
     func liftDictionaryExpression(valueType: BridgeType) -> ExprSyntax {
@@ -845,45 +813,13 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch elementType {
-        case .jsObject(let className?) where className != "JSObject":
-            return ["\(raw: accessor).map { $0.jsObject }.bridgeJSStackPush()"]
         case .swiftProtocol:
             return ["\(raw: accessor).map { $0 as! \(raw: elementType.swiftType) }.bridgeJSStackPush()"]
-        case .nullable, .closure:
-            return lowerArrayStatementsInline(
-                elementType: elementType,
-                accessor: accessor,
-                varPrefix: varPrefix
-            )
         case .void, .namespaceEnum:
             fatalError("Invalid array element type: \(elementType)")
         default:
             return ["\(raw: accessor).bridgeJSStackPush()"]
         }
-    }
-
-    private func lowerArrayStatementsInline(
-        elementType: BridgeType,
-        accessor: String,
-        varPrefix: String
-    ) -> [CodeBlockItemSyntax] {
-        var statements: [String] = []
-        let elementVarName = "__bjs_elem_\(varPrefix)"
-        statements.append("for \(elementVarName) in \(accessor) {")
-
-        let elementStatements = lowerStatements(
-            for: elementType,
-            accessor: elementVarName,
-            varPrefix: "\(varPrefix)_elem"
-        )
-        for stmt in elementStatements {
-            statements.append(stmt.description)
-        }
-
-        statements.append("}")
-        statements.append("_swift_js_push_i32(Int32(\(accessor).count))")
-        let parsed: CodeBlockItemListSyntax = "\(raw: statements.joined(separator: "\n"))"
-        return Array(parsed)
     }
 
     private func lowerDictionaryStatements(
