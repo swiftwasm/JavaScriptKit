@@ -35,8 +35,14 @@ export function getImports(importsContext) {
         jsRoundTripOptionalJSValueArrayNull: (v) => {
             return v ?? null;
         },
+        jsRoundTripOptionalJSValueArrayUndefined: (v) => {
+            return v === undefined ? undefined : v;
+        },
         jsRoundTripOptionalStringToStringDictionaryNull: (v) => {
             return v ?? null;
+        },
+        jsRoundTripOptionalStringToStringDictionaryUndefined: (v) => {
+            return v === undefined ? undefined : v;
         },
         runJsOptionalSupportTests: () => {
             const exports = importsContext.getExports();
