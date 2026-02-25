@@ -860,27 +860,6 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
-    private static func optionalLiftReturnAssociatedEnum(
-        fullName: String,
-        kind: JSOptionalKind
-    ) -> IntrinsicJSFragment {
-        let base = fullName.components(separatedBy: ".").last ?? fullName
-        let absenceLiteral = kind.absenceLiteral
-        return IntrinsicJSFragment(
-            parameters: [],
-            printCode: { _, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let resultVar = scope.variable("optResult")
-                let tagVar = scope.variable("tag")
-                printer.write("const \(tagVar) = \(scope.popI32());")
-                printer.write(
-                    "const \(resultVar) = \(tagVar) === -1 ? \(absenceLiteral) : \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(tagVar));"
-                )
-                return [resultVar]
-            }
-        )
-    }
-
     private static func optionalLiftReturnHeapObject(
         className: String,
         kind: JSOptionalKind
@@ -946,10 +925,6 @@ struct IntrinsicJSFragment: Sendable {
 
         if case .swiftStruct(let fullName) = wrappedType {
             return optionalLiftReturnStruct(fullName: fullName, kind: kind)
-        }
-
-        if wrappedType.nilSentinel.hasSentinel, case .associatedValueEnum(let fullName) = wrappedType {
-            return optionalLiftReturnAssociatedEnum(fullName: fullName, kind: kind)
         }
 
         return optionalLiftReturnWithPresenceFlag(wrappedType: wrappedType, kind: kind)
@@ -1204,22 +1179,8 @@ struct IntrinsicJSFragment: Sendable {
         }
     }
 
-    @discardableResult
-    private static func emitOptionalPlaceholders(
-        for wrappedType: BridgeType,
-        scope: JSGlueVariableScope,
-        printer: CodeFragmentPrinter
-    ) -> Bool {
-        let params = wrappedType.wasmParams
-        if params.isEmpty {
-            return false
-        }
-        for param in params {
-            emitPush(for: param.type, value: param.type.jsZeroLiteral, scope: scope, printer: printer)
-        }
-        return true
-    }
-
+    /// Lower an optional value to the stack using the **conditional** protocol:
+    /// push isSome flag, then conditionally push the payload (no placeholders for nil).
     private static func stackOptionalLower(
         wrappedType: BridgeType,
         kind: JSOptionalKind,
@@ -1244,23 +1205,7 @@ struct IntrinsicJSFragment: Sendable {
                 for line in ifBodyPrinter.lines {
                     printer.write(line)
                 }
-                let placeholderPrinter = CodeFragmentPrinter()
-                let hasPlaceholders = emitOptionalPlaceholders(
-                    for: wrappedType,
-                    scope: scope,
-                    printer: placeholderPrinter
-                )
-                if hasPlaceholders {
-                    printer.write("} else {")
-                    printer.indent {
-                        for line in placeholderPrinter.lines {
-                            printer.write(line)
-                        }
-                    }
-                    printer.write("}")
-                } else {
-                    printer.write("}")
-                }
+                printer.write("}")
                 scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
                 return []
             }
@@ -1773,12 +1718,16 @@ struct IntrinsicJSFragment: Sendable {
                     } else {
                         coerced = value
                     }
-                    emitPush(
-                        for: wasmType,
-                        value: "\(isSomeVar) ? \(coerced) : \(wasmType.jsZeroLiteral)",
-                        scope: scope,
-                        printer: printer
-                    )
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        emitPush(
+                            for: wasmType,
+                            value: coerced,
+                            scope: scope,
+                            printer: printer
+                        )
+                    }
+                    printer.write("}")
                     scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
                     return []
                 }
@@ -2283,6 +2232,8 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
+    /// Lower an optional element to the stack using the **conditional** protocol:
+    /// push isSome flag, then conditionally push the payload (no placeholders for nil).
     private static func optionalElementLowerFragment(
         wrappedType: BridgeType,
         kind: JSOptionalKind
@@ -2304,23 +2255,7 @@ struct IntrinsicJSFragment: Sendable {
                         context
                     )
                 }
-                let placeholderPrinter = CodeFragmentPrinter()
-                let hasPlaceholders = emitOptionalPlaceholders(
-                    for: wrappedType,
-                    scope: scope,
-                    printer: placeholderPrinter
-                )
-                if hasPlaceholders {
-                    printer.write("} else {")
-                    printer.indent {
-                        for line in placeholderPrinter.lines {
-                            printer.write(line)
-                        }
-                    }
-                    printer.write("}")
-                } else {
-                    printer.write("}")
-                }
+                printer.write("}")
                 scope.emitPushI32Parameter(isSomeVar, printer: printer)
 
                 return []
@@ -2525,10 +2460,6 @@ struct IntrinsicJSFragment: Sendable {
                         printer.write("if (\(isSomeVar)) {")
                         printer.indent {
                             emitPush(for: wasmType, value: coerced, scope: scope, printer: printer)
-                        }
-                        printer.write("} else {")
-                        printer.indent {
-                            emitPush(for: wasmType, value: wasmType.jsZeroLiteral, scope: scope, printer: printer)
                         }
                         printer.write("}")
                         scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)

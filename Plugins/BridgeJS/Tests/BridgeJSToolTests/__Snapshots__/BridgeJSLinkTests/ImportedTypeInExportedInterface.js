@@ -46,8 +46,6 @@ export async function createInstantiator(options, swift) {
                     id1 = undefined;
                 }
                 i32Stack.push(id1 !== undefined ? id1 : 0);
-            } else {
-                i32Stack.push(0);
             }
             i32Stack.push(isSome ? 1 : 0);
         },
@@ -303,8 +301,6 @@ export async function createInstantiator(options, swift) {
                         if (isSome) {
                             const objId = swift.memory.retain(elem);
                             i32Stack.push(objId);
-                        } else {
-                            i32Stack.push(0);
                         }
                         i32Stack.push(isSome);
                     }

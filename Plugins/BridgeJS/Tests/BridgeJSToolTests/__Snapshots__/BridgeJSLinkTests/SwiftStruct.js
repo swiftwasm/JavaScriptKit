@@ -44,15 +44,11 @@ export async function createInstantiator(options, swift) {
             const isSome = value.optCount != null;
             if (isSome) {
                 i32Stack.push((value.optCount | 0));
-            } else {
-                i32Stack.push(0);
             }
             i32Stack.push(isSome ? 1 : 0);
             const isSome1 = value.optFlag != null;
             if (isSome1) {
                 i32Stack.push(value.optFlag ? 1 : 0);
-            } else {
-                i32Stack.push(0);
             }
             i32Stack.push(isSome1 ? 1 : 0);
         },
@@ -92,8 +88,6 @@ export async function createInstantiator(options, swift) {
             const isSome = value.zipCode != null;
             if (isSome) {
                 i32Stack.push((value.zipCode | 0));
-            } else {
-                i32Stack.push(0);
             }
             i32Stack.push(isSome ? 1 : 0);
         },
@@ -125,9 +119,6 @@ export async function createInstantiator(options, swift) {
                 const id1 = swift.memory.retain(bytes1);
                 i32Stack.push(bytes1.length);
                 i32Stack.push(id1);
-            } else {
-                i32Stack.push(0);
-                i32Stack.push(0);
             }
             i32Stack.push(isSome ? 1 : 0);
         },
@@ -165,8 +156,6 @@ export async function createInstantiator(options, swift) {
             const isSome = value.optionalPrecision != null;
             if (isSome) {
                 f32Stack.push(Math.fround(value.optionalPrecision));
-            } else {
-                f32Stack.push(0.0);
             }
             i32Stack.push(isSome ? 1 : 0);
         },
@@ -209,8 +198,6 @@ export async function createInstantiator(options, swift) {
                     id1 = undefined;
                 }
                 i32Stack.push(id1 !== undefined ? id1 : 0);
-            } else {
-                i32Stack.push(0);
             }
             i32Stack.push(isSome ? 1 : 0);
         },

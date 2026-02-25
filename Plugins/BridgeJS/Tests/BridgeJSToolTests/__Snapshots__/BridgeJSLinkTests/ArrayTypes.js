@@ -598,8 +598,6 @@ export async function createInstantiator(options, swift) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
                             i32Stack.push((elem | 0));
-                        } else {
-                            i32Stack.push(0);
                         }
                         i32Stack.push(isSome);
                     }
@@ -629,9 +627,6 @@ export async function createInstantiator(options, swift) {
                             const id = swift.memory.retain(bytes);
                             i32Stack.push(bytes.length);
                             i32Stack.push(id);
-                        } else {
-                            i32Stack.push(0);
-                            i32Stack.push(0);
                         }
                         i32Stack.push(isSome);
                     }
@@ -710,8 +705,6 @@ export async function createInstantiator(options, swift) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
                             i32Stack.push((elem | 0));
-                        } else {
-                            i32Stack.push(0);
                         }
                         i32Stack.push(isSome);
                     }
@@ -738,8 +731,6 @@ export async function createInstantiator(options, swift) {
                         const isSome = elem != null ? 1 : 0;
                         if (isSome) {
                             i32Stack.push((elem | 0));
-                        } else {
-                            i32Stack.push(0);
                         }
                         i32Stack.push(isSome);
                     }
@@ -901,8 +892,6 @@ export async function createInstantiator(options, swift) {
                         if (isSome) {
                             const objId = swift.memory.retain(elem);
                             i32Stack.push(objId);
-                        } else {
-                            i32Stack.push(0);
                         }
                         i32Stack.push(isSome);
                     }

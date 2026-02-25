@@ -685,8 +685,14 @@ export async function createInstantiator(options, swift) {
                         result = 0;
                     }
                     instance.exports.invoke_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(boxPtr, +isSome, result);
-                    const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.APIResult.lift(tag);
+                    const isSome1 = i32Stack.pop();
+                    let optResult;
+                    if (isSome1) {
+                        const ret = enumHelpers.APIResult.lift(i32Stack.pop());
+                        optResult = ret;
+                    } else {
+                        optResult = null;
+                    }
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);

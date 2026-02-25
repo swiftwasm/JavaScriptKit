@@ -386,8 +386,6 @@ export async function createInstantiator(options, swift) {
                         const isSome = value != null ? 1 : 0;
                         if (isSome) {
                             ptrStack.push(value.pointer);
-                        } else {
-                            ptrStack.push(0);
                         }
                         i32Stack.push(isSome);
                     }
