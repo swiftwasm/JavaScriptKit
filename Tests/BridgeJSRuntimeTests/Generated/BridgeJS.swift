@@ -1643,6 +1643,51 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y
     #endif
 }
 
+struct AnyArrayElementProtocol: ArrayElementProtocol, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    var value: Int {
+        get {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_ArrayElementProtocol_value_get(jsObjectValue)
+            return Int.bridgeJSLiftReturn(ret)
+        }
+        set {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let newValueValue = newValue.bridgeJSLowerParameter()
+            bjs_ArrayElementProtocol_value_set(jsObjectValue, newValueValue)
+        }
+    }
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyArrayElementProtocol(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayElementProtocol_value_get")
+fileprivate func bjs_ArrayElementProtocol_value_get_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_ArrayElementProtocol_value_get_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArrayElementProtocol_value_get(_ jsObject: Int32) -> Int32 {
+    return bjs_ArrayElementProtocol_value_get_extern(jsObject)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayElementProtocol_value_set")
+fileprivate func bjs_ArrayElementProtocol_value_set_extern(_ jsObject: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_ArrayElementProtocol_value_set_extern(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArrayElementProtocol_value_set(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    return bjs_ArrayElementProtocol_value_set_extern(jsObject, newValue)
+}
+
 struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
     let jsObject: JSObject
 
@@ -2203,6 +2248,443 @@ fileprivate func bjs_DataProcessor_optionalHelper_set_extern(_ jsObject: Int32, 
 #endif
 @inline(never) fileprivate func bjs_DataProcessor_optionalHelper_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValuePointer: UnsafeMutableRawPointer) -> Void {
     return bjs_DataProcessor_optionalHelper_set_extern(jsObject, newValueIsSome, newValuePointer)
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripIntArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripIntArray")
+public func _bjs_ArraySupportExports_static_roundTripIntArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripIntArray(_: [Int].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripStringArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripStringArray")
+public func _bjs_ArraySupportExports_static_roundTripStringArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripStringArray(_: [String].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripDoubleArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripDoubleArray")
+public func _bjs_ArraySupportExports_static_roundTripDoubleArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripDoubleArray(_: [Double].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripBoolArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripBoolArray")
+public func _bjs_ArraySupportExports_static_roundTripBoolArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripBoolArray(_: [Bool].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripUnsafeRawPointerArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripUnsafeRawPointerArray")
+public func _bjs_ArraySupportExports_static_roundTripUnsafeRawPointerArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripUnsafeRawPointerArray(_: [UnsafeRawPointer].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripUnsafeMutableRawPointerArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripUnsafeMutableRawPointerArray")
+public func _bjs_ArraySupportExports_static_roundTripUnsafeMutableRawPointerArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripUnsafeMutableRawPointerArray(_: [UnsafeMutableRawPointer].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOpaquePointerArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOpaquePointerArray")
+public func _bjs_ArraySupportExports_static_roundTripOpaquePointerArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOpaquePointerArray(_: [OpaquePointer].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripUnsafePointerArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripUnsafePointerArray")
+public func _bjs_ArraySupportExports_static_roundTripUnsafePointerArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripUnsafePointerArray(_: [UnsafePointer<UInt8>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripUnsafeMutablePointerArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripUnsafeMutablePointerArray")
+public func _bjs_ArraySupportExports_static_roundTripUnsafeMutablePointerArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripUnsafeMutablePointerArray(_: [UnsafeMutablePointer<UInt8>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripJSValueArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripJSValueArray")
+public func _bjs_ArraySupportExports_static_roundTripJSValueArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripJSValueArray(_: [JSValue].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripJSObjectArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripJSObjectArray")
+public func _bjs_ArraySupportExports_static_roundTripJSObjectArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripJSObjectArray(_: [JSObject].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripCaseEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripCaseEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripCaseEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripCaseEnumArray(_: [Direction].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripStringRawValueEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripStringRawValueEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripStringRawValueEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripStringRawValueEnumArray(_: [Theme].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripIntRawValueEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripIntRawValueEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripIntRawValueEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripIntRawValueEnumArray(_: [HttpStatus].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripStructArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripStructArray")
+public func _bjs_ArraySupportExports_static_roundTripStructArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripStructArray(_: [DataPoint].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripSwiftClassArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripSwiftClassArray")
+public func _bjs_ArraySupportExports_static_roundTripSwiftClassArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripSwiftClassArray(_: [Greeter].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripNamespacedSwiftClassArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripNamespacedSwiftClassArray")
+public func _bjs_ArraySupportExports_static_roundTripNamespacedSwiftClassArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripNamespacedSwiftClassArray(_: [Utils.Converter].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripProtocolArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripProtocolArray")
+public func _bjs_ArraySupportExports_static_roundTripProtocolArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripProtocolArray(_: [AnyArrayElementProtocol].bridgeJSStackPop())
+    ret.map { $0 as! AnyArrayElementProtocol }.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripJSClassArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripJSClassArray")
+public func _bjs_ArraySupportExports_static_roundTripJSClassArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripJSClassArray(_: [ArrayElementObject].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalIntArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalIntArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalIntArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalIntArray(_: [Optional<Int>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalStringArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalStringArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalStringArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalStringArray(_: [Optional<String>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalJSObjectArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalJSObjectArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalJSObjectArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalJSObjectArray(_: [Optional<JSObject>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalCaseEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalCaseEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalCaseEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalCaseEnumArray(_: [Optional<Direction>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalStringRawValueEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalStringRawValueEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalStringRawValueEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalStringRawValueEnumArray(_: [Optional<Theme>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalIntRawValueEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalIntRawValueEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalIntRawValueEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalIntRawValueEnumArray(_: [Optional<HttpStatus>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalStructArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalStructArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalStructArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalStructArray(_: [Optional<DataPoint>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalSwiftClassArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalSwiftClassArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalSwiftClassArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalSwiftClassArray(_: [Optional<Greeter>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalJSClassArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalJSClassArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalJSClassArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalJSClassArray(_: [Optional<ArrayElementObject>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripNestedIntArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripNestedIntArray")
+public func _bjs_ArraySupportExports_static_roundTripNestedIntArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripNestedIntArray(_: [[Int]].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripNestedStringArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripNestedStringArray")
+public func _bjs_ArraySupportExports_static_roundTripNestedStringArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripNestedStringArray(_: [[String]].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripNestedDoubleArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripNestedDoubleArray")
+public func _bjs_ArraySupportExports_static_roundTripNestedDoubleArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripNestedDoubleArray(_: [[Double]].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripNestedBoolArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripNestedBoolArray")
+public func _bjs_ArraySupportExports_static_roundTripNestedBoolArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripNestedBoolArray(_: [[Bool]].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripNestedStructArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripNestedStructArray")
+public func _bjs_ArraySupportExports_static_roundTripNestedStructArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripNestedStructArray(_: [[DataPoint]].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripNestedCaseEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripNestedCaseEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripNestedCaseEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripNestedCaseEnumArray(_: [[Direction]].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripNestedSwiftClassArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripNestedSwiftClassArray")
+public func _bjs_ArraySupportExports_static_roundTripNestedSwiftClassArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripNestedSwiftClassArray(_: [[Greeter]].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_multiArrayFirst")
+@_cdecl("bjs_ArraySupportExports_static_multiArrayFirst")
+public func _bjs_ArraySupportExports_static_multiArrayFirst() -> Void {
+    #if arch(wasm32)
+    let _tmp_b = [String].bridgeJSStackPop()
+    let _tmp_a = [Int].bridgeJSStackPop()
+    let ret = ArraySupportExports.multiArrayFirst(_: _tmp_a, _: _tmp_b)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_multiArraySecond")
+@_cdecl("bjs_ArraySupportExports_static_multiArraySecond")
+public func _bjs_ArraySupportExports_static_multiArraySecond() -> Void {
+    #if arch(wasm32)
+    let _tmp_b = [String].bridgeJSStackPop()
+    let _tmp_a = [Int].bridgeJSStackPop()
+    let ret = ArraySupportExports.multiArraySecond(_: _tmp_a, _: _tmp_b)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_multiOptionalArrayFirst")
+@_cdecl("bjs_ArraySupportExports_static_multiOptionalArrayFirst")
+public func _bjs_ArraySupportExports_static_multiOptionalArrayFirst() -> Void {
+    #if arch(wasm32)
+    let _tmp_b = Optional<[String]>.bridgeJSLiftParameter()
+    let _tmp_a = Optional<[Int]>.bridgeJSLiftParameter()
+    let ret = ArraySupportExports.multiOptionalArrayFirst(_: _tmp_a, _: _tmp_b)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_multiOptionalArraySecond")
+@_cdecl("bjs_ArraySupportExports_static_multiOptionalArraySecond")
+public func _bjs_ArraySupportExports_static_multiOptionalArraySecond() -> Void {
+    #if arch(wasm32)
+    let _tmp_b = Optional<[String]>.bridgeJSLiftParameter()
+    let _tmp_a = Optional<[Int]>.bridgeJSLiftParameter()
+    let ret = ArraySupportExports.multiOptionalArraySecond(_: _tmp_a, _: _tmp_b)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension Direction: _BridgedSwiftCaseEnum {
@@ -4427,17 +4909,6 @@ public func _bjs_roundTripOptionalJSValue(_ vIsSome: Int32, _ vKind: Int32, _ vP
     #endif
 }
 
-@_expose(wasm, "bjs_roundTripJSValueArray")
-@_cdecl("bjs_roundTripJSValueArray")
-public func _bjs_roundTripJSValueArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripJSValueArray(v: [JSValue].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
 @_expose(wasm, "bjs_roundTripOptionalJSValueArray")
 @_cdecl("bjs_roundTripOptionalJSValueArray")
 public func _bjs_roundTripOptionalJSValueArray() -> Void {
@@ -5578,171 +6049,6 @@ public func _bjs_makeAdder(_ base: Int32) -> Int32 {
     #endif
 }
 
-@_expose(wasm, "bjs_roundTripIntArray")
-@_cdecl("bjs_roundTripIntArray")
-public func _bjs_roundTripIntArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripIntArray(_: [Int].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripStringArray")
-@_cdecl("bjs_roundTripStringArray")
-public func _bjs_roundTripStringArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripStringArray(_: [String].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripDoubleArray")
-@_cdecl("bjs_roundTripDoubleArray")
-public func _bjs_roundTripDoubleArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripDoubleArray(_: [Double].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripBoolArray")
-@_cdecl("bjs_roundTripBoolArray")
-public func _bjs_roundTripBoolArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripBoolArray(_: [Bool].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripDirectionArray")
-@_cdecl("bjs_roundTripDirectionArray")
-public func _bjs_roundTripDirectionArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripDirectionArray(_: [Direction].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripStatusArray")
-@_cdecl("bjs_roundTripStatusArray")
-public func _bjs_roundTripStatusArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripStatusArray(_: [Status].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripThemeArray")
-@_cdecl("bjs_roundTripThemeArray")
-public func _bjs_roundTripThemeArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripThemeArray(_: [Theme].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripHttpStatusArray")
-@_cdecl("bjs_roundTripHttpStatusArray")
-public func _bjs_roundTripHttpStatusArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripHttpStatusArray(_: [HttpStatus].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripDataPointArray")
-@_cdecl("bjs_roundTripDataPointArray")
-public func _bjs_roundTripDataPointArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripDataPointArray(_: [DataPoint].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripGreeterArray")
-@_cdecl("bjs_roundTripGreeterArray")
-public func _bjs_roundTripGreeterArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripGreeterArray(_: [Greeter].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalIntArray")
-@_cdecl("bjs_roundTripOptionalIntArray")
-public func _bjs_roundTripOptionalIntArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalIntArray(_: [Optional<Int>].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalStringArray")
-@_cdecl("bjs_roundTripOptionalStringArray")
-public func _bjs_roundTripOptionalStringArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalStringArray(_: [Optional<String>].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalDataPointArray")
-@_cdecl("bjs_roundTripOptionalDataPointArray")
-public func _bjs_roundTripOptionalDataPointArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalDataPointArray(_: [Optional<DataPoint>].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalDirectionArray")
-@_cdecl("bjs_roundTripOptionalDirectionArray")
-public func _bjs_roundTripOptionalDirectionArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalDirectionArray(_: [Optional<Direction>].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalStatusArray")
-@_cdecl("bjs_roundTripOptionalStatusArray")
-public func _bjs_roundTripOptionalStatusArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalStatusArray(_: [Optional<Status>].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
 @_expose(wasm, "bjs_roundTripOptionalIntArrayType")
 @_cdecl("bjs_roundTripOptionalIntArrayType")
 public func _bjs_roundTripOptionalIntArrayType() -> Void {
@@ -5770,256 +6076,6 @@ public func _bjs_roundTripOptionalStringArrayType() -> Void {
 public func _bjs_roundTripOptionalGreeterArrayType() -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalGreeterArrayType(_: Optional<[Greeter]>.bridgeJSLiftParameter())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripNestedIntArray")
-@_cdecl("bjs_roundTripNestedIntArray")
-public func _bjs_roundTripNestedIntArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripNestedIntArray(_: [[Int]].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripNestedStringArray")
-@_cdecl("bjs_roundTripNestedStringArray")
-public func _bjs_roundTripNestedStringArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripNestedStringArray(_: [[String]].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripNestedDoubleArray")
-@_cdecl("bjs_roundTripNestedDoubleArray")
-public func _bjs_roundTripNestedDoubleArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripNestedDoubleArray(_: [[Double]].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripNestedBoolArray")
-@_cdecl("bjs_roundTripNestedBoolArray")
-public func _bjs_roundTripNestedBoolArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripNestedBoolArray(_: [[Bool]].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripNestedDataPointArray")
-@_cdecl("bjs_roundTripNestedDataPointArray")
-public func _bjs_roundTripNestedDataPointArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripNestedDataPointArray(_: [[DataPoint]].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripNestedDirectionArray")
-@_cdecl("bjs_roundTripNestedDirectionArray")
-public func _bjs_roundTripNestedDirectionArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripNestedDirectionArray(_: [[Direction]].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripNestedGreeterArray")
-@_cdecl("bjs_roundTripNestedGreeterArray")
-public func _bjs_roundTripNestedGreeterArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripNestedGreeterArray(_: [[Greeter]].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripUnsafeRawPointerArray")
-@_cdecl("bjs_roundTripUnsafeRawPointerArray")
-public func _bjs_roundTripUnsafeRawPointerArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripUnsafeRawPointerArray(_: [UnsafeRawPointer].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripUnsafeMutableRawPointerArray")
-@_cdecl("bjs_roundTripUnsafeMutableRawPointerArray")
-public func _bjs_roundTripUnsafeMutableRawPointerArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripUnsafeMutableRawPointerArray(_: [UnsafeMutableRawPointer].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOpaquePointerArray")
-@_cdecl("bjs_roundTripOpaquePointerArray")
-public func _bjs_roundTripOpaquePointerArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOpaquePointerArray(_: [OpaquePointer].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripUnsafePointerArray")
-@_cdecl("bjs_roundTripUnsafePointerArray")
-public func _bjs_roundTripUnsafePointerArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripUnsafePointerArray(_: [UnsafePointer<UInt8>].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripUnsafeMutablePointerArray")
-@_cdecl("bjs_roundTripUnsafeMutablePointerArray")
-public func _bjs_roundTripUnsafeMutablePointerArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripUnsafeMutablePointerArray(_: [UnsafeMutablePointer<UInt8>].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_consumeDataProcessorArrayType")
-@_cdecl("bjs_consumeDataProcessorArrayType")
-public func _bjs_consumeDataProcessorArrayType() -> Int32 {
-    #if arch(wasm32)
-    let ret = consumeDataProcessorArrayType(_: [AnyDataProcessor].bridgeJSStackPop())
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripDataProcessorArrayType")
-@_cdecl("bjs_roundTripDataProcessorArrayType")
-public func _bjs_roundTripDataProcessorArrayType() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripDataProcessorArrayType(_: [AnyDataProcessor].bridgeJSStackPop())
-    ret.map { $0 as! AnyDataProcessor }.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripJSObjectArray")
-@_cdecl("bjs_roundTripJSObjectArray")
-public func _bjs_roundTripJSObjectArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripJSObjectArray(_: [JSObject].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalJSObjectArray")
-@_cdecl("bjs_roundTripOptionalJSObjectArray")
-public func _bjs_roundTripOptionalJSObjectArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalJSObjectArray(_: [Optional<JSObject>].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripFooArray")
-@_cdecl("bjs_roundTripFooArray")
-public func _bjs_roundTripFooArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripFooArray(_: [Foo].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalFooArray")
-@_cdecl("bjs_roundTripOptionalFooArray")
-public func _bjs_roundTripOptionalFooArray() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalFooArray(_: [Optional<Foo>].bridgeJSStackPop())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_multiArrayFirstNums")
-@_cdecl("bjs_multiArrayFirstNums")
-public func _bjs_multiArrayFirstNums() -> Void {
-    #if arch(wasm32)
-    let _tmp_strs = [String].bridgeJSStackPop()
-    let _tmp_nums = [Int].bridgeJSStackPop()
-    let ret = multiArrayFirstNums(nums: _tmp_nums, strs: _tmp_strs)
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_multiArrayFirstStrs")
-@_cdecl("bjs_multiArrayFirstStrs")
-public func _bjs_multiArrayFirstStrs() -> Void {
-    #if arch(wasm32)
-    let _tmp_strs = [String].bridgeJSStackPop()
-    let _tmp_nums = [Int].bridgeJSStackPop()
-    let ret = multiArrayFirstStrs(nums: _tmp_nums, strs: _tmp_strs)
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_multiOptionalArrayFirstA")
-@_cdecl("bjs_multiOptionalArrayFirstA")
-public func _bjs_multiOptionalArrayFirstA() -> Void {
-    #if arch(wasm32)
-    let _tmp_b = Optional<[String]>.bridgeJSLiftParameter()
-    let _tmp_a = Optional<[Int]>.bridgeJSLiftParameter()
-    let ret = multiOptionalArrayFirstA(a: _tmp_a, b: _tmp_b)
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_multiOptionalArrayFirstB")
-@_cdecl("bjs_multiOptionalArrayFirstB")
-public func _bjs_multiOptionalArrayFirstB() -> Void {
-    #if arch(wasm32)
-    let _tmp_b = Optional<[String]>.bridgeJSLiftParameter()
-    let _tmp_a = Optional<[Int]>.bridgeJSLiftParameter()
-    let ret = multiOptionalArrayFirstB(a: _tmp_a, b: _tmp_b)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -9316,6 +9372,78 @@ fileprivate func bjs_ArraySupportImports_jsRoundTripJSClassArray_static_extern()
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripOptionalIntArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalIntArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalIntArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalIntArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripOptionalIntArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripOptionalStringArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalStringArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalStringArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalStringArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripOptionalStringArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripOptionalBoolArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalBoolArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalBoolArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalBoolArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripOptionalBoolArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripOptionalJSObjectArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSObjectArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSObjectArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSObjectArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripOptionalJSObjectArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripOptionalJSClassArray_static")
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSClassArray_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSClassArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSClassArray_static() -> Void {
+    return bjs_ArraySupportImports_jsRoundTripOptionalJSClassArray_static_extern()
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsSumNumberArray_static")
 fileprivate func bjs_ArraySupportImports_jsSumNumberArray_static_extern() -> Float64
 #else
@@ -9337,6 +9465,18 @@ fileprivate func bjs_ArraySupportImports_jsCreateNumberArray_static_extern() -> 
 #endif
 @inline(never) fileprivate func bjs_ArraySupportImports_jsCreateNumberArray_static() -> Void {
     return bjs_ArraySupportImports_jsCreateNumberArray_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_runJsArraySupportTests_static")
+fileprivate func bjs_ArraySupportImports_runJsArraySupportTests_static_extern() -> Void
+#else
+fileprivate func bjs_ArraySupportImports_runJsArraySupportTests_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ArraySupportImports_runJsArraySupportTests_static() -> Void {
+    return bjs_ArraySupportImports_runJsArraySupportTests_static_extern()
 }
 
 func _$ArraySupportImports_jsIntArrayLength(_ items: [Int]) throws(JSException) -> Int {
@@ -9411,6 +9551,60 @@ func _$ArraySupportImports_jsRoundTripJSClassArray(_ values: [ArrayElementObject
     return [ArrayElementObject].bridgeJSLiftReturn()
 }
 
+func _$ArraySupportImports_jsRoundTripOptionalIntArray(_ values: [Optional<Int>]) throws(JSException) -> [Optional<Int>] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripOptionalIntArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Optional<Int>].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripOptionalStringArray(_ values: [Optional<String>]) throws(JSException) -> [Optional<String>] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripOptionalStringArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Optional<String>].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripOptionalBoolArray(_ values: [Optional<Bool>]) throws(JSException) -> [Optional<Bool>] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripOptionalBoolArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Optional<Bool>].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripOptionalJSValueArray(_ values: [Optional<JSValue>]) throws(JSException) -> [Optional<JSValue>] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Optional<JSValue>].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripOptionalJSObjectArray(_ values: [Optional<JSObject>]) throws(JSException) -> [Optional<JSObject>] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripOptionalJSObjectArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Optional<JSObject>].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_jsRoundTripOptionalJSClassArray(_ values: [Optional<ArrayElementObject>]) throws(JSException) -> [Optional<ArrayElementObject>] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_ArraySupportImports_jsRoundTripOptionalJSClassArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [Optional<ArrayElementObject>].bridgeJSLiftReturn()
+}
+
 func _$ArraySupportImports_jsSumNumberArray(_ values: [Double]) throws(JSException) -> Double {
     let _ = values.bridgeJSLowerParameter()
     let ret = bjs_ArraySupportImports_jsSumNumberArray_static()
@@ -9426,6 +9620,13 @@ func _$ArraySupportImports_jsCreateNumberArray() throws(JSException) -> [Double]
         throw error
     }
     return [Double].bridgeJSLiftReturn()
+}
+
+func _$ArraySupportImports_runJsArraySupportTests() throws(JSException) -> Void {
+    bjs_ArraySupportImports_runJsArraySupportTests_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 #if arch(wasm32)
