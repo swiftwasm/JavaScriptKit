@@ -3652,6 +3652,304 @@ public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_se
     #endif
 }
 
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalString")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalString")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalString(_ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalString(_: Optional<String>.bridgeJSLiftParameter(vIsSome, vBytes, vLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalInt")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalInt")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalInt(_ vIsSome: Int32, _ vValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalInt(_: Optional<Int>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalBool")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalBool")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalBool(_ vIsSome: Int32, _ vValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalBool(_: Optional<Bool>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalFloat")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalFloat")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalFloat(_ vIsSome: Int32, _ vValue: Float32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalFloat(_: Optional<Float>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalDouble")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalDouble")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalDouble(_ vIsSome: Int32, _ vValue: Float64) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalDouble(_: Optional<Double>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalSyntax")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalSyntax")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalSyntax(_ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalSyntax(_: Optional<String>.bridgeJSLiftParameter(vIsSome, vBytes, vLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalCaseEnum")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalCaseEnum")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalCaseEnum(_ vIsSome: Int32, _ vValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalCaseEnum(_: Optional<Status>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalStringRawValueEnum")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalStringRawValueEnum")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalStringRawValueEnum(_ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalStringRawValueEnum(_: Optional<Theme>.bridgeJSLiftParameter(vIsSome, vBytes, vLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalIntRawValueEnum")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalIntRawValueEnum")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalIntRawValueEnum(_ vIsSome: Int32, _ vValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalIntRawValueEnum(_: Optional<HttpStatus>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalTSEnum")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalTSEnum")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalTSEnum(_ vIsSome: Int32, _ vValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalTSEnum(_: Optional<TSDirection>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalTSStringEnum")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalTSStringEnum")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalTSStringEnum(_ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalTSStringEnum(_: Optional<TSTheme>.bridgeJSLiftParameter(vIsSome, vBytes, vLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalNamespacedEnum")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalNamespacedEnum")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalNamespacedEnum(_ vIsSome: Int32, _ vValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalNamespacedEnum(_: Optional<Networking.API.Method>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalSwiftClass")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalSwiftClass")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalSwiftClass(_ vIsSome: Int32, _ vValue: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalSwiftClass(_: Optional<Greeter>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalIntArray")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalIntArray")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalIntArray() -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalIntArray(_: Optional<[Int]>.bridgeJSLiftParameter())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalStringArray")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalStringArray")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalStringArray() -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalStringArray(_: Optional<[String]>.bridgeJSLiftParameter())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalSwiftClassArray")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalSwiftClassArray")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalSwiftClassArray() -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalSwiftClassArray(_: Optional<[Greeter]>.bridgeJSLiftParameter())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalAPIResult")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalAPIResult")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalAPIResult(_ vIsSome: Int32, _ vCaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalAPIResult(_: Optional<APIResult>.bridgeJSLiftParameter(vIsSome, vCaseId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalTypedPayloadResult")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalTypedPayloadResult")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalTypedPayloadResult(_ vIsSome: Int32, _ vCaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalTypedPayloadResult(_: Optional<TypedPayloadResult>.bridgeJSLiftParameter(vIsSome, vCaseId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalComplexResult")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalComplexResult")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalComplexResult(_ vIsSome: Int32, _ vCaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalComplexResult(_: Optional<ComplexResult>.bridgeJSLiftParameter(vIsSome, vCaseId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalAllTypesResult")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalAllTypesResult")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalAllTypesResult(_ vIsSome: Int32, _ vCaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalAllTypesResult(_: Optional<AllTypesResult>.bridgeJSLiftParameter(vIsSome, vCaseId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalPayloadResult")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalPayloadResult")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalPayloadResult(_ v: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalPayloadResult(_: OptionalAllTypesResult.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalPayloadResultOpt")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalPayloadResultOpt")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalPayloadResultOpt(_ vIsSome: Int32, _ vCaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalPayloadResultOpt(_: Optional<OptionalAllTypesResult>.bridgeJSLiftParameter(vIsSome, vCaseId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalAPIOptionalResult")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalAPIOptionalResult")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalAPIOptionalResult(_ vIsSome: Int32, _ vCaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalAPIOptionalResult(_: Optional<APIOptionalResult>.bridgeJSLiftParameter(vIsSome, vCaseId))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_takeOptionalJSObject")
+@_cdecl("bjs_OptionalSupportExports_static_takeOptionalJSObject")
+public func _bjs_OptionalSupportExports_static_takeOptionalJSObject(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    OptionalSupportExports.takeOptionalJSObject(_: Optional<JSObject>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_applyOptionalGreeter")
+@_cdecl("bjs_OptionalSupportExports_static_applyOptionalGreeter")
+public func _bjs_OptionalSupportExports_static_applyOptionalGreeter(_ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer, _ transform: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.applyOptionalGreeter(_: Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valueValue), _: _BJS_Closure_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC.bridgeJSLift(transform))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_makeOptionalHolder")
+@_cdecl("bjs_OptionalSupportExports_static_makeOptionalHolder")
+public func _bjs_OptionalSupportExports_static_makeOptionalHolder(_ nullableGreeterIsSome: Int32, _ nullableGreeterValue: UnsafeMutableRawPointer, _ undefinedNumberIsSome: Int32, _ undefinedNumberValue: Float64) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.makeOptionalHolder(nullableGreeter: Optional<Greeter>.bridgeJSLiftParameter(nullableGreeterIsSome, nullableGreeterValue), undefinedNumber: JSUndefinedOr<Double>.bridgeJSLiftParameter(undefinedNumberIsSome, undefinedNumberValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_compareAPIResults")
+@_cdecl("bjs_OptionalSupportExports_static_compareAPIResults")
+public func _bjs_OptionalSupportExports_static_compareAPIResults(_ r1IsSome: Int32, _ r1CaseId: Int32, _ r2IsSome: Int32, _ r2CaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let _tmp_r2 = Optional<APIResult>.bridgeJSLiftParameter(r2IsSome, r2CaseId)
+    let _tmp_r1 = Optional<APIResult>.bridgeJSLiftParameter(r1IsSome, r1CaseId)
+    let ret = OptionalSupportExports.compareAPIResults(_: _tmp_r1, _: _tmp_r2)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> OptionalAllTypesResult {
         switch caseId {
@@ -6066,359 +6364,6 @@ public func _bjs_makeAdder(_ base: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = makeAdder(base: Int.bridgeJSLiftParameter(base))
     return JSTypedClosure(ret).bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalIntArrayType")
-@_cdecl("bjs_roundTripOptionalIntArrayType")
-public func _bjs_roundTripOptionalIntArrayType() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalIntArrayType(_: Optional<[Int]>.bridgeJSLiftParameter())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalStringArrayType")
-@_cdecl("bjs_roundTripOptionalStringArrayType")
-public func _bjs_roundTripOptionalStringArrayType() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalStringArrayType(_: Optional<[String]>.bridgeJSLiftParameter())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalGreeterArrayType")
-@_cdecl("bjs_roundTripOptionalGreeterArrayType")
-public func _bjs_roundTripOptionalGreeterArrayType() -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalGreeterArrayType(_: Optional<[Greeter]>.bridgeJSLiftParameter())
-    ret.bridgeJSStackPush()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalString")
-@_cdecl("bjs_roundTripOptionalString")
-public func _bjs_roundTripOptionalString(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalString(name: Optional<String>.bridgeJSLiftParameter(nameIsSome, nameBytes, nameLength))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalInt")
-@_cdecl("bjs_roundTripOptionalInt")
-public func _bjs_roundTripOptionalInt(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalInt(value: Optional<Int>.bridgeJSLiftParameter(valueIsSome, valueValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalBool")
-@_cdecl("bjs_roundTripOptionalBool")
-public func _bjs_roundTripOptionalBool(_ flagIsSome: Int32, _ flagValue: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalBool(flag: Optional<Bool>.bridgeJSLiftParameter(flagIsSome, flagValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalFloat")
-@_cdecl("bjs_roundTripOptionalFloat")
-public func _bjs_roundTripOptionalFloat(_ numberIsSome: Int32, _ numberValue: Float32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalFloat(number: Optional<Float>.bridgeJSLiftParameter(numberIsSome, numberValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalDouble")
-@_cdecl("bjs_roundTripOptionalDouble")
-public func _bjs_roundTripOptionalDouble(_ precisionIsSome: Int32, _ precisionValue: Float64) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalDouble(precision: Optional<Double>.bridgeJSLiftParameter(precisionIsSome, precisionValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalSyntax")
-@_cdecl("bjs_roundTripOptionalSyntax")
-public func _bjs_roundTripOptionalSyntax(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalSyntax(name: Optional<String>.bridgeJSLiftParameter(nameIsSome, nameBytes, nameLength))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalMixSyntax")
-@_cdecl("bjs_roundTripOptionalMixSyntax")
-public func _bjs_roundTripOptionalMixSyntax(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalMixSyntax(name: Optional<String>.bridgeJSLiftParameter(nameIsSome, nameBytes, nameLength))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalSwiftSyntax")
-@_cdecl("bjs_roundTripOptionalSwiftSyntax")
-public func _bjs_roundTripOptionalSwiftSyntax(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalSwiftSyntax(name: Optional<String>.bridgeJSLiftParameter(nameIsSome, nameBytes, nameLength))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalWithSpaces")
-@_cdecl("bjs_roundTripOptionalWithSpaces")
-public func _bjs_roundTripOptionalWithSpaces(_ valueIsSome: Int32, _ valueValue: Float64) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalWithSpaces(value: Optional<Double>.bridgeJSLiftParameter(valueIsSome, valueValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalTypeAlias")
-@_cdecl("bjs_roundTripOptionalTypeAlias")
-public func _bjs_roundTripOptionalTypeAlias(_ ageIsSome: Int32, _ ageValue: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalTypeAlias(age: Optional<Int>.bridgeJSLiftParameter(ageIsSome, ageValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalStatus")
-@_cdecl("bjs_roundTripOptionalStatus")
-public func _bjs_roundTripOptionalStatus(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalStatus(value: Optional<Status>.bridgeJSLiftParameter(valueIsSome, valueValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalTheme")
-@_cdecl("bjs_roundTripOptionalTheme")
-public func _bjs_roundTripOptionalTheme(_ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalTheme(value: Optional<Theme>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalHttpStatus")
-@_cdecl("bjs_roundTripOptionalHttpStatus")
-public func _bjs_roundTripOptionalHttpStatus(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalHttpStatus(value: Optional<HttpStatus>.bridgeJSLiftParameter(valueIsSome, valueValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalTSDirection")
-@_cdecl("bjs_roundTripOptionalTSDirection")
-public func _bjs_roundTripOptionalTSDirection(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalTSDirection(value: Optional<TSDirection>.bridgeJSLiftParameter(valueIsSome, valueValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalTSTheme")
-@_cdecl("bjs_roundTripOptionalTSTheme")
-public func _bjs_roundTripOptionalTSTheme(_ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalTSTheme(value: Optional<TSTheme>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalNetworkingAPIMethod")
-@_cdecl("bjs_roundTripOptionalNetworkingAPIMethod")
-public func _bjs_roundTripOptionalNetworkingAPIMethod(_ methodIsSome: Int32, _ methodValue: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalNetworkingAPIMethod(_: Optional<Networking.API.Method>.bridgeJSLiftParameter(methodIsSome, methodValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalAPIResult")
-@_cdecl("bjs_roundTripOptionalAPIResult")
-public func _bjs_roundTripOptionalAPIResult(_ valueIsSome: Int32, _ valueCaseId: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalAPIResult(value: Optional<APIResult>.bridgeJSLiftParameter(valueIsSome, valueCaseId))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalTypedPayloadResult")
-@_cdecl("bjs_roundTripOptionalTypedPayloadResult")
-public func _bjs_roundTripOptionalTypedPayloadResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalTypedPayloadResult(_: Optional<TypedPayloadResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_takeOptionalJSObject")
-@_cdecl("bjs_takeOptionalJSObject")
-public func _bjs_takeOptionalJSObject(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
-    #if arch(wasm32)
-    takeOptionalJSObject(_: Optional<JSObject>.bridgeJSLiftParameter(valueIsSome, valueValue))
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_compareAPIResults")
-@_cdecl("bjs_compareAPIResults")
-public func _bjs_compareAPIResults(_ r1IsSome: Int32, _ r1CaseId: Int32, _ r2IsSome: Int32, _ r2CaseId: Int32) -> Void {
-    #if arch(wasm32)
-    let _tmp_r2 = Optional<APIResult>.bridgeJSLiftParameter(r2IsSome, r2CaseId)
-    let _tmp_r1 = Optional<APIResult>.bridgeJSLiftParameter(r1IsSome, r1CaseId)
-    let ret = compareAPIResults(_: _tmp_r1, _: _tmp_r2)
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalComplexResult")
-@_cdecl("bjs_roundTripOptionalComplexResult")
-public func _bjs_roundTripOptionalComplexResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalComplexResult(_: Optional<ComplexResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalAllTypesResult")
-@_cdecl("bjs_roundTripOptionalAllTypesResult")
-public func _bjs_roundTripOptionalAllTypesResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalAllTypesResult(_: Optional<AllTypesResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalPayloadResult")
-@_cdecl("bjs_roundTripOptionalPayloadResult")
-public func _bjs_roundTripOptionalPayloadResult(_ result: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalPayloadResult(_: OptionalAllTypesResult.bridgeJSLiftParameter(result))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalPayloadResultOpt")
-@_cdecl("bjs_roundTripOptionalPayloadResultOpt")
-public func _bjs_roundTripOptionalPayloadResultOpt(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalPayloadResultOpt(_: Optional<OptionalAllTypesResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalClass")
-@_cdecl("bjs_roundTripOptionalClass")
-public func _bjs_roundTripOptionalClass(_ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalClass(value: Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valueValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalGreeter")
-@_cdecl("bjs_roundTripOptionalGreeter")
-public func _bjs_roundTripOptionalGreeter(_ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalGreeter(_: Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valueValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_applyOptionalGreeter")
-@_cdecl("bjs_applyOptionalGreeter")
-public func _bjs_applyOptionalGreeter(_ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer, _ transform: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = applyOptionalGreeter(_: Optional<Greeter>.bridgeJSLiftParameter(valueIsSome, valueValue), _: _BJS_Closure_20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC.bridgeJSLift(transform))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_makeOptionalHolder")
-@_cdecl("bjs_makeOptionalHolder")
-public func _bjs_makeOptionalHolder(_ nullableGreeterIsSome: Int32, _ nullableGreeterValue: UnsafeMutableRawPointer, _ undefinedNumberIsSome: Int32, _ undefinedNumberValue: Float64) -> UnsafeMutableRawPointer {
-    #if arch(wasm32)
-    let ret = makeOptionalHolder(nullableGreeter: Optional<Greeter>.bridgeJSLiftParameter(nullableGreeterIsSome, nullableGreeterValue), undefinedNumber: JSUndefinedOr<Double>.bridgeJSLiftParameter(undefinedNumberIsSome, undefinedNumberValue))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripOptionalAPIOptionalResult")
-@_cdecl("bjs_roundTripOptionalAPIOptionalResult")
-public func _bjs_roundTripOptionalAPIOptionalResult(_ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
-    #if arch(wasm32)
-    let ret = roundTripOptionalAPIOptionalResult(result: Optional<APIOptionalResult>.bridgeJSLiftParameter(resultIsSome, resultCaseId))
-    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
