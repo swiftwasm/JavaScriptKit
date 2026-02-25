@@ -300,6 +300,172 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_DefaultArgumentConstructorDefaults_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "defaultValue" : {
+                "string" : {
+                  "_0" : "Default"
+                }
+              },
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "defaultValue" : {
+                "int" : {
+                  "_0" : 42
+                }
+              },
+              "label" : "count",
+              "name" : "count",
+              "type" : {
+                "int" : {
+
+                }
+              }
+            },
+            {
+              "defaultValue" : {
+                "bool" : {
+                  "_0" : true
+                }
+              },
+              "label" : "enabled",
+              "name" : "enabled",
+              "type" : {
+                "bool" : {
+
+                }
+              }
+            },
+            {
+              "defaultValue" : {
+                "enumCase" : {
+                  "_0" : "Status",
+                  "_1" : "success"
+                }
+              },
+              "label" : "status",
+              "name" : "status",
+              "type" : {
+                "caseEnum" : {
+                  "_0" : "Status"
+                }
+              }
+            },
+            {
+              "defaultValue" : {
+                "null" : {
+
+                }
+              },
+              "label" : "tag",
+              "name" : "tag",
+              "type" : {
+                "nullable" : {
+                  "_0" : {
+                    "string" : {
+
+                    }
+                  },
+                  "_1" : "null"
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_DefaultArgumentConstructorDefaults_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "DefaultArgumentConstructorDefaults",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "count",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "enabled",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "status",
+            "type" : {
+              "caseEnum" : {
+                "_0" : "Status"
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "tag",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "DefaultArgumentConstructorDefaults"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_Greeter_init",
           "effects" : {
             "isAsync" : false,
@@ -1257,172 +1423,6 @@
 
         ],
         "swiftCallName" : "MathUtils"
-      },
-      {
-        "constructor" : {
-          "abiName" : "bjs_ConstructorDefaults_init",
-          "effects" : {
-            "isAsync" : false,
-            "isStatic" : false,
-            "isThrows" : false
-          },
-          "parameters" : [
-            {
-              "defaultValue" : {
-                "string" : {
-                  "_0" : "Default"
-                }
-              },
-              "label" : "name",
-              "name" : "name",
-              "type" : {
-                "string" : {
-
-                }
-              }
-            },
-            {
-              "defaultValue" : {
-                "int" : {
-                  "_0" : 42
-                }
-              },
-              "label" : "count",
-              "name" : "count",
-              "type" : {
-                "int" : {
-
-                }
-              }
-            },
-            {
-              "defaultValue" : {
-                "bool" : {
-                  "_0" : true
-                }
-              },
-              "label" : "enabled",
-              "name" : "enabled",
-              "type" : {
-                "bool" : {
-
-                }
-              }
-            },
-            {
-              "defaultValue" : {
-                "enumCase" : {
-                  "_0" : "Status",
-                  "_1" : "success"
-                }
-              },
-              "label" : "status",
-              "name" : "status",
-              "type" : {
-                "caseEnum" : {
-                  "_0" : "Status"
-                }
-              }
-            },
-            {
-              "defaultValue" : {
-                "null" : {
-
-                }
-              },
-              "label" : "tag",
-              "name" : "tag",
-              "type" : {
-                "nullable" : {
-                  "_0" : {
-                    "string" : {
-
-                    }
-                  },
-                  "_1" : "null"
-                }
-              }
-            }
-          ]
-        },
-        "methods" : [
-          {
-            "abiName" : "bjs_ConstructorDefaults_describe",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : false
-            },
-            "name" : "describe",
-            "parameters" : [
-
-            ],
-            "returnType" : {
-              "string" : {
-
-              }
-            }
-          }
-        ],
-        "name" : "ConstructorDefaults",
-        "properties" : [
-          {
-            "isReadonly" : false,
-            "isStatic" : false,
-            "name" : "name",
-            "type" : {
-              "string" : {
-
-              }
-            }
-          },
-          {
-            "isReadonly" : false,
-            "isStatic" : false,
-            "name" : "count",
-            "type" : {
-              "int" : {
-
-              }
-            }
-          },
-          {
-            "isReadonly" : false,
-            "isStatic" : false,
-            "name" : "enabled",
-            "type" : {
-              "bool" : {
-
-              }
-            }
-          },
-          {
-            "isReadonly" : false,
-            "isStatic" : false,
-            "name" : "status",
-            "type" : {
-              "caseEnum" : {
-                "_0" : "Status"
-              }
-            }
-          },
-          {
-            "isReadonly" : false,
-            "isStatic" : false,
-            "name" : "tag",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "swiftCallName" : "ConstructorDefaults"
       },
       {
         "constructor" : {
@@ -5572,6 +5572,769 @@
         ],
         "swiftCallName" : "ArraySupportExports",
         "tsFullPath" : "ArraySupportExports"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "DefaultArgumentExports",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testStringDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testStringDefault",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "string" : {
+                    "_0" : "Hello World"
+                  }
+                },
+                "label" : "message",
+                "name" : "message",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testIntDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testIntDefault",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "int" : {
+                    "_0" : 42
+                  }
+                },
+                "label" : "count",
+                "name" : "count",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testBoolDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testBoolDefault",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "bool" : {
+                    "_0" : true
+                  }
+                },
+                "label" : "flag",
+                "name" : "flag",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "bool" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testOptionalDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testOptionalDefault",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "null" : {
+
+                  }
+                },
+                "label" : "name",
+                "name" : "name",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testMultipleDefaults",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testMultipleDefaults",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "string" : {
+                    "_0" : "Default Title"
+                  }
+                },
+                "label" : "title",
+                "name" : "title",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "defaultValue" : {
+                  "int" : {
+                    "_0" : -10
+                  }
+                },
+                "label" : "count",
+                "name" : "count",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "defaultValue" : {
+                  "bool" : {
+                    "_0" : false
+                  }
+                },
+                "label" : "enabled",
+                "name" : "enabled",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testSimpleEnumDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testSimpleEnumDefault",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "enumCase" : {
+                    "_0" : "Status",
+                    "_1" : "success"
+                  }
+                },
+                "label" : "status",
+                "name" : "status",
+                "type" : {
+                  "caseEnum" : {
+                    "_0" : "Status"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "caseEnum" : {
+                "_0" : "Status"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testDirectionDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testDirectionDefault",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "enumCase" : {
+                    "_0" : "Direction",
+                    "_1" : "north"
+                  }
+                },
+                "label" : "direction",
+                "name" : "direction",
+                "type" : {
+                  "caseEnum" : {
+                    "_0" : "Direction"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "caseEnum" : {
+                "_0" : "Direction"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testRawStringEnumDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testRawStringEnumDefault",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "enumCase" : {
+                    "_0" : "Theme",
+                    "_1" : "light"
+                  }
+                },
+                "label" : "theme",
+                "name" : "theme",
+                "type" : {
+                  "rawValueEnum" : {
+                    "_0" : "Theme",
+                    "_1" : "String"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "rawValueEnum" : {
+                "_0" : "Theme",
+                "_1" : "String"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testComplexInit",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testComplexInit",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "objectWithArguments" : {
+                    "_0" : "Greeter",
+                    "_1" : [
+                      {
+                        "string" : {
+                          "_0" : "DefaultGreeter"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "label" : "greeter",
+                "name" : "greeter",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_testEmptyInit",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "testEmptyInit",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "object" : {
+                    "_0" : "StaticPropertyHolder"
+                  }
+                },
+                "label" : "_",
+                "name" : "object",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "StaticPropertyHolder"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "StaticPropertyHolder"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_createConstructorDefaults",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "createConstructorDefaults",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "string" : {
+                    "_0" : "Default"
+                  }
+                },
+                "label" : "name",
+                "name" : "name",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "defaultValue" : {
+                  "int" : {
+                    "_0" : 42
+                  }
+                },
+                "label" : "count",
+                "name" : "count",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "defaultValue" : {
+                  "bool" : {
+                    "_0" : true
+                  }
+                },
+                "label" : "enabled",
+                "name" : "enabled",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "defaultValue" : {
+                  "enumCase" : {
+                    "_0" : "Status",
+                    "_1" : "success"
+                  }
+                },
+                "label" : "status",
+                "name" : "status",
+                "type" : {
+                  "caseEnum" : {
+                    "_0" : "Status"
+                  }
+                }
+              },
+              {
+                "defaultValue" : {
+                  "null" : {
+
+                  }
+                },
+                "label" : "tag",
+                "name" : "tag",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "DefaultArgumentConstructorDefaults"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_describeConstructorDefaults",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "describeConstructorDefaults",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftHeapObject" : {
+                    "_0" : "DefaultArgumentConstructorDefaults"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_arrayWithDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "arrayWithDefault",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "array" : {
+                    "_0" : [
+                      {
+                        "int" : {
+                          "_0" : 1
+                        }
+                      },
+                      {
+                        "int" : {
+                          "_0" : 2
+                        }
+                      },
+                      {
+                        "int" : {
+                          "_0" : 3
+                        }
+                      }
+                    ]
+                  }
+                },
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_arrayWithOptionalDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "arrayWithOptionalDefault",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "null" : {
+
+                  }
+                },
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DefaultArgumentExports_static_arrayMixedDefaults",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "arrayMixedDefaults",
+            "namespace" : [
+              "DefaultArgumentExports"
+            ],
+            "parameters" : [
+              {
+                "defaultValue" : {
+                  "string" : {
+                    "_0" : "Sum"
+                  }
+                },
+                "label" : "prefix",
+                "name" : "prefix",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "defaultValue" : {
+                  "array" : {
+                    "_0" : [
+                      {
+                        "int" : {
+                          "_0" : 10
+                        }
+                      },
+                      {
+                        "int" : {
+                          "_0" : 20
+                        }
+                      }
+                    ]
+                  }
+                },
+                "label" : "values",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "defaultValue" : {
+                  "string" : {
+                    "_0" : "!"
+                  }
+                },
+                "label" : "suffix",
+                "name" : "suffix",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "DefaultArgumentExports"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "DefaultArgumentExports",
+        "tsFullPath" : "DefaultArgumentExports"
       },
       {
         "cases" : [
@@ -9965,518 +10728,6 @@
         "name" : "getObserverStats",
         "parameters" : [
 
-        ],
-        "returnType" : {
-          "string" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testStringDefault",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testStringDefault",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "string" : {
-                "_0" : "Hello World"
-              }
-            },
-            "label" : "message",
-            "name" : "message",
-            "type" : {
-              "string" : {
-
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "string" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testIntDefault",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testIntDefault",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "int" : {
-                "_0" : 42
-              }
-            },
-            "label" : "count",
-            "name" : "count",
-            "type" : {
-              "int" : {
-
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "int" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testBoolDefault",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testBoolDefault",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "bool" : {
-                "_0" : true
-              }
-            },
-            "label" : "flag",
-            "name" : "flag",
-            "type" : {
-              "bool" : {
-
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "bool" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testOptionalDefault",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testOptionalDefault",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "null" : {
-
-              }
-            },
-            "label" : "name",
-            "name" : "name",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "string" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testMultipleDefaults",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testMultipleDefaults",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "string" : {
-                "_0" : "Default Title"
-              }
-            },
-            "label" : "title",
-            "name" : "title",
-            "type" : {
-              "string" : {
-
-              }
-            }
-          },
-          {
-            "defaultValue" : {
-              "int" : {
-                "_0" : -10
-              }
-            },
-            "label" : "count",
-            "name" : "count",
-            "type" : {
-              "int" : {
-
-              }
-            }
-          },
-          {
-            "defaultValue" : {
-              "bool" : {
-                "_0" : false
-              }
-            },
-            "label" : "enabled",
-            "name" : "enabled",
-            "type" : {
-              "bool" : {
-
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "string" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testSimpleEnumDefault",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testSimpleEnumDefault",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "enumCase" : {
-                "_0" : "Status",
-                "_1" : "success"
-              }
-            },
-            "label" : "status",
-            "name" : "status",
-            "type" : {
-              "caseEnum" : {
-                "_0" : "Status"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "caseEnum" : {
-            "_0" : "Status"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testDirectionDefault",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testDirectionDefault",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "enumCase" : {
-                "_0" : "Direction",
-                "_1" : "north"
-              }
-            },
-            "label" : "direction",
-            "name" : "direction",
-            "type" : {
-              "caseEnum" : {
-                "_0" : "Direction"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "caseEnum" : {
-            "_0" : "Direction"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testRawStringEnumDefault",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testRawStringEnumDefault",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "enumCase" : {
-                "_0" : "Theme",
-                "_1" : "light"
-              }
-            },
-            "label" : "theme",
-            "name" : "theme",
-            "type" : {
-              "rawValueEnum" : {
-                "_0" : "Theme",
-                "_1" : "String"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "rawValueEnum" : {
-            "_0" : "Theme",
-            "_1" : "String"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testComplexInit",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testComplexInit",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "objectWithArguments" : {
-                "_0" : "Greeter",
-                "_1" : [
-                  {
-                    "string" : {
-                      "_0" : "DefaultGreeter"
-                    }
-                  }
-                ]
-              }
-            },
-            "label" : "greeter",
-            "name" : "greeter",
-            "type" : {
-              "swiftHeapObject" : {
-                "_0" : "Greeter"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "string" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_testEmptyInit",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "testEmptyInit",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "object" : {
-                "_0" : "StaticPropertyHolder"
-              }
-            },
-            "label" : "_",
-            "name" : "object",
-            "type" : {
-              "swiftHeapObject" : {
-                "_0" : "StaticPropertyHolder"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftHeapObject" : {
-            "_0" : "StaticPropertyHolder"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_arrayWithDefault",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "arrayWithDefault",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "array" : {
-                "_0" : [
-                  {
-                    "int" : {
-                      "_0" : 1
-                    }
-                  },
-                  {
-                    "int" : {
-                      "_0" : 2
-                    }
-                  },
-                  {
-                    "int" : {
-                      "_0" : 3
-                    }
-                  }
-                ]
-              }
-            },
-            "label" : "_",
-            "name" : "values",
-            "type" : {
-              "array" : {
-                "_0" : {
-                  "int" : {
-
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "int" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_arrayWithOptionalDefault",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "arrayWithOptionalDefault",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "null" : {
-
-              }
-            },
-            "label" : "_",
-            "name" : "values",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "array" : {
-                    "_0" : {
-                      "int" : {
-
-                      }
-                    }
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "int" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_arrayMixedDefaults",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "arrayMixedDefaults",
-        "parameters" : [
-          {
-            "defaultValue" : {
-              "string" : {
-                "_0" : "Sum"
-              }
-            },
-            "label" : "prefix",
-            "name" : "prefix",
-            "type" : {
-              "string" : {
-
-              }
-            }
-          },
-          {
-            "defaultValue" : {
-              "array" : {
-                "_0" : [
-                  {
-                    "int" : {
-                      "_0" : 10
-                    }
-                  },
-                  {
-                    "int" : {
-                      "_0" : 20
-                    }
-                  }
-                ]
-              }
-            },
-            "label" : "values",
-            "name" : "values",
-            "type" : {
-              "array" : {
-                "_0" : {
-                  "int" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "defaultValue" : {
-              "string" : {
-                "_0" : "!"
-              }
-            },
-            "label" : "suffix",
-            "name" : "suffix",
-            "type" : {
-              "string" : {
-
-              }
-            }
-          }
         ],
         "returnType" : {
           "string" : {
@@ -15341,6 +15592,38 @@
               },
               {
                 "name" : "runJsClosureSupportTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "DefaultArgumentImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "name" : "runJsDefaultArgumentTests",
                 "parameters" : [
 
                 ],
