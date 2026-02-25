@@ -824,16 +824,12 @@ struct StackCodegen {
         switch type {
         case .string, .int, .uint, .bool, .float, .double, .jsValue,
             .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
-            .caseEnum, .rawValueEnum:
+            .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct, .nullable:
             return ["\(raw: accessor).bridgeJSStackPush()"]
         case .jsObject(_?):
             return ["\(raw: accessor).jsObject.bridgeJSStackPush()"]
         case .swiftProtocol:
             return ["(\(raw: accessor) as! \(raw: type.swiftType)).bridgeJSStackPush()"]
-        case .associatedValueEnum, .swiftStruct:
-            return ["\(raw: accessor).bridgeJSStackPush()"]
-        case .nullable(let wrappedType, _):
-            return lowerOptionalStatements(wrappedType: wrappedType, accessor: accessor, varPrefix: varPrefix)
         case .void, .namespaceEnum:
             return []
         case .array(let elementType):
@@ -945,54 +941,6 @@ struct StackCodegen {
         statements.append("}")
         statements.append("_swift_js_push_i32(Int32(\(raw: accessor).count))")
         return statements
-    }
-
-    private func lowerOptionalStatements(
-        wrappedType: BridgeType,
-        accessor: String,
-        varPrefix: String
-    ) -> [CodeBlockItemSyntax] {
-        switch wrappedType {
-        case .array, .dictionary, .swiftStruct:
-            return ["\(raw: accessor).bridgeJSStackPush()"]
-        default:
-            break
-        }
-
-        var statements: [String] = []
-        statements.append("let __bjs_isSome_\(varPrefix) = \(accessor) != nil")
-        statements.append("if let __bjs_unwrapped_\(varPrefix) = \(accessor) {")
-
-        let innerStatements = lowerUnwrappedOptionalStatements(
-            wrappedType: wrappedType,
-            unwrappedVar: "__bjs_unwrapped_\(varPrefix)"
-        )
-        for stmt in innerStatements {
-            statements.append(stmt.description)
-        }
-
-        statements.append("}")
-        statements.append("_swift_js_push_i32(__bjs_isSome_\(varPrefix) ? 1 : 0)")
-        let parsed: CodeBlockItemListSyntax = "\(raw: statements.joined(separator: "\n"))"
-        return Array(parsed)
-    }
-
-    private func lowerUnwrappedOptionalStatements(
-        wrappedType: BridgeType,
-        unwrappedVar: String
-    ) -> [CodeBlockItemSyntax] {
-        switch wrappedType {
-        case .jsObject(_?):
-            return ["\(raw: unwrappedVar).jsObject.bridgeJSStackPush()"]
-        case .swiftProtocol:
-            return ["(\(raw: unwrappedVar) as! \(raw: wrappedType.swiftType)).bridgeJSStackPush()"]
-        case .string, .int, .uint, .bool, .float, .double, .jsValue,
-            .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
-            .caseEnum, .rawValueEnum, .associatedValueEnum:
-            return ["\(raw: unwrappedVar).bridgeJSStackPush()"]
-        default:
-            return ["preconditionFailure(\"BridgeJS: unsupported optional wrapped type\")"]
-        }
     }
 }
 

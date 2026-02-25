@@ -230,11 +230,7 @@ extension Person: _BridgedSwiftStruct {
         self.name.bridgeJSStackPush()
         self.age.bridgeJSStackPush()
         self.address.bridgeJSStackPush()
-        let __bjs_isSome_email = self.email != nil
-        if let __bjs_unwrapped_email = self.email {
-        __bjs_unwrapped_email.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
+        self.email.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -1603,11 +1599,7 @@ public func _bjs_ArrayRoundtrip_makeOptionalIntArray(_ _self: UnsafeMutableRawPo
     #if arch(wasm32)
     let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalIntArray()
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -1630,11 +1622,7 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalIntArray(_ _self: UnsafeMutable
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else

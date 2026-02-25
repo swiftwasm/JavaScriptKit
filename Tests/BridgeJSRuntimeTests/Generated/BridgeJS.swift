@@ -2689,18 +2689,10 @@ extension TypedPayloadResult: _BridgedSwiftAssociatedValueEnum {
             param0.bridgeJSStackPush()
             return Int32(1)
         case .optPrecision(let param0):
-            let __bjs_isSome_param0 = param0 != nil
-            if let __bjs_unwrapped_param0 = param0 {
-            __bjs_unwrapped_param0.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+            param0.bridgeJSStackPush()
             return Int32(2)
         case .optDirection(let param0):
-            let __bjs_isSome_param0 = param0 != nil
-            if let __bjs_unwrapped_param0 = param0 {
-            __bjs_unwrapped_param0.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+            param0.bridgeJSStackPush()
             return Int32(3)
         case .empty:
             return Int32(4)
@@ -3041,35 +3033,19 @@ extension OptionalAllTypesResult: _BridgedSwiftAssociatedValueEnum {
             param0.bridgeJSStackPush()
             return Int32(0)
         case .optClass(let param0):
-            let __bjs_isSome_param0 = param0 != nil
-            if let __bjs_unwrapped_param0 = param0 {
-            __bjs_unwrapped_param0.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+            param0.bridgeJSStackPush()
             return Int32(1)
         case .optJSObject(let param0):
-            let __bjs_isSome_param0 = param0 != nil
-            if let __bjs_unwrapped_param0 = param0 {
-            __bjs_unwrapped_param0.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+            param0.bridgeJSStackPush()
             return Int32(2)
         case .optNestedEnum(let param0):
-            let __bjs_isSome_param0 = param0 != nil
-            if let __bjs_unwrapped_param0 = param0 {
-            __bjs_unwrapped_param0.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+            param0.bridgeJSStackPush()
             return Int32(3)
         case .optArray(let param0):
             param0.bridgeJSStackPush()
             return Int32(4)
         case .optJsClass(let param0):
-            let __bjs_isSome_param0 = param0 != nil
-            if let __bjs_unwrapped_param0 = param0 {
-            __bjs_unwrapped_param0.jsObject.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+            param0.bridgeJSStackPush()
             return Int32(5)
         case .empty:
             return Int32(6)
@@ -3094,40 +3070,16 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
         switch self {
         case .success(let param0):
-            let __bjs_isSome_param0 = param0 != nil
-            if let __bjs_unwrapped_param0 = param0 {
-            __bjs_unwrapped_param0.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
+            param0.bridgeJSStackPush()
             return Int32(0)
         case .failure(let param0, let param1):
-            let __bjs_isSome_param0 = param0 != nil
-            if let __bjs_unwrapped_param0 = param0 {
-            __bjs_unwrapped_param0.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
-            let __bjs_isSome_param1 = param1 != nil
-            if let __bjs_unwrapped_param1 = param1 {
-            __bjs_unwrapped_param1.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
+            param0.bridgeJSStackPush()
+            param1.bridgeJSStackPush()
             return Int32(1)
         case .status(let param0, let param1, let param2):
-            let __bjs_isSome_param0 = param0 != nil
-            if let __bjs_unwrapped_param0 = param0 {
-            __bjs_unwrapped_param0.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param0 ? 1 : 0)
-            let __bjs_isSome_param1 = param1 != nil
-            if let __bjs_unwrapped_param1 = param1 {
-            __bjs_unwrapped_param1.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param1 ? 1 : 0)
-            let __bjs_isSome_param2 = param2 != nil
-            if let __bjs_unwrapped_param2 = param2 {
-            __bjs_unwrapped_param2.bridgeJSStackPush()
-            }
-            _swift_js_push_i32(__bjs_isSome_param2 ? 1 : 0)
+            param0.bridgeJSStackPush()
+            param1.bridgeJSStackPush()
+            param2.bridgeJSStackPush()
             return Int32(2)
         }
     }
@@ -3260,16 +3212,8 @@ extension DataPoint: _BridgedSwiftStruct {
         self.x.bridgeJSStackPush()
         self.y.bridgeJSStackPush()
         self.label.bridgeJSStackPush()
-        let __bjs_isSome_optCount = self.optCount != nil
-        if let __bjs_unwrapped_optCount = self.optCount {
-        __bjs_unwrapped_optCount.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optCount ? 1 : 0)
-        let __bjs_isSome_optFlag = self.optFlag != nil
-        if let __bjs_unwrapped_optFlag = self.optFlag {
-        __bjs_unwrapped_optFlag.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optFlag ? 1 : 0)
+        self.optCount.bridgeJSStackPush()
+        self.optFlag.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -3389,11 +3333,7 @@ extension Address: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.street.bridgeJSStackPush()
         self.city.bridgeJSStackPush()
-        let __bjs_isSome_zipCode = self.zipCode != nil
-        if let __bjs_unwrapped_zipCode = self.zipCode {
-        __bjs_unwrapped_zipCode.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_zipCode ? 1 : 0)
+        self.zipCode.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -3446,11 +3386,7 @@ extension Contact: _BridgedSwiftStruct {
         self.name.bridgeJSStackPush()
         self.age.bridgeJSStackPush()
         self.address.bridgeJSStackPush()
-        let __bjs_isSome_email = self.email != nil
-        if let __bjs_unwrapped_email = self.email {
-        __bjs_unwrapped_email.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
+        self.email.bridgeJSStackPush()
         self.secondaryAddress.bridgeJSStackPush()
     }
 
@@ -3501,16 +3437,8 @@ extension Config: _BridgedSwiftStruct {
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.name.bridgeJSStackPush()
-        let __bjs_isSome_theme = self.theme != nil
-        if let __bjs_unwrapped_theme = self.theme {
-        __bjs_unwrapped_theme.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_theme ? 1 : 0)
-        let __bjs_isSome_direction = self.direction != nil
-        if let __bjs_unwrapped_direction = self.direction {
-        __bjs_unwrapped_direction.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_direction ? 1 : 0)
+        self.theme.bridgeJSStackPush()
+        self.direction.bridgeJSStackPush()
         self.status.bridgeJSStackPush()
     }
 
@@ -3559,11 +3487,7 @@ extension SessionData: _BridgedSwiftStruct {
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.id.bridgeJSStackPush()
-        let __bjs_isSome_owner = self.owner != nil
-        if let __bjs_unwrapped_owner = self.owner {
-        __bjs_unwrapped_owner.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_owner ? 1 : 0)
+        self.owner.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -3614,16 +3538,8 @@ extension ValidationReport: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.id.bridgeJSStackPush()
         self.result.bridgeJSStackPush()
-        let __bjs_isSome_status = self.status != nil
-        if let __bjs_unwrapped_status = self.status {
-        __bjs_unwrapped_status.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_status ? 1 : 0)
-        let __bjs_isSome_outcome = self.outcome != nil
-        if let __bjs_unwrapped_outcome = self.outcome {
-        __bjs_unwrapped_outcome.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_outcome ? 1 : 0)
+        self.status.bridgeJSStackPush()
+        self.outcome.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -3683,16 +3599,8 @@ extension AdvancedConfig: _BridgedSwiftStruct {
         self.enabled.bridgeJSStackPush()
         self.theme.bridgeJSStackPush()
         self.status.bridgeJSStackPush()
-        let __bjs_isSome_result = self.result != nil
-        if let __bjs_unwrapped_result = self.result {
-        __bjs_unwrapped_result.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_result ? 1 : 0)
-        let __bjs_isSome_metadata = self.metadata != nil
-        if let __bjs_unwrapped_metadata = self.metadata {
-        __bjs_unwrapped_metadata.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_metadata ? 1 : 0)
+        self.result.bridgeJSStackPush()
+        self.metadata.bridgeJSStackPush()
         self.location.bridgeJSStackPush()
         self.defaults.bridgeJSStackPush()
         self.overrideDefaults.bridgeJSStackPush()
@@ -3746,16 +3654,8 @@ extension MeasurementConfig: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.precision.bridgeJSStackPush()
         self.ratio.bridgeJSStackPush()
-        let __bjs_isSome_optionalPrecision = self.optionalPrecision != nil
-        if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
-        __bjs_unwrapped_optionalPrecision.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optionalPrecision ? 1 : 0)
-        let __bjs_isSome_optionalRatio = self.optionalRatio != nil
-        if let __bjs_unwrapped_optionalRatio = self.optionalRatio {
-        __bjs_unwrapped_optionalRatio.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optionalRatio ? 1 : 0)
+        self.optionalPrecision.bridgeJSStackPush()
+        self.optionalRatio.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -3893,11 +3793,7 @@ extension CopyableCart: _BridgedSwiftStruct {
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.x.bridgeJSStackPush()
-        let __bjs_isSome_note = self.note != nil
-        if let __bjs_unwrapped_note = self.note {
-        __bjs_unwrapped_note.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_note ? 1 : 0)
+        self.note.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -4177,11 +4073,7 @@ extension JSObjectContainer: _BridgedSwiftStruct {
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.object.bridgeJSStackPush()
-        let __bjs_isSome_optionalObject = self.optionalObject != nil
-        if let __bjs_unwrapped_optionalObject = self.optionalObject {
-        __bjs_unwrapped_optionalObject.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optionalObject ? 1 : 0)
+        self.optionalObject.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -4229,11 +4121,7 @@ extension FooContainer: _BridgedSwiftStruct {
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.foo.jsObject.bridgeJSStackPush()
-        let __bjs_isSome_optionalFoo = self.optionalFoo != nil
-        if let __bjs_unwrapped_optionalFoo = self.optionalFoo {
-        __bjs_unwrapped_optionalFoo.jsObject.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optionalFoo ? 1 : 0)
+        self.optionalFoo.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -5815,11 +5703,7 @@ public func _bjs_roundTripOptionalIntArray() -> Void {
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -5842,11 +5726,7 @@ public func _bjs_roundTripOptionalStringArray() -> Void {
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -5892,11 +5772,7 @@ public func _bjs_roundTripOptionalDirectionArray() -> Void {
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -5919,11 +5795,7 @@ public func _bjs_roundTripOptionalStatusArray() -> Void {
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -6144,11 +6016,7 @@ public func _bjs_roundTripOptionalJSObjectArray() -> Void {
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -6182,11 +6050,7 @@ public func _bjs_roundTripOptionalFooArray() -> Void {
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.jsObject.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -9512,18 +9376,6 @@ fileprivate func bjs_ArraySupportImports_jsRoundTripJSValueArray_static_extern()
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static")
-fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern(_ v: Int32) -> Void
-#else
-fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern(_ v: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static(_ v: Int32) -> Void {
-    return bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static_extern(v)
-}
-
-#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArraySupportImports_jsRoundTripJSObjectArray_static")
 fileprivate func bjs_ArraySupportImports_jsRoundTripJSObjectArray_static_extern() -> Void
 #else
@@ -9623,15 +9475,6 @@ func _$ArraySupportImports_jsRoundTripJSValueArray(_ v: [JSValue]) throws(JSExce
         throw error
     }
     return [JSValue].bridgeJSLiftReturn()
-}
-
-func _$ArraySupportImports_jsRoundTripOptionalJSValueArray(_ v: Optional<[JSValue]>) throws(JSException) -> Optional<[JSValue]> {
-    let vIsSome = v.bridgeJSLowerParameter()
-    bjs_ArraySupportImports_jsRoundTripOptionalJSValueArray_static(vIsSome)
-    if let error = _swift_js_take_exception() {
-        throw error
-    }
-    return Optional<[JSValue]>.bridgeJSLiftReturn()
 }
 
 func _$ArraySupportImports_jsRoundTripJSObjectArray(_ values: [JSObject]) throws(JSException) -> [JSObject] {
@@ -11446,6 +11289,30 @@ fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_s
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static")
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static_extern(_ v: Int32) -> Void
+#else
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static_extern(_ v: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static(_ v: Int32) -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static")
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern(_ v: Int32) -> Void
+#else
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern(_ v: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static(_ v: Int32) -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern(v)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_runJsOptionalSupportTests_static")
 fileprivate func bjs_OptionalSupportImports_runJsOptionalSupportTests_static_extern() -> Void
 #else
@@ -11491,6 +11358,24 @@ func _$OptionalSupportImports_jsRoundTripOptionalStringUndefined(_ name: JSUndef
         throw error
     }
     return JSUndefinedOr<String>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull(_ v: Optional<[JSValue]>) throws(JSException) -> Optional<[JSValue]> {
+    let vIsSome = v.bridgeJSLowerParameter()
+    bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static(vIsSome)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<[JSValue]>.bridgeJSLiftReturn()
+}
+
+func _$OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull(_ v: Optional<[String: String]>) throws(JSException) -> Optional<[String: String]> {
+    let vIsSome = v.bridgeJSLowerParameter()
+    bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static(vIsSome)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<[String: String]>.bridgeJSLiftReturn()
 }
 
 func _$OptionalSupportImports_runJsOptionalSupportTests() throws(JSException) -> Void {
