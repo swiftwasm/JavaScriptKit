@@ -2,9 +2,10 @@ type ref = number;
 type pointer = number;
 
 declare class JSObjectSpace {
-    private _heapValueById;
-    private _heapEntryByValue;
-    private _heapNextKey;
+    private _valueMap;
+    private _values;
+    private _rcById;
+    private _freeStack;
     constructor();
     retain(value: any): number;
     retainByRef(ref: ref): number;

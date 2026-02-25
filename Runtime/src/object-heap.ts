@@ -1,54 +1,68 @@
 import { globalVariable } from "./find-global.js";
 import { ref } from "./types.js";
 
-type SwiftRuntimeHeapEntry = {
-    id: number;
-    rc: number;
-};
 export class JSObjectSpace {
-    private _heapValueById: Map<number, any>;
-    private _heapEntryByValue: Map<any, SwiftRuntimeHeapEntry>;
-    private _heapNextKey: number;
+    private _valueMap: Map<any, number>;
+    private _values: (any | undefined)[];
+    private _rcById: number[];
+    private _freeStack: number[];
 
     constructor() {
-        this._heapValueById = new Map();
-        this._heapValueById.set(1, globalVariable);
+        this._values = [];
+        this._values[0] = undefined;
+        this._values[1] = globalVariable;
 
-        this._heapEntryByValue = new Map();
-        this._heapEntryByValue.set(globalVariable, { id: 1, rc: 1 });
+        this._valueMap = new Map();
+        this._valueMap.set(globalVariable, 1);
 
-        // Note: 0 is preserved for invalid references, 1 is preserved for globalThis
-        this._heapNextKey = 2;
+        this._rcById = [];
+        this._rcById[0] = 0;
+        this._rcById[1] = 1;
+
+        this._freeStack = [];
     }
 
     retain(value: any) {
-        const entry = this._heapEntryByValue.get(value);
-        if (entry) {
-            entry.rc++;
-            return entry.id;
+        const id = this._valueMap.get(value);
+        if (id !== undefined) {
+            this._rcById[id]++;
+            return id;
         }
-        const id = this._heapNextKey++;
-        this._heapValueById.set(id, value);
-        this._heapEntryByValue.set(value, { id: id, rc: 1 });
-        return id;
+        if (this._freeStack.length > 0) {
+            const newId = this._freeStack.pop()!;
+            this._values[newId] = value;
+            this._rcById[newId] = 1;
+            this._valueMap.set(value, newId);
+            return newId;
+        }
+        const newId = this._values.length;
+        this._values[newId] = value;
+        this._rcById[newId] = 1;
+        this._valueMap.set(value, newId);
+        return newId;
     }
 
     retainByRef(ref: ref) {
-        return this.retain(this.getObject(ref));
+        this._rcById[ref]++;
+        return ref;
     }
 
     release(ref: ref) {
-        const value = this._heapValueById.get(ref);
-        const entry = this._heapEntryByValue.get(value)!;
-        entry.rc--;
-        if (entry.rc != 0) return;
+        if (--this._rcById[ref] !== 0) return;
 
-        this._heapEntryByValue.delete(value);
-        this._heapValueById.delete(ref);
+        const value = this._values[ref];
+        this._valueMap.delete(value);
+        if (ref === this._values.length - 1) {
+            this._values.length = ref;
+            this._rcById.length = ref;
+        } else {
+            this._values[ref] = undefined;
+            this._freeStack.push(ref);
+        }
     }
 
     getObject(ref: ref) {
-        const value = this._heapValueById.get(ref);
+        const value = this._values[ref];
         if (value === undefined) {
             throw new ReferenceError(
                 "Attempted to read invalid reference " + ref,
