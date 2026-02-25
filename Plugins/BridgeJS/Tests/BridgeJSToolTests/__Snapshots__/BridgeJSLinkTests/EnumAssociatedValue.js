@@ -379,46 +379,48 @@ export async function createInstantiator(options, swift) {
             const enumTag = value.tag;
             switch (enumTag) {
                 case APIOptionalResultValues.Tag.Success: {
-                    const isSome = value.param0 != null;
+                    const isSome = value.param0 != null ? 1 : 0;
                     if (isSome) {
                         const bytes = textEncoder.encode(value.param0);
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                    } else {
-                        i32Stack.push(0);
-                        i32Stack.push(0);
                     }
-                    i32Stack.push(isSome ? 1 : 0);
+                    i32Stack.push(isSome);
                     return APIOptionalResultValues.Tag.Success;
                 }
                 case APIOptionalResultValues.Tag.Failure: {
-                    const isSome = value.param1 != null;
-                    i32Stack.push(isSome ? (value.param1 ? 1 : 0) : 0);
-                    i32Stack.push(isSome ? 1 : 0);
-                    const isSome1 = value.param0 != null;
-                    i32Stack.push(isSome1 ? (value.param0 | 0) : 0);
-                    i32Stack.push(isSome1 ? 1 : 0);
+                    const isSome = value.param1 != null ? 1 : 0;
+                    if (isSome) {
+                        i32Stack.push(value.param1 ? 1 : 0);
+                    }
+                    i32Stack.push(isSome);
+                    const isSome1 = value.param0 != null ? 1 : 0;
+                    if (isSome1) {
+                        i32Stack.push((value.param0 | 0));
+                    }
+                    i32Stack.push(isSome1);
                     return APIOptionalResultValues.Tag.Failure;
                 }
                 case APIOptionalResultValues.Tag.Status: {
-                    const isSome = value.param2 != null;
+                    const isSome = value.param2 != null ? 1 : 0;
                     if (isSome) {
                         const bytes = textEncoder.encode(value.param2);
                         const id = swift.memory.retain(bytes);
                         i32Stack.push(bytes.length);
                         i32Stack.push(id);
-                    } else {
-                        i32Stack.push(0);
-                        i32Stack.push(0);
                     }
-                    i32Stack.push(isSome ? 1 : 0);
-                    const isSome1 = value.param1 != null;
-                    i32Stack.push(isSome1 ? (value.param1 | 0) : 0);
-                    i32Stack.push(isSome1 ? 1 : 0);
-                    const isSome2 = value.param0 != null;
-                    i32Stack.push(isSome2 ? (value.param0 ? 1 : 0) : 0);
-                    i32Stack.push(isSome2 ? 1 : 0);
+                    i32Stack.push(isSome);
+                    const isSome1 = value.param1 != null ? 1 : 0;
+                    if (isSome1) {
+                        i32Stack.push((value.param1 | 0));
+                    }
+                    i32Stack.push(isSome1);
+                    const isSome2 = value.param0 != null ? 1 : 0;
+                    if (isSome2) {
+                        i32Stack.push(value.param0 ? 1 : 0);
+                    }
+                    i32Stack.push(isSome2);
                     return APIOptionalResultValues.Tag.Status;
                 }
                 default: throw new Error("Unknown APIOptionalResultValues tag: " + String(enumTag));
@@ -429,60 +431,60 @@ export async function createInstantiator(options, swift) {
             switch (tag) {
                 case APIOptionalResultValues.Tag.Success: {
                     const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
-                        const string = strStack.pop();
-                        optional = string;
+                    let optValue;
+                    if (isSome === 0) {
+                        optValue = null;
                     } else {
-                        optional = null;
+                        const string = strStack.pop();
+                        optValue = string;
                     }
-                    return { tag: APIOptionalResultValues.Tag.Success, param0: optional };
+                    return { tag: APIOptionalResultValues.Tag.Success, param0: optValue };
                 }
                 case APIOptionalResultValues.Tag.Failure: {
                     const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
-                        const bool = i32Stack.pop() !== 0;
-                        optional = bool;
+                    let optValue;
+                    if (isSome === 0) {
+                        optValue = null;
                     } else {
-                        optional = null;
+                        const bool = i32Stack.pop() !== 0;
+                        optValue = bool;
                     }
                     const isSome1 = i32Stack.pop();
-                    let optional1;
-                    if (isSome1) {
-                        const int = i32Stack.pop();
-                        optional1 = int;
+                    let optValue1;
+                    if (isSome1 === 0) {
+                        optValue1 = null;
                     } else {
-                        optional1 = null;
+                        const int = i32Stack.pop();
+                        optValue1 = int;
                     }
-                    return { tag: APIOptionalResultValues.Tag.Failure, param0: optional1, param1: optional };
+                    return { tag: APIOptionalResultValues.Tag.Failure, param0: optValue1, param1: optValue };
                 }
                 case APIOptionalResultValues.Tag.Status: {
                     const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
-                        const string = strStack.pop();
-                        optional = string;
+                    let optValue;
+                    if (isSome === 0) {
+                        optValue = null;
                     } else {
-                        optional = null;
+                        const string = strStack.pop();
+                        optValue = string;
                     }
                     const isSome1 = i32Stack.pop();
-                    let optional1;
-                    if (isSome1) {
-                        const int = i32Stack.pop();
-                        optional1 = int;
+                    let optValue1;
+                    if (isSome1 === 0) {
+                        optValue1 = null;
                     } else {
-                        optional1 = null;
+                        const int = i32Stack.pop();
+                        optValue1 = int;
                     }
                     const isSome2 = i32Stack.pop();
-                    let optional2;
-                    if (isSome2) {
-                        const bool = i32Stack.pop() !== 0;
-                        optional2 = bool;
+                    let optValue2;
+                    if (isSome2 === 0) {
+                        optValue2 = null;
                     } else {
-                        optional2 = null;
+                        const bool = i32Stack.pop() !== 0;
+                        optValue2 = bool;
                     }
-                    return { tag: APIOptionalResultValues.Tag.Status, param0: optional2, param1: optional1, param2: optional };
+                    return { tag: APIOptionalResultValues.Tag.Status, param0: optValue2, param1: optValue1, param2: optValue };
                 }
                 default: throw new Error("Unknown APIOptionalResultValues tag returned from Swift: " + String(tag));
             }
@@ -501,15 +503,19 @@ export async function createInstantiator(options, swift) {
                     return TypedPayloadResultValues.Tag.Direction;
                 }
                 case TypedPayloadResultValues.Tag.OptPrecision: {
-                    const isSome = value.param0 != null;
-                    f32Stack.push(isSome ? Math.fround(value.param0) : 0.0);
-                    i32Stack.push(isSome ? 1 : 0);
+                    const isSome = value.param0 != null ? 1 : 0;
+                    if (isSome) {
+                        f32Stack.push(Math.fround(value.param0));
+                    }
+                    i32Stack.push(isSome);
                     return TypedPayloadResultValues.Tag.OptPrecision;
                 }
                 case TypedPayloadResultValues.Tag.OptDirection: {
-                    const isSome = value.param0 != null;
-                    i32Stack.push(isSome ? (value.param0 | 0) : 0);
-                    i32Stack.push(isSome ? 1 : 0);
+                    const isSome = value.param0 != null ? 1 : 0;
+                    if (isSome) {
+                        i32Stack.push((value.param0 | 0));
+                    }
+                    i32Stack.push(isSome);
                     return TypedPayloadResultValues.Tag.OptDirection;
                 }
                 case TypedPayloadResultValues.Tag.Empty: {
@@ -531,25 +537,25 @@ export async function createInstantiator(options, swift) {
                 }
                 case TypedPayloadResultValues.Tag.OptPrecision: {
                     const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
-                        const rawValue = f32Stack.pop();
-                        optional = rawValue;
+                    let optValue;
+                    if (isSome === 0) {
+                        optValue = null;
                     } else {
-                        optional = null;
+                        const rawValue = f32Stack.pop();
+                        optValue = rawValue;
                     }
-                    return { tag: TypedPayloadResultValues.Tag.OptPrecision, param0: optional };
+                    return { tag: TypedPayloadResultValues.Tag.OptPrecision, param0: optValue };
                 }
                 case TypedPayloadResultValues.Tag.OptDirection: {
                     const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
-                        const caseId = i32Stack.pop();
-                        optional = caseId;
+                    let optValue;
+                    if (isSome === 0) {
+                        optValue = null;
                     } else {
-                        optional = null;
+                        const caseId = i32Stack.pop();
+                        optValue = caseId;
                     }
-                    return { tag: TypedPayloadResultValues.Tag.OptDirection, param0: optional };
+                    return { tag: TypedPayloadResultValues.Tag.OptDirection, param0: optValue };
                 }
                 case TypedPayloadResultValues.Tag.Empty: return { tag: TypedPayloadResultValues.Tag.Empty };
                 default: throw new Error("Unknown TypedPayloadResultValues tag returned from Swift: " + String(tag));
@@ -633,54 +639,49 @@ export async function createInstantiator(options, swift) {
             const enumTag = value.tag;
             switch (enumTag) {
                 case OptionalAllTypesResultValues.Tag.OptStruct: {
-                    const isSome = value.param0 != null;
+                    const isSome = value.param0 != null ? 1 : 0;
                     if (isSome) {
                         structHelpers.Point.lower(value.param0);
                     }
-                    i32Stack.push(isSome ? 1 : 0);
+                    i32Stack.push(isSome);
                     return OptionalAllTypesResultValues.Tag.OptStruct;
                 }
                 case OptionalAllTypesResultValues.Tag.OptClass: {
-                    const isSome = value.param0 != null;
+                    const isSome = value.param0 != null ? 1 : 0;
                     if (isSome) {
                         ptrStack.push(value.param0.pointer);
-                    } else {
-                        ptrStack.push(0);
                     }
-                    i32Stack.push(isSome ? 1 : 0);
+                    i32Stack.push(isSome);
                     return OptionalAllTypesResultValues.Tag.OptClass;
                 }
                 case OptionalAllTypesResultValues.Tag.OptJSObject: {
-                    const isSome = value.param0 != null;
+                    const isSome = value.param0 != null ? 1 : 0;
                     if (isSome) {
                         const objId = swift.memory.retain(value.param0);
                         i32Stack.push(objId);
-                    } else {
-                        i32Stack.push(0);
                     }
-                    i32Stack.push(isSome ? 1 : 0);
+                    i32Stack.push(isSome);
                     return OptionalAllTypesResultValues.Tag.OptJSObject;
                 }
                 case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                    const isSome = value.param0 != null;
+                    const isSome = value.param0 != null ? 1 : 0;
                     if (isSome) {
                         const caseId = enumHelpers.APIResult.lower(value.param0);
                         i32Stack.push(caseId);
                     } else {
-                        i32Stack.push(0);
+                        i32Stack.push(-1);
                     }
-                    i32Stack.push(isSome ? 1 : 0);
                     return OptionalAllTypesResultValues.Tag.OptNestedEnum;
                 }
                 case OptionalAllTypesResultValues.Tag.OptArray: {
-                    const isSome = value.param0 != null;
+                    const isSome = value.param0 != null ? 1 : 0;
                     if (isSome) {
                         for (const elem of value.param0) {
                             i32Stack.push((elem | 0));
                         }
                         i32Stack.push(value.param0.length);
                     }
-                    i32Stack.push(isSome ? 1 : 0);
+                    i32Stack.push(isSome);
                     return OptionalAllTypesResultValues.Tag.OptArray;
                 }
                 case OptionalAllTypesResultValues.Tag.Empty: {
@@ -694,55 +695,56 @@ export async function createInstantiator(options, swift) {
             switch (tag) {
                 case OptionalAllTypesResultValues.Tag.OptStruct: {
                     const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
-                        const struct = structHelpers.Point.lift();
-                        optional = struct;
+                    let optValue;
+                    if (isSome === 0) {
+                        optValue = null;
                     } else {
-                        optional = null;
+                        const struct = structHelpers.Point.lift();
+                        optValue = struct;
                     }
-                    return { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: optional };
+                    return { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptClass: {
                     const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
+                    let optValue;
+                    if (isSome === 0) {
+                        optValue = null;
+                    } else {
                         const ptr = ptrStack.pop();
                         const obj = _exports['User'].__construct(ptr);
-                        optional = obj;
-                    } else {
-                        optional = null;
+                        optValue = obj;
                     }
-                    return { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: optional };
+                    return { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptJSObject: {
                     const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
+                    let optValue;
+                    if (isSome === 0) {
+                        optValue = null;
+                    } else {
                         const objId = i32Stack.pop();
                         const obj = swift.memory.getObject(objId);
                         swift.memory.release(objId);
-                        optional = obj;
-                    } else {
-                        optional = null;
+                        optValue = obj;
                     }
-                    return { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: optional };
+                    return { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                    const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
-                        const caseId = i32Stack.pop();
-                        optional = enumHelpers.APIResult.lift(caseId);
+                    const caseId = i32Stack.pop();
+                    let optValue;
+                    if (caseId === -1) {
+                        optValue = null;
                     } else {
-                        optional = null;
+                        optValue = enumHelpers.APIResult.lift(caseId);
                     }
-                    return { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: optional };
+                    return { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptArray: {
                     const isSome = i32Stack.pop();
-                    let optional;
-                    if (isSome) {
+                    let optValue;
+                    if (isSome === 0) {
+                        optValue = null;
+                    } else {
                         const arrayLen = i32Stack.pop();
                         const arrayResult = [];
                         for (let i = 0; i < arrayLen; i++) {
@@ -750,11 +752,9 @@ export async function createInstantiator(options, swift) {
                             arrayResult.push(int);
                         }
                         arrayResult.reverse();
-                        optional = arrayResult;
-                    } else {
-                        optional = null;
+                        optValue = arrayResult;
                     }
-                    return { tag: OptionalAllTypesResultValues.Tag.OptArray, param0: optional };
+                    return { tag: OptionalAllTypesResultValues.Tag.OptArray, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.Empty: return { tag: OptionalAllTypesResultValues.Tag.Empty };
                 default: throw new Error("Unknown OptionalAllTypesResultValues tag returned from Swift: " + String(tag));

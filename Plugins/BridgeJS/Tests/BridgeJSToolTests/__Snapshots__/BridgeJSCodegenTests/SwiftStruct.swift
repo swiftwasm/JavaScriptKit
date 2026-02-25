@@ -15,16 +15,8 @@ extension DataPoint: _BridgedSwiftStruct {
         self.x.bridgeJSStackPush()
         self.y.bridgeJSStackPush()
         self.label.bridgeJSStackPush()
-        let __bjs_isSome_optCount = self.optCount != nil
-        if let __bjs_unwrapped_optCount = self.optCount {
-        __bjs_unwrapped_optCount.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optCount ? 1 : 0)
-        let __bjs_isSome_optFlag = self.optFlag != nil
-        if let __bjs_unwrapped_optFlag = self.optFlag {
-        __bjs_unwrapped_optFlag.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optFlag ? 1 : 0)
+        self.optCount.bridgeJSStackPush()
+        self.optFlag.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -85,11 +77,7 @@ extension Address: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.street.bridgeJSStackPush()
         self.city.bridgeJSStackPush()
-        let __bjs_isSome_zipCode = self.zipCode != nil
-        if let __bjs_unwrapped_zipCode = self.zipCode {
-        __bjs_unwrapped_zipCode.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_zipCode ? 1 : 0)
+        self.zipCode.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -141,11 +129,7 @@ extension Person: _BridgedSwiftStruct {
         self.name.bridgeJSStackPush()
         self.age.bridgeJSStackPush()
         self.address.bridgeJSStackPush()
-        let __bjs_isSome_email = self.email != nil
-        if let __bjs_unwrapped_email = self.email {
-        __bjs_unwrapped_email.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_email ? 1 : 0)
+        self.email.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -243,11 +227,7 @@ extension Measurement: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.value.bridgeJSStackPush()
         self.precision.bridgeJSStackPush()
-        let __bjs_isSome_optionalPrecision = self.optionalPrecision != nil
-        if let __bjs_unwrapped_optionalPrecision = self.optionalPrecision {
-        __bjs_unwrapped_optionalPrecision.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optionalPrecision ? 1 : 0)
+        self.optionalPrecision.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -414,11 +394,7 @@ extension Container: _BridgedSwiftStruct {
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.object.bridgeJSStackPush()
-        let __bjs_isSome_optionalObject = self.optionalObject != nil
-        if let __bjs_unwrapped_optionalObject = self.optionalObject {
-        __bjs_unwrapped_optionalObject.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optionalObject ? 1 : 0)
+        self.optionalObject.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {

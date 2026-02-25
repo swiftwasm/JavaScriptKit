@@ -146,6 +146,37 @@ public protocol _BridgedSwiftStackType {
     associatedtype StackLiftResult = Self
     static func bridgeJSStackPop() -> StackLiftResult
     consuming func bridgeJSStackPush()
+
+    // MARK: Specialization points
+
+    /// Specialization point for popping an `Optional<Self>`
+    static func bridgeJSStackPopAsOptional() -> StackLiftResult?
+    /// Specialization point for pushing an `Optional<Self>`
+    static func bridgeJSStackPushAsOptional(_ value: consuming Self?)
+}
+
+extension _BridgedSwiftStackType {
+    /// Default implementation for popping an `Optional<Self>` using
+    /// a leading discriminator on the stack (0 for nil, 1 for some).
+    public static func bridgeJSStackPopAsOptional() -> StackLiftResult? {
+        let isSome = _swift_js_pop_i32()
+        if isSome == 0 {
+            return nil
+        }
+        return Self.bridgeJSStackPop()
+    }
+
+    /// Default implementation for pushing an `Optional<Self>` using
+    /// a leading discriminator on the stack (0 for nil, 1 for some).
+    public static func bridgeJSStackPushAsOptional(_ value: consuming Self?) {
+        switch consume value {
+        case .none:
+            _swift_js_push_i32(0)
+        case .some(let value):
+            value.bridgeJSStackPush()
+            _swift_js_push_i32(1)
+        }
+    }
 }
 
 /// Types that bridge with the same (isSome, value) ABI as Optional.
@@ -604,7 +635,8 @@ extension _BridgedSwiftCaseEnum {
 /// A protocol that Swift associated value enum types conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
-public protocol _BridgedSwiftAssociatedValueEnum: _BridgedSwiftTypeLoweredIntoVoidType, _BridgedSwiftStackType {
+public protocol _BridgedSwiftAssociatedValueEnum: _BridgedSwiftTypeLoweredIntoVoidType, _BridgedSwiftStackType
+where StackLiftResult == Self {
     /// Pops the payload of the associated value enum from the stack.
     ///
     /// - Parameter caseId: The enum case ID.
@@ -624,6 +656,23 @@ extension _BridgedSwiftAssociatedValueEnum {
 
     @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
         _swift_js_push_i32(bridgeJSStackPushPayload())
+    }
+
+    public static func bridgeJSStackPopAsOptional() -> Self? {
+        let discriminator = _swift_js_pop_i32()
+        if discriminator == -1 {
+            return nil
+        }
+        return bridgeJSStackPopPayload(discriminator)
+    }
+
+    public static func bridgeJSStackPushAsOptional(_ value: consuming Self?) {
+        switch consume value {
+        case .none:
+            _swift_js_push_i32(-1)
+        case .some(let value):
+            _swift_js_push_i32(value.bridgeJSStackPushPayload())
+        }
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ caseId: Int32) -> Self {
@@ -646,7 +695,8 @@ extension _BridgedSwiftAssociatedValueEnum {
 /// A protocol that Swift struct types conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
-public protocol _BridgedSwiftStruct: _BridgedSwiftTypeLoweredIntoVoidType, _BridgedSwiftGenericOptionalStackType {
+public protocol _BridgedSwiftStruct: _BridgedSwiftTypeLoweredIntoVoidType, _BridgedSwiftStackType
+where StackLiftResult == Self {
     // MARK: ExportSwift
     @_spi(BridgeJS) static func bridgeJSStackPop() -> Self
     @_spi(BridgeJS) consuming func bridgeJSStackPush() -> Void
@@ -1227,7 +1277,9 @@ extension Optional {
     }
 }
 
-public protocol _BridgedSwiftOptionalScalarBridge: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
+public protocol _BridgedSwiftOptionalScalarBridge: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType,
+    _BridgedSwiftStackType
+where StackLiftResult == Self {
     @_spi(BridgeJS) static func bridgeJSPopOptionalScalarPayload() -> WasmCoreType
     @_spi(BridgeJS) static var bridgeJSOptionalScalarNonePayload: WasmCoreType { get }
     @_spi(BridgeJS) static func bridgeJSWriteOptionalReturn(_ isSome: Int32, _ value: WasmCoreType)
@@ -1324,12 +1376,6 @@ extension Optional where Wrapped: _BridgedSwiftOptionalScalarBridge {
         return Wrapped.bridgeJSLiftParameter(wrappedValue)
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        let wrappedValue = Wrapped.bridgeJSPopOptionalScalarPayload()
-        return bridgeJSLiftParameter(isSome, wrappedValue)
-    }
-
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         switch consume self {
         case .none:
@@ -1378,13 +1424,6 @@ extension Optional where Wrapped == String {
         _bridgeJSLiftParameter(isSome, (bytes, count), liftWrapped: { String.bridgeJSLiftParameter($0.0, $0.1) })
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> String? {
-        let isSome = _swift_js_pop_i32()
-        let bytes = _swift_js_pop_i32()
-        let count = _swift_js_pop_i32()
-        return bridgeJSLiftParameter(isSome, bytes, count)
-    }
-
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> String? {
         let length = _swift_js_get_optional_string()
         if length < 0 {
@@ -1416,12 +1455,6 @@ extension Optional where Wrapped == JSObject {
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> JSObject? {
         _bridgeJSLiftParameter(isSome, objectId, liftWrapped: JSObject.bridgeJSLiftParameter)
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> JSObject? {
-        let isSome = _swift_js_pop_i32()
-        let objectId = _swift_js_pop_i32()
-        return bridgeJSLiftParameter(isSome, objectId)
     }
 
     @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
@@ -1466,32 +1499,14 @@ extension Optional where Wrapped == JSValue {
         }
     }
 
-    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> JSValue? {
-        let isSome = _swift_js_pop_i32()
-        if isSome == 0 {
-            return nil
-        }
-        let payload2 = _swift_js_pop_f64()
-        let payload1 = _swift_js_pop_i32()
-        let kind = _swift_js_pop_i32()
-        return JSValue.bridgeJSLiftParameter(kind, payload1, payload2)
-    }
-
-    @_spi(BridgeJS) public func bridgeJSLowerReturn() -> Void {
-        switch self {
-        case .none:
-            _swift_js_push_i32(0)
-        case .some(let value):
-            value.bridgeJSLowerReturn()
-            _swift_js_push_i32(1)
-        }
+    @_spi(BridgeJS) public func bridgeJSLowerReturn() {
+        self.bridgeJSStackPush()
     }
 }
 
-extension Optional where Wrapped == [JSValue] {
-    // MARK: ExportSwift
-
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+extension Optional {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter<Element>() -> Int32
+    where Wrapped == [Element], Element: _BridgedSwiftStackType, Element == Element.StackLiftResult {
         switch consume self {
         case .none:
             return 0
@@ -1501,29 +1516,47 @@ extension Optional where Wrapped == [JSValue] {
         }
     }
 
-    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32) -> [JSValue]? {
-        if isSome == 0 {
-            return nil
-        }
-        return [JSValue].bridgeJSLiftParameter()
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter<Element>() -> [Element]?
+    where Wrapped == [Element], Element: _BridgedSwiftStackType, Element == Element.StackLiftResult {
+        return self.bridgeJSStackPop()
     }
 
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> [JSValue]? {
-        let isSome = _swift_js_pop_i32()
-        if isSome == 0 {
-            return nil
-        }
-        return [JSValue].bridgeJSLiftReturn()
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn<Element>() -> [Element]?
+    where Wrapped == [Element], Element: _BridgedSwiftStackType, Element == Element.StackLiftResult {
+        return self.bridgeJSStackPop()
     }
 
-    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn<Element>() -> Void
+    where Wrapped == [Element], Element: _BridgedSwiftStackType, Element == Element.StackLiftResult {
+        self.bridgeJSStackPush()
+    }
+}
+
+extension Optional {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter<Value>() -> Int32
+    where Wrapped == [String: Value], Value: _BridgedSwiftStackType, Value == Value.StackLiftResult {
         switch consume self {
         case .none:
-            _swift_js_push_i32(0)
-        case .some(let array):
-            array.bridgeJSLowerReturn()
-            _swift_js_push_i32(1)
+            return 0
+        case .some(let value):
+            value.bridgeJSLowerReturn()
+            return 1
         }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter<Value>() -> [String: Value]?
+    where Wrapped == [String: Value], Value: _BridgedSwiftStackType, Value == Value.StackLiftResult {
+        return self.bridgeJSStackPop()
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn<Value>() -> [String: Value]?
+    where Wrapped == [String: Value], Value: _BridgedSwiftStackType, Value == Value.StackLiftResult {
+        return self.bridgeJSStackPop()
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn<Value>() -> Void
+    where Wrapped == [String: Value], Value: _BridgedSwiftStackType, Value == Value.StackLiftResult {
+        self.bridgeJSStackPush()
     }
 }
 
@@ -1583,12 +1616,6 @@ extension Optional where Wrapped: _BridgedSwiftHeapObject {
         _bridgeJSLiftParameter(isSome, pointer, liftWrapped: Wrapped.bridgeJSLiftParameter)
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        let pointer = _swift_js_pop_pointer()
-        return bridgeJSLiftParameter(isSome, pointer)
-    }
-
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Wrapped? {
         let pointer = _swift_js_get_optional_heap_object_pointer()
         if pointer == UnsafeMutableRawPointer(bitPattern: 0) {
@@ -1618,12 +1645,6 @@ extension Optional where Wrapped: _BridgedSwiftCaseEnum {
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
         _bridgeJSLiftParameter(isSome, wrappedValue, liftWrapped: Wrapped.bridgeJSLiftParameter)
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        let wrappedValue = _swift_js_pop_i32()
-        return bridgeJSLiftParameter(isSome, wrappedValue)
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Int32) -> Wrapped? {
@@ -1687,12 +1708,6 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
         let optionalRawValue: String? = self?.rawValue
         optionalRawValue.bridgeJSLowerReturn()
     }
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        let bytes = _swift_js_pop_i32()
-        let count = _swift_js_pop_i32()
-        return bridgeJSLiftParameter(isSome, bytes, count)
-    }
 }
 
 extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == Int {
@@ -1709,12 +1724,6 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Int32) -> Wrapped? {
         let optionalRawValue = Int?.bridgeJSLiftParameter(isSome, wrappedValue)
         return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        let wrappedValue = _swift_js_pop_i32()
-        return bridgeJSLiftParameter(isSome, wrappedValue)
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Wrapped? {
@@ -1741,12 +1750,6 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
         return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        let wrappedValue = _swift_js_pop_i32()
-        return bridgeJSLiftParameter(isSome, wrappedValue)
-    }
-
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         let optionalRawValue: Bool? = self?.rawValue
         optionalRawValue.bridgeJSLowerReturn()
@@ -1770,12 +1773,6 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float32) -> Wrapped? {
         let optionalRawValue = Float?.bridgeJSLiftParameter(isSome, wrappedValue)
         return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        let wrappedValue = _swift_js_pop_f32()
-        return bridgeJSLiftParameter(isSome, wrappedValue)
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Wrapped? {
@@ -1813,12 +1810,6 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
         return optionalRawValue.flatMap { Wrapped(rawValue: $0) }
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        let wrappedValue = _swift_js_pop_f64()
-        return bridgeJSLiftParameter(isSome, wrappedValue)
-    }
-
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Wrapped? {
         let isSome = _swift_js_get_optional_double_presence()
         if isSome == 0 {
@@ -1838,22 +1829,6 @@ extension Optional where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepres
 // MARK: Optional Associated Value Enum Support
 
 extension Optional where Wrapped: _BridgedSwiftAssociatedValueEnum {
-    private static func bridgeJSStackPopPayload(_ discriminant: Int32) -> Wrapped? {
-        if discriminant == -1 {
-            return nil
-        } else {
-            return Wrapped.bridgeJSStackPopPayload(discriminant)
-        }
-    }
-    private consuming func bridgeJSStackPushPayload() -> Int32 {
-        switch consume self {
-        case .none:
-            return -1
-        case .some(let value):
-            return value.bridgeJSStackPushPayload()
-        }
-    }
-
     // MARK: ExportSwift
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (isSome: Int32, caseId: Int32) {
@@ -1874,26 +1849,15 @@ extension Optional where Wrapped: _BridgedSwiftAssociatedValueEnum {
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ caseId: Int32) -> Wrapped? {
-        return bridgeJSStackPopPayload(caseId)
+        if caseId == -1 {
+            return nil
+        } else {
+            return Wrapped.bridgeJSStackPopPayload(caseId)
+        }
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
         bridgeJSStackPush()
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        let caseId = _swift_js_pop_i32()
-        return bridgeJSLiftParameter(isSome, caseId)
-    }
-
-    @_spi(BridgeJS) public consuming func bridgeJSStackPush() -> Void {
-        switch consume self {
-        case .none:
-            _swift_js_push_i32(-1)  // Use -1 as sentinel for null
-        case .some(let value):
-            value.bridgeJSStackPush()
-        }
     }
 }
 
@@ -1907,52 +1871,44 @@ extension Optional where Wrapped: _BridgedSwiftStruct {
             return Wrapped.bridgeJSStackPop()
         }
     }
-    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> Wrapped? {
-        return bridgeJSStackPop()
-    }
-}
-
-// MARK: - Generic Optional Stack Support
-
-/// Marker protocol for types whose Optional wrapper should use the generic
-/// stack-based ABI (`_BridgedSwiftStackType`).  Only Array, Dictionary, and
-/// `_BridgedSwiftStruct` conform. Primitives and other types keep their
-/// own type-specific Optional extensions.
-public protocol _BridgedSwiftGenericOptionalStackType: _BridgedSwiftStackType
-where StackLiftResult == Self {}
-
-extension Optional: _BridgedSwiftStackType
-where Wrapped: _BridgedSwiftGenericOptionalStackType {
-    public typealias StackLiftResult = Wrapped?
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
-        let isSome = _swift_js_pop_i32()
-        if isSome == 0 {
-            return nil
-        }
-        return Wrapped.bridgeJSStackPop()
-    }
-
-    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
-        switch consume self {
-        case .none:
-            _swift_js_push_i32(0)
-        case .some(let value):
-            value.bridgeJSStackPush()
-            _swift_js_push_i32(1)
-        }
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> Wrapped? {
-        return bridgeJSStackPop()
-    }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         bridgeJSStackPush()
     }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> Wrapped? {
+        bridgeJSStackPop()
+    }
+}
+
+// MARK: - Optional _BridgedSwiftStackType conformance
+
+// The default push/pop implementation just goes through
+// `_BridgedSwiftStackType.bridgeJSStackPushAsOptional`, but some
+// Wrapped types (e.g. case enums) have a more efficient implementation.
+extension Optional: _BridgedSwiftStackType
+where Wrapped: _BridgedSwiftStackType, Wrapped.StackLiftResult == Wrapped {
+    public typealias StackLiftResult = Wrapped?
+
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Wrapped? {
+        return Wrapped.bridgeJSStackPopAsOptional()
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        Wrapped.bridgeJSStackPushAsOptional(self)
+    }
 }
 
 // MARK: - _BridgedAsOptional (JSUndefinedOr) delegating to Optional<Wrapped>
+
+extension _BridgedAsOptional where Wrapped: _BridgedSwiftStackType, Wrapped.StackLiftResult == Wrapped {
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        asOptional.bridgeJSStackPush()
+    }
+}
 
 extension _BridgedAsOptional where Wrapped: _BridgedSwiftOptionalScalarBridge {
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (
@@ -1966,10 +1922,6 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftOptionalScalarBridge {
         _ wrappedValue: Wrapped.WasmCoreType
     ) -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, wrappedValue))
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
@@ -2002,10 +1954,6 @@ extension _BridgedAsOptional where Wrapped == String {
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, bytes, count))
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
-    }
-
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftReturnFromSideChannel())
     }
@@ -2022,10 +1970,6 @@ extension _BridgedAsOptional where Wrapped == JSObject {
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, objectId))
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
@@ -2056,10 +2000,6 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftHeapObject {
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, pointer))
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
-    }
-
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftReturnFromSideChannel())
     }
@@ -2076,10 +2016,6 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftCaseEnum {
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ caseId: Int32) -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, caseId))
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ caseId: Int32) -> Self {
@@ -2105,10 +2041,6 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, bytes, count))
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
-    }
-
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftReturnFromSideChannel())
     }
@@ -2128,10 +2060,6 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, wrappedValue))
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
-    }
-
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftReturnFromSideChannel())
     }
@@ -2147,10 +2075,6 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, wrappedValue))
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
-    }
-
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         asOptional.bridgeJSLowerReturn()
     }
@@ -2164,10 +2088,6 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ wrappedValue: Float32) -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, wrappedValue))
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
@@ -2189,10 +2109,6 @@ where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.Ra
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, wrappedValue))
     }
 
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
-    }
-
     @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftReturnFromSideChannel())
     }
@@ -2209,10 +2125,6 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftAssociatedValueEnum {
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ caseId: Int32) -> Self {
         Self(optional: Optional<Wrapped>.bridgeJSLiftParameter(isSome, caseId))
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ caseId: Int32) -> Self {
@@ -2232,20 +2144,10 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftStruct {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         asOptional.bridgeJSLowerReturn()
     }
-
-    // MARK: Stack ABI
-    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
-        Self(optional: Optional<Wrapped>.bridgeJSStackPop())
-    }
-    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
-        asOptional.bridgeJSStackPush()
-    }
 }
 
 // MARK: - Array Support
 
-extension Array: _BridgedSwiftGenericOptionalStackType
-where Element: _BridgedSwiftStackType, Element.StackLiftResult == Element {}
 extension Array: _BridgedSwiftStackType where Element: _BridgedSwiftStackType, Element.StackLiftResult == Element {
     public typealias StackLiftResult = [Element]
 
@@ -2286,14 +2188,12 @@ extension Array: _BridgedSwiftStackType where Element: _BridgedSwiftStackType, E
 // MARK: - Dictionary Support
 
 public protocol _BridgedSwiftDictionaryStackType: _BridgedSwiftTypeLoweredIntoVoidType,
-    _BridgedSwiftGenericOptionalStackType
-{
+    _BridgedSwiftStackType
+where StackLiftResult == Self {
     associatedtype DictionaryValue: _BridgedSwiftStackType
     where DictionaryValue.StackLiftResult == DictionaryValue
 }
 
-extension Dictionary: _BridgedSwiftGenericOptionalStackType
-where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {}
 extension Dictionary: _BridgedSwiftStackType
 where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
     public typealias StackLiftResult = [String: Value]
@@ -2371,6 +2271,10 @@ extension Optional where Wrapped: _BridgedSwiftDictionaryStackType {
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> [String: Wrapped.DictionaryValue]? {
         return bridgeJSStackPopPayload(_swift_js_pop_i32())
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        bridgeJSStackPush()
     }
 }
 

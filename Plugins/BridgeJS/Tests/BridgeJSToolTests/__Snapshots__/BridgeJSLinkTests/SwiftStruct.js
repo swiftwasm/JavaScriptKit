@@ -41,42 +41,38 @@ export async function createInstantiator(options, swift) {
             const id = swift.memory.retain(bytes);
             i32Stack.push(bytes.length);
             i32Stack.push(id);
-            const isSome = value.optCount != null;
+            const isSome = value.optCount != null ? 1 : 0;
             if (isSome) {
                 i32Stack.push((value.optCount | 0));
-            } else {
-                i32Stack.push(0);
             }
-            i32Stack.push(isSome ? 1 : 0);
-            const isSome1 = value.optFlag != null;
+            i32Stack.push(isSome);
+            const isSome1 = value.optFlag != null ? 1 : 0;
             if (isSome1) {
                 i32Stack.push(value.optFlag ? 1 : 0);
-            } else {
-                i32Stack.push(0);
             }
-            i32Stack.push(isSome1 ? 1 : 0);
+            i32Stack.push(isSome1);
         },
         lift: () => {
             const isSome = i32Stack.pop();
-            let optional;
-            if (isSome) {
-                const bool = i32Stack.pop() !== 0;
-                optional = bool;
+            let optValue;
+            if (isSome === 0) {
+                optValue = null;
             } else {
-                optional = null;
+                const bool = i32Stack.pop() !== 0;
+                optValue = bool;
             }
             const isSome1 = i32Stack.pop();
-            let optional1;
-            if (isSome1) {
-                const int = i32Stack.pop();
-                optional1 = int;
+            let optValue1;
+            if (isSome1 === 0) {
+                optValue1 = null;
             } else {
-                optional1 = null;
+                const int = i32Stack.pop();
+                optValue1 = int;
             }
             const string = strStack.pop();
             const f64 = f64Stack.pop();
             const f641 = f64Stack.pop();
-            return { x: f641, y: f64, label: string, optCount: optional1, optFlag: optional };
+            return { x: f641, y: f64, label: string, optCount: optValue1, optFlag: optValue };
         }
     });
     const __bjs_createAddressHelpers = () => ({
@@ -89,26 +85,24 @@ export async function createInstantiator(options, swift) {
             const id1 = swift.memory.retain(bytes1);
             i32Stack.push(bytes1.length);
             i32Stack.push(id1);
-            const isSome = value.zipCode != null;
+            const isSome = value.zipCode != null ? 1 : 0;
             if (isSome) {
                 i32Stack.push((value.zipCode | 0));
-            } else {
-                i32Stack.push(0);
             }
-            i32Stack.push(isSome ? 1 : 0);
+            i32Stack.push(isSome);
         },
         lift: () => {
             const isSome = i32Stack.pop();
-            let optional;
-            if (isSome) {
-                const int = i32Stack.pop();
-                optional = int;
+            let optValue;
+            if (isSome === 0) {
+                optValue = null;
             } else {
-                optional = null;
+                const int = i32Stack.pop();
+                optValue = int;
             }
             const string = strStack.pop();
             const string1 = strStack.pop();
-            return { street: string1, city: string, zipCode: optional };
+            return { street: string1, city: string, zipCode: optValue };
         }
     });
     const __bjs_createPersonHelpers = () => ({
@@ -119,31 +113,28 @@ export async function createInstantiator(options, swift) {
             i32Stack.push(id);
             i32Stack.push((value.age | 0));
             structHelpers.Address.lower(value.address);
-            const isSome = value.email != null;
+            const isSome = value.email != null ? 1 : 0;
             if (isSome) {
                 const bytes1 = textEncoder.encode(value.email);
                 const id1 = swift.memory.retain(bytes1);
                 i32Stack.push(bytes1.length);
                 i32Stack.push(id1);
-            } else {
-                i32Stack.push(0);
-                i32Stack.push(0);
             }
-            i32Stack.push(isSome ? 1 : 0);
+            i32Stack.push(isSome);
         },
         lift: () => {
             const isSome = i32Stack.pop();
-            let optional;
-            if (isSome) {
-                const string = strStack.pop();
-                optional = string;
+            let optValue;
+            if (isSome === 0) {
+                optValue = null;
             } else {
-                optional = null;
+                const string = strStack.pop();
+                optValue = string;
             }
             const struct = structHelpers.Address.lift();
             const int = i32Stack.pop();
             const string1 = strStack.pop();
-            return { name: string1, age: int, address: struct, email: optional };
+            return { name: string1, age: int, address: struct, email: optValue };
         }
     });
     const __bjs_createSessionHelpers = () => ({
@@ -162,26 +153,24 @@ export async function createInstantiator(options, swift) {
         lower: (value) => {
             f64Stack.push(value.value);
             f32Stack.push(Math.fround(value.precision));
-            const isSome = value.optionalPrecision != null;
+            const isSome = value.optionalPrecision != null ? 1 : 0;
             if (isSome) {
                 f32Stack.push(Math.fround(value.optionalPrecision));
-            } else {
-                f32Stack.push(0.0);
             }
-            i32Stack.push(isSome ? 1 : 0);
+            i32Stack.push(isSome);
         },
         lift: () => {
             const isSome = i32Stack.pop();
-            let optional;
-            if (isSome) {
-                const rawValue = f32Stack.pop();
-                optional = rawValue;
+            let optValue;
+            if (isSome === 0) {
+                optValue = null;
             } else {
-                optional = null;
+                const rawValue = f32Stack.pop();
+                optValue = rawValue;
             }
             const rawValue1 = f32Stack.pop();
             const f64 = f64Stack.pop();
-            return { value: f64, precision: rawValue1, optionalPrecision: optional };
+            return { value: f64, precision: rawValue1, optionalPrecision: optValue };
         }
     });
     const __bjs_createConfigStructHelpers = () => ({
@@ -200,45 +189,33 @@ export async function createInstantiator(options, swift) {
                 id = undefined;
             }
             i32Stack.push(id !== undefined ? id : 0);
-            const isSome = value.optionalObject != null;
+            const isSome = value.optionalObject != null ? 1 : 0;
             if (isSome) {
-                let id1;
-                if (value.optionalObject != null) {
-                    id1 = swift.memory.retain(value.optionalObject);
-                } else {
-                    id1 = undefined;
-                }
-                i32Stack.push(id1 !== undefined ? id1 : 0);
-            } else {
-                i32Stack.push(0);
+                const objId = swift.memory.retain(value.optionalObject);
+                i32Stack.push(objId);
             }
-            i32Stack.push(isSome ? 1 : 0);
+            i32Stack.push(isSome);
         },
         lift: () => {
             const isSome = i32Stack.pop();
-            let optional;
-            if (isSome) {
-                const objectId = i32Stack.pop();
-                let value;
-                if (objectId !== 0) {
-                    value = swift.memory.getObject(objectId);
-                    swift.memory.release(objectId);
-                } else {
-                    value = null;
-                }
-                optional = value;
+            let optValue;
+            if (isSome === 0) {
+                optValue = null;
             } else {
-                optional = null;
+                const objId = i32Stack.pop();
+                const obj = swift.memory.getObject(objId);
+                swift.memory.release(objId);
+                optValue = obj;
             }
-            const objectId1 = i32Stack.pop();
-            let value1;
-            if (objectId1 !== 0) {
-                value1 = swift.memory.getObject(objectId1);
-                swift.memory.release(objectId1);
+            const objectId = i32Stack.pop();
+            let value;
+            if (objectId !== 0) {
+                value = swift.memory.getObject(objectId);
+                swift.memory.release(objectId);
             } else {
-                value1 = null;
+                value = null;
             }
-            return { object: value1, optionalObject: optional };
+            return { object: value, optionalObject: optValue };
         }
     });
 

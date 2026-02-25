@@ -1204,22 +1204,8 @@ struct IntrinsicJSFragment: Sendable {
         }
     }
 
-    @discardableResult
-    private static func emitOptionalPlaceholders(
-        for wrappedType: BridgeType,
-        scope: JSGlueVariableScope,
-        printer: CodeFragmentPrinter
-    ) -> Bool {
-        let params = wrappedType.wasmParams
-        if params.isEmpty {
-            return false
-        }
-        for param in params {
-            emitPush(for: param.type, value: param.type.jsZeroLiteral, scope: scope, printer: printer)
-        }
-        return true
-    }
-
+    /// Lower an optional value to the stack using the **conditional** protocol:
+    /// push isSome flag, then conditionally push the payload (no placeholders for nil).
     private static func stackOptionalLower(
         wrappedType: BridgeType,
         kind: JSOptionalKind,
@@ -1244,23 +1230,7 @@ struct IntrinsicJSFragment: Sendable {
                 for line in ifBodyPrinter.lines {
                     printer.write(line)
                 }
-                let placeholderPrinter = CodeFragmentPrinter()
-                let hasPlaceholders = emitOptionalPlaceholders(
-                    for: wrappedType,
-                    scope: scope,
-                    printer: placeholderPrinter
-                )
-                if hasPlaceholders {
-                    printer.write("} else {")
-                    printer.indent {
-                        for line in placeholderPrinter.lines {
-                            printer.write(line)
-                        }
-                    }
-                    printer.write("}")
-                } else {
-                    printer.write("}")
-                }
+                printer.write("}")
                 scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
                 return []
             }
@@ -1744,107 +1714,19 @@ struct IntrinsicJSFragment: Sendable {
     private static func associatedValuePushPayload(type: BridgeType) throws -> IntrinsicJSFragment {
         switch type {
         case .nullable(let wrappedType, let kind):
-            return try associatedValueOptionalPushPayload(wrappedType: wrappedType, kind: kind)
+            return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
         default:
             return try stackLowerFragment(elementType: type)
         }
     }
 
-    private static func associatedValueOptionalPushPayload(
-        wrappedType: BridgeType,
-        kind: JSOptionalKind
-    ) throws -> IntrinsicJSFragment {
-        if wrappedType.isSingleParamScalar {
-            let wasmType = wrappedType.wasmParams[0].type
-            let stackCoerce = wrappedType.stackLowerCoerce
-            return IntrinsicJSFragment(
-                parameters: ["value"],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let value = arguments[0]
-                    let isSomeVar = scope.variable("isSome")
-                    printer.write("const \(isSomeVar) = \(kind.presenceCheck(value: value));")
-                    var coerced: String
-                    if let coerce = stackCoerce {
-                        coerced = coerce.replacingOccurrences(of: "$0", with: value)
-                        if coerced.contains("?") && !coerced.hasPrefix("(") {
-                            coerced = "(\(coerced))"
-                        }
-                    } else {
-                        coerced = value
-                    }
-                    emitPush(
-                        for: wasmType,
-                        value: "\(isSomeVar) ? \(coerced) : \(wasmType.jsZeroLiteral)",
-                        scope: scope,
-                        printer: printer
-                    )
-                    scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                    return []
-                }
-            )
-        }
-
-        let innerFragment = try stackLowerFragment(elementType: wrappedType)
-        return stackOptionalLower(
-            wrappedType: wrappedType,
-            kind: kind,
-            innerFragment: innerFragment
-        )
-    }
-
     private static func associatedValuePopPayload(type: BridgeType) throws -> IntrinsicJSFragment {
         switch type {
         case .nullable(let wrappedType, let kind):
-            return associatedValueOptionalPopPayload(wrappedType: wrappedType, kind: kind)
+            return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
         default:
             return try stackLiftFragment(elementType: type)
         }
-    }
-
-    private static func associatedValueOptionalPopPayload(
-        wrappedType: BridgeType,
-        kind: JSOptionalKind
-    ) -> IntrinsicJSFragment {
-        return IntrinsicJSFragment(
-            parameters: [],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let optVar = scope.variable("optional")
-                let isSomeVar = scope.variable("isSome")
-
-                printer.write("const \(isSomeVar) = \(scope.popI32());")
-                printer.write("let \(optVar);")
-                printer.write("if (\(isSomeVar)) {")
-                try printer.indent {
-                    // For optional associated value enums, Swift uses bridgeJSLowerParameter()
-                    // which pushes caseId to i32Stack (same as bridgeJSLowerReturn()).
-                    if case .associatedValueEnum(let fullName) = wrappedType {
-                        let base = fullName.components(separatedBy: ".").last ?? fullName
-                        let caseIdVar = scope.variable("caseId")
-                        printer.write("const \(caseIdVar) = \(scope.popI32());")
-                        printer.write(
-                            "\(optVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(caseIdVar));"
-                        )
-                    } else {
-                        let wrappedFragment = try associatedValuePopPayload(type: wrappedType)
-                        let wrappedResults = try wrappedFragment.printCode([], context)
-                        if let wrappedResult = wrappedResults.first {
-                            printer.write("\(optVar) = \(wrappedResult);")
-                        } else {
-                            printer.write("\(optVar) = undefined;")
-                        }
-                    }
-                }
-                printer.write("} else {")
-                printer.indent {
-                    printer.write("\(optVar) = \(kind.absenceLiteral);")
-                }
-                printer.write("}")
-
-                return [optVar]
-            }
-        )
     }
 
     private static func swiftStructLower(structBase: String) -> IntrinsicJSFragment {
@@ -2252,6 +2134,35 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
+        if case .associatedValueEnum(let fullName) = wrappedType {
+            let base = fullName.components(separatedBy: ".").last ?? fullName
+            let absenceLiteral = kind.absenceLiteral
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
+                    let caseIdVar = scope.variable("caseId")
+                    let resultVar = scope.variable("optValue")
+
+                    printer.write("const \(caseIdVar) = \(scope.popI32());")
+                    printer.write("let \(resultVar);")
+                    printer.write("if (\(caseIdVar) === -1) {")
+                    printer.indent {
+                        printer.write("\(resultVar) = \(absenceLiteral);")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write(
+                            "\(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(caseIdVar));"
+                        )
+                    }
+                    printer.write("}")
+
+                    return [resultVar]
+                }
+            )
+        }
+
         let absenceLiteral = kind.absenceLiteral
         return IntrinsicJSFragment(
             parameters: [],
@@ -2283,10 +2194,42 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
+    /// Lower an optional element to the stack using the **conditional** protocol:
+    /// push isSome flag, then conditionally push the payload (no placeholders for nil).
     private static func optionalElementLowerFragment(
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
+        if case .associatedValueEnum(let fullName) = wrappedType {
+            let base = fullName.components(separatedBy: ".").last ?? fullName
+            return IntrinsicJSFragment(
+                parameters: ["value"],
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
+                    let value = arguments[0]
+                    let isSomeVar = scope.variable("isSome")
+                    let presenceExpr = kind.presenceCheck(value: value)
+
+                    printer.write("const \(isSomeVar) = \(presenceExpr) ? 1 : 0;")
+                    printer.write("if (\(isSomeVar)) {")
+                    printer.indent {
+                        let caseIdVar = scope.variable("caseId")
+                        printer.write(
+                            "const \(caseIdVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
+                        )
+                        scope.emitPushI32Parameter(caseIdVar, printer: printer)
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        scope.emitPushI32Parameter("-1", printer: printer)
+                    }
+                    printer.write("}")
+
+                    return []
+                }
+            )
+        }
+
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
@@ -2304,23 +2247,7 @@ struct IntrinsicJSFragment: Sendable {
                         context
                     )
                 }
-                let placeholderPrinter = CodeFragmentPrinter()
-                let hasPlaceholders = emitOptionalPlaceholders(
-                    for: wrappedType,
-                    scope: scope,
-                    printer: placeholderPrinter
-                )
-                if hasPlaceholders {
-                    printer.write("} else {")
-                    printer.indent {
-                        for line in placeholderPrinter.lines {
-                            printer.write(line)
-                        }
-                    }
-                    printer.write("}")
-                } else {
-                    printer.write("}")
-                }
+                printer.write("}")
                 scope.emitPushI32Parameter(isSomeVar, printer: printer)
 
                 return []
@@ -2506,47 +2433,7 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         case .nullable(let wrappedType, let kind):
-            if wrappedType.isSingleParamScalar {
-                let wasmType = wrappedType.wasmParams[0].type
-                let stackCoerce = wrappedType.stackLowerCoerce
-                return IntrinsicJSFragment(
-                    parameters: ["value"],
-                    printCode: { arguments, context in
-                        let (scope, printer) = (context.scope, context.printer)
-                        let value = arguments[0]
-                        let isSomeVar = scope.variable("isSome")
-                        printer.write("const \(isSomeVar) = \(kind.presenceCheck(value: value));")
-                        let coerced: String
-                        if let coerce = stackCoerce {
-                            coerced = coerce.replacingOccurrences(of: "$0", with: value)
-                        } else {
-                            coerced = value
-                        }
-                        printer.write("if (\(isSomeVar)) {")
-                        printer.indent {
-                            emitPush(for: wasmType, value: coerced, scope: scope, printer: printer)
-                        }
-                        printer.write("} else {")
-                        printer.indent {
-                            emitPush(for: wasmType, value: wasmType.jsZeroLiteral, scope: scope, printer: printer)
-                        }
-                        printer.write("}")
-                        scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                        return []
-                    }
-                )
-            }
-
-            let innerFragment = try structFieldLowerFragment(
-                type: wrappedType,
-                fieldName: fieldName,
-                allStructs: allStructs
-            )
-            return stackOptionalLower(
-                wrappedType: wrappedType,
-                kind: kind,
-                innerFragment: innerFragment
-            )
+            return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
         case .swiftStruct(let nestedName):
             return IntrinsicJSFragment(
                 parameters: ["value"],
@@ -2584,50 +2471,7 @@ struct IntrinsicJSFragment: Sendable {
         case .jsValue:
             preconditionFailure("Struct field of JSValue is not supported yet")
         case .nullable(let wrappedType, let kind):
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let isSomeVar = scope.variable("isSome")
-                    let optVar = scope.variable("optional")
-                    printer.write("const \(isSomeVar) = \(scope.popI32());")
-                    printer.write("let \(optVar);")
-                    printer.write("if (\(isSomeVar)) {")
-                    try printer.indent {
-                        // Special handling for associated value enum - in struct fields, case ID is pushed to i32Stack
-                        if case .associatedValueEnum(let enumName) = wrappedType {
-                            let base = enumName.components(separatedBy: ".").last ?? enumName
-                            let caseIdVar = scope.variable("enumCaseId")
-                            printer.write("const \(caseIdVar) = \(scope.popI32());")
-                            printer.write(
-                                "\(optVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(caseIdVar));"
-                            )
-                        } else {
-                            let wrappedFragment = try structFieldLiftFragment(
-                                field: ExportedProperty(
-                                    name: field.name,
-                                    type: wrappedType,
-                                    isReadonly: true,
-                                    isStatic: false
-                                ),
-                                allStructs: allStructs
-                            )
-                            let wrappedResults = try wrappedFragment.printCode([], context)
-                            if let wrappedResult = wrappedResults.first {
-                                printer.write("\(optVar) = \(wrappedResult);")
-                            } else {
-                                printer.write("\(optVar) = undefined;")
-                            }
-                        }
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(optVar) = \(kind.absenceLiteral);")
-                    }
-                    printer.write("}")
-                    return [optVar]
-                }
-            )
+            return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
         case .swiftStruct(let nestedName):
             return IntrinsicJSFragment(
                 parameters: [],

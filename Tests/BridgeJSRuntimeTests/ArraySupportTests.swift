@@ -16,10 +16,6 @@ import JavaScriptKit
     @JSFunction static func jsRoundTripBoolArray(_ values: [Bool]) throws(JSException) -> [Bool]
 
     @JSFunction static func jsRoundTripJSValueArray(_ v: [JSValue]) throws(JSException) -> [JSValue]
-    @JSFunction static func jsRoundTripOptionalJSValueArray(
-        _ v: Optional<[JSValue]>
-    ) throws(JSException) -> Optional<[JSValue]>
-
     @JSFunction static func jsRoundTripJSObjectArray(_ values: [JSObject]) throws(JSException) -> [JSObject]
 
     @JSFunction static func jsRoundTripJSClassArray(
@@ -91,13 +87,6 @@ final class ArraySupportTests: XCTestCase {
         let roundTripped = try ArraySupportImports.jsRoundTripJSValueArray(values)
         XCTAssertEqual(roundTripped, values)
         XCTAssertEqual(try ArraySupportImports.jsRoundTripJSValueArray([]), [])
-    }
-
-    func testRoundTripOptionalJSValueArray() throws {
-        XCTAssertNil(try ArraySupportImports.jsRoundTripOptionalJSValueArray(nil))
-        let values: [JSValue] = [.number(1), .undefined, .null]
-        let result = try ArraySupportImports.jsRoundTripOptionalJSValueArray(values)
-        XCTAssertEqual(result, values)
     }
 
     func testRoundTripJSObjectArray() throws {

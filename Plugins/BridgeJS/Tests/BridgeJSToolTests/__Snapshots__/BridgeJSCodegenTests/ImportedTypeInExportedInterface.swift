@@ -7,11 +7,7 @@ extension FooContainer: _BridgedSwiftStruct {
 
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
         self.foo.jsObject.bridgeJSStackPush()
-        let __bjs_isSome_optionalFoo = self.optionalFoo != nil
-        if let __bjs_unwrapped_optionalFoo = self.optionalFoo {
-        __bjs_unwrapped_optionalFoo.jsObject.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(__bjs_isSome_optionalFoo ? 1 : 0)
+        self.optionalFoo.bridgeJSStackPush()
     }
 
     init(unsafelyCopying jsObject: JSObject) {
@@ -101,11 +97,7 @@ public func _bjs_processOptionalFooArray() -> Void {
         return __result
     }())
     for __bjs_elem_ret in ret {
-    let __bjs_isSome_ret_elem = __bjs_elem_ret != nil
-    if let __bjs_unwrapped_ret_elem = __bjs_elem_ret {
-    __bjs_unwrapped_ret_elem.jsObject.bridgeJSStackPush()
-    }
-    _swift_js_push_i32(__bjs_isSome_ret_elem ? 1 : 0)
+    __bjs_elem_ret.bridgeJSStackPush()
     }
     _swift_js_push_i32(Int32(ret.count))
     #else

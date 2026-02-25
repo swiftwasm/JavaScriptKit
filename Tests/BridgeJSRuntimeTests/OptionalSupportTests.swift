@@ -10,6 +10,20 @@ import JavaScriptEventLoop
         _ name: JSUndefinedOr<String>
     ) throws -> JSUndefinedOr<String>
 
+    @JSFunction static func jsRoundTripOptionalJSValueArrayNull(
+        _ v: Optional<[JSValue]>
+    ) throws(JSException) -> Optional<[JSValue]>
+    // @JSFunction static func jsRoundTripOptionalJSValueArrayUndefined(
+    //     _ v: JSUndefinedOr<[JSValue]>
+    // ) throws(JSException) -> JSUndefinedOr<[JSValue]>
+
+    @JSFunction static func jsRoundTripOptionalStringToStringDictionaryNull(
+        _ v: Optional<[String: String]>
+    ) throws(JSException) -> Optional<[String: String]>
+    // @JSFunction static func jsRoundTripOptionalStringToStringDictionaryUndefined(
+    //     _ v: JSUndefinedOr<[String: String]>
+    // ) throws(JSException) -> JSUndefinedOr<[String: String]>
+
     @JSFunction static func runJsOptionalSupportTests() throws(JSException)
 }
 
@@ -51,6 +65,22 @@ final class OptionalSupportTests: XCTestCase {
     func testRoundTripOptionalNumberUndefined() throws {
         try roundTripTest(OptionalSupportImports.jsRoundTripOptionalNumberUndefined, 42)
     }
+
+    func testRoundTripOptionalJSValueArrayNull() throws {
+        try roundTripTest(OptionalSupportImports.jsRoundTripOptionalJSValueArrayNull, [.number(1), .undefined, .null])
+    }
+
+    // func testRoundTripOptionalJSValueArrayUndefined() throws {
+    //     try roundTripTest(OptionalSupportImports.jsRoundTripOptionalJSValueArrayUndefined, [.number(1), .undefined, .null])
+    // }
+
+    func testRoundTripOptionalStringToStringDictionaryNull() throws {
+        try roundTripTest(OptionalSupportImports.jsRoundTripOptionalStringToStringDictionaryNull, ["key": "value"])
+    }
+
+    // func testRoundTripOptionalStringToStringDictionaryUndefined() throws {
+    //     try roundTripTest(OptionalSupportImports.jsRoundTripOptionalStringToStringDictionaryUndefined, ["key": "value"])
+    // }
 }
 
 // MARK: - Optional Bridging

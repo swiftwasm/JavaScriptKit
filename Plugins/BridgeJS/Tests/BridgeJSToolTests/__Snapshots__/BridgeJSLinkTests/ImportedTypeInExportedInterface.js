@@ -37,45 +37,33 @@ export async function createInstantiator(options, swift) {
                 id = undefined;
             }
             i32Stack.push(id !== undefined ? id : 0);
-            const isSome = value.optionalFoo != null;
+            const isSome = value.optionalFoo != null ? 1 : 0;
             if (isSome) {
-                let id1;
-                if (value.optionalFoo != null) {
-                    id1 = swift.memory.retain(value.optionalFoo);
-                } else {
-                    id1 = undefined;
-                }
-                i32Stack.push(id1 !== undefined ? id1 : 0);
-            } else {
-                i32Stack.push(0);
+                const objId = swift.memory.retain(value.optionalFoo);
+                i32Stack.push(objId);
             }
-            i32Stack.push(isSome ? 1 : 0);
+            i32Stack.push(isSome);
         },
         lift: () => {
             const isSome = i32Stack.pop();
-            let optional;
-            if (isSome) {
-                const objectId = i32Stack.pop();
-                let value;
-                if (objectId !== 0) {
-                    value = swift.memory.getObject(objectId);
-                    swift.memory.release(objectId);
-                } else {
-                    value = null;
-                }
-                optional = value;
+            let optValue;
+            if (isSome === 0) {
+                optValue = null;
             } else {
-                optional = null;
+                const objId = i32Stack.pop();
+                const obj = swift.memory.getObject(objId);
+                swift.memory.release(objId);
+                optValue = obj;
             }
-            const objectId1 = i32Stack.pop();
-            let value1;
-            if (objectId1 !== 0) {
-                value1 = swift.memory.getObject(objectId1);
-                swift.memory.release(objectId1);
+            const objectId = i32Stack.pop();
+            let value;
+            if (objectId !== 0) {
+                value = swift.memory.getObject(objectId);
+                swift.memory.release(objectId);
             } else {
-                value1 = null;
+                value = null;
             }
-            return { foo: value1, optionalFoo: optional };
+            return { foo: value, optionalFoo: optValue };
         }
     });
 
@@ -303,8 +291,6 @@ export async function createInstantiator(options, swift) {
                         if (isSome) {
                             const objId = swift.memory.retain(elem);
                             i32Stack.push(objId);
-                        } else {
-                            i32Stack.push(0);
                         }
                         i32Stack.push(isSome);
                     }
