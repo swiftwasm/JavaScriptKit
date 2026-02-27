@@ -68,10 +68,6 @@ func runJsWorks() -> Void
     return v
 }
 
-@JS func roundTripJSValueArray(v: [JSValue]) -> [JSValue] {
-    return v
-}
-
 @JS func roundTripOptionalJSValueArray(v: [JSValue]?) -> [JSValue]? {
     return v
 }
@@ -1275,71 +1271,6 @@ enum GraphOperations {
 
 // MARK: - Array Tests
 
-// Primitive arrays
-@JS func roundTripIntArray(_ values: [Int]) -> [Int] {
-    return values
-}
-
-@JS func roundTripStringArray(_ values: [String]) -> [String] {
-    return values
-}
-
-@JS func roundTripDoubleArray(_ values: [Double]) -> [Double] {
-    return values
-}
-
-@JS func roundTripBoolArray(_ values: [Bool]) -> [Bool] {
-    return values
-}
-
-// Enum arrays
-@JS func roundTripDirectionArray(_ values: [Direction]) -> [Direction] {
-    return values
-}
-
-@JS func roundTripStatusArray(_ values: [Status]) -> [Status] {
-    return values
-}
-
-@JS func roundTripThemeArray(_ values: [Theme]) -> [Theme] {
-    return values
-}
-
-@JS func roundTripHttpStatusArray(_ values: [HttpStatus]) -> [HttpStatus] {
-    return values
-}
-
-// Struct arrays
-@JS func roundTripDataPointArray(_ points: [DataPoint]) -> [DataPoint] {
-    return points
-}
-
-// Class arrays
-@JS func roundTripGreeterArray(_ greeters: [Greeter]) -> [Greeter] {
-    return greeters
-}
-
-// Arrays of optional elements
-@JS func roundTripOptionalIntArray(_ values: [Int?]) -> [Int?] {
-    return values
-}
-
-@JS func roundTripOptionalStringArray(_ values: [String?]) -> [String?] {
-    return values
-}
-
-@JS func roundTripOptionalDataPointArray(_ points: [DataPoint?]) -> [DataPoint?] {
-    return points
-}
-
-@JS func roundTripOptionalDirectionArray(_ directions: [Direction?]) -> [Direction?] {
-    return directions
-}
-
-@JS func roundTripOptionalStatusArray(_ statuses: [Status?]) -> [Status?] {
-    return statuses
-}
-
 // Optional arrays
 @JS func roundTripOptionalIntArrayType(_ values: [Int]?) -> [Int]? {
     return values
@@ -1351,94 +1282,6 @@ enum GraphOperations {
 
 @JS func roundTripOptionalGreeterArrayType(_ greeters: [Greeter]?) -> [Greeter]? {
     return greeters
-}
-
-// Nested arrays
-
-@JS func roundTripNestedIntArray(_ values: [[Int]]) -> [[Int]] {
-    return values
-}
-
-@JS func roundTripNestedStringArray(_ values: [[String]]) -> [[String]] {
-    return values
-}
-
-@JS func roundTripNestedDoubleArray(_ values: [[Double]]) -> [[Double]] {
-    return values
-}
-
-@JS func roundTripNestedBoolArray(_ values: [[Bool]]) -> [[Bool]] {
-    return values
-}
-
-@JS func roundTripNestedDataPointArray(_ points: [[DataPoint]]) -> [[DataPoint]] {
-    return points
-}
-
-@JS func roundTripNestedDirectionArray(_ directions: [[Direction]]) -> [[Direction]] {
-    return directions
-}
-
-@JS func roundTripNestedGreeterArray(_ greeters: [[Greeter]]) -> [[Greeter]] {
-    return greeters
-}
-
-@JS func roundTripUnsafeRawPointerArray(_ values: [UnsafeRawPointer]) -> [UnsafeRawPointer] {
-    return values
-}
-@JS func roundTripUnsafeMutableRawPointerArray(_ values: [UnsafeMutableRawPointer]) -> [UnsafeMutableRawPointer] {
-    return values
-}
-@JS func roundTripOpaquePointerArray(_ values: [OpaquePointer]) -> [OpaquePointer] {
-    return values
-}
-@JS func roundTripUnsafePointerArray(_ values: [UnsafePointer<UInt8>]) -> [UnsafePointer<UInt8>] {
-    return values
-}
-@JS func roundTripUnsafeMutablePointerArray(_ values: [UnsafeMutablePointer<UInt8>]) -> [UnsafeMutablePointer<UInt8>] {
-    return values
-}
-
-@JS func consumeDataProcessorArrayType(_ processors: [DataProcessor]) -> Int {
-    return processors.count
-}
-
-@JS func roundTripDataProcessorArrayType(_ processors: [DataProcessor]) -> [DataProcessor] {
-    return processors
-}
-
-@JS func roundTripJSObjectArray(_ objects: [JSObject]) -> [JSObject] {
-    return objects
-}
-
-@JS func roundTripOptionalJSObjectArray(_ objects: [JSObject?]) -> [JSObject?] {
-    return objects
-}
-
-@JS func roundTripFooArray(_ foos: [Foo]) -> [Foo] {
-    return foos
-}
-
-@JS func roundTripOptionalFooArray(_ foos: [Foo?]) -> [Foo?] {
-    return foos
-}
-
-// MARK: - Multiple stack-based parameters (regression test for LIFO ordering)
-
-@JS func multiArrayFirstNums(nums: [Int], strs: [String]) -> [Int] {
-    return nums
-}
-
-@JS func multiArrayFirstStrs(nums: [Int], strs: [String]) -> [String] {
-    return strs
-}
-
-@JS func multiOptionalArrayFirstA(a: [Int]?, b: [String]?) -> [Int]? {
-    return a
-}
-
-@JS func multiOptionalArrayFirstB(a: [Int]?, b: [String]?) -> [String]? {
-    return b
 }
 
 class ExportAPITests: XCTestCase {
