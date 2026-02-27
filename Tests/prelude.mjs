@@ -789,7 +789,6 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.Services.Graph.GraphOperations.nodeCount(0), 0);
 
     testProtocolSupport(exports);
-    testArraySupport(exports);
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
@@ -1147,38 +1146,6 @@ function setupTestGlobals(global) {
         sym: Symbol("s"),
         bi: BigInt(3)
     };
-}
-
-/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
-function testArraySupport(exports) {
-    const { Direction, Status, Theme, HttpStatus, Greeter } = exports;
-
-    // Optional arrays
-    assert.deepEqual(exports.roundTripOptionalIntArrayType([1, 2, 3]), [1, 2, 3]);
-    assert.equal(exports.roundTripOptionalIntArrayType(null), null);
-    assert.deepEqual(exports.roundTripOptionalStringArrayType(["a", "b"]), ["a", "b"]);
-    assert.equal(exports.roundTripOptionalStringArrayType(null), null);
-    const og1 = new Greeter("OptGreeter");
-    const optGreeterResult = exports.roundTripOptionalGreeterArrayType([og1]);
-    assert.equal(optGreeterResult[0].name, "OptGreeter");
-    assert.equal(exports.roundTripOptionalGreeterArrayType(null), null);
-    og1.release();
-    optGreeterResult.forEach(g => g.release());
-    const helper1 = new exports.Greeter("Helper1");
-    const jsProcessor1 = {
-        count: 1, name: "Processor1", optionalTag: null, optionalCount: null,
-        direction: null, optionalTheme: null, httpStatus: null, apiResult: null,
-        helper: helper1, optionalHelper: null,
-        increment(by) { this.count += by; },
-        getValue() { return this.count; },
-        setLabelElements(a, b) { }, getLabel() { return ""; },
-        isEven() { return this.count % 2 === 0; },
-        processGreeter(g) { return ""; }, createGreeter() { return new exports.Greeter("P1"); },
-        processOptionalGreeter(g) { return ""; }, createOptionalGreeter() { return null; },
-        handleAPIResult(r) { }, getAPIResult() { return null; }
-    };
-
-    helper1.release();
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

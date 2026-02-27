@@ -83,115 +83,70 @@ final class OptionalSupportTests: XCTestCase {
     // }
 }
 
-// MARK: - Optional Bridging
+@JS enum OptionalSupportExports {
+    @JS static func roundTripOptionalString(_ v: String?) -> String? { v }
+    @JS static func roundTripOptionalInt(_ v: Int?) -> Int? { v }
+    @JS static func roundTripOptionalBool(_ v: Bool?) -> Bool? { v }
+    @JS static func roundTripOptionalFloat(_ v: Float?) -> Float? { v }
+    @JS static func roundTripOptionalDouble(_ v: Double?) -> Double? { v }
+    @JS static func roundTripOptionalSyntax(_ v: Optional<String>) -> Optional<String> { v }
+    @JS static func roundTripOptionalCaseEnum(_ v: Status?) -> Status? { v }
+    @JS static func roundTripOptionalStringRawValueEnum(_ v: Theme?) -> Theme? { v }
+    @JS static func roundTripOptionalIntRawValueEnum(_ v: HttpStatus?) -> HttpStatus? { v }
+    @JS static func roundTripOptionalTSEnum(_ v: TSDirection?) -> TSDirection? { v }
+    @JS static func roundTripOptionalTSStringEnum(_ v: TSTheme?) -> TSTheme? { v }
+    @JS static func roundTripOptionalNamespacedEnum(_ v: Networking.API.Method?) -> Networking.API.Method? { v }
+    @JS static func roundTripOptionalSwiftClass(_ v: Greeter?) -> Greeter? { v }
+    @JS static func roundTripOptionalIntArray(_ v: [Int]?) -> [Int]? { v }
+    @JS static func roundTripOptionalStringArray(_ v: [String]?) -> [String]? { v }
+    @JS static func roundTripOptionalSwiftClassArray(_ v: [Greeter]?) -> [Greeter]? { v }
 
-@JS func roundTripOptionalString(name: String?) -> String? {
-    name
-}
+    @JS static func roundTripOptionalAPIResult(_ v: APIResult?) -> APIResult? { v }
+    @JS static func roundTripOptionalTypedPayloadResult(_ v: TypedPayloadResult?) -> TypedPayloadResult? { v }
+    @JS static func roundTripOptionalComplexResult(_ v: ComplexResult?) -> ComplexResult? { v }
+    @JS static func roundTripOptionalAllTypesResult(_ v: AllTypesResult?) -> AllTypesResult? { v }
+    @JS static func roundTripOptionalPayloadResult(_ v: OptionalAllTypesResult) -> OptionalAllTypesResult { v }
+    @JS static func roundTripOptionalPayloadResultOpt(_ v: OptionalAllTypesResult?) -> OptionalAllTypesResult? { v }
+    @JS static func roundTripOptionalAPIOptionalResult(_ v: APIOptionalResult?) -> APIOptionalResult? { v }
 
-@JS func roundTripOptionalInt(value: Int?) -> Int? {
-    value
-}
+    @JS static func takeOptionalJSObject(_ value: JSObject?) {}
 
-@JS func roundTripOptionalBool(flag: Bool?) -> Bool? {
-    flag
-}
-
-@JS func roundTripOptionalFloat(number: Float?) -> Float? {
-    number
-}
-
-@JS func roundTripOptionalDouble(precision: Double?) -> Double? {
-    precision
-}
-
-@JS func roundTripOptionalSyntax(name: Optional<String>) -> Optional<String> {
-    name
-}
-
-@JS func roundTripOptionalMixSyntax(name: String?) -> Optional<String> {
-    name
-}
-
-@JS func roundTripOptionalSwiftSyntax(name: Swift.Optional<String>) -> Swift.Optional<String> {
-    name
-}
-
-@JS func roundTripOptionalWithSpaces(value: Optional<Double>) -> Optional<Double> {
-    value
-}
-
-typealias OptionalAge = Int?
-@JS func roundTripOptionalTypeAlias(age: OptionalAge) -> OptionalAge {
-    age
-}
-
-@JS func roundTripOptionalStatus(value: Status?) -> Status? {
-    value
-}
-
-@JS func roundTripOptionalTheme(value: Theme?) -> Theme? {
-    value
-}
-
-@JS func roundTripOptionalHttpStatus(value: HttpStatus?) -> HttpStatus? {
-    value
-}
-
-@JS func roundTripOptionalTSDirection(value: TSDirection?) -> TSDirection? {
-    value
-}
-
-@JS func roundTripOptionalTSTheme(value: TSTheme?) -> TSTheme? {
-    value
-}
-
-@JS func roundTripOptionalNetworkingAPIMethod(_ method: Networking.API.Method?) -> Networking.API.Method? {
-    method
-}
-
-@JS func roundTripOptionalAPIResult(value: APIResult?) -> APIResult? {
-    value
-}
-
-@JS func roundTripOptionalTypedPayloadResult(_ result: TypedPayloadResult?) -> TypedPayloadResult? {
-    result
-}
-
-@JS func takeOptionalJSObject(_ value: JSObject?) {}
-
-@JS func compareAPIResults(_ r1: APIResult?, _ r2: APIResult?) -> String {
-    let r1Str: String
-    switch r1 {
-    case .none: r1Str = "nil"
-    case .some(.success(let msg)): r1Str = "success:\(msg)"
-    case .some(.failure(let code)): r1Str = "failure:\(code)"
-    case .some(.info): r1Str = "info"
-    case .some(.flag(let b)): r1Str = "flag:\(b)"
-    case .some(.rate(let r)): r1Str = "rate:\(r)"
-    case .some(.precise(let p)): r1Str = "precise:\(p)"
+    @JS static func applyOptionalGreeter(_ value: Greeter?, _ transform: (Greeter?) -> Greeter?) -> Greeter? {
+        transform(value)
     }
 
-    let r2Str: String
-    switch r2 {
-    case .none: r2Str = "nil"
-    case .some(.success(let msg)): r2Str = "success:\(msg)"
-    case .some(.failure(let code)): r2Str = "failure:\(code)"
-    case .some(.info): r2Str = "info"
-    case .some(.flag(let b)): r2Str = "flag:\(b)"
-    case .some(.rate(let r)): r2Str = "rate:\(r)"
-    case .some(.precise(let p)): r2Str = "precise:\(p)"
+    @JS static func makeOptionalHolder(
+        nullableGreeter: Greeter?,
+        undefinedNumber: JSUndefinedOr<Double>
+    ) -> OptionalHolder {
+        OptionalHolder(nullableGreeter: nullableGreeter, undefinedNumber: undefinedNumber)
     }
 
-    return "r1:\(r1Str),r2:\(r2Str)"
-}
+    @JS static func compareAPIResults(_ r1: APIResult?, _ r2: APIResult?) -> String {
+        let r1Str: String
+        switch r1 {
+        case .none: r1Str = "nil"
+        case .some(.success(let msg)): r1Str = "success:\(msg)"
+        case .some(.failure(let code)): r1Str = "failure:\(code)"
+        case .some(.info): r1Str = "info"
+        case .some(.flag(let b)): r1Str = "flag:\(b)"
+        case .some(.rate(let r)): r1Str = "rate:\(r)"
+        case .some(.precise(let p)): r1Str = "precise:\(p)"
+        }
 
-@JS func roundTripOptionalComplexResult(_ result: ComplexResult?) -> ComplexResult? {
-    result
-}
+        let r2Str: String
+        switch r2 {
+        case .none: r2Str = "nil"
+        case .some(.success(let msg)): r2Str = "success:\(msg)"
+        case .some(.failure(let code)): r2Str = "failure:\(code)"
+        case .some(.info): r2Str = "info"
+        case .some(.flag(let b)): r2Str = "flag:\(b)"
+        case .some(.rate(let r)): r2Str = "rate:\(r)"
+        case .some(.precise(let p)): r2Str = "precise:\(p)"
+        }
 
-@JS func roundTripOptionalAllTypesResult(_ result: AllTypesResult?) -> AllTypesResult? {
-    result
+        return "r1:\(r1Str),r2:\(r2Str)"
+    }
 }
 
 @JS
@@ -205,26 +160,6 @@ enum OptionalAllTypesResult {
     case empty
 }
 
-@JS func roundTripOptionalPayloadResult(_ result: OptionalAllTypesResult) -> OptionalAllTypesResult {
-    result
-}
-
-@JS func roundTripOptionalPayloadResultOpt(_ result: OptionalAllTypesResult?) -> OptionalAllTypesResult? {
-    result
-}
-
-@JS func roundTripOptionalClass(value: Greeter?) -> Greeter? {
-    value
-}
-
-@JS func roundTripOptionalGreeter(_ value: Greeter?) -> Greeter? {
-    value
-}
-
-@JS func applyOptionalGreeter(_ value: Greeter?, _ transform: (Greeter?) -> Greeter?) -> Greeter? {
-    transform(value)
-}
-
 @JS class OptionalHolder {
     @JS var nullableGreeter: Greeter?
     @JS var undefinedNumber: JSUndefinedOr<Double>
@@ -233,10 +168,6 @@ enum OptionalAllTypesResult {
         self.nullableGreeter = nullableGreeter
         self.undefinedNumber = undefinedNumber
     }
-}
-
-@JS func makeOptionalHolder(nullableGreeter: Greeter?, undefinedNumber: JSUndefinedOr<Double>) -> OptionalHolder {
-    OptionalHolder(nullableGreeter: nullableGreeter, undefinedNumber: undefinedNumber)
 }
 
 @JS class OptionalPropertyHolder {
@@ -254,8 +185,4 @@ enum APIOptionalResult {
     case success(String?)
     case failure(Int?, Bool?)
     case status(Bool?, Int?, String?)
-}
-
-@JS func roundTripOptionalAPIOptionalResult(result: APIOptionalResult?) -> APIOptionalResult? {
-    result
 }

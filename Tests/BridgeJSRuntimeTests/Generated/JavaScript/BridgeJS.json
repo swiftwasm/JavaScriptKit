@@ -8011,6 +8011,1251 @@
       },
       {
         "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "OptionalSupportExports",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalString",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalString",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalInt",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalInt",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "int" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalBool",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalBool",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "bool" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalFloat",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalFloat",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "float" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "float" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalDouble",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalDouble",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "double" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalSyntax",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalSyntax",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalCaseEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalCaseEnum",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "caseEnum" : {
+                        "_0" : "Status"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "caseEnum" : {
+                    "_0" : "Status"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalStringRawValueEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalStringRawValueEnum",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "Theme",
+                        "_1" : "String"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "Theme",
+                    "_1" : "String"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalIntRawValueEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalIntRawValueEnum",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "HttpStatus",
+                        "_1" : "Int"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "HttpStatus",
+                    "_1" : "Int"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalTSEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalTSEnum",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "caseEnum" : {
+                        "_0" : "TSDirection"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "caseEnum" : {
+                    "_0" : "TSDirection"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalTSStringEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalTSStringEnum",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "TSTheme",
+                        "_1" : "String"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "TSTheme",
+                    "_1" : "String"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalNamespacedEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalNamespacedEnum",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "caseEnum" : {
+                        "_0" : "Networking.API.Method"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "caseEnum" : {
+                    "_0" : "Networking.API.Method"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalSwiftClass",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalSwiftClass",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalIntArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalIntArray",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "int" : {
+
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalStringArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalStringArray",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalSwiftClassArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalSwiftClassArray",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "swiftHeapObject" : {
+                            "_0" : "Greeter"
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalAPIResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalAPIResult",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "APIResult"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "APIResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalTypedPayloadResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalTypedPayloadResult",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "TypedPayloadResult"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "TypedPayloadResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalComplexResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalComplexResult",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "ComplexResult"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "ComplexResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalAllTypesResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalAllTypesResult",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "AllTypesResult"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "AllTypesResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalPayloadResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalPayloadResult",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "associatedValueEnum" : {
+                    "_0" : "OptionalAllTypesResult"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "OptionalAllTypesResult"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalPayloadResultOpt",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalPayloadResultOpt",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "OptionalAllTypesResult"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "OptionalAllTypesResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalAPIOptionalResult",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalAPIOptionalResult",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "APIOptionalResult"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "APIOptionalResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_takeOptionalJSObject",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "takeOptionalJSObject",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsObject" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_applyOptionalGreeter",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "applyOptionalGreeter",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "label" : "_",
+                "name" : "transform",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "nullable" : {
+                            "_0" : {
+                              "swiftHeapObject" : {
+                                "_0" : "Greeter"
+                              }
+                            },
+                            "_1" : "null"
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "nullable" : {
+                          "_0" : {
+                            "swiftHeapObject" : {
+                              "_0" : "Greeter"
+                            }
+                          },
+                          "_1" : "null"
+                        }
+                      }
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftHeapObject" : {
+                    "_0" : "Greeter"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_makeOptionalHolder",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "makeOptionalHolder",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "nullableGreeter",
+                "name" : "nullableGreeter",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "swiftHeapObject" : {
+                        "_0" : "Greeter"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "label" : "undefinedNumber",
+                "name" : "undefinedNumber",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "OptionalHolder"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_compareAPIResults",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "compareAPIResults",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "r1",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "APIResult"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "label" : "_",
+                "name" : "r2",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "APIResult"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "OptionalSupportExports",
+        "tsFullPath" : "OptionalSupportExports"
+      },
+      {
+        "cases" : [
           {
             "associatedValues" : [
               {
@@ -10870,1196 +12115,6 @@
               }
             },
             "useJSTypedClosure" : false
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalIntArrayType",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalIntArrayType",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "values",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "array" : {
-                    "_0" : {
-                      "int" : {
-
-                      }
-                    }
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "array" : {
-                "_0" : {
-                  "int" : {
-
-                  }
-                }
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalStringArrayType",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalStringArrayType",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "values",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "array" : {
-                    "_0" : {
-                      "string" : {
-
-                      }
-                    }
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "array" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                }
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalGreeterArrayType",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalGreeterArrayType",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "greeters",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "array" : {
-                    "_0" : {
-                      "swiftHeapObject" : {
-                        "_0" : "Greeter"
-                      }
-                    }
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "array" : {
-                "_0" : {
-                  "swiftHeapObject" : {
-                    "_0" : "Greeter"
-                  }
-                }
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalString",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalString",
-        "parameters" : [
-          {
-            "label" : "name",
-            "name" : "name",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "string" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalInt",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalInt",
-        "parameters" : [
-          {
-            "label" : "value",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "int" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "int" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalBool",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalBool",
-        "parameters" : [
-          {
-            "label" : "flag",
-            "name" : "flag",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "bool" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "bool" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalFloat",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalFloat",
-        "parameters" : [
-          {
-            "label" : "number",
-            "name" : "number",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "float" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "float" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalDouble",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalDouble",
-        "parameters" : [
-          {
-            "label" : "precision",
-            "name" : "precision",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "double" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "double" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalSyntax",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalSyntax",
-        "parameters" : [
-          {
-            "label" : "name",
-            "name" : "name",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "string" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalMixSyntax",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalMixSyntax",
-        "parameters" : [
-          {
-            "label" : "name",
-            "name" : "name",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "string" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalSwiftSyntax",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalSwiftSyntax",
-        "parameters" : [
-          {
-            "label" : "name",
-            "name" : "name",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "string" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalWithSpaces",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalWithSpaces",
-        "parameters" : [
-          {
-            "label" : "value",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "double" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "double" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalTypeAlias",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalTypeAlias",
-        "parameters" : [
-          {
-            "label" : "age",
-            "name" : "age",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "int" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "int" : {
-
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalStatus",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalStatus",
-        "parameters" : [
-          {
-            "label" : "value",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "caseEnum" : {
-                    "_0" : "Status"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "caseEnum" : {
-                "_0" : "Status"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalTheme",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalTheme",
-        "parameters" : [
-          {
-            "label" : "value",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "rawValueEnum" : {
-                    "_0" : "Theme",
-                    "_1" : "String"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "rawValueEnum" : {
-                "_0" : "Theme",
-                "_1" : "String"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalHttpStatus",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalHttpStatus",
-        "parameters" : [
-          {
-            "label" : "value",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "rawValueEnum" : {
-                    "_0" : "HttpStatus",
-                    "_1" : "Int"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "rawValueEnum" : {
-                "_0" : "HttpStatus",
-                "_1" : "Int"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalTSDirection",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalTSDirection",
-        "parameters" : [
-          {
-            "label" : "value",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "caseEnum" : {
-                    "_0" : "TSDirection"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "caseEnum" : {
-                "_0" : "TSDirection"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalTSTheme",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalTSTheme",
-        "parameters" : [
-          {
-            "label" : "value",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "rawValueEnum" : {
-                    "_0" : "TSTheme",
-                    "_1" : "String"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "rawValueEnum" : {
-                "_0" : "TSTheme",
-                "_1" : "String"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalNetworkingAPIMethod",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalNetworkingAPIMethod",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "method",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "caseEnum" : {
-                    "_0" : "Networking.API.Method"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "caseEnum" : {
-                "_0" : "Networking.API.Method"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalAPIResult",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalAPIResult",
-        "parameters" : [
-          {
-            "label" : "value",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "APIResult"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "associatedValueEnum" : {
-                "_0" : "APIResult"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalTypedPayloadResult",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalTypedPayloadResult",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "result",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "TypedPayloadResult"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "associatedValueEnum" : {
-                "_0" : "TypedPayloadResult"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_takeOptionalJSObject",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "takeOptionalJSObject",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "jsObject" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "void" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_compareAPIResults",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "compareAPIResults",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "r1",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "APIResult"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          },
-          {
-            "label" : "_",
-            "name" : "r2",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "APIResult"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "string" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalComplexResult",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalComplexResult",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "result",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "ComplexResult"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "associatedValueEnum" : {
-                "_0" : "ComplexResult"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalAllTypesResult",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalAllTypesResult",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "result",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "AllTypesResult"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "associatedValueEnum" : {
-                "_0" : "AllTypesResult"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalPayloadResult",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalPayloadResult",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "result",
-            "type" : {
-              "associatedValueEnum" : {
-                "_0" : "OptionalAllTypesResult"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "associatedValueEnum" : {
-            "_0" : "OptionalAllTypesResult"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalPayloadResultOpt",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalPayloadResultOpt",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "result",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "OptionalAllTypesResult"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "associatedValueEnum" : {
-                "_0" : "OptionalAllTypesResult"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalClass",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalClass",
-        "parameters" : [
-          {
-            "label" : "value",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "swiftHeapObject" : {
-                    "_0" : "Greeter"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "swiftHeapObject" : {
-                "_0" : "Greeter"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalGreeter",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalGreeter",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "swiftHeapObject" : {
-                    "_0" : "Greeter"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "swiftHeapObject" : {
-                "_0" : "Greeter"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_applyOptionalGreeter",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "applyOptionalGreeter",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "value",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "swiftHeapObject" : {
-                    "_0" : "Greeter"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          },
-          {
-            "label" : "_",
-            "name" : "transform",
-            "type" : {
-              "closure" : {
-                "_0" : {
-                  "isAsync" : false,
-                  "isThrows" : false,
-                  "mangleName" : "20BridgeJSRuntimeTestsSq7GreeterC_Sq7GreeterC",
-                  "moduleName" : "BridgeJSRuntimeTests",
-                  "parameters" : [
-                    {
-                      "nullable" : {
-                        "_0" : {
-                          "swiftHeapObject" : {
-                            "_0" : "Greeter"
-                          }
-                        },
-                        "_1" : "null"
-                      }
-                    }
-                  ],
-                  "returnType" : {
-                    "nullable" : {
-                      "_0" : {
-                        "swiftHeapObject" : {
-                          "_0" : "Greeter"
-                        }
-                      },
-                      "_1" : "null"
-                    }
-                  }
-                },
-                "useJSTypedClosure" : false
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "swiftHeapObject" : {
-                "_0" : "Greeter"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_makeOptionalHolder",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "makeOptionalHolder",
-        "parameters" : [
-          {
-            "label" : "nullableGreeter",
-            "name" : "nullableGreeter",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "swiftHeapObject" : {
-                    "_0" : "Greeter"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          },
-          {
-            "label" : "undefinedNumber",
-            "name" : "undefinedNumber",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "double" : {
-
-                  }
-                },
-                "_1" : "undefined"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftHeapObject" : {
-            "_0" : "OptionalHolder"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripOptionalAPIOptionalResult",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalAPIOptionalResult",
-        "parameters" : [
-          {
-            "label" : "result",
-            "name" : "result",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "APIOptionalResult"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "associatedValueEnum" : {
-                "_0" : "APIOptionalResult"
-              }
-            },
-            "_1" : "null"
           }
         }
       },
