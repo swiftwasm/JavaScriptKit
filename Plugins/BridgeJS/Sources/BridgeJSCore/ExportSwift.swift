@@ -395,6 +395,17 @@ public class ExportSwift {
             }
         }
 
+        var swiftCallName: String {
+            switch self {
+            case .enumStatic(let enumDef):
+                return enumDef.swiftCallName
+            case .classStatic(let klass), .classInstance(let klass):
+                return klass.swiftCallName
+            case .structStatic(let structDef):
+                return structDef.swiftCallName
+            }
+        }
+
         func callName(for property: ExportedProperty) -> String {
             switch self {
             case .enumStatic(let enumDef):
@@ -423,7 +434,7 @@ public class ExportSwift {
 
         if !isStatic {
             try getterBuilder.liftParameter(
-                param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(className))
+                param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(context.swiftCallName))
             )
         }
 
@@ -446,7 +457,7 @@ public class ExportSwift {
             if !isStatic {
                 // Instance properties need _self parameter
                 try setterBuilder.liftParameter(
-                    param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(className))
+                    param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(context.swiftCallName))
                 )
             }
 

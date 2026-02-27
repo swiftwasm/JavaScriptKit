@@ -84,6 +84,7 @@ export interface SwiftHeapObject {
 }
 export interface Converter extends SwiftHeapObject {
     toString(value: number): string;
+    precision: number;
 }
 export interface HTTPServer extends SwiftHeapObject {
     call(method: Networking.API.MethodTag): void;

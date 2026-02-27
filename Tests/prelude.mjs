@@ -608,6 +608,9 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.roundtripInternalSupportedMethod(exports.Networking.APIV2.Internal.SupportedMethod.Get), exports.Networking.APIV2.Internal.SupportedMethod.Get);
 
     const converter = new exports.Utils.Converter();
+    assert.equal(converter.precision, 2);
+    converter.precision = 5;
+    assert.equal(converter.precision, 5);
     assert.equal(converter.toString(42), "42");
     assert.equal(converter.toString(123), "123");
     converter.release();
