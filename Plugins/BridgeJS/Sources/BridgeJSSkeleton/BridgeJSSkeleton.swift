@@ -1,5 +1,21 @@
 // This file is shared between BridgeTool and BridgeJSLink
 
+// MARK: - Namespaced Type Protocol
+
+public protocol NamespacedExportedType {
+    var name: String { get }
+    var namespace: [String]? { get }
+}
+
+extension NamespacedExportedType {
+    public var abiName: String {
+        if let namespace = namespace, !namespace.isEmpty {
+            return (namespace + [name]).joined(separator: "_")
+        }
+        return name
+    }
+}
+
 // MARK: - ABI Name Generation
 
 /// Utility for generating consistent ABI names across all exported and imported types
@@ -412,7 +428,7 @@ public struct StructField: Codable, Equatable, Sendable {
     }
 }
 
-public struct ExportedStruct: Codable, Equatable, Sendable {
+public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedType {
     public let name: String
     public let swiftCallName: String
     public let explicitAccessControl: String?
@@ -490,7 +506,7 @@ public enum EnumEmitStyle: String, Codable, Sendable {
     case tsEnum
 }
 
-public struct ExportedEnum: Codable, Equatable, Sendable {
+public struct ExportedEnum: Codable, Equatable, Sendable, NamespacedExportedType {
     public static let valuesSuffix = "Values"
     public static let objectSuffix = "Object"
 
@@ -619,7 +635,7 @@ public struct ExportedFunction: Codable, Equatable, Sendable {
     }
 }
 
-public struct ExportedClass: Codable {
+public struct ExportedClass: Codable, NamespacedExportedType {
     public var name: String
     public var swiftCallName: String
     public var explicitAccessControl: String?

@@ -7103,9 +7103,9 @@ fileprivate func _bjs_PackageGreeter_wrap_extern(_ pointer: UnsafeMutableRawPoin
     return _bjs_PackageGreeter_wrap_extern(pointer)
 }
 
-@_expose(wasm, "bjs_Converter_init")
-@_cdecl("bjs_Converter_init")
-public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
+@_expose(wasm, "bjs_Utils_Converter_init")
+@_cdecl("bjs_Utils_Converter_init")
+public func _bjs_Utils_Converter_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = Utils.Converter()
     return ret.bridgeJSLowerReturn()
@@ -7114,9 +7114,9 @@ public func _bjs_Converter_init() -> UnsafeMutableRawPointer {
     #endif
 }
 
-@_expose(wasm, "bjs_Converter_toString")
-@_cdecl("bjs_Converter_toString")
-public func _bjs_Converter_toString(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+@_expose(wasm, "bjs_Utils_Converter_toString")
+@_cdecl("bjs_Utils_Converter_toString")
+public func _bjs_Utils_Converter_toString(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
     let ret = Utils.Converter.bridgeJSLiftParameter(_self).toString(value: Int.bridgeJSLiftParameter(value))
     return ret.bridgeJSLowerReturn()
@@ -7125,9 +7125,9 @@ public func _bjs_Converter_toString(_ _self: UnsafeMutableRawPointer, _ value: I
     #endif
 }
 
-@_expose(wasm, "bjs_Converter_precision_get")
-@_cdecl("bjs_Converter_precision_get")
-public func _bjs_Converter_precision_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+@_expose(wasm, "bjs_Utils_Converter_precision_get")
+@_cdecl("bjs_Utils_Converter_precision_get")
+public func _bjs_Utils_Converter_precision_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let ret = Utils.Converter.bridgeJSLiftParameter(_self).precision
     return ret.bridgeJSLowerReturn()
@@ -7136,9 +7136,9 @@ public func _bjs_Converter_precision_get(_ _self: UnsafeMutableRawPointer) -> In
     #endif
 }
 
-@_expose(wasm, "bjs_Converter_precision_set")
-@_cdecl("bjs_Converter_precision_set")
-public func _bjs_Converter_precision_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+@_expose(wasm, "bjs_Utils_Converter_precision_set")
+@_cdecl("bjs_Utils_Converter_precision_set")
+public func _bjs_Utils_Converter_precision_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
     Utils.Converter.bridgeJSLiftParameter(_self).precision = Int.bridgeJSLiftParameter(value)
     #else
@@ -7146,9 +7146,9 @@ public func _bjs_Converter_precision_set(_ _self: UnsafeMutableRawPointer, _ val
     #endif
 }
 
-@_expose(wasm, "bjs_Converter_deinit")
-@_cdecl("bjs_Converter_deinit")
-public func _bjs_Converter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_Utils_Converter_deinit")
+@_cdecl("bjs_Utils_Converter_deinit")
+public func _bjs_Utils_Converter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     Unmanaged<Utils.Converter>.fromOpaque(pointer).release()
     #else
@@ -7158,25 +7158,25 @@ public func _bjs_Converter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
 
 extension Utils.Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Utils_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Converter_wrap")
-fileprivate func _bjs_Converter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Utils_Converter_wrap")
+fileprivate func _bjs_Utils_Converter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_Converter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Utils_Converter_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _bjs_Converter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
-    return _bjs_Converter_wrap_extern(pointer)
+@inline(never) fileprivate func _bjs_Utils_Converter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Utils_Converter_wrap_extern(pointer)
 }
 
-@_expose(wasm, "bjs_HTTPServer_init")
-@_cdecl("bjs_HTTPServer_init")
-public func _bjs_HTTPServer_init() -> UnsafeMutableRawPointer {
+@_expose(wasm, "bjs_Networking_API_HTTPServer_init")
+@_cdecl("bjs_Networking_API_HTTPServer_init")
+public func _bjs_Networking_API_HTTPServer_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = Networking.API.HTTPServer()
     return ret.bridgeJSLowerReturn()
@@ -7185,9 +7185,9 @@ public func _bjs_HTTPServer_init() -> UnsafeMutableRawPointer {
     #endif
 }
 
-@_expose(wasm, "bjs_HTTPServer_call")
-@_cdecl("bjs_HTTPServer_call")
-public func _bjs_HTTPServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
+@_expose(wasm, "bjs_Networking_API_HTTPServer_call")
+@_cdecl("bjs_Networking_API_HTTPServer_call")
+public func _bjs_Networking_API_HTTPServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
     #if arch(wasm32)
     Networking.API.HTTPServer.bridgeJSLiftParameter(_self).call(_: Networking.API.Method.bridgeJSLiftParameter(method))
     #else
@@ -7195,9 +7195,9 @@ public func _bjs_HTTPServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int
     #endif
 }
 
-@_expose(wasm, "bjs_HTTPServer_deinit")
-@_cdecl("bjs_HTTPServer_deinit")
-public func _bjs_HTTPServer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_Networking_API_HTTPServer_deinit")
+@_cdecl("bjs_Networking_API_HTTPServer_deinit")
+public func _bjs_Networking_API_HTTPServer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     Unmanaged<Networking.API.HTTPServer>.fromOpaque(pointer).release()
     #else
@@ -7207,25 +7207,25 @@ public func _bjs_HTTPServer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
 
 extension Networking.API.HTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Networking_API_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_HTTPServer_wrap")
-fileprivate func _bjs_HTTPServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Networking_API_HTTPServer_wrap")
+fileprivate func _bjs_Networking_API_HTTPServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_HTTPServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Networking_API_HTTPServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _bjs_HTTPServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
-    return _bjs_HTTPServer_wrap_extern(pointer)
+@inline(never) fileprivate func _bjs_Networking_API_HTTPServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Networking_API_HTTPServer_wrap_extern(pointer)
 }
 
-@_expose(wasm, "bjs_UUID_init")
-@_cdecl("bjs_UUID_init")
-public func _bjs_UUID_init(_ valueBytes: Int32, _ valueLength: Int32) -> UnsafeMutableRawPointer {
+@_expose(wasm, "bjs___Swift_Foundation_UUID_init")
+@_cdecl("bjs___Swift_Foundation_UUID_init")
+public func _bjs___Swift_Foundation_UUID_init(_ valueBytes: Int32, _ valueLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = UUID(value: String.bridgeJSLiftParameter(valueBytes, valueLength))
     return ret.bridgeJSLowerReturn()
@@ -7234,9 +7234,9 @@ public func _bjs_UUID_init(_ valueBytes: Int32, _ valueLength: Int32) -> UnsafeM
     #endif
 }
 
-@_expose(wasm, "bjs_UUID_uuidString")
-@_cdecl("bjs_UUID_uuidString")
-public func _bjs_UUID_uuidString(_ _self: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs___Swift_Foundation_UUID_uuidString")
+@_cdecl("bjs___Swift_Foundation_UUID_uuidString")
+public func _bjs___Swift_Foundation_UUID_uuidString(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = UUID.bridgeJSLiftParameter(_self).uuidString()
     return ret.bridgeJSLowerReturn()
@@ -7245,9 +7245,9 @@ public func _bjs_UUID_uuidString(_ _self: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-@_expose(wasm, "bjs_UUID_deinit")
-@_cdecl("bjs_UUID_deinit")
-public func _bjs_UUID_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs___Swift_Foundation_UUID_deinit")
+@_cdecl("bjs___Swift_Foundation_UUID_deinit")
+public func _bjs___Swift_Foundation_UUID_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     Unmanaged<UUID>.fromOpaque(pointer).release()
     #else
@@ -7257,25 +7257,25 @@ public func _bjs_UUID_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
 
 extension UUID: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_UUID_wrap(Unmanaged.passRetained(self).toOpaque()))))
+        return .object(JSObject(id: UInt32(bitPattern: _bjs___Swift_Foundation_UUID_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_UUID_wrap")
-fileprivate func _bjs_UUID_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs___Swift_Foundation_UUID_wrap")
+fileprivate func _bjs___Swift_Foundation_UUID_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_UUID_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs___Swift_Foundation_UUID_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _bjs_UUID_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
-    return _bjs_UUID_wrap_extern(pointer)
+@inline(never) fileprivate func _bjs___Swift_Foundation_UUID_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs___Swift_Foundation_UUID_wrap_extern(pointer)
 }
 
-@_expose(wasm, "bjs_TestServer_init")
-@_cdecl("bjs_TestServer_init")
-public func _bjs_TestServer_init() -> UnsafeMutableRawPointer {
+@_expose(wasm, "bjs_Networking_APIV2_Internal_TestServer_init")
+@_cdecl("bjs_Networking_APIV2_Internal_TestServer_init")
+public func _bjs_Networking_APIV2_Internal_TestServer_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let ret = Internal.TestServer()
     return ret.bridgeJSLowerReturn()
@@ -7284,9 +7284,9 @@ public func _bjs_TestServer_init() -> UnsafeMutableRawPointer {
     #endif
 }
 
-@_expose(wasm, "bjs_TestServer_call")
-@_cdecl("bjs_TestServer_call")
-public func _bjs_TestServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
+@_expose(wasm, "bjs_Networking_APIV2_Internal_TestServer_call")
+@_cdecl("bjs_Networking_APIV2_Internal_TestServer_call")
+public func _bjs_Networking_APIV2_Internal_TestServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
     #if arch(wasm32)
     Internal.TestServer.bridgeJSLiftParameter(_self).call(_: Internal.SupportedMethod.bridgeJSLiftParameter(method))
     #else
@@ -7294,9 +7294,9 @@ public func _bjs_TestServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int
     #endif
 }
 
-@_expose(wasm, "bjs_TestServer_deinit")
-@_cdecl("bjs_TestServer_deinit")
-public func _bjs_TestServer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+@_expose(wasm, "bjs_Networking_APIV2_Internal_TestServer_deinit")
+@_cdecl("bjs_Networking_APIV2_Internal_TestServer_deinit")
+public func _bjs_Networking_APIV2_Internal_TestServer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     Unmanaged<Internal.TestServer>.fromOpaque(pointer).release()
     #else
@@ -7306,20 +7306,20 @@ public func _bjs_TestServer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
 
 extension Internal.TestServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
     var jsValue: JSValue {
-        return .object(JSObject(id: UInt32(bitPattern: _bjs_TestServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Networking_APIV2_Internal_TestServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
     }
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_TestServer_wrap")
-fileprivate func _bjs_TestServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Networking_APIV2_Internal_TestServer_wrap")
+fileprivate func _bjs_Networking_APIV2_Internal_TestServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _bjs_TestServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func _bjs_Networking_APIV2_Internal_TestServer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _bjs_TestServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
-    return _bjs_TestServer_wrap_extern(pointer)
+@inline(never) fileprivate func _bjs_Networking_APIV2_Internal_TestServer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Networking_APIV2_Internal_TestServer_wrap_extern(pointer)
 }
 
 @_expose(wasm, "bjs_SimplePropertyHolder_init")

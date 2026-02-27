@@ -232,15 +232,19 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
-            importObject["TestModule"]["bjs_Converter_wrap"] = function(pointer) {
+            importObject["TestModule"]["bjs_Utils_Converter_wrap"] = function(pointer) {
                 const obj = _exports.Utils.Converter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
-            importObject["TestModule"]["bjs_HTTPServer_wrap"] = function(pointer) {
+            importObject["TestModule"]["bjs_Formatting_Converter_wrap"] = function(pointer) {
+                const obj = _exports.Formatting.Converter.__construct(pointer);
+                return swift.memory.retain(obj);
+            };
+            importObject["TestModule"]["bjs_Networking_API_HTTPServer_wrap"] = function(pointer) {
                 const obj = _exports.Networking.API.HTTPServer.__construct(pointer);
                 return swift.memory.retain(obj);
             };
-            importObject["TestModule"]["bjs_TestServer_wrap"] = function(pointer) {
+            importObject["TestModule"]["bjs_Networking_APIV2_Internal_TestServer_wrap"] = function(pointer) {
                 const obj = _exports.Networking.APIV2.Internal.TestServer.__construct(pointer);
                 return swift.memory.retain(obj);
             };
@@ -287,55 +291,74 @@ export async function createInstantiator(options, swift) {
             }
             class Converter extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Converter_deinit, Converter.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Utils_Converter_deinit, Converter.prototype);
                 }
 
                 constructor() {
-                    const ret = instance.exports.bjs_Converter_init();
+                    const ret = instance.exports.bjs_Utils_Converter_init();
                     return Converter.__construct(ret);
                 }
                 toString(value) {
-                    instance.exports.bjs_Converter_toString(this.pointer, value);
+                    instance.exports.bjs_Utils_Converter_toString(this.pointer, value);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
                 }
                 get precision() {
-                    const ret = instance.exports.bjs_Converter_precision_get(this.pointer);
+                    const ret = instance.exports.bjs_Utils_Converter_precision_get(this.pointer);
                     return ret;
                 }
                 set precision(value) {
-                    instance.exports.bjs_Converter_precision_set(this.pointer, value);
+                    instance.exports.bjs_Utils_Converter_precision_set(this.pointer, value);
                 }
             }
             class HTTPServer extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_HTTPServer_deinit, HTTPServer.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Networking_API_HTTPServer_deinit, HTTPServer.prototype);
                 }
 
                 constructor() {
-                    const ret = instance.exports.bjs_HTTPServer_init();
+                    const ret = instance.exports.bjs_Networking_API_HTTPServer_init();
                     return HTTPServer.__construct(ret);
                 }
                 call(method) {
-                    instance.exports.bjs_HTTPServer_call(this.pointer, method);
+                    instance.exports.bjs_Networking_API_HTTPServer_call(this.pointer, method);
                 }
             }
             class TestServer extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_TestServer_deinit, TestServer.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Networking_APIV2_Internal_TestServer_deinit, TestServer.prototype);
                 }
 
                 constructor() {
-                    const ret = instance.exports.bjs_TestServer_init();
+                    const ret = instance.exports.bjs_Networking_APIV2_Internal_TestServer_init();
                     return TestServer.__construct(ret);
                 }
                 call(method) {
-                    instance.exports.bjs_TestServer_call(this.pointer, method);
+                    instance.exports.bjs_Networking_APIV2_Internal_TestServer_call(this.pointer, method);
+                }
+            }
+            class Converter extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Formatting_Converter_deinit, Converter.prototype);
+                }
+
+                constructor() {
+                    const ret = instance.exports.bjs_Formatting_Converter_init();
+                    return Converter.__construct(ret);
+                }
+                format(value) {
+                    instance.exports.bjs_Formatting_Converter_format(this.pointer, value);
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
                 }
             }
             if (typeof globalThis.Configuration === 'undefined') {
                 globalThis.Configuration = {};
+            }
+            if (typeof globalThis.Formatting === 'undefined') {
+                globalThis.Formatting = {};
             }
             if (typeof globalThis.Networking === 'undefined') {
                 globalThis.Networking = {};
@@ -365,6 +388,9 @@ export async function createInstantiator(options, swift) {
                 Configuration: {
                     LogLevel: LogLevelValues,
                     Port: PortValues,
+                },
+                Formatting: {
+                    Converter,
                 },
                 Networking: {
                     API: {
@@ -410,6 +436,7 @@ export async function createInstantiator(options, swift) {
             globalThis.Utils.Converter = exports.Utils.Converter;
             globalThis.Networking.API.HTTPServer = exports.Networking.API.HTTPServer;
             globalThis.Networking.APIV2.Internal.TestServer = exports.Networking.APIV2.Internal.TestServer;
+            globalThis.Formatting.Converter = exports.Formatting.Converter;
             globalThis.Services.Graph.GraphOperations.createGraph = exports.Services.Graph.GraphOperations.createGraph;
             globalThis.Services.Graph.GraphOperations.nodeCount = exports.Services.Graph.GraphOperations.nodeCount;
             globalThis.Services.Graph.GraphOperations.validate = exports.Services.Graph.GraphOperations.validate;

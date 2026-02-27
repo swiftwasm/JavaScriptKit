@@ -3,7 +3,7 @@
     "classes" : [
       {
         "constructor" : {
-          "abiName" : "bjs_PrivateClass_init",
+          "abiName" : "bjs_PrivateAPI_PrivateClass_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -15,7 +15,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_PrivateClass_greet",
+            "abiName" : "bjs_PrivateAPI_PrivateClass_greet",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
