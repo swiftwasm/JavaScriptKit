@@ -64,10 +64,18 @@ export interface HTTPServer extends SwiftHeapObject {
 export interface TestServer extends SwiftHeapObject {
     call(method: Networking.APIV2.Internal.SupportedMethodTag): void;
 }
+export interface Converter extends SwiftHeapObject {
+    format(value: number): string;
+}
 export type Exports = {
     Configuration: {
         LogLevel: LogLevelObject
         Port: PortObject
+    },
+    Formatting: {
+        Converter: {
+            new(): Converter;
+        }
     },
     Networking: {
         API: {

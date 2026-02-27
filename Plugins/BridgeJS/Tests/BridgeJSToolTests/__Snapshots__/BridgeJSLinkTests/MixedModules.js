@@ -188,7 +188,7 @@ export async function createInstantiator(options, swift) {
             if (!importObject["GlobalModule"]) {
                 importObject["GlobalModule"] = {};
             }
-            importObject["GlobalModule"]["bjs_GlobalClass_wrap"] = function(pointer) {
+            importObject["GlobalModule"]["bjs_GlobalAPI_GlobalClass_wrap"] = function(pointer) {
                 const obj = _exports.GlobalAPI.GlobalClass.__construct(pointer);
                 return swift.memory.retain(obj);
             };
@@ -196,7 +196,7 @@ export async function createInstantiator(options, swift) {
             if (!importObject["PrivateModule"]) {
                 importObject["PrivateModule"] = {};
             }
-            importObject["PrivateModule"]["bjs_PrivateClass_wrap"] = function(pointer) {
+            importObject["PrivateModule"]["bjs_PrivateAPI_PrivateClass_wrap"] = function(pointer) {
                 const obj = _exports.PrivateAPI.PrivateClass.__construct(pointer);
                 return swift.memory.retain(obj);
             };
@@ -243,15 +243,15 @@ export async function createInstantiator(options, swift) {
             }
             class GlobalClass extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_GlobalClass_deinit, GlobalClass.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_GlobalAPI_GlobalClass_deinit, GlobalClass.prototype);
                 }
 
                 constructor() {
-                    const ret = instance.exports.bjs_GlobalClass_init();
+                    const ret = instance.exports.bjs_GlobalAPI_GlobalClass_init();
                     return GlobalClass.__construct(ret);
                 }
                 greet() {
-                    instance.exports.bjs_GlobalClass_greet(this.pointer);
+                    instance.exports.bjs_GlobalAPI_GlobalClass_greet(this.pointer);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
@@ -259,15 +259,15 @@ export async function createInstantiator(options, swift) {
             }
             class PrivateClass extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PrivateClass_deinit, PrivateClass.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PrivateAPI_PrivateClass_deinit, PrivateClass.prototype);
                 }
 
                 constructor() {
-                    const ret = instance.exports.bjs_PrivateClass_init();
+                    const ret = instance.exports.bjs_PrivateAPI_PrivateClass_init();
                     return PrivateClass.__construct(ret);
                 }
                 greet() {
-                    instance.exports.bjs_PrivateClass_greet(this.pointer);
+                    instance.exports.bjs_PrivateAPI_PrivateClass_greet(this.pointer);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;

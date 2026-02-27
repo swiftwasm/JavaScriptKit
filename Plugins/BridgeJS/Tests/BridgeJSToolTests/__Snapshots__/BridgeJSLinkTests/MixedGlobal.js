@@ -188,7 +188,7 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
-            importObject["TestModule"]["bjs_GlobalClass_wrap"] = function(pointer) {
+            importObject["TestModule"]["bjs_GlobalAPI_GlobalClass_wrap"] = function(pointer) {
                 const obj = _exports.GlobalAPI.GlobalClass.__construct(pointer);
                 return swift.memory.retain(obj);
             };
@@ -235,15 +235,15 @@ export async function createInstantiator(options, swift) {
             }
             class GlobalClass extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_GlobalClass_deinit, GlobalClass.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_GlobalAPI_GlobalClass_deinit, GlobalClass.prototype);
                 }
 
                 constructor() {
-                    const ret = instance.exports.bjs_GlobalClass_init();
+                    const ret = instance.exports.bjs_GlobalAPI_GlobalClass_init();
                     return GlobalClass.__construct(ret);
                 }
                 greet() {
-                    instance.exports.bjs_GlobalClass_greet(this.pointer);
+                    instance.exports.bjs_GlobalAPI_GlobalClass_greet(this.pointer);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;

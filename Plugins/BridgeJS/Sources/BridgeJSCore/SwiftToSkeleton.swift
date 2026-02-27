@@ -1060,9 +1060,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         switch state {
         case .topLevel:
             staticContext = nil
-        case .classBody(let className, _):
+        case .classBody(_, let classKey):
             if isStatic {
-                staticContext = .className(className)
+                let classAbiName = exportedClassByName[classKey]?.abiName ?? "unknown"
+                staticContext = .className(classAbiName)
             } else {
                 staticContext = nil
             }
@@ -1077,9 +1078,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             staticContext = isNamespaceEnum ? .namespaceEnum(swiftCallName) : .enumName(enumName)
         case .protocolBody(_, _):
             return nil
-        case .structBody(let structName, _):
+        case .structBody(_, let structKey):
             if isStatic {
-                staticContext = .structName(structName)
+                let structAbiName = exportedStructByName[structKey]?.abiName ?? "unknown"
+                staticContext = .structName(structAbiName)
             } else {
                 staticContext = nil
             }
@@ -1087,10 +1089,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
         let classNameForABI: String?
         switch state {
-        case .classBody(let className, _):
-            classNameForABI = className
-        case .structBody(let structName, _):
-            classNameForABI = structName
+        case .classBody(_, let classKey):
+            classNameForABI = exportedClassByName[classKey]?.abiName
+        case .structBody(_, let structKey):
+            classNameForABI = exportedStructByName[structKey]?.abiName
         default:
             classNameForABI = nil
         }
@@ -1179,7 +1181,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
 
         switch state {
-        case .classBody(let className, let classKey):
+        case .classBody(_, let classKey):
             if extractNamespace(from: jsAttribute) != nil {
                 diagnose(
                     node: jsAttribute,
@@ -1194,14 +1196,15 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 return .skipChildren
             }
 
+            let classAbiName = exportedClassByName[classKey]?.abiName ?? "unknown"
             let constructor = ExportedConstructor(
-                abiName: "bjs_\(className)_init",
+                abiName: "bjs_\(classAbiName)_init",
                 parameters: parameters,
                 effects: effects
             )
             exportedClassByName[classKey]?.constructor = constructor
 
-        case .structBody(let structName, let structKey):
+        case .structBody(_, let structKey):
             if extractNamespace(from: jsAttribute) != nil {
                 diagnose(
                     node: jsAttribute,
@@ -1216,8 +1219,9 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 return .skipChildren
             }
 
+            let structAbiName = exportedStructByName[structKey]?.abiName ?? "unknown"
             let constructor = ExportedConstructor(
-                abiName: "bjs_\(structName)_init",
+                abiName: "bjs_\(structAbiName)_init",
                 parameters: parameters,
                 effects: effects
             )
@@ -1263,8 +1267,13 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         let staticContext: StaticContext?
 
         switch state {
-        case .classBody(let className, _):
-            staticContext = isStatic ? .className(className) : nil
+        case .classBody(_, let classKey):
+            if isStatic {
+                let classAbiName = exportedClassByName[classKey]?.abiName ?? "unknown"
+                staticContext = .className(classAbiName)
+            } else {
+                staticContext = nil
+            }
         case .enumBody(let enumName, let enumKey):
             if !isStatic {
                 diagnose(node: node, message: "Only static properties are supported in enums")
@@ -1280,9 +1289,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return .skipChildren
         case .protocolBody(let protocolName, let protocolKey):
             return visitProtocolProperty(node: node, protocolName: protocolName, protocolKey: protocolKey)
-        case .structBody(let structName, _):
+        case .structBody(_, let structKey):
             if isStatic {
-                staticContext = .structName(structName)
+                let structAbiName = exportedStructByName[structKey]?.abiName ?? "unknown"
+                staticContext = .structName(structAbiName)
             } else {
                 diagnose(node: node, message: "@JS var must be static in structs (instance fields don't need @JS)")
                 return .skipChildren

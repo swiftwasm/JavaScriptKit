@@ -835,7 +835,7 @@
       },
       {
         "constructor" : {
-          "abiName" : "bjs_Converter_init",
+          "abiName" : "bjs_Utils_Converter_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -847,7 +847,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_Converter_toString",
+            "abiName" : "bjs_Utils_Converter_toString",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -898,7 +898,7 @@
       },
       {
         "constructor" : {
-          "abiName" : "bjs_HTTPServer_init",
+          "abiName" : "bjs_Networking_API_HTTPServer_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -910,7 +910,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_HTTPServer_call",
+            "abiName" : "bjs_Networking_API_HTTPServer_call",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -951,7 +951,7 @@
       },
       {
         "constructor" : {
-          "abiName" : "bjs_UUID_init",
+          "abiName" : "bjs___Swift_Foundation_UUID_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -971,7 +971,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_UUID_uuidString",
+            "abiName" : "bjs___Swift_Foundation_UUID_uuidString",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -1000,7 +1000,7 @@
       },
       {
         "constructor" : {
-          "abiName" : "bjs_TestServer_init",
+          "abiName" : "bjs_Networking_APIV2_Internal_TestServer_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -1012,7 +1012,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_TestServer_call",
+            "abiName" : "bjs_Networking_APIV2_Internal_TestServer_call",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,

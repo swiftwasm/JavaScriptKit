@@ -447,7 +447,7 @@ public struct BridgeJSLink {
                 printer.write("}")
                 if !allStructs.isEmpty {
                     for structDef in allStructs {
-                        printer.write("bjs[\"swift_js_struct_lower_\(structDef.name)\"] = function(objectId) {")
+                        printer.write("bjs[\"swift_js_struct_lower_\(structDef.abiName)\"] = function(objectId) {")
                         printer.indent {
                             printer.write(
                                 "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
@@ -455,7 +455,7 @@ public struct BridgeJSLink {
                         }
                         printer.write("}")
 
-                        printer.write("bjs[\"swift_js_struct_lift_\(structDef.name)\"] = function() {")
+                        printer.write("bjs[\"swift_js_struct_lift_\(structDef.abiName)\"] = function() {")
                         printer.indent {
                             printer.write(
                                 "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lift();"
@@ -1155,7 +1155,7 @@ public struct BridgeJSLink {
             wrapperLines.append("}")
 
             for klass in classes.sorted(by: { $0.name < $1.name }) {
-                let wrapperFunctionName = "bjs_\(klass.name)_wrap"
+                let wrapperFunctionName = "bjs_\(klass.abiName)_wrap"
                 let namespacePath = (klass.namespace ?? []).map { ".\($0)" }.joined()
                 let exportsPath =
                     namespacePath.isEmpty ? "_exports['\(klass.name)']" : "_exports\(namespacePath).\(klass.name)"
@@ -1967,7 +1967,7 @@ extension BridgeJSLink {
             jsPrinter.write("static __construct(ptr) {")
             jsPrinter.indent {
                 jsPrinter.write(
-                    "return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_\(klass.name)_deinit, \(klass.name).prototype);"
+                    "return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_\(klass.abiName)_deinit, \(klass.name).prototype);"
                 )
             }
             jsPrinter.write("}")
@@ -2069,7 +2069,7 @@ extension BridgeJSLink {
         for property in klass.properties {
             try renderClassProperty(
                 property: property,
-                className: klass.name,
+                className: klass.abiName,
                 isStatic: property.isStatic,
                 jsPrinter: jsPrinter,
                 dtsPrinter: property.isStatic ? dtsExportEntryPrinter : dtsTypePrinter

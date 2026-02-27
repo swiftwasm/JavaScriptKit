@@ -3,7 +3,7 @@
     "classes" : [
       {
         "constructor" : {
-          "abiName" : "bjs_Converter_init",
+          "abiName" : "bjs_Utils_Converter_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -15,7 +15,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_Converter_toString",
+            "abiName" : "bjs_Utils_Converter_toString",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -66,7 +66,7 @@
       },
       {
         "constructor" : {
-          "abiName" : "bjs_HTTPServer_init",
+          "abiName" : "bjs_Networking_API_HTTPServer_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -78,7 +78,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_HTTPServer_call",
+            "abiName" : "bjs_Networking_API_HTTPServer_call",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -119,7 +119,7 @@
       },
       {
         "constructor" : {
-          "abiName" : "bjs_TestServer_init",
+          "abiName" : "bjs_Networking_APIV2_Internal_TestServer_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -131,7 +131,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_TestServer_call",
+            "abiName" : "bjs_Networking_APIV2_Internal_TestServer_call",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -171,6 +171,57 @@
 
         ],
         "swiftCallName" : "Internal.TestServer"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Formatting_Converter_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Formatting_Converter_format",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "format",
+            "namespace" : [
+              "Formatting"
+            ],
+            "parameters" : [
+              {
+                "label" : "value",
+                "name" : "value",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Converter",
+        "namespace" : [
+          "Formatting"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Formatting.Converter"
       }
     ],
     "enums" : [
@@ -413,6 +464,21 @@
         ],
         "swiftCallName" : "Internal.SupportedMethod",
         "tsFullPath" : "Networking.APIV2.Internal.SupportedMethod"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "Formatting",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Formatting",
+        "tsFullPath" : "Formatting"
       },
       {
         "cases" : [

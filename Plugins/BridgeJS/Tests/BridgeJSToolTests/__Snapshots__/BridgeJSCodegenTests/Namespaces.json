@@ -3,7 +3,7 @@
     "classes" : [
       {
         "constructor" : {
-          "abiName" : "bjs_Greeter_init",
+          "abiName" : "bjs___Swift_Foundation_Greeter_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -23,7 +23,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_Greeter_greet",
+            "abiName" : "bjs___Swift_Foundation_Greeter_greet",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -52,7 +52,7 @@
       },
       {
         "constructor" : {
-          "abiName" : "bjs_Converter_init",
+          "abiName" : "bjs_Utils_Converters_Converter_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -64,7 +64,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_Converter_toString",
+            "abiName" : "bjs_Utils_Converters_Converter_toString",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -102,7 +102,7 @@
       {
         "methods" : [
           {
-            "abiName" : "bjs_UUID_uuidString",
+            "abiName" : "bjs___Swift_Foundation_UUID_uuidString",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -131,7 +131,7 @@
       },
       {
         "constructor" : {
-          "abiName" : "bjs_Container_init",
+          "abiName" : "bjs_Collections_Container_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -143,7 +143,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_Container_getItems",
+            "abiName" : "bjs_Collections_Container_getItems",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -164,7 +164,7 @@
             }
           },
           {
-            "abiName" : "bjs_Container_addItem",
+            "abiName" : "bjs_Collections_Container_addItem",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,

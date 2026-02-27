@@ -389,9 +389,9 @@ public class ExportSwift {
             case .enumStatic(let enumDef):
                 return enumDef.name
             case .classStatic(let klass), .classInstance(let klass):
-                return klass.name
+                return klass.abiName
             case .structStatic(let structDef):
-                return structDef.name
+                return structDef.abiName
             }
         }
 
@@ -653,7 +653,7 @@ public class ExportSwift {
 
         do {
             let funcDecl = SwiftCodePattern.buildExposedFunctionDecl(
-                abiName: "bjs_\(klass.name)_deinit",
+                abiName: "bjs_\(klass.abiName)_deinit",
                 signature: SwiftSignatureBuilder.buildABIFunctionSignature(
                     abiParameters: [("pointer", .pointer)],
                     returnType: nil
@@ -686,8 +686,8 @@ public class ExportSwift {
     /// fileprivate func _bjs_Greeter_wrap(_: UnsafeMutableRawPointer) -> Int32
     /// ```
     func renderConvertibleToJSValueExtension(klass: ExportedClass) -> [DeclSyntax] {
-        let wrapFunctionName = "_bjs_\(klass.name)_wrap"
-        let externFunctionName = "bjs_\(klass.name)_wrap"
+        let wrapFunctionName = "_bjs_\(klass.abiName)_wrap"
+        let externFunctionName = "bjs_\(klass.abiName)_wrap"
 
         // If the class has an explicit access control, we need to add it to the extension declaration.
         let accessControl = klass.explicitAccessControl.map { "\($0) " } ?? ""
@@ -1087,10 +1087,10 @@ struct StructCodegen {
     func renderStructHelpers(_ structDef: ExportedStruct) -> [DeclSyntax] {
         let typeName = structDef.swiftCallName
 
-        let lowerExternName = "swift_js_struct_lower_\(structDef.name)"
-        let liftExternName = "swift_js_struct_lift_\(structDef.name)"
-        let lowerFunctionName = "_bjs_struct_lower_\(structDef.name)"
-        let liftFunctionName = "_bjs_struct_lift_\(structDef.name)"
+        let lowerExternName = "swift_js_struct_lower_\(structDef.abiName)"
+        let liftExternName = "swift_js_struct_lift_\(structDef.abiName)"
+        let lowerFunctionName = "_bjs_struct_lower_\(structDef.abiName)"
+        let liftFunctionName = "_bjs_struct_lift_\(structDef.abiName)"
 
         let printer = CodeFragmentPrinter()
         printer.write("extension \(typeName): _BridgedSwiftStruct {")

@@ -188,19 +188,19 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
-            importObject["TestModule"]["bjs_Container_wrap"] = function(pointer) {
+            importObject["TestModule"]["bjs_Collections_Container_wrap"] = function(pointer) {
                 const obj = _exports.Collections.Container.__construct(pointer);
                 return swift.memory.retain(obj);
             };
-            importObject["TestModule"]["bjs_Converter_wrap"] = function(pointer) {
+            importObject["TestModule"]["bjs_Utils_Converters_Converter_wrap"] = function(pointer) {
                 const obj = _exports.Utils.Converters.Converter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
-            importObject["TestModule"]["bjs_Greeter_wrap"] = function(pointer) {
+            importObject["TestModule"]["bjs___Swift_Foundation_Greeter_wrap"] = function(pointer) {
                 const obj = _exports.__Swift.Foundation.Greeter.__construct(pointer);
                 return swift.memory.retain(obj);
             };
-            importObject["TestModule"]["bjs_UUID_wrap"] = function(pointer) {
+            importObject["TestModule"]["bjs___Swift_Foundation_UUID_wrap"] = function(pointer) {
                 const obj = _exports.__Swift.Foundation.UUID.__construct(pointer);
                 return swift.memory.retain(obj);
             };
@@ -247,17 +247,17 @@ export async function createInstantiator(options, swift) {
             }
             class Greeter extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Greeter_deinit, Greeter.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs___Swift_Foundation_Greeter_deinit, Greeter.prototype);
                 }
 
                 constructor(name) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
-                    const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
+                    const ret = instance.exports.bjs___Swift_Foundation_Greeter_init(nameId, nameBytes.length);
                     return Greeter.__construct(ret);
                 }
                 greet() {
-                    instance.exports.bjs_Greeter_greet(this.pointer);
+                    instance.exports.bjs___Swift_Foundation_Greeter_greet(this.pointer);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
@@ -265,15 +265,15 @@ export async function createInstantiator(options, swift) {
             }
             class Converter extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Converter_deinit, Converter.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Utils_Converters_Converter_deinit, Converter.prototype);
                 }
 
                 constructor() {
-                    const ret = instance.exports.bjs_Converter_init();
+                    const ret = instance.exports.bjs_Utils_Converters_Converter_init();
                     return Converter.__construct(ret);
                 }
                 toString(value) {
-                    instance.exports.bjs_Converter_toString(this.pointer, value);
+                    instance.exports.bjs_Utils_Converters_Converter_toString(this.pointer, value);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
@@ -281,11 +281,11 @@ export async function createInstantiator(options, swift) {
             }
             class UUID extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_UUID_deinit, UUID.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs___Swift_Foundation_UUID_deinit, UUID.prototype);
                 }
 
                 uuidString() {
-                    instance.exports.bjs_UUID_uuidString(this.pointer);
+                    instance.exports.bjs___Swift_Foundation_UUID_uuidString(this.pointer);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
@@ -293,15 +293,15 @@ export async function createInstantiator(options, swift) {
             }
             class Container extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Container_deinit, Container.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Collections_Container_deinit, Container.prototype);
                 }
 
                 constructor() {
-                    const ret = instance.exports.bjs_Container_init();
+                    const ret = instance.exports.bjs_Collections_Container_init();
                     return Container.__construct(ret);
                 }
                 getItems() {
-                    instance.exports.bjs_Container_getItems(this.pointer);
+                    instance.exports.bjs_Collections_Container_getItems(this.pointer);
                     const arrayLen = i32Stack.pop();
                     const arrayResult = [];
                     for (let i = 0; i < arrayLen; i++) {
@@ -313,7 +313,7 @@ export async function createInstantiator(options, swift) {
                     return arrayResult;
                 }
                 addItem(item) {
-                    instance.exports.bjs_Container_addItem(this.pointer, item.pointer);
+                    instance.exports.bjs_Collections_Container_addItem(this.pointer, item.pointer);
                 }
             }
             if (typeof globalThis.Collections === 'undefined') {

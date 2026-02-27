@@ -3,7 +3,7 @@
     "classes" : [
       {
         "constructor" : {
-          "abiName" : "bjs_GlobalClass_init",
+          "abiName" : "bjs_GlobalAPI_GlobalClass_init",
           "effects" : {
             "isAsync" : false,
             "isStatic" : false,
@@ -15,7 +15,7 @@
         },
         "methods" : [
           {
-            "abiName" : "bjs_GlobalClass_greet",
+            "abiName" : "bjs_GlobalAPI_GlobalClass_greet",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,

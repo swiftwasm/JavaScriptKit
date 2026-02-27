@@ -57,6 +57,16 @@ enum Internal {
     }
 }
 
+@JS enum Formatting {
+    @JS class Converter {
+        @JS init() {}
+
+        @JS func format(value: Int) -> String {
+            return "formatted_\(value)"
+        }
+    }
+}
+
 @JS(namespace: "Services.Graph")
 enum GraphOperations {
     @JS static func createGraph(rootId: Int) -> Int {
