@@ -281,6 +281,13 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 }
+                get precision() {
+                    const ret = instance.exports.bjs_Converter_precision_get(this.pointer);
+                    return ret;
+                }
+                set precision(value) {
+                    instance.exports.bjs_Converter_precision_set(this.pointer, value);
+                }
             }
             class HTTPServer extends SwiftHeapObject {
                 static __construct(ptr) {

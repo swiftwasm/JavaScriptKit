@@ -714,7 +714,19 @@
           "Utils"
         ],
         "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "precision",
+            "namespace" : [
+              "Utils"
+            ],
+            "type" : {
+              "int" : {
 
+              }
+            }
+          }
         ],
         "swiftCallName" : "Utils.Converter"
       },

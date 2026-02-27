@@ -313,7 +313,11 @@ struct TestError: Error {
 
 @JS enum Utils {
     @JS class Converter {
-        @JS init() {}
+        @JS var precision: Int
+
+        @JS init() {
+            self.precision = 2
+        }
 
         @JS func toString(value: Int) -> String {
             return String(value)
