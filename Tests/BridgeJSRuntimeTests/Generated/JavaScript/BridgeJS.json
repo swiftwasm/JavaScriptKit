@@ -15706,12 +15706,38 @@
       },
       {
         "functions" : [
+
+        ],
+        "types" : [
           {
-            "name" : "jsRoundTripDictionary",
-            "parameters" : [
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "DictionarySupportImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
               {
-                "name" : "values",
-                "type" : {
+                "name" : "jsRoundTripDictionaryInt",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "dictionary" : {
+                        "_0" : {
+                          "int" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
                   "dictionary" : {
                     "_0" : {
                       "int" : {
@@ -15720,24 +15746,24 @@
                     }
                   }
                 }
-              }
-            ],
-            "returnType" : {
-              "dictionary" : {
-                "_0" : {
-                  "int" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripDictionaryBool",
-            "parameters" : [
+              },
               {
-                "name" : "values",
-                "type" : {
+                "name" : "jsRoundTripDictionaryBool",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "dictionary" : {
+                        "_0" : {
+                          "bool" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
                   "dictionary" : {
                     "_0" : {
                       "bool" : {
@@ -15746,24 +15772,24 @@
                     }
                   }
                 }
-              }
-            ],
-            "returnType" : {
-              "dictionary" : {
-                "_0" : {
-                  "bool" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripDictionaryDouble",
-            "parameters" : [
+              },
               {
-                "name" : "values",
-                "type" : {
+                "name" : "jsRoundTripDictionaryDouble",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "dictionary" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
                   "dictionary" : {
                     "_0" : {
                       "double" : {
@@ -15772,24 +15798,24 @@
                     }
                   }
                 }
-              }
-            ],
-            "returnType" : {
-              "dictionary" : {
-                "_0" : {
-                  "double" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripDictionaryJSObject",
-            "parameters" : [
+              },
               {
-                "name" : "values",
-                "type" : {
+                "name" : "jsRoundTripDictionaryJSObject",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "dictionary" : {
+                        "_0" : {
+                          "jsObject" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
                   "dictionary" : {
                     "_0" : {
                       "jsObject" : {
@@ -15798,24 +15824,24 @@
                     }
                   }
                 }
-              }
-            ],
-            "returnType" : {
-              "dictionary" : {
-                "_0" : {
-                  "jsObject" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripDictionaryJSValue",
-            "parameters" : [
+              },
               {
-                "name" : "values",
-                "type" : {
+                "name" : "jsRoundTripDictionaryJSValue",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "dictionary" : {
+                        "_0" : {
+                          "jsValue" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
                   "dictionary" : {
                     "_0" : {
                       "jsValue" : {
@@ -15824,24 +15850,28 @@
                     }
                   }
                 }
-              }
-            ],
-            "returnType" : {
-              "dictionary" : {
-                "_0" : {
-                  "jsValue" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripNestedDictionary",
-            "parameters" : [
+              },
               {
-                "name" : "values",
-                "type" : {
+                "name" : "jsRoundTripDictionaryDoubleArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "dictionary" : {
+                        "_0" : {
+                          "array" : {
+                            "_0" : {
+                              "double" : {
+
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
                   "dictionary" : {
                     "_0" : {
                       "array" : {
@@ -15855,96 +15885,8 @@
                   }
                 }
               }
-            ],
-            "returnType" : {
-              "dictionary" : {
-                "_0" : {
-                  "array" : {
-                    "_0" : {
-                      "double" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripOptionalDictionary",
-            "parameters" : [
-              {
-                "name" : "values",
-                "type" : {
-                  "nullable" : {
-                    "_0" : {
-                      "dictionary" : {
-                        "_0" : {
-                          "string" : {
-
-                          }
-                        }
-                      }
-                    },
-                    "_1" : "null"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "nullable" : {
-                "_0" : {
-                  "dictionary" : {
-                    "_0" : {
-                      "string" : {
-
-                      }
-                    }
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          },
-          {
-            "name" : "jsRoundTripUndefinedDictionary",
-            "parameters" : [
-              {
-                "name" : "values",
-                "type" : {
-                  "nullable" : {
-                    "_0" : {
-                      "dictionary" : {
-                        "_0" : {
-                          "int" : {
-
-                          }
-                        }
-                      }
-                    },
-                    "_1" : "undefined"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "nullable" : {
-                "_0" : {
-                  "dictionary" : {
-                    "_0" : {
-                      "int" : {
-
-                      }
-                    }
-                  }
-                },
-                "_1" : "undefined"
-              }
-            }
+            ]
           }
-        ],
-        "types" : [
-
         ]
       },
       {
@@ -17100,6 +17042,42 @@
                 }
               },
               {
+                "name" : "jsRoundTripOptionalJSValueArrayUndefined",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "array" : {
+                            "_0" : {
+                              "jsValue" : {
+
+                              }
+                            }
+                          }
+                        },
+                        "_1" : "undefined"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "jsValue" : {
+
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              },
+              {
                 "name" : "jsRoundTripOptionalStringToStringDictionaryNull",
                 "parameters" : [
                   {
@@ -17132,6 +17110,42 @@
                       }
                     },
                     "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripOptionalStringToStringDictionaryUndefined",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "dictionary" : {
+                            "_0" : {
+                              "string" : {
+
+                              }
+                            }
+                          }
+                        },
+                        "_1" : "undefined"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "dictionary" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "undefined"
                   }
                 }
               },
