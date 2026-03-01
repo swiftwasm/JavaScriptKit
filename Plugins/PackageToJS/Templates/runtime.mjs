@@ -240,38 +240,48 @@ const globalVariable = globalThis;
 
 class JSObjectSpace {
     constructor() {
-        this._heapValueById = new Map();
-        this._heapValueById.set(1, globalVariable);
-        this._heapEntryByValue = new Map();
-        this._heapEntryByValue.set(globalVariable, { id: 1, rc: 1 });
-        // Note: 0 is preserved for invalid references, 1 is preserved for globalThis
-        this._heapNextKey = 2;
+        this._values = [];
+        this._values[0] = undefined;
+        this._values[1] = globalVariable;
+        this._valueRefMap = new Map();
+        this._valueRefMap.set(globalVariable, 1);
+        this._refCounts = [];
+        this._refCounts[0] = 0;
+        this._refCounts[1] = 1;
+        this._freeSlotStack = [];
     }
     retain(value) {
-        const entry = this._heapEntryByValue.get(value);
-        if (entry) {
-            entry.rc++;
-            return entry.id;
+        const id = this._valueRefMap.get(value);
+        if (id !== undefined) {
+            this._refCounts[id]++;
+            return id;
         }
-        const id = this._heapNextKey++;
-        this._heapValueById.set(id, value);
-        this._heapEntryByValue.set(value, { id: id, rc: 1 });
-        return id;
+        const newId = this._freeSlotStack.length > 0 ? this._freeSlotStack.pop() : this._values.length;
+        this._values[newId] = value;
+        this._refCounts[newId] = 1;
+        this._valueRefMap.set(value, newId);
+        return newId;
     }
     retainByRef(ref) {
-        return this.retain(this.getObject(ref));
+        this._refCounts[ref]++;
+        return ref;
     }
     release(ref) {
-        const value = this._heapValueById.get(ref);
-        const entry = this._heapEntryByValue.get(value);
-        entry.rc--;
-        if (entry.rc != 0)
+        if (--this._refCounts[ref] !== 0)
             return;
-        this._heapEntryByValue.delete(value);
-        this._heapValueById.delete(ref);
+        const value = this._values[ref];
+        this._valueRefMap.delete(value);
+        if (ref === this._values.length - 1) {
+            this._values.length = ref;
+            this._refCounts.length = ref;
+        }
+        else {
+            this._values[ref] = undefined;
+            this._freeSlotStack.push(ref);
+        }
     }
     getObject(ref) {
-        const value = this._heapValueById.get(ref);
+        const value = this._values[ref];
         if (value === undefined) {
             throw new ReferenceError("Attempted to read invalid reference " + ref);
         }
