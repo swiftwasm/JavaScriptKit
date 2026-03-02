@@ -5,6 +5,7 @@
 
 import { JSObjectSpace } from "../src/object-heap.js";
 import { JSObjectSpaceOriginal } from "./_original.js";
+import { JSObjectSpace_v2 } from "./_version2.js";
 
 export interface HeapLike {
     retain(value: unknown): number;
@@ -94,7 +95,8 @@ function runBenchmark(
 function main() {
     const implementations: Array<{ name: string; Heap: new () => HeapLike }> = [
         { name: "JSObjectSpaceOriginal", Heap: JSObjectSpaceOriginal },
-        { name: "JSObjectSpace (current)", Heap: JSObjectSpace },
+        { name: "JSObjectSpace_v2 (ref++, single map)", Heap: JSObjectSpace_v2 },
+        { name: "JSObjectSpace (current)", Heap: JSObjectSpace }
     ];
 
     console.log("JSObjectSpace benchmark");

@@ -40,6 +40,12 @@ export class JSObjectSpace {
     }
 
     retainByRef(ref: ref) {
+        if (this._refCounts[ref] === 0) {
+            throw new ReferenceError(
+                "Attempted to retain invalid reference " + ref,
+            );
+        }
+
         this._refCounts[ref]++;
         return ref;
     }

@@ -256,13 +256,18 @@ class JSObjectSpace {
             this._refCounts[id]++;
             return id;
         }
-        const newId = this._freeSlotStack.length > 0 ? this._freeSlotStack.pop() : this._values.length;
+        const newId = this._freeSlotStack.length > 0
+            ? this._freeSlotStack.pop()
+            : this._values.length;
         this._values[newId] = value;
         this._refCounts[newId] = 1;
         this._valueRefMap.set(value, newId);
         return newId;
     }
     retainByRef(ref) {
+        if (this._refCounts[ref] === 0) {
+            throw new ReferenceError("Attempted to retain invalid reference " + ref);
+        }
         this._refCounts[ref]++;
         return ref;
     }
