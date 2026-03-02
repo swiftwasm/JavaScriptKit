@@ -5,8 +5,11 @@
 
 import { JSObjectSpace } from "../src/object-heap.js";
 import { JSObjectSpaceOriginal } from "./_original.js";
+import { JSObjectSpace_v1 } from "./_version1.js";
 import { JSObjectSpace_v2 } from "./_version2.js";
 import { JSObjectSpace_v3 } from "./_version3.js";
+import { JSObjectSpace_v4 } from "./_version4.js";
+import { JSObjectSpace_v5 } from "./_version5.js";
 
 export interface HeapLike {
     retain(value: unknown): number;
@@ -18,6 +21,7 @@ const ITERATIONS = 5;
 const HEAVY_OPS = 200_000;
 const FILL_LEVELS = [1_000, 10_000, 50_000] as const;
 const MIXED_OPS_PER_LEVEL = 100_000;
+const gcIfAvailable = (globalThis as { gc?: () => void }).gc;
 
 function median(numbers: number[]): number {
     const sorted = [...numbers].sort((a, b) => a - b);
@@ -96,8 +100,11 @@ function runBenchmark(
 function main() {
     const implementations: Array<{ name: string; Heap: new () => HeapLike }> = [
         { name: "JSObjectSpaceOriginal", Heap: JSObjectSpaceOriginal },
+        { name: "JSObjectSpace_v1 (reused refs, single map)", Heap: JSObjectSpace_v1 },
         { name: "JSObjectSpace_v2 (ref++, single map)", Heap: JSObjectSpace_v2 },
         { name: "JSObjectSpace_v3 (ref++, all maps)", Heap: JSObjectSpace_v3 },
+        { name: "JSObjectSpace_v4 (gen-tagged refs, single map)", Heap: JSObjectSpace_v4 },
+        { name: "JSObjectSpace_v5 (gen-tagged refs, typed state)", Heap: JSObjectSpace_v5 },
         { name: "JSObjectSpace (current)", Heap: JSObjectSpace }
     ];
 
@@ -110,11 +117,21 @@ function main() {
         `Mixed: ${MIXED_OPS_PER_LEVEL} ops per fill level (${FILL_LEVELS.join(", ")})`,
     );
     console.log(`Median of ${ITERATIONS} runs per scenario.\n`);
+    if (!gcIfAvailable) {
+        console.warn(
+            "Warning: global.gc is unavailable (run Node with --expose-gc for lower-variance results).",
+        );
+    }
 
     const results: Array<ReturnType<typeof runBenchmark>> = [];
     for (const { name, Heap } of implementations) {
         console.log(`Running ${name}...`);
+        // Reduce cross-implementation variance from pending garbage.
+        gcIfAvailable?.();
+        gcIfAvailable?.();
         runBenchmark(name, Heap);
+        gcIfAvailable?.();
+        gcIfAvailable?.();
         results.push(runBenchmark(name, Heap));
     }
 
