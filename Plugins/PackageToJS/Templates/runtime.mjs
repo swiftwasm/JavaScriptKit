@@ -238,59 +238,90 @@ function deserializeError(error) {
 
 const globalVariable = globalThis;
 
+const SLOT_BITS = 22;
+const SLOT_MASK = (1 << SLOT_BITS) - 1;
+const GEN_MASK = (1 << (32 - SLOT_BITS)) - 1;
 class JSObjectSpace {
     constructor() {
+        this._slotByValue = new Map();
         this._values = [];
+        this._stateBySlot = [];
+        this._freeSlotStack = [];
         this._values[0] = undefined;
         this._values[1] = globalVariable;
-        this._valueRefMap = new Map();
-        this._valueRefMap.set(globalVariable, 1);
-        this._refCounts = [];
-        this._refCounts[0] = 0;
-        this._refCounts[1] = 1;
-        this._freeSlotStack = [];
+        this._slotByValue.set(globalVariable, 1);
+        this._stateBySlot[1] = 1; // gen=0, rc=1
     }
     retain(value) {
-        const id = this._valueRefMap.get(value);
-        if (id !== undefined) {
-            this._refCounts[id]++;
-            return id;
+        const slot = this._slotByValue.get(value);
+        if (slot !== undefined) {
+            const state = this._stateBySlot[slot];
+            const nextState = (state + 1) >>> 0;
+            if ((nextState & SLOT_MASK) === 0) {
+                throw new RangeError(`Reference count overflow at slot ${slot}`);
+            }
+            this._stateBySlot[slot] = nextState;
+            return ((nextState & ~SLOT_MASK) | slot) >>> 0;
         }
-        const newId = this._freeSlotStack.length > 0
-            ? this._freeSlotStack.pop()
-            : this._values.length;
-        this._values[newId] = value;
-        this._refCounts[newId] = 1;
-        this._valueRefMap.set(value, newId);
-        return newId;
-    }
-    retainByRef(ref) {
-        if (this._refCounts[ref] === 0) {
-            throw new ReferenceError("Attempted to retain invalid reference " + ref);
-        }
-        this._refCounts[ref]++;
-        return ref;
-    }
-    release(ref) {
-        if (--this._refCounts[ref] !== 0)
-            return;
-        const value = this._values[ref];
-        this._valueRefMap.delete(value);
-        if (ref === this._values.length - 1) {
-            this._values.length = ref;
-            this._refCounts.length = ref;
+        let newSlot;
+        let state;
+        if (this._freeSlotStack.length > 0) {
+            newSlot = this._freeSlotStack.pop();
+            const gen = this._stateBySlot[newSlot] >>> SLOT_BITS;
+            state = ((gen << SLOT_BITS) | 1) >>> 0;
         }
         else {
-            this._values[ref] = undefined;
-            this._freeSlotStack.push(ref);
+            newSlot = this._values.length;
+            if (newSlot > SLOT_MASK) {
+                throw new RangeError(`Reference slot overflow: ${newSlot} exceeds ${SLOT_MASK}`);
+            }
+            state = 1;
         }
+        this._stateBySlot[newSlot] = state;
+        this._values[newSlot] = value;
+        this._slotByValue.set(value, newSlot);
+        return ((state & ~SLOT_MASK) | newSlot) >>> 0;
     }
-    getObject(ref) {
-        const value = this._values[ref];
-        if (value === undefined) {
-            throw new ReferenceError("Attempted to read invalid reference " + ref);
+    retainByRef(reference) {
+        const state = this._getValidatedSlotState(reference);
+        const slot = reference & SLOT_MASK;
+        const nextState = (state + 1) >>> 0;
+        if ((nextState & SLOT_MASK) === 0) {
+            throw new RangeError(`Reference count overflow at slot ${slot}`);
         }
-        return value;
+        this._stateBySlot[slot] = nextState;
+        return reference;
+    }
+    release(reference) {
+        const state = this._getValidatedSlotState(reference);
+        const slot = reference & SLOT_MASK;
+        if ((state & SLOT_MASK) > 1) {
+            this._stateBySlot[slot] = (state - 1) >>> 0;
+            return;
+        }
+        this._slotByValue.delete(this._values[slot]);
+        this._values[slot] = undefined;
+        const nextGen = ((state >>> SLOT_BITS) + 1) & GEN_MASK;
+        this._stateBySlot[slot] = (nextGen << SLOT_BITS) >>> 0;
+        this._freeSlotStack.push(slot);
+    }
+    getObject(reference) {
+        this._getValidatedSlotState(reference);
+        return this._values[reference & SLOT_MASK];
+    }
+    // Returns the packed state for the slot, after validating the reference.
+    _getValidatedSlotState(reference) {
+        const slot = reference & SLOT_MASK;
+        if (slot === 0)
+            throw new ReferenceError("Attempted to use invalid reference " + reference);
+        const state = this._stateBySlot[slot];
+        if (state === undefined || (state & SLOT_MASK) === 0) {
+            throw new ReferenceError("Attempted to use invalid reference " + reference);
+        }
+        if ((state >>> SLOT_BITS) !== (reference >>> SLOT_BITS)) {
+            throw new ReferenceError("Attempted to use stale reference " + reference);
+        }
+        return state;
     }
 }
 
