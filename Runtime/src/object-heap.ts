@@ -29,7 +29,9 @@ export class JSObjectSpace {
             const state = this._stateBySlot[slot]!;
             const nextState = (state + 1) >>> 0;
             if ((nextState & SLOT_MASK) === 0) {
-                throw new RangeError(`Reference count overflow at slot ${slot}`);
+                throw new RangeError(
+                    `Reference count overflow at slot ${slot}`,
+                );
             }
             this._stateBySlot[slot] = nextState;
             return ((nextState & ~SLOT_MASK) | slot) >>> 0;
@@ -44,7 +46,9 @@ export class JSObjectSpace {
         } else {
             newSlot = this._values.length;
             if (newSlot > SLOT_MASK) {
-                throw new RangeError(`Reference slot overflow: ${newSlot} exceeds ${SLOT_MASK}`);
+                throw new RangeError(
+                    `Reference slot overflow: ${newSlot} exceeds ${SLOT_MASK}`,
+                );
             }
             state = 1;
         }
@@ -89,13 +93,20 @@ export class JSObjectSpace {
     // Returns the packed state for the slot, after validating the reference.
     private _getValidatedSlotState(reference: ref): number {
         const slot = reference & SLOT_MASK;
-        if (slot === 0) throw new ReferenceError("Attempted to use invalid reference " + reference);
+        if (slot === 0)
+            throw new ReferenceError(
+                "Attempted to use invalid reference " + reference,
+            );
         const state = this._stateBySlot[slot];
         if (state === undefined || (state & SLOT_MASK) === 0) {
-            throw new ReferenceError("Attempted to use invalid reference " + reference);
+            throw new ReferenceError(
+                "Attempted to use invalid reference " + reference,
+            );
         }
-        if ((state >>> SLOT_BITS) !== (reference >>> SLOT_BITS)) {
-            throw new ReferenceError("Attempted to use stale reference " + reference);
+        if (state >>> SLOT_BITS !== reference >>> SLOT_BITS) {
+            throw new ReferenceError(
+                "Attempted to use stale reference " + reference,
+            );
         }
         return state;
     }
