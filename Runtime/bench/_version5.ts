@@ -1,11 +1,11 @@
-import { globalVariable } from "./find-global.js";
-import { ref } from "./types.js";
+import { globalVariable } from "../src/find-global.js";
+import { ref } from "../src/types.js";
 
 const SLOT_BITS = 22;
 const SLOT_MASK = (1 << SLOT_BITS) - 1;
 const GEN_MASK = (1 << (32 - SLOT_BITS)) - 1;
 
-export class JSObjectSpace {
+export class JSObjectSpace_v5 {
     private _slotByValue: Map<any, number>;
     private _values: (any | undefined)[];
     private _stateBySlot: number[];
