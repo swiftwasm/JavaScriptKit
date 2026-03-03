@@ -153,10 +153,18 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     public subscript(_ name: String) -> JSValue {
         get {
             assertOnOwnerThread(hint: "reading '\(name)' property")
+            #if Tracing
+            let traceEnd = JSTracingHooks.beginJSCall(.propertyGet(receiver: self, propertyName: name))
+            defer { traceEnd?() }
+            #endif
             return getJSValue(this: self, name: JSString(name))
         }
         set {
             assertOnOwnerThread(hint: "writing '\(name)' property")
+            #if Tracing
+            let traceEnd = JSTracingHooks.beginJSCall(.propertySet(receiver: self, propertyName: name, value: newValue))
+            defer { traceEnd?() }
+            #endif
             setJSValue(this: self, name: JSString(name), value: newValue)
         }
     }
@@ -167,10 +175,18 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     public subscript(_ name: JSString) -> JSValue {
         get {
             assertOnOwnerThread(hint: "reading '<<JSString>>' property")
+            #if Tracing
+            let traceEnd = JSTracingHooks.beginJSCall(.propertyGet(receiver: self, propertyName: String(name)))
+            defer { traceEnd?() }
+            #endif
             return getJSValue(this: self, name: name)
         }
         set {
             assertOnOwnerThread(hint: "writing '<<JSString>>' property")
+            #if Tracing
+            let traceEnd = JSTracingHooks.beginJSCall(.propertySet(receiver: self, propertyName: String(name), value: newValue))
+            defer { traceEnd?() }
+            #endif
             setJSValue(this: self, name: name, value: newValue)
         }
     }
@@ -181,10 +197,18 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     public subscript(_ index: Int) -> JSValue {
         get {
             assertOnOwnerThread(hint: "reading '\(index)' property")
+            #if Tracing
+            let traceEnd = JSTracingHooks.beginJSCall(.propertyGet(receiver: self, propertyName: String(index)))
+            defer { traceEnd?() }
+            #endif
             return getJSValue(this: self, index: Int32(index))
         }
         set {
             assertOnOwnerThread(hint: "writing '\(index)' property")
+            #if Tracing
+            let traceEnd = JSTracingHooks.beginJSCall(.propertySet(receiver: self, propertyName: String(index), value: newValue))
+            defer { traceEnd?() }
+            #endif
             setJSValue(this: self, index: Int32(index), value: newValue)
         }
     }
@@ -195,10 +219,18 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     public subscript(_ name: JSSymbol) -> JSValue {
         get {
             assertOnOwnerThread(hint: "reading '<<JSSymbol>>' property")
+            #if Tracing
+            let traceEnd = JSTracingHooks.beginJSCall(.propertyGet(receiver: self, propertyName: "<<JSSymbol>>"))
+            defer { traceEnd?() }
+            #endif
             return getJSValue(this: self, symbol: name)
         }
         set {
             assertOnOwnerThread(hint: "writing '<<JSSymbol>>' property")
+            #if Tracing
+            let traceEnd = JSTracingHooks.beginJSCall(.propertySet(receiver: self, propertyName: "<<JSSymbol>>", value: newValue))
+            defer { traceEnd?() }
+            #endif
             setJSValue(this: self, symbol: name, value: newValue)
         }
     }

@@ -7,6 +7,8 @@ public struct JSTracing: Sendable {
     public enum JSCallInfo {
         case function(function: JSObject, arguments: [JSValue])
         case method(receiver: JSObject, methodName: String?, arguments: [JSValue])
+        case propertyGet(receiver: JSObject, propertyName: String)
+        case propertySet(receiver: JSObject, propertyName: String, value: JSValue)
     }
 
     /// Register a hook for Swift to JavaScript calls.
