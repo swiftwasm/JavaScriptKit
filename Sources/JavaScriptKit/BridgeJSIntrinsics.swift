@@ -395,6 +395,38 @@ extension String: _BridgedSwiftStackType {
     }
 }
 
+/// Runs `body` with a borrowed UTF-8 (address, count) tuple.
+@_spi(BridgeJS) @_transparent
+public func _swift_js_with_borrowed_utf8<R>(
+    _ value: consuming String,
+    _ body: (Int32, Int32) -> R
+) -> R {
+    return value.withUTF8 { utf8 in
+        let address = utf8.baseAddress.map { Int32(truncatingIfNeeded: UInt(bitPattern: $0)) } ?? 0
+        return body(address, Int32(utf8.count))
+    }
+}
+
+/// Runs `body` with optional borrowed UTF-8 components.
+///
+/// .none is encoded as `(0, 0, 0)`.
+/// .some is encoded as `(1, address, count)`.
+@_spi(BridgeJS) @_transparent
+public func _swift_js_with_optional_borrowed_utf8<R>(
+    _ value: consuming String?,
+    _ body: (Int32, Int32, Int32) -> R
+) -> R {
+    switch consume value {
+    case .none:
+        return body(0, 0, 0)
+    case .some(var value):
+        return value.withUTF8 { utf8 in
+            let address = utf8.baseAddress.map { Int32(truncatingIfNeeded: UInt(bitPattern: $0)) } ?? 0
+            return body(1, address, Int32(utf8.count))
+        }
+    }
+}
+
 extension JSObject: _BridgedSwiftStackType {
     // JSObject is a non-final class, so we must explicitly specify the associated type
     // rather than relying on the default `Self` (which Swift requires for covariant returns).

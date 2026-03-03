@@ -20,14 +20,14 @@ func _$returnAnimatable() throws(JSException) -> Animatable {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Greeter_init")
-fileprivate func bjs_Greeter_init_extern(_ name: Int32) -> Int32
+fileprivate func bjs_Greeter_init_extern(_ nameBytes: Int32, _ nameLength: Int32) -> Int32
 #else
-fileprivate func bjs_Greeter_init_extern(_ name: Int32) -> Int32 {
+fileprivate func bjs_Greeter_init_extern(_ nameBytes: Int32, _ nameLength: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_Greeter_init(_ name: Int32) -> Int32 {
-    return bjs_Greeter_init_extern(name)
+@inline(never) fileprivate func bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> Int32 {
+    return bjs_Greeter_init_extern(nameBytes, nameLength)
 }
 
 #if arch(wasm32)
@@ -56,14 +56,14 @@ fileprivate func bjs_Greeter_age_get_extern(_ self: Int32) -> Float64 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Greeter_name_set")
-fileprivate func bjs_Greeter_name_set_extern(_ self: Int32, _ newValue: Int32) -> Void
+fileprivate func bjs_Greeter_name_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
 #else
-fileprivate func bjs_Greeter_name_set_extern(_ self: Int32, _ newValue: Int32) -> Void {
+fileprivate func bjs_Greeter_name_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_Greeter_name_set(_ self: Int32, _ newValue: Int32) -> Void {
-    return bjs_Greeter_name_set_extern(self, newValue)
+@inline(never) fileprivate func bjs_Greeter_name_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+    return bjs_Greeter_name_set_extern(self, newValueBytes, newValueLength)
 }
 
 #if arch(wasm32)
@@ -80,19 +80,20 @@ fileprivate func bjs_Greeter_greet_extern(_ self: Int32) -> Int32 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Greeter_changeName")
-fileprivate func bjs_Greeter_changeName_extern(_ self: Int32, _ name: Int32) -> Void
+fileprivate func bjs_Greeter_changeName_extern(_ self: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void
 #else
-fileprivate func bjs_Greeter_changeName_extern(_ self: Int32, _ name: Int32) -> Void {
+fileprivate func bjs_Greeter_changeName_extern(_ self: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_Greeter_changeName(_ self: Int32, _ name: Int32) -> Void {
-    return bjs_Greeter_changeName_extern(self, name)
+@inline(never) fileprivate func bjs_Greeter_changeName(_ self: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
+    return bjs_Greeter_changeName_extern(self, nameBytes, nameLength)
 }
 
 func _$Greeter_init(_ name: String) throws(JSException) -> JSObject {
-    let nameValue = name.bridgeJSLowerParameter()
-    let ret = bjs_Greeter_init(nameValue)
+    let ret = _swift_js_with_borrowed_utf8(name) { nameBytes, nameLength in
+        bjs_Greeter_init(nameBytes, nameLength)
+    }
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -119,8 +120,9 @@ func _$Greeter_age_get(_ self: JSObject) throws(JSException) -> Double {
 
 func _$Greeter_name_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    let newValueValue = newValue.bridgeJSLowerParameter()
-    bjs_Greeter_name_set(selfValue, newValueValue)
+    _swift_js_with_borrowed_utf8(newValue) { newValueBytes, newValueLength in
+        bjs_Greeter_name_set(selfValue, newValueBytes, newValueLength)
+    }
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -137,8 +139,9 @@ func _$Greeter_greet(_ self: JSObject) throws(JSException) -> String {
 
 func _$Greeter_changeName(_ self: JSObject, _ name: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    let nameValue = name.bridgeJSLowerParameter()
-    bjs_Greeter_changeName(selfValue, nameValue)
+    _swift_js_with_borrowed_utf8(name) { nameBytes, nameLength in
+        bjs_Greeter_changeName(selfValue, nameBytes, nameLength)
+    }
     if let error = _swift_js_take_exception() {
         throw error
     }

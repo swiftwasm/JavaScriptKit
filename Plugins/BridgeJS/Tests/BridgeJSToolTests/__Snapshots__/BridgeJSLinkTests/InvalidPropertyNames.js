@@ -276,11 +276,12 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WeirdNaming_normalProperty_set"] = function bjs_WeirdNaming_normalProperty_set(self, newValue) {
+            TestModule["bjs_WeirdNaming_normalProperty_set"] = function bjs_WeirdNaming_normalProperty_set(self, newValueBytes, newValueCount) {
                 try {
-                    const newValueObject = swift.memory.getObject(newValue);
-                    swift.memory.release(newValue);
-                    swift.memory.getObject(self).normalProperty = newValueObject;
+                    const bytesView = new Uint8Array(memory.buffer, newValueBytes, newValueCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).normalProperty = string;
                 } catch (error) {
                     setException(error);
                 }
@@ -299,11 +300,12 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WeirdNaming_property_with_spaces_set"] = function bjs_WeirdNaming_property_with_spaces_set(self, newValue) {
+            TestModule["bjs_WeirdNaming_property_with_spaces_set"] = function bjs_WeirdNaming_property_with_spaces_set(self, newValueBytes, newValueCount) {
                 try {
-                    const newValueObject = swift.memory.getObject(newValue);
-                    swift.memory.release(newValue);
-                    swift.memory.getObject(self)["property with spaces"] = newValueObject;
+                    const bytesView = new Uint8Array(memory.buffer, newValueBytes, newValueCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self)["property with spaces"] = string;
                 } catch (error) {
                     setException(error);
                 }
@@ -315,29 +317,32 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WeirdNaming_constructor_set"] = function bjs_WeirdNaming_constructor_set(self, newValue) {
+            TestModule["bjs_WeirdNaming_constructor_set"] = function bjs_WeirdNaming_constructor_set(self, newValueBytes, newValueCount) {
                 try {
-                    const newValueObject = swift.memory.getObject(newValue);
-                    swift.memory.release(newValue);
-                    swift.memory.getObject(self).constructor = newValueObject;
+                    const bytesView = new Uint8Array(memory.buffer, newValueBytes, newValueCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).constructor = string;
                 } catch (error) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WeirdNaming_for_set"] = function bjs_WeirdNaming_for_set(self, newValue) {
+            TestModule["bjs_WeirdNaming_for_set"] = function bjs_WeirdNaming_for_set(self, newValueBytes, newValueCount) {
                 try {
-                    const newValueObject = swift.memory.getObject(newValue);
-                    swift.memory.release(newValue);
-                    swift.memory.getObject(self).for = newValueObject;
+                    const bytesView = new Uint8Array(memory.buffer, newValueBytes, newValueCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).for = string;
                 } catch (error) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WeirdNaming_any_set"] = function bjs_WeirdNaming_any_set(self, newValue) {
+            TestModule["bjs_WeirdNaming_any_set"] = function bjs_WeirdNaming_any_set(self, newValueBytes, newValueCount) {
                 try {
-                    const newValueObject = swift.memory.getObject(newValue);
-                    swift.memory.release(newValue);
-                    swift.memory.getObject(self).Any = newValueObject;
+                    const bytesView = new Uint8Array(memory.buffer, newValueBytes, newValueCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).Any = string;
                 } catch (error) {
                     setException(error);
                 }

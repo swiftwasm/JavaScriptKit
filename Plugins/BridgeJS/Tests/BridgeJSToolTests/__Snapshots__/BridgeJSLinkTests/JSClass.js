@@ -195,11 +195,12 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_Greeter_init"] = function bjs_Greeter_init(name) {
+            TestModule["bjs_Greeter_init"] = function bjs_Greeter_init(nameBytes, nameCount) {
                 try {
-                    const nameObject = swift.memory.getObject(name);
-                    swift.memory.release(name);
-                    return swift.memory.retain(new imports.Greeter(nameObject));
+                    const bytesView = new Uint8Array(memory.buffer, nameBytes, nameCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    return swift.memory.retain(new imports.Greeter(string));
                 } catch (error) {
                     setException(error);
                     return 0
@@ -223,11 +224,12 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_Greeter_name_set"] = function bjs_Greeter_name_set(self, newValue) {
+            TestModule["bjs_Greeter_name_set"] = function bjs_Greeter_name_set(self, newValueBytes, newValueCount) {
                 try {
-                    const newValueObject = swift.memory.getObject(newValue);
-                    swift.memory.release(newValue);
-                    swift.memory.getObject(self).name = newValueObject;
+                    const bytesView = new Uint8Array(memory.buffer, newValueBytes, newValueCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).name = string;
                 } catch (error) {
                     setException(error);
                 }
@@ -241,11 +243,12 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_Greeter_changeName"] = function bjs_Greeter_changeName(self, name) {
+            TestModule["bjs_Greeter_changeName"] = function bjs_Greeter_changeName(self, nameBytes, nameCount) {
                 try {
-                    const nameObject = swift.memory.getObject(name);
-                    swift.memory.release(name);
-                    swift.memory.getObject(self).changeName(nameObject);
+                    const bytesView = new Uint8Array(memory.buffer, nameBytes, nameCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).changeName(string);
                 } catch (error) {
                     setException(error);
                 }

@@ -453,19 +453,20 @@ public func _bjs_validateSession(_ session: Int32) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_takesFeatureFlag")
-fileprivate func bjs_takesFeatureFlag_extern(_ flag: Int32) -> Void
+fileprivate func bjs_takesFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: Int32) -> Void
 #else
-fileprivate func bjs_takesFeatureFlag_extern(_ flag: Int32) -> Void {
+fileprivate func bjs_takesFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_takesFeatureFlag(_ flag: Int32) -> Void {
-    return bjs_takesFeatureFlag_extern(flag)
+@inline(never) fileprivate func bjs_takesFeatureFlag(_ flagBytes: Int32, _ flagLength: Int32) -> Void {
+    return bjs_takesFeatureFlag_extern(flagBytes, flagLength)
 }
 
 func _$takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void {
-    let flagValue = flag.bridgeJSLowerParameter()
-    bjs_takesFeatureFlag(flagValue)
+    _swift_js_with_borrowed_utf8(flag.rawValue) { flagBytes, flagLength in
+        bjs_takesFeatureFlag(flagBytes, flagLength)
+    }
     if let error = _swift_js_take_exception() {
         throw error
     }

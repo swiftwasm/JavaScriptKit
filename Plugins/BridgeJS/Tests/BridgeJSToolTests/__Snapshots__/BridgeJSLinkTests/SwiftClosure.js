@@ -327,12 +327,13 @@ export async function createInstantiator(options, swift) {
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO);
             }
-            bjs["invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO"] = function(callbackId, param0) {
+            bjs["invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO"] = function(callbackId, param0Bytes, param0Count) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    const param0Object = swift.memory.getObject(param0);
-                    swift.memory.release(param0);
-                    let ret = callback(param0Object);
+                    const bytesView = new Uint8Array(memory.buffer, param0Bytes, param0Count);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    let ret = callback(string);
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -428,12 +429,13 @@ export async function createInstantiator(options, swift) {
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule9DirectionO_9DirectionO);
             }
-            bjs["invoke_js_callback_TestModule_10TestModuleSS_SS"] = function(callbackId, param0) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSS_SS"] = function(callbackId, param0Bytes, param0Count) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    const param0Object = swift.memory.getObject(param0);
-                    swift.memory.release(param0);
-                    let ret = callback(param0Object);
+                    const bytesView = new Uint8Array(memory.buffer, param0Bytes, param0Count);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    let ret = callback(string);
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
@@ -575,14 +577,15 @@ export async function createInstantiator(options, swift) {
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO);
             }
-            bjs["invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO"] = function(callbackId, param0IsSome, param0ObjectId) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO"] = function(callbackId, param0IsSome, param0Bytes, param0Count) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let optResult;
                     if (param0IsSome) {
-                        const param0ObjectIdObject = swift.memory.getObject(param0ObjectId);
-                        swift.memory.release(param0ObjectId);
-                        optResult = param0ObjectIdObject;
+                        const bytesView = new Uint8Array(memory.buffer, param0Bytes, param0Count);
+                        const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                        const string = textDecoder.decode(bytesToDecode);
+                        optResult = string;
                     } else {
                         optResult = null;
                     }
@@ -723,14 +726,15 @@ export async function createInstantiator(options, swift) {
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO);
             }
-            bjs["invoke_js_callback_TestModule_10TestModuleSqSS_SqSS"] = function(callbackId, param0IsSome, param0ObjectId) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSqSS_SqSS"] = function(callbackId, param0IsSome, param0Bytes, param0Count) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let optResult;
                     if (param0IsSome) {
-                        const param0ObjectIdObject = swift.memory.getObject(param0ObjectId);
-                        swift.memory.release(param0ObjectId);
-                        optResult = param0ObjectIdObject;
+                        const bytesView = new Uint8Array(memory.buffer, param0Bytes, param0Count);
+                        const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                        const string = textDecoder.decode(bytesToDecode);
+                        optResult = string;
                     } else {
                         optResult = null;
                     }

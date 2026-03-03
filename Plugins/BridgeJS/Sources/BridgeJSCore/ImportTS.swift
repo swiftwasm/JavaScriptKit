@@ -81,6 +81,12 @@ public struct ImportTS {
     }
 
     class CallJSEmission {
+        private struct BorrowedStringArgument {
+            let expression: String
+            let forwardedParameterNames: [String]
+            let isOptional: Bool
+        }
+
         let abiName: String
         let moduleName: String
         let context: BridgeContext
@@ -95,11 +101,33 @@ public struct ImportTS {
         var stackLoweringStmts: [String] = []
         // Values to extend lifetime during call
         var valuesToExtendLifetimeDuringCall: [String] = []
+        // String-like parameters lowered through borrowed UTF-8 wrappers at call site.
+        private var borrowedStringArguments: [BorrowedStringArgument] = []
 
         init(moduleName: String, abiName: String, context: BridgeContext = .importTS) {
             self.moduleName = moduleName
             self.abiName = abiName
             self.context = context
+        }
+
+        private func borrowedStringInfo(for param: Parameter) -> (expression: String, isOptional: Bool)? {
+            switch param.type {
+            case .string:
+                return (param.name, false)
+            case .rawValueEnum(_, .string):
+                return ("\(param.name).rawValue", false)
+            case .nullable(let wrappedType, _):
+                switch wrappedType {
+                case .string:
+                    return ("\(param.name).asOptional", true)
+                case .rawValueEnum(_, .string):
+                    return ("\(param.name).asOptional?.rawValue", true)
+                default:
+                    return nil
+                }
+            default:
+                return nil
+            }
         }
 
         func lowerParameter(param: Parameter) throws {
@@ -115,6 +143,35 @@ public struct ImportTS {
             default:
                 break
             }
+
+            if let borrowed = borrowedStringInfo(for: param) {
+                let destructuredNames = loweringInfo.loweredParameters.map {
+                    "\(param.name)\($0.name.capitalizedFirstLetter)"
+                }
+                if loweringInfo.loweredParameters.count != destructuredNames.count || destructuredNames.isEmpty {
+                    throw BridgeJSCoreError("Unexpected borrowed string lowering shape for parameter \(param.name)")
+                }
+
+                for (index, (paramName, type)) in loweringInfo.loweredParameters.enumerated() {
+                    let abiParamName: String
+                    if loweringInfo.loweredParameters.count == 1 {
+                        abiParamName = param.name
+                    } else {
+                        abiParamName = "\(param.name)\(paramName.capitalizedFirstLetter)"
+                    }
+                    abiParameterSignatures.append((abiParamName, type))
+                    abiParameterForwardings.append(destructuredNames[index])
+                }
+                borrowedStringArguments.append(
+                    BorrowedStringArgument(
+                        expression: borrowed.expression,
+                        forwardedParameterNames: destructuredNames,
+                        isOptional: borrowed.isOptional
+                    )
+                )
+                return
+            }
+
             let initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
 
             if loweringInfo.loweredParameters.isEmpty {
@@ -164,19 +221,35 @@ public struct ImportTS {
             let assign =
                 (returnType == .void || returnType.usesSideChannelForOptionalReturn() || liftingInfo.valueToLift == nil)
                 ? "" : "let ret = "
-            let callExpr = "\(abiName)(\(abiParameterForwardings.joined(separator: ", ")))"
+            var callExpr = "\(abiName)(\(abiParameterForwardings.joined(separator: ", ")))"
 
             if !valuesToExtendLifetimeDuringCall.isEmpty {
-                body.write(
-                    "\(assign)withExtendedLifetime((\(valuesToExtendLifetimeDuringCall.joined(separator: ", ")))) {"
-                )
-                body.indent {
-                    body.write(callExpr)
-                }
-                body.write("}")
-            } else {
-                body.write("\(assign)\(callExpr)")
+                callExpr =
+                    "withExtendedLifetime((\(valuesToExtendLifetimeDuringCall.joined(separator: ", ")))) { \(callExpr) }"
             }
+
+            if !borrowedStringArguments.isEmpty {
+                for argument in borrowedStringArguments.reversed() {
+                    if argument.isOptional {
+                        guard argument.forwardedParameterNames.count == 3 else {
+                            throw BridgeJSCoreError(
+                                "Optional borrowed string argument must have 3 lowered values: \(argument.expression)"
+                            )
+                        }
+                        callExpr =
+                            "_swift_js_with_optional_borrowed_utf8(\(argument.expression)) { \(argument.forwardedParameterNames[0]), \(argument.forwardedParameterNames[1]), \(argument.forwardedParameterNames[2]) in \(callExpr) }"
+                    } else {
+                        guard argument.forwardedParameterNames.count == 2 else {
+                            throw BridgeJSCoreError(
+                                "Borrowed string argument must have 2 lowered values: \(argument.expression)"
+                            )
+                        }
+                        callExpr =
+                            "_swift_js_with_borrowed_utf8(\(argument.expression)) { \(argument.forwardedParameterNames[0]), \(argument.forwardedParameterNames[1]) in \(callExpr) }"
+                    }
+                }
+            }
+            body.write("\(assign)\(callExpr)")
 
             // Add exception check for ImportTS context
             if context == .importTS {
@@ -724,7 +797,7 @@ extension BridgeType {
         static let int = LoweringParameterInfo(loweredParameters: [("value", .i32)])
         static let float = LoweringParameterInfo(loweredParameters: [("value", .f32)])
         static let double = LoweringParameterInfo(loweredParameters: [("value", .f64)])
-        static let string = LoweringParameterInfo(loweredParameters: [("value", .i32)])
+        static let string = LoweringParameterInfo(loweredParameters: [("bytes", .i32), ("length", .i32)])
         static let jsObject = LoweringParameterInfo(loweredParameters: [("value", .i32)])
         static let jsValue = LoweringParameterInfo(loweredParameters: [
             ("kind", .i32),
@@ -761,6 +834,9 @@ extension BridgeType {
                 return LoweringParameterInfo(loweredParameters: [("value", .i32)])
             }
         case .rawValueEnum(_, let rawType):
+            if rawType == .string {
+                return .string
+            }
             let wasmType = rawType.wasmCoreType ?? .i32
             return LoweringParameterInfo(loweredParameters: [("value", wasmType)])
         case .associatedValueEnum:
