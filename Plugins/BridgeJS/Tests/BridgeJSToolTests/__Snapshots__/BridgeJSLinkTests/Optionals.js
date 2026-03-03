@@ -198,21 +198,23 @@ export async function createInstantiator(options, swift) {
                 return swift.memory.retain(obj);
             };
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_WithOptionalJSClass_init"] = function bjs_WithOptionalJSClass_init(valueOrNullIsSome, valueOrNullObjectId, valueOrUndefinedIsSome, valueOrUndefinedObjectId) {
+            TestModule["bjs_WithOptionalJSClass_init"] = function bjs_WithOptionalJSClass_init(valueOrNullIsSome, valueOrNullBytes, valueOrNullCount, valueOrUndefinedIsSome, valueOrUndefinedBytes, valueOrUndefinedCount) {
                 try {
                     let optResult;
                     if (valueOrNullIsSome) {
-                        const valueOrNullObjectIdObject = swift.memory.getObject(valueOrNullObjectId);
-                        swift.memory.release(valueOrNullObjectId);
-                        optResult = valueOrNullObjectIdObject;
+                        const bytesView = new Uint8Array(memory.buffer, valueOrNullBytes, valueOrNullCount);
+                        const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                        const string = textDecoder.decode(bytesToDecode);
+                        optResult = string;
                     } else {
                         optResult = null;
                     }
                     let optResult1;
                     if (valueOrUndefinedIsSome) {
-                        const valueOrUndefinedObjectIdObject = swift.memory.getObject(valueOrUndefinedObjectId);
-                        swift.memory.release(valueOrUndefinedObjectId);
-                        optResult1 = valueOrUndefinedObjectIdObject;
+                        const bytesView1 = new Uint8Array(memory.buffer, valueOrUndefinedBytes, valueOrUndefinedCount);
+                        const bytesToDecode1 = (typeof SharedArrayBuffer !== "undefined" && bytesView1.buffer instanceof SharedArrayBuffer) ? bytesView1.slice() : bytesView1;
+                        const string1 = textDecoder.decode(bytesToDecode1);
+                        optResult1 = string1;
                     } else {
                         optResult1 = undefined;
                     }
@@ -294,13 +296,14 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WithOptionalJSClass_stringOrNull_set"] = function bjs_WithOptionalJSClass_stringOrNull_set(self, newValueIsSome, newValueObjectId) {
+            TestModule["bjs_WithOptionalJSClass_stringOrNull_set"] = function bjs_WithOptionalJSClass_stringOrNull_set(self, newValueIsSome, newValueBytes, newValueCount) {
                 try {
                     let optResult;
                     if (newValueIsSome) {
-                        const newValueObjectIdObject = swift.memory.getObject(newValueObjectId);
-                        swift.memory.release(newValueObjectId);
-                        optResult = newValueObjectIdObject;
+                        const bytesView = new Uint8Array(memory.buffer, newValueBytes, newValueCount);
+                        const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                        const string = textDecoder.decode(bytesToDecode);
+                        optResult = string;
                     } else {
                         optResult = null;
                     }
@@ -309,13 +312,14 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WithOptionalJSClass_stringOrUndefined_set"] = function bjs_WithOptionalJSClass_stringOrUndefined_set(self, newValueIsSome, newValueObjectId) {
+            TestModule["bjs_WithOptionalJSClass_stringOrUndefined_set"] = function bjs_WithOptionalJSClass_stringOrUndefined_set(self, newValueIsSome, newValueBytes, newValueCount) {
                 try {
                     let optResult;
                     if (newValueIsSome) {
-                        const newValueObjectIdObject = swift.memory.getObject(newValueObjectId);
-                        swift.memory.release(newValueObjectId);
-                        optResult = newValueObjectIdObject;
+                        const bytesView = new Uint8Array(memory.buffer, newValueBytes, newValueCount);
+                        const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                        const string = textDecoder.decode(bytesToDecode);
+                        optResult = string;
                     } else {
                         optResult = undefined;
                     }
@@ -366,13 +370,14 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WithOptionalJSClass_roundTripStringOrNull"] = function bjs_WithOptionalJSClass_roundTripStringOrNull(self, valueIsSome, valueObjectId) {
+            TestModule["bjs_WithOptionalJSClass_roundTripStringOrNull"] = function bjs_WithOptionalJSClass_roundTripStringOrNull(self, valueIsSome, valueBytes, valueCount) {
                 try {
                     let optResult;
                     if (valueIsSome) {
-                        const valueObjectIdObject = swift.memory.getObject(valueObjectId);
-                        swift.memory.release(valueObjectId);
-                        optResult = valueObjectIdObject;
+                        const bytesView = new Uint8Array(memory.buffer, valueBytes, valueCount);
+                        const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                        const string = textDecoder.decode(bytesToDecode);
+                        optResult = string;
                     } else {
                         optResult = null;
                     }
@@ -383,13 +388,14 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WithOptionalJSClass_roundTripStringOrUndefined"] = function bjs_WithOptionalJSClass_roundTripStringOrUndefined(self, valueIsSome, valueObjectId) {
+            TestModule["bjs_WithOptionalJSClass_roundTripStringOrUndefined"] = function bjs_WithOptionalJSClass_roundTripStringOrUndefined(self, valueIsSome, valueBytes, valueCount) {
                 try {
                     let optResult;
                     if (valueIsSome) {
-                        const valueObjectIdObject = swift.memory.getObject(valueObjectId);
-                        swift.memory.release(valueObjectId);
-                        optResult = valueObjectIdObject;
+                        const bytesView = new Uint8Array(memory.buffer, valueBytes, valueCount);
+                        const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                        const string = textDecoder.decode(bytesToDecode);
+                        optResult = string;
                     } else {
                         optResult = undefined;
                     }

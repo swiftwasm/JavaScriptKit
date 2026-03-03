@@ -261,11 +261,12 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_takesFeatureFlag"] = function bjs_takesFeatureFlag(flag) {
+            TestModule["bjs_takesFeatureFlag"] = function bjs_takesFeatureFlag(flagBytes, flagCount) {
                 try {
-                    const flagObject = swift.memory.getObject(flag);
-                    swift.memory.release(flag);
-                    imports.takesFeatureFlag(flagObject);
+                    const bytesView = new Uint8Array(memory.buffer, flagBytes, flagCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    imports.takesFeatureFlag(string);
                 } catch (error) {
                     setException(error);
                 }

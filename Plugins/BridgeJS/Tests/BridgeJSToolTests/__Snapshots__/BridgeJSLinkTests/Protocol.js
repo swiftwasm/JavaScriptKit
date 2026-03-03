@@ -291,13 +291,14 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_optionalName_set"] = function bjs_MyViewControllerDelegate_optionalName_set(self, valueIsSome, valueObjectId) {
+            TestModule["bjs_MyViewControllerDelegate_optionalName_set"] = function bjs_MyViewControllerDelegate_optionalName_set(self, valueIsSome, valueBytes, valueCount) {
                 try {
                     let optResult;
                     if (valueIsSome) {
-                        const valueObjectIdObject = swift.memory.getObject(valueObjectId);
-                        swift.memory.release(valueObjectId);
-                        optResult = valueObjectIdObject;
+                        const bytesView = new Uint8Array(memory.buffer, valueBytes, valueCount);
+                        const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                        const string = textDecoder.decode(bytesToDecode);
+                        optResult = string;
                     } else {
                         optResult = null;
                     }
@@ -314,13 +315,14 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_optionalRawEnum_set"] = function bjs_MyViewControllerDelegate_optionalRawEnum_set(self, valueIsSome, valueObjectId) {
+            TestModule["bjs_MyViewControllerDelegate_optionalRawEnum_set"] = function bjs_MyViewControllerDelegate_optionalRawEnum_set(self, valueIsSome, valueBytes, valueCount) {
                 try {
                     let optResult;
                     if (valueIsSome) {
-                        const valueObjectIdObject = swift.memory.getObject(valueObjectId);
-                        swift.memory.release(valueObjectId);
-                        optResult = valueObjectIdObject;
+                        const bytesView = new Uint8Array(memory.buffer, valueBytes, valueCount);
+                        const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                        const string = textDecoder.decode(bytesToDecode);
+                        optResult = string;
                     } else {
                         optResult = null;
                     }
@@ -338,11 +340,12 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_rawStringEnum_set"] = function bjs_MyViewControllerDelegate_rawStringEnum_set(self, value) {
+            TestModule["bjs_MyViewControllerDelegate_rawStringEnum_set"] = function bjs_MyViewControllerDelegate_rawStringEnum_set(self, valueBytes, valueCount) {
                 try {
-                    const valueObject = swift.memory.getObject(value);
-                    swift.memory.release(value);
-                    swift.memory.getObject(self).rawStringEnum = valueObject;
+                    const bytesView = new Uint8Array(memory.buffer, valueBytes, valueCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).rawStringEnum = string;
                 } catch (error) {
                     setException(error);
                 }
@@ -462,11 +465,12 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_onValueChanged"] = function bjs_MyViewControllerDelegate_onValueChanged(self, value) {
+            TestModule["bjs_MyViewControllerDelegate_onValueChanged"] = function bjs_MyViewControllerDelegate_onValueChanged(self, valueBytes, valueCount) {
                 try {
-                    const valueObject = swift.memory.getObject(value);
-                    swift.memory.release(value);
-                    swift.memory.getObject(self).onValueChanged(valueObject);
+                    const bytesView = new Uint8Array(memory.buffer, valueBytes, valueCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).onValueChanged(string);
                 } catch (error) {
                     setException(error);
                 }
@@ -480,13 +484,15 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_MyViewControllerDelegate_onLabelUpdated"] = function bjs_MyViewControllerDelegate_onLabelUpdated(self, prefix, suffix) {
+            TestModule["bjs_MyViewControllerDelegate_onLabelUpdated"] = function bjs_MyViewControllerDelegate_onLabelUpdated(self, prefixBytes, prefixCount, suffixBytes, suffixCount) {
                 try {
-                    const prefixObject = swift.memory.getObject(prefix);
-                    swift.memory.release(prefix);
-                    const suffixObject = swift.memory.getObject(suffix);
-                    swift.memory.release(suffix);
-                    swift.memory.getObject(self).onLabelUpdated(prefixObject, suffixObject);
+                    const bytesView = new Uint8Array(memory.buffer, prefixBytes, prefixCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    const bytesView1 = new Uint8Array(memory.buffer, suffixBytes, suffixCount);
+                    const bytesToDecode1 = (typeof SharedArrayBuffer !== "undefined" && bytesView1.buffer instanceof SharedArrayBuffer) ? bytesView1.slice() : bytesView1;
+                    const string1 = textDecoder.decode(bytesToDecode1);
+                    swift.memory.getObject(self).onLabelUpdated(string, string1);
                 } catch (error) {
                     setException(error);
                 }

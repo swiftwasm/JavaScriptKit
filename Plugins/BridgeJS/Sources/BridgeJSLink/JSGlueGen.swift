@@ -261,17 +261,24 @@ struct IntrinsicJSFragment: Sendable {
         }
     )
     static let stringLiftParameter = IntrinsicJSFragment(
-        parameters: ["objectId"],
+        parameters: ["bytes", "count"],
         printCode: { arguments, context in
             let (scope, printer) = (context.scope, context.printer)
-            let objectId = arguments[0]
-            let objectLabel = scope.variable("\(objectId)Object")
-            // TODO: Implement "take" operation
+            let bytesExpr = arguments[0]
+            let countExpr = arguments[1]
+            let bytesLabel = scope.variable("bytesView")
+            let bytesToDecodeLabel = scope.variable("bytesToDecode")
+            let stringLabel = scope.variable("string")
             printer.write(
-                "const \(objectLabel) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(objectId));"
+                "const \(bytesLabel) = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, \(bytesExpr), \(countExpr));"
             )
-            printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(objectId));")
-            return [objectLabel]
+            printer.write(
+                "const \(bytesToDecodeLabel) = (typeof SharedArrayBuffer !== \"undefined\" && \(bytesLabel).buffer instanceof SharedArrayBuffer) ? \(bytesLabel).slice() : \(bytesLabel);"
+            )
+            printer.write(
+                "const \(stringLabel) = \(JSGlueVariableScope.reservedTextDecoder).decode(\(bytesToDecodeLabel));"
+            )
+            return [stringLabel]
         }
     )
     static let stringLowerReturn = IntrinsicJSFragment(

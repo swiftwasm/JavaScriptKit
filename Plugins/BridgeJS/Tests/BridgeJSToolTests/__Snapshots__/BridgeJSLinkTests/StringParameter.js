@@ -186,20 +186,22 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_checkString"] = function bjs_checkString(a) {
+            TestModule["bjs_checkString"] = function bjs_checkString(aBytes, aCount) {
                 try {
-                    const aObject = swift.memory.getObject(a);
-                    swift.memory.release(a);
-                    imports.checkString(aObject);
+                    const bytesView = new Uint8Array(memory.buffer, aBytes, aCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    imports.checkString(string);
                 } catch (error) {
                     setException(error);
                 }
             }
-            TestModule["bjs_checkStringWithLength"] = function bjs_checkStringWithLength(a, b) {
+            TestModule["bjs_checkStringWithLength"] = function bjs_checkStringWithLength(aBytes, aCount, b) {
                 try {
-                    const aObject = swift.memory.getObject(a);
-                    swift.memory.release(a);
-                    imports.checkStringWithLength(aObject, b);
+                    const bytesView = new Uint8Array(memory.buffer, aBytes, aCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    imports.checkStringWithLength(string, b);
                 } catch (error) {
                     setException(error);
                 }

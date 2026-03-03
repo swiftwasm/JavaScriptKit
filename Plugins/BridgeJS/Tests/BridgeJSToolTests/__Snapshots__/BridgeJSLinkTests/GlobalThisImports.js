@@ -194,31 +194,34 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_parseInt"] = function bjs_parseInt(string) {
+            TestModule["bjs_parseInt"] = function bjs_parseInt(stringBytes, stringCount) {
                 try {
-                    const stringObject = swift.memory.getObject(string);
-                    swift.memory.release(string);
-                    let ret = globalThis.parseInt(stringObject);
+                    const bytesView = new Uint8Array(memory.buffer, stringBytes, stringCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    let ret = globalThis.parseInt(string);
                     return ret;
                 } catch (error) {
                     setException(error);
                     return 0
                 }
             }
-            TestModule["bjs_JSConsole_log"] = function bjs_JSConsole_log(self, message) {
+            TestModule["bjs_JSConsole_log"] = function bjs_JSConsole_log(self, messageBytes, messageCount) {
                 try {
-                    const messageObject = swift.memory.getObject(message);
-                    swift.memory.release(message);
-                    swift.memory.getObject(self).log(messageObject);
+                    const bytesView = new Uint8Array(memory.buffer, messageBytes, messageCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).log(string);
                 } catch (error) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WebSocket_init"] = function bjs_WebSocket_init(url) {
+            TestModule["bjs_WebSocket_init"] = function bjs_WebSocket_init(urlBytes, urlCount) {
                 try {
-                    const urlObject = swift.memory.getObject(url);
-                    swift.memory.release(url);
-                    return swift.memory.retain(new globalThis.WebSocket(urlObject));
+                    const bytesView = new Uint8Array(memory.buffer, urlBytes, urlCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    return swift.memory.retain(new globalThis.WebSocket(string));
                 } catch (error) {
                     setException(error);
                     return 0

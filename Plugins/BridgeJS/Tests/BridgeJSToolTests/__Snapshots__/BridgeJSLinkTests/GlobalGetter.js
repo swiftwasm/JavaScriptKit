@@ -195,11 +195,12 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_JSConsole_log"] = function bjs_JSConsole_log(self, message) {
+            TestModule["bjs_JSConsole_log"] = function bjs_JSConsole_log(self, messageBytes, messageCount) {
                 try {
-                    const messageObject = swift.memory.getObject(message);
-                    swift.memory.release(message);
-                    swift.memory.getObject(self).log(messageObject);
+                    const bytesView = new Uint8Array(memory.buffer, messageBytes, messageCount);
+                    const bytesToDecode = (typeof SharedArrayBuffer !== "undefined" && bytesView.buffer instanceof SharedArrayBuffer) ? bytesView.slice() : bytesView;
+                    const string = textDecoder.decode(bytesToDecode);
+                    swift.memory.getObject(self).log(string);
                 } catch (error) {
                     setException(error);
                 }
