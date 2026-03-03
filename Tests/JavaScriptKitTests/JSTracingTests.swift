@@ -40,20 +40,23 @@ final class JSTracingTests: XCTestCase {
         }
         defer { remove() }
 
-        let obj = JSObject.global.globalObject1
+        let obj = JSObject()
+        obj.foo = .number(42)
+
+        // Reset after setup so we only capture the reads/writes below.
+        startInfo.removeAll()
+        ended = 0
 
         // Read a property (triggers propertyGet)
-        let _: JSValue = obj.prop_1
+        let _: JSValue = obj.foo
 
         // Write a property (triggers propertySet)
-        obj.prop_1 = .number(999)
+        obj.foo = .number(999)
 
-        // Filter to only propertyGet/propertySet events (subscript reads for the
-        // method-call test fixture also fire propertyGet, so be precise).
         let propEvents = startInfo.filter {
             switch $0 {
-            case .propertyGet(_, let name) where name == "prop_1": return true
-            case .propertySet(_, let name, _) where name == "prop_1": return true
+            case .propertyGet(_, let name) where name == "foo": return true
+            case .propertySet(_, let name, _) where name == "foo": return true
             default: return false
             }
         }
@@ -64,15 +67,15 @@ final class JSTracingTests: XCTestCase {
             XCTFail("Expected propertyGet info")
             return
         }
-        XCTAssertEqual(getReceiver.id, obj.object!.id)
-        XCTAssertEqual(getName, "prop_1")
+        XCTAssertEqual(getReceiver.id, obj.id)
+        XCTAssertEqual(getName, "foo")
 
         guard case .propertySet(let setReceiver, let setName, let setValue) = propEvents[1] else {
             XCTFail("Expected propertySet info")
             return
         }
-        XCTAssertEqual(setReceiver.id, obj.object!.id)
-        XCTAssertEqual(setName, "prop_1")
+        XCTAssertEqual(setReceiver.id, obj.id)
+        XCTAssertEqual(setName, "foo")
         XCTAssertEqual(setValue, .number(999))
 
         XCTAssertEqual(ended, startInfo.count)
