@@ -43,7 +43,7 @@ final class JSTracingTests: XCTestCase {
         let obj = JSObject.global.globalObject1
 
         // Read a property (triggers propertyGet)
-        let _ = obj.prop_1
+        let _: JSValue = obj.prop_1
 
         // Write a property (triggers propertySet)
         obj.prop_1 = .number(999)
