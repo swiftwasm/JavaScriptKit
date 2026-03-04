@@ -420,7 +420,12 @@ extension JSObject: _BridgedSwiftStackType {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
-        return _swift_js_retain(Int32(bitPattern: self.id))
+        // withExtendedLifetime is required here to prevent a use-after-free.
+        // In a `consuming func`, Swift ARC may release `self` (and thus release
+        // the underlying JS reference) as soon as it extracts `self.id`, which
+        // happens *before* `_swift_js_retain` is called. `withExtendedLifetime` forces
+        // `self` to stay alive until after `_swift_js_retain` returns.
+        return withExtendedLifetime(self) { _swift_js_retain(Int32(bitPattern: self.id)) }
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
