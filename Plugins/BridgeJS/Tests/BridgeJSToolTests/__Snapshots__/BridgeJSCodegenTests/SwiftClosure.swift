@@ -91,9 +91,11 @@ private enum _BJS_Closure_10TestModule5ThemeO_5ThemeO {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            let ret = _swift_js_with_borrowed_utf8(param0.rawValue) { param0Bytes, param0Length in
-                invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO(callbackValue, param0Bytes, param0Length)
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let ret = invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO(callbackValue, param0Bytes, param0Length)
+                return ret
             }
+            let ret = ret0
             return Theme.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
@@ -344,9 +346,11 @@ private enum _BJS_Closure_10TestModuleSS_SS {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            let ret = _swift_js_with_borrowed_utf8(param0) { param0Bytes, param0Length in
-                invoke_js_callback_TestModule_10TestModuleSS_SS(callbackValue, param0Bytes, param0Length)
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let ret = invoke_js_callback_TestModule_10TestModuleSS_SS(callbackValue, param0Bytes, param0Length)
+                return ret
             }
+            let ret = ret0
             return String.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
@@ -723,7 +727,7 @@ private enum _BJS_Closure_10TestModuleSq5ThemeO_Sq5ThemeO {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            _swift_js_with_optional_borrowed_utf8(param0.asOptional?.rawValue) { param0IsSome, param0Bytes, param0Length in
+            param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Bytes, param0Length) in
                 invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(callbackValue, param0IsSome, param0Bytes, param0Length)
             }
             return Optional<Theme>.bridgeJSLiftReturnFromSideChannel()
@@ -976,7 +980,7 @@ private enum _BJS_Closure_10TestModuleSqSS_SqSS {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            _swift_js_with_optional_borrowed_utf8(param0.asOptional) { param0IsSome, param0Bytes, param0Length in
+            param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Bytes, param0Length) in
                 invoke_js_callback_TestModule_10TestModuleSqSS_SqSS(callbackValue, param0IsSome, param0Bytes, param0Length)
             }
             return Optional<String>.bridgeJSLiftReturnFromSideChannel()

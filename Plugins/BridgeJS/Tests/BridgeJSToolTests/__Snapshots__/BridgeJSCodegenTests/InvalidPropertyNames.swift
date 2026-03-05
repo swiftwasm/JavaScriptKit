@@ -328,7 +328,7 @@ func _$WeirdNaming_Any_get(_ self: JSObject) throws(JSException) -> String {
 
 func _$WeirdNaming_normalProperty_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(newValue) { newValueBytes, newValueLength in
+    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
         bjs_WeirdNaming_normalProperty_set(selfValue, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -356,7 +356,7 @@ func _$WeirdNaming__123invalidStart_set(_ self: JSObject, _ newValue: Bool) thro
 
 func _$WeirdNaming_property_with_spaces_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(newValue) { newValueBytes, newValueLength in
+    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
         bjs_WeirdNaming_property_with_spaces_set(selfValue, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -375,7 +375,7 @@ func _$WeirdNaming__specialChar_set(_ self: JSObject, _ newValue: Double) throws
 
 func _$WeirdNaming_constructor_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(newValue) { newValueBytes, newValueLength in
+    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
         bjs_WeirdNaming_constructor_set(selfValue, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -385,7 +385,7 @@ func _$WeirdNaming_constructor_set(_ self: JSObject, _ newValue: String) throws(
 
 func _$WeirdNaming_for_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(newValue) { newValueBytes, newValueLength in
+    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
         bjs_WeirdNaming_for_set(selfValue, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -395,7 +395,7 @@ func _$WeirdNaming_for_set(_ self: JSObject, _ newValue: String) throws(JSExcept
 
 func _$WeirdNaming_any_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(newValue) { newValueBytes, newValueLength in
+    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
         bjs_WeirdNaming_any_set(selfValue, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {

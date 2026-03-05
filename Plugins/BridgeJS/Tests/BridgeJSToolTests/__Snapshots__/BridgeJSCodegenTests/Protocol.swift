@@ -8,7 +8,9 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
 
     func onValueChanged(_ value: String) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _swift_js_with_borrowed_utf8(value) { valueBytes, valueLength in _extern_onValueChanged(jsObjectValue, valueBytes, valueLength) }
+        value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+            _extern_onValueChanged(jsObjectValue, valueBytes, valueLength)
+        }
     }
 
     func onCountUpdated(count: Int) -> Bool {
@@ -20,7 +22,11 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
 
     func onLabelUpdated(_ prefix: String, _ suffix: String) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _swift_js_with_borrowed_utf8(prefix) { prefixBytes, prefixLength in _swift_js_with_borrowed_utf8(suffix) { suffixBytes, suffixLength in _extern_onLabelUpdated(jsObjectValue, prefixBytes, prefixLength, suffixBytes, suffixLength) } }
+        prefix.bridgeJSWithLoweredParameter { (prefixBytes, prefixLength) in
+            suffix.bridgeJSWithLoweredParameter { (suffixBytes, suffixLength) in
+                _extern_onLabelUpdated(jsObjectValue, prefixBytes, prefixLength, suffixBytes, suffixLength)
+            }
+        }
     }
 
     func isCountEven() -> Bool {
@@ -100,7 +106,9 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         }
         set {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            _swift_js_with_optional_borrowed_utf8(newValue.asOptional) { newValueIsSome, newValueBytes, newValueLength in bjs_MyViewControllerDelegate_optionalName_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength) }
+            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+                bjs_MyViewControllerDelegate_optionalName_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
+            }
         }
     }
 
@@ -112,7 +120,9 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         }
         set {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            _swift_js_with_optional_borrowed_utf8(newValue.asOptional?.rawValue) { newValueIsSome, newValueBytes, newValueLength in bjs_MyViewControllerDelegate_optionalRawEnum_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength) }
+            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+                bjs_MyViewControllerDelegate_optionalRawEnum_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
+            }
         }
     }
 
@@ -124,7 +134,9 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         }
         set {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            _swift_js_with_borrowed_utf8(newValue.rawValue) { newValueBytes, newValueLength in bjs_MyViewControllerDelegate_rawStringEnum_set(jsObjectValue, newValueBytes, newValueLength) }
+            newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+                bjs_MyViewControllerDelegate_rawStringEnum_set(jsObjectValue, newValueBytes, newValueLength)
+            }
         }
     }
 

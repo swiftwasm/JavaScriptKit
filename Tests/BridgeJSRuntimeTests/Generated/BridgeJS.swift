@@ -100,9 +100,11 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests5ThemeO_SS {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            let ret = _swift_js_with_borrowed_utf8(param0.rawValue) { param0Bytes, param0Length in
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS(callbackValue, param0Bytes, param0Length)
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS(callbackValue, param0Bytes, param0Length)
+                return ret
             }
+            let ret = ret0
             return String.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
@@ -164,9 +166,11 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests5ThemeO_Sb {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            let ret = _swift_js_with_borrowed_utf8(param0.rawValue) { param0Bytes, param0Length in
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb(callbackValue, param0Bytes, param0Length)
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb(callbackValue, param0Bytes, param0Length)
+                return ret
             }
+            let ret = ret0
             return Bool.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
@@ -543,9 +547,11 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_7GreeterC {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            let ret = _swift_js_with_borrowed_utf8(param0) { param0Bytes, param0Length in
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC(callbackValue, param0Bytes, param0Length)
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC(callbackValue, param0Bytes, param0Length)
+                return ret
             }
+            let ret = ret0
             return Greeter.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
@@ -607,9 +613,11 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_SS {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            let ret = _swift_js_with_borrowed_utf8(param0) { param0Bytes, param0Length in
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS(callbackValue, param0Bytes, param0Length)
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS(callbackValue, param0Bytes, param0Length)
+                return ret
             }
+            let ret = ret0
             return String.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
@@ -735,10 +743,12 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSiSSSd_SS {
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
-            let param2Value = param2.bridgeJSLowerParameter()
-            let ret = _swift_js_with_borrowed_utf8(param1) { param1Bytes, param1Length in
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS(callbackValue, param0Value, param1Bytes, param1Length, param2Value)
+            let ret0 = param1.bridgeJSWithLoweredParameter { (param1Bytes, param1Length) in
+                let param2Value = param2.bridgeJSLowerParameter()
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS(callbackValue, param0Value, param1Bytes, param1Length, param2Value)
+                return ret
             }
+            let ret = ret0
             return String.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
@@ -1053,9 +1063,11 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSq5ThemeO_SS {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            let ret = _swift_js_with_optional_borrowed_utf8(param0.asOptional?.rawValue) { param0IsSome, param0Bytes, param0Length in
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(callbackValue, param0IsSome, param0Bytes, param0Length)
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Bytes, param0Length) in
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(callbackValue, param0IsSome, param0Bytes, param0Length)
+                return ret
             }
+            let ret = ret0
             return String.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
@@ -1369,9 +1381,11 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSqSS_SS {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            let ret = _swift_js_with_optional_borrowed_utf8(param0.asOptional) { param0IsSome, param0Bytes, param0Length in
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS(callbackValue, param0IsSome, param0Bytes, param0Length)
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Bytes, param0Length) in
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS(callbackValue, param0IsSome, param0Bytes, param0Length)
+                return ret
             }
+            let ret = ret0
             return String.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
@@ -1712,7 +1726,11 @@ struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
 
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _swift_js_with_borrowed_utf8(labelPrefix) { labelPrefixBytes, labelPrefixLength in _swift_js_with_borrowed_utf8(labelSuffix) { labelSuffixBytes, labelSuffixLength in _extern_setLabelElements(jsObjectValue, labelPrefixBytes, labelPrefixLength, labelSuffixBytes, labelSuffixLength) } }
+        labelPrefix.bridgeJSWithLoweredParameter { (labelPrefixBytes, labelPrefixLength) in
+            labelSuffix.bridgeJSWithLoweredParameter { (labelSuffixBytes, labelSuffixLength) in
+                _extern_setLabelElements(jsObjectValue, labelPrefixBytes, labelPrefixLength, labelSuffixBytes, labelSuffixLength)
+            }
+        }
     }
 
     func getLabel() -> String {
@@ -1794,7 +1812,9 @@ struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
         }
         set {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            _swift_js_with_optional_borrowed_utf8(newValue.asOptional) { newValueIsSome, newValueBytes, newValueLength in bjs_DataProcessor_optionalTag_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength) }
+            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+                bjs_DataProcessor_optionalTag_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
+            }
         }
     }
 
@@ -1832,7 +1852,9 @@ struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
         }
         set {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            _swift_js_with_optional_borrowed_utf8(newValue.asOptional?.rawValue) { newValueIsSome, newValueBytes, newValueLength in bjs_DataProcessor_optionalTheme_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength) }
+            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+                bjs_DataProcessor_optionalTheme_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
+            }
         }
     }
 
@@ -9249,9 +9271,11 @@ fileprivate func bjs_ArrayElementObject_id_get_extern(_ self: Int32) -> Int32 {
 }
 
 func _$ArrayElementObject_init(_ id: String) throws(JSException) -> JSObject {
-    let ret = _swift_js_with_borrowed_utf8(id) { idBytes, idLength in
-        bjs_ArrayElementObject_init(idBytes, idLength)
+    let ret0 = id.bridgeJSWithLoweredParameter { (idBytes, idLength) in
+        let ret = bjs_ArrayElementObject_init(idBytes, idLength)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -9875,10 +9899,12 @@ func _$ClosureSupportImports_jsApplyDouble(_ value: Double, _ transform: JSTyped
 }
 
 func _$ClosureSupportImports_jsApplyString(_ value: String, _ transform: JSTypedClosure<(String) -> String>) throws(JSException) -> String {
-    let transformFuncRef = transform.bridgeJSLowerParameter()
-    let ret = _swift_js_with_borrowed_utf8(value) { valueBytes, valueLength in
-        bjs_ClosureSupportImports_jsApplyString_static(valueBytes, valueLength, transformFuncRef)
+    let ret0 = value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        let transformFuncRef = transform.bridgeJSLowerParameter()
+        let ret = bjs_ClosureSupportImports_jsApplyString_static(valueBytes, valueLength, transformFuncRef)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -9914,9 +9940,11 @@ func _$ClosureSupportImports_jsMakeDoubleToDouble(_ base: Double) throws(JSExcep
 }
 
 func _$ClosureSupportImports_jsMakeStringToString(_ prefix: String) throws(JSException) -> (String) -> String {
-    let ret = _swift_js_with_borrowed_utf8(prefix) { prefixBytes, prefixLength in
-        bjs_ClosureSupportImports_jsMakeStringToString_static(prefixBytes, prefixLength)
+    let ret0 = prefix.bridgeJSWithLoweredParameter { (prefixBytes, prefixLength) in
+        let ret = bjs_ClosureSupportImports_jsMakeStringToString_static(prefixBytes, prefixLength)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -10169,9 +10197,11 @@ fileprivate func bjs_Foo_value_get_extern(_ self: Int32) -> Int32 {
 }
 
 func _$Foo_init(_ value: String) throws(JSException) -> JSObject {
-    let ret = _swift_js_with_borrowed_utf8(value) { valueBytes, valueLength in
-        bjs_Foo_init(valueBytes, valueLength)
+    let ret0 = value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        let ret = bjs_Foo_init(valueBytes, valueLength)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -10281,9 +10311,11 @@ fileprivate func bjs_jsRoundTripString_extern(_ vBytes: Int32, _ vLength: Int32)
 }
 
 func _$jsRoundTripString(_ v: String) throws(JSException) -> String {
-    let ret = _swift_js_with_borrowed_utf8(v) { vBytes, vLength in
-        bjs_jsRoundTripString(vBytes, vLength)
+    let ret0 = v.bridgeJSWithLoweredParameter { (vBytes, vLength) in
+        let ret = bjs_jsRoundTripString(vBytes, vLength)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -10407,9 +10439,11 @@ fileprivate func bjs_jsRoundTripFeatureFlag_extern(_ flagBytes: Int32, _ flagLen
 }
 
 func _$jsRoundTripFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> FeatureFlag {
-    let ret = _swift_js_with_borrowed_utf8(flag.rawValue) { flagBytes, flagLength in
-        bjs_jsRoundTripFeatureFlag(flagBytes, flagLength)
+    let ret0 = flag.bridgeJSWithLoweredParameter { (flagBytes, flagLength) in
+        let ret = bjs_jsRoundTripFeatureFlag(flagBytes, flagLength)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -10469,9 +10503,11 @@ fileprivate func bjs_parseInt_extern(_ stringBytes: Int32, _ stringLength: Int32
 }
 
 func _$parseInt(_ string: String) throws(JSException) -> Double {
-    let ret = _swift_js_with_borrowed_utf8(string) { stringBytes, stringLength in
-        bjs_parseInt(stringBytes, stringLength)
+    let ret0 = string.bridgeJSWithLoweredParameter { (stringBytes, stringLength) in
+        let ret = bjs_parseInt(stringBytes, stringLength)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -10551,11 +10587,14 @@ fileprivate func bjs_JsGreeter_changeName_extern(_ self: Int32, _ nameBytes: Int
 }
 
 func _$JsGreeter_init(_ name: String, _ prefix: String) throws(JSException) -> JSObject {
-    let ret = _swift_js_with_borrowed_utf8(name) { nameBytes, nameLength in
-        _swift_js_with_borrowed_utf8(prefix) { prefixBytes, prefixLength in
-            bjs_JsGreeter_init(nameBytes, nameLength, prefixBytes, prefixLength)
+    let ret0 = name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
+        let ret1 = prefix.bridgeJSWithLoweredParameter { (prefixBytes, prefixLength) in
+            let ret = bjs_JsGreeter_init(nameBytes, nameLength, prefixBytes, prefixLength)
+            return ret
         }
+        return ret1
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -10582,7 +10621,7 @@ func _$JsGreeter_prefix_get(_ self: JSObject) throws(JSException) -> String {
 
 func _$JsGreeter_name_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(newValue) { newValueBytes, newValueLength in
+    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
         bjs_JsGreeter_name_set(selfValue, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -10601,7 +10640,7 @@ func _$JsGreeter_greet(_ self: JSObject) throws(JSException) -> String {
 
 func _$JsGreeter_changeName(_ self: JSObject, _ name: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(name) { nameBytes, nameLength in
+    name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
         bjs_JsGreeter_changeName(selfValue, nameBytes, nameLength)
     }
     if let error = _swift_js_take_exception() {
@@ -10882,11 +10921,13 @@ fileprivate func bjs_Animal_getIsCat_extern(_ self: Int32) -> Int32 {
 }
 
 func _$Animal_init(_ name: String, _ age: Double, _ isCat: Bool) throws(JSException) -> JSObject {
-    let ageValue = age.bridgeJSLowerParameter()
-    let isCatValue = isCat.bridgeJSLowerParameter()
-    let ret = _swift_js_with_borrowed_utf8(name) { nameBytes, nameLength in
-        bjs_Animal_init(nameBytes, nameLength, ageValue, isCatValue)
+    let ret0 = name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
+        let ageValue = age.bridgeJSLowerParameter()
+        let isCatValue = isCat.bridgeJSLowerParameter()
+        let ret = bjs_Animal_init(nameBytes, nameLength, ageValue, isCatValue)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -10922,7 +10963,7 @@ func _$Animal_isCat_get(_ self: JSObject) throws(JSException) -> Bool {
 
 func _$Animal_name_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(newValue) { newValueBytes, newValueLength in
+    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
         bjs_Animal_name_set(selfValue, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -11465,7 +11506,7 @@ func _$OptionalSupportImports_jsRoundTripOptionalNumberUndefined(_ value: JSUnde
 }
 
 func _$OptionalSupportImports_jsRoundTripOptionalStringNull(_ name: Optional<String>) throws(JSException) -> Optional<String> {
-    _swift_js_with_optional_borrowed_utf8(name.asOptional) { nameIsSome, nameBytes, nameLength in
+    name.bridgeJSWithLoweredParameter { (nameIsSome, nameBytes, nameLength) in
         bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static(nameIsSome, nameBytes, nameLength)
     }
     if let error = _swift_js_take_exception() {
@@ -11475,7 +11516,7 @@ func _$OptionalSupportImports_jsRoundTripOptionalStringNull(_ name: Optional<Str
 }
 
 func _$OptionalSupportImports_jsRoundTripOptionalStringUndefined(_ name: JSUndefinedOr<String>) throws(JSException) -> JSUndefinedOr<String> {
-    _swift_js_with_optional_borrowed_utf8(name.asOptional) { nameIsSome, nameBytes, nameLength in
+    name.bridgeJSWithLoweredParameter { (nameIsSome, nameBytes, nameLength) in
         bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static(nameIsSome, nameBytes, nameLength)
     }
     if let error = _swift_js_take_exception() {

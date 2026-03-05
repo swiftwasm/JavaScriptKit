@@ -1761,8 +1761,8 @@ fileprivate func bjs_benchmarkRunner_extern(_ nameBytes: Int32, _ nameLength: In
 }
 
 func _$benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Void {
-    let bodyValue = body.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(name) { nameBytes, nameLength in
+    name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
+        let bodyValue = body.bridgeJSLowerParameter()
         bjs_benchmarkRunner(nameBytes, nameLength, bodyValue)
     }
     if let error = _swift_js_take_exception() {

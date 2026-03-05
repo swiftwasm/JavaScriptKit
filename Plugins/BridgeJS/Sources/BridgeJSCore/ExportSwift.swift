@@ -1177,17 +1177,18 @@ struct ProtocolCodegen {
         var externDecls: [DeclSyntax] = []
 
         for method in proto.methods {
-            let builder = ImportTS.CallJSEmission(
+            let builder = try ImportTS.CallJSEmission(
                 moduleName: moduleName,
                 abiName: "_extern_\(method.name)",
+                returnType: method.returnType,
                 context: .exportSwift
             )
             try builder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
-            try builder.call(returnType: method.returnType)
-            try builder.liftReturnValue(returnType: method.returnType)
+            try builder.call()
+            try builder.liftReturnValue()
 
             // Build function signature using SwiftSignatureBuilder
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
@@ -1275,14 +1276,15 @@ struct ProtocolCodegen {
             className: protocolName
         )
 
-        let getterBuilder = ImportTS.CallJSEmission(
+        let getterBuilder = try ImportTS.CallJSEmission(
             moduleName: moduleName,
             abiName: getterAbiName,
+            returnType: property.type,
             context: .exportSwift
         )
         try getterBuilder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
-        try getterBuilder.call(returnType: property.type)
-        try getterBuilder.liftReturnValue(returnType: property.type)
+        try getterBuilder.call()
+        try getterBuilder.liftReturnValue()
 
         // Build getter extern declaration using helper function
         let getterExternDeclPrinter = CodeFragmentPrinter()
@@ -1307,14 +1309,15 @@ struct ProtocolCodegen {
 
             if property.isReadonly { return }
 
-            let setterBuilder = ImportTS.CallJSEmission(
+            let setterBuilder = try ImportTS.CallJSEmission(
                 moduleName: moduleName,
                 abiName: setterAbiName,
+                returnType: .void,
                 context: .exportSwift
             )
             try setterBuilder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
             try setterBuilder.lowerParameter(param: Parameter(label: nil, name: "newValue", type: property.type))
-            try setterBuilder.call(returnType: .void)
+            try setterBuilder.call()
 
             // Build setter extern declaration using helper function
             let setterExternDeclPrinter = CodeFragmentPrinter()

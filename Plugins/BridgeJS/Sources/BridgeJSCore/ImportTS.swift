@@ -66,9 +66,13 @@ public struct ImportTS {
         _ getter: ImportedGetterSkeleton,
         topLevelDecls: inout [DeclSyntax]
     ) throws -> [DeclSyntax] {
-        let builder = CallJSEmission(moduleName: moduleName, abiName: getter.abiName(context: nil))
-        try builder.call(returnType: getter.type)
-        try builder.liftReturnValue(returnType: getter.type)
+        let builder = try CallJSEmission(
+            moduleName: moduleName,
+            abiName: getter.abiName(context: nil),
+            returnType: getter.type
+        )
+        try builder.call()
+        try builder.liftReturnValue()
         topLevelDecls.append(builder.renderImportDecl())
         return [
             builder.renderThunkDecl(
@@ -81,14 +85,16 @@ public struct ImportTS {
     }
 
     class CallJSEmission {
-        private struct BorrowedStringArgument {
-            let expression: String
-            let forwardedParameterNames: [String]
-            let isOptional: Bool
+        private struct BorrowedArgument {
+            /// The variable name of the `bridgeJSWithLoweredParameter` return value
+            let returnVariableName: String?
+            /// The closure to close the borrowing call
+            let closeBorrowedClosure: (CodeFragmentPrinter) -> Void
         }
 
         let abiName: String
         let moduleName: String
+        let returnType: BridgeType
         let context: BridgeContext
 
         var body = CodeFragmentPrinter()
@@ -101,33 +107,18 @@ public struct ImportTS {
         var stackLoweringStmts: [String] = []
         // Values to extend lifetime during call
         var valuesToExtendLifetimeDuringCall: [String] = []
-        // String-like parameters lowered through borrowed UTF-8 wrappers at call site.
-        private var borrowedStringArguments: [BorrowedStringArgument] = []
+        // Closures to close borrowed parameters
+        private var borrowedArguments: [BorrowedArgument] = []
+        private let needsReturnVariable: Bool
 
-        init(moduleName: String, abiName: String, context: BridgeContext = .importTS) {
+        init(moduleName: String, abiName: String, returnType: BridgeType, context: BridgeContext = .importTS) throws {
             self.moduleName = moduleName
             self.abiName = abiName
+            self.returnType = returnType
             self.context = context
-        }
-
-        private func borrowedStringInfo(for param: Parameter) -> (expression: String, isOptional: Bool)? {
-            switch param.type {
-            case .string:
-                return (param.name, false)
-            case .rawValueEnum(_, .string):
-                return ("\(param.name).rawValue", false)
-            case .nullable(let wrappedType, _):
-                switch wrappedType {
-                case .string:
-                    return ("\(param.name).asOptional", true)
-                case .rawValueEnum(_, .string):
-                    return ("\(param.name).asOptional?.rawValue", true)
-                default:
-                    return nil
-                }
-            default:
-                return nil
-            }
+            let liftingInfo = try returnType.liftingReturnInfo(context: context)
+            needsReturnVariable =
+                !(returnType == .void || returnType.usesSideChannelForOptionalReturn() || liftingInfo.valueToLift == nil)
         }
 
         func lowerParameter(param: Parameter) throws {
@@ -144,41 +135,6 @@ public struct ImportTS {
                 break
             }
 
-            if let borrowed = borrowedStringInfo(for: param) {
-                let destructuredNames = loweringInfo.loweredParameters.map {
-                    "\(param.name)\($0.name.capitalizedFirstLetter)"
-                }
-                if loweringInfo.loweredParameters.count != destructuredNames.count || destructuredNames.isEmpty {
-                    throw BridgeJSCoreError("Unexpected borrowed string lowering shape for parameter \(param.name)")
-                }
-
-                for (index, (paramName, type)) in loweringInfo.loweredParameters.enumerated() {
-                    let abiParamName: String
-                    if loweringInfo.loweredParameters.count == 1 {
-                        abiParamName = param.name
-                    } else {
-                        abiParamName = "\(param.name)\(paramName.capitalizedFirstLetter)"
-                    }
-                    abiParameterSignatures.append((abiParamName, type))
-                    abiParameterForwardings.append(destructuredNames[index])
-                }
-                borrowedStringArguments.append(
-                    BorrowedStringArgument(
-                        expression: borrowed.expression,
-                        forwardedParameterNames: destructuredNames,
-                        isOptional: borrowed.isOptional
-                    )
-                )
-                return
-            }
-
-            let initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
-
-            if loweringInfo.loweredParameters.isEmpty {
-                stackLoweringStmts.insert("let _ = \(initializerExpr)", at: 0)
-                return
-            }
-
             // Generate destructured variable names for all lowered parameters
             let destructuredNames = loweringInfo.loweredParameters.map {
                 "\(param.name)\($0.name.capitalizedFirstLetter)"
@@ -192,7 +148,30 @@ public struct ImportTS {
                 pattern = "(" + destructuredNames.joined(separator: ", ") + ")"
             }
 
-            body.write("let \(pattern) = \(initializerExpr)")
+            if loweringInfo.useBorrowing {
+                let returnVariableName = "ret\(borrowedArguments.count)"
+                let assign = needsReturnVariable ? "let \(returnVariableName) = " : ""
+                body.write("\(assign)\(param.name).bridgeJSWithLoweredParameter { \(pattern) in")
+                body.indent()
+                borrowedArguments.append(
+                    BorrowedArgument(
+                        returnVariableName: needsReturnVariable ? returnVariableName : nil,
+                        closeBorrowedClosure: { printer in
+                            printer.unindent()
+                            printer.write("}")
+                        }
+                    )
+                )
+            } else {
+                let initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
+
+                if loweringInfo.loweredParameters.isEmpty {
+                    stackLoweringStmts.insert("let _ = \(initializerExpr)", at: 0)
+                    return
+                }
+
+                body.write("let \(pattern) = \(initializerExpr)")
+            }
             destructuredVarNames.append(contentsOf: destructuredNames)
 
             // Add to signatures and forwardings (unified for both single and multiple)
@@ -212,15 +191,12 @@ public struct ImportTS {
             }
         }
 
-        func call(returnType: BridgeType) throws {
-            let liftingInfo: BridgeType.LiftingReturnInfo = try returnType.liftingReturnInfo(context: context)
+        func call() throws {
             for stmt in stackLoweringStmts {
                 body.write(stmt.description)
             }
 
-            let assign =
-                (returnType == .void || returnType.usesSideChannelForOptionalReturn() || liftingInfo.valueToLift == nil)
-                ? "" : "let ret = "
+            let assign = needsReturnVariable ? "let ret = " : ""
             var callExpr = "\(abiName)(\(abiParameterForwardings.joined(separator: ", ")))"
 
             if !valuesToExtendLifetimeDuringCall.isEmpty {
@@ -228,28 +204,23 @@ public struct ImportTS {
                     "withExtendedLifetime((\(valuesToExtendLifetimeDuringCall.joined(separator: ", ")))) { \(callExpr) }"
             }
 
-            if !borrowedStringArguments.isEmpty {
-                for argument in borrowedStringArguments.reversed() {
-                    if argument.isOptional {
-                        guard argument.forwardedParameterNames.count == 3 else {
-                            throw BridgeJSCoreError(
-                                "Optional borrowed string argument must have 3 lowered values: \(argument.expression)"
-                            )
-                        }
-                        callExpr =
-                            "_swift_js_with_optional_borrowed_utf8(\(argument.expression)) { \(argument.forwardedParameterNames[0]), \(argument.forwardedParameterNames[1]), \(argument.forwardedParameterNames[2]) in \(callExpr) }"
-                    } else {
-                        guard argument.forwardedParameterNames.count == 2 else {
-                            throw BridgeJSCoreError(
-                                "Borrowed string argument must have 2 lowered values: \(argument.expression)"
-                            )
-                        }
-                        callExpr =
-                            "_swift_js_with_borrowed_utf8(\(argument.expression)) { \(argument.forwardedParameterNames[0]), \(argument.forwardedParameterNames[1]) in \(callExpr) }"
+            body.write("\(assign)\(callExpr)")
+
+            if let firstBorrowedArgument = borrowedArguments.first {
+                if needsReturnVariable {
+                    body.write("return ret")
+                }
+                for borrowedArgument in borrowedArguments.dropFirst().reversed() {
+                    borrowedArgument.closeBorrowedClosure(body)
+                    if let returnVariableName = borrowedArgument.returnVariableName {
+                        body.write("return \(returnVariableName)")
                     }
                 }
+                firstBorrowedArgument.closeBorrowedClosure(body)
+                if let returnVariableName = firstBorrowedArgument.returnVariableName {
+                    body.write("let ret = \(returnVariableName)")
+                }
             }
-            body.write("\(assign)\(callExpr)")
 
             // Add exception check for ImportTS context
             if context == .importTS {
@@ -257,7 +228,7 @@ public struct ImportTS {
             }
         }
 
-        func liftReturnValue(returnType: BridgeType) throws {
+        func liftReturnValue() throws {
             let liftingInfo = try returnType.liftingReturnInfo(context: context)
 
             if returnType == .void {
@@ -367,12 +338,16 @@ public struct ImportTS {
         _ function: ImportedFunctionSkeleton,
         topLevelDecls: inout [DeclSyntax]
     ) throws -> [DeclSyntax] {
-        let builder = CallJSEmission(moduleName: moduleName, abiName: function.abiName(context: nil))
+        let builder = try CallJSEmission(
+            moduleName: moduleName,
+            abiName: function.abiName(context: nil),
+            returnType: function.returnType
+        )
         for param in function.parameters {
             try builder.lowerParameter(param: param)
         }
-        try builder.call(returnType: function.returnType)
-        try builder.liftReturnValue(returnType: function.returnType)
+        try builder.call()
+        try builder.liftReturnValue()
         topLevelDecls.append(builder.renderImportDecl())
         return [
             builder.renderThunkDecl(
@@ -389,13 +364,17 @@ public struct ImportTS {
         var decls: [DeclSyntax] = []
 
         func renderMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
-            let builder = CallJSEmission(moduleName: moduleName, abiName: method.abiName(context: type))
+            let builder = try CallJSEmission(
+                moduleName: moduleName,
+                abiName: method.abiName(context: type),
+                returnType: method.returnType
+            )
             try builder.lowerParameter(param: selfParameter)
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
-            try builder.call(returnType: method.returnType)
-            try builder.liftReturnValue(returnType: method.returnType)
+            try builder.call()
+            try builder.liftReturnValue()
             topLevelDecls.append(builder.renderImportDecl())
             return [
                 builder.renderThunkDecl(
@@ -408,12 +387,12 @@ public struct ImportTS {
 
         func renderStaticMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
             let abiName = method.abiName(context: type, operation: "static")
-            let builder = CallJSEmission(moduleName: moduleName, abiName: abiName)
+            let builder = try CallJSEmission(moduleName: moduleName, abiName: abiName, returnType: method.returnType)
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
-            try builder.call(returnType: method.returnType)
-            try builder.liftReturnValue(returnType: method.returnType)
+            try builder.call()
+            try builder.liftReturnValue()
             topLevelDecls.append(builder.renderImportDecl())
             return [
                 builder.renderThunkDecl(
@@ -425,12 +404,16 @@ public struct ImportTS {
         }
 
         func renderConstructorDecl(constructor: ImportedConstructorSkeleton) throws -> [DeclSyntax] {
-            let builder = CallJSEmission(moduleName: moduleName, abiName: constructor.abiName(context: type))
+            let builder = try CallJSEmission(
+                moduleName: moduleName,
+                abiName: constructor.abiName(context: type),
+                returnType: .jsObject(nil)
+            )
             for param in constructor.parameters {
                 try builder.lowerParameter(param: param)
             }
-            try builder.call(returnType: .jsObject(nil))
-            try builder.liftReturnValue(returnType: .jsObject(nil))
+            try builder.call()
+            try builder.liftReturnValue()
             topLevelDecls.append(builder.renderImportDecl())
             return [
                 builder.renderThunkDecl(
@@ -442,13 +425,14 @@ public struct ImportTS {
         }
 
         func renderGetterDecl(getter: ImportedGetterSkeleton) throws -> DeclSyntax {
-            let builder = CallJSEmission(
+            let builder = try CallJSEmission(
                 moduleName: moduleName,
-                abiName: getter.abiName(context: type)
+                abiName: getter.abiName(context: type),
+                returnType: getter.type
             )
             try builder.lowerParameter(param: selfParameter)
-            try builder.call(returnType: getter.type)
-            try builder.liftReturnValue(returnType: getter.type)
+            try builder.call()
+            try builder.liftReturnValue()
             topLevelDecls.append(builder.renderImportDecl())
             return DeclSyntax(
                 builder.renderThunkDecl(
@@ -460,14 +444,15 @@ public struct ImportTS {
         }
 
         func renderSetterDecl(setter: ImportedSetterSkeleton) throws -> DeclSyntax {
-            let builder = CallJSEmission(
+            let builder = try CallJSEmission(
                 moduleName: moduleName,
-                abiName: setter.abiName(context: type)
+                abiName: setter.abiName(context: type),
+                returnType: .void
             )
             let newValue = Parameter(label: nil, name: "newValue", type: setter.type)
             try builder.lowerParameter(param: selfParameter)
             try builder.lowerParameter(param: newValue)
-            try builder.call(returnType: .void)
+            try builder.call()
             topLevelDecls.append(builder.renderImportDecl())
             // Use functionName if available (has lowercase first char), otherwise derive from name
             let propertyNameForThunk: String
@@ -792,12 +777,18 @@ enum SwiftCodePattern {
 extension BridgeType {
     struct LoweringParameterInfo {
         let loweredParameters: [(name: String, type: WasmCoreType)]
+        /// If true, the parameter should be lowered by using `bridgeJSWithLoweredParameter`
+        /// that takes a closure to handle the borrowed parameter.
+        var useBorrowing: Bool = false
 
         static let bool = LoweringParameterInfo(loweredParameters: [("value", .i32)])
         static let int = LoweringParameterInfo(loweredParameters: [("value", .i32)])
         static let float = LoweringParameterInfo(loweredParameters: [("value", .f32)])
         static let double = LoweringParameterInfo(loweredParameters: [("value", .f64)])
-        static let string = LoweringParameterInfo(loweredParameters: [("bytes", .i32), ("length", .i32)])
+        static let string = LoweringParameterInfo(
+            loweredParameters: [("bytes", .i32), ("length", .i32)],
+            useBorrowing: true
+        )
         static let jsObject = LoweringParameterInfo(loweredParameters: [("value", .i32)])
         static let jsValue = LoweringParameterInfo(loweredParameters: [
             ("kind", .i32),
@@ -860,7 +851,7 @@ extension BridgeType {
             let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
             var params = [("isSome", WasmCoreType.i32)]
             params.append(contentsOf: wrappedInfo.loweredParameters)
-            return LoweringParameterInfo(loweredParameters: params)
+            return LoweringParameterInfo(loweredParameters: params, useBorrowing: wrappedInfo.useBorrowing)
         case .array, .dictionary:
             return LoweringParameterInfo(loweredParameters: [])
         }

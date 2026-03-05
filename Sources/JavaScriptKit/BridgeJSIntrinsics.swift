@@ -348,9 +348,9 @@ extension String: _BridgedSwiftStackType {
 
     // MARK: ImportTS
 
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T {
         return self.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+            body(Int32(bitPattern: UInt32(UInt(bitPattern: b.baseAddress))), Int32(b.count))
         }
     }
 
@@ -391,38 +391,6 @@ extension String: _BridgedSwiftStackType {
     @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
         self.withUTF8 { ptr in
             _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
-        }
-    }
-}
-
-/// Runs `body` with a borrowed UTF-8 (address, count) tuple.
-@_spi(BridgeJS) @_transparent
-public func _swift_js_with_borrowed_utf8<R>(
-    _ value: consuming String,
-    _ body: (Int32, Int32) -> R
-) -> R {
-    return value.withUTF8 { utf8 in
-        let address = utf8.baseAddress.map { Int32(truncatingIfNeeded: UInt(bitPattern: $0)) } ?? 0
-        return body(address, Int32(utf8.count))
-    }
-}
-
-/// Runs `body` with optional borrowed UTF-8 components.
-///
-/// .none is encoded as `(0, 0, 0)`.
-/// .some is encoded as `(1, address, count)`.
-@_spi(BridgeJS) @_transparent
-public func _swift_js_with_optional_borrowed_utf8<R>(
-    _ value: consuming String?,
-    _ body: (Int32, Int32, Int32) -> R
-) -> R {
-    switch consume value {
-    case .none:
-        return body(0, 0, 0)
-    case .some(var value):
-        return value.withUTF8 { utf8 in
-            let address = utf8.baseAddress.map { Int32(truncatingIfNeeded: UInt(bitPattern: $0)) } ?? 0
-            return body(1, address, Int32(utf8.count))
         }
     }
 }
@@ -769,7 +737,7 @@ extension _BridgedSwiftStruct {
 
 extension _BridgedSwiftEnumNoPayload where Self: RawRepresentable, RawValue == String {
     // MARK: ImportTS
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 { rawValue.bridgeJSLowerParameter() }
+    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T { rawValue.bridgeJSWithLoweredParameter(body) }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ id: Int32) -> Self {
         Self(rawValue: .bridgeJSLiftReturn(id))!
@@ -1539,10 +1507,15 @@ extension _BridgedAsOptional where Wrapped == Bool {
 }
 
 extension _BridgedAsOptional where Wrapped == String {
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
-        isSome: Int32, value: Int32
-    ) {
-        asOptional._bridgeJSLowerParameter(noneValue: 0, lowerWrapped: { $0.bridgeJSLowerParameter() })
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32, Int32) -> T) -> T {
+        switch asOptional {
+        case .none:
+            return body(0, 0, 0)
+        case .some(let value):
+            return value.bridgeJSWithLoweredParameter { bytes, count in
+                return body(1, bytes, count)
+            }
+        }
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(
@@ -1715,14 +1688,14 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftCaseEnum {
 
 extension _BridgedAsOptional
 where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == String {
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
-        isSome: Int32, value: Int32
-    ) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32, Int32) -> T) -> T {
         switch asOptional {
         case .none:
-            return (isSome: 0, value: 0)
+            return body(0, 0, 0)
         case .some(let wrapped):
-            return (isSome: 1, value: wrapped.bridgeJSLowerParameter())
+            return wrapped.bridgeJSWithLoweredParameter { bytes, count in
+                return body(1, bytes, count)
+            }
         }
     }
 

@@ -32,7 +32,7 @@ fileprivate func bjs_checkString_extern(_ aBytes: Int32, _ aLength: Int32) -> Vo
 }
 
 func _$checkString(_ a: String) throws(JSException) -> Void {
-    _swift_js_with_borrowed_utf8(a) { aBytes, aLength in
+    a.bridgeJSWithLoweredParameter { (aBytes, aLength) in
         bjs_checkString(aBytes, aLength)
     }
     if let error = _swift_js_take_exception() {
@@ -53,8 +53,8 @@ fileprivate func bjs_checkStringWithLength_extern(_ aBytes: Int32, _ aLength: In
 }
 
 func _$checkStringWithLength(_ a: String, _ b: Double) throws(JSException) -> Void {
-    let bValue = b.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(a) { aBytes, aLength in
+    a.bridgeJSWithLoweredParameter { (aBytes, aLength) in
+        let bValue = b.bridgeJSLowerParameter()
         bjs_checkStringWithLength(aBytes, aLength, bValue)
     }
     if let error = _swift_js_take_exception() {
