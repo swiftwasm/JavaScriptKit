@@ -13,6 +13,7 @@ final class JSGlueVariableScope {
     static let reservedInstance = "instance"
     static let reservedMemory = "memory"
     static let reservedSetException = "setException"
+    static let reservedDecodeString = "decodeString"
     static let reservedStorageToReturnString = "tmpRetString"
     static let reservedStorageToReturnBytes = "tmpRetBytes"
     static let reservedStorageToReturnException = "tmpRetException"
@@ -40,6 +41,7 @@ final class JSGlueVariableScope {
         reservedInstance,
         reservedMemory,
         reservedSetException,
+        reservedDecodeString,
         reservedStorageToReturnString,
         reservedStorageToReturnBytes,
         reservedStorageToReturnException,
@@ -266,17 +268,9 @@ struct IntrinsicJSFragment: Sendable {
             let (scope, printer) = (context.scope, context.printer)
             let bytesExpr = arguments[0]
             let countExpr = arguments[1]
-            let bytesLabel = scope.variable("bytesView")
-            let bytesToDecodeLabel = scope.variable("bytesToDecode")
             let stringLabel = scope.variable("string")
             printer.write(
-                "const \(bytesLabel) = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, \(bytesExpr), \(countExpr));"
-            )
-            printer.write(
-                "const \(bytesToDecodeLabel) = (typeof SharedArrayBuffer !== \"undefined\" && \(bytesLabel).buffer instanceof SharedArrayBuffer) ? \(bytesLabel).slice() : \(bytesLabel);"
-            )
-            printer.write(
-                "const \(stringLabel) = \(JSGlueVariableScope.reservedTextDecoder).decode(\(bytesToDecodeLabel));"
+                "const \(stringLabel) = \(JSGlueVariableScope.reservedDecodeString)(\(bytesExpr), \(countExpr));"
             )
             return [stringLabel]
         }
