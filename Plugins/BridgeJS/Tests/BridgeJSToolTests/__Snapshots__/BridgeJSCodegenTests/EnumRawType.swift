@@ -464,7 +464,7 @@ fileprivate func bjs_takesFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: I
 }
 
 func _$takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void {
-    _swift_js_with_borrowed_utf8(flag.rawValue) { flagBytes, flagLength in
+    flag.bridgeJSWithLoweredParameter { (flagBytes, flagLength) in
         bjs_takesFeatureFlag(flagBytes, flagLength)
     }
     if let error = _swift_js_take_exception() {

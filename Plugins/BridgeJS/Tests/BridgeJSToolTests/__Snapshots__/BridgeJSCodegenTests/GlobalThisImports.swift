@@ -31,9 +31,11 @@ fileprivate func bjs_parseInt_extern(_ stringBytes: Int32, _ stringLength: Int32
 }
 
 func _$parseInt(_ string: String) throws(JSException) -> Double {
-    let ret = _swift_js_with_borrowed_utf8(string) { stringBytes, stringLength in
-        bjs_parseInt(stringBytes, stringLength)
+    let ret0 = string.bridgeJSWithLoweredParameter { (stringBytes, stringLength) in
+        let ret = bjs_parseInt(stringBytes, stringLength)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -54,7 +56,7 @@ fileprivate func bjs_JSConsole_log_extern(_ self: Int32, _ messageBytes: Int32, 
 
 func _$JSConsole_log(_ self: JSObject, _ message: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(message) { messageBytes, messageLength in
+    message.bridgeJSWithLoweredParameter { (messageBytes, messageLength) in
         bjs_JSConsole_log(selfValue, messageBytes, messageLength)
     }
     if let error = _swift_js_take_exception() {
@@ -87,9 +89,11 @@ fileprivate func bjs_WebSocket_close_extern(_ self: Int32) -> Void {
 }
 
 func _$WebSocket_init(_ url: String) throws(JSException) -> JSObject {
-    let ret = _swift_js_with_borrowed_utf8(url) { urlBytes, urlLength in
-        bjs_WebSocket_init(urlBytes, urlLength)
+    let ret0 = url.bridgeJSWithLoweredParameter { (urlBytes, urlLength) in
+        let ret = bjs_WebSocket_init(urlBytes, urlLength)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }

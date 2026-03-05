@@ -91,9 +91,11 @@ fileprivate func bjs_Greeter_changeName_extern(_ self: Int32, _ nameBytes: Int32
 }
 
 func _$Greeter_init(_ name: String) throws(JSException) -> JSObject {
-    let ret = _swift_js_with_borrowed_utf8(name) { nameBytes, nameLength in
-        bjs_Greeter_init(nameBytes, nameLength)
+    let ret0 = name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
+        let ret = bjs_Greeter_init(nameBytes, nameLength)
+        return ret
     }
+    let ret = ret0
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -120,7 +122,7 @@ func _$Greeter_age_get(_ self: JSObject) throws(JSException) -> Double {
 
 func _$Greeter_name_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(newValue) { newValueBytes, newValueLength in
+    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
         bjs_Greeter_name_set(selfValue, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -139,7 +141,7 @@ func _$Greeter_greet(_ self: JSObject) throws(JSException) -> String {
 
 func _$Greeter_changeName(_ self: JSObject, _ name: String) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
-    _swift_js_with_borrowed_utf8(name) { nameBytes, nameLength in
+    name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
         bjs_Greeter_changeName(selfValue, nameBytes, nameLength)
     }
     if let error = _swift_js_take_exception() {
