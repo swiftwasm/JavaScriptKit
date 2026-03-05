@@ -63,6 +63,8 @@ enum Internal {
 
 @JS enum GlobalUtils {
     @JS class PublicConverter {
+        @JS var precision: Int = 2
+
         @JS init() {}
 
         @JS func toString(value: Int) -> String {

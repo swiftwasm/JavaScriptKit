@@ -156,7 +156,19 @@
           "GlobalUtils"
         ],
         "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "precision",
+            "namespace" : [
+              "GlobalUtils"
+            ],
+            "type" : {
+              "int" : {
 
+              }
+            }
+          }
         ],
         "swiftCallName" : "GlobalUtils.PublicConverter"
       }

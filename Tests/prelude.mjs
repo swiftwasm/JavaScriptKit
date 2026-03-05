@@ -1032,6 +1032,9 @@ function BridgeJSGlobalTests_runJsWorksGlobal() {
 
     const globalConverter = new globalThis.GlobalUtils.PublicConverter();
     assert.equal(globalConverter.toString(99), "99");
+    assert.equal(globalConverter.precision, 2);
+    globalConverter.precision = 5;
+    assert.equal(globalConverter.precision, 5);
     globalConverter.release();
 
     const globalHttpServer = new globalThis.GlobalNetworking.API.TestHTTPServer();
