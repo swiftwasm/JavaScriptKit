@@ -118,7 +118,8 @@ public struct ImportTS {
             self.context = context
             let liftingInfo = try returnType.liftingReturnInfo(context: context)
             needsReturnVariable =
-                !(returnType == .void || returnType.usesSideChannelForOptionalReturn() || liftingInfo.valueToLift == nil)
+                !(returnType == .void || returnType.usesSideChannelForOptionalReturn()
+                || liftingInfo.valueToLift == nil)
         }
 
         func lowerParameter(param: Parameter) throws {
