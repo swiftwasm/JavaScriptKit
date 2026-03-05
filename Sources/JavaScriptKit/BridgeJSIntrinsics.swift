@@ -348,9 +348,9 @@ extension String: _BridgedSwiftStackType {
 
     // MARK: ImportTS
 
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T {
         return self.withUTF8 { b in
-            _swift_js_make_js_string(b.baseAddress.unsafelyUnwrapped, Int32(b.count))
+            body(Int32(bitPattern: UInt32(UInt(bitPattern: b.baseAddress))), Int32(b.count))
         }
     }
 
@@ -737,7 +737,9 @@ extension _BridgedSwiftStruct {
 
 extension _BridgedSwiftEnumNoPayload where Self: RawRepresentable, RawValue == String {
     // MARK: ImportTS
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 { rawValue.bridgeJSLowerParameter() }
+    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T {
+        rawValue.bridgeJSWithLoweredParameter(body)
+    }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ id: Int32) -> Self {
         Self(rawValue: .bridgeJSLiftReturn(id))!
@@ -1507,10 +1509,17 @@ extension _BridgedAsOptional where Wrapped == Bool {
 }
 
 extension _BridgedAsOptional where Wrapped == String {
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
-        isSome: Int32, value: Int32
-    ) {
-        asOptional._bridgeJSLowerParameter(noneValue: 0, lowerWrapped: { $0.bridgeJSLowerParameter() })
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSWithLoweredParameter<T>(
+        _ body: (Int32, Int32, Int32) -> T
+    ) -> T {
+        switch asOptional {
+        case .none:
+            return body(0, 0, 0)
+        case .some(let value):
+            return value.bridgeJSWithLoweredParameter { bytes, count in
+                return body(1, bytes, count)
+            }
+        }
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(
@@ -1683,14 +1692,16 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftCaseEnum {
 
 extension _BridgedAsOptional
 where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == String {
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
-        isSome: Int32, value: Int32
-    ) {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSWithLoweredParameter<T>(
+        _ body: (Int32, Int32, Int32) -> T
+    ) -> T {
         switch asOptional {
         case .none:
-            return (isSome: 0, value: 0)
+            return body(0, 0, 0)
         case .some(let wrapped):
-            return (isSome: 1, value: wrapped.bridgeJSLowerParameter())
+            return wrapped.bridgeJSWithLoweredParameter { bytes, count in
+                return body(1, bytes, count)
+            }
         }
     }
 

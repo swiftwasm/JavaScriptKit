@@ -26,9 +26,10 @@ public struct ClosureCodegen {
         let externName = "invoke_js_callback_\(signature.moduleName)_\(mangledName)"
 
         // Use CallJSEmission to generate the callback invocation
-        let builder = ImportTS.CallJSEmission(
+        let builder = try ImportTS.CallJSEmission(
             moduleName: "bjs",
             abiName: externName,
+            returnType: signature.returnType,
             context: .exportSwift
         )
 
@@ -41,8 +42,8 @@ public struct ClosureCodegen {
         }
 
         // Generate the call and return value lifting
-        try builder.call(returnType: signature.returnType)
-        try builder.liftReturnValue(returnType: signature.returnType)
+        try builder.call()
+        try builder.liftReturnValue()
 
         // Generate extern declaration using CallJSEmission
         let externDecl = builder.renderImportDecl()

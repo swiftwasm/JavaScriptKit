@@ -289,6 +289,7 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedInstance);",
             "let \(JSGlueVariableScope.reservedMemory);",
             "let \(JSGlueVariableScope.reservedSetException);",
+            "let \(JSGlueVariableScope.reservedDecodeString);",
             "const \(JSGlueVariableScope.reservedTextDecoder) = new TextDecoder(\"utf-8\");",
             "const \(JSGlueVariableScope.reservedTextEncoder) = new TextEncoder(\"utf-8\");",
             "let \(JSGlueVariableScope.reservedStorageToReturnString);",
@@ -337,10 +338,7 @@ public struct BridgeJSLink {
                 printer.write("bjs[\"swift_js_return_string\"] = function(ptr, len) {")
                 printer.indent {
                     printer.write(
-                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");"
-                    )
-                    printer.write(
-                        "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);"
+                        "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(ptr, len);"
                     )
                 }
                 printer.write("}")
@@ -361,10 +359,7 @@ public struct BridgeJSLink {
                 printer.write("bjs[\"swift_js_make_js_string\"] = function(ptr, len) {")
                 printer.indent {
                     printer.write(
-                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");"
-                    )
-                    printer.write(
-                        "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(\(JSGlueVariableScope.reservedTextDecoder).decode(bytes));"
+                        "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(\(JSGlueVariableScope.reservedDecodeString)(ptr, len));"
                     )
                 }
                 printer.write("}")
@@ -413,10 +408,7 @@ public struct BridgeJSLink {
                 printer.write("}")
                 printer.write("bjs[\"swift_js_push_string\"] = function(ptr, len) {")
                 printer.indent {
-                    printer.write(
-                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len)\(sharedMemory ? ".slice()" : "");"
-                    )
-                    printer.write("const value = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);")
+                    printer.write("const value = \(JSGlueVariableScope.reservedDecodeString)(ptr, len);")
                     printer.write("\(JSGlueVariableScope.reservedStringStack).push(value);")
                 }
                 printer.write("}")
@@ -529,8 +521,7 @@ public struct BridgeJSLink {
                     printer.write("} else {")
                     printer.indent {
                         printer.write(lines: [
-                            "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len);",
-                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes);",
+                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(ptr, len);"
                         ])
                     }
                     printer.write("}")
@@ -1038,6 +1029,16 @@ public struct BridgeJSLink {
                     "\(JSGlueVariableScope.reservedInstance) = i;",
                     "\(JSGlueVariableScope.reservedMemory) = \(JSGlueVariableScope.reservedInstance).exports.memory;",
                 ])
+                printer.nextLine()
+                if sharedMemory {
+                    printer.write(
+                        "\(JSGlueVariableScope.reservedDecodeString) = (ptr, len) => { const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr >>> 0, len >>> 0).slice(); return \(JSGlueVariableScope.reservedTextDecoder).decode(bytes); }"
+                    )
+                } else {
+                    printer.write(
+                        "\(JSGlueVariableScope.reservedDecodeString) = (ptr, len) => { const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr >>> 0, len >>> 0); return \(JSGlueVariableScope.reservedTextDecoder).decode(bytes); }"
+                    )
+                }
                 printer.nextLine()
                 // Error handling
                 printer.write("\(JSGlueVariableScope.reservedSetException) = (error) => {")

@@ -13,6 +13,7 @@ final class JSGlueVariableScope {
     static let reservedInstance = "instance"
     static let reservedMemory = "memory"
     static let reservedSetException = "setException"
+    static let reservedDecodeString = "decodeString"
     static let reservedStorageToReturnString = "tmpRetString"
     static let reservedStorageToReturnBytes = "tmpRetBytes"
     static let reservedStorageToReturnException = "tmpRetException"
@@ -40,6 +41,7 @@ final class JSGlueVariableScope {
         reservedInstance,
         reservedMemory,
         reservedSetException,
+        reservedDecodeString,
         reservedStorageToReturnString,
         reservedStorageToReturnBytes,
         reservedStorageToReturnException,
@@ -261,17 +263,16 @@ struct IntrinsicJSFragment: Sendable {
         }
     )
     static let stringLiftParameter = IntrinsicJSFragment(
-        parameters: ["objectId"],
+        parameters: ["bytes", "count"],
         printCode: { arguments, context in
             let (scope, printer) = (context.scope, context.printer)
-            let objectId = arguments[0]
-            let objectLabel = scope.variable("\(objectId)Object")
-            // TODO: Implement "take" operation
+            let bytesExpr = arguments[0]
+            let countExpr = arguments[1]
+            let stringLabel = scope.variable("string")
             printer.write(
-                "const \(objectLabel) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(objectId));"
+                "const \(stringLabel) = \(JSGlueVariableScope.reservedDecodeString)(\(bytesExpr), \(countExpr));"
             )
-            printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(objectId));")
-            return [objectLabel]
+            return [stringLabel]
         }
     )
     static let stringLowerReturn = IntrinsicJSFragment(

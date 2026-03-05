@@ -89,6 +89,7 @@ export async function createInstantiator(options, swift) {
     let instance;
     let memory;
     let setException;
+    let decodeString;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
     let tmpRetString;
@@ -770,8 +771,7 @@ export async function createInstantiator(options, swift) {
             bjs = {};
             importObject["bjs"] = bjs;
             bjs["swift_js_return_string"] = function(ptr, len) {
-                const bytes = new Uint8Array(memory.buffer, ptr, len);
-                tmpRetString = textDecoder.decode(bytes);
+                tmpRetString = decodeString(ptr, len);
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
@@ -780,8 +780,7 @@ export async function createInstantiator(options, swift) {
                 bytes.set(source);
             }
             bjs["swift_js_make_js_string"] = function(ptr, len) {
-                const bytes = new Uint8Array(memory.buffer, ptr, len);
-                return swift.memory.retain(textDecoder.decode(bytes));
+                return swift.memory.retain(decodeString(ptr, len));
             }
             bjs["swift_js_init_memory_with_result"] = function(ptr, len) {
                 const target = new Uint8Array(memory.buffer, ptr, len);
@@ -807,8 +806,7 @@ export async function createInstantiator(options, swift) {
                 f64Stack.push(v);
             }
             bjs["swift_js_push_string"] = function(ptr, len) {
-                const bytes = new Uint8Array(memory.buffer, ptr, len);
-                const value = textDecoder.decode(bytes);
+                const value = decodeString(ptr, len);
                 strStack.push(value);
             }
             bjs["swift_js_pop_i32"] = function() {
@@ -865,8 +863,7 @@ export async function createInstantiator(options, swift) {
                 if (isSome === 0) {
                     tmpRetString = null;
                 } else {
-                    const bytes = new Uint8Array(memory.buffer, ptr, len);
-                    tmpRetString = textDecoder.decode(bytes);
+                    tmpRetString = decodeString(ptr, len);
                 }
             }
             bjs["swift_js_return_optional_object"] = function(isSome, objectId) {
@@ -936,6 +933,8 @@ export async function createInstantiator(options, swift) {
         setInstance: (i) => {
             instance = i;
             memory = instance.exports.memory;
+
+            decodeString = (ptr, len) => { const bytes = new Uint8Array(memory.buffer, ptr >>> 0, len >>> 0); return textDecoder.decode(bytes); }
 
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)
