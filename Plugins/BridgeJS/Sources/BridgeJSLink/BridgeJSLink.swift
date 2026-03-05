@@ -2947,6 +2947,16 @@ extension BridgeJSLink {
                                         "\(method.name)\(renderTSSignatureCallback(method.parameters, method.returnType, method.effects));"
                                     printer.write(methodSignature)
                                 }
+
+                                let sortedProperties = klass.properties.filter { !$0.isStatic }.sorted {
+                                    $0.name < $1.name
+                                }
+                                for property in sortedProperties {
+                                    let readonly = property.isReadonly ? "readonly " : ""
+                                    printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                                }
+
+                                printer.write("release(): void;")
                             }
                             printer.write("}")
                         }

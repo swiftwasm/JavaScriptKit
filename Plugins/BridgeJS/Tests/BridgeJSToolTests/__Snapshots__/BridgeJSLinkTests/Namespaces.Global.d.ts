@@ -12,6 +12,7 @@ declare global {
             constructor();
             addItem(item: Greeter): void;
             getItems(): Greeter[];
+            release(): void;
         }
     }
     namespace MyModule {
@@ -24,6 +25,7 @@ declare global {
             class Converter {
                 constructor();
                 toString(value: number): string;
+                release(): void;
             }
         }
     }
@@ -32,9 +34,11 @@ declare global {
             class Greeter {
                 constructor(name: string);
                 greet(): string;
+                release(): void;
             }
             class UUID {
                 uuidString(): string;
+                release(): void;
             }
         }
     }
