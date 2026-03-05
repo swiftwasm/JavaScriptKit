@@ -296,6 +296,27 @@ public func _bjs_GlobalUtils_PublicConverter_toString(_ _self: UnsafeMutableRawP
     #endif
 }
 
+@_expose(wasm, "bjs_GlobalUtils_PublicConverter_precision_get")
+@_cdecl("bjs_GlobalUtils_PublicConverter_precision_get")
+public func _bjs_GlobalUtils_PublicConverter_precision_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = GlobalUtils.PublicConverter.bridgeJSLiftParameter(_self).precision
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_GlobalUtils_PublicConverter_precision_set")
+@_cdecl("bjs_GlobalUtils_PublicConverter_precision_set")
+public func _bjs_GlobalUtils_PublicConverter_precision_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    GlobalUtils.PublicConverter.bridgeJSLiftParameter(_self).precision = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_GlobalUtils_PublicConverter_deinit")
 @_cdecl("bjs_GlobalUtils_PublicConverter_deinit")
 public func _bjs_GlobalUtils_PublicConverter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {

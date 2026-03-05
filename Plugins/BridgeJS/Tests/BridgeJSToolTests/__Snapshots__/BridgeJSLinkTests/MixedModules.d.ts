@@ -11,6 +11,7 @@ declare global {
         class GlobalClass {
             constructor();
             greet(): string;
+            release(): void;
         }
         function globalFunction(): string;
     }

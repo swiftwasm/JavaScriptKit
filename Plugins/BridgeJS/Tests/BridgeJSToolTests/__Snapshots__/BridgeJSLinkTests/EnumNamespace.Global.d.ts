@@ -34,6 +34,7 @@ declare global {
         class Converter {
             constructor();
             format(value: number): string;
+            release(): void;
         }
     }
     namespace Networking {
@@ -41,6 +42,7 @@ declare global {
             class HTTPServer {
                 constructor();
                 call(method: Networking.API.MethodTag): void;
+                release(): void;
             }
             const MethodValues: {
                 readonly Get: 0;
@@ -55,6 +57,7 @@ declare global {
                 class TestServer {
                     constructor();
                     call(method: Networking.APIV2.Internal.SupportedMethodTag): void;
+                    release(): void;
                 }
                 const SupportedMethodValues: {
                     readonly Get: 0;
@@ -77,6 +80,8 @@ declare global {
         class Converter {
             constructor();
             toString(value: number): string;
+            precision: number;
+            release(): void;
         }
     }
 }
