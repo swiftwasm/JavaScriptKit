@@ -60,3 +60,9 @@
 }
 
 @JS func roundtripContainer(_ container: Container) -> Container
+
+extension DataPoint {
+    @JS func distanceFromOrigin() -> Double {
+        return (x * x + y * y).squareRoot()
+    }
+}
