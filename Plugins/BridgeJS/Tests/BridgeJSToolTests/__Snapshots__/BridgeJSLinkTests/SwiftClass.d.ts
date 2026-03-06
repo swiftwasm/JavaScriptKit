@@ -14,6 +14,7 @@ export interface SwiftHeapObject {
 export interface Greeter extends SwiftHeapObject {
     greet(): string;
     changeName(name: string): void;
+    greetEnthusiastically(): string;
     name: string;
 }
 export interface PublicGreeter extends SwiftHeapObject {

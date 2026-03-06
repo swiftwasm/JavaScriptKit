@@ -63,6 +63,23 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_Greeter_greetEnthusiastically",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "greetEnthusiastically",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
           }
         ],
         "name" : "Greeter",

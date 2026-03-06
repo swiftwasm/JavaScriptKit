@@ -214,7 +214,23 @@
           ]
         },
         "methods" : [
+          {
+            "abiName" : "bjs_DataPoint_distanceFromOrigin",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "distanceFromOrigin",
+            "parameters" : [
 
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          }
         ],
         "name" : "DataPoint",
         "properties" : [

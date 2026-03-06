@@ -40,6 +40,17 @@ public func _bjs_Greeter_changeName(_ _self: UnsafeMutableRawPointer, _ nameByte
     #endif
 }
 
+@_expose(wasm, "bjs_Greeter_greetEnthusiastically")
+@_cdecl("bjs_Greeter_greetEnthusiastically")
+public func _bjs_Greeter_greetEnthusiastically(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = Greeter.bridgeJSLiftParameter(_self).greetEnthusiastically()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Greeter_name_get")
 @_cdecl("bjs_Greeter_name_get")
 public func _bjs_Greeter_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
