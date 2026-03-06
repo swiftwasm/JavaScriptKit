@@ -168,6 +168,24 @@ import Testing
     }
 
     @Test
+    func codegenCrossFileExtension() throws {
+        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let classURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileExtensionClass.swift")
+        swiftAPI.addSourceFile(
+            Parser.parse(source: try String(contentsOf: classURL, encoding: .utf8)),
+            inputFilePath: "CrossFileExtensionClass.swift"
+        )
+        let extensionURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileExtension.swift")
+        swiftAPI.addSourceFile(
+            Parser.parse(source: try String(contentsOf: extensionURL, encoding: .utf8)),
+            inputFilePath: "CrossFileExtension.swift"
+        )
+        let skeleton = try swiftAPI.finalize()
+        try snapshotCodegen(skeleton: skeleton, name: "CrossFileExtension")
+    }
+
+
+    @Test
     func codegenSkipsEmptySkeletons() throws {
         let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
         let importedURL = Self.multifileInputsDirectory.appendingPathComponent("ImportedFunctions.swift")

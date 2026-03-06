@@ -12,6 +12,12 @@
     }
 }
 
+extension Greeter {
+    @JS func greetEnthusiastically() -> String {
+        return "Hey, " + self.name + "!!!"
+    }
+}
+
 @JS func takeGreeter(greeter: Greeter) {
     print(greeter.greet())
 }
