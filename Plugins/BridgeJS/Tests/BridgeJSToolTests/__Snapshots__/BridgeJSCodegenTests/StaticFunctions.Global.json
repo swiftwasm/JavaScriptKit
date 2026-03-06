@@ -125,6 +125,45 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_MathUtils_static_divide",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "divide",
+            "parameters" : [
+              {
+                "label" : "a",
+                "name" : "a",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              },
+              {
+                "label" : "b",
+                "name" : "b",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "MathUtils"
+              }
+            }
           }
         ],
         "name" : "MathUtils",
@@ -161,6 +200,36 @@
               "isThrows" : false
             },
             "name" : "square",
+            "parameters" : [
+              {
+                "label" : "value",
+                "name" : "value",
+                "type" : {
+                  "int" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "int" : {
+
+              }
+            },
+            "staticContext" : {
+              "enumName" : {
+                "_0" : "Calculator"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Calculator_static_cube",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "cube",
             "parameters" : [
               {
                 "label" : "value",

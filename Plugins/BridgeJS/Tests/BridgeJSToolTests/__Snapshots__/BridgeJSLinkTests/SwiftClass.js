@@ -283,6 +283,12 @@ export async function createInstantiator(options, swift) {
                     const nameId = swift.memory.retain(nameBytes);
                     instance.exports.bjs_Greeter_changeName(this.pointer, nameId, nameBytes.length);
                 }
+                greetEnthusiastically() {
+                    instance.exports.bjs_Greeter_greetEnthusiastically(this.pointer);
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                }
                 get name() {
                     instance.exports.bjs_Greeter_name_get(this.pointer);
                     const ret = tmpRetString;

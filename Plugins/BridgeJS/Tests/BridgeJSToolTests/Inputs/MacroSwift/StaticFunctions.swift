@@ -38,3 +38,15 @@ enum APIResult {
         }
     }
 }
+
+extension MathUtils {
+    @JS static func divide(a: Int, b: Int) -> Int {
+        return a / b
+    }
+}
+
+extension Calculator {
+    @JS static func cube(value: Int) -> Int {
+        return value * value * value
+    }
+}
