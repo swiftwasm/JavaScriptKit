@@ -19,7 +19,7 @@ unittest:
 	swift package --swift-sdk "$(SWIFT_SDK_ID)" \
 	    $(TRACING_ARGS) \
 	    --disable-sandbox \
-	    js test --prelude ./Tests/prelude.mjs -Xnode --expose-gc
+	    js test --prelude ./Tests/prelude.mjs -Xnode --expose-gc --verbose
 
 .PHONY: regenerate_swiftpm_resources
 regenerate_swiftpm_resources:

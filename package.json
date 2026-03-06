@@ -12,6 +12,7 @@
     "build": "npm run build:clean && npm run build:ts",
     "build:clean": "rm -rf Runtime/lib",
     "build:ts": "cd Runtime; rollup -c",
+    "bench": "cd Runtime && rollup -c rollup.bench.mjs && node bench/dist/bench.mjs",
     "prepublishOnly": "npm run build",
     "format": "prettier --write Runtime/src",
     "check:bridgejs-dts": "tsc --project Plugins/BridgeJS/Tests/BridgeJSToolTests/__Snapshots__/BridgeJSLinkTests/tsconfig.json"
