@@ -54,12 +54,20 @@ extension ConvertibleToJSException {
 }
 
 extension Error {
-    @available(*, unavailable, message: "It is only possible to throw a JSException or an Error which conforms to ConvertibleToJSException")
+    @available(
+        *,
+        unavailable,
+        message: "It is only possible to throw a JSException or an Error which conforms to ConvertibleToJSException"
+    )
     @_spi(BridgeJS) public func bridgeJSLowerThrow() {
         fatalError()
     }
 
-    @available(*, unavailable, message: "It is only possible to throw a JSException or an Error which conforms to ConvertibleToJSException")
+    @available(
+        *,
+        unavailable,
+        message: "It is only possible to throw a JSException or an Error which conforms to ConvertibleToJSException"
+    )
     @_spi(BridgeJS) public func bridgeJSLowerThrowAsync() -> JSException {
         fatalError()
     }

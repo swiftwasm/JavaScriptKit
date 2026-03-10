@@ -1126,7 +1126,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             guard throwsClause.type != nil else {
                 diagnose(
                     node: throwsClause,
-                    message: "Thrown type must be specified. Only JSException or any error conforming to ConvertibleToJSException is supported"
+                    message:
+                        "Thrown type must be specified. Only JSException or any error conforming to ConvertibleToJSException is supported"
                 )
                 return nil
             }
