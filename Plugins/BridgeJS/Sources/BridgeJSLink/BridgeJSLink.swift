@@ -660,7 +660,7 @@ public struct BridgeJSLink {
                                     helperPrinter.write("let length = 0;")
                                     helperPrinter.write("while (bytes[length] !== 0) { length += 1; }")
                                     helperPrinter.write(
-                                        "const fileID = \(JSGlueVariableScope.reservedTextDecoder).decode(bytes.subarray(0, length));"
+                                        "const fileID = \(JSGlueVariableScope.reservedDecodeString)(state.file, length);"
                                     )
                                     helperPrinter.write(
                                         "throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);"

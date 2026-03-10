@@ -40,7 +40,7 @@ export async function createInstantiator(options, swift) {
                 const bytes = new Uint8Array(memory.buffer, state.file);
                 let length = 0;
                 while (bytes[length] !== 0) { length += 1; }
-                const fileID = textDecoder.decode(bytes.subarray(0, length));
+                const fileID = decodeString(state.file, length);
                 throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);
             }
             return func(...args);
