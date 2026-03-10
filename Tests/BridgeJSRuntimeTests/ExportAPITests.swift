@@ -85,6 +85,15 @@ struct TestError: Error {
     let message: String
 }
 
+struct StringError: ConvertibleToJSException {
+    let message: String
+    var jsException: JSException { JSException(message: message) }
+}
+
+@JS func throwsStringError() throws(StringError) {
+    throw StringError(message: "Custom string error")
+}
+
 @JS func throwsSwiftError(shouldThrow: Bool) throws(JSException) -> Void {
     if shouldThrow {
         throw JSException(JSError(message: "TestError").jsValue)

@@ -1,0 +1,54 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_asyncThrowsVoid",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "asyncThrowsVoid",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncThrowsWithResult",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "asyncThrowsWithResult",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "int" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule"
+}

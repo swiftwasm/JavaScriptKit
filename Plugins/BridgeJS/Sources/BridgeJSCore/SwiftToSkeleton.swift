@@ -1122,18 +1122,11 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         let isAsync = signature.effectSpecifiers?.asyncSpecifier != nil
         var isThrows = false
         if let throwsClause: ThrowsClauseSyntax = signature.effectSpecifiers?.throwsClause {
-            // Limit the thrown type to JSException for now
-            guard let thrownType = throwsClause.type else {
+            // Require typed throws for now
+            guard throwsClause.type != nil else {
                 diagnose(
                     node: throwsClause,
-                    message: "Thrown type is not specified, only JSException is supported for now"
-                )
-                return nil
-            }
-            guard thrownType.trimmedDescription == "JSException" else {
-                diagnose(
-                    node: throwsClause,
-                    message: "Only JSException is supported for thrown type, got \(thrownType.trimmedDescription)"
+                    message: "Thrown type must be specified. Only JSException or any error conforming to ConvertibleToJSException is supported"
                 )
                 return nil
             }
