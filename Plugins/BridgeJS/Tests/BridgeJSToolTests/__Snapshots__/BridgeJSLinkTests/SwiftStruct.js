@@ -74,7 +74,13 @@ export async function createInstantiator(options, swift) {
             const string = strStack.pop();
             const f64 = f64Stack.pop();
             const f641 = f64Stack.pop();
-            return { x: f641, y: f64, label: string, optCount: optValue1, optFlag: optValue };
+            const instance1 = { x: f641, y: f64, label: string, optCount: optValue1, optFlag: optValue };
+            instance1.distanceFromOrigin = function() {
+                structHelpers.DataPoint.lower(this);
+                const ret = instance.exports.bjs_DataPoint_distanceFromOrigin();
+                return ret;
+            }.bind(instance1);
+            return instance1;
         }
     });
     const __bjs_createAddressHelpers = () => ({
@@ -550,6 +556,15 @@ export async function createInstantiator(options, swift) {
                         const isSome = optCount != null;
                         const isSome1 = optFlag != null;
                         instance.exports.bjs_DataPoint_init(x, y, labelId, labelBytes.length, +isSome, isSome ? optCount : 0, +isSome1, isSome1 ? optFlag ? 1 : 0 : 0);
+                        const structValue = structHelpers.DataPoint.lift();
+                        return structValue;
+                    },
+                    get dimensions() {
+                        const ret = instance.exports.bjs_DataPoint_static_dimensions_get();
+                        return ret;
+                    },
+                    origin: function() {
+                        instance.exports.bjs_DataPoint_static_origin();
                         const structValue = structHelpers.DataPoint.lift();
                         return structValue;
                     },

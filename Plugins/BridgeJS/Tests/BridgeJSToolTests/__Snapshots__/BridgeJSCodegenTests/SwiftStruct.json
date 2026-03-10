@@ -230,6 +230,28 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_DataPoint_static_origin",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "origin",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "DataPoint"
+              }
+            },
+            "staticContext" : {
+              "structName" : {
+                "_0" : "DataPoint"
+              }
+            }
           }
         ],
         "name" : "DataPoint",
@@ -294,6 +316,21 @@
                   }
                 },
                 "_1" : "null"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "dimensions",
+            "staticContext" : {
+              "structName" : {
+                "_0" : "DataPoint"
+              }
+            },
+            "type" : {
+              "int" : {
+
               }
             }
           }
