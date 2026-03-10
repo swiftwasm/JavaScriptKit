@@ -184,7 +184,6 @@ import Testing
         try snapshotCodegen(skeleton: skeleton, name: "CrossFileExtension")
     }
 
-
     @Test
     func codegenSkipsEmptySkeletons() throws {
         let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
