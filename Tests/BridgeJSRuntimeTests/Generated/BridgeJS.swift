@@ -2467,7 +2467,9 @@ public func _bjs_ArraySupportExports_static_roundTripNamespacedSwiftClassArray()
 public func _bjs_ArraySupportExports_static_roundTripProtocolArray() -> Void {
     #if arch(wasm32)
     let ret = ArraySupportExports.roundTripProtocolArray(_: [AnyArrayElementProtocol].bridgeJSStackPop())
-    ret.map { $0 as! AnyArrayElementProtocol }.bridgeJSStackPush()
+    for __bjs_elem_ret in ret {
+    _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -6685,9 +6687,12 @@ public func _bjs_ClosureSupportExports_deinit(_ pointer: UnsafeMutableRawPointer
     #endif
 }
 
-extension ClosureSupportExports: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension ClosureSupportExports: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_ClosureSupportExports_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_ClosureSupportExports_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -6840,9 +6845,12 @@ public func _bjs_DefaultArgumentConstructorDefaults_deinit(_ pointer: UnsafeMuta
     #endif
 }
 
-extension DefaultArgumentConstructorDefaults: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension DefaultArgumentConstructorDefaults: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_DefaultArgumentConstructorDefaults_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_DefaultArgumentConstructorDefaults_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -6976,9 +6984,12 @@ public func _bjs_Greeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     public var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    public consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7026,9 +7037,12 @@ public func _bjs_Calculator_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension Calculator: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Calculator: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Calculator_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Calculator_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7054,9 +7068,12 @@ public func _bjs_InternalGreeter_deinit(_ pointer: UnsafeMutableRawPointer) -> V
     #endif
 }
 
-extension InternalGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension InternalGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     internal var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_InternalGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    internal consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_InternalGreeter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7082,9 +7099,12 @@ public func _bjs_PublicGreeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Voi
     #endif
 }
 
-extension PublicGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension PublicGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     public var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PublicGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    public consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_PublicGreeter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7110,9 +7130,12 @@ public func _bjs_PackageGreeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Vo
     #endif
 }
 
-extension PackageGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension PackageGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     package var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PackageGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    package consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_PackageGreeter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7181,9 +7204,12 @@ public func _bjs_Utils_Converter_deinit(_ pointer: UnsafeMutableRawPointer) -> V
     #endif
 }
 
-extension Utils.Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Utils.Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Utils_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Utils_Converter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7230,9 +7256,12 @@ public func _bjs_Networking_API_HTTPServer_deinit(_ pointer: UnsafeMutableRawPoi
     #endif
 }
 
-extension Networking.API.HTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Networking.API.HTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Networking_API_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Networking_API_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7280,9 +7309,12 @@ public func _bjs___Swift_Foundation_UUID_deinit(_ pointer: UnsafeMutableRawPoint
     #endif
 }
 
-extension UUID: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension UUID: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs___Swift_Foundation_UUID_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs___Swift_Foundation_UUID_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7329,9 +7361,12 @@ public func _bjs_Networking_APIV2_Internal_TestServer_deinit(_ pointer: UnsafeMu
     #endif
 }
 
-extension Internal.TestServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Internal.TestServer: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Networking_APIV2_Internal_TestServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Networking_APIV2_Internal_TestServer_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7389,9 +7424,12 @@ public func _bjs_SimplePropertyHolder_deinit(_ pointer: UnsafeMutableRawPointer)
     #endif
 }
 
-extension SimplePropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension SimplePropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_SimplePropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_SimplePropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7715,9 +7753,12 @@ public func _bjs_PropertyHolder_deinit(_ pointer: UnsafeMutableRawPointer) -> Vo
     #endif
 }
 
-extension PropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension PropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_PropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -7765,9 +7806,12 @@ public func _bjs_MathUtils_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension MathUtils: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension MathUtils: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_MathUtils_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_MathUtils_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -8015,9 +8059,12 @@ public func _bjs_StaticPropertyHolder_deinit(_ pointer: UnsafeMutableRawPointer)
     #endif
 }
 
-extension StaticPropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension StaticPropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_StaticPropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_StaticPropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -8259,8 +8306,8 @@ public func _bjs_DataProcessorManager_setProcessorAPIResult(_ _self: UnsafeMutab
 @_cdecl("bjs_DataProcessorManager_processor_get")
 public func _bjs_DataProcessorManager_processor_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).processor as! AnyDataProcessor
-    return ret.bridgeJSLowerReturn()
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).processor as! _BridgedSwiftProtocolExportable
+    return ret.bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8280,8 +8327,12 @@ public func _bjs_DataProcessorManager_processor_set(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_DataProcessorManager_backupProcessor_get")
 public func _bjs_DataProcessorManager_backupProcessor_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = (DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor).flatMap { $0 as? AnyDataProcessor }
-    return ret.bridgeJSLowerReturn()
+    let ret = DataProcessorManager.bridgeJSLiftParameter(_self).backupProcessor
+    if let ret {
+        _swift_js_return_optional_object(1, (ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+    } else {
+        _swift_js_return_optional_object(0, 0)
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8307,9 +8358,12 @@ public func _bjs_DataProcessorManager_deinit(_ pointer: UnsafeMutableRawPointer)
     #endif
 }
 
-extension DataProcessorManager: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension DataProcessorManager: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_DataProcessorManager_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_DataProcessorManager_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -8664,9 +8718,12 @@ public func _bjs_SwiftDataProcessor_deinit(_ pointer: UnsafeMutableRawPointer) -
     #endif
 }
 
-extension SwiftDataProcessor: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension SwiftDataProcessor: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_SwiftDataProcessor_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_SwiftDataProcessor_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -8680,6 +8737,105 @@ fileprivate func _bjs_SwiftDataProcessor_wrap_extern(_ pointer: UnsafeMutableRaw
 #endif
 @inline(never) fileprivate func _bjs_SwiftDataProcessor_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_SwiftDataProcessor_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_ProtocolReturnTests_static_createNativeProcessor")
+@_cdecl("bjs_ProtocolReturnTests_static_createNativeProcessor")
+public func _bjs_ProtocolReturnTests_static_createNativeProcessor() -> Int32 {
+    #if arch(wasm32)
+    let ret = ProtocolReturnTests.createNativeProcessor() as! _BridgedSwiftProtocolExportable
+    return ret.bridgeJSLowerAsProtocolReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ProtocolReturnTests_static_createNativeProcessorOptional")
+@_cdecl("bjs_ProtocolReturnTests_static_createNativeProcessorOptional")
+public func _bjs_ProtocolReturnTests_static_createNativeProcessorOptional() -> Void {
+    #if arch(wasm32)
+    let ret = ProtocolReturnTests.createNativeProcessorOptional()
+    if let ret {
+        _swift_js_return_optional_object(1, (ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+    } else {
+        _swift_js_return_optional_object(0, 0)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ProtocolReturnTests_static_createNativeProcessorNil")
+@_cdecl("bjs_ProtocolReturnTests_static_createNativeProcessorNil")
+public func _bjs_ProtocolReturnTests_static_createNativeProcessorNil() -> Void {
+    #if arch(wasm32)
+    let ret = ProtocolReturnTests.createNativeProcessorNil()
+    if let ret {
+        _swift_js_return_optional_object(1, (ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+    } else {
+        _swift_js_return_optional_object(0, 0)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ProtocolReturnTests_static_createNativeProcessorArray")
+@_cdecl("bjs_ProtocolReturnTests_static_createNativeProcessorArray")
+public func _bjs_ProtocolReturnTests_static_createNativeProcessorArray() -> Void {
+    #if arch(wasm32)
+    let ret = ProtocolReturnTests.createNativeProcessorArray()
+    for __bjs_elem_ret in ret {
+    _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())}
+    _swift_js_push_i32(Int32(ret.count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ProtocolReturnTests_static_createNativeProcessorDictionary")
+@_cdecl("bjs_ProtocolReturnTests_static_createNativeProcessorDictionary")
+public func _bjs_ProtocolReturnTests_static_createNativeProcessorDictionary() -> Void {
+    #if arch(wasm32)
+    let ret = ProtocolReturnTests.createNativeProcessorDictionary()
+    for __bjs_kv_ret in ret {
+    __bjs_kv_ret.key.bridgeJSStackPush()
+    _swift_js_push_i32((__bjs_kv_ret.value as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())}
+    _swift_js_push_i32(Int32(ret.count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ProtocolReturnTests_deinit")
+@_cdecl("bjs_ProtocolReturnTests_deinit")
+public func _bjs_ProtocolReturnTests_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<ProtocolReturnTests>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension ProtocolReturnTests: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_ProtocolReturnTests_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_ProtocolReturnTests_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ProtocolReturnTests_wrap")
+fileprivate func _bjs_ProtocolReturnTests_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_ProtocolReturnTests_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_ProtocolReturnTests_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ProtocolReturnTests_wrap_extern(pointer)
 }
 
 @_expose(wasm, "bjs_TextProcessor_init")
@@ -8923,9 +9079,12 @@ public func _bjs_TextProcessor_deinit(_ pointer: UnsafeMutableRawPointer) -> Voi
     #endif
 }
 
-extension TextProcessor: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension TextProcessor: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_TextProcessor_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_TextProcessor_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -9004,9 +9163,12 @@ public func _bjs_OptionalHolder_deinit(_ pointer: UnsafeMutableRawPointer) -> Vo
     #endif
 }
 
-extension OptionalHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension OptionalHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_OptionalHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_OptionalHolder_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -9106,9 +9268,12 @@ public func _bjs_OptionalPropertyHolder_deinit(_ pointer: UnsafeMutableRawPointe
     #endif
 }
 
-extension OptionalPropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension OptionalPropertyHolder: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_OptionalPropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_OptionalPropertyHolder_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -9189,9 +9354,12 @@ public func _bjs_Container_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension Container: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Container: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Container_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Container_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -9228,9 +9396,12 @@ public func _bjs_LeakCheck_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension LeakCheck: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension LeakCheck: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     public var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_LeakCheck_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    public consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_LeakCheck_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

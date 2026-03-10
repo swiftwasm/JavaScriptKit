@@ -567,7 +567,7 @@ extension _JSBridgedClass {
 /// A protocol that Swift protocol wrappers exposed from JavaScript must conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.
-public protocol _BridgedSwiftProtocolWrapper: _BridgedSwiftStackType {
+public protocol _BridgedSwiftProtocolWrapper: _BridgedSwiftStackType, _BridgedSwiftProtocolExportable {
     var jsObject: JSObject { get }
     static func bridgeJSLiftParameter(_ value: Int32) -> Self
 }
@@ -592,6 +592,21 @@ extension _BridgedSwiftProtocolWrapper {
     }
     @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
         _swift_js_push_i32(jsObject.bridgeJSLowerReturn())
+    }
+}
+
+/// A protocol that allows any BridgeJS-exported type to be lowered to a JSObject ID
+/// for protocol existential bridging in the Swift-to-JS direction.
+///
+/// Both `_BridgedSwiftProtocolWrapper` (JS-originated protocol objects) and `@JS class`
+/// types conform to this, enabling runtime dispatch when a protocol existential is returned.
+public protocol _BridgedSwiftProtocolExportable {
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32
+}
+
+extension _BridgedSwiftProtocolExportable where Self: _BridgedSwiftProtocolWrapper {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        jsObject.bridgeJSLowerReturn()
     }
 }
 
@@ -1023,7 +1038,7 @@ private func _swift_js_return_optional_object_extern(_ isSome: Int32, _ objectId
     _onlyAvailableOnWasm()
 }
 #endif
-@inline(never) func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32) {
+@_spi(BridgeJS) @inline(never) public func _swift_js_return_optional_object(_ isSome: Int32, _ objectId: Int32) {
     _swift_js_return_optional_object_extern(isSome, objectId)
 }
 

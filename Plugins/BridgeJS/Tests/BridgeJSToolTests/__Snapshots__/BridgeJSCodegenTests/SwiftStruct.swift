@@ -508,9 +508,12 @@ public func _bjs_Greeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Greeter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

@@ -2578,6 +2578,143 @@
         "swiftCallName" : "SwiftDataProcessor"
       },
       {
+        "methods" : [
+          {
+            "abiName" : "bjs_ProtocolReturnTests_static_createNativeProcessor",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "createNativeProcessor",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftProtocol" : {
+                "_0" : "DataProcessor"
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ProtocolReturnTests"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ProtocolReturnTests_static_createNativeProcessorOptional",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "createNativeProcessorOptional",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftProtocol" : {
+                    "_0" : "DataProcessor"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ProtocolReturnTests"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ProtocolReturnTests_static_createNativeProcessorNil",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "createNativeProcessorNil",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftProtocol" : {
+                    "_0" : "DataProcessor"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ProtocolReturnTests"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ProtocolReturnTests_static_createNativeProcessorArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "createNativeProcessorArray",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "swiftProtocol" : {
+                    "_0" : "DataProcessor"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ProtocolReturnTests"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ProtocolReturnTests_static_createNativeProcessorDictionary",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "createNativeProcessorDictionary",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "dictionary" : {
+                "_0" : {
+                  "swiftProtocol" : {
+                    "_0" : "DataProcessor"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ProtocolReturnTests"
+              }
+            }
+          }
+        ],
+        "name" : "ProtocolReturnTests",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "ProtocolReturnTests"
+      },
+      {
         "constructor" : {
           "abiName" : "bjs_TextProcessor_init",
           "effects" : {

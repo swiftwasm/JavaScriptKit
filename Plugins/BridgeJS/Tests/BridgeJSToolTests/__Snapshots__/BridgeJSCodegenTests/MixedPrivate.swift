@@ -41,9 +41,12 @@ public func _bjs_PrivateAPI_PrivateClass_deinit(_ pointer: UnsafeMutableRawPoint
     #endif
 }
 
-extension PrivateClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension PrivateClass: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PrivateAPI_PrivateClass_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_PrivateAPI_PrivateClass_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

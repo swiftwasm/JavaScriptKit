@@ -1409,4 +1409,38 @@ function testProtocolSupport(exports) {
 
     managerWithOptional.release();
     swiftBackup.release();
+
+  const nativeProcessor = exports.ProtocolReturnTests.createNativeProcessor();
+  assert.notEqual(nativeProcessor, undefined, "createNativeProcessor should return a value");
+  assert.equal(typeof nativeProcessor.increment, "function", "should have increment method");
+  nativeProcessor.increment(1);
+  assert.equal(nativeProcessor.count, 1, "count should be 1 after increment");
+  nativeProcessor.release();
+
+  const optProcessor = exports.ProtocolReturnTests.createNativeProcessorOptional();
+  assert.notEqual(optProcessor, null, "optional processor should not be null");
+  optProcessor.increment(1);
+  assert.equal(optProcessor.count, 1, "optional processor count should be 1 after increment");
+  optProcessor.release();
+
+  const nilProcessor = exports.ProtocolReturnTests.createNativeProcessorNil();
+  assert.equal(nilProcessor, null, "nil processor should be null");
+
+  const nativeArray = exports.ProtocolReturnTests.createNativeProcessorArray();
+  assert.equal(nativeArray.length, 2, "array should have 2 elements");
+  assert.equal(nativeArray[0].count, 10, "first element count should be 10");
+  assert.equal(nativeArray[1].count, 20, "second element count should be 20");
+  nativeArray[0].increment(1);
+  assert.equal(nativeArray[0].count, 11, "first element count should be 11 after increment");
+  nativeArray[0].release();
+  nativeArray[1].release();
+
+  const nativeDict = exports.ProtocolReturnTests.createNativeProcessorDictionary();
+  assert.notEqual(nativeDict, undefined, "dictionary should not be undefined");
+  assert.equal(nativeDict["first"].count, 10, "first entry count should be 10");
+  assert.equal(nativeDict["second"].count, 20, "second entry count should be 20");
+  nativeDict["first"].increment(5);
+  assert.equal(nativeDict["first"].count, 15, "first entry count should be 15 after increment");
+  nativeDict["first"].release();
+  nativeDict["second"].release();
 }

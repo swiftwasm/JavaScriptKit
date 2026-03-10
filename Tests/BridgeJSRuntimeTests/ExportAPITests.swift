@@ -1026,6 +1026,36 @@ enum GraphOperations {
     }
 }
 
+@JS class ProtocolReturnTests {
+    @JS static func createNativeProcessor() -> DataProcessor {
+        return SwiftDataProcessor()
+    }
+
+    @JS static func createNativeProcessorOptional() -> DataProcessor? {
+        return SwiftDataProcessor()
+    }
+
+    @JS static func createNativeProcessorNil() -> DataProcessor? {
+        return nil
+    }
+
+    @JS static func createNativeProcessorArray() -> [DataProcessor] {
+        let p1 = SwiftDataProcessor()
+        p1.count = 10
+        let p2 = SwiftDataProcessor()
+        p2.count = 20
+        return [p1, p2]
+    }
+
+    @JS static func createNativeProcessorDictionary() -> [String: DataProcessor] {
+        let p1 = SwiftDataProcessor()
+        p1.count = 10
+        let p2 = SwiftDataProcessor()
+        p2.count = 20
+        return ["first": p1, "second": p2]
+    }
+}
+
 // MARK: - Closure Tests
 
 // @JS func makeFormatter(prefix: String) -> (String) -> String {

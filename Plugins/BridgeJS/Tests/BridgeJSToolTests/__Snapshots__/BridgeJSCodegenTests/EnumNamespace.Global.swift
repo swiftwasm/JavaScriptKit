@@ -182,9 +182,12 @@ public func _bjs_Utils_Converter_deinit(_ pointer: UnsafeMutableRawPointer) -> V
     #endif
 }
 
-extension Utils.Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Utils.Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Utils_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Utils_Converter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -231,9 +234,12 @@ public func _bjs_Networking_API_HTTPServer_deinit(_ pointer: UnsafeMutableRawPoi
     #endif
 }
 
-extension Networking.API.HTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Networking.API.HTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Networking_API_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Networking_API_HTTPServer_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -280,9 +286,12 @@ public func _bjs_Networking_APIV2_Internal_TestServer_deinit(_ pointer: UnsafeMu
     #endif
 }
 
-extension Internal.TestServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Internal.TestServer: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Networking_APIV2_Internal_TestServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Networking_APIV2_Internal_TestServer_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -330,9 +339,12 @@ public func _bjs_Formatting_Converter_deinit(_ pointer: UnsafeMutableRawPointer)
     #endif
 }
 
-extension Formatting.Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Formatting.Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Formatting_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Formatting_Converter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

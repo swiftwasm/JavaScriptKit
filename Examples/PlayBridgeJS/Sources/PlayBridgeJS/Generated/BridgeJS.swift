@@ -209,9 +209,12 @@ public func _bjs_PlayBridgeJS_deinit(_ pointer: UnsafeMutableRawPointer) -> Void
     #endif
 }
 
-extension PlayBridgeJS: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension PlayBridgeJS: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PlayBridgeJS_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_PlayBridgeJS_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

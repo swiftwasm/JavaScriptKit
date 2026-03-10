@@ -51,9 +51,12 @@ public func _bjs_FunctionB_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension FunctionB: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension FunctionB: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_FunctionB_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_FunctionB_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -112,9 +115,12 @@ public func _bjs_FunctionA_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension FunctionA: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension FunctionA: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_FunctionA_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_FunctionA_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
