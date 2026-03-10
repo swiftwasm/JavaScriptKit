@@ -55,6 +55,17 @@ public func _bjs_Calculator_static_cube(_ value: Int32) -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_Calculator_static_version_get")
+@_cdecl("bjs_Calculator_static_version_get")
+public func _bjs_Calculator_static_version_get() -> Void {
+    #if arch(wasm32)
+    let ret = Calculator.version
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 extension APIResult: _BridgedSwiftAssociatedValueEnum {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> APIResult {
         switch caseId {
@@ -150,6 +161,17 @@ public func _bjs_MathUtils_multiply(_ _self: UnsafeMutableRawPointer, _ x: Int32
 public func _bjs_MathUtils_static_divide(_ a: Int32, _ b: Int32) -> Int32 {
     #if arch(wasm32)
     let ret = MathUtils.divide(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MathUtils_static_pi_get")
+@_cdecl("bjs_MathUtils_static_pi_get")
+public func _bjs_MathUtils_static_pi_get() -> Float64 {
+    #if arch(wasm32)
+    let ret = MathUtils.pi
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

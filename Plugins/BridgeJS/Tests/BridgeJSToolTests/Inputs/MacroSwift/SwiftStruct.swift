@@ -65,4 +65,10 @@ extension DataPoint {
     @JS func distanceFromOrigin() -> Double {
         return (x * x + y * y).squareRoot()
     }
+
+    @JS static func origin() -> DataPoint {
+        return DataPoint(x: 0, y: 0, label: "origin", optCount: nil, optFlag: nil)
+    }
+
+    @JS static var dimensions: Int { 2 }
 }

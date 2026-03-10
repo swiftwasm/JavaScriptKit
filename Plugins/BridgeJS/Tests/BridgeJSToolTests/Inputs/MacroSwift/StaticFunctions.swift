@@ -43,10 +43,14 @@ extension MathUtils {
     @JS static func divide(a: Int, b: Int) -> Int {
         return a / b
     }
+
+    @JS static var pi: Double { 3.14159 }
 }
 
 extension Calculator {
     @JS static func cube(value: Int) -> Int {
         return value * value * value
     }
+
+    @JS static var version: String { "1.0" }
 }

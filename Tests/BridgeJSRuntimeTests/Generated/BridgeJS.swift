@@ -3418,6 +3418,28 @@ public func _bjs_StaticCalculator_static_roundtrip(_ value: Int32) -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_StaticCalculator_static_doubleValue")
+@_cdecl("bjs_StaticCalculator_static_doubleValue")
+public func _bjs_StaticCalculator_static_doubleValue(_ value: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = StaticCalculator.doubleValue(_: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StaticCalculator_static_version_get")
+@_cdecl("bjs_StaticCalculator_static_version_get")
+public func _bjs_StaticCalculator_static_version_get() -> Void {
+    #if arch(wasm32)
+    let ret = StaticCalculator.version
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_StaticUtils_Nested_static_roundtrip")
 @_cdecl("bjs_StaticUtils_Nested_static_roundtrip")
 public func _bjs_StaticUtils_Nested_static_roundtrip(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
@@ -4227,6 +4249,39 @@ fileprivate func _bjs_struct_lift_DataPoint_extern() -> Int32 {
 public func _bjs_DataPoint_init(_ x: Float64, _ y: Float64, _ labelBytes: Int32, _ labelLength: Int32, _ optCountIsSome: Int32, _ optCountValue: Int32, _ optFlagIsSome: Int32, _ optFlagValue: Int32) -> Void {
     #if arch(wasm32)
     let ret = DataPoint(x: Double.bridgeJSLiftParameter(x), y: Double.bridgeJSLiftParameter(y), label: String.bridgeJSLiftParameter(labelBytes, labelLength), optCount: Optional<Int>.bridgeJSLiftParameter(optCountIsSome, optCountValue), optFlag: Optional<Bool>.bridgeJSLiftParameter(optFlagIsSome, optFlagValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataPoint_static_dimensions_get")
+@_cdecl("bjs_DataPoint_static_dimensions_get")
+public func _bjs_DataPoint_static_dimensions_get() -> Int32 {
+    #if arch(wasm32)
+    let ret = DataPoint.dimensions
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataPoint_distanceFromOrigin")
+@_cdecl("bjs_DataPoint_distanceFromOrigin")
+public func _bjs_DataPoint_distanceFromOrigin() -> Float64 {
+    #if arch(wasm32)
+    let ret = DataPoint.bridgeJSLiftParameter().distanceFromOrigin()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataPoint_static_origin")
+@_cdecl("bjs_DataPoint_static_origin")
+public func _bjs_DataPoint_static_origin() -> Void {
+    #if arch(wasm32)
+    let ret = DataPoint.origin()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -6934,6 +6989,28 @@ public func _bjs_Greeter_makeCustomGreeter(_ _self: UnsafeMutableRawPointer) -> 
     #endif
 }
 
+@_expose(wasm, "bjs_Greeter_greetEnthusiastically")
+@_cdecl("bjs_Greeter_greetEnthusiastically")
+public func _bjs_Greeter_greetEnthusiastically(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = Greeter.bridgeJSLiftParameter(_self).greetEnthusiastically()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Greeter_static_greetAnonymously")
+@_cdecl("bjs_Greeter_static_greetAnonymously")
+public func _bjs_Greeter_static_greetAnonymously() -> Void {
+    #if arch(wasm32)
+    let ret = Greeter.greetAnonymously()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_Greeter_name_get")
 @_cdecl("bjs_Greeter_name_get")
 public func _bjs_Greeter_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
@@ -6960,6 +7037,28 @@ public func _bjs_Greeter_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes
 public func _bjs_Greeter_prefix_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = Greeter.bridgeJSLiftParameter(_self).prefix
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Greeter_nameCount_get")
+@_cdecl("bjs_Greeter_nameCount_get")
+public func _bjs_Greeter_nameCount_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = Greeter.bridgeJSLiftParameter(_self).nameCount
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Greeter_static_defaultGreeting_get")
+@_cdecl("bjs_Greeter_static_defaultGreeting_get")
+public func _bjs_Greeter_static_defaultGreeting_get() -> Void {
+    #if arch(wasm32)
+    let ret = Greeter.defaultGreeting
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

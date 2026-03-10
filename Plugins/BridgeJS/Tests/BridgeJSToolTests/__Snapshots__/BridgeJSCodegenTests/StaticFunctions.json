@@ -168,7 +168,21 @@
         ],
         "name" : "MathUtils",
         "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "pi",
+            "staticContext" : {
+              "className" : {
+                "_0" : "MathUtils"
+              }
+            },
+            "type" : {
+              "double" : {
 
+              }
+            }
+          }
         ],
         "swiftCallName" : "MathUtils"
       }
@@ -254,7 +268,21 @@
           }
         ],
         "staticProperties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "version",
+            "staticContext" : {
+              "enumName" : {
+                "_0" : "Calculator"
+              }
+            },
+            "type" : {
+              "string" : {
 
+              }
+            }
+          }
         ],
         "swiftCallName" : "Calculator",
         "tsFullPath" : "Calculator"

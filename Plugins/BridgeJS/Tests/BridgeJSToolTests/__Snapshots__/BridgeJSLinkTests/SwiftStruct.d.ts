@@ -16,6 +16,7 @@ export interface DataPoint {
     label: string;
     optCount: number | null;
     optFlag: boolean | null;
+    distanceFromOrigin(): number;
 }
 export interface Address {
     street: string;
@@ -65,6 +66,8 @@ export type Exports = {
     Precision: PrecisionObject
     DataPoint: {
         init(x: number, y: number, label: string, optCount: number | null, optFlag: boolean | null): DataPoint;
+        readonly dimensions: number;
+        origin(): DataPoint;
     }
     ConfigStruct: {
         readonly maxRetries: number;

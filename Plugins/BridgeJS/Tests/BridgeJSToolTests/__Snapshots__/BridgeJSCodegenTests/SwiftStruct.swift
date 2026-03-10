@@ -66,11 +66,33 @@ public func _bjs_DataPoint_init(_ x: Float64, _ y: Float64, _ labelBytes: Int32,
     #endif
 }
 
+@_expose(wasm, "bjs_DataPoint_static_dimensions_get")
+@_cdecl("bjs_DataPoint_static_dimensions_get")
+public func _bjs_DataPoint_static_dimensions_get() -> Int32 {
+    #if arch(wasm32)
+    let ret = DataPoint.dimensions
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_DataPoint_distanceFromOrigin")
 @_cdecl("bjs_DataPoint_distanceFromOrigin")
 public func _bjs_DataPoint_distanceFromOrigin() -> Float64 {
     #if arch(wasm32)
     let ret = DataPoint.bridgeJSLiftParameter().distanceFromOrigin()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataPoint_static_origin")
+@_cdecl("bjs_DataPoint_static_origin")
+public func _bjs_DataPoint_static_origin() -> Void {
+    #if arch(wasm32)
+    let ret = DataPoint.origin()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
