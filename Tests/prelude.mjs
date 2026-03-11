@@ -793,14 +793,19 @@ function testStructSupport(exports) {
     const data2 = { x: 0.0, y: 0.0, label: "", optCount: null, optFlag: null };
     assert.deepEqual(exports.roundTripDataPoint(data2), data2);
 
-    // Test struct extension members
-    const data3 = { x: 3.0, y: 4.0, label: "Test", optCount: null, optFlag: null };
-    assert.equal(exports.DataPoint.distanceFromOrigin(data3), 5.0);
+    // Test struct extension static members
     const origin = exports.DataPoint.origin();
     assert.equal(origin.x, 0.0);
     assert.equal(origin.y, 0.0);
     assert.equal(origin.label, "origin");
     assert.equal(exports.DataPoint.dimensions, 2);
+
+    // Test struct extension instance methods
+    const vec = new exports.Vector2D(3.0, 4.0);
+    assert.equal(vec.magnitude(), 5.0);
+    const scaled = vec.scaled(2.0);
+    assert.equal(scaled.dx, 6.0);
+    assert.equal(scaled.dy, 8.0);
 
     const publicPoint = { x: 9, y: -3 };
     assert.deepEqual(exports.roundTripPublicPoint(publicPoint), publicPoint);
