@@ -797,7 +797,7 @@ function testStructSupport(exports) {
     assert.equal(exports.DataPoint.dimensions, 2);
 
     // Test struct extension instance methods
-    const vec = new exports.Vector2D(3.0, 4.0);
+    const vec = exports.Vector2D.init(3.0, 4.0);
     assert.equal(vec.magnitude(), 5.0);
     const scaled = vec.scaled(2.0);
     assert.equal(scaled.dx, 6.0);

@@ -1425,7 +1425,12 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
     }
 
-    /// Walks extension members under the matching type’s state, returning whether the type was found
+    /// Walks extension members under the matching type’s state, returning whether the type was found.
+    ///
+    /// Note: The lookup scans dictionaries keyed by `makeKey(name:namespace:)`, matching only by
+    /// plain name. If two types share a name but differ by namespace, `.first(where:)` picks
+    /// whichever comes first. This is acceptable today since namespace collisions are unlikely,
+    /// but may need refinement if namespace-qualified extension resolution is added.
     func resolveExtension(_ ext: ExtensionDeclSyntax) -> Bool {
         let name = ext.extendedType.trimmedDescription
         let state: State
@@ -1435,6 +1440,13 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             state = .structBody(name: name, key: entry.key)
         } else if let entry = exportedEnumByName.first(where: { $0.value.name == name }) {
             state = .enumBody(name: name, key: entry.key)
+        } else if exportedProtocolByName.values.contains(where: { $0.name == name }) {
+            diagnose(
+                node: ext.extendedType,
+                message: "Protocol extensions are not supported by BridgeJS.",
+                hint: "You cannot extend `@JS` protocol '\(name)' with additional members"
+            )
+            return true
         } else {
             return false
         }
