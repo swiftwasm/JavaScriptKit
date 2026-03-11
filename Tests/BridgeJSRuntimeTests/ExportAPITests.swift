@@ -1206,6 +1206,34 @@ enum GraphOperations {
             }
         }
     }
+
+    @JS func processDataProcessor(_ callback: (DataProcessor) -> String) -> String {
+        let processor = SwiftDataProcessor()
+        processor.increment(by: 42)
+        return callback(processor)
+    }
+
+    @JS func makeDataProcessorFactory() -> () -> DataProcessor {
+        var count = 0
+        return {
+            count += 1
+            let p = SwiftDataProcessor()
+            p.increment(by: count * 10)
+            return p
+        }
+    }
+
+    @JS func roundtripDataProcessor(
+        _ callback: @escaping (DataProcessor) -> DataProcessor
+    ) -> (DataProcessor) -> DataProcessor {
+        return callback
+    }
+
+    @JS func processOptionalDataProcessor(_ callback: (DataProcessor?) -> String) -> String {
+        let processor = SwiftDataProcessor()
+        processor.increment(by: 7)
+        return callback(processor) + " | " + callback(nil)
+    }
 }
 
 class ExportAPITests: XCTestCase {

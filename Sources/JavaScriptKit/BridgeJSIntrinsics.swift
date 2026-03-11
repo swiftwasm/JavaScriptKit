@@ -578,6 +578,10 @@ extension _BridgedSwiftProtocolWrapper {
         bridgeJSStackPop()
     }
 
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Int32) -> Self {
+        bridgeJSLiftParameter(value)
+    }
+
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
         jsObject.bridgeJSLowerReturn()
     }

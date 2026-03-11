@@ -77,15 +77,23 @@ export function getImports(importsContext) {
             }
         },
         jsOptionalInvoke: (fn) => {
-            if (fn == null) { return false; }
+            if (fn == null) {
+                return false;
+            }
             return fn();
         },
-        jsStoreClosure: (fn) => { globalThis.__storedClosure = fn; },
-        jsCallStoredClosure: () => { return globalThis.__storedClosure?.(); },
+        jsStoreClosure: (fn) => {
+            globalThis.__storedClosure = fn;
+        },
+        jsCallStoredClosure: () => {
+            return globalThis.__storedClosure?.();
+        },
 
         runJsClosureSupportTests: () => {
             const exports = importsContext.getExports();
-            if (!exports) { throw new Error("No exports!?"); }
+            if (!exports) {
+                throw new Error("No exports!?");
+            }
             runJsClosureSupportTests(exports);
         },
     };
@@ -103,19 +111,32 @@ export function runJsClosureSupportTests(exports) {
     const multiParamTransform = (count, text, ratio) => {
         return `${text.toUpperCase()}-${count}-${ratio.toFixed(2)}`;
     };
-    assert.equal(processor.processWithCustom("world", multiParamTransform), "WORLD-42-3.14");
+    assert.equal(
+        processor.processWithCustom("world", multiParamTransform),
+        "WORLD-42-3.14",
+    );
     assert.equal(processor.process("test"), "TEST");
 
     const greeterForClosure = new exports.Greeter("World");
     const greeterCaller = new exports.Greeter("Caller");
-    const customGreeting = (greeter) => `Custom greeting for ${greeter.name}: ${greeter.greet()}`;
-    const greetResult = greeterCaller.greetWith(greeterForClosure, customGreeting);
+    const customGreeting = (greeter) =>
+        `Custom greeting for ${greeter.name}: ${greeter.greet()}`;
+    const greetResult = greeterCaller.greetWith(
+        greeterForClosure,
+        customGreeting,
+    );
     assert.equal(greetResult, "Custom greeting for World: Hello, World!");
     greeterForClosure.release();
     greeterCaller.release();
 
-    assert.equal(exports.formatName("ada", (name) => name.toUpperCase()), "ADA");
-    assert.equal(exports.formatName("grace", (name) => `Dr. ${name}`), "Dr. grace");
+    assert.equal(
+        exports.formatName("ada", (name) => name.toUpperCase()),
+        "ADA",
+    );
+    assert.equal(
+        exports.formatName("grace", (name) => `Dr. ${name}`),
+        "Dr. grace",
+    );
 
     const addDr = exports.makeFormatter("Dr.");
     assert.equal(addDr("Ada"), "Dr. Ada");
@@ -137,8 +158,14 @@ export function runJsClosureSupportTests(exports) {
 
     const greeterForFormatter = new exports.Greeter("Formatter");
     const greeterFormatter = greeterForFormatter.makeFormatter(" [suffix]");
-    assert.equal(greeterFormatter("test"), "Hello, Formatter! - test -  [suffix]");
-    assert.equal(greeterFormatter("data"), "Hello, Formatter! - data -  [suffix]");
+    assert.equal(
+        greeterFormatter("test"),
+        "Hello, Formatter! - test -  [suffix]",
+    );
+    assert.equal(
+        greeterFormatter("data"),
+        "Hello, Formatter! - data -  [suffix]",
+    );
     greeterForFormatter.release();
 
     const greeterCreator = exports.Greeter.makeCreator("Default");
@@ -206,11 +233,16 @@ export function runJsClosureSupportTests(exports) {
 
     const dirResult = processor.processDirection((dir) => {
         switch (dir) {
-            case exports.Direction.North: return "Going North";
-            case exports.Direction.South: return "Going South";
-            case exports.Direction.East: return "Going East";
-            case exports.Direction.West: return "Going West";
-            default: return "Unknown";
+            case exports.Direction.North:
+                return "Going North";
+            case exports.Direction.South:
+                return "Going South";
+            case exports.Direction.East:
+                return "Going East";
+            case exports.Direction.West:
+                return "Going West";
+            default:
+                return "Unknown";
         }
     });
     assert.equal(dirResult, "Going North");
@@ -251,12 +283,27 @@ export function runJsClosureSupportTests(exports) {
     assert.equal(statusExtractor(exports.HttpStatus.Unknown), -1);
 
     const apiHandler = processor.makeAPIResultHandler();
-    assert.equal(apiHandler({ tag: exports.APIResult.Tag.Success, param0: "done" }), "Success: done");
-    assert.equal(apiHandler({ tag: exports.APIResult.Tag.Failure, param0: 500 }), "Failure: 500");
+    assert.equal(
+        apiHandler({ tag: exports.APIResult.Tag.Success, param0: "done" }),
+        "Success: done",
+    );
+    assert.equal(
+        apiHandler({ tag: exports.APIResult.Tag.Failure, param0: 500 }),
+        "Failure: 500",
+    );
     assert.equal(apiHandler({ tag: exports.APIResult.Tag.Info }), "Info");
-    assert.equal(apiHandler({ tag: exports.APIResult.Tag.Flag, param0: true }), "Flag: true");
-    assert.equal(apiHandler({ tag: exports.APIResult.Tag.Rate, param0: 1.5 }), "Rate: 1.5");
-    assert.equal(apiHandler({ tag: exports.APIResult.Tag.Precise, param0: 3.14159 }), "Precise: 3.14159");
+    assert.equal(
+        apiHandler({ tag: exports.APIResult.Tag.Flag, param0: true }),
+        "Flag: true",
+    );
+    assert.equal(
+        apiHandler({ tag: exports.APIResult.Tag.Rate, param0: 1.5 }),
+        "Rate: 1.5",
+    );
+    assert.equal(
+        apiHandler({ tag: exports.APIResult.Tag.Precise, param0: 3.14159 }),
+        "Precise: 3.14159",
+    );
 
     const optDirResult = processor.processOptionalDirection((dir) => {
         return dir !== null ? `Dir: ${dir}` : "Dir: null";
@@ -284,28 +331,55 @@ export function runJsClosureSupportTests(exports) {
     assert.equal(optDirFormatter(exports.Direction.West), "W");
     assert.equal(optDirFormatter(null), "nil");
 
-    processor.release();
+    const dpResult = processor.processDataProcessor((dp) => {
+        return `Value: ${dp.getValue()}`;
+    });
+    assert.equal(dpResult, "Value: 42");
 
+    const dpFactory = processor.makeDataProcessorFactory();
+    const dp1 = dpFactory();
+    assert.equal(dp1.getValue(), 10);
+    const dp2 = dpFactory();
+    assert.equal(dp2.getValue(), 20);
+
+    const dpRoundtrip = processor.roundtripDataProcessor((dp) => {
+        dp.increment(100);
+        return dp;
+    });
+    const testDp = new exports.SwiftDataProcessor();
+    const roundtrippedDp = dpRoundtrip(testDp);
+    assert.equal(roundtrippedDp.getValue(), 100);
+
+    const optDpResult = processor.processOptionalDataProcessor((dp) => {
+        return dp !== null ? `DP: ${dp.getValue()}` : "DP: null";
+    });
+    assert.equal(optDpResult, "DP: 7 | DP: null");
+
+    processor.release();
 
     const intToInt = exports.ClosureSupportExports.makeIntToInt(10);
     assert.equal(intToInt(0), 10);
     assert.equal(intToInt(32), 42);
 
-    const doubleToDouble = exports.ClosureSupportExports.makeDoubleToDouble(10.0);
+    const doubleToDouble =
+        exports.ClosureSupportExports.makeDoubleToDouble(10.0);
     assert.equal(doubleToDouble(0.0), 10.0);
     assert.equal(doubleToDouble(32.0), 42.0);
 
-    const stringToString = exports.ClosureSupportExports.makeStringToString("Hello, ");
+    const stringToString =
+        exports.ClosureSupportExports.makeStringToString("Hello, ");
     assert.equal(stringToString("world!"), "Hello, world!");
 
     const jsIntToInt = exports.ClosureSupportExports.makeJSIntToInt(10);
     assert.equal(jsIntToInt(0), 10);
     assert.equal(jsIntToInt(32), 42);
 
-    const jsDoubleToDouble = exports.ClosureSupportExports.makeJSDoubleToDouble(10.0);
+    const jsDoubleToDouble =
+        exports.ClosureSupportExports.makeJSDoubleToDouble(10.0);
     assert.equal(jsDoubleToDouble(0.0), 10.0);
     assert.equal(jsDoubleToDouble(32.0), 42.0);
 
-    const jsStringToString = exports.ClosureSupportExports.makeJSStringToString("Hello, ");
+    const jsStringToString =
+        exports.ClosureSupportExports.makeJSStringToString("Hello, ");
     assert.equal(jsStringToString("world!"), "Hello, world!");
 }

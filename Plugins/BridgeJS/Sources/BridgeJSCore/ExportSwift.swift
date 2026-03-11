@@ -1454,6 +1454,16 @@ extension BridgeType {
         }
     }
 
+    var closureSwiftType: String {
+        switch self {
+        case .swiftProtocol(let name): return "any \(name)"
+        case .nullable(let wrappedType, let kind):
+            let wrappedClosureType = wrappedType.closureSwiftType
+            return kind == .null ? "Optional<\(wrappedClosureType)>" : "JSUndefinedOr<\(wrappedClosureType)>"
+        default: return swiftType
+        }
+    }
+
     var isClosureType: Bool {
         if case .closure = self { return true }
         return false
