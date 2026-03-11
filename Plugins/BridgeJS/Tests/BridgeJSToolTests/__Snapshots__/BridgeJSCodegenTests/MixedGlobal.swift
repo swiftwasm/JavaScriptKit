@@ -41,9 +41,12 @@ public func _bjs_GlobalAPI_GlobalClass_deinit(_ pointer: UnsafeMutableRawPointer
     #endif
 }
 
-extension GlobalClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension GlobalClass: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_GlobalAPI_GlobalClass_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_GlobalAPI_GlobalClass_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

@@ -697,7 +697,9 @@ extension Priority: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 public func _bjs_processDelegates() -> Void {
     #if arch(wasm32)
     let ret = processDelegates(_: [AnyMyViewControllerDelegate].bridgeJSStackPop())
-    ret.map { $0 as! AnyMyViewControllerDelegate }.bridgeJSStackPush()
+    for __bjs_elem_ret in ret {
+    _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -755,9 +757,12 @@ public func _bjs_Helper_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension Helper: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Helper: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Helper_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Helper_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -850,8 +855,8 @@ public func _bjs_MyViewController_sendHelper(_ _self: UnsafeMutableRawPointer, _
 @_cdecl("bjs_MyViewController_delegate_get")
 public func _bjs_MyViewController_delegate_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = MyViewController.bridgeJSLiftParameter(_self).delegate as! AnyMyViewControllerDelegate
-    return ret.bridgeJSLowerReturn()
+    let ret = MyViewController.bridgeJSLiftParameter(_self).delegate as! _BridgedSwiftProtocolExportable
+    return ret.bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -871,8 +876,12 @@ public func _bjs_MyViewController_delegate_set(_ _self: UnsafeMutableRawPointer,
 @_cdecl("bjs_MyViewController_secondDelegate_get")
 public func _bjs_MyViewController_secondDelegate_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = (MyViewController.bridgeJSLiftParameter(_self).secondDelegate).flatMap { $0 as? AnyMyViewControllerDelegate }
-    return ret.bridgeJSLowerReturn()
+    let ret = MyViewController.bridgeJSLiftParameter(_self).secondDelegate
+    if let ret {
+        _swift_js_return_optional_object(1, (ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+    } else {
+        _swift_js_return_optional_object(0, 0)
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -898,9 +907,12 @@ public func _bjs_MyViewController_deinit(_ pointer: UnsafeMutableRawPointer) -> 
     #endif
 }
 
-extension MyViewController: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension MyViewController: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_MyViewController_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_MyViewController_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -942,7 +954,9 @@ public func _bjs_DelegateManager_notifyAll(_ _self: UnsafeMutableRawPointer) -> 
 public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
     let ret = DelegateManager.bridgeJSLiftParameter(_self).delegates
-    ret.map { $0 as! AnyMyViewControllerDelegate }.bridgeJSStackPush()
+    for __bjs_elem_ret in ret {
+    _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())}
+    _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -968,9 +982,12 @@ public func _bjs_DelegateManager_deinit(_ pointer: UnsafeMutableRawPointer) -> V
     #endif
 }
 
-extension DelegateManager: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension DelegateManager: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_DelegateManager_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_DelegateManager_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

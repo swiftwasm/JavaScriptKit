@@ -428,9 +428,12 @@ public func _bjs_DefaultGreeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Vo
     #endif
 }
 
-extension DefaultGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension DefaultGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_DefaultGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_DefaultGreeter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -467,9 +470,12 @@ public func _bjs_EmptyGreeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void
     #endif
 }
 
-extension EmptyGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension EmptyGreeter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_EmptyGreeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_EmptyGreeter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -611,9 +617,12 @@ public func _bjs_ConstructorDefaults_deinit(_ pointer: UnsafeMutableRawPointer) 
     #endif
 }
 
-extension ConstructorDefaults: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension ConstructorDefaults: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_ConstructorDefaults_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_ConstructorDefaults_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

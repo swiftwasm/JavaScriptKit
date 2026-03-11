@@ -491,9 +491,12 @@ public func _bjs_EnumRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Voi
     #endif
 }
 
-extension EnumRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension EnumRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_EnumRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_EnumRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -628,9 +631,12 @@ public func _bjs_ComplexResultRoundtrip_deinit(_ pointer: UnsafeMutableRawPointe
     #endif
 }
 
-extension ComplexResultRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension ComplexResultRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_ComplexResultRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_ComplexResultRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -688,9 +694,12 @@ public func _bjs_StringRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> V
     #endif
 }
 
-extension StringRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension StringRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_StringRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_StringRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -815,9 +824,12 @@ public func _bjs_OptionalReturnRoundtrip_deinit(_ pointer: UnsafeMutableRawPoint
     #endif
 }
 
-extension OptionalReturnRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension OptionalReturnRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_OptionalReturnRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_OptionalReturnRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -982,9 +994,12 @@ public func _bjs_StructRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> V
     #endif
 }
 
-extension StructRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension StructRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_StructRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_StructRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -1126,9 +1141,12 @@ public func _bjs_SimpleClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Void 
     #endif
 }
 
-extension SimpleClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension SimpleClass: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_SimpleClass_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_SimpleClass_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -1228,9 +1246,12 @@ public func _bjs_AddressClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Void
     #endif
 }
 
-extension AddressClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension AddressClass: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_AddressClass_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_AddressClass_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -1331,9 +1352,12 @@ public func _bjs_ClassRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Vo
     #endif
 }
 
-extension ClassRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension ClassRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_ClassRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_ClassRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -1691,9 +1715,12 @@ public func _bjs_ArrayRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Vo
     #endif
 }
 
-extension ArrayRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension ArrayRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_ArrayRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_ArrayRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

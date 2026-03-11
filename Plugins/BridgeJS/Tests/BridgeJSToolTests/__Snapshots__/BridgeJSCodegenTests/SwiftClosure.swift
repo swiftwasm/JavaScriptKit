@@ -1610,9 +1610,12 @@ public func _bjs_Person_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension Person: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Person: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     public var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Person_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    public consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Person_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -1649,9 +1652,12 @@ public func _bjs_TestProcessor_deinit(_ pointer: UnsafeMutableRawPointer) -> Voi
     #endif
 }
 
-extension TestProcessor: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension TestProcessor: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_TestProcessor_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_TestProcessor_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

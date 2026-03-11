@@ -414,9 +414,12 @@ public func _bjs_Item_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension Item: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Item: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Item_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Item_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -477,9 +480,12 @@ public func _bjs_MultiArrayContainer_deinit(_ pointer: UnsafeMutableRawPointer) 
     #endif
 }
 
-extension MultiArrayContainer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension MultiArrayContainer: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_MultiArrayContainer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_MultiArrayContainer_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

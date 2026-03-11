@@ -167,12 +167,7 @@ public class ExportSwift {
         private func protocolCastSuffix(for returnType: BridgeType) -> (prefix: String, suffix: String) {
             switch returnType {
             case .swiftProtocol:
-                return ("", " as! \(returnType.swiftType)")
-            case .nullable(let wrappedType, _):
-                if case .swiftProtocol = wrappedType {
-                    return ("(", ").flatMap { $0 as? \(wrappedType.swiftType) }")
-                }
-                return ("", "")
+                return ("", " as! _BridgedSwiftProtocolExportable")
             default:
                 return ("", "")
             }
@@ -311,6 +306,23 @@ public class ExportSwift {
                 for stmt in stackCodegen.lowerStatements(for: returnType, accessor: "ret", varPrefix: "ret") {
                     append(stmt)
                 }
+            case .dictionary(.swiftProtocol):
+                let stackCodegen = StackCodegen()
+                for stmt in stackCodegen.lowerStatements(for: returnType, accessor: "ret", varPrefix: "ret") {
+                    append(stmt)
+                }
+            case .swiftProtocol:
+                append("return ret.bridgeJSLowerAsProtocolReturn()")
+            case .nullable(.swiftProtocol, _):
+                append(
+                    """
+                    if let ret {
+                        _swift_js_return_optional_object(1, (ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+                    } else {
+                        _swift_js_return_optional_object(0, 0)
+                    }
+                    """
+                )
             default:
                 append("return ret.bridgeJSLowerReturn()")
             }
@@ -703,9 +715,12 @@ public class ExportSwift {
         // If the class has an explicit access control, we need to add it to the extension declaration.
         let accessControl = klass.explicitAccessControl.map { "\($0) " } ?? ""
         let extensionDecl: DeclSyntax = """
-            extension \(raw: klass.swiftCallName): ConvertibleToJSValue, _BridgedSwiftHeapObject {
+            extension \(raw: klass.swiftCallName): ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
                 \(raw: accessControl)var jsValue: JSValue {
                     return .object(JSObject(id: UInt32(bitPattern: \(raw: wrapFunctionName)(Unmanaged.passRetained(self).toOpaque()))))
+                }
+                \(raw: accessControl)consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+                    \(raw: wrapFunctionName)(Unmanaged.passRetained(self).toOpaque())
                 }
             }
             """
@@ -781,7 +796,9 @@ struct StackCodegen {
         case .jsObject(_?):
             return ["\(raw: accessor).jsObject.bridgeJSStackPush()"]
         case .swiftProtocol:
-            return ["(\(raw: accessor) as! \(raw: type.swiftType)).bridgeJSStackPush()"]
+            return [
+                "_swift_js_push_i32((\(raw: accessor) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
+            ]
         case .void, .namespaceEnum:
             return []
         case .array(let elementType):
@@ -798,12 +815,27 @@ struct StackCodegen {
     ) -> [CodeBlockItemSyntax] {
         switch elementType {
         case .swiftProtocol:
-            return ["\(raw: accessor).map { $0 as! \(raw: elementType.swiftType) }.bridgeJSStackPush()"]
+            return lowerProtocolArrayStatements(accessor: accessor, varPrefix: varPrefix)
         case .void, .namespaceEnum:
             fatalError("Invalid array element type: \(elementType)")
         default:
             return ["\(raw: accessor).bridgeJSStackPush()"]
         }
+    }
+
+    private func lowerProtocolArrayStatements(
+        accessor: String,
+        varPrefix: String
+    ) -> [CodeBlockItemSyntax] {
+        var statements: [CodeBlockItemSyntax] = []
+        let elemVar = "__bjs_elem_\(varPrefix)"
+        statements.append("for \(raw: elemVar) in \(raw: accessor) {")
+        statements.append(
+            "    _swift_js_push_i32((\(raw: elemVar) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
+        )
+        statements.append("}")
+        statements.append("_swift_js_push_i32(Int32(\(raw: accessor).count))")
+        return statements
     }
 
     private func lowerDictionaryStatements(
@@ -815,7 +847,7 @@ struct StackCodegen {
         case .jsObject(let className?) where className != "JSObject":
             return ["\(raw: accessor).mapValues { $0.jsObject }.bridgeJSStackPush()"]
         case .swiftProtocol:
-            return ["\(raw: accessor).mapValues { $0 as! \(raw: valueType.swiftType) }.bridgeJSStackPush()"]
+            return lowerProtocolDictionaryStatements(accessor: accessor, varPrefix: varPrefix)
         case .nullable, .closure:
             return lowerDictionaryStatementsInline(
                 valueType: valueType,
@@ -858,6 +890,22 @@ struct StackCodegen {
             statements.append(stmt)
         }
 
+        statements.append("}")
+        statements.append("_swift_js_push_i32(Int32(\(raw: accessor).count))")
+        return statements
+    }
+
+    private func lowerProtocolDictionaryStatements(
+        accessor: String,
+        varPrefix: String
+    ) -> [CodeBlockItemSyntax] {
+        var statements: [CodeBlockItemSyntax] = []
+        let pairVar = "__bjs_kv_\(varPrefix)"
+        statements.append("for \(raw: pairVar) in \(raw: accessor) {")
+        statements.append("    \(raw: pairVar).key.bridgeJSStackPush()")
+        statements.append(
+            "    _swift_js_push_i32((\(raw: pairVar).value as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
+        )
         statements.append("}")
         statements.append("_swift_js_push_i32(Int32(\(raw: accessor).count))")
         return statements

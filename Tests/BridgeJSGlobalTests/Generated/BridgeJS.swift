@@ -207,9 +207,12 @@ public func _bjs_GlobalNetworking_API_TestHTTPServer_deinit(_ pointer: UnsafeMut
     #endif
 }
 
-extension GlobalNetworking.API.TestHTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension GlobalNetworking.API.TestHTTPServer: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_GlobalNetworking_API_TestHTTPServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_GlobalNetworking_API_TestHTTPServer_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -256,9 +259,12 @@ public func _bjs_GlobalNetworking_APIV2_Internal_TestInternalServer_deinit(_ poi
     #endif
 }
 
-extension Internal.TestInternalServer: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Internal.TestInternalServer: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_GlobalNetworking_APIV2_Internal_TestInternalServer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_GlobalNetworking_APIV2_Internal_TestInternalServer_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -327,9 +333,12 @@ public func _bjs_GlobalUtils_PublicConverter_deinit(_ pointer: UnsafeMutableRawP
     #endif
 }
 
-extension GlobalUtils.PublicConverter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension GlobalUtils.PublicConverter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_GlobalUtils_PublicConverter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_GlobalUtils_PublicConverter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

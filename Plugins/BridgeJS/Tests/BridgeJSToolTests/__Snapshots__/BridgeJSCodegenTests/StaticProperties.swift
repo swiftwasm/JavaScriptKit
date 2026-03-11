@@ -319,9 +319,12 @@ public func _bjs_PropertyClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Voi
     #endif
 }
 
-extension PropertyClass: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension PropertyClass: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_PropertyClass_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_PropertyClass_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

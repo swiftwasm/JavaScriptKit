@@ -63,9 +63,12 @@ public func _bjs_Box_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
     #endif
 }
 
-extension Box: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Box: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Box_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Box_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 

@@ -52,9 +52,12 @@ public func _bjs___Swift_Foundation_Greeter_deinit(_ pointer: UnsafeMutableRawPo
     #endif
 }
 
-extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Greeter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs___Swift_Foundation_Greeter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs___Swift_Foundation_Greeter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -102,9 +105,12 @@ public func _bjs_Utils_Converters_Converter_deinit(_ pointer: UnsafeMutableRawPo
     #endif
 }
 
-extension Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Converter: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Utils_Converters_Converter_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Utils_Converters_Converter_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -141,9 +147,12 @@ public func _bjs___Swift_Foundation_UUID_deinit(_ pointer: UnsafeMutableRawPoint
     #endif
 }
 
-extension UUID: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension UUID: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs___Swift_Foundation_UUID_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs___Swift_Foundation_UUID_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
@@ -201,9 +210,12 @@ public func _bjs_Collections_Container_deinit(_ pointer: UnsafeMutableRawPointer
     #endif
 }
 
-extension Container: ConvertibleToJSValue, _BridgedSwiftHeapObject {
+extension Container: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
     var jsValue: JSValue {
         return .object(JSObject(id: UInt32(bitPattern: _bjs_Collections_Container_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Collections_Container_wrap(Unmanaged.passRetained(self).toOpaque())
     }
 }
 
