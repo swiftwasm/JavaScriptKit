@@ -3595,6 +3595,189 @@
                 "useJSTypedClosure" : false
               }
             }
+          },
+          {
+            "abiName" : "bjs_TextProcessor_processDataProcessor",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "processDataProcessor",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "callback",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTests13DataProcessorP_SS",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "swiftProtocol" : {
+                            "_0" : "DataProcessor"
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "string" : {
+
+                        }
+                      }
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_TextProcessor_makeDataProcessorFactory",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeDataProcessorFactory",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsy_13DataProcessorP",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+
+                  ],
+                  "returnType" : {
+                    "swiftProtocol" : {
+                      "_0" : "DataProcessor"
+                    }
+                  }
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_TextProcessor_roundtripDataProcessor",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "roundtripDataProcessor",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "callback",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTests13DataProcessorP_13DataProcessorP",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "swiftProtocol" : {
+                            "_0" : "DataProcessor"
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "swiftProtocol" : {
+                          "_0" : "DataProcessor"
+                        }
+                      }
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTests13DataProcessorP_13DataProcessorP",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "swiftProtocol" : {
+                        "_0" : "DataProcessor"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "swiftProtocol" : {
+                      "_0" : "DataProcessor"
+                    }
+                  }
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_TextProcessor_processOptionalDataProcessor",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "processOptionalDataProcessor",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "callback",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTestsSq13DataProcessorP_SS",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "nullable" : {
+                            "_0" : {
+                              "swiftProtocol" : {
+                                "_0" : "DataProcessor"
+                              }
+                            },
+                            "_1" : "null"
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "string" : {
+
+                        }
+                      }
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
           }
         ],
         "name" : "TextProcessor",

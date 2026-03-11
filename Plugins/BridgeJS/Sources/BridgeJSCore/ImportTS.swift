@@ -163,8 +163,28 @@ public struct ImportTS {
                         }
                     )
                 )
+            } else if case .nullable(.swiftProtocol, _) = param.type, context == .exportSwift {
+                body.write("let \(pattern): (Int32, Int32)")
+                body.write("if let \(param.name) {")
+                body.indent {
+                    body.write(
+                        "\(pattern) = (1, (\(param.name) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
+                    )
+                }
+                body.write("} else {")
+                body.indent {
+                    body.write("\(pattern) = (0, 0)")
+                }
+                body.write("}")
             } else {
-                let initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
+                let initializerExpr: ExprSyntax
+                if case .swiftProtocol = param.type, context == .exportSwift {
+                    initializerExpr = ExprSyntax(
+                        "(\(raw: param.name) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()"
+                    )
+                } else {
+                    initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
+                }
 
                 if loweringInfo.loweredParameters.isEmpty {
                     stackLoweringStmts.insert("let _ = \(initializerExpr)", at: 0)
@@ -817,7 +837,12 @@ extension BridgeType {
         case .swiftHeapObject:
             return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
         case .swiftProtocol:
-            throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
+            case .exportSwift:
+                return LoweringParameterInfo(loweredParameters: [("objectId", .i32)])
+            }
         case .caseEnum:
             switch context {
             case .importTS:
@@ -891,7 +916,12 @@ extension BridgeType {
         case .swiftHeapObject:
             return LiftingReturnInfo(valueToLift: .pointer)
         case .swiftProtocol:
-            throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
+            switch context {
+            case .importTS:
+                throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
+            case .exportSwift:
+                return LiftingReturnInfo(valueToLift: .i32)
+            }
         case .caseEnum:
             switch context {
             case .importTS:

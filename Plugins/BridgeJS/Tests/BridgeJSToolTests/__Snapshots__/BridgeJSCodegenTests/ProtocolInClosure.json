@@ -1,0 +1,281 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Widget_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Widget",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Widget"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_processRenderable",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processRenderable",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "item",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "Renderable"
+              }
+            }
+          },
+          {
+            "label" : "transform",
+            "name" : "transform",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModule10RenderableP_SS",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "swiftProtocol" : {
+                        "_0" : "Renderable"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "string" : {
+
+                    }
+                  }
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeRenderableFactory",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeRenderableFactory",
+        "parameters" : [
+          {
+            "label" : "defaultName",
+            "name" : "defaultName",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : false,
+              "mangleName" : "10TestModuley_10RenderableP",
+              "moduleName" : "TestModule",
+              "parameters" : [
+
+              ],
+              "returnType" : {
+                "swiftProtocol" : {
+                  "_0" : "Renderable"
+                }
+              }
+            },
+            "useJSTypedClosure" : false
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundtripRenderable",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripRenderable",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "callback",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModule10RenderableP_10RenderableP",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "swiftProtocol" : {
+                        "_0" : "Renderable"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "swiftProtocol" : {
+                      "_0" : "Renderable"
+                    }
+                  }
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : false,
+              "mangleName" : "10TestModule10RenderableP_10RenderableP",
+              "moduleName" : "TestModule",
+              "parameters" : [
+                {
+                  "swiftProtocol" : {
+                    "_0" : "Renderable"
+                  }
+                }
+              ],
+              "returnType" : {
+                "swiftProtocol" : {
+                  "_0" : "Renderable"
+                }
+              }
+            },
+            "useJSTypedClosure" : false
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_processOptionalRenderable",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processOptionalRenderable",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "callback",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModuleSq10RenderableP_SS",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "nullable" : {
+                        "_0" : {
+                          "swiftProtocol" : {
+                            "_0" : "Renderable"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "string" : {
+
+                    }
+                  }
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_Renderable_render",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "render",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Renderable",
+        "properties" : [
+
+        ]
+      }
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule"
+}

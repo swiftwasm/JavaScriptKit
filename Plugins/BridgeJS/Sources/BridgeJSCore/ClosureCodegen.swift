@@ -12,9 +12,9 @@ public struct ClosureCodegen {
     public init() {}
 
     private func swiftClosureType(for signature: ClosureSignature) -> String {
-        let closureParams = signature.parameters.map { "\($0.swiftType)" }.joined(separator: ", ")
+        let closureParams = signature.parameters.map { "\($0.closureSwiftType)" }.joined(separator: ", ")
         let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
-        let swiftReturnType = signature.returnType.swiftType
+        let swiftReturnType = signature.returnType.closureSwiftType
         return "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
     }
 
@@ -158,7 +158,26 @@ public struct ClosureCodegen {
                 printer.write(closureCallExpr.description)
             } else {
                 printer.write("let result = \(closureCallExpr)")
-                printer.write("return result.bridgeJSLowerReturn()")
+                switch signature.returnType {
+                case .swiftProtocol:
+                    printer.write(
+                        "return (result as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()"
+                    )
+                case .nullable(.swiftProtocol, _):
+                    printer.write("if let result {")
+                    printer.indent {
+                        printer.write(
+                            "_swift_js_return_optional_object(1, (result as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
+                        )
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("_swift_js_return_optional_object(0, 0)")
+                    }
+                    printer.write("}")
+                default:
+                    printer.write("return result.bridgeJSLowerReturn()")
+                }
             }
         }
 
