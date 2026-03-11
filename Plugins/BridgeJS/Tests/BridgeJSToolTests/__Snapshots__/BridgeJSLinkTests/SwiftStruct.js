@@ -74,13 +74,7 @@ export async function createInstantiator(options, swift) {
             const string = strStack.pop();
             const f64 = f64Stack.pop();
             const f641 = f64Stack.pop();
-            const instance1 = { x: f641, y: f64, label: string, optCount: optValue1, optFlag: optValue };
-            instance1.distanceFromOrigin = function() {
-                structHelpers.DataPoint.lower(this);
-                const ret = instance.exports.bjs_DataPoint_distanceFromOrigin();
-                return ret;
-            }.bind(instance1);
-            return instance1;
+            return { x: f641, y: f64, label: string, optCount: optValue1, optFlag: optValue };
         }
     });
     const __bjs_createAddressHelpers = () => ({
@@ -226,6 +220,29 @@ export async function createInstantiator(options, swift) {
             return { object: value, optionalObject: optValue };
         }
     });
+    const __bjs_createVector2DHelpers = () => ({
+        lower: (value) => {
+            f64Stack.push(value.dx);
+            f64Stack.push(value.dy);
+        },
+        lift: () => {
+            const f64 = f64Stack.pop();
+            const f641 = f64Stack.pop();
+            const instance1 = { dx: f641, dy: f64 };
+            instance1.magnitude = function() {
+                structHelpers.Vector2D.lower(this);
+                const ret = instance.exports.bjs_Vector2D_magnitude();
+                return ret;
+            }.bind(instance1);
+            instance1.scaled = function(factor) {
+                structHelpers.Vector2D.lower(this);
+                const ret = instance.exports.bjs_Vector2D_scaled(factor);
+                const structValue = structHelpers.Vector2D.lift();
+                return structValue;
+            }.bind(instance1);
+            return instance1;
+        }
+    });
 
     return {
         /**
@@ -341,6 +358,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_struct_lift_Container"] = function() {
                 const value = structHelpers.Container.lift();
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Vector2D"] = function(objectId) {
+                structHelpers.Vector2D.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Vector2D"] = function() {
+                const value = structHelpers.Vector2D.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -533,6 +557,9 @@ export async function createInstantiator(options, swift) {
 
             const ContainerHelpers = __bjs_createContainerHelpers();
             structHelpers.Container = ContainerHelpers;
+
+            const Vector2DHelpers = __bjs_createVector2DHelpers();
+            structHelpers.Vector2D = Vector2DHelpers;
 
             const exports = {
                 Greeter,

@@ -16,7 +16,6 @@ export interface DataPoint {
     label: string;
     optCount: number | null;
     optFlag: boolean | null;
-    distanceFromOrigin(): number;
 }
 export interface Address {
     street: string;
@@ -43,6 +42,12 @@ export interface ConfigStruct {
 export interface Container {
     object: any;
     optionalObject: any | null;
+}
+export interface Vector2D {
+    dx: number;
+    dy: number;
+    magnitude(): number;
+    scaled(factor: number): Vector2D;
 }
 export type PrecisionObject = typeof PrecisionValues;
 
