@@ -1,0 +1,379 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_checkJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkJSString",
+        "parameters" : [
+          {
+            "label" : "a",
+            "name" : "a",
+            "type" : {
+              "jsString" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getJSString",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "jsString" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripJSString",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "jsString" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsString" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_checkOptionalJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkOptionalJSString",
+        "parameters" : [
+          {
+            "label" : "a",
+            "name" : "a",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsString" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getOptionalJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getOptionalJSString",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "jsString" : {
+
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOptionalJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalJSString",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsString" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "jsString" : {
+
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_checkUndefinedOrJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkUndefinedOrJSString",
+        "parameters" : [
+          {
+            "label" : "a",
+            "name" : "a",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsString" : {
+
+                  }
+                },
+                "_1" : "undefined"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getUndefinedOrJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getUndefinedOrJSString",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "jsString" : {
+
+              }
+            },
+            "_1" : "undefined"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUndefinedOrJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUndefinedOrJSString",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsString" : {
+
+                  }
+                },
+                "_1" : "undefined"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "jsString" : {
+
+              }
+            },
+            "_1" : "undefined"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "jsCheckJSString",
+            "parameters" : [
+              {
+                "name" : "a",
+                "type" : {
+                  "jsString" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsGetJSString",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "jsString" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsCheckOptionalJSString",
+            "parameters" : [
+              {
+                "name" : "a",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsString" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsGetOptionalJSString",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "jsString" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "name" : "jsCheckUndefinedOrJSString",
+            "parameters" : [
+              {
+                "name" : "a",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsString" : {
+
+                      }
+                    },
+                    "_1" : "undefined"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsGetUndefinedOrJSString",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "jsString" : {
+
+                  }
+                },
+                "_1" : "undefined"
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

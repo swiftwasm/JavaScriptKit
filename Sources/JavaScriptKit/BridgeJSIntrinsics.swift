@@ -433,6 +433,39 @@ extension JSObject: _BridgedSwiftStackType {
     }
 }
 
+extension JSString: _BridgedSwiftStackType {
+    public typealias StackLiftResult = JSString
+
+    // MARK: ImportTS
+
+    @_spi(BridgeJS) public func bridgeJSWithLoweredParameter<T>(_ body: (Int32) -> T) -> T {
+        withExtendedLifetime(self.guts) {
+            body(Int32(bitPattern: self.asInternalJSRef()))
+        }
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ id: Int32) -> JSString {
+        JSString(jsRef: JavaScriptObjectRef(bitPattern: id))
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ id: Int32) -> JSString {
+        JSString(jsRef: JavaScriptObjectRef(bitPattern: id))
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> JSString {
+        bridgeJSLiftParameter(_swift_js_pop_i32())
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
+        withExtendedLifetime(self.guts) { _swift_js_retain(Int32(bitPattern: self.asInternalJSRef())) }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        _swift_js_push_i32(bridgeJSLowerReturn())
+    }
+}
+
 extension JSValue: _BridgedSwiftStackType {
     public typealias StackLiftResult = JSValue
 
@@ -1599,6 +1632,34 @@ extension _BridgedAsOptional where Wrapped == JSObject {
             lowerWrapped: { $0.bridgeJSLowerReturn() },
             write: _swift_js_return_optional_object
         )
+    }
+}
+
+extension _BridgedAsOptional where Wrapped == JSString {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32) -> T) -> T {
+        switch asOptional {
+        case .none:
+            return body(0)
+        case .some(let value):
+            return value.bridgeJSWithLoweredParameter(body)
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        Self(optional: value == 0 ? nil : JSString.bridgeJSLiftParameter(value))
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Int32) -> Self {
+        Self(optional: value == 0 ? nil : JSString.bridgeJSLiftReturn(value))
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
+        switch asOptional {
+        case .none:
+            return 0
+        case .some(let value):
+            return value.bridgeJSLowerReturn()
+        }
     }
 }
 

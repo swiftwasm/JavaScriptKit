@@ -633,6 +633,15 @@ struct IntrinsicJSFragment: Sendable {
         kind: JSOptionalKind,
         context bridgeContext: BridgeContext = .importTS
     ) throws -> IntrinsicJSFragment {
+        if wrappedType == .jsString {
+            let innerFragment = try liftParameter(type: wrappedType, context: bridgeContext)
+            return sentinelOptionalLiftSingleValue(
+                wrappedType: wrappedType,
+                kind: kind,
+                innerFragment: { innerFragment }
+            )
+        }
+
         if wrappedType.isSingleParamScalar {
             let coerce = wrappedType.liftCoerce
             return IntrinsicJSFragment(
@@ -716,6 +725,15 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
+        if wrappedType == .jsString {
+            let innerFragment = try lowerParameter(type: wrappedType)
+            return sentinelOptionalLowerSingleValue(
+                wrappedType: wrappedType,
+                kind: kind,
+                innerFragment: innerFragment
+            )
+        }
+
         if wrappedType.isSingleParamScalar {
             let wasmType = wrappedType.wasmParams[0].type
             let coerce = wrappedType.lowerCoerce
@@ -803,6 +821,94 @@ struct IntrinsicJSFragment: Sendable {
                 } else {
                     return ["+\(isSomeVar)"] + resultVars
                 }
+            }
+        )
+    }
+
+    private static func sentinelOptionalLiftSingleValue(
+        wrappedType: BridgeType,
+        kind: JSOptionalKind,
+        innerFragment: @escaping @Sendable () throws -> IntrinsicJSFragment
+    ) -> IntrinsicJSFragment {
+        let sentinelLiteral = wrappedType.nilSentinel.jsLiteral
+        let absenceLiteral = kind.absenceLiteral
+        return IntrinsicJSFragment(
+            parameters: ["wrappedValue"],
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
+                let wrappedValue = arguments[0]
+
+                let bufferPrinter = CodeFragmentPrinter()
+                let innerResults = try innerFragment().printCode(
+                    [wrappedValue],
+                    context.with(\.printer, bufferPrinter)
+                )
+                let innerExpr = innerResults.first ?? "undefined"
+
+                if bufferPrinter.lines.isEmpty {
+                    return ["\(wrappedValue) === \(sentinelLiteral) ? \(absenceLiteral) : \(innerExpr)"]
+                }
+
+                let resultVar = scope.variable("optResult")
+                printer.write("let \(resultVar);")
+                printer.write("if (\(wrappedValue) === \(sentinelLiteral)) {")
+                printer.indent {
+                    printer.write("\(resultVar) = \(absenceLiteral);")
+                }
+                printer.write("} else {")
+                printer.indent {
+                    for line in bufferPrinter.lines {
+                        printer.write(line)
+                    }
+                    printer.write("\(resultVar) = \(innerExpr);")
+                }
+                printer.write("}")
+                return [resultVar]
+            }
+        )
+    }
+
+    private static func sentinelOptionalLowerSingleValue(
+        wrappedType: BridgeType,
+        kind: JSOptionalKind,
+        innerFragment: IntrinsicJSFragment
+    ) -> IntrinsicJSFragment {
+        let sentinelLiteral = wrappedType.nilSentinel.jsLiteral
+        return IntrinsicJSFragment(
+            parameters: ["value"],
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
+                let value = arguments[0]
+                let isSomeVar = scope.variable("isSome")
+                let presenceExpr = kind.presenceCheck(value: value)
+                printer.write("const \(isSomeVar) = \(presenceExpr);")
+
+                let bufferPrinter = CodeFragmentPrinter()
+                let innerResults = try innerFragment.printCode(
+                    [value],
+                    context.with(\.printer, bufferPrinter)
+                )
+                let innerExpr = innerResults.first ?? sentinelLiteral
+
+                if bufferPrinter.lines.isEmpty {
+                    return ["\(isSomeVar) ? \(innerExpr) : \(sentinelLiteral)"]
+                }
+
+                let resultVar = scope.variable("optResult")
+                printer.write("let \(resultVar);")
+                printer.write("if (\(isSomeVar)) {")
+                printer.indent {
+                    for line in bufferPrinter.lines {
+                        printer.write(line)
+                    }
+                    printer.write("\(resultVar) = \(innerExpr);")
+                }
+                printer.write("} else {")
+                printer.indent {
+                    printer.write("\(resultVar) = \(sentinelLiteral);")
+                }
+                printer.write("}")
+                return [resultVar]
             }
         )
     }
@@ -934,6 +1040,14 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) -> IntrinsicJSFragment {
+        if wrappedType == .jsString {
+            return sentinelOptionalLiftSingleValue(
+                wrappedType: wrappedType,
+                kind: kind,
+                innerFragment: { try liftReturn(type: wrappedType) }
+            )
+        }
+
         if let scalarKind = wrappedType.optionalScalarKind {
             return optionalLiftReturnFromStorage(storage: scalarKind.storageName)
         }
@@ -1065,6 +1179,15 @@ struct IntrinsicJSFragment: Sendable {
                     )
                     return []
                 }
+            )
+        }
+
+        if wrappedType == .jsString {
+            let innerFragment = try lowerReturn(type: wrappedType, context: .exportSwift)
+            return sentinelOptionalLowerReturn(
+                wrappedType: wrappedType,
+                kind: kind,
+                innerFragment: innerFragment
             )
         }
 
@@ -1249,6 +1372,7 @@ struct IntrinsicJSFragment: Sendable {
             return .identity
         case .string: return .stringLowerParameter
         case .jsObject: return .jsObjectLowerParameter
+        case .jsString: return .jsObjectLowerParameter
         case .jsValue: return .jsValueLower
         case .swiftHeapObject: return .swiftHeapObjectLowerParameter
         case .swiftProtocol: return .jsObjectLowerParameter
@@ -1299,6 +1423,7 @@ struct IntrinsicJSFragment: Sendable {
             return .identity
         case .string: return .stringLiftReturn
         case .jsObject: return .jsObjectLiftReturn
+        case .jsString: return .jsObjectLiftReturn
         case .jsValue: return .jsValueLift
         case .swiftHeapObject(let name): return .swiftHeapObjectLiftReturn(name)
         case .swiftProtocol: return .jsObjectLiftReturn
@@ -1348,6 +1473,7 @@ struct IntrinsicJSFragment: Sendable {
             return .identity
         case .string: return .stringLiftParameter
         case .jsObject: return .jsObjectLiftParameter
+        case .jsString: return .jsObjectLiftParameter
         case .jsValue: return .jsValueLiftParameter
         case .swiftHeapObject(let name):
             return .swiftHeapObjectLiftParameter(name)
@@ -1432,6 +1558,7 @@ struct IntrinsicJSFragment: Sendable {
             return .identity
         case .string: return .stringLowerReturn
         case .jsObject: return .jsObjectLowerReturn
+        case .jsString: return .jsObjectLowerReturn
         case .jsValue: return .jsValueLowerReturn(context: context)
         case .swiftHeapObject: return .swiftHeapObjectLowerReturn
         case .swiftProtocol: return .jsObjectLowerReturn
@@ -1986,7 +2113,7 @@ struct IntrinsicJSFragment: Sendable {
                     return [objVar]
                 }
             )
-        case .jsObject, .swiftProtocol:
+        case .jsObject, .jsString, .swiftProtocol:
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, context in
@@ -2108,7 +2235,7 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
-        case .jsObject, .swiftProtocol:
+        case .jsObject, .jsString, .swiftProtocol:
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
@@ -2587,6 +2714,8 @@ private extension BridgeType {
             return .sideChannelReturn(.storage)
         case .jsObject:
             return .sideChannelReturn(.retainedObject)
+        case .jsString:
+            return .sideChannelReturn(.retainedObject)
         case .jsValue:
             return .inlineFlag
         case .swiftHeapObject:
@@ -2621,7 +2750,7 @@ private extension BridgeType {
 
     var nilSentinel: NilSentinel {
         switch self {
-        case .jsObject, .swiftProtocol:
+        case .jsObject, .jsString, .swiftProtocol:
             return .i32(0)
         case .swiftHeapObject:
             return .pointer
@@ -2659,6 +2788,8 @@ private extension BridgeType {
         case .string:
             return [("bytes", .i32), ("length", .i32)]
         case .jsObject:
+            return [("value", .i32)]
+        case .jsString:
             return [("value", .i32)]
         case .jsValue:
             return [("kind", .i32), ("payload1", .i32), ("payload2", .f64)]

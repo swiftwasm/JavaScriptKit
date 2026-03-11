@@ -749,7 +749,7 @@ struct StackCodegen {
     func liftExpression(for type: BridgeType) -> ExprSyntax {
         switch type {
         case .string, .int, .uint, .bool, .float, .double,
-            .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject, .unsafePointer,
+            .jsObject(nil), .jsString, .jsValue, .swiftStruct, .swiftHeapObject, .unsafePointer,
             .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum, .array, .dictionary:
             return "\(raw: type.swiftType).bridgeJSStackPop()"
         case .jsObject(let className?):
@@ -766,7 +766,7 @@ struct StackCodegen {
     private func liftNullableExpression(wrappedType: BridgeType, kind: JSOptionalKind) -> ExprSyntax {
         let typeName = kind == .null ? "Optional" : "JSUndefinedOr"
         switch wrappedType {
-        case .string, .int, .uint, .bool, .float, .double, .jsObject(nil), .jsValue,
+        case .string, .int, .uint, .bool, .float, .double, .jsObject(nil), .jsString, .jsValue,
             .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum,
             .array, .dictionary:
             return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
@@ -790,7 +790,7 @@ struct StackCodegen {
     ) -> [CodeBlockItemSyntax] {
         switch type {
         case .string, .int, .uint, .bool, .float, .double, .jsValue,
-            .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
+            .jsObject(nil), .jsString, .swiftHeapObject, .unsafePointer, .closure,
             .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct, .nullable:
             return ["\(raw: accessor).bridgeJSStackPush()"]
         case .jsObject(_?):
@@ -1433,6 +1433,7 @@ extension BridgeType {
         case .jsValue: return "JSValue"
         case .jsObject(nil): return "JSObject"
         case .jsObject(let name?): return name
+        case .jsString: return "JSString"
         case .swiftHeapObject(let name): return name
         case .unsafePointer(let ptr): return ptr.swiftType
         case .swiftProtocol(let name): return "Any\(name)"
@@ -1489,6 +1490,7 @@ extension BridgeType {
         static let double = LiftingIntrinsicInfo(parameters: [("value", .f64)])
         static let string = LiftingIntrinsicInfo(parameters: [("bytes", .i32), ("length", .i32)])
         static let jsObject = LiftingIntrinsicInfo(parameters: [("value", .i32)])
+        static let jsString = LiftingIntrinsicInfo(parameters: [("value", .i32)])
         static let jsValue = LiftingIntrinsicInfo(parameters: [("kind", .i32), ("payload1", .i32), ("payload2", .f64)])
         static let swiftHeapObject = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
         static let unsafePointer = LiftingIntrinsicInfo(parameters: [("pointer", .pointer)])
@@ -1507,11 +1509,14 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsString: return .jsString
         case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject
         case .void: return .void
+        case .nullable(.jsString, _):
+            return .jsString
         case .nullable(let wrappedType, _):
             let wrappedInfo = try wrappedType.liftParameterInfo()
             if wrappedInfo.parameters.isEmpty {
@@ -1545,6 +1550,7 @@ extension BridgeType {
         static let double = LoweringIntrinsicInfo(returnType: .f64)
         static let string = LoweringIntrinsicInfo(returnType: nil)
         static let jsObject = LoweringIntrinsicInfo(returnType: .i32)
+        static let jsString = LoweringIntrinsicInfo(returnType: .i32)
         static let jsValue = LoweringIntrinsicInfo(returnType: nil)
         static let swiftHeapObject = LoweringIntrinsicInfo(returnType: .pointer)
         static let unsafePointer = LoweringIntrinsicInfo(returnType: .pointer)
@@ -1565,11 +1571,14 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsString: return .jsString
         case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject
         case .void: return .void
+        case .nullable(.jsString, _):
+            return .jsString
         case .nullable: return .optional
         case .caseEnum: return .caseEnum
         case .rawValueEnum(_, let rawType):

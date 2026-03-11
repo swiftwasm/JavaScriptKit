@@ -165,7 +165,7 @@ public enum JSOptionalKind: String, Codable, Equatable, Hashable, Sendable {
 }
 
 public enum BridgeType: Codable, Equatable, Hashable, Sendable {
-    case int, uint, float, double, string, bool, jsObject(String?), jsValue, swiftHeapObject(String), void
+    case int, uint, float, double, string, bool, jsObject(String?), jsString, jsValue, swiftHeapObject(String), void
     case unsafePointer(UnsafePointerType)
     indirect case nullable(BridgeType, JSOptionalKind)
     indirect case array(BridgeType)
@@ -1074,6 +1074,8 @@ extension BridgeType {
             self = .void
         case "JSObject":
             self = .jsObject(nil)
+        case "JSString":
+            self = .jsString
         case "UnsafeRawPointer":
             self = .unsafePointer(.init(kind: .unsafeRawPointer))
         case "UnsafeMutableRawPointer":
@@ -1093,6 +1095,7 @@ extension BridgeType {
         case .float: return .f32
         case .double: return .f64
         case .string: return nil
+        case .jsString: return .i32
         case .jsObject: return .i32
         case .jsValue: return nil
         case .swiftHeapObject:
@@ -1143,6 +1146,7 @@ extension BridgeType {
         case .float: return "Sf"
         case .double: return "Sd"
         case .string: return "SS"
+        case .jsString: return "8JSStringV"
         case .bool: return "Sb"
         case .void: return "y"
         case .jsObject(let name):
