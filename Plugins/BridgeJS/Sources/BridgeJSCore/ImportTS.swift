@@ -849,6 +849,8 @@ extension BridgeType {
             }
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
+        case .nullable(.jsString, _):
+            return LoweringParameterInfo(loweredParameters: [("value", .i32)], useBorrowing: true)
         case .nullable(let wrappedType, _):
             let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
             var params = [("isSome", WasmCoreType.i32)]

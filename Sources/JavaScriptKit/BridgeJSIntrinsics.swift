@@ -1616,6 +1616,34 @@ extension _BridgedAsOptional where Wrapped == JSObject {
     }
 }
 
+extension _BridgedAsOptional where Wrapped == JSString {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32) -> T) -> T {
+        switch asOptional {
+        case .none:
+            return body(0)
+        case .some(let value):
+            return value.bridgeJSWithLoweredParameter(body)
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        Self(optional: value == 0 ? nil : JSString.bridgeJSLiftParameter(value))
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Int32) -> Self {
+        Self(optional: value == 0 ? nil : JSString.bridgeJSLiftReturn(value))
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
+        switch asOptional {
+        case .none:
+            return 0
+        case .some(let value):
+            return value.bridgeJSLowerReturn()
+        }
+    }
+}
+
 extension _BridgedAsOptional where Wrapped: _BridgedSwiftProtocolWrapper {
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> Self {
         Self(

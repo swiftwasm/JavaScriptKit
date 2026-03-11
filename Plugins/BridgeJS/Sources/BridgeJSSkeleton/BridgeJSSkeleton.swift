@@ -1210,7 +1210,7 @@ extension BridgeType {
         }
 
         switch wrappedType {
-        case .string, .int, .float, .double, .jsObject, .jsString, .swiftProtocol:
+        case .string, .int, .float, .double, .jsObject, .swiftProtocol:
             return true
         case .rawValueEnum(_, let rawType):
             switch rawType {

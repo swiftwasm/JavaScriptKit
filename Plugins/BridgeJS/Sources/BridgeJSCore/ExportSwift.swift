@@ -1457,6 +1457,8 @@ extension BridgeType {
         case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject
         case .void: return .void
+        case .nullable(.jsString, _):
+            return .jsString
         case .nullable(let wrappedType, _):
             let wrappedInfo = try wrappedType.liftParameterInfo()
             if wrappedInfo.parameters.isEmpty {
@@ -1517,6 +1519,8 @@ extension BridgeType {
         case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject
         case .void: return .void
+        case .nullable(.jsString, _):
+            return .jsString
         case .nullable: return .optional
         case .caseEnum: return .caseEnum
         case .rawValueEnum(_, let rawType):

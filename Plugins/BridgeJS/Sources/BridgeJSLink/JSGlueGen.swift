@@ -633,6 +633,15 @@ struct IntrinsicJSFragment: Sendable {
         kind: JSOptionalKind,
         context bridgeContext: BridgeContext = .importTS
     ) throws -> IntrinsicJSFragment {
+        if wrappedType == .jsString {
+            let innerFragment = try liftParameter(type: wrappedType, context: bridgeContext)
+            return sentinelOptionalLiftSingleValue(
+                wrappedType: wrappedType,
+                kind: kind,
+                innerFragment: { innerFragment }
+            )
+        }
+
         if wrappedType.isSingleParamScalar {
             let coerce = wrappedType.liftCoerce
             return IntrinsicJSFragment(
@@ -716,6 +725,15 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
+        if wrappedType == .jsString {
+            let innerFragment = try lowerParameter(type: wrappedType)
+            return sentinelOptionalLowerSingleValue(
+                wrappedType: wrappedType,
+                kind: kind,
+                innerFragment: innerFragment
+            )
+        }
+
         if wrappedType.isSingleParamScalar {
             let wasmType = wrappedType.wasmParams[0].type
             let coerce = wrappedType.lowerCoerce
@@ -803,6 +821,94 @@ struct IntrinsicJSFragment: Sendable {
                 } else {
                     return ["+\(isSomeVar)"] + resultVars
                 }
+            }
+        )
+    }
+
+    private static func sentinelOptionalLiftSingleValue(
+        wrappedType: BridgeType,
+        kind: JSOptionalKind,
+        innerFragment: @escaping @Sendable () throws -> IntrinsicJSFragment
+    ) -> IntrinsicJSFragment {
+        let sentinelLiteral = wrappedType.nilSentinel.jsLiteral
+        let absenceLiteral = kind.absenceLiteral
+        return IntrinsicJSFragment(
+            parameters: ["wrappedValue"],
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
+                let wrappedValue = arguments[0]
+
+                let bufferPrinter = CodeFragmentPrinter()
+                let innerResults = try innerFragment().printCode(
+                    [wrappedValue],
+                    context.with(\.printer, bufferPrinter)
+                )
+                let innerExpr = innerResults.first ?? "undefined"
+
+                if bufferPrinter.lines.isEmpty {
+                    return ["\(wrappedValue) === \(sentinelLiteral) ? \(absenceLiteral) : \(innerExpr)"]
+                }
+
+                let resultVar = scope.variable("optResult")
+                printer.write("let \(resultVar);")
+                printer.write("if (\(wrappedValue) === \(sentinelLiteral)) {")
+                printer.indent {
+                    printer.write("\(resultVar) = \(absenceLiteral);")
+                }
+                printer.write("} else {")
+                printer.indent {
+                    for line in bufferPrinter.lines {
+                        printer.write(line)
+                    }
+                    printer.write("\(resultVar) = \(innerExpr);")
+                }
+                printer.write("}")
+                return [resultVar]
+            }
+        )
+    }
+
+    private static func sentinelOptionalLowerSingleValue(
+        wrappedType: BridgeType,
+        kind: JSOptionalKind,
+        innerFragment: IntrinsicJSFragment
+    ) -> IntrinsicJSFragment {
+        let sentinelLiteral = wrappedType.nilSentinel.jsLiteral
+        return IntrinsicJSFragment(
+            parameters: ["value"],
+            printCode: { arguments, context in
+                let (scope, printer) = (context.scope, context.printer)
+                let value = arguments[0]
+                let isSomeVar = scope.variable("isSome")
+                let presenceExpr = kind.presenceCheck(value: value)
+                printer.write("const \(isSomeVar) = \(presenceExpr);")
+
+                let bufferPrinter = CodeFragmentPrinter()
+                let innerResults = try innerFragment.printCode(
+                    [value],
+                    context.with(\.printer, bufferPrinter)
+                )
+                let innerExpr = innerResults.first ?? sentinelLiteral
+
+                if bufferPrinter.lines.isEmpty {
+                    return ["\(isSomeVar) ? \(innerExpr) : \(sentinelLiteral)"]
+                }
+
+                let resultVar = scope.variable("optResult")
+                printer.write("let \(resultVar);")
+                printer.write("if (\(isSomeVar)) {")
+                printer.indent {
+                    for line in bufferPrinter.lines {
+                        printer.write(line)
+                    }
+                    printer.write("\(resultVar) = \(innerExpr);")
+                }
+                printer.write("} else {")
+                printer.indent {
+                    printer.write("\(resultVar) = \(sentinelLiteral);")
+                }
+                printer.write("}")
+                return [resultVar]
             }
         )
     }
@@ -934,6 +1040,14 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) -> IntrinsicJSFragment {
+        if wrappedType == .jsString {
+            return sentinelOptionalLiftSingleValue(
+                wrappedType: wrappedType,
+                kind: kind,
+                innerFragment: { try liftReturn(type: wrappedType) }
+            )
+        }
+
         if let scalarKind = wrappedType.optionalScalarKind {
             return optionalLiftReturnFromStorage(storage: scalarKind.storageName)
         }
@@ -1065,6 +1179,15 @@ struct IntrinsicJSFragment: Sendable {
                     )
                     return []
                 }
+            )
+        }
+
+        if wrappedType == .jsString {
+            let innerFragment = try lowerReturn(type: wrappedType, context: .exportSwift)
+            return sentinelOptionalLowerReturn(
+                wrappedType: wrappedType,
+                kind: kind,
+                innerFragment: innerFragment
             )
         }
 

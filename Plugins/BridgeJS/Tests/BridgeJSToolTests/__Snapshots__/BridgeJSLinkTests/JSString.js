@@ -199,6 +199,38 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
+            TestModule["bjs_jsCheckOptionalJSString"] = function bjs_jsCheckOptionalJSString(a) {
+                try {
+                    imports.jsCheckOptionalJSString(a === 0 ? null : swift.memory.getObject(a));
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_jsGetOptionalJSString"] = function bjs_jsGetOptionalJSString() {
+                try {
+                    let ret = imports.jsGetOptionalJSString();
+                    const isSome = ret != null;
+                    return isSome ? swift.memory.retain(ret) : 0;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_jsCheckUndefinedOrJSString"] = function bjs_jsCheckUndefinedOrJSString(a) {
+                try {
+                    imports.jsCheckUndefinedOrJSString(a === 0 ? undefined : swift.memory.getObject(a));
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_jsGetUndefinedOrJSString"] = function bjs_jsGetUndefinedOrJSString() {
+                try {
+                    let ret = imports.jsGetUndefinedOrJSString();
+                    const isSome = ret !== undefined;
+                    return isSome ? swift.memory.retain(ret) : 0;
+                } catch (error) {
+                    setException(error);
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;
@@ -228,6 +260,64 @@ export async function createInstantiator(options, swift) {
                     const ret1 = swift.memory.getObject(ret);
                     swift.memory.release(ret);
                     return ret1;
+                },
+                checkOptionalJSString: function bjs_checkOptionalJSString(a) {
+                    const isSome = a != null;
+                    instance.exports.bjs_checkOptionalJSString(isSome ? swift.memory.retain(a) : 0);
+                },
+                getOptionalJSString: function bjs_getOptionalJSString() {
+                    const ret = instance.exports.bjs_getOptionalJSString();
+                    let optResult;
+                    if (ret === 0) {
+                        optResult = null;
+                    } else {
+                        const ret1 = swift.memory.getObject(ret);
+                        swift.memory.release(ret);
+                        optResult = ret1;
+                    }
+                    return optResult;
+                },
+                roundTripOptionalJSString: function bjs_roundTripOptionalJSString(value) {
+                    const isSome = value != null;
+                    const ret = instance.exports.bjs_roundTripOptionalJSString(isSome ? swift.memory.retain(value) : 0);
+                    let optResult;
+                    if (ret === 0) {
+                        optResult = null;
+                    } else {
+                        const ret1 = swift.memory.getObject(ret);
+                        swift.memory.release(ret);
+                        optResult = ret1;
+                    }
+                    return optResult;
+                },
+                checkUndefinedOrJSString: function bjs_checkUndefinedOrJSString(a) {
+                    const isSome = a !== undefined;
+                    instance.exports.bjs_checkUndefinedOrJSString(isSome ? swift.memory.retain(a) : 0);
+                },
+                getUndefinedOrJSString: function bjs_getUndefinedOrJSString() {
+                    const ret = instance.exports.bjs_getUndefinedOrJSString();
+                    let optResult;
+                    if (ret === 0) {
+                        optResult = undefined;
+                    } else {
+                        const ret1 = swift.memory.getObject(ret);
+                        swift.memory.release(ret);
+                        optResult = ret1;
+                    }
+                    return optResult;
+                },
+                roundTripUndefinedOrJSString: function bjs_roundTripUndefinedOrJSString(value) {
+                    const isSome = value !== undefined;
+                    const ret = instance.exports.bjs_roundTripUndefinedOrJSString(isSome ? swift.memory.retain(value) : 0);
+                    let optResult;
+                    if (ret === 0) {
+                        optResult = undefined;
+                    } else {
+                        const ret1 = swift.memory.getObject(ret);
+                        swift.memory.release(ret);
+                        optResult = ret1;
+                    }
+                    return optResult;
                 },
             };
             _exports = exports;
