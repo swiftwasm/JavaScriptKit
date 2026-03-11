@@ -433,6 +433,39 @@ extension JSObject: _BridgedSwiftStackType {
     }
 }
 
+extension JSString: _BridgedSwiftStackType {
+    public typealias StackLiftResult = JSString
+
+    // MARK: ImportTS
+
+    @_spi(BridgeJS) public func bridgeJSWithLoweredParameter<T>(_ body: (Int32) -> T) -> T {
+        withExtendedLifetime(self.guts) {
+            body(Int32(bitPattern: self.asInternalJSRef()))
+        }
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ id: Int32) -> JSString {
+        JSString(jsRef: JavaScriptObjectRef(bitPattern: id))
+    }
+
+    // MARK: ExportSwift
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ id: Int32) -> JSString {
+        JSString(jsRef: JavaScriptObjectRef(bitPattern: id))
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> JSString {
+        bridgeJSLiftParameter(_swift_js_pop_i32())
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
+        withExtendedLifetime(self.guts) { _swift_js_retain(Int32(bitPattern: self.asInternalJSRef())) }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        _swift_js_push_i32(bridgeJSLowerReturn())
+    }
+}
+
 extension JSValue: _BridgedSwiftStackType {
     public typealias StackLiftResult = JSValue
 

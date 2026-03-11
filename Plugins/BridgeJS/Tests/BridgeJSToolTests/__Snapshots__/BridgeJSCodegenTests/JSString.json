@@ -1,0 +1,127 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_checkJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkJSString",
+        "parameters" : [
+          {
+            "label" : "a",
+            "name" : "a",
+            "type" : {
+              "jsString" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getJSString",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "jsString" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripJSString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripJSString",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "jsString" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsString" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "jsCheckJSString",
+            "parameters" : [
+              {
+                "name" : "a",
+                "type" : {
+                  "jsString" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "name" : "jsGetJSString",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "jsString" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

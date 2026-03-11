@@ -807,6 +807,7 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsString: return LoweringParameterInfo(loweredParameters: [("value", .i32)], useBorrowing: true)
         case .jsValue: return .jsValue
         case .void: return .void
         case .closure:
@@ -881,6 +882,7 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsString: return .jsObject
         case .jsValue: return .jsValue
         case .void: return .void
         case .closure:
