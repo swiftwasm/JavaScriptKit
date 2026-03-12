@@ -26,8 +26,11 @@
               "type" : {
                 "array" : {
                   "_0" : {
-                    "int" : {
-
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
                     }
                   }
                 }
@@ -60,8 +63,11 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -178,8 +184,11 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -189,8 +198,11 @@
         "returnType" : {
           "array" : {
             "_0" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -411,8 +423,11 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -420,8 +435,11 @@
           }
         ],
         "returnType" : {
-          "int" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
           }
         }
       },
@@ -591,8 +609,11 @@
                 "_0" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -607,8 +628,11 @@
             "_0" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -677,8 +701,11 @@
                 "_0" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -693,8 +720,11 @@
             "_0" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -851,8 +881,11 @@
                 "_0" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -866,8 +899,11 @@
             "_0" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -1163,8 +1199,11 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -1185,8 +1224,11 @@
           }
         ],
         "returnType" : {
-          "int" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
           }
         }
       },
@@ -1207,8 +1249,11 @@
                 "_0" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -1237,8 +1282,11 @@
           }
         ],
         "returnType" : {
-          "int" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
           }
         }
       }

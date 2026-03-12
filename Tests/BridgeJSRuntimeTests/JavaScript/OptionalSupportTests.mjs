@@ -5,6 +5,8 @@ import {
     StatusValues,
     ThemeValues,
     HttpStatusValues,
+    FileSizeValues,
+    SessionIdValues,
     TSDirection,
     TSTheme,
     APIResultValues,
@@ -58,7 +60,7 @@ export function getImports(importsContext) {
  */
 export function runJsOptionalSupportTests(rootExports) {
     const exports = rootExports.OptionalSupportExports;
-    const { Status, Theme, HttpStatus, Networking, ComplexResult, APIResult, Greeter, OptionalPropertyHolder, TypedPayloadResult, Direction } = rootExports;
+    const { Status, Theme, HttpStatus, FileSize, SessionId, Networking, ComplexResult, APIResult, Greeter, OptionalPropertyHolder, TypedPayloadResult, Direction } = rootExports;
     assert.equal(exports.roundTripOptionalString(null), null);
     assert.equal(exports.roundTripOptionalInt(null), null);
     assert.equal(exports.roundTripOptionalBool(null), null);
@@ -76,6 +78,8 @@ export function runJsOptionalSupportTests(rootExports) {
     assert.equal(exports.roundTripOptionalCaseEnum(Status.Success), StatusValues.Success);
     assert.equal(exports.roundTripOptionalStringRawValueEnum(Theme.Light), ThemeValues.Light);
     assert.equal(exports.roundTripOptionalIntRawValueEnum(HttpStatus.Ok), HttpStatusValues.Ok);
+    assert.equal(exports.roundTripOptionalInt64RawValueEnum(FileSize.Tiny), FileSizeValues.Tiny);
+    assert.equal(exports.roundTripOptionalUInt64RawValueEnum(SessionId.Active), SessionIdValues.Active);
     assert.equal(exports.roundTripOptionalTSEnum(TSDirection.North), TSDirection.North);
     assert.equal(exports.roundTripOptionalTSStringEnum(TSTheme.Light), TSTheme.Light);
     assert.equal(exports.roundTripOptionalNamespacedEnum(Networking.API.Method.Get), Networking.API.Method.Get);

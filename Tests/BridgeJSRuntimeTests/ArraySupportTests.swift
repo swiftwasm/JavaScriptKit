@@ -190,6 +190,8 @@ final class ArraySupportTests: XCTestCase {
     @JS static func roundTripCaseEnumArray(_ v: [Direction]) -> [Direction] { v }
     @JS static func roundTripStringRawValueEnumArray(_ v: [Theme]) -> [Theme] { v }
     @JS static func roundTripIntRawValueEnumArray(_ v: [HttpStatus]) -> [HttpStatus] { v }
+    @JS static func roundTripInt64RawValueEnumArray(_ v: [FileSize]) -> [FileSize] { v }
+    @JS static func roundTripUInt64RawValueEnumArray(_ v: [SessionId]) -> [SessionId] { v }
     @JS static func roundTripStructArray(_ v: [DataPoint]) -> [DataPoint] { v }
     @JS static func roundTripSwiftClassArray(_ v: [Greeter]) -> [Greeter] { v }
     @JS static func roundTripNamespacedSwiftClassArray(_ v: [Utils.Converter]) -> [Utils.Converter] { v }
@@ -202,6 +204,8 @@ final class ArraySupportTests: XCTestCase {
     @JS static func roundTripOptionalCaseEnumArray(_ v: [Direction?]) -> [Direction?] { v }
     @JS static func roundTripOptionalStringRawValueEnumArray(_ v: [Theme?]) -> [Theme?] { v }
     @JS static func roundTripOptionalIntRawValueEnumArray(_ v: [HttpStatus?]) -> [HttpStatus?] { v }
+    @JS static func roundTripOptionalInt64RawValueEnumArray(_ v: [FileSize?]) -> [FileSize?] { v }
+    @JS static func roundTripOptionalUInt64RawValueEnumArray(_ v: [SessionId?]) -> [SessionId?] { v }
     @JS static func roundTripOptionalStructArray(_ v: [DataPoint?]) -> [DataPoint?] { v }
     @JS static func roundTripOptionalSwiftClassArray(_ v: [Greeter?]) -> [Greeter?] { v }
     @JS static func roundTripOptionalJSClassArray(_ v: [ArrayElementObject?]) -> [ArrayElementObject?] { v }

@@ -228,7 +228,7 @@ public func _bjs_roundTripOptionalPriority(_ inputIsSome: Int32, _ inputValue: I
 
 @_expose(wasm, "bjs_setFileSize")
 @_cdecl("bjs_setFileSize")
-public func _bjs_setFileSize(_ size: Int32) -> Void {
+public func _bjs_setFileSize(_ size: Int64) -> Void {
     #if arch(wasm32)
     setFileSize(_: FileSize.bridgeJSLiftParameter(size))
     #else
@@ -238,7 +238,7 @@ public func _bjs_setFileSize(_ size: Int32) -> Void {
 
 @_expose(wasm, "bjs_getFileSize")
 @_cdecl("bjs_getFileSize")
-public func _bjs_getFileSize() -> Int32 {
+public func _bjs_getFileSize() -> Int64 {
     #if arch(wasm32)
     let ret = getFileSize()
     return ret.bridgeJSLowerReturn()
@@ -249,7 +249,7 @@ public func _bjs_getFileSize() -> Int32 {
 
 @_expose(wasm, "bjs_roundTripOptionalFileSize")
 @_cdecl("bjs_roundTripOptionalFileSize")
-public func _bjs_roundTripOptionalFileSize(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
+public func _bjs_roundTripOptionalFileSize(_ inputIsSome: Int32, _ inputValue: Int64) -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalFileSize(_: Optional<FileSize>.bridgeJSLiftParameter(inputIsSome, inputValue))
     return ret.bridgeJSLowerReturn()
@@ -324,7 +324,7 @@ public func _bjs_roundTripOptionalTokenId(_ inputIsSome: Int32, _ inputValue: In
 
 @_expose(wasm, "bjs_setSessionId")
 @_cdecl("bjs_setSessionId")
-public func _bjs_setSessionId(_ session: Int32) -> Void {
+public func _bjs_setSessionId(_ session: Int64) -> Void {
     #if arch(wasm32)
     setSessionId(_: SessionId.bridgeJSLiftParameter(session))
     #else
@@ -334,7 +334,7 @@ public func _bjs_setSessionId(_ session: Int32) -> Void {
 
 @_expose(wasm, "bjs_getSessionId")
 @_cdecl("bjs_getSessionId")
-public func _bjs_getSessionId() -> Int32 {
+public func _bjs_getSessionId() -> Int64 {
     #if arch(wasm32)
     let ret = getSessionId()
     return ret.bridgeJSLowerReturn()
@@ -345,7 +345,7 @@ public func _bjs_getSessionId() -> Int32 {
 
 @_expose(wasm, "bjs_roundTripOptionalSessionId")
 @_cdecl("bjs_roundTripOptionalSessionId")
-public func _bjs_roundTripOptionalSessionId(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
+public func _bjs_roundTripOptionalSessionId(_ inputIsSome: Int32, _ inputValue: Int64) -> Void {
     #if arch(wasm32)
     let ret = roundTripOptionalSessionId(_: Optional<SessionId>.bridgeJSLiftParameter(inputIsSome, inputValue))
     return ret.bridgeJSLowerReturn()
@@ -442,7 +442,7 @@ public func _bjs_convertPriority(_ status: Int32) -> Int32 {
 
 @_expose(wasm, "bjs_validateSession")
 @_cdecl("bjs_validateSession")
-public func _bjs_validateSession(_ session: Int32) -> Void {
+public func _bjs_validateSession(_ session: Int64) -> Void {
     #if arch(wasm32)
     let ret = validateSession(_: SessionId.bridgeJSLiftParameter(session))
     return ret.bridgeJSLowerReturn()

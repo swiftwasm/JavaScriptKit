@@ -302,6 +302,7 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);",
             "let \(JSGlueVariableScope.reservedStringStack) = [];",
             "let \(JSGlueVariableScope.reservedI32Stack) = [];",
+            "let \(JSGlueVariableScope.reservedI64Stack) = [];",
             "let \(JSGlueVariableScope.reservedF32Stack) = [];",
             "let \(JSGlueVariableScope.reservedF64Stack) = [];",
             "let \(JSGlueVariableScope.reservedPointerStack) = [];",
@@ -435,6 +436,16 @@ public struct BridgeJSLink {
                 printer.write("bjs[\"swift_js_pop_pointer\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedPointerStack).pop();")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_push_i64\"] = function(v) {")
+                printer.indent {
+                    printer.write("\(JSGlueVariableScope.reservedI64Stack).push(v);")
+                }
+                printer.write("}")
+                printer.write("bjs[\"swift_js_pop_i64\"] = function() {")
+                printer.indent {
+                    printer.write("return \(JSGlueVariableScope.reservedI64Stack).pop();")
                 }
                 printer.write("}")
                 if !allStructs.isEmpty {
@@ -3508,8 +3519,8 @@ extension BridgeType {
             return "void"
         case .string:
             return "string"
-        case .int, .uint:
-            return "number"
+        case .integer(let t):
+            return t.tsTypeName
         case .float:
             return "number"
         case .double:

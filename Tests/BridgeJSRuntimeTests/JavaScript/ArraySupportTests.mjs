@@ -75,7 +75,7 @@ export function getImports(importsContext) {
  */
 export function runJsArraySupportTests(rootExports) {
     const exports = rootExports.ArraySupportExports;
-    const { Direction, Status, Theme, HttpStatus, Greeter, Utils } = rootExports;
+    const { Direction, Status, Theme, HttpStatus, FileSize, SessionId, Greeter, Utils } = rootExports;
 
     // Primitive arrays
     assert.deepEqual(exports.roundTripIntArray([1, 2, 3, -10, 2147483647]), [1, 2, 3, -10, 2147483647]);
@@ -112,6 +112,8 @@ export function runJsArraySupportTests(rootExports) {
     assert.deepEqual(exports.roundTripCaseEnumArray([Direction.North, Direction.South]), [Direction.North, Direction.South]);
     assert.deepEqual(exports.roundTripIntRawValueEnumArray([HttpStatus.Ok, HttpStatus.NotFound]), [HttpStatus.Ok, HttpStatus.NotFound]);
     assert.deepEqual(exports.roundTripStringRawValueEnumArray([Theme.Light, Theme.Dark]), [Theme.Light, Theme.Dark]);
+    assert.deepEqual(exports.roundTripInt64RawValueEnumArray([FileSize.Tiny, FileSize.Large]), [FileSize.Tiny, FileSize.Large]);
+    assert.deepEqual(exports.roundTripUInt64RawValueEnumArray([SessionId.None, SessionId.Active]), [SessionId.None, SessionId.Active]);
 
     // Struct arrays
     const points = [
@@ -172,6 +174,8 @@ export function runJsArraySupportTests(rootExports) {
     assert.equal(optPoints[1], null);
     assert.deepEqual(exports.roundTripOptionalCaseEnumArray([Direction.North, null]), [Direction.North, null]);
     assert.deepEqual(exports.roundTripOptionalIntRawValueEnumArray([HttpStatus.Ok, null]), [HttpStatus.Ok, null]);
+    assert.deepEqual(exports.roundTripOptionalInt64RawValueEnumArray([FileSize.Small, null]), [FileSize.Small, null]);
+    assert.deepEqual(exports.roundTripOptionalUInt64RawValueEnumArray([SessionId.Expired, null]), [SessionId.Expired, null]);
     assert.deepEqual(exports.roundTripOptionalJSClassArray([]), []);
     const optJsClassResult = exports.roundTripOptionalJSClassArray([foo1, null, foo2]);
     assert.equal(optJsClassResult.length, 3);

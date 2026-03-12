@@ -442,7 +442,7 @@ public final class SwiftToSkeleton {
 }
 
 private enum ExportSwiftConstants {
-    static let supportedRawTypes = SwiftEnumRawType.allCases.map { $0.rawValue }
+    static let supportedRawTypes = SwiftEnumRawType.supportedTypeNames
 }
 
 extension AttributeSyntax {
@@ -828,7 +828,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             let intValue = Int(intLiteral.literal.text)
         {
             let value = DefaultValue.int(isNegative ? -intValue : intValue)
-            if let type = type, !type.isCompatibleWith(.int) {
+            if let type = type, !type.isCompatibleWith(.integer(.int)) {
                 return nil
             }
             return value
@@ -1489,12 +1489,12 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             for enumCase in exportedEnum.cases {
                 for associatedValue in enumCase.associatedValues {
                     switch associatedValue.type {
-                    case .string, .int, .float, .double, .bool, .caseEnum, .rawValueEnum,
+                    case .string, .integer, .float, .double, .bool, .caseEnum, .rawValueEnum,
                         .swiftStruct, .swiftHeapObject, .jsObject, .associatedValueEnum, .array:
                         break
                     case .nullable(let wrappedType, _):
                         switch wrappedType {
-                        case .string, .int, .float, .double, .bool, .caseEnum, .rawValueEnum,
+                        case .string, .integer, .float, .double, .bool, .caseEnum, .rawValueEnum,
                             .swiftStruct, .swiftHeapObject, .jsObject, .associatedValueEnum, .array:
                             break
                         default:

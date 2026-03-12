@@ -21,6 +21,7 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalHeapObject;
     let strStack = [];
     let i32Stack = [];
+    let i64Stack = [];
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
@@ -102,6 +103,12 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
+            }
+            bjs["swift_js_push_i64"] = function(v) {
+                i64Stack.push(v);
+            }
+            bjs["swift_js_pop_i64"] = function() {
+                return i64Stack.pop();
             }
             bjs["swift_js_struct_lower_Point"] = function(objectId) {
                 structHelpers.Point.lower(swift.memory.getObject(objectId));
