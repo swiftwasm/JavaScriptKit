@@ -31,8 +31,11 @@
             "associatedValues" : [
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -118,8 +121,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -137,8 +143,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -196,15 +205,21 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -304,8 +319,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -323,8 +341,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -378,8 +399,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -426,8 +450,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -467,8 +494,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -705,8 +735,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -811,8 +844,11 @@
                     "_0" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }

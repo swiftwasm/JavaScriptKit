@@ -1,0 +1,471 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_roundTripInt8",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripInt8",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w8"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "w8"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUInt8",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUInt8",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w8"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : false,
+              "width" : "w8"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripInt16",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripInt16",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w16"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "w16"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUInt16",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUInt16",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w16"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : false,
+              "width" : "w16"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripInt32",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripInt32",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w32"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "w32"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUInt32",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUInt32",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w32"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : false,
+              "width" : "w32"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripInt64",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripInt64",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w64"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "w64"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUInt64",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUInt64",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w64"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : false,
+              "width" : "w64"
+            }
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "name" : "roundTripInt8",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w8"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w8"
+                }
+              }
+            }
+          },
+          {
+            "name" : "roundTripUInt8",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w8"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w8"
+                }
+              }
+            }
+          },
+          {
+            "name" : "roundTripInt16",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w16"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w16"
+                }
+              }
+            }
+          },
+          {
+            "name" : "roundTripUInt16",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w16"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w16"
+                }
+              }
+            }
+          },
+          {
+            "name" : "roundTripInt32",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w32"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w32"
+                }
+              }
+            }
+          },
+          {
+            "name" : "roundTripUInt32",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w32"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w32"
+                }
+              }
+            }
+          },
+          {
+            "name" : "roundTripInt64",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w64"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w64"
+                }
+              }
+            }
+          },
+          {
+            "name" : "roundTripUInt64",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w64"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w64"
+                }
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

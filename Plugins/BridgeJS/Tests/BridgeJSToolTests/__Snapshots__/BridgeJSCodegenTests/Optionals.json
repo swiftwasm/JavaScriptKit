@@ -134,8 +134,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -286,8 +289,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -298,8 +304,257 @@
         "returnType" : {
           "nullable" : {
             "_0" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripInt8",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripInt8",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w8"
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w8"
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUInt8",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUInt8",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w8"
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w8"
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripInt16",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripInt16",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w16"
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w16"
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUInt16",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUInt16",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w16"
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w16"
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripInt32",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripInt32",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w32"
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w32"
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripUInt32",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripUInt32",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w32"
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w32"
+                }
               }
             },
             "_1" : "null"
@@ -601,8 +856,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -613,8 +871,11 @@
         "returnType" : {
           "nullable" : {
             "_0" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "_1" : "null"
@@ -699,8 +960,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -858,8 +1122,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -871,8 +1138,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "undefined"
@@ -1057,8 +1327,11 @@
                     "type" : {
                       "nullable" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         },
                         "_1" : "null"
@@ -1069,8 +1342,11 @@
                 "returnType" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -1085,8 +1361,11 @@
                     "type" : {
                       "nullable" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         },
                         "_1" : "undefined"
@@ -1097,8 +1376,11 @@
                 "returnType" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "undefined"
@@ -1198,8 +1480,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -1212,8 +1497,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "undefined"

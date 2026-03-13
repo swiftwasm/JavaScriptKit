@@ -164,8 +164,65 @@ public enum JSOptionalKind: String, Codable, Equatable, Hashable, Sendable {
     }
 }
 
+public enum IntegerWidth: String, Codable, Equatable, Hashable, Sendable {
+    case word  // Int / UInt (ptr-sized, 32-bit on wasm32)
+    case w8, w16, w32, w64
+}
+
+public struct BridgeIntegerType: Codable, Equatable, Hashable, Sendable {
+    public let width: IntegerWidth
+    public let isSigned: Bool
+
+    public static let int = BridgeIntegerType(width: .word, isSigned: true)
+    public static let uint = BridgeIntegerType(width: .word, isSigned: false)
+    public static let int8 = BridgeIntegerType(width: .w8, isSigned: true)
+    public static let uint8 = BridgeIntegerType(width: .w8, isSigned: false)
+    public static let int16 = BridgeIntegerType(width: .w16, isSigned: true)
+    public static let uint16 = BridgeIntegerType(width: .w16, isSigned: false)
+    public static let int32 = BridgeIntegerType(width: .w32, isSigned: true)
+    public static let uint32 = BridgeIntegerType(width: .w32, isSigned: false)
+    public static let int64 = BridgeIntegerType(width: .w64, isSigned: true)
+    public static let uint64 = BridgeIntegerType(width: .w64, isSigned: false)
+
+    public var is64Bit: Bool { width == .w64 }
+    public var wasmCoreType: WasmCoreType { is64Bit ? .i64 : .i32 }
+
+    public var swiftTypeName: String {
+        switch (width, isSigned) {
+        case (.word, true): return "Int"
+        case (.word, false): return "UInt"
+        case (.w8, true): return "Int8"
+        case (.w8, false): return "UInt8"
+        case (.w16, true): return "Int16"
+        case (.w16, false): return "UInt16"
+        case (.w32, true): return "Int32"
+        case (.w32, false): return "UInt32"
+        case (.w64, true): return "Int64"
+        case (.w64, false): return "UInt64"
+        }
+    }
+
+    public var tsTypeName: String { is64Bit ? "bigint" : "number" }
+
+    public var mangleTypeName: String {
+        switch (width, isSigned) {
+        case (.word, true): return "Si"
+        case (.word, false): return "Su"
+        case (.w8, true): return "s8"
+        case (.w8, false): return "u8"
+        case (.w16, true): return "s16"
+        case (.w16, false): return "u16"
+        case (.w32, true): return "s32"
+        case (.w32, false): return "u32"
+        case (.w64, true): return "s64"
+        case (.w64, false): return "u64"
+        }
+    }
+}
+
 public enum BridgeType: Codable, Equatable, Hashable, Sendable {
-    case int, uint, float, double, string, bool, jsObject(String?), jsValue, swiftHeapObject(String), void
+    case integer(BridgeIntegerType), float, double, string, bool, jsObject(String?), jsValue, swiftHeapObject(String),
+        void
     case unsafePointer(UnsafePointerType)
     indirect case nullable(BridgeType, JSOptionalKind)
     indirect case array(BridgeType)
@@ -183,26 +240,53 @@ public enum WasmCoreType: String, Codable, Sendable {
     case i32, i64, f32, f64, pointer
 }
 
-public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
-    case string = "String"
-    case bool = "Bool"
-    case int = "Int"
-    case int32 = "Int32"
-    case int64 = "Int64"
-    case uint = "UInt"
-    case uint32 = "UInt32"
-    case uint64 = "UInt64"
-    case float = "Float"
-    case double = "Double"
+public enum SwiftEnumRawType: RawRepresentable, Codable, Equatable, Hashable, Sendable {
+    case string
+    case bool
+    case integer(BridgeIntegerType)
+    case float
+    case double
+
+    private static let integerTypeMappings: [(name: String, type: BridgeIntegerType)] = [
+        ("Int", .int),
+        ("Int32", .int32),
+        ("Int64", .int64),
+        ("UInt", .uint),
+        ("UInt32", .uint32),
+        ("UInt64", .uint64),
+    ]
+
+    public static let supportedTypeNames =
+        [
+            "String",
+            "Bool",
+            "Float",
+            "Double",
+        ] + integerTypeMappings.map(\.name)
+
+    public var rawValue: String {
+        switch self {
+        case .string:
+            return "String"
+        case .bool:
+            return "Bool"
+        case .integer(let integerType):
+            return integerType.swiftTypeName
+        case .float:
+            return "Float"
+        case .double:
+            return "Double"
+        }
+    }
 
     public var wasmCoreType: WasmCoreType? {
         switch self {
         case .string:
             return nil
-        case .bool, .int, .int32, .uint, .uint32:
+        case .bool:
             return .i32
-        case .int64, .uint64:
-            return .i64
+        case .integer(let integerType):
+            return integerType.wasmCoreType
         case .float:
             return .f32
         case .double:
@@ -210,13 +294,54 @@ public enum SwiftEnumRawType: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    public init?(_ rawTypeString: String?) {
-        guard let rawTypeString = rawTypeString,
-            let match = Self.allCases.first(where: { $0.rawValue == rawTypeString })
-        else {
+    public var integerType: BridgeIntegerType? {
+        guard case .integer(let integerType) = self else {
             return nil
         }
-        self = match
+        return integerType
+    }
+
+    public init?(rawValue: String) {
+        if let integerType = Self.integerTypeMappings.first(where: { $0.name == rawValue })?.type {
+            self = .integer(integerType)
+            return
+        }
+        switch rawValue {
+        case "String":
+            self = .string
+        case "Bool":
+            self = .bool
+        case "Float":
+            self = .float
+        case "Double":
+            self = .double
+        default:
+            return nil
+        }
+    }
+
+    public init?(_ rawTypeString: String?) {
+        guard let rawTypeString else {
+            return nil
+        }
+        self.init(rawValue: rawTypeString)
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        guard let value = Self(rawValue: rawValue) else {
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unknown Swift enum raw type: \(rawValue)"
+            )
+        }
+        self = value
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
     }
 }
 
@@ -495,8 +620,10 @@ extension EnumCase {
             return "\"\(rawValue)\""
         case .bool:
             return rawValue.lowercased() == "true" ? "true" : "false"
-        case .float, .double, .int, .int32, .int64, .uint, .uint32, .uint64:
+        case .float, .double:
             return rawValue
+        case .integer(let integerType):
+            return integerType.is64Bit ? "\(rawValue)n" : rawValue
         }
     }
 }
@@ -1056,10 +1183,16 @@ extension BridgeType {
     /// Maps Swift primitive type names to BridgeType. Returns nil for unknown types.
     public init?(swiftType: String) {
         switch swiftType {
-        case "Int":
-            self = .int
-        case "UInt":
-            self = .uint
+        case "Int": self = .integer(.int)
+        case "UInt": self = .integer(.uint)
+        case "Int8": self = .integer(.int8)
+        case "UInt8": self = .integer(.uint8)
+        case "Int16": self = .integer(.int16)
+        case "UInt16": self = .integer(.uint16)
+        case "Int32": self = .integer(.int32)
+        case "UInt32": self = .integer(.uint32)
+        case "Int64": self = .integer(.int64)
+        case "UInt64": self = .integer(.uint64)
         case "Float":
             self = .float
         case "Double":
@@ -1089,7 +1222,7 @@ extension BridgeType {
         switch self {
         case .void: return nil
         case .bool: return .i32
-        case .int, .uint: return .i32
+        case .integer(let t): return t.wasmCoreType
         case .float: return .f32
         case .double: return .f64
         case .string: return nil
@@ -1138,8 +1271,7 @@ extension BridgeType {
     /// https://github.com/swiftlang/swift/blob/main/docs/ABI/Mangling.rst#types
     public var mangleTypeName: String {
         switch self {
-        case .int: return "Si"
-        case .uint: return "Su"
+        case .integer(let t): return t.mangleTypeName
         case .float: return "Sf"
         case .double: return "Sd"
         case .string: return "SS"
@@ -1206,12 +1338,14 @@ extension BridgeType {
         }
 
         switch wrappedType {
-        case .string, .int, .float, .double, .jsObject, .swiftProtocol:
+        case .string, .integer, .float, .double, .jsObject, .swiftProtocol:
             return true
         case .rawValueEnum(_, let rawType):
             switch rawType {
-            case .string, .int, .float, .double:
+            case .string, .float, .double:
                 return true
+            case .integer(let integerType):
+                return !integerType.is64Bit
             default:
                 return false
             }

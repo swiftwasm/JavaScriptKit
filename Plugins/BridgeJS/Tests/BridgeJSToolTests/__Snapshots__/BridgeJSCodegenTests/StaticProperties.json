@@ -43,8 +43,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -103,8 +106,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -179,8 +185,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -280,8 +289,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },

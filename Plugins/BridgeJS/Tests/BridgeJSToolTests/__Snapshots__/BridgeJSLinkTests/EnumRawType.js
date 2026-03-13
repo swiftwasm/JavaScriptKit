@@ -42,10 +42,10 @@ export const PriorityValues = {
 };
 
 export const FileSizeValues = {
-    Tiny: 1024,
-    Small: 10240,
-    Medium: 102400,
-    Large: 1048576,
+    Tiny: 1024n,
+    Small: 10240n,
+    Medium: 102400n,
+    Large: 1048576n,
 };
 
 export const UserIdValues = {
@@ -61,9 +61,9 @@ export const TokenIdValues = {
 };
 
 export const SessionIdValues = {
-    None: 0,
-    Active: 9876543210,
-    Expired: 1234567890,
+    None: 0n,
+    Active: 9876543210n,
+    Expired: 1234567890n,
 };
 
 export const PrecisionValues = {
@@ -96,6 +96,7 @@ export async function createInstantiator(options, swift) {
     let tmpRetOptionalHeapObject;
     let strStack = [];
     let i32Stack = [];
+    let i64Stack = [];
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
@@ -166,6 +167,12 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_pointer"] = function() {
                 return ptrStack.pop();
+            }
+            bjs["swift_js_push_i64"] = function(v) {
+                i64Stack.push(v);
+            }
+            bjs["swift_js_pop_i64"] = function() {
+                return i64Stack.pop();
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -426,8 +433,14 @@ export async function createInstantiator(options, swift) {
                 roundTripOptionalFileSize: function bjs_roundTripOptionalFileSize(input) {
                     const isSome = input != null;
                     instance.exports.bjs_roundTripOptionalFileSize(+isSome, isSome ? input : 0);
-                    const optResult = tmpRetOptionalInt;
-                    tmpRetOptionalInt = undefined;
+                    const isSome1 = i32Stack.pop();
+                    let optResult;
+                    if (isSome1) {
+                        const rawValue = i64Stack.pop();
+                        optResult = rawValue;
+                    } else {
+                        optResult = null;
+                    }
                     return optResult;
                 },
                 setUserId: function bjs_setUserId(id) {
@@ -435,7 +448,7 @@ export async function createInstantiator(options, swift) {
                 },
                 getUserId: function bjs_getUserId() {
                     const ret = instance.exports.bjs_getUserId();
-                    return ret;
+                    return ret >>> 0;
                 },
                 roundTripOptionalUserId: function bjs_roundTripOptionalUserId(input) {
                     const isSome = input != null;
@@ -449,7 +462,7 @@ export async function createInstantiator(options, swift) {
                 },
                 getTokenId: function bjs_getTokenId() {
                     const ret = instance.exports.bjs_getTokenId();
-                    return ret;
+                    return ret >>> 0;
                 },
                 roundTripOptionalTokenId: function bjs_roundTripOptionalTokenId(input) {
                     const isSome = input != null;
@@ -463,13 +476,19 @@ export async function createInstantiator(options, swift) {
                 },
                 getSessionId: function bjs_getSessionId() {
                     const ret = instance.exports.bjs_getSessionId();
-                    return ret;
+                    return BigInt.asUintN(64, ret);
                 },
                 roundTripOptionalSessionId: function bjs_roundTripOptionalSessionId(input) {
                     const isSome = input != null;
                     instance.exports.bjs_roundTripOptionalSessionId(+isSome, isSome ? input : 0);
-                    const optResult = tmpRetOptionalInt;
-                    tmpRetOptionalInt = undefined;
+                    const isSome1 = i32Stack.pop();
+                    let optResult;
+                    if (isSome1) {
+                        const rawValue = i64Stack.pop();
+                        optResult = rawValue;
+                    } else {
+                        optResult = null;
+                    }
                     return optResult;
                 },
                 setPrecision: function bjs_setPrecision(precision) {

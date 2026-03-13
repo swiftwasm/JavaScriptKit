@@ -21,8 +21,11 @@
             "label" : "a",
             "name" : "a",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -30,8 +33,11 @@
             "label" : "b",
             "name" : "b",
             "type" : {
-              "uint" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "word"
+                }
               }
             }
           },

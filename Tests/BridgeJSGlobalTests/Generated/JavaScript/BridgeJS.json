@@ -138,8 +138,11 @@
                 "label" : "value",
                 "name" : "value",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -164,8 +167,11 @@
               "GlobalUtils"
             ],
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -476,8 +482,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },

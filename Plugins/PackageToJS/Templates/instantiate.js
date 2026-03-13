@@ -65,6 +65,8 @@ async function createInstantiator(options, swift) {
                 swift_js_get_optional_heap_object_pointer: unexpectedBjsCall,
                 swift_js_push_pointer: unexpectedBjsCall,
                 swift_js_pop_pointer: unexpectedBjsCall,
+                swift_js_push_i64: unexpectedBjsCall,
+                swift_js_pop_i64: unexpectedBjsCall,
                 swift_js_closure_unregister: unexpectedBjsCall,
             };
         },

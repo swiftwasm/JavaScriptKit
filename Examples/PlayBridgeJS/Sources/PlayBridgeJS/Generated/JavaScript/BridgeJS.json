@@ -147,8 +147,11 @@
             "isStatic" : false,
             "name" : "startLine",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -157,8 +160,11 @@
             "isStatic" : false,
             "name" : "startColumn",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -167,8 +173,11 @@
             "isStatic" : false,
             "name" : "endLine",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -177,8 +186,11 @@
             "isStatic" : false,
             "name" : "endColumn",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }

@@ -11,8 +11,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -22,8 +25,11 @@
             "returnType" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }

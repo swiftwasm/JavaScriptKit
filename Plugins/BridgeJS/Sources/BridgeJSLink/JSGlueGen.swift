@@ -26,6 +26,7 @@ final class JSGlueVariableScope {
     static let reservedTextDecoder = "textDecoder"
     static let reservedStringStack = "strStack"
     static let reservedI32Stack = "i32Stack"
+    static let reservedI64Stack = "i64Stack"
     static let reservedF32Stack = "f32Stack"
     static let reservedF64Stack = "f64Stack"
     static let reservedPointerStack = "ptrStack"
@@ -54,6 +55,7 @@ final class JSGlueVariableScope {
         reservedTextDecoder,
         reservedStringStack,
         reservedI32Stack,
+        reservedI64Stack,
         reservedF32Stack,
         reservedF64Stack,
         reservedPointerStack,
@@ -100,6 +102,9 @@ extension JSGlueVariableScope {
     func emitPushI32Parameter(_ value: String, printer: CodeFragmentPrinter) {
         printer.write("\(JSGlueVariableScope.reservedI32Stack).push(\(value));")
     }
+    func emitPushI64Parameter(_ value: String, printer: CodeFragmentPrinter) {
+        printer.write("\(JSGlueVariableScope.reservedI64Stack).push(\(value));")
+    }
     func emitPushF64Parameter(_ value: String, printer: CodeFragmentPrinter) {
         printer.write("\(JSGlueVariableScope.reservedF64Stack).push(\(value));")
     }
@@ -116,6 +121,9 @@ extension JSGlueVariableScope {
     }
     func popI32() -> String {
         return "\(JSGlueVariableScope.reservedI32Stack).pop()"
+    }
+    func popI64() -> String {
+        return "\(JSGlueVariableScope.reservedI64Stack).pop()"
     }
     func popF64() -> String {
         return "\(JSGlueVariableScope.reservedF64Stack).pop()"
@@ -237,6 +245,14 @@ struct IntrinsicJSFragment: Sendable {
         }
     )
     static let uintLiftParameter = uintLiftReturn
+
+    static let uint64LiftReturn = IntrinsicJSFragment(
+        parameters: ["value"],
+        printCode: { arguments, _ in
+            return ["BigInt.asUintN(64, \(arguments[0]))"]
+        }
+    )
+    static let uint64LiftParameter = uint64LiftReturn
 
     // MARK: - String Fragments
 
@@ -650,7 +666,12 @@ struct IntrinsicJSFragment: Sendable {
             )
         }
 
-        let innerFragment = try liftParameter(type: wrappedType, context: bridgeContext)
+        let innerFragment =
+            if wrappedType.optionalConvention == .stackABI {
+                try stackLiftFragment(elementType: wrappedType)
+            } else {
+                try liftParameter(type: wrappedType, context: bridgeContext)
+            }
         return compositeOptionalLiftParameter(
             wrappedType: wrappedType,
             kind: kind,
@@ -738,7 +759,12 @@ struct IntrinsicJSFragment: Sendable {
             )
         }
 
-        let innerFragment = try lowerParameter(type: wrappedType)
+        let innerFragment =
+            if wrappedType.optionalConvention == .stackABI {
+                try stackLowerFragment(elementType: wrappedType)
+            } else {
+                try lowerParameter(type: wrappedType)
+            }
         return try compositeOptionalLowerParameter(
             wrappedType: wrappedType,
             kind: kind,
@@ -832,7 +858,12 @@ struct IntrinsicJSFragment: Sendable {
                 let isSomeVar = scope.variable("isSome")
                 printer.write("const \(isSomeVar) = \(scope.popI32());")
 
-                let innerFragment = try liftReturn(type: wrappedType)
+                let innerFragment =
+                    if wrappedType.optionalConvention == .stackABI {
+                        try stackLiftFragment(elementType: wrappedType)
+                    } else {
+                        try liftReturn(type: wrappedType)
+                    }
 
                 let innerPrinter = CodeFragmentPrinter()
                 let innerResults = try innerFragment.printCode([], context.with(\.printer, innerPrinter))
@@ -1077,6 +1108,15 @@ struct IntrinsicJSFragment: Sendable {
             return optionalLowerReturnToSideChannel(mode: mode, kind: kind)
         }
 
+        if wrappedType.optionalConvention == .stackABI {
+            let innerFragment = try stackLowerFragment(elementType: wrappedType)
+            return stackOptionalLower(
+                wrappedType: wrappedType,
+                kind: kind,
+                innerFragment: innerFragment
+            )
+        }
+
         if wrappedType.nilSentinel.hasSentinel {
             let innerFragment = try lowerReturn(type: wrappedType, context: .exportSwift)
             return sentinelOptionalLowerReturn(
@@ -1183,10 +1223,10 @@ struct IntrinsicJSFragment: Sendable {
     private static func popExpression(for wasmType: WasmCoreType, scope: JSGlueVariableScope) -> String {
         switch wasmType {
         case .i32: return scope.popI32()
+        case .i64: return scope.popI64()
         case .f32: return scope.popF32()
         case .f64: return scope.popF64()
         case .pointer: return scope.popPointer()
-        case .i64: return scope.popI32()
         }
     }
 
@@ -1198,10 +1238,10 @@ struct IntrinsicJSFragment: Sendable {
     ) {
         switch wasmType {
         case .i32: scope.emitPushI32Parameter(value, printer: printer)
+        case .i64: scope.emitPushI64Parameter(value, printer: printer)
         case .f32: scope.emitPushF32Parameter(value, printer: printer)
         case .f64: scope.emitPushF64Parameter(value, printer: printer)
         case .pointer: scope.emitPushPointerParameter(value, printer: printer)
-        case .i64: scope.emitPushI32Parameter(value, printer: printer)
         }
     }
 
@@ -1243,7 +1283,7 @@ struct IntrinsicJSFragment: Sendable {
     /// Returns a fragment that lowers a JS value to Wasm core values for parameters
     static func lowerParameter(type: BridgeType) throws -> IntrinsicJSFragment {
         switch type {
-        case .bool, .int, .uint, .float, .double, .unsafePointer, .caseEnum:
+        case .bool, .integer, .float, .double, .unsafePointer, .caseEnum:
             return .identity
         case .rawValueEnum(_, let rawType) where rawType != .string:
             return .identity
@@ -1291,9 +1331,19 @@ struct IntrinsicJSFragment: Sendable {
         switch type {
         case .bool, .rawValueEnum(_, .bool):
             return .boolLiftReturn
-        case .uint:
+        case .integer(let t) where !t.is64Bit && !t.isSigned:
             return .uintLiftReturn
-        case .int, .float, .double, .unsafePointer, .caseEnum:
+        case .integer(let t) where t.is64Bit && !t.isSigned:
+            return .uint64LiftReturn
+        case .rawValueEnum(_, let rawType)
+        where rawType.integerType?.is64Bit == false
+            && rawType.integerType?.isSigned == false:
+            return .uintLiftReturn
+        case .rawValueEnum(_, let rawType)
+        where rawType.integerType?.is64Bit == true
+            && rawType.integerType?.isSigned == false:
+            return .uint64LiftReturn
+        case .integer, .float, .double, .unsafePointer, .caseEnum:
             return .identity
         case .rawValueEnum(_, let rawType) where rawType != .string && rawType != .bool:
             return .identity
@@ -1340,9 +1390,19 @@ struct IntrinsicJSFragment: Sendable {
         switch type {
         case .bool, .rawValueEnum(_, .bool):
             return .boolLiftParameter
-        case .uint:
+        case .integer(let t) where !t.is64Bit && !t.isSigned:
             return .uintLiftParameter
-        case .int, .float, .double, .unsafePointer, .caseEnum:
+        case .integer(let t) where t.is64Bit && !t.isSigned:
+            return .uint64LiftParameter
+        case .rawValueEnum(_, let rawType)
+        where rawType.integerType?.is64Bit == false
+            && rawType.integerType?.isSigned == false:
+            return .uintLiftParameter
+        case .rawValueEnum(_, let rawType)
+        where rawType.integerType?.is64Bit == true
+            && rawType.integerType?.isSigned == false:
+            return .uint64LiftParameter
+        case .integer, .float, .double, .unsafePointer, .caseEnum:
             return .identity
         case .rawValueEnum(_, let rawType) where rawType != .string && rawType != .bool:
             return .identity
@@ -1426,7 +1486,7 @@ struct IntrinsicJSFragment: Sendable {
         switch type {
         case .bool, .rawValueEnum(_, .bool):
             return .boolLowerReturn
-        case .int, .uint, .float, .double, .unsafePointer, .caseEnum:
+        case .integer, .float, .double, .unsafePointer, .caseEnum:
             return .identity
         case .rawValueEnum(_, let rawType) where rawType != .string && rawType != .bool:
             return .identity
@@ -2577,8 +2637,10 @@ private extension BridgeType {
         switch self {
         case .bool:
             return .inlineFlag
-        case .int, .uint:
+        case .integer(let t) where !t.is64Bit:
             return .sideChannelReturn(.none)
+        case .integer:
+            return .stackABI
         case .float:
             return .sideChannelReturn(.none)
         case .double:
@@ -2605,7 +2667,9 @@ private extension BridgeType {
                 return .sideChannelReturn(.none)
             case .bool:
                 return .inlineFlag
-            case .int, .int32, .int64, .uint, .uint32, .uint64:
+            case .integer(let integerType) where integerType.is64Bit:
+                return .stackABI
+            case .integer:
                 return .sideChannelReturn(.none)
             }
         case .associatedValueEnum:
@@ -2637,9 +2701,10 @@ private extension BridgeType {
     var optionalScalarKind: OptionalScalarKind? {
         switch self {
         case .bool, .rawValueEnum(_, .bool): return .bool
-        case .int, .uint, .caseEnum,
-            .rawValueEnum(_, .int), .rawValueEnum(_, .int32), .rawValueEnum(_, .int64),
-            .rawValueEnum(_, .uint), .rawValueEnum(_, .uint32), .rawValueEnum(_, .uint64):
+        case .integer(let t) where !t.is64Bit: return .int
+        case .caseEnum:
+            return .int
+        case .rawValueEnum(_, let rawType) where rawType.integerType?.is64Bit == false:
             return .int
         case .float, .rawValueEnum(_, .float): return .float
         case .double, .rawValueEnum(_, .double): return .double
@@ -2650,8 +2715,10 @@ private extension BridgeType {
 
     var wasmParams: [(name: String, type: WasmCoreType)] {
         switch self {
-        case .bool, .int, .uint:
+        case .bool:
             return [("value", .i32)]
+        case .integer(let t):
+            return [("value", t.wasmCoreType)]
         case .float:
             return [("value", .f32)]
         case .double:
@@ -2678,8 +2745,10 @@ private extension BridgeType {
                 return [("value", .f32)]
             case .double:
                 return [("value", .f64)]
-            case .bool, .int, .int32, .int64, .uint, .uint32, .uint64:
+            case .bool:
                 return [("value", .i32)]
+            case .integer(let integerType):
+                return [("value", integerType.wasmCoreType)]
             }
         case .associatedValueEnum:
             return [("caseId", .i32)]
@@ -2694,7 +2763,7 @@ private extension BridgeType {
 
     var isSingleParamScalar: Bool {
         switch self {
-        case .bool, .int, .uint, .float, .double, .unsafePointer, .caseEnum: return true
+        case .bool, .integer, .float, .double, .unsafePointer, .caseEnum: return true
         case .rawValueEnum(_, let rawType): return rawType != .string
         default: return false
         }
@@ -2703,9 +2772,11 @@ private extension BridgeType {
     var stackLowerCoerce: String? {
         switch self {
         case .bool, .rawValueEnum(_, .bool): return "$0 ? 1 : 0"
-        case .int, .uint, .unsafePointer, .caseEnum,
-            .rawValueEnum(_, .int), .rawValueEnum(_, .int32), .rawValueEnum(_, .int64),
-            .rawValueEnum(_, .uint), .rawValueEnum(_, .uint32), .rawValueEnum(_, .uint64):
+        case .integer(let t) where !t.is64Bit: return "($0 | 0)"
+        case .integer: return nil  // 64-bit integers pass through directly
+        case .unsafePointer, .caseEnum:
+            return "($0 | 0)"
+        case .rawValueEnum(_, let rawType) where rawType.integerType?.is64Bit == false:
             return "($0 | 0)"
         case .float, .rawValueEnum(_, .float): return "Math.fround($0)"
         case .double, .rawValueEnum(_, .double): return nil
@@ -2716,7 +2787,11 @@ private extension BridgeType {
     var liftCoerce: String? {
         switch self {
         case .bool, .rawValueEnum(_, .bool): return "$0 !== 0"
-        case .uint: return "$0 >>> 0"
+        case .integer(let t) where !t.is64Bit && !t.isSigned: return "$0 >>> 0"
+        case .rawValueEnum(_, let rawType)
+        where rawType.integerType?.is64Bit == false
+            && rawType.integerType?.isSigned == false:
+            return "$0 >>> 0"
         default: return nil
         }
     }
@@ -2731,7 +2806,7 @@ private extension BridgeType {
     var varHint: String {
         switch self {
         case .bool: return "bool"
-        case .int, .uint: return "int"
+        case .integer: return "int"
         case .float: return "f32"
         case .double: return "f64"
         case .unsafePointer: return "pointer"

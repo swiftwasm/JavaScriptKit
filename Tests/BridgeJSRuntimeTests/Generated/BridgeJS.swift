@@ -2685,6 +2685,28 @@ public func _bjs_ArraySupportExports_static_roundTripIntRawValueEnumArray() -> V
     #endif
 }
 
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripInt64RawValueEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripInt64RawValueEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripInt64RawValueEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripInt64RawValueEnumArray(_: [FileSize].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripUInt64RawValueEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripUInt64RawValueEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripUInt64RawValueEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripUInt64RawValueEnumArray(_: [SessionId].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_ArraySupportExports_static_roundTripStructArray")
 @_cdecl("bjs_ArraySupportExports_static_roundTripStructArray")
 public func _bjs_ArraySupportExports_static_roundTripStructArray() -> Void {
@@ -2802,6 +2824,28 @@ public func _bjs_ArraySupportExports_static_roundTripOptionalStringRawValueEnumA
 public func _bjs_ArraySupportExports_static_roundTripOptionalIntRawValueEnumArray() -> Void {
     #if arch(wasm32)
     let ret = ArraySupportExports.roundTripOptionalIntRawValueEnumArray(_: [Optional<HttpStatus>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalInt64RawValueEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalInt64RawValueEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalInt64RawValueEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalInt64RawValueEnumArray(_: [Optional<FileSize>].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ArraySupportExports_static_roundTripOptionalUInt64RawValueEnumArray")
+@_cdecl("bjs_ArraySupportExports_static_roundTripOptionalUInt64RawValueEnumArray")
+public func _bjs_ArraySupportExports_static_roundTripOptionalUInt64RawValueEnumArray() -> Void {
+    #if arch(wasm32)
+    let ret = ArraySupportExports.roundTripOptionalUInt64RawValueEnumArray(_: [Optional<SessionId>].bridgeJSStackPop())
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -3221,6 +3265,12 @@ extension Theme: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
 extension HttpStatus: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+}
+
+extension FileSize: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+}
+
+extension SessionId: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
 extension Precision: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
@@ -3935,6 +3985,116 @@ public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_se
     #endif
 }
 
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripInt")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripInt")
+public func _bjs_IntegerTypesSupportExports_static_roundTripInt(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripInt(_: Int.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripUInt")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripUInt")
+public func _bjs_IntegerTypesSupportExports_static_roundTripUInt(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripUInt(_: UInt.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripInt8")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripInt8")
+public func _bjs_IntegerTypesSupportExports_static_roundTripInt8(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripInt8(_: Int8.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripUInt8")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripUInt8")
+public func _bjs_IntegerTypesSupportExports_static_roundTripUInt8(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripUInt8(_: UInt8.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripInt16")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripInt16")
+public func _bjs_IntegerTypesSupportExports_static_roundTripInt16(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripInt16(_: Int16.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripUInt16")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripUInt16")
+public func _bjs_IntegerTypesSupportExports_static_roundTripUInt16(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripUInt16(_: UInt16.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripInt32")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripInt32")
+public func _bjs_IntegerTypesSupportExports_static_roundTripInt32(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripInt32(_: Int32.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripUInt32")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripUInt32")
+public func _bjs_IntegerTypesSupportExports_static_roundTripUInt32(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripUInt32(_: UInt32.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripInt64")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripInt64")
+public func _bjs_IntegerTypesSupportExports_static_roundTripInt64(_ v: Int64) -> Int64 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripInt64(_: Int64.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripUInt64")
+@_cdecl("bjs_IntegerTypesSupportExports_static_roundTripUInt64")
+public func _bjs_IntegerTypesSupportExports_static_roundTripUInt64(_ v: Int64) -> Int64 {
+    #if arch(wasm32)
+    let ret = IntegerTypesSupportExports.roundTripUInt64(_: UInt64.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalString")
 @_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalString")
 public func _bjs_OptionalSupportExports_static_roundTripOptionalString(_ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
@@ -4028,6 +4188,28 @@ public func _bjs_OptionalSupportExports_static_roundTripOptionalStringRawValueEn
 public func _bjs_OptionalSupportExports_static_roundTripOptionalIntRawValueEnum(_ vIsSome: Int32, _ vValue: Int32) -> Void {
     #if arch(wasm32)
     let ret = OptionalSupportExports.roundTripOptionalIntRawValueEnum(_: Optional<HttpStatus>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalInt64RawValueEnum")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalInt64RawValueEnum")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalInt64RawValueEnum(_ vIsSome: Int32, _ vValue: Int64) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalInt64RawValueEnum(_: Optional<FileSize>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalUInt64RawValueEnum")
+@_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalUInt64RawValueEnum")
+public func _bjs_OptionalSupportExports_static_roundTripOptionalUInt64RawValueEnum(_ vIsSome: Int32, _ vValue: Int64) -> Void {
+    #if arch(wasm32)
+    let ret = OptionalSupportExports.roundTripOptionalUInt64RawValueEnum(_: Optional<SessionId>.bridgeJSLiftParameter(vIsSome, vValue))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -5468,28 +5650,6 @@ public func _bjs_roundTripVoid() -> Void {
     #endif
 }
 
-@_expose(wasm, "bjs_roundTripInt")
-@_cdecl("bjs_roundTripInt")
-public func _bjs_roundTripInt(_ v: Int32) -> Int32 {
-    #if arch(wasm32)
-    let ret = roundTripInt(v: Int.bridgeJSLiftParameter(v))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_roundTripUInt")
-@_cdecl("bjs_roundTripUInt")
-public func _bjs_roundTripUInt(_ v: Int32) -> Int32 {
-    #if arch(wasm32)
-    let ret = roundTripUInt(v: UInt.bridgeJSLiftParameter(v))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
 @_expose(wasm, "bjs_roundTripFloat")
 @_cdecl("bjs_roundTripFloat")
 public func _bjs_roundTripFloat(_ v: Float32) -> Float32 {
@@ -6130,6 +6290,50 @@ public func _bjs_setHttpStatus(_ status: Int32) -> Int32 {
 public func _bjs_getHttpStatus() -> Int32 {
     #if arch(wasm32)
     let ret = getHttpStatus()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_setFileSize")
+@_cdecl("bjs_setFileSize")
+public func _bjs_setFileSize(_ size: Int64) -> Int64 {
+    #if arch(wasm32)
+    let ret = setFileSize(_: FileSize.bridgeJSLiftParameter(size))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getFileSize")
+@_cdecl("bjs_getFileSize")
+public func _bjs_getFileSize() -> Int64 {
+    #if arch(wasm32)
+    let ret = getFileSize()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_setSessionId")
+@_cdecl("bjs_setSessionId")
+public func _bjs_setSessionId(_ session: Int64) -> Int64 {
+    #if arch(wasm32)
+    let ret = setSessionId(_: SessionId.bridgeJSLiftParameter(session))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getSessionId")
+@_cdecl("bjs_getSessionId")
+public func _bjs_getSessionId() -> Int64 {
+    #if arch(wasm32)
+    let ret = getSessionId()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -11499,6 +11703,235 @@ func _$jsTranslatePoint(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException
         throw error
     }
     return Point.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripInt_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt_static(_ v: Int32) -> Int32 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripInt_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripUInt_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt_static(_ v: Int32) -> Int32 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripUInt_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripInt8_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt8_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt8_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt8_static(_ v: Int32) -> Int32 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripInt8_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripUInt8_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt8_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt8_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt8_static(_ v: Int32) -> Int32 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripUInt8_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripInt16_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt16_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt16_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt16_static(_ v: Int32) -> Int32 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripInt16_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripUInt16_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt16_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt16_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt16_static(_ v: Int32) -> Int32 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripUInt16_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripInt32_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt32_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt32_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt32_static(_ v: Int32) -> Int32 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripInt32_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripUInt32_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt32_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt32_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt32_static(_ v: Int32) -> Int32 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripUInt32_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripInt64_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt64_static_extern(_ v: Int64) -> Int64
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt64_static_extern(_ v: Int64) -> Int64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt64_static(_ v: Int64) -> Int64 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripInt64_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripUInt64_static")
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt64_static_extern(_ v: Int64) -> Int64
+#else
+fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt64_static_extern(_ v: Int64) -> Int64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripUInt64_static(_ v: Int64) -> Int64 {
+    return bjs_IntegerTypesSupportImports_jsRoundTripUInt64_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_runJsIntegerTypesSupportTests_static")
+fileprivate func bjs_IntegerTypesSupportImports_runJsIntegerTypesSupportTests_static_extern() -> Void
+#else
+fileprivate func bjs_IntegerTypesSupportImports_runJsIntegerTypesSupportTests_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_IntegerTypesSupportImports_runJsIntegerTypesSupportTests_static() -> Void {
+    return bjs_IntegerTypesSupportImports_runJsIntegerTypesSupportTests_static_extern()
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripInt(_ v: Int) throws(JSException) -> Int {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripInt_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripUInt(_ v: UInt) throws(JSException) -> UInt {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripUInt_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UInt.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripInt8(_ v: Int8) throws(JSException) -> Int8 {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripInt8_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int8.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripUInt8(_ v: UInt8) throws(JSException) -> UInt8 {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripUInt8_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UInt8.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripInt16(_ v: Int16) throws(JSException) -> Int16 {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripInt16_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int16.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripUInt16(_ v: UInt16) throws(JSException) -> UInt16 {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripUInt16_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UInt16.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripInt32(_ v: Int32) throws(JSException) -> Int32 {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripInt32_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int32.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripUInt32(_ v: UInt32) throws(JSException) -> UInt32 {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripUInt32_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UInt32.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripInt64(_ v: Int64) throws(JSException) -> Int64 {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripInt64_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int64.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_jsRoundTripUInt64(_ v: UInt64) throws(JSException) -> UInt64 {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_IntegerTypesSupportImports_jsRoundTripUInt64_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UInt64.bridgeJSLiftReturn(ret)
+}
+
+func _$IntegerTypesSupportImports_runJsIntegerTypesSupportTests() throws(JSException) -> Void {
+    bjs_IntegerTypesSupportImports_runJsIntegerTypesSupportTests_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 #if arch(wasm32)

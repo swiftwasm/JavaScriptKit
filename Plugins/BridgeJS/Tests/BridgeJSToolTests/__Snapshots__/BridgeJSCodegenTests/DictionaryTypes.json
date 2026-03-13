@@ -32,8 +32,11 @@
             "type" : {
               "dictionary" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -43,8 +46,11 @@
         "returnType" : {
           "dictionary" : {
             "_0" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -110,8 +116,11 @@
                 "_0" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -125,8 +134,11 @@
             "_0" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }

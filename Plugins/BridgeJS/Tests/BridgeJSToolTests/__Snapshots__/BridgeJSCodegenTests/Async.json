@@ -38,15 +38,21 @@
             "label" : "_",
             "name" : "v",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
         ],
         "returnType" : {
-          "int" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
           }
         }
       },

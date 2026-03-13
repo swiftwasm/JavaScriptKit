@@ -41,6 +41,36 @@ func roundTripInt(value: Int?) -> Int? {
 }
 
 @JS
+func roundTripInt8(value: Int8?) -> Int8? {
+    return value
+}
+
+@JS
+func roundTripUInt8(value: UInt8?) -> UInt8? {
+    return value
+}
+
+@JS
+func roundTripInt16(value: Int16?) -> Int16? {
+    return value
+}
+
+@JS
+func roundTripUInt16(value: UInt16?) -> UInt16? {
+    return value
+}
+
+@JS
+func roundTripInt32(value: Int32?) -> Int32? {
+    return value
+}
+
+@JS
+func roundTripUInt32(value: UInt32?) -> UInt32? {
+    return value
+}
+
+@JS
 func roundTripBool(flag: Bool?) -> Bool? {
     return flag
 }

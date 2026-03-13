@@ -46,10 +46,10 @@ export const PriorityValues: {
 export type PriorityTag = typeof PriorityValues[keyof typeof PriorityValues];
 
 export const FileSizeValues: {
-    readonly Tiny: 1024;
-    readonly Small: 10240;
-    readonly Medium: 102400;
-    readonly Large: 1048576;
+    readonly Tiny: 1024n;
+    readonly Small: 10240n;
+    readonly Medium: 102400n;
+    readonly Large: 1048576n;
 };
 export type FileSizeTag = typeof FileSizeValues[keyof typeof FileSizeValues];
 
@@ -68,9 +68,9 @@ export const TokenIdValues: {
 export type TokenIdTag = typeof TokenIdValues[keyof typeof TokenIdValues];
 
 export const SessionIdValues: {
-    readonly None: 0;
-    readonly Active: 9876543210;
-    readonly Expired: 1234567890;
+    readonly None: 0n;
+    readonly Active: 9876543210n;
+    readonly Expired: 1234567890n;
 };
 export type SessionIdTag = typeof SessionIdValues[keyof typeof SessionIdValues];
 

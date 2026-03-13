@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    DirectionValues, StatusValues, ThemeValues, HttpStatusValues, TSDirection, TSTheme, APIResultValues, ComplexResultValues, APIOptionalResultValues, StaticCalculatorValues, StaticPropertyEnumValues, PrecisionValues, TypedPayloadResultValues, AllTypesResultValues, OptionalAllTypesResultValues
+    DirectionValues, StatusValues, ThemeValues, HttpStatusValues, FileSizeValues, SessionIdValues, TSDirection, TSTheme, APIResultValues, ComplexResultValues, APIOptionalResultValues, StaticCalculatorValues, StaticPropertyEnumValues, PrecisionValues, TypedPayloadResultValues, AllTypesResultValues, OptionalAllTypesResultValues
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 import { ImportedFoo } from './BridgeJSRuntimeTests/JavaScript/Types.mjs';
 import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
@@ -12,6 +12,7 @@ import { getImports as getArraySupportImports, ArrayElementObject } from './Brid
 import { getImports as getDictionarySupportImports } from './BridgeJSRuntimeTests/JavaScript/DictionarySupportTests.mjs';
 import { getImports as getDefaultArgumentImports } from './BridgeJSRuntimeTests/JavaScript/DefaultArgumentTests.mjs';
 import { getImports as getJSClassSupportImports, JSClassWithArrayMembers } from './BridgeJSRuntimeTests/JavaScript/JSClassSupportTests.mjs';
+import { getImports as getIntegerTypesSupportImports } from './BridgeJSRuntimeTests/JavaScript/IntegerTypesSupportTests.mjs';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
 export async function setupOptions(options, context) {
@@ -144,6 +145,7 @@ export async function setupOptions(options, context) {
                 DictionarySupportImports: getDictionarySupportImports(importsContext),
                 DefaultArgumentImports: getDefaultArgumentImports(importsContext),
                 JSClassSupportImports: getJSClassSupportImports(importsContext),
+                IntegerTypesSupportImports: getIntegerTypesSupportImports(importsContext),
             };
         },
         addToCoreImports(importObject, importsContext) {
@@ -182,12 +184,6 @@ import assert from "node:assert";
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     exports.roundTripVoid();
-    for (const v of [0, 1, -1, 2147483647, -2147483648]) {
-        assert.equal(exports.roundTripInt(v), v);
-    }
-    for (const v of [0, 1, 2147483647, 4294967295]) {
-        assert.equal(exports.roundTripUInt(v), v);
-    }
     for (const v of [
         0.0, 1.0, -1.0,
         NaN,
@@ -534,6 +530,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.HttpStatus.NotFound, 404);
     assert.equal(HttpStatusValues.ServerError, 500);
     assert.equal(HttpStatusValues.Unknown, -1);
+    assert.equal(exports.FileSize.Tiny, 1024n);
+    assert.equal(FileSizeValues.Large, 1048576n);
+    assert.equal(exports.SessionId.None, 0n);
+    assert.equal(SessionIdValues.Active, 9876543210n);
 
     assert.equal(exports.Precision.Rough, 0.1);
     assert.equal(exports.Precision.Normal, 0.01);
@@ -547,6 +547,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.getTheme(), ThemeValues.Light);
     assert.equal(exports.setHttpStatus(exports.HttpStatus.Ok), HttpStatusValues.Ok);
     assert.equal(exports.getHttpStatus(), exports.HttpStatus.Ok);
+    assert.equal(exports.setFileSize(exports.FileSize.Medium), FileSizeValues.Medium);
+    assert.equal(exports.getFileSize(), FileSizeValues.Small);
+    assert.equal(exports.setSessionId(exports.SessionId.Expired), SessionIdValues.Expired);
+    assert.equal(exports.getSessionId(), SessionIdValues.Active);
     assert.equal(exports.processTheme(exports.Theme.Light), exports.HttpStatus.Ok);
     assert.equal(exports.processTheme(exports.Theme.Dark), HttpStatusValues.NotFound);
 

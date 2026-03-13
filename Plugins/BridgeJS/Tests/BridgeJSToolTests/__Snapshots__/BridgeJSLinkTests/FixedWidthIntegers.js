@@ -38,6 +38,7 @@ export async function createInstantiator(options, swift) {
         addImports: (importObject, importsContext) => {
             bjs = {};
             importObject["bjs"] = bjs;
+            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(ptr, len) {
                 tmpRetString = decodeString(ptr, len);
             }
@@ -188,14 +189,79 @@ export async function createInstantiator(options, swift) {
                 return pointer || 0;
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
-            // Wrapper functions for module: TestModule
-            if (!importObject["TestModule"]) {
-                importObject["TestModule"] = {};
+            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
+            TestModule["bjs_roundTripInt8"] = function bjs_roundTripInt8(v) {
+                try {
+                    let ret = imports.roundTripInt8(v);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
             }
-            importObject["TestModule"]["bjs_PrivateAPI_PrivateClass_wrap"] = function(pointer) {
-                const obj = _exports.PrivateAPI.PrivateClass.__construct(pointer);
-                return swift.memory.retain(obj);
-            };
+            TestModule["bjs_roundTripUInt8"] = function bjs_roundTripUInt8(v) {
+                try {
+                    let ret = imports.roundTripUInt8(v >>> 0);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_roundTripInt16"] = function bjs_roundTripInt16(v) {
+                try {
+                    let ret = imports.roundTripInt16(v);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_roundTripUInt16"] = function bjs_roundTripUInt16(v) {
+                try {
+                    let ret = imports.roundTripUInt16(v >>> 0);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_roundTripInt32"] = function bjs_roundTripInt32(v) {
+                try {
+                    let ret = imports.roundTripInt32(v);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_roundTripUInt32"] = function bjs_roundTripUInt32(v) {
+                try {
+                    let ret = imports.roundTripUInt32(v >>> 0);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_roundTripInt64"] = function bjs_roundTripInt64(v) {
+                try {
+                    let ret = imports.roundTripInt64(v);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_roundTripUInt64"] = function bjs_roundTripUInt64(v) {
+                try {
+                    let ret = imports.roundTripUInt64(BigInt.asUintN(64, v));
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;
@@ -210,60 +276,38 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const swiftHeapObjectFinalizationRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
-                if (state.hasReleased) {
-                    return;
-                }
-                state.hasReleased = true;
-                state.deinit(state.pointer);
-            });
-
-            /// Represents a Swift heap object like a class instance or an actor instance.
-            class SwiftHeapObject {
-                static __wrap(pointer, deinit, prototype) {
-                    const obj = Object.create(prototype);
-                    const state = { pointer, deinit, hasReleased: false };
-                    obj.pointer = pointer;
-                    obj.__swiftHeapObjectState = state;
-                    swiftHeapObjectFinalizationRegistry.register(obj, state, state);
-                    return obj;
-                }
-
-                release() {
-                    const state = this.__swiftHeapObjectState;
-                    if (state.hasReleased) {
-                        return;
-                    }
-                    state.hasReleased = true;
-                    swiftHeapObjectFinalizationRegistry.unregister(state);
-                    state.deinit(state.pointer);
-                }
-            }
-            class PrivateClass extends SwiftHeapObject {
-                static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PrivateAPI_PrivateClass_deinit, PrivateClass.prototype);
-                }
-
-                constructor() {
-                    const ret = instance.exports.bjs_PrivateAPI_PrivateClass_init();
-                    return PrivateClass.__construct(ret);
-                }
-                greet() {
-                    instance.exports.bjs_PrivateAPI_PrivateClass_greet(this.pointer);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                }
-            }
             const exports = {
-                PrivateAPI: {
-                    PrivateClass,
-                    privateFunction: function bjs_PrivateAPI_privateFunction() {
-                        instance.exports.bjs_PrivateAPI_privateFunction();
-                        const ret = tmpRetString;
-                        tmpRetString = undefined;
-                        return ret;
-                    },
+                roundTripInt8: function bjs_roundTripInt8(v) {
+                    const ret = instance.exports.bjs_roundTripInt8(v);
+                    return ret;
+                },
+                roundTripUInt8: function bjs_roundTripUInt8(v) {
+                    const ret = instance.exports.bjs_roundTripUInt8(v);
+                    return ret >>> 0;
+                },
+                roundTripInt16: function bjs_roundTripInt16(v) {
+                    const ret = instance.exports.bjs_roundTripInt16(v);
+                    return ret;
+                },
+                roundTripUInt16: function bjs_roundTripUInt16(v) {
+                    const ret = instance.exports.bjs_roundTripUInt16(v);
+                    return ret >>> 0;
+                },
+                roundTripInt32: function bjs_roundTripInt32(v) {
+                    const ret = instance.exports.bjs_roundTripInt32(v);
+                    return ret;
+                },
+                roundTripUInt32: function bjs_roundTripUInt32(v) {
+                    const ret = instance.exports.bjs_roundTripUInt32(v);
+                    return ret >>> 0;
+                },
+                roundTripInt64: function bjs_roundTripInt64(v) {
+                    const ret = instance.exports.bjs_roundTripInt64(v);
+                    return ret;
+                },
+                roundTripUInt64: function bjs_roundTripUInt64(v) {
+                    const ret = instance.exports.bjs_roundTripUInt64(v);
+                    return BigInt.asUintN(64, ret);
                 },
             };
             _exports = exports;

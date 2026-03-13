@@ -20,8 +20,11 @@
 
         ],
         "returnType" : {
-          "int" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
           }
         }
       },
@@ -37,8 +40,11 @@
 
         ],
         "returnType" : {
-          "uint" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : false,
+              "width" : "word"
+            }
           }
         }
       },

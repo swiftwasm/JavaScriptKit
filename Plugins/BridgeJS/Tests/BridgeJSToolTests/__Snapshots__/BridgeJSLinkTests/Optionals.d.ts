@@ -50,6 +50,12 @@ export type Exports = {
     testOptionalPropertyRoundtrip(holder: OptionalPropertyHolder | null): OptionalPropertyHolder | null;
     roundTripString(name: string | null): string | null;
     roundTripInt(value: number | null): number | null;
+    roundTripInt8(value: number | null): number | null;
+    roundTripUInt8(value: number | null): number | null;
+    roundTripInt16(value: number | null): number | null;
+    roundTripUInt16(value: number | null): number | null;
+    roundTripInt32(value: number | null): number | null;
+    roundTripUInt32(value: number | null): number | null;
     roundTripBool(flag: boolean | null): boolean | null;
     roundTripFloat(number: number | null): number | null;
     roundTripDouble(precision: number | null): number | null;

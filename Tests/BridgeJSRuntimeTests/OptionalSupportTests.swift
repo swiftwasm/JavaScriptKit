@@ -96,6 +96,8 @@ final class OptionalSupportTests: XCTestCase {
     @JS static func roundTripOptionalCaseEnum(_ v: Status?) -> Status? { v }
     @JS static func roundTripOptionalStringRawValueEnum(_ v: Theme?) -> Theme? { v }
     @JS static func roundTripOptionalIntRawValueEnum(_ v: HttpStatus?) -> HttpStatus? { v }
+    @JS static func roundTripOptionalInt64RawValueEnum(_ v: FileSize?) -> FileSize? { v }
+    @JS static func roundTripOptionalUInt64RawValueEnum(_ v: SessionId?) -> SessionId? { v }
     @JS static func roundTripOptionalTSEnum(_ v: TSDirection?) -> TSDirection? { v }
     @JS static func roundTripOptionalTSStringEnum(_ v: TSTheme?) -> TSTheme? { v }
     @JS static func roundTripOptionalNamespacedEnum(_ v: Networking.API.Method?) -> Networking.API.Method? { v }

@@ -16,8 +16,11 @@
                 "label" : "_",
                 "name" : "base",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -31,14 +34,20 @@
                   "moduleName" : "BridgeJSRuntimeTests",
                   "parameters" : [
                     {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   ],
                   "returnType" : {
-                    "int" : {
-
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
                     }
                   }
                 },
@@ -160,8 +169,11 @@
                 "label" : "_",
                 "name" : "base",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -175,14 +187,20 @@
                   "moduleName" : "BridgeJSRuntimeTests",
                   "parameters" : [
                     {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   ],
                   "returnType" : {
-                    "int" : {
-
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
                     }
                   }
                 },
@@ -330,8 +348,11 @@
               "label" : "count",
               "name" : "count",
               "type" : {
-                "int" : {
-
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
                 }
               }
             },
@@ -421,8 +442,11 @@
             "isStatic" : false,
             "name" : "count",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -747,15 +771,21 @@
                 "label" : "value",
                 "name" : "value",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -772,8 +802,11 @@
                 "label" : "a",
                 "name" : "a",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -781,15 +814,21 @@
                 "label" : "b",
                 "name" : "b",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -862,8 +901,11 @@
                 "label" : "value",
                 "name" : "value",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -888,8 +930,11 @@
               "Utils"
             ],
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -1066,8 +1111,11 @@
               "label" : "value",
               "name" : "value",
               "type" : {
-                "int" : {
-
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
                 }
               }
             }
@@ -1083,8 +1131,11 @@
             "isStatic" : false,
             "name" : "value",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -1104,8 +1155,11 @@
               "label" : "intValue",
               "name" : "intValue",
               "type" : {
-                "int" : {
-
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
                 }
               }
             },
@@ -1191,8 +1245,11 @@
             "isStatic" : false,
             "name" : "intValue",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -1241,8 +1298,11 @@
             "isStatic" : false,
             "name" : "readonlyInt",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -1321,8 +1381,11 @@
             "isStatic" : false,
             "name" : "computedReadonly",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -1341,8 +1404,11 @@
             "isStatic" : false,
             "name" : "observedProperty",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -1364,8 +1430,11 @@
                 "label" : "a",
                 "name" : "a",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -1373,15 +1442,21 @@
                 "label" : "b",
                 "name" : "b",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -1403,8 +1478,11 @@
                 "label" : "a",
                 "name" : "a",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -1412,15 +1490,21 @@
                 "label" : "b",
                 "name" : "b",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -1478,8 +1562,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -1568,8 +1655,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -1605,8 +1695,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -1665,8 +1758,11 @@
                 "label" : "_",
                 "name" : "amount",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -1757,8 +1853,11 @@
 
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -1793,8 +1892,11 @@
             "returnType" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -1884,8 +1986,11 @@
             "returnType" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -1907,8 +2012,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -2191,8 +2299,11 @@
                 "label" : "by",
                 "name" : "amount",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -2215,8 +2326,11 @@
 
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -2442,8 +2556,11 @@
             "isStatic" : false,
             "name" : "count",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -2479,8 +2596,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -2808,8 +2928,11 @@
                       "moduleName" : "BridgeJSRuntimeTests",
                       "parameters" : [
                         {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         },
                         {
@@ -2946,8 +3069,11 @@
                         {
                           "nullable" : {
                             "_0" : {
-                              "int" : {
-
+                              "integer" : {
+                                "_0" : {
+                                  "isSigned" : true,
+                                  "width" : "word"
+                                }
                               }
                             },
                             "_1" : "null"
@@ -3210,8 +3336,11 @@
                         }
                       ],
                       "returnType" : {
-                        "int" : {
-
+                        "integer" : {
+                          "_0" : {
+                            "isSigned" : true,
+                            "width" : "word"
+                          }
                         }
                       }
                     },
@@ -3221,8 +3350,11 @@
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -3367,8 +3499,11 @@
                     }
                   ],
                   "returnType" : {
-                    "int" : {
-
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
                     }
                   }
                 },
@@ -3915,8 +4050,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -4057,8 +4195,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -4068,8 +4209,11 @@
             "returnType" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -4642,6 +4786,92 @@
             }
           },
           {
+            "abiName" : "bjs_ArraySupportExports_static_roundTripInt64RawValueEnumArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripInt64RawValueEnumArray",
+            "namespace" : [
+              "ArraySupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "FileSize",
+                        "_1" : "Int64"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "FileSize",
+                    "_1" : "Int64"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "ArraySupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArraySupportExports_static_roundTripUInt64RawValueEnumArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripUInt64RawValueEnumArray",
+            "namespace" : [
+              "ArraySupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "SessionId",
+                        "_1" : "UInt64"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "SessionId",
+                    "_1" : "UInt64"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "ArraySupportExports"
+              }
+            }
+          },
+          {
             "abiName" : "bjs_ArraySupportExports_static_roundTripStructArray",
             "effects" : {
               "isAsync" : false,
@@ -4866,8 +5096,11 @@
                     "_0" : {
                       "nullable" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         },
                         "_1" : "null"
@@ -4882,8 +5115,11 @@
                 "_0" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -5157,6 +5393,112 @@
             }
           },
           {
+            "abiName" : "bjs_ArraySupportExports_static_roundTripOptionalInt64RawValueEnumArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalInt64RawValueEnumArray",
+            "namespace" : [
+              "ArraySupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "nullable" : {
+                        "_0" : {
+                          "rawValueEnum" : {
+                            "_0" : "FileSize",
+                            "_1" : "Int64"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "nullable" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "FileSize",
+                        "_1" : "Int64"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "ArraySupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArraySupportExports_static_roundTripOptionalUInt64RawValueEnumArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalUInt64RawValueEnumArray",
+            "namespace" : [
+              "ArraySupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "nullable" : {
+                        "_0" : {
+                          "rawValueEnum" : {
+                            "_0" : "SessionId",
+                            "_1" : "UInt64"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "nullable" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "SessionId",
+                        "_1" : "UInt64"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "ArraySupportExports"
+              }
+            }
+          },
+          {
             "abiName" : "bjs_ArraySupportExports_static_roundTripOptionalStructArray",
             "effects" : {
               "isAsync" : false,
@@ -5329,8 +5671,11 @@
                     "_0" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -5344,8 +5689,11 @@
                 "_0" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -5670,8 +6018,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -5694,8 +6045,11 @@
             "returnType" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -5724,8 +6078,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -5780,8 +6137,11 @@
                     "_0" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -5814,8 +6174,11 @@
                 "_0" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -5849,8 +6212,11 @@
                     "_0" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -5971,15 +6337,21 @@
                 "label" : "count",
                 "name" : "count",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -6109,8 +6481,11 @@
                 "label" : "count",
                 "name" : "count",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -6377,8 +6752,11 @@
                 "label" : "count",
                 "name" : "count",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -6514,8 +6892,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -6523,8 +6904,11 @@
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -6558,8 +6942,11 @@
                     "_0" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -6570,8 +6957,11 @@
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -6628,8 +7018,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -6816,6 +7209,85 @@
         ],
         "swiftCallName" : "HttpStatus",
         "tsFullPath" : "HttpStatus"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "tiny",
+            "rawValue" : "1024"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "small",
+            "rawValue" : "10240"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "medium",
+            "rawValue" : "102400"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "large",
+            "rawValue" : "1048576"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "FileSize",
+        "rawType" : "Int64",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "FileSize",
+        "tsFullPath" : "FileSize"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "none",
+            "rawValue" : "0"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "active",
+            "rawValue" : "9876543210"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "expired",
+            "rawValue" : "1234567890"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "SessionId",
+        "rawType" : "UInt64",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "SessionId",
+        "tsFullPath" : "SessionId"
       },
       {
         "cases" : [
@@ -7306,8 +7778,11 @@
             "associatedValues" : [
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -7393,8 +7868,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -7438,8 +7916,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -7497,15 +7978,21 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -7605,8 +8092,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -7624,8 +8114,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -7694,8 +8187,11 @@
               },
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -7773,8 +8269,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -7924,15 +8423,21 @@
                 "label" : "_",
                 "name" : "value",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -8043,15 +8548,21 @@
                 "label" : "rootId",
                 "name" : "rootId",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -8078,15 +8589,21 @@
                 "label" : "graphId",
                 "name" : "graphId",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -8148,8 +8665,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -8178,8 +8698,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -8193,8 +8716,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -8294,8 +8820,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -8340,6 +8869,410 @@
         ],
         "swiftCallName" : "StaticPropertyNamespace.NestedProperties",
         "tsFullPath" : "StaticPropertyNamespace.NestedProperties"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "IntegerTypesSupportExports",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripInt",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripInt",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripUInt",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripUInt",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "word"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripInt8",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripInt8",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w8"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w8"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripUInt8",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripUInt8",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w8"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w8"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripInt16",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripInt16",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w16"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w16"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripUInt16",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripUInt16",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w16"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w16"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripInt32",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripInt32",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w32"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w32"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripUInt32",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripUInt32",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w32"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w32"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripInt64",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripInt64",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w64"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w64"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_IntegerTypesSupportExports_static_roundTripUInt64",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripUInt64",
+            "namespace" : [
+              "IntegerTypesSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w64"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : false,
+                  "width" : "w64"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "IntegerTypesSupportExports"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "IntegerTypesSupportExports",
+        "tsFullPath" : "IntegerTypesSupportExports"
       },
       {
         "cases" : [
@@ -8409,8 +9342,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -8421,8 +9357,11 @@
             "returnType" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -8740,6 +9679,96 @@
             }
           },
           {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalInt64RawValueEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalInt64RawValueEnum",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "FileSize",
+                        "_1" : "Int64"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "FileSize",
+                    "_1" : "Int64"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalUInt64RawValueEnum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripOptionalUInt64RawValueEnum",
+            "namespace" : [
+              "OptionalSupportExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "rawValueEnum" : {
+                        "_0" : "SessionId",
+                        "_1" : "UInt64"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "SessionId",
+                    "_1" : "UInt64"
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "OptionalSupportExports"
+              }
+            }
+          },
+          {
             "abiName" : "bjs_OptionalSupportExports_static_roundTripOptionalTSEnum",
             "effects" : {
               "isAsync" : false,
@@ -8933,8 +9962,11 @@
                     "_0" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -8949,8 +9981,11 @@
                 "_0" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -9664,8 +10699,11 @@
                     "_0" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -9737,8 +10775,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -9778,8 +10819,11 @@
                 "type" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -9829,56 +10873,6 @@
         ],
         "returnType" : {
           "void" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripInt",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripInt",
-        "parameters" : [
-          {
-            "label" : "v",
-            "name" : "v",
-            "type" : {
-              "int" : {
-
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "int" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_roundTripUInt",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripUInt",
-        "parameters" : [
-          {
-            "label" : "v",
-            "name" : "v",
-            "type" : {
-              "uint" : {
-
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "uint" : {
 
           }
         }
@@ -10197,8 +11191,11 @@
             "type" : {
               "dictionary" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -10208,8 +11205,11 @@
         "returnType" : {
           "dictionary" : {
             "_0" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -10423,8 +11423,11 @@
 
         ],
         "returnType" : {
-          "int" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
           }
         }
       },
@@ -10560,15 +11563,21 @@
             "label" : "v",
             "name" : "v",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
         ],
         "returnType" : {
-          "int" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
           }
         }
       },
@@ -10795,8 +11804,11 @@
             "label" : "x",
             "name" : "x",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -10804,15 +11816,21 @@
             "label" : "y",
             "name" : "y",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
         ],
         "returnType" : {
-          "int" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
           }
         }
       },
@@ -11033,6 +12051,96 @@
         }
       },
       {
+        "abiName" : "bjs_setFileSize",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "setFileSize",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "size",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "FileSize",
+                "_1" : "Int64"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "rawValueEnum" : {
+            "_0" : "FileSize",
+            "_1" : "Int64"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getFileSize",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getFileSize",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "rawValueEnum" : {
+            "_0" : "FileSize",
+            "_1" : "Int64"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_setSessionId",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "setSessionId",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "session",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "SessionId",
+                "_1" : "UInt64"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "rawValueEnum" : {
+            "_0" : "SessionId",
+            "_1" : "UInt64"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getSessionId",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getSessionId",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "rawValueEnum" : {
+            "_0" : "SessionId",
+            "_1" : "UInt64"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_processTheme",
         "effects" : {
           "isAsync" : false,
@@ -11185,8 +12293,11 @@
             "label" : "value",
             "name" : "value",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -11491,8 +12602,11 @@
             "label" : "_",
             "name" : "value",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -11667,8 +12781,11 @@
             "label" : "_",
             "name" : "code",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -11744,8 +12861,11 @@
             "label" : "_",
             "name" : "code",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -11839,8 +12959,11 @@
             "label" : "_",
             "name" : "count1",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -11848,8 +12971,11 @@
             "label" : "_",
             "name" : "count2",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -11969,8 +13095,11 @@
             "label" : "_",
             "name" : "code",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -12003,8 +13132,11 @@
             "label" : "_",
             "name" : "code",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -12071,8 +13203,11 @@
             "label" : "_",
             "name" : "code",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -12196,8 +13331,11 @@
             "label" : "intValue",
             "name" : "intValue",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -12420,8 +13558,11 @@
             "label" : "base",
             "name" : "base",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -12435,14 +13576,20 @@
               "moduleName" : "BridgeJSRuntimeTests",
               "parameters" : [
                 {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               ],
               "returnType" : {
-                "int" : {
-
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
                 }
               }
             },
@@ -12960,8 +14107,11 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -12969,8 +14119,11 @@
           }
         ],
         "returnType" : {
-          "int" : {
-
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
           }
         }
       },
@@ -13029,8 +14182,11 @@
             "isReadonly" : false,
             "name" : "value",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -13051,8 +14207,11 @@
                 "label" : "by",
                 "name" : "amount",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -13075,8 +14234,11 @@
 
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -13301,8 +14463,11 @@
             "isReadonly" : false,
             "name" : "count",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -13335,8 +14500,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -13439,8 +14607,11 @@
             "isStatic" : false,
             "name" : "x",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -13449,8 +14620,11 @@
             "isStatic" : false,
             "name" : "y",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -13637,8 +14811,11 @@
               "type" : {
                 "nullable" : {
                   "_0" : {
-                    "int" : {
-
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
                     }
                   },
                   "_1" : "null"
@@ -13703,8 +14880,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -13742,8 +14922,11 @@
               "label" : "x",
               "name" : "x",
               "type" : {
-                "int" : {
-
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
                 }
               }
             },
@@ -13751,8 +14934,11 @@
               "label" : "y",
               "name" : "y",
               "type" : {
-                "int" : {
-
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
                 }
               }
             }
@@ -13769,8 +14955,11 @@
             "isStatic" : false,
             "name" : "x",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -13779,8 +14968,11 @@
             "isStatic" : false,
             "name" : "y",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -13820,8 +15012,11 @@
             "type" : {
               "nullable" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 },
                 "_1" : "null"
@@ -13852,8 +15047,11 @@
             "isStatic" : false,
             "name" : "age",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -13971,8 +15169,11 @@
             "isStatic" : false,
             "name" : "id",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -14005,8 +15206,11 @@
             "isStatic" : false,
             "name" : "id",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -14064,8 +15268,11 @@
             "isStatic" : false,
             "name" : "id",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -14445,8 +15652,11 @@
             "isStatic" : false,
             "name" : "x",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -14489,8 +15699,11 @@
             "isStatic" : false,
             "name" : "quantity",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -14537,8 +15750,11 @@
             "isStatic" : false,
             "name" : "id",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -14591,8 +15807,11 @@
             "isStatic" : false,
             "name" : "value",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -14621,8 +15840,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -14744,8 +15966,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -14753,8 +15978,11 @@
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -14802,8 +16030,11 @@
             "type" : {
               "array" : {
                 "_0" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -14894,8 +16125,11 @@
                     "type" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -14903,8 +16137,11 @@
                   }
                 ],
                 "returnType" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -14916,8 +16153,11 @@
                     "type" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -14927,8 +16167,11 @@
                 "returnType" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -15100,8 +16343,11 @@
                         "_0" : {
                           "nullable" : {
                             "_0" : {
-                              "int" : {
-
+                              "integer" : {
+                                "_0" : {
+                                  "isSigned" : true,
+                                  "width" : "word"
+                                }
                               }
                             },
                             "_1" : "null"
@@ -15116,8 +16362,11 @@
                     "_0" : {
                       "nullable" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         },
                         "_1" : "null"
@@ -15445,8 +16694,11 @@
                   {
                     "name" : "value",
                     "type" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   },
@@ -15461,14 +16713,20 @@
                           "moduleName" : "BridgeJSRuntimeTests",
                           "parameters" : [
                             {
-                              "int" : {
-
+                              "integer" : {
+                                "_0" : {
+                                  "isSigned" : true,
+                                  "width" : "word"
+                                }
                               }
                             }
                           ],
                           "returnType" : {
-                            "int" : {
-
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : true,
+                                "width" : "word"
+                              }
                             }
                           }
                         },
@@ -15478,8 +16736,11 @@
                   }
                 ],
                 "returnType" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -15621,8 +16882,11 @@
                   {
                     "name" : "base",
                     "type" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -15636,14 +16900,20 @@
                       "moduleName" : "BridgeJSRuntimeTests",
                       "parameters" : [
                         {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       ],
                       "returnType" : {
-                        "int" : {
-
+                        "integer" : {
+                          "_0" : {
+                            "isSigned" : true,
+                            "width" : "word"
+                          }
                         }
                       }
                     },
@@ -15729,8 +16999,11 @@
                   {
                     "name" : "value",
                     "type" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   },
@@ -15745,8 +17018,11 @@
                           "moduleName" : "BridgeJSRuntimeTests",
                           "parameters" : [
                             {
-                              "int" : {
-
+                              "integer" : {
+                                "_0" : {
+                                  "isSigned" : true,
+                                  "width" : "word"
+                                }
                               }
                             }
                           ],
@@ -15762,8 +17038,11 @@
                   }
                 ],
                 "returnType" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -15781,19 +17060,28 @@
                           "moduleName" : "BridgeJSRuntimeTests",
                           "parameters" : [
                             {
-                              "int" : {
-
+                              "integer" : {
+                                "_0" : {
+                                  "isSigned" : true,
+                                  "width" : "word"
+                                }
                               }
                             },
                             {
-                              "int" : {
-
+                              "integer" : {
+                                "_0" : {
+                                  "isSigned" : true,
+                                  "width" : "word"
+                                }
                               }
                             }
                           ],
                           "returnType" : {
-                            "int" : {
-
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : true,
+                                "width" : "word"
+                              }
                             }
                           }
                         },
@@ -15803,8 +17091,11 @@
                   }
                 ],
                 "returnType" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -15822,24 +17113,36 @@
                           "moduleName" : "BridgeJSRuntimeTests",
                           "parameters" : [
                             {
-                              "int" : {
-
+                              "integer" : {
+                                "_0" : {
+                                  "isSigned" : true,
+                                  "width" : "word"
+                                }
                               }
                             },
                             {
-                              "int" : {
-
+                              "integer" : {
+                                "_0" : {
+                                  "isSigned" : true,
+                                  "width" : "word"
+                                }
                               }
                             },
                             {
-                              "int" : {
-
+                              "integer" : {
+                                "_0" : {
+                                  "isSigned" : true,
+                                  "width" : "word"
+                                }
                               }
                             }
                           ],
                           "returnType" : {
-                            "int" : {
-
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : true,
+                                "width" : "word"
+                              }
                             }
                           }
                         },
@@ -15849,8 +17152,11 @@
                   }
                 ],
                 "returnType" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -15972,8 +17278,11 @@
 
                 ],
                 "returnType" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -16049,8 +17358,11 @@
                     "type" : {
                       "dictionary" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -16060,8 +17372,11 @@
                 "returnType" : {
                   "dictionary" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -16820,16 +18135,22 @@
               {
                 "name" : "dx",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
               {
                 "name" : "dy",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -16851,6 +18172,278 @@
         ],
         "types" : [
           {
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "IntegerTypesSupportImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "name" : "jsRoundTripInt",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripUInt",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : false,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripInt8",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "w8"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w8"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripUInt8",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : false,
+                          "width" : "w8"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w8"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripInt16",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "w16"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w16"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripUInt16",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : false,
+                          "width" : "w16"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w16"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripInt32",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "w32"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w32"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripUInt32",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : false,
+                          "width" : "w32"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w32"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripInt64",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "w64"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w64"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "jsRoundTripUInt64",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : false,
+                          "width" : "w64"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : false,
+                      "width" : "w64"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "runJsIntegerTypesSupportTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
             "constructor" : {
               "parameters" : [
                 {
@@ -16858,8 +18451,11 @@
                   "type" : {
                     "array" : {
                       "_0" : {
-                        "int" : {
-
+                        "integer" : {
+                          "_0" : {
+                            "isSigned" : true,
+                            "width" : "word"
+                          }
                         }
                       }
                     }
@@ -16885,8 +18481,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -16914,8 +18513,11 @@
                     "type" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -16925,8 +18527,11 @@
                 "returnType" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -16989,8 +18594,11 @@
                 "type" : {
                   "array" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   }
@@ -17034,8 +18642,11 @@
                     "type" : {
                       "array" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       }
@@ -17221,8 +18832,11 @@
                     "type" : {
                       "nullable" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         },
                         "_1" : "null"
@@ -17233,8 +18847,11 @@
                 "returnType" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -17249,8 +18866,11 @@
                     "type" : {
                       "nullable" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         },
                         "_1" : "undefined"
@@ -17261,8 +18881,11 @@
                 "returnType" : {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "undefined"

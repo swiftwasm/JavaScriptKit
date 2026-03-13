@@ -42,6 +42,72 @@ public func _bjs_roundTripInt(_ valueIsSome: Int32, _ valueValue: Int32) -> Void
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripInt8")
+@_cdecl("bjs_roundTripInt8")
+public func _bjs_roundTripInt8(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripInt8(value: Optional<Int8>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripUInt8")
+@_cdecl("bjs_roundTripUInt8")
+public func _bjs_roundTripUInt8(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripUInt8(value: Optional<UInt8>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripInt16")
+@_cdecl("bjs_roundTripInt16")
+public func _bjs_roundTripInt16(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripInt16(value: Optional<Int16>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripUInt16")
+@_cdecl("bjs_roundTripUInt16")
+public func _bjs_roundTripUInt16(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripUInt16(value: Optional<UInt16>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripInt32")
+@_cdecl("bjs_roundTripInt32")
+public func _bjs_roundTripInt32(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripInt32(value: Optional<Int32>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripUInt32")
+@_cdecl("bjs_roundTripUInt32")
+public func _bjs_roundTripUInt32(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripUInt32(value: Optional<UInt32>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripBool")
 @_cdecl("bjs_roundTripBool")
 public func _bjs_roundTripBool(_ flagIsSome: Int32, _ flagValue: Int32) -> Void {

@@ -748,7 +748,7 @@ struct StackCodegen {
     /// - Returns: An ExprSyntax representing the lift expression
     func liftExpression(for type: BridgeType) -> ExprSyntax {
         switch type {
-        case .string, .int, .uint, .bool, .float, .double,
+        case .string, .integer, .bool, .float, .double,
             .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject, .unsafePointer,
             .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum, .array, .dictionary:
             return "\(raw: type.swiftType).bridgeJSStackPop()"
@@ -766,7 +766,7 @@ struct StackCodegen {
     private func liftNullableExpression(wrappedType: BridgeType, kind: JSOptionalKind) -> ExprSyntax {
         let typeName = kind == .null ? "Optional" : "JSUndefinedOr"
         switch wrappedType {
-        case .string, .int, .uint, .bool, .float, .double, .jsObject(nil), .jsValue,
+        case .string, .integer, .bool, .float, .double, .jsObject(nil), .jsValue,
             .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum,
             .array, .dictionary:
             return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
@@ -789,7 +789,7 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch type {
-        case .string, .int, .uint, .bool, .float, .double, .jsValue,
+        case .string, .integer, .bool, .float, .double, .jsValue,
             .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
             .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct, .nullable:
             return ["\(raw: accessor).bridgeJSStackPush()"]
@@ -1425,8 +1425,7 @@ extension BridgeType {
     var swiftType: String {
         switch self {
         case .bool: return "Bool"
-        case .int: return "Int"
-        case .uint: return "UInt"
+        case .integer(let t): return t.swiftTypeName
         case .float: return "Float"
         case .double: return "Double"
         case .string: return "String"
@@ -1502,7 +1501,7 @@ extension BridgeType {
     func liftParameterInfo() throws -> LiftingIntrinsicInfo {
         switch self {
         case .bool: return .bool
-        case .int, .uint: return .int
+        case .integer(let t): return LiftingIntrinsicInfo(parameters: [("value", t.wasmCoreType)])
         case .float: return .float
         case .double: return .double
         case .string: return .string
@@ -1560,7 +1559,7 @@ extension BridgeType {
     func loweringReturnInfo() throws -> LoweringIntrinsicInfo {
         switch self {
         case .bool: return .bool
-        case .int, .uint: return .int
+        case .integer(let t): return LoweringIntrinsicInfo(returnType: t.wasmCoreType)
         case .float: return .float
         case .double: return .double
         case .string: return .string
@@ -1592,7 +1591,8 @@ extension SwiftEnumRawType {
     var liftingIntrinsicInfo: BridgeType.LiftingIntrinsicInfo {
         switch self {
         case .bool: return .bool
-        case .int, .int32, .int64, .uint, .uint32, .uint64: return .int
+        case .integer(let integerType):
+            return .init(parameters: [("value", integerType.wasmCoreType)])
         case .float: return .float
         case .double: return .double
         case .string: return .string
@@ -1602,7 +1602,8 @@ extension SwiftEnumRawType {
     var loweringIntrinsicInfo: BridgeType.LoweringIntrinsicInfo {
         switch self {
         case .bool: return .bool
-        case .int, .int32, .int64, .uint, .uint32, .uint64: return .int
+        case .integer(let integerType):
+            return .init(returnType: integerType.wasmCoreType)
         case .float: return .float
         case .double: return .double
         case .string: return .string

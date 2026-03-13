@@ -215,8 +215,11 @@
             "associatedValues" : [
               {
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -362,14 +365,20 @@
                   "moduleName" : "TestModule",
                   "parameters" : [
                     {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   ],
                   "returnType" : {
-                    "int" : {
-
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
                     }
                   }
                 },
@@ -387,14 +396,20 @@
               "moduleName" : "TestModule",
               "parameters" : [
                 {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               ],
               "returnType" : {
-                "int" : {
-
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
                 }
               }
             },
@@ -689,8 +704,11 @@
                     {
                       "nullable" : {
                         "_0" : {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         },
                         "_1" : "null"
@@ -700,8 +718,11 @@
                   "returnType" : {
                     "nullable" : {
                       "_0" : {
-                        "int" : {
-
+                        "integer" : {
+                          "_0" : {
+                            "isSigned" : true,
+                            "width" : "word"
+                          }
                         }
                       },
                       "_1" : "null"
@@ -724,8 +745,11 @@
                 {
                   "nullable" : {
                     "_0" : {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     },
                     "_1" : "null"
@@ -735,8 +759,11 @@
               "returnType" : {
                 "nullable" : {
                   "_0" : {
-                    "int" : {
-
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
                     }
                   },
                   "_1" : "null"

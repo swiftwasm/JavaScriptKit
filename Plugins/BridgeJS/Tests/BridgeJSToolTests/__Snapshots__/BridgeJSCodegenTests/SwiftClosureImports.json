@@ -9,8 +9,11 @@
               {
                 "name" : "value",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -25,14 +28,20 @@
                       "moduleName" : "TestModule",
                       "parameters" : [
                         {
-                          "int" : {
-
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
                           }
                         }
                       ],
                       "returnType" : {
-                        "int" : {
-
+                        "integer" : {
+                          "_0" : {
+                            "isSigned" : true,
+                            "width" : "word"
+                          }
                         }
                       }
                     },
@@ -42,8 +51,11 @@
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -53,8 +65,11 @@
               {
                 "name" : "base",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
@@ -68,14 +83,20 @@
                   "moduleName" : "TestModule",
                   "parameters" : [
                     {
-                      "int" : {
-
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
                       }
                     }
                   ],
                   "returnType" : {
-                    "int" : {
-
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
                     }
                   }
                 },

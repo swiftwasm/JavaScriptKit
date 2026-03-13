@@ -10,12 +10,6 @@ func runJsWorks() -> Void
     return
 }
 
-@JS func roundTripInt(v: Int) -> Int {
-    return v
-}
-@JS func roundTripUInt(v: UInt) -> UInt {
-    return v
-}
 @JS func roundTripFloat(v: Float) -> Float {
     return v
 }
@@ -225,6 +219,19 @@ struct TestError: Error {
     case unknown = -1
 }
 
+@JS enum FileSize: Int64 {
+    case tiny = 1024
+    case small = 10240
+    case medium = 102400
+    case large = 1048576
+}
+
+@JS enum SessionId: UInt64 {
+    case none = 0
+    case active = 9876543210
+    case expired = 1234567890
+}
+
 @JS enum Precision: Float {
     case rough = 0.1
     case normal = 0.01
@@ -279,6 +286,22 @@ struct TestError: Error {
 
 @JS func getHttpStatus() -> HttpStatus {
     return .ok
+}
+
+@JS func setFileSize(_ size: FileSize) -> FileSize {
+    return size
+}
+
+@JS func getFileSize() -> FileSize {
+    return .small
+}
+
+@JS func setSessionId(_ session: SessionId) -> SessionId {
+    return session
+}
+
+@JS func getSessionId() -> SessionId {
+    return .active
 }
 
 @JS func processTheme(_ theme: Theme) -> HttpStatus {
