@@ -94,7 +94,8 @@ This differs from structs, which use copy semantics and transfer data by value.
 |:--------------|:-------|
 | Initializers: `init()` | ✅ |
 | Initializers that throw JSException: `init() throws(JSException)` | ✅ |
-| Initializers that throw any exception: `init() throws` | ❌  |
+| Initializers that throw typed error conforming to `ConvertibleToJSException` | ✅ |
+| Untyped throws initializers: `init() throws` | ❌  |
 | Async initializers: `init() async` | ❌ |
 | Deinitializers: `deinit` | ✅ |
 | Stored properties: `var`, `let` (with `willSet`, `didSet`) | ✅ |

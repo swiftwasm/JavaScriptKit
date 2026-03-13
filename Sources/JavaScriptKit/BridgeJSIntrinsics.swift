@@ -33,6 +33,46 @@ private func _swift_js_throw_extern(_ id: Int32) {
     _swift_js_throw_extern(id)
 }
 
+extension ConvertibleToJSException {
+    @_spi(BridgeJS) public func bridgeJSLowerThrow() {
+        let thrownValue = self.jsException.thrownValue
+        if let object = thrownValue.object {
+            withExtendedLifetime(object) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: "\(thrownValue)")
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+    }
+
+    @_spi(BridgeJS) public func bridgeJSLowerThrowAsync() -> JSException {
+        jsException
+    }
+}
+
+extension Error {
+    @available(
+        *,
+        unavailable,
+        message: "It is only possible to throw a JSException or an Error which conforms to ConvertibleToJSException"
+    )
+    @_spi(BridgeJS) public func bridgeJSLowerThrow() {
+        fatalError()
+    }
+
+    @available(
+        *,
+        unavailable,
+        message: "It is only possible to throw a JSException or an Error which conforms to ConvertibleToJSException"
+    )
+    @_spi(BridgeJS) public func bridgeJSLowerThrowAsync() -> JSException {
+        fatalError()
+    }
+}
+
 /// Retrieves and clears any pending JavaScript exception.
 ///
 /// This function checks for any JavaScript exceptions that were thrown during

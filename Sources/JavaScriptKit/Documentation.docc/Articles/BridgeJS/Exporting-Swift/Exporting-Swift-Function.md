@@ -39,14 +39,31 @@ export type Exports = {
 
 ### Throwing functions
 
-Swift functions can throw JavaScript errors using `throws(JSException)`.
+Swift functions can throw JavaScript errors using `throws(JSException)`:
 
 ```swift
 import JavaScriptKit
 
 @JS public func findUser(id: Int) throws(JSException) -> String {
     if id <= 0 {
-        throw JSException(JSError(message: "Invalid ID").jsValue)
+        throw JSException(message: "Invalid ID")
+    }
+    return "User_\(id)"
+}
+```
+
+You can also use custom error types by conforming to `ConvertibleToJSException`:
+
+```swift
+import JavaScriptKit
+
+struct InvalidIDError: ConvertibleToJSException {
+    var jsException: JSException { JSException(message: "Invalid ID") }
+}
+
+@JS public func findUser(id: Int) throws(InvalidIDError) -> String {
+    if id <= 0 {
+        throw InvalidIDError()
     }
     return "User_\(id)"
 }
@@ -72,7 +89,7 @@ export type Exports = {
 ```
 
 Notes:
-- Only `throws(JSException)` is supported. Plain `throws` is not supported.
+- Typed throws is required. Plain `throws` is not supported.
 - Thrown values are surfaced to JS as normal JS exceptions.
 
 ### Async functions
@@ -145,8 +162,9 @@ export type Exports = {
 | `@JS class` parameter/result type | ✅ |
 | `@JS enum` parameter/result type | ✅ |
 | `JSObject` parameter/result type | ✅ |
-| Throwing JS exception: `func x() throws(JSException)` | ✅ |
-| Throwing any exception: `func x() throws` | ❌ |
+| Throwing JSException: `func x() throws(JSException)` | ✅ |
+| Throwing typed error conforming to `ConvertibleToJSException` | ✅ |
+| Untyped throws: `func x() throws` | ❌ |
 | Async methods: `func x() async` | ✅ |
 | Generics | ❌ |
 | Opaque types: `func x() -> some P`, `func y(_: some P)` | ❌ |
