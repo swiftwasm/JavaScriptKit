@@ -40,22 +40,13 @@ extension JavaScriptEventLoop: SchedulingExecutor {
         tolerance: C.Duration?,
         clock: C
     ) {
-        #if hasFeature(Embedded)
-        #if compiler(>=6.4)
-        // In Embedded Swift, ContinuousClock and SuspendingClock are unavailable.
-        // Hand-off the scheduling work to the Clock implementation for custom clocks.
-        clock.enqueue(
-            job,
-            on: self,
-            at: clock.now.advanced(by: delay),
-            tolerance: tolerance
-        )
+        #if $Embedded
+        // ContinuousClock and SuspendingClock are unavailable in Embedded Swift,
+        // but Swift.Duration is, and every standard clock uses it.
+        guard let duration = delay as? Duration else {
+            fatalError("Unsupported clock type; only Duration-based clocks are supported in Embedded Swift")
+        }
         #else
-        fatalError(
-            "Delayed enqueue requires Swift 6.4+ in Embedded mode"
-        )
-        #endif  // #if compiler(>=6.4) (Embedded)
-        #else  // #if hasFeature(Embedded)
         let duration: Duration
         if let _ = clock as? ContinuousClock {
             duration = delay as! ContinuousClock.Duration
@@ -64,12 +55,12 @@ extension JavaScriptEventLoop: SchedulingExecutor {
         } else {
             fatalError("Unsupported clock type; only ContinuousClock and SuspendingClock are supported")
         }
+        #endif
         let milliseconds = Self.delayInMilliseconds(from: duration)
         self.enqueue(
             UnownedJob(job),
             withDelay: milliseconds
         )
-        #endif  // #if hasFeature(Embedded)
     }
 
     private static func delayInMilliseconds(from swiftDuration: Duration) -> Double {
