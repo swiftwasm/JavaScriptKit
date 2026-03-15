@@ -5,7 +5,7 @@
 // See: https://forums.swift.org/t/pitch-2-custom-main-and-global-executors/78437
 
 #if compiler(>=6.3)
-@_spi(ExperimentalCustomExecutors) import _Concurrency
+@_spi(ExperimentalCustomExecutors) @_spi(ExperimentalScheduling) import _Concurrency
 #else
 import _Concurrency
 #endif
@@ -34,6 +34,7 @@ extension JavaScriptEventLoop: TaskExecutor {}
 @available(macOS 9999, iOS 9999, watchOS 9999, tvOS 9999, visionOS 9999, *)
 @_spi(ExperimentalCustomExecutors)
 extension JavaScriptEventLoop: SchedulingExecutor {
+#if !$Embedded
     public func enqueue<C: Clock>(
         _ job: consuming ExecutorJob,
         after delay: C.Duration,
@@ -42,19 +43,12 @@ extension JavaScriptEventLoop: SchedulingExecutor {
     ) {
         let duration: Duration
         // Handle clocks we know
-        if let _ = clock as? ContinuousClock {
-            duration = delay as! ContinuousClock.Duration
-        } else if let _ = clock as? SuspendingClock {
-            duration = delay as! SuspendingClock.Duration
+        if let continuousDelay = delay as? ContinuousClock.Duration {
+            duration = continuousDelay
+        } else if let suspendingDelay = delay as? SuspendingClock.Duration {
+            duration = suspendingDelay
         } else {
-            // Hand-off the scheduling work to Clock implementation for unknown clocks
-            clock.enqueue(
-                job,
-                on: self,
-                at: clock.now.advanced(by: delay),
-                tolerance: tolerance
-            )
-            return
+            fatalError("Unsupported clock type: \(C.self)")
         }
         let milliseconds = Self.delayInMilliseconds(from: duration)
         self.enqueue(
@@ -67,6 +61,13 @@ extension JavaScriptEventLoop: SchedulingExecutor {
         let (seconds, attoseconds) = swiftDuration.components
         return Double(seconds) * 1_000 + (Double(attoseconds) / 1_000_000_000_000_000)
     }
+#else
+    // SchedulingExecutor requirements are compiled out in Embedded Swift,
+    // so an empty conformance is valid. Task.sleep falls back to
+    // _enqueueJobGlobalWithDelay, which does not integrate with the
+    // JavaScript event loop.
+    #warning("SchedulingExecutor conformance is not yet available in Embedded Swift. Task.sleep will fall back to the default global executor, which does not integrate with the JavaScript event loop.")
+#endif
 }
 
 // MARK: - ExecutorFactory Implementation
@@ -81,6 +82,7 @@ extension JavaScriptEventLoop: ExecutorFactory {
             JavaScriptEventLoop.shared.enqueue(job)
         }
 
+#if !$Embedded
         func enqueue<C: Clock>(
             _ job: consuming ExecutorJob,
             after delay: C.Duration,
@@ -94,6 +96,7 @@ extension JavaScriptEventLoop: ExecutorFactory {
                 clock: clock
             )
         }
+#endif
         func run() throws {
             try JavaScriptEventLoop.shared.run()
         }
