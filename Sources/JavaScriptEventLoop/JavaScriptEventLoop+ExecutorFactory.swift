@@ -5,7 +5,7 @@
 // See: https://forums.swift.org/t/pitch-2-custom-main-and-global-executors/78437
 
 #if compiler(>=6.3)
-@_spi(ExperimentalCustomExecutors) import _Concurrency
+@_spi(ExperimentalCustomExecutors) @_spi(ExperimentalScheduling) import _Concurrency
 #else
 import _Concurrency
 #endif
@@ -42,6 +42,7 @@ extension JavaScriptEventLoop: SchedulingExecutor {
     ) {
         let duration: Duration
         // Handle clocks we know
+        #if !hasFeature(Embedded)
         if let _ = clock as? ContinuousClock {
             duration = delay as! ContinuousClock.Duration
         } else if let _ = clock as? SuspendingClock {
@@ -56,6 +57,9 @@ extension JavaScriptEventLoop: SchedulingExecutor {
             )
             return
         }
+        #else
+        fatalError("SchedulingExecutor.enqueue is not supported in embedded mode")
+        #endif
         let milliseconds = Self.delayInMilliseconds(from: duration)
         self.enqueue(
             UnownedJob(job),
@@ -81,6 +85,7 @@ extension JavaScriptEventLoop: ExecutorFactory {
             JavaScriptEventLoop.shared.enqueue(job)
         }
 
+        #if !hasFeature(Embedded)
         func enqueue<C: Clock>(
             _ job: consuming ExecutorJob,
             after delay: C.Duration,
@@ -94,6 +99,7 @@ extension JavaScriptEventLoop: ExecutorFactory {
                 clock: clock
             )
         }
+        #endif
         func run() throws {
             try JavaScriptEventLoop.shared.run()
         }
