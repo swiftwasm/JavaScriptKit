@@ -265,6 +265,12 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(g.name, "Bob");
     assert.equal(g.greet(), "Hello, Bob!");
 
+    // Test class extension members
+    assert.equal(g.greetEnthusiastically(), "Hey, Bob!!!");
+    assert.equal(g.nameCount, 3);
+    assert.equal(exports.Greeter.greetAnonymously(), "Hello.");
+    assert.equal(exports.Greeter.defaultGreeting, "Hello, world!");
+
     const g2 = exports.roundTripSwiftHeapObject(g)
     assert.equal(g2.greet(), "Hello, Bob!");
     assert.equal(g2.name, "Bob");
@@ -765,6 +771,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(StaticCalculatorValues.Basic, 1);
     assert.equal(StaticCalculatorValues.Scientific, exports.StaticCalculator.Scientific);
     assert.equal(StaticCalculatorValues.Basic, exports.StaticCalculator.Basic);
+
+    // Test enum extension static members
+    assert.equal(exports.StaticCalculator.doubleValue(21), 42);
+    assert.equal(exports.StaticCalculator.version, "1.0");
     assert.equal(exports.StaticUtils.Nested.roundtrip("hello world"), "hello world");
     assert.equal(exports.StaticUtils.Nested.roundtrip("test"), "test");
 
@@ -782,6 +792,20 @@ function testStructSupport(exports) {
     assert.deepEqual(exports.roundTripDataPoint(data1), data1);
     const data2 = { x: 0.0, y: 0.0, label: "", optCount: null, optFlag: null };
     assert.deepEqual(exports.roundTripDataPoint(data2), data2);
+
+    // Test struct extension static members
+    const origin = exports.DataPoint.origin();
+    assert.equal(origin.x, 0.0);
+    assert.equal(origin.y, 0.0);
+    assert.equal(origin.label, "origin");
+    assert.equal(exports.DataPoint.dimensions, 2);
+
+    // Test struct extension instance methods
+    const vec = exports.Vector2D.init(3.0, 4.0);
+    assert.equal(vec.magnitude(), 5.0);
+    const scaled = vec.scaled(2.0);
+    assert.equal(scaled.dx, 6.0);
+    assert.equal(scaled.dy, 8.0);
 
     const publicPoint = { x: 9, y: -3 };
     assert.deepEqual(exports.roundTripPublicPoint(publicPoint), publicPoint);

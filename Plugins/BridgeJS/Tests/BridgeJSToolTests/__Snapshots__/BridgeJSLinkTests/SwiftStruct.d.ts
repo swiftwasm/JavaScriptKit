@@ -43,6 +43,12 @@ export interface Container {
     object: any;
     optionalObject: any | null;
 }
+export interface Vector2D {
+    dx: number;
+    dy: number;
+    magnitude(): number;
+    scaled(factor: number): Vector2D;
+}
 export type PrecisionObject = typeof PrecisionValues;
 
 /// Represents a Swift heap object like a class instance or an actor instance.
@@ -65,6 +71,8 @@ export type Exports = {
     Precision: PrecisionObject
     DataPoint: {
         init(x: number, y: number, label: string, optCount: number | null, optFlag: boolean | null): DataPoint;
+        readonly dimensions: number;
+        origin(): DataPoint;
     }
     ConfigStruct: {
         readonly maxRetries: number;

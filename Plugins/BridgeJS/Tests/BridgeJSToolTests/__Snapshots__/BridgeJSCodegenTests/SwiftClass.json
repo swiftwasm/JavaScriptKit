@@ -63,6 +63,45 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_Greeter_greetEnthusiastically",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "greetEnthusiastically",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Greeter_static_greetAnonymously",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "greetAnonymously",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "Greeter"
+              }
+            }
           }
         ],
         "name" : "Greeter",
@@ -71,6 +110,31 @@
             "isReadonly" : false,
             "isStatic" : false,
             "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "nameCount",
+            "type" : {
+              "int" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "defaultGreeting",
+            "staticContext" : {
+              "className" : {
+                "_0" : "Greeter"
+              }
+            },
             "type" : {
               "string" : {
 
