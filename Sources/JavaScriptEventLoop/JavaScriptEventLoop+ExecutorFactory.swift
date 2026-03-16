@@ -48,7 +48,9 @@ extension JavaScriptEventLoop: SchedulingExecutor {
         } else if let _ = clock as? SuspendingClock {
             duration = delay as! SuspendingClock.Duration
         } else {
-            // Hand-off the scheduling work to Clock implementation for unknown clocks
+            #if compiler(>=6.4)
+            // Hand-off the scheduling work to Clock implementation for unknown clocks.
+            // Clock.enqueue is only available in the development branch (6.4+).
             clock.enqueue(
                 job,
                 on: self,
@@ -56,6 +58,9 @@ extension JavaScriptEventLoop: SchedulingExecutor {
                 tolerance: tolerance
             )
             return
+            #else
+            fatalError("Unsupported clock type; only ContinuousClock and SuspendingClock are supported")
+            #endif
         }
         #else
         fatalError("SchedulingExecutor.enqueue is not supported in embedded mode")
