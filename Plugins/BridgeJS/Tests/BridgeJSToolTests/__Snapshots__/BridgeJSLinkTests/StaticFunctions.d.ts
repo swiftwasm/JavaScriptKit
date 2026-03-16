@@ -22,8 +22,6 @@ export type APIResultTag =
 
 export type CalculatorObject = typeof CalculatorValues & {
     square(value: number): number;
-    cube(value: number): number;
-    readonly version: string;
 };
 
 export type APIResultObject = typeof APIResultValues & {
@@ -45,8 +43,6 @@ export type Exports = {
         new(): MathUtils;
         subtract(a: number, b: number): number;
         add(a: number, b: number): number;
-        divide(a: number, b: number): number;
-        readonly pi: number;
     }
     Calculator: CalculatorObject
     APIResult: APIResultObject

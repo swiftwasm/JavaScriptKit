@@ -77,53 +77,6 @@ export type Exports = {
 }
 ```
 
-## Adding Members via Extensions
-
-You can add exported methods, computed properties, and static members to a `@JS` class using extensions. The extension block itself does not need `@JS` - only the individual members do:
-
-```swift
-@JS class Greeter {
-    @JS var name: String
-
-    @JS init(name: String) {
-        self.name = name
-    }
-
-    @JS func greet() -> String {
-        return "Hello, " + self.name + "!"
-    }
-}
-
-extension Greeter {
-    @JS func greetEnthusiastically() -> String {
-        return "Hey, " + self.name + "!!!"
-    }
-
-    @JS var nameCount: Int { name.count }
-
-    @JS static func greetAnonymously() -> String {
-        return "Hello."
-    }
-
-    @JS static var defaultGreeting: String { "Hello, world!" }
-}
-```
-
-This also works across files within the same module:
-
-```swift
-// GreeterExtension.swift
-extension Greeter {
-    @JS func greetFormally() -> String {
-        return "Good day, " + self.name + "."
-    }
-}
-```
-
-All `@JS`-annotated members in extensions are merged into the same generated TypeScript interface as the original class declaration.
-
-> Note: Extensions must target `@JS`-annotated types from the same module.
-
 ## How It Works
 
 Classes use **reference semantics** when crossing the Swift/JavaScript boundary:
@@ -150,6 +103,5 @@ This differs from structs, which use copy semantics and transfer data by value.
 | Static / class properties: `static var`, `class let` | ✅ (See <doc:Exporting-Swift-Static-Properties> )|
 | Methods: `func` | ✅ (See <doc:Exporting-Swift-Function> ) |
 | Static/class methods: `static func`, `class func` | ✅ (See <doc:Exporting-Swift-Static-Functions> ) |
-| Extension methods/properties | ✅ |
 | Subscripts: `subscript()` | ❌ |
 | Generics | ❌ |

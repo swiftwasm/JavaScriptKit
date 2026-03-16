@@ -66,28 +66,6 @@ public func _bjs_DataPoint_init(_ x: Float64, _ y: Float64, _ labelBytes: Int32,
     #endif
 }
 
-@_expose(wasm, "bjs_DataPoint_static_dimensions_get")
-@_cdecl("bjs_DataPoint_static_dimensions_get")
-public func _bjs_DataPoint_static_dimensions_get() -> Int32 {
-    #if arch(wasm32)
-    let ret = DataPoint.dimensions
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_DataPoint_static_origin")
-@_cdecl("bjs_DataPoint_static_origin")
-public func _bjs_DataPoint_static_origin() -> Void {
-    #if arch(wasm32)
-    let ret = DataPoint.origin()
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
 extension Address: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Address {
         let zipCode = Optional<Int>.bridgeJSStackPop()
@@ -453,76 +431,6 @@ fileprivate func _bjs_struct_lift_Container_extern() -> Int32 {
 #endif
 @inline(never) fileprivate func _bjs_struct_lift_Container() -> Int32 {
     return _bjs_struct_lift_Container_extern()
-}
-
-extension Vector2D: _BridgedSwiftStruct {
-    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Vector2D {
-        let dy = Double.bridgeJSStackPop()
-        let dx = Double.bridgeJSStackPop()
-        return Vector2D(dx: dx, dy: dy)
-    }
-
-    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
-        self.dx.bridgeJSStackPush()
-        self.dy.bridgeJSStackPush()
-    }
-
-    init(unsafelyCopying jsObject: JSObject) {
-        _bjs_struct_lower_Vector2D(jsObject.bridgeJSLowerParameter())
-        self = Self.bridgeJSStackPop()
-    }
-
-    func toJSObject() -> JSObject {
-        let __bjs_self = self
-        __bjs_self.bridgeJSStackPush()
-        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Vector2D()))
-    }
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Vector2D")
-fileprivate func _bjs_struct_lower_Vector2D_extern(_ objectId: Int32) -> Void
-#else
-fileprivate func _bjs_struct_lower_Vector2D_extern(_ objectId: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func _bjs_struct_lower_Vector2D(_ objectId: Int32) -> Void {
-    return _bjs_struct_lower_Vector2D_extern(objectId)
-}
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Vector2D")
-fileprivate func _bjs_struct_lift_Vector2D_extern() -> Int32
-#else
-fileprivate func _bjs_struct_lift_Vector2D_extern() -> Int32 {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func _bjs_struct_lift_Vector2D() -> Int32 {
-    return _bjs_struct_lift_Vector2D_extern()
-}
-
-@_expose(wasm, "bjs_Vector2D_magnitude")
-@_cdecl("bjs_Vector2D_magnitude")
-public func _bjs_Vector2D_magnitude() -> Float64 {
-    #if arch(wasm32)
-    let ret = Vector2D.bridgeJSLiftParameter().magnitude()
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
-}
-
-@_expose(wasm, "bjs_Vector2D_scaled")
-@_cdecl("bjs_Vector2D_scaled")
-public func _bjs_Vector2D_scaled(_ factor: Float64) -> Void {
-    #if arch(wasm32)
-    let ret = Vector2D.bridgeJSLiftParameter().scaled(by: Double.bridgeJSLiftParameter(factor))
-    return ret.bridgeJSLowerReturn()
-    #else
-    fatalError("Only available on WebAssembly")
-    #endif
 }
 
 @_expose(wasm, "bjs_roundtrip")
