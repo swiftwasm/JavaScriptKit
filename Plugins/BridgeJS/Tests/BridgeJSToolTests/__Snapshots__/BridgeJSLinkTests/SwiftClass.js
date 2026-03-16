@@ -289,18 +289,6 @@ export async function createInstantiator(options, swift) {
                     const nameId = swift.memory.retain(nameBytes);
                     instance.exports.bjs_Greeter_changeName(this.pointer, nameId, nameBytes.length);
                 }
-                greetEnthusiastically() {
-                    instance.exports.bjs_Greeter_greetEnthusiastically(this.pointer);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                }
-                static greetAnonymously() {
-                    instance.exports.bjs_Greeter_static_greetAnonymously();
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
-                }
                 get name() {
                     instance.exports.bjs_Greeter_name_get(this.pointer);
                     const ret = tmpRetString;
@@ -311,16 +299,6 @@ export async function createInstantiator(options, swift) {
                     const valueBytes = textEncoder.encode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_Greeter_name_set(this.pointer, valueId, valueBytes.length);
-                }
-                get nameCount() {
-                    const ret = instance.exports.bjs_Greeter_nameCount_get(this.pointer);
-                    return ret;
-                }
-                static get defaultGreeting() {
-                    instance.exports.bjs_Greeter_static_defaultGreeting_get();
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
                 }
             }
             class PublicGreeter extends SwiftHeapObject {

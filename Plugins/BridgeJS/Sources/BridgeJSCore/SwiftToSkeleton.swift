@@ -43,14 +43,12 @@ public final class SwiftToSkeleton {
         var perSourceErrors: [(inputFilePath: String, errors: [DiagnosticError])] = []
         var importedFiles: [ImportedFileSkeleton] = []
         var exported = ExportedSkeleton(functions: [], classes: [], enums: [], exposeToGlobal: exposeToGlobal)
-        var exportCollectors: [ExportSwiftAPICollector] = []
 
         for (sourceFile, inputFilePath) in sourceFiles {
             progress.print("Processing \(inputFilePath)")
 
             let exportCollector = ExportSwiftAPICollector(parent: self)
             exportCollector.walk(sourceFile)
-            exportCollectors.append(exportCollector)
 
             let typeNameCollector = ImportSwiftMacrosJSImportTypeNameCollector(viewMode: .sourceAccurate)
             typeNameCollector.walk(sourceFile)
@@ -76,15 +74,7 @@ public final class SwiftToSkeleton {
             if !importedFile.isEmpty {
                 importedFiles.append(importedFile)
             }
-        }
-
-        // Resolve extensions against all collectors. This needs to happen at this point so we can resolve both same file and cross file extensions.
-        for source in exportCollectors {
-            source.resolveDeferredExtensions(against: exportCollectors)
-        }
-
-        for collector in exportCollectors {
-            collector.finalize(&exported)
+            exportCollector.finalize(&exported)
         }
 
         if !perSourceErrors.isEmpty {
@@ -496,8 +486,6 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     var exportedStructNames: [String] = []
     var exportedStructByName: [String: ExportedStruct] = [:]
     var errors: [DiagnosticError] = []
-    /// Extensions collected during the walk, to be resolved after all files have been walked
-    var deferredExtensions: [ExtensionDeclSyntax] = []
 
     func finalize(_ result: inout ExportedSkeleton) {
         result.functions.append(contentsOf: exportedFunctions)
@@ -1398,64 +1386,6 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         if case .classBody(_, _) = stateStack.current {
             stateStack.pop()
         }
-    }
-
-    override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
-        // Defer until all type declarations in the module have been collected.
-        deferredExtensions.append(node)
-        return .skipChildren
-    }
-
-    func resolveDeferredExtensions(against collectors: [ExportSwiftAPICollector]) {
-        for ext in deferredExtensions {
-            var resolved = false
-            for collector in collectors {
-                if collector.resolveExtension(ext) {
-                    resolved = true
-                    break
-                }
-            }
-            if !resolved {
-                diagnose(
-                    node: ext.extendedType,
-                    message: "Unsupported type '\(ext.extendedType.trimmedDescription)'.",
-                    hint: "You can only extend `@JS` annotated types defined in the same module"
-                )
-            }
-        }
-    }
-
-    /// Walks extension members under the matching type’s state, returning whether the type was found.
-    ///
-    /// Note: The lookup scans dictionaries keyed by `makeKey(name:namespace:)`, matching only by
-    /// plain name. If two types share a name but differ by namespace, `.first(where:)` picks
-    /// whichever comes first. This is acceptable today since namespace collisions are unlikely,
-    /// but may need refinement if namespace-qualified extension resolution is added.
-    func resolveExtension(_ ext: ExtensionDeclSyntax) -> Bool {
-        let name = ext.extendedType.trimmedDescription
-        let state: State
-        if let entry = exportedClassByName.first(where: { $0.value.name == name }) {
-            state = .classBody(name: name, key: entry.key)
-        } else if let entry = exportedStructByName.first(where: { $0.value.name == name }) {
-            state = .structBody(name: name, key: entry.key)
-        } else if let entry = exportedEnumByName.first(where: { $0.value.name == name }) {
-            state = .enumBody(name: name, key: entry.key)
-        } else if exportedProtocolByName.values.contains(where: { $0.name == name }) {
-            diagnose(
-                node: ext.extendedType,
-                message: "Protocol extensions are not supported by BridgeJS.",
-                hint: "You cannot extend `@JS` protocol '\(name)' with additional members"
-            )
-            return true
-        } else {
-            return false
-        }
-        stateStack.push(state: state)
-        for member in ext.memberBlock.members {
-            walk(member)
-        }
-        stateStack.pop()
-        return true
     }
 
     override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {

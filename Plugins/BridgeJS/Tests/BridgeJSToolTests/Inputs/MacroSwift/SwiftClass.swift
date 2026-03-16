@@ -12,20 +12,6 @@
     }
 }
 
-extension Greeter {
-    @JS func greetEnthusiastically() -> String {
-        return "Hey, " + self.name + "!!!"
-    }
-
-    @JS var nameCount: Int { name.count }
-
-    @JS static func greetAnonymously() -> String {
-        return "Hello."
-    }
-
-    @JS static var defaultGreeting: String { "Hello, world!" }
-}
-
 @JS func takeGreeter(greeter: Greeter) {
     print(greeter.greet())
 }

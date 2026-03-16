@@ -144,20 +144,6 @@ struct TestError: Error {
     }
 }
 
-extension Greeter {
-    @JS func greetEnthusiastically() -> String {
-        return "Hey, \(name)!!!"
-    }
-
-    @JS var nameCount: Int { name.count }
-
-    @JS static func greetAnonymously() -> String {
-        return "Hello."
-    }
-
-    @JS static var defaultGreeting: String { "Hello, world!" }
-}
-
 @JS func takeGreeter(g: Greeter, name: String) {
     g.changeName(name: name)
 }
@@ -269,14 +255,6 @@ extension Greeter {
     case light = "light"
     case dark = "dark"
     case auto = "auto"
-}
-
-extension StaticCalculator {
-    @JS static func doubleValue(_ value: Int) -> Int {
-        return value * 2
-    }
-
-    @JS static var version: String { "1.0" }
 }
 
 @JS func setDirection(_ direction: Direction) -> Direction {

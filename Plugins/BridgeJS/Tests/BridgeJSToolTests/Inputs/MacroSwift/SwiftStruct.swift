@@ -60,26 +60,3 @@
 }
 
 @JS func roundtripContainer(_ container: Container) -> Container
-
-@JS struct Vector2D {
-    var dx: Double
-    var dy: Double
-}
-
-extension Vector2D {
-    @JS func magnitude() -> Double {
-        return (dx * dx + dy * dy).squareRoot()
-    }
-
-    @JS func scaled(by factor: Double) -> Vector2D {
-        return Vector2D(dx: dx * factor, dy: dy * factor)
-    }
-}
-
-extension DataPoint {
-    @JS static func origin() -> DataPoint {
-        return DataPoint(x: 0, y: 0, label: "origin", optCount: nil, optFlag: nil)
-    }
-
-    @JS static var dimensions: Int { 2 }
-}

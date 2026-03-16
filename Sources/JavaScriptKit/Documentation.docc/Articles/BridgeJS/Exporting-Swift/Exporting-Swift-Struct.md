@@ -165,7 +165,6 @@ This differs from classes, which use reference semantics and share state across 
 | Instance methods | ✅ |
 | Static methods | ✅ |
 | Static properties | ✅ |
-| Extension methods/properties | ✅ |
 | Property observers (`willSet`, `didSet`) | ❌ |
 | Generics | ❌ |
 | Conformances | ❌ |

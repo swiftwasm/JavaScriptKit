@@ -14,9 +14,7 @@ export interface SwiftHeapObject {
 export interface Greeter extends SwiftHeapObject {
     greet(): string;
     changeName(name: string): void;
-    greetEnthusiastically(): string;
     name: string;
-    readonly nameCount: number;
 }
 export interface PublicGreeter extends SwiftHeapObject {
 }
@@ -25,8 +23,6 @@ export interface PackageGreeter extends SwiftHeapObject {
 export type Exports = {
     Greeter: {
         new(name: string): Greeter;
-        greetAnonymously(): string;
-        readonly defaultGreeting: string;
     }
     PublicGreeter: {
     }
