@@ -123,13 +123,16 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     private static func installGlobalExecutorIsolated() {
         guard !didInstallGlobalExecutor else { return }
         didInstallGlobalExecutor = true
-        #if compiler(>=6.3)
+        #if compiler(>=6.3) && !hasFeature(Embedded)
         if #available(macOS 9999, iOS 9999, watchOS 9999, tvOS 9999, visionOS 9999, *) {
             // For Swift 6.3 and above, we can use the new `ExecutorFactory` API
             _Concurrency._createExecutors(factory: JavaScriptEventLoop.self)
         }
         #else
-        // For Swift 6.1 and below, we need to install the global executor by hook API
+        // For Swift 6.1 and below, or Embedded Swift, we need to install
+        // the global executor by hook API. The ExecutorFactory mechanism
+        // does not work in Embedded Swift because ExecutorImpl.swift is
+        // excluded from the embedded Concurrency library.
         installByLegacyHook()
         #endif
     }
