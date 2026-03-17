@@ -174,7 +174,9 @@ jobs:
       - uses: swiftwasm/setup-swiftwasm@v2
         id: setup-wasm32-unknown-wasip1-threads
         with: { target: wasm32-unknown-wasip1-threads }
-      - run: ./Utilities/build-examples.sh
+      - run: |
+          swift --version
+          ./Utilities/build-examples.sh
         env:
           SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
           SWIFT_SDK_ID_wasm32_unknown_wasip1: ${{ steps.setup-wasm32-unknown-wasip1.outputs.swift-sdk-id }}
