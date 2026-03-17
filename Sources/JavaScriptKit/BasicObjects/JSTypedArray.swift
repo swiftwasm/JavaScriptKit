@@ -121,7 +121,9 @@ public final class JSTypedArray<Traits>: JSBridgedClass, ExpressibleByArrayLiter
     ///   argument is valid only for the duration of the closure's execution.
     /// - Returns: The return value, if any, of the `body`async closure parameter.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public func withUnsafeBytesAsync<R, E: Error>(_ body: (UnsafeBufferPointer<Element>) async throws(E) -> R) async throws(E) -> R {
+    public func withUnsafeBytesAsync<R, E: Error>(
+        _ body: (UnsafeBufferPointer<Element>) async throws(E) -> R
+    ) async throws(E) -> R {
         let buffer = UnsafeMutableBufferPointer<Element>.allocate(capacity: length)
         defer { buffer.deallocate() }
         copyMemory(to: buffer)

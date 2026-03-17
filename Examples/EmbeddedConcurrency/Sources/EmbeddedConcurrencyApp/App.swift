@@ -6,8 +6,8 @@ import _Concurrency
 typealias DefaultExecutorFactory = JavaScriptEventLoop
 #endif
 
-nonisolated(unsafe) var testsPassed = 0
-nonisolated(unsafe) var testsFailed = 0
+@MainActor var testsPassed = 0
+@MainActor var testsFailed = 0
 
 @MainActor
 func check(_ condition: Bool, _ message: String) {
@@ -23,6 +23,7 @@ func check(_ condition: Bool, _ message: String) {
 
 @main
 struct App {
+    @MainActor
     static func main() async throws(JSException) {
         JavaScriptEventLoop.installGlobalExecutor()
 
