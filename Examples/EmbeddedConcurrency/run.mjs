@@ -3,7 +3,7 @@ import { instantiate } from
 import { defaultNodeSetup } from
   "./.build/plugins/PackageToJS/outputs/Package/platforms/node.js"
 
-const EXPECTED_TESTS = 6;
+const EXPECTED_TESTS = 8;
 const TIMEOUT_MS = 30_000;
 
 // Intercept console.log to capture test output

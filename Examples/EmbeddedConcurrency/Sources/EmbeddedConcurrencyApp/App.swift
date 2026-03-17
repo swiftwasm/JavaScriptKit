@@ -121,6 +121,36 @@ struct App {
             check(false, "Promise chaining should succeed")
         }
 
+        // Test 7: JSPromise.value await (with async resolution)
+        let promise2 = JSPromise(resolver: { resolve in
+            _ = JSObject.global.setTimeout!(
+                JSOneshotClosure { _ in
+                    resolve(.success(JSValue.number(456)))
+                    return .undefined
+                },
+                1
+            )
+        })
+        let awaitedValue = try await promise2.value
+        check(awaitedValue.number == 456, "JSPromise.value await returns correct value")
+
+        // Test 8: JSPromise.result await (with async resolution)
+        let promise3 = JSPromise(resolver: { resolve in
+            _ = JSObject.global.setTimeout!(
+                JSOneshotClosure { _ in
+                    resolve(.success(JSValue.number(789)))
+                    return .undefined
+                },
+                1
+            )
+        })
+        let awaitedResult = await promise3.result
+        if case .success(let val) = awaitedResult {
+            check(val.number == 789, "JSPromise.result await resolves correctly")
+        } else {
+            check(false, "JSPromise.result await should succeed")
+        }
+
         // Summary
         let console = JSObject.global.console
         let totalTests = testsPassed + testsFailed
