@@ -8,7 +8,7 @@
 @_spi(ExperimentalCustomExecutors) @_spi(ExperimentalScheduling) import _Concurrency
 #else
 import _Concurrency
-#endif
+#endif  // #if compiler(>=6.3)
 import _CJavaScriptKit
 
 #if compiler(>=6.3)
@@ -40,7 +40,22 @@ extension JavaScriptEventLoop: SchedulingExecutor {
         tolerance: C.Duration?,
         clock: C
     ) {
-        #if !hasFeature(Embedded)
+        #if hasFeature(Embedded)
+        #if compiler(>=6.4)
+        // In Embedded Swift, ContinuousClock and SuspendingClock are unavailable.
+        // Hand-off the scheduling work to the Clock implementation for custom clocks.
+        clock.enqueue(
+            job,
+            on: self,
+            at: clock.now.advanced(by: delay),
+            tolerance: tolerance
+        )
+        #else
+        fatalError(
+            "Delayed enqueue requires Swift 6.4+ in Embedded mode"
+        )
+        #endif  // #if compiler(>=6.4) (Embedded)
+        #else  // #if hasFeature(Embedded)
         let duration: Duration
         // Handle clocks we know
         if let _ = clock as? ContinuousClock {
@@ -60,16 +75,14 @@ extension JavaScriptEventLoop: SchedulingExecutor {
             return
             #else
             fatalError("Unsupported clock type; only ContinuousClock and SuspendingClock are supported")
-            #endif
+            #endif  // #if compiler(>=6.4) (non-Embedded)
         }
         let milliseconds = Self.delayInMilliseconds(from: duration)
         self.enqueue(
             UnownedJob(job),
             withDelay: milliseconds
         )
-        #else
-        fatalError("SchedulingExecutor.enqueue is not supported in embedded mode")
-        #endif
+        #endif  // #if hasFeature(Embedded)
     }
 
     private static func delayInMilliseconds(from swiftDuration: Duration) -> Double {
@@ -90,7 +103,6 @@ extension JavaScriptEventLoop: ExecutorFactory {
             JavaScriptEventLoop.shared.enqueue(job)
         }
 
-        #if !hasFeature(Embedded)
         func enqueue<C: Clock>(
             _ job: consuming ExecutorJob,
             after delay: C.Duration,
@@ -104,7 +116,6 @@ extension JavaScriptEventLoop: ExecutorFactory {
                 clock: clock
             )
         }
-        #endif
         func run() throws {
             try JavaScriptEventLoop.shared.run()
         }
@@ -122,4 +133,4 @@ extension JavaScriptEventLoop: ExecutorFactory {
     }
 }
 
-#endif  // compiler(>=6.3)
+#endif  // #if compiler(>=6.3)
