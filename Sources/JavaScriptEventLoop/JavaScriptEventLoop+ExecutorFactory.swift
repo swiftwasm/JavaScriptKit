@@ -4,14 +4,14 @@
 // See: https://github.com/swiftlang/swift/pull/80266
 // See: https://forums.swift.org/t/pitch-2-custom-main-and-global-executors/78437
 
-#if compiler(>=6.3)
+#if compiler(>=6.4) || (swift(>=6.3) && arch(wasm32))
 @_spi(ExperimentalCustomExecutors) @_spi(ExperimentalScheduling) import _Concurrency
 #else
 import _Concurrency
-#endif  // #if compiler(>=6.3)
+#endif  // #if compiler(>=6.4) || (swift(>=6.3) && arch(wasm32))
 import _CJavaScriptKit
 
-#if compiler(>=6.3)
+#if compiler(>=6.4) || (swift(>=6.3) && arch(wasm32))
 
 // MARK: - MainExecutor Implementation
 // MainExecutor is used by the main actor to execute tasks on the main thread
@@ -133,4 +133,4 @@ extension JavaScriptEventLoop: ExecutorFactory {
     }
 }
 
-#endif  // #if compiler(>=6.3)
+#endif  // #if compiler(>=6.4) || (swift(>=6.3) && arch(wasm32))
