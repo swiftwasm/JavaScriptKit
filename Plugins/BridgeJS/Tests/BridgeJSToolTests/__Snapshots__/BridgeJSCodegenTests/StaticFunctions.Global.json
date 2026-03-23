@@ -166,8 +166,11 @@
                 "label" : "a",
                 "name" : "a",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               },
@@ -175,15 +178,21 @@
                 "label" : "b",
                 "name" : "b",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -282,15 +291,21 @@
                 "label" : "value",
                 "name" : "value",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {

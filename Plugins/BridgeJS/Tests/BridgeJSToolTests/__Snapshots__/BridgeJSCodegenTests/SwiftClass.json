@@ -121,8 +121,11 @@
             "isStatic" : false,
             "name" : "nameCount",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },

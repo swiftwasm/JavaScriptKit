@@ -797,8 +797,11 @@
             "isStatic" : false,
             "name" : "nameCount",
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           },
@@ -8523,15 +8526,21 @@
                 "label" : "_",
                 "name" : "value",
                 "type" : {
-                  "int" : {
-
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
                   }
                 }
               }
             ],
             "returnType" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             },
             "staticContext" : {
@@ -15045,8 +15054,11 @@
               }
             },
             "type" : {
-              "int" : {
-
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
