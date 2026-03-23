@@ -923,6 +923,7 @@ public struct ImportedFunctionSkeleton: Codable {
     public let from: JSImportFrom?
     public let parameters: [Parameter]
     public let returnType: BridgeType
+    public let effects: Effects
     public let documentation: String?
 
     public init(
@@ -931,6 +932,7 @@ public struct ImportedFunctionSkeleton: Codable {
         from: JSImportFrom? = nil,
         parameters: [Parameter],
         returnType: BridgeType,
+        effects: Effects = Effects(isAsync: false, isThrows: true),
         documentation: String? = nil
     ) {
         self.name = name
@@ -938,6 +940,7 @@ public struct ImportedFunctionSkeleton: Codable {
         self.from = from
         self.parameters = parameters
         self.returnType = returnType
+        self.effects = effects
         self.documentation = documentation
     }
 

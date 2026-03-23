@@ -1233,7 +1233,7 @@ public struct BridgeJSLink {
                     for method in type.methods {
                         let methodName = method.jsName ?? method.name
                         let methodSignature =
-                            "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                            "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                         printer.write(methodSignature)
                     }
 
@@ -3124,21 +3124,23 @@ extension BridgeJSLink {
         }
         let jsName = function.jsName ?? function.name
         let importRootExpr = function.from == .global ? "globalThis" : "imports"
+        // For async functions, the JS handler returns the Promise as a jsObject.
+        // The Swift side handles awaiting and lifting the resolved value.
+        let abiReturnType: BridgeType = function.effects.isAsync ? .jsObject(nil) : function.returnType
         let returnExpr = try thunkBuilder.call(
             name: jsName,
             fromObjectExpr: importRootExpr,
-            returnType: function.returnType
+            returnType: abiReturnType
         )
         let funcLines = thunkBuilder.renderFunction(
             name: function.abiName(context: nil),
             returnExpr: returnExpr,
-            returnType: function.returnType
+            returnType: abiReturnType
         )
-        let effects = Effects(isAsync: false, isThrows: false)
         if function.from == nil {
             importObjectBuilder.appendDts(
                 [
-                    "\(renderTSPropertyName(jsName))\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: effects));"
+                    "\(renderTSPropertyName(jsName))\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
                 ]
             )
         }
@@ -3337,11 +3339,12 @@ extension BridgeJSLink {
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let returnExpr = try thunkBuilder.callMethod(name: method.jsName ?? method.name, returnType: method.returnType)
+        let abiReturnType: BridgeType = method.effects.isAsync ? .jsObject(nil) : method.returnType
+        let returnExpr = try thunkBuilder.callMethod(name: method.jsName ?? method.name, returnType: abiReturnType)
         let funcLines = thunkBuilder.renderFunction(
             name: method.abiName(context: context),
             returnExpr: returnExpr,
-            returnType: method.returnType
+            returnType: abiReturnType
         )
         return (funcLines, [])
     }

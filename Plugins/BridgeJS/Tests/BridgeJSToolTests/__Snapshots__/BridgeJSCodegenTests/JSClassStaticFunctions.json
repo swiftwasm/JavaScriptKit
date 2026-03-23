@@ -12,6 +12,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "value",
                 "parameters" : [
 
@@ -29,6 +34,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "create",
                 "parameters" : [
                   {
@@ -47,6 +57,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "value",
                 "parameters" : [
 
@@ -58,6 +73,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "makeDefault",
                 "parameters" : [
 
@@ -69,6 +89,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "jsName" : "with-dashes",
                 "name" : "dashed",
                 "parameters" : [
@@ -107,6 +132,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "create",
                 "parameters" : [
                   {

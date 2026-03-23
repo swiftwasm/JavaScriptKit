@@ -1279,6 +1279,6 @@ class ExportAPITests: XCTestCase {
     }
 
     func testAllAsync() async throws {
-        _ = try await runAsyncWorks().value()
+        try await runAsyncWorks()
     }
 }

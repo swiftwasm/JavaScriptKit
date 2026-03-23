@@ -146,6 +146,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsRoundTripGreeter",
             "parameters" : [
               {
@@ -164,6 +169,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsRoundTripOptionalGreeter",
             "parameters" : [
               {

@@ -11137,12 +11137,106 @@ fileprivate func bjs_runAsyncWorks_extern() -> Int32 {
     return bjs_runAsyncWorks_extern()
 }
 
-func _$runAsyncWorks() throws(JSException) -> JSPromise {
+func _$runAsyncWorks() async throws(JSException) -> Void {
     let ret = bjs_runAsyncWorks()
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return JSPromise.bridgeJSLiftReturn(ret)
+    let promise = JSPromise(unsafelyWrapping: JSObject(id: UInt32(bitPattern: ret)))
+    _ = try await promise.value
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsAsyncRoundTripVoid")
+fileprivate func bjs_jsAsyncRoundTripVoid_extern() -> Int32
+#else
+fileprivate func bjs_jsAsyncRoundTripVoid_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsAsyncRoundTripVoid() -> Int32 {
+    return bjs_jsAsyncRoundTripVoid_extern()
+}
+
+func _$jsAsyncRoundTripVoid() async throws(JSException) -> Void {
+    let ret = bjs_jsAsyncRoundTripVoid()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    let promise = JSPromise(unsafelyWrapping: JSObject(id: UInt32(bitPattern: ret)))
+    _ = try await promise.value
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsAsyncRoundTripNumber")
+fileprivate func bjs_jsAsyncRoundTripNumber_extern(_ v: Float64) -> Int32
+#else
+fileprivate func bjs_jsAsyncRoundTripNumber_extern(_ v: Float64) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsAsyncRoundTripNumber(_ v: Float64) -> Int32 {
+    return bjs_jsAsyncRoundTripNumber_extern(v)
+}
+
+func _$jsAsyncRoundTripNumber(_ v: Double) async throws(JSException) -> Double {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_jsAsyncRoundTripNumber(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    let promise = JSPromise(unsafelyWrapping: JSObject(id: UInt32(bitPattern: ret)))
+    let resolved = try await promise.value
+    return Double(resolved.number!)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsAsyncRoundTripBool")
+fileprivate func bjs_jsAsyncRoundTripBool_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_jsAsyncRoundTripBool_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsAsyncRoundTripBool(_ v: Int32) -> Int32 {
+    return bjs_jsAsyncRoundTripBool_extern(v)
+}
+
+func _$jsAsyncRoundTripBool(_ v: Bool) async throws(JSException) -> Bool {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_jsAsyncRoundTripBool(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    let promise = JSPromise(unsafelyWrapping: JSObject(id: UInt32(bitPattern: ret)))
+    let resolved = try await promise.value
+    return resolved.boolean!
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsAsyncRoundTripString")
+fileprivate func bjs_jsAsyncRoundTripString_extern(_ vBytes: Int32, _ vLength: Int32) -> Int32
+#else
+fileprivate func bjs_jsAsyncRoundTripString_extern(_ vBytes: Int32, _ vLength: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsAsyncRoundTripString(_ vBytes: Int32, _ vLength: Int32) -> Int32 {
+    return bjs_jsAsyncRoundTripString_extern(vBytes, vLength)
+}
+
+func _$jsAsyncRoundTripString(_ v: String) async throws(JSException) -> String {
+    let ret0 = v.bridgeJSWithLoweredParameter { (vBytes, vLength) in
+        let ret = bjs_jsAsyncRoundTripString(vBytes, vLength)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    let promise = JSPromise(unsafelyWrapping: JSObject(id: UInt32(bitPattern: ret)))
+    let resolved = try await promise.value
+    return resolved.string!
 }
 
 #if arch(wasm32)

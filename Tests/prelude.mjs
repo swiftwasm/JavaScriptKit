@@ -119,6 +119,18 @@ export async function setupOptions(options, context) {
                 },
                 StaticBox,
                 Foo: ImportedFoo,
+                "jsAsyncRoundTripVoid": () => {
+                    return Promise.resolve();
+                },
+                "jsAsyncRoundTripNumber": (v) => {
+                    return Promise.resolve(v);
+                },
+                "jsAsyncRoundTripBool": (v) => {
+                    return Promise.resolve(v);
+                },
+                "jsAsyncRoundTripString": (v) => {
+                    return Promise.resolve(v);
+                },
                 runAsyncWorks: async () => {
                     const exports = importsContext.getExports();
                     if (!exports) {

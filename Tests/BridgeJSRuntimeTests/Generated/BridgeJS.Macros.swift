@@ -41,7 +41,15 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
     @JSFunction func changeName(_ name: String) throws(JSException) -> Void
 }
 
-@JSFunction func runAsyncWorks() throws(JSException) -> JSPromise
+@JSFunction func runAsyncWorks() async throws(JSException) -> Void
+
+@JSFunction func jsAsyncRoundTripVoid() async throws(JSException) -> Void
+
+@JSFunction func jsAsyncRoundTripNumber(_ v: Double) async throws(JSException) -> Double
+
+@JSFunction func jsAsyncRoundTripBool(_ v: Bool) async throws(JSException) -> Bool
+
+@JSFunction func jsAsyncRoundTripString(_ v: String) async throws(JSException) -> String
 
 @JSFunction(jsName: "$jsWeirdFunction") func _jsWeirdFunction() throws(JSException) -> Double
 

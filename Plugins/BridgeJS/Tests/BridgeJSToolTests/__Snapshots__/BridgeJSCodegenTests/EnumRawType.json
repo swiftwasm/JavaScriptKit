@@ -1526,6 +1526,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "takesFeatureFlag",
             "parameters" : [
               {
@@ -1545,6 +1550,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "returnsFeatureFlag",
             "parameters" : [
 

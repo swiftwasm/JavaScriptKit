@@ -2839,6 +2839,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "benchmarkHelperNoop",
             "parameters" : [
 
@@ -2850,6 +2855,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "benchmarkHelperNoopWithNumber",
             "parameters" : [
               {
@@ -2868,6 +2878,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "benchmarkRunner",
             "parameters" : [
               {

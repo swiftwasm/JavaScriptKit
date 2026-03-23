@@ -278,6 +278,40 @@ public struct ImportTS {
             }
         }
 
+        func liftAsyncReturnValue(originalReturnType: BridgeType) {
+            // For async imports, the extern function returns a Promise object ID (i32).
+            // We wrap it in JSPromise, await the resolved value, then lift to the target type.
+            abiReturnType = .i32
+            body.write(
+                "let promise = JSPromise(unsafelyWrapping: JSObject(id: UInt32(bitPattern: ret)))"
+            )
+            if originalReturnType == .void {
+                body.write("_ = try await promise.value")
+            } else {
+                body.write("let resolved = try await promise.value")
+                let liftExpr: String
+                switch originalReturnType {
+                case .double:
+                    liftExpr = "Double(resolved.number!)"
+                case .float:
+                    liftExpr = "Float(resolved.number!)"
+                case .integer:
+                    liftExpr = "Int(resolved.number!)"
+                case .string:
+                    liftExpr = "resolved.string!"
+                case .bool:
+                    liftExpr = "resolved.boolean!"
+                case .jsObject:
+                    liftExpr = "resolved.object!"
+                case .jsValue:
+                    liftExpr = "resolved"
+                default:
+                    liftExpr = "resolved.object!"
+                }
+                body.write("return \(liftExpr)")
+            }
+        }
+
         func assignThis(returnType: BridgeType) {
             guard case .jsObject = returnType else {
                 preconditionFailure("assignThis can only be called with a jsObject return type")
@@ -299,9 +333,13 @@ public struct ImportTS {
             return "\(raw: printer.lines.joined(separator: "\n"))"
         }
 
-        func renderThunkDecl(name: String, parameters: [Parameter], returnType: BridgeType) -> DeclSyntax {
+        func renderThunkDecl(
+            name: String,
+            parameters: [Parameter],
+            returnType: BridgeType,
+            effects: Effects = Effects(isAsync: false, isThrows: true)
+        ) -> DeclSyntax {
             let printer = CodeFragmentPrinter()
-            let effects = Effects(isAsync: false, isThrows: true)
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
                 parameters: parameters,
                 returnType: returnType,
@@ -359,22 +397,30 @@ public struct ImportTS {
         _ function: ImportedFunctionSkeleton,
         topLevelDecls: inout [DeclSyntax]
     ) throws -> [DeclSyntax] {
+        // For async functions, the ABI return type is always jsObject (the Promise).
+        // We tell CallJSEmission that the return type is jsObject so it captures the return value.
+        let abiReturnType: BridgeType = function.effects.isAsync ? .jsObject(nil) : function.returnType
         let builder = try CallJSEmission(
             moduleName: moduleName,
             abiName: function.abiName(context: nil),
-            returnType: function.returnType
+            returnType: abiReturnType
         )
         for param in function.parameters {
             try builder.lowerParameter(param: param)
         }
         try builder.call()
-        try builder.liftReturnValue()
+        if function.effects.isAsync {
+            builder.liftAsyncReturnValue(originalReturnType: function.returnType)
+        } else {
+            try builder.liftReturnValue()
+        }
         topLevelDecls.append(builder.renderImportDecl())
         return [
             builder.renderThunkDecl(
                 name: Self.thunkName(function: function),
                 parameters: function.parameters,
-                returnType: function.returnType
+                returnType: function.returnType,
+                effects: function.effects
             )
             .with(\.leadingTrivia, Self.renderDocumentation(documentation: function.documentation))
         ]
@@ -385,41 +431,53 @@ public struct ImportTS {
         var decls: [DeclSyntax] = []
 
         func renderMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
+            let abiReturnType: BridgeType = method.effects.isAsync ? .jsObject(nil) : method.returnType
             let builder = try CallJSEmission(
                 moduleName: moduleName,
                 abiName: method.abiName(context: type),
-                returnType: method.returnType
+                returnType: abiReturnType
             )
             try builder.lowerParameter(param: selfParameter)
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
             try builder.call()
-            try builder.liftReturnValue()
+            if method.effects.isAsync {
+                builder.liftAsyncReturnValue(originalReturnType: method.returnType)
+            } else {
+                try builder.liftReturnValue()
+            }
             topLevelDecls.append(builder.renderImportDecl())
             return [
                 builder.renderThunkDecl(
                     name: Self.thunkName(type: type, method: method),
                     parameters: [selfParameter] + method.parameters,
-                    returnType: method.returnType
+                    returnType: method.returnType,
+                    effects: method.effects
                 )
             ]
         }
 
         func renderStaticMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
             let abiName = method.abiName(context: type, operation: "static")
-            let builder = try CallJSEmission(moduleName: moduleName, abiName: abiName, returnType: method.returnType)
+            let abiReturnType: BridgeType = method.effects.isAsync ? .jsObject(nil) : method.returnType
+            let builder = try CallJSEmission(moduleName: moduleName, abiName: abiName, returnType: abiReturnType)
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
             try builder.call()
-            try builder.liftReturnValue()
+            if method.effects.isAsync {
+                builder.liftAsyncReturnValue(originalReturnType: method.returnType)
+            } else {
+                try builder.liftReturnValue()
+            }
             topLevelDecls.append(builder.renderImportDecl())
             return [
                 builder.renderThunkDecl(
                     name: Self.thunkName(type: type, method: method),
                     parameters: method.parameters,
-                    returnType: method.returnType
+                    returnType: method.returnType,
+                    effects: method.effects
                 )
             ]
         }

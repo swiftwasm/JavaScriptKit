@@ -4,6 +4,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "createWeirdObject",
             "parameters" : [
 
@@ -15,6 +20,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "createWeirdClass",
             "parameters" : [
 
@@ -100,6 +110,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "as",
                 "parameters" : [
 
@@ -111,6 +126,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "try",
                 "parameters" : [
 
@@ -218,6 +238,11 @@
             "jsName" : "$Weird",
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "jsName" : "method-with-dashes",
                 "name" : "method_with_dashes",
                 "parameters" : [

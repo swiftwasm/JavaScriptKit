@@ -2067,7 +2067,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         let valueType: BridgeType
     }
 
-    /// Validates effects (throws required, async not supported)
+    /// Validates effects (throws required, async only supported for @JSFunction)
     private func validateEffects(
         _ effects: FunctionEffectSpecifiersSyntax?,
         node: some SyntaxProtocol,
@@ -2083,7 +2083,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             )
             return nil
         }
-        if effects.isAsync {
+        if effects.isAsync && attributeName != "JSFunction" {
             errors.append(
                 DiagnosticError(
                     node: node,
@@ -2420,7 +2420,12 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         _ jsFunction: AttributeSyntax,
         _ node: FunctionDeclSyntax,
     ) -> ImportedFunctionSkeleton? {
-        guard validateEffects(node.signature.effectSpecifiers, node: node, attributeName: "JSFunction") != nil
+        guard
+            let effects = validateEffects(
+                node.signature.effectSpecifiers,
+                node: node,
+                attributeName: "JSFunction"
+            )
         else {
             return nil
         }
@@ -2446,6 +2451,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             from: from,
             parameters: parameters,
             returnType: returnType,
+            effects: effects,
             documentation: nil
         )
     }

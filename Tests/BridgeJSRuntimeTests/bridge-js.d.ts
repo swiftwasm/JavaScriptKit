@@ -26,6 +26,12 @@ export class JsGreeter {
 
 export function runAsyncWorks(): Promise<void>;
 
+// Async round-trip tests
+export function jsAsyncRoundTripVoid(): Promise<void>;
+export function jsAsyncRoundTripNumber(v: number): Promise<number>;
+export function jsAsyncRoundTripBool(v: boolean): Promise<boolean>;
+export function jsAsyncRoundTripString(v: string): Promise<string>;
+
 // jsName tests
 export function $jsWeirdFunction(): number;
 
