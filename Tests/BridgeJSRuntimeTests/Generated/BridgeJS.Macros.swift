@@ -51,6 +51,17 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
 
 @JSFunction func jsAsyncRoundTripString(_ v: String) async throws(JSException) -> String
 
+@JSFunction func fetchWeatherData(_ city: String) async throws(JSException) -> WeatherData
+
+@JSClass struct WeatherData {
+    @JSGetter var temperature: Double
+    @JSSetter func setTemperature(_ value: Double) throws(JSException)
+    @JSGetter var description: String
+    @JSSetter func setDescription(_ value: String) throws(JSException)
+    @JSGetter var humidity: Double
+    @JSSetter func setHumidity(_ value: Double) throws(JSException)
+}
+
 @JSFunction(jsName: "$jsWeirdFunction") func _jsWeirdFunction() throws(JSException) -> Double
 
 @JSClass(jsName: "$WeirdClass") struct _WeirdClass {

@@ -301,8 +301,12 @@ public struct ImportTS {
                     liftExpr = "resolved.string!"
                 case .bool:
                     liftExpr = "resolved.boolean!"
-                case .jsObject:
-                    liftExpr = "resolved.object!"
+                case .jsObject(let name):
+                    if let name {
+                        liftExpr = "\(name)(unsafelyWrapping: resolved.object!)"
+                    } else {
+                        liftExpr = "resolved.object!"
+                    }
                 case .jsValue:
                     liftExpr = "resolved"
                 default:

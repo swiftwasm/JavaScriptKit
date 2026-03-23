@@ -32,6 +32,14 @@ export function jsAsyncRoundTripNumber(v: number): Promise<number>;
 export function jsAsyncRoundTripBool(v: boolean): Promise<boolean>;
 export function jsAsyncRoundTripString(v: string): Promise<string>;
 
+// Async fetch-like test with structured return type
+export interface WeatherData {
+    temperature: number;
+    description: string;
+    humidity: number;
+}
+export function fetchWeatherData(city: string): Promise<WeatherData>;
+
 // jsName tests
 export function $jsWeirdFunction(): number;
 
