@@ -1,5 +1,5 @@
 import JavaScriptKit
-#if compiler(>=6.3)
+#if compiler(>=6.4) || (swift(>=6.3) && arch(wasm32))
 @_spi(ExperimentalCustomExecutors) import _Concurrency
 #else
 import _Concurrency
@@ -123,9 +123,9 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     private static func installGlobalExecutorIsolated() {
         guard !didInstallGlobalExecutor else { return }
         didInstallGlobalExecutor = true
-        #if compiler(>=6.3) && !hasFeature(Embedded)
+        #if (compiler(>=6.4) || (swift(>=6.3) && arch(wasm32))) && !hasFeature(Embedded)
         if #available(macOS 9999, iOS 9999, watchOS 9999, tvOS 9999, visionOS 9999, *) {
-            // For Swift 6.3 and above, we can use the new `ExecutorFactory` API
+            // For Swift 6.4 and above, we can use the new `ExecutorFactory` API
             _Concurrency._createExecutors(factory: JavaScriptEventLoop.self)
         }
         #else
