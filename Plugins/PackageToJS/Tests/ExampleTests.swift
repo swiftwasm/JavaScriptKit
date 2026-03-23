@@ -368,6 +368,26 @@ extension Trait where Self == ConditionTrait {
     }
     #endif  // compiler(>=6.3)
 
+    #if compiler(>=6.3)
+    @Test(.requireEmbeddedSwiftInSwiftSDK())
+    func embeddedConcurrency() throws {
+        let swiftSDKID = try #require(Self.getEmbeddedSwiftSDKID())
+        try withPackage(at: "Plugins/PackageToJS/Fixtures/EmbeddedConcurrency") {
+            packageDir, runProcess, runSwift in
+            try runSwift(
+                ["package", "--swift-sdk", swiftSDKID, "js", "--default-platform", "node"],
+                [:]
+            )
+            try runProcess(
+                which("npm"),
+                ["-C", ".build/plugins/PackageToJS/outputs/Package", "install"],
+                [:]
+            )
+            try runProcess(which("node"), ["run.mjs"], [:])
+        }
+    }
+    #endif  // compiler(>=6.3)
+
     @Test(.requireSwiftSDK)
     func continuationLeakInTest_XCTest() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
