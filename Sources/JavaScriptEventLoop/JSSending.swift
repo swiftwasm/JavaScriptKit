@@ -226,6 +226,32 @@ extension JSSending {
     /// - Parameter isolation: The actor isolation context for this call, used in Swift concurrency.
     /// - Returns: The received object of type `T`.
     /// - Throws: `JSSendingError` if the sending operation fails, or `JSException` if a JavaScript error occurs.
+    #if compiler(>=6.4)
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    public func receive(
+        isolation: isolated (any Actor)? = #isolation,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) async throws(JSException) -> T {
+        #if _runtime(_multithreaded)
+        let idInDestination = try await withCheckedThrowingContinuation { continuation in
+            let context = _JSSendingContext(continuation: continuation)
+            let idInSource = self.storage.idInSource
+            let transferring = self.storage.transferring ? [idInSource] : []
+            swjs_request_sending_object(
+                idInSource,
+                transferring,
+                Int32(transferring.count),
+                self.storage.sourceTid,
+                Unmanaged.passRetained(context).toOpaque()
+            )
+        }
+        return storage.construct(JSObject(id: idInDestination))
+        #else
+        return storage.construct(storage.sourceObject)
+        #endif
+    }
+    #else
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public func receive(
         isolation: isolated (any Actor)? = #isolation,
@@ -250,6 +276,7 @@ extension JSSending {
         return storage.construct(storage.sourceObject)
         #endif
     }
+    #endif
 
     // 6.0 and below can't compile the following without a compiler crash.
     #if compiler(>=6.1)
@@ -341,11 +368,19 @@ extension JSSending {
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 private final class _JSSendingContext: Sendable {
+    #if compiler(>=6.4)
+    let continuation: CheckedContinuation<JavaScriptObjectRef, JSException>
+
+    init(continuation: CheckedContinuation<JavaScriptObjectRef, JSException>) {
+        self.continuation = continuation
+    }
+    #else
     let continuation: CheckedContinuation<JavaScriptObjectRef, Error>
 
     init(continuation: CheckedContinuation<JavaScriptObjectRef, Error>) {
         self.continuation = continuation
     }
+    #endif
 }
 
 /// Error type representing failures during JavaScript object sending operations.

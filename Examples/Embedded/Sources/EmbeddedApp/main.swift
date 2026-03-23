@@ -3,7 +3,7 @@ import JavaScriptKit
 let alert = JSObject.global.alert.object!
 let document = JSObject.global.document
 
-print("Hello from WASM, document title: \(document.title.string ?? "")")
+print("Hello from Wasm, document title: \(document.title.string ?? "")")
 
 var count = 0
 
