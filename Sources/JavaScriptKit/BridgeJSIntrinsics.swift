@@ -4,6 +4,7 @@
 /// by the BridgeJS system.
 
 import _CJavaScriptKit
+import _Concurrency
 
 #if !arch(wasm32)
 @usableFromInline func _onlyAvailableOnWasm() -> Never {
