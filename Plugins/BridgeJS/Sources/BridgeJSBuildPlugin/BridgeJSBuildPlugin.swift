@@ -20,9 +20,11 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
 
     private func createGenerateCommand(context: PluginContext, target: SwiftSourceModuleTarget) throws -> Command {
         let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.swift")
+        let outputMacrosSwiftPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.Macros.swift")
 
         let inputSwiftFiles = target.sourceFiles.filter {
-            !$0.url.path.hasPrefix(context.pluginWorkDirectoryURL.path + "/")
+            $0.url.pathExtension == "swift"
+                && !$0.url.path.hasPrefix(context.pluginWorkDirectoryURL.path + "/")
         }
         .map(\.url)
 
@@ -42,6 +44,7 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
         inputFiles.append(contentsOf: pluginGeneratedSwiftFiles)
 
         let inputTSFile = target.directoryURL.appending(path: "bridge-js.d.ts")
+        let inputGlobalTSFile = target.directoryURL.appending(path: "bridge-js.global.d.ts")
         let tsconfigPath = context.package.directoryURL.appending(path: "tsconfig.json")
 
         var arguments: [String] = [
@@ -55,8 +58,16 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
             "--always-write", "true",
         ]
 
-        if FileManager.default.fileExists(atPath: inputTSFile.path) {
-            inputFiles.append(contentsOf: [inputTSFile, tsconfigPath])
+        let hasDts = FileManager.default.fileExists(atPath: inputTSFile.path)
+        let hasGlobalDts = FileManager.default.fileExists(atPath: inputGlobalTSFile.path)
+        if hasDts || hasGlobalDts {
+            if hasDts {
+                inputFiles.append(inputTSFile)
+            }
+            if hasGlobalDts {
+                inputFiles.append(inputGlobalTSFile)
+            }
+            inputFiles.append(tsconfigPath)
             arguments.append(contentsOf: [
                 "--project",
                 tsconfigPath.path,
@@ -71,7 +82,7 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
             executable: try context.tool(named: "BridgeJSTool").url,
             arguments: arguments,
             inputFiles: inputFiles,
-            outputFiles: [outputSwiftPath]
+            outputFiles: [outputSwiftPath, outputMacrosSwiftPath]
         )
     }
 }

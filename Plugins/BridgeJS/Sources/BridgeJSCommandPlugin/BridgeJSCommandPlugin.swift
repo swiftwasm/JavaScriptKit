@@ -103,6 +103,7 @@ extension BridgeJSCommandPlugin.Context {
         let generatedDirectory = target.directoryURL.appending(path: "Generated")
 
         let bridgeDtsPath = target.directoryURL.appending(path: "bridge-js.d.ts")
+        let bridgeGlobalDtsPath = target.directoryURL.appending(path: "bridge-js.global.d.ts")
         let tsconfigPath = context.package.directoryURL.appending(path: "tsconfig.json")
 
         // Unified generate command
@@ -118,12 +119,16 @@ extension BridgeJSCommandPlugin.Context {
             options.verbose ? "true" : "false",
         ]
 
-        if FileManager.default.fileExists(atPath: bridgeDtsPath.path) {
+        let hasDts = FileManager.default.fileExists(atPath: bridgeDtsPath.path)
+        let hasGlobalDts = FileManager.default.fileExists(atPath: bridgeGlobalDtsPath.path)
+        if hasDts || hasGlobalDts {
             generateArguments.append(contentsOf: [
                 "--project",
                 tsconfigPath.path,
-                bridgeDtsPath.path,
             ])
+            if hasDts {
+                generateArguments.append(bridgeDtsPath.path)
+            }
         }
 
         generateArguments.append(
