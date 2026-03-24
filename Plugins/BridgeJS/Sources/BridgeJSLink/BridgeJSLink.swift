@@ -135,6 +135,7 @@ public struct BridgeJSLink {
         var importObjectBuilders: [ImportObjectBuilder] = []
         var enumStaticAssignments: [String] = []
         var needsImportsObject: Bool = false
+        var hasAsyncImports: Bool = false
     }
 
     private func collectLinkData() throws -> LinkData {
@@ -237,11 +238,18 @@ public struct BridgeJSLink {
                     if function.from == nil {
                         data.needsImportsObject = true
                     }
+                    if function.effects.isAsync {
+                        data.hasAsyncImports = true
+                    }
                     try renderImportedFunction(importObjectBuilder: importObjectBuilder, function: function)
                 }
                 for type in fileSkeleton.types {
                     if type.constructor != nil, type.from == nil {
                         data.needsImportsObject = true
+                    }
+                    // Check for async methods in imported types
+                    for method in type.methods where method.effects.isAsync {
+                        data.hasAsyncImports = true
                     }
                     try renderImportedType(importObjectBuilder: importObjectBuilder, type: type)
                 }
@@ -311,6 +319,85 @@ public struct BridgeJSLink {
             "",
             "let _exports = null;",
             "let bjs = null;",
+        ]
+    }
+
+    /// Generates helper functions for the continuation-pointer pattern used by async imports.
+    ///
+    /// These encode a JS value as `(kind, payload1, payload2)` matching the `RawJSValue`
+    /// encoding from `_CJavaScriptKit.h`, then call the appropriate Wasm export to resume
+    /// the Swift continuation.
+    private func generatePromiseContinuationHelpers() -> [String] {
+        let printer = CodeFragmentPrinter()
+        // Helper to encode a JS value into (kind, payload1, payload2) and call the resolve export
+        printer.write("function bjs_resolvePromiseContinuation(ptr, value) {")
+        printer.indent {
+            printer.write(lines: generateJSValueEncoding(variableName: "value"))
+            printer.write(
+                "\(JSGlueVariableScope.reservedInstance).exports.bjs_resolve_promise_continuation(ptr, kind, payload1, payload2);"
+            )
+        }
+        printer.write("}")
+        // Helper to encode a JS value into (kind, payload1, payload2) and call the reject export
+        printer.write("function bjs_rejectPromiseContinuation(ptr, error) {")
+        printer.indent {
+            printer.write(lines: generateJSValueEncoding(variableName: "error"))
+            printer.write(
+                "\(JSGlueVariableScope.reservedInstance).exports.bjs_reject_promise_continuation(ptr, kind, payload1, payload2);"
+            )
+        }
+        printer.write("}")
+        return printer.lines
+    }
+
+    /// Generates JS code that encodes a variable into `(kind, payload1, payload2)`.
+    ///
+    /// The encoding matches `JavaScriptValueKind` from `_CJavaScriptKit.h`:
+    /// - Boolean(0): payload1 = 1 or 0
+    /// - String(1): payload1 = retained object ID
+    /// - Number(2): payload2 = the number
+    /// - Object(3): payload1 = retained object ID
+    /// - Null(4): no payload
+    /// - Undefined(5): no payload
+    /// - Symbol(7): payload1 = retained object ID
+    /// - BigInt(8): payload1 = retained object ID
+    private func generateJSValueEncoding(variableName: String) -> [String] {
+        let s = JSGlueVariableScope.reservedSwift
+        return [
+            "let kind, payload1 = 0, payload2 = 0;",
+            "if (\(variableName) === null) {",
+            "    kind = 4;",
+            "} else if (\(variableName) === undefined) {",
+            "    kind = 5;",
+            "} else {",
+            "    const type = typeof \(variableName);",
+            "    switch (type) {",
+            "        case \"boolean\":",
+            "            kind = 0;",
+            "            payload1 = \(variableName) ? 1 : 0;",
+            "            break;",
+            "        case \"number\":",
+            "            kind = 2;",
+            "            payload2 = \(variableName);",
+            "            break;",
+            "        case \"string\":",
+            "            kind = 1;",
+            "            payload1 = \(s).memory.retain(\(variableName));",
+            "            break;",
+            "        case \"symbol\":",
+            "            kind = 7;",
+            "            payload1 = \(s).memory.retain(\(variableName));",
+            "            break;",
+            "        case \"bigint\":",
+            "            kind = 8;",
+            "            payload1 = \(s).memory.retain(\(variableName));",
+            "            break;",
+            "        default:",
+            "            kind = 3;",
+            "            payload1 = \(s).memory.retain(\(variableName));",
+            "            break;",
+            "    }",
+            "}",
         ]
     }
 
@@ -969,6 +1056,11 @@ public struct BridgeJSLink {
 
         try printer.indent {
             printer.write(lines: generateVariableDeclarations())
+
+            // Generate Promise continuation helpers when async imports exist
+            if data.hasAsyncImports {
+                printer.write(lines: generatePromiseContinuationHelpers())
+            }
 
             let bodyPrinter = CodeFragmentPrinter()
             let allStructs = exportedSkeletons.flatMap { $0.structs }
@@ -2232,6 +2324,46 @@ extension BridgeJSLink {
             return printer.lines
         }
 
+        /// Generates the call expression for an async import.
+        ///
+        /// Instead of lowering the return value, this assigns the result to `promise`
+        /// and attaches `.then`/`.catch` handlers that call the resolve/reject continuations.
+        func callAsync(name: String, fromObjectExpr: String) {
+            let calleeExpr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: name)
+            let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
+            body.write("const promise = \(callExpr);")
+            body.write("promise.then(")
+            body.indent {
+                body.write("(value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },")
+                body.write("(error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }")
+            }
+            body.write(");")
+        }
+
+        /// Renders an async import function with continuation-pointer pattern.
+        ///
+        /// The generated function takes `continuationPtr` as the first parameter,
+        /// wraps the import call in try/catch, attaches Promise handlers, and
+        /// calls reject continuation on synchronous errors.
+        func renderAsyncFunction(name: String?) -> [String] {
+            let printer = CodeFragmentPrinter()
+            let allParams = ["continuationPtr"] + parameterNames
+            printer.write("function\(name.map { " \($0)" } ?? "")(\(allParams.joined(separator: ", "))) {")
+            printer.indent {
+                printer.write("try {")
+                printer.indent {
+                    printer.write(contentsOf: body)
+                }
+                printer.write("} catch (error) {")
+                printer.indent {
+                    printer.write("bjs_rejectPromiseContinuation(continuationPtr, error);")
+                }
+                printer.write("}")
+            }
+            printer.write("}")
+            return printer.lines
+        }
+
         func call(name: String, fromObjectExpr: String, returnType: BridgeType) throws -> String? {
             let calleeExpr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: name)
             return try self.call(calleeExpr: calleeExpr, returnType: returnType)
@@ -2283,6 +2415,20 @@ extension BridgeJSLink {
                 calleeExpr: calleeExpr,
                 returnType: returnType
             )
+        }
+
+        /// Generates an async method call with continuation-pointer pattern.
+        func callAsyncMethod(name: String) {
+            let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
+            let calleeExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
+            let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
+            body.write("const promise = \(callExpr);")
+            body.write("promise.then(")
+            body.indent {
+                body.write("(value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },")
+                body.write("(error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }")
+            }
+            body.write(");")
         }
 
         func callStaticMethod(on objectExpr: String, name: String, returnType: BridgeType) throws -> String? {
@@ -3124,19 +3270,27 @@ extension BridgeJSLink {
         }
         let jsName = function.jsName ?? function.name
         let importRootExpr = function.from == .global ? "globalThis" : "imports"
-        // For async functions, the JS handler returns the Promise as a jsObject.
-        // The Swift side handles awaiting and lifting the resolved value.
-        let abiReturnType: BridgeType = function.effects.isAsync ? .jsObject(nil) : function.returnType
-        let returnExpr = try thunkBuilder.call(
-            name: jsName,
-            fromObjectExpr: importRootExpr,
-            returnType: abiReturnType
-        )
-        let funcLines = thunkBuilder.renderFunction(
-            name: function.abiName(context: nil),
-            returnExpr: returnExpr,
-            returnType: abiReturnType
-        )
+
+        let funcLines: [String]
+        if function.effects.isAsync {
+            // For async functions, use the continuation-pointer pattern.
+            // The generated function takes continuationPtr as first param,
+            // calls the import, attaches .then/.catch on the returned Promise,
+            // and calls resolve/reject continuations.
+            thunkBuilder.callAsync(name: jsName, fromObjectExpr: importRootExpr)
+            funcLines = thunkBuilder.renderAsyncFunction(name: function.abiName(context: nil))
+        } else {
+            let returnExpr = try thunkBuilder.call(
+                name: jsName,
+                fromObjectExpr: importRootExpr,
+                returnType: function.returnType
+            )
+            funcLines = thunkBuilder.renderFunction(
+                name: function.abiName(context: nil),
+                returnExpr: returnExpr,
+                returnType: function.returnType
+            )
+        }
         if function.from == nil {
             importObjectBuilder.appendDts(
                 [
@@ -3339,13 +3493,19 @@ extension BridgeJSLink {
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let abiReturnType: BridgeType = method.effects.isAsync ? .jsObject(nil) : method.returnType
-        let returnExpr = try thunkBuilder.callMethod(name: method.jsName ?? method.name, returnType: abiReturnType)
-        let funcLines = thunkBuilder.renderFunction(
-            name: method.abiName(context: context),
-            returnExpr: returnExpr,
-            returnType: abiReturnType
-        )
+
+        let funcLines: [String]
+        if method.effects.isAsync {
+            thunkBuilder.callAsyncMethod(name: method.jsName ?? method.name)
+            funcLines = thunkBuilder.renderAsyncFunction(name: method.abiName(context: context))
+        } else {
+            let returnExpr = try thunkBuilder.callMethod(name: method.jsName ?? method.name, returnType: method.returnType)
+            funcLines = thunkBuilder.renderFunction(
+                name: method.abiName(context: context),
+                returnExpr: returnExpr,
+                returnType: method.returnType
+            )
+        }
         return (funcLines, [])
     }
 

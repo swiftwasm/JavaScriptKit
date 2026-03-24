@@ -30,6 +30,80 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    function bjs_resolvePromiseContinuation(ptr, value) {
+        let kind, payload1 = 0, payload2 = 0;
+        if (value === null) {
+            kind = 4;
+        } else if (value === undefined) {
+            kind = 5;
+        } else {
+            const type = typeof value;
+            switch (type) {
+                case "boolean":
+                    kind = 0;
+                    payload1 = value ? 1 : 0;
+                    break;
+                case "number":
+                    kind = 2;
+                    payload2 = value;
+                    break;
+                case "string":
+                    kind = 1;
+                    payload1 = swift.memory.retain(value);
+                    break;
+                case "symbol":
+                    kind = 7;
+                    payload1 = swift.memory.retain(value);
+                    break;
+                case "bigint":
+                    kind = 8;
+                    payload1 = swift.memory.retain(value);
+                    break;
+                default:
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    break;
+            }
+        }
+        instance.exports.bjs_resolve_promise_continuation(ptr, kind, payload1, payload2);
+    }
+    function bjs_rejectPromiseContinuation(ptr, error) {
+        let kind, payload1 = 0, payload2 = 0;
+        if (error === null) {
+            kind = 4;
+        } else if (error === undefined) {
+            kind = 5;
+        } else {
+            const type = typeof error;
+            switch (type) {
+                case "boolean":
+                    kind = 0;
+                    payload1 = error ? 1 : 0;
+                    break;
+                case "number":
+                    kind = 2;
+                    payload2 = error;
+                    break;
+                case "string":
+                    kind = 1;
+                    payload1 = swift.memory.retain(error);
+                    break;
+                case "symbol":
+                    kind = 7;
+                    payload1 = swift.memory.retain(error);
+                    break;
+                case "bigint":
+                    kind = 8;
+                    payload1 = swift.memory.retain(error);
+                    break;
+                default:
+                    kind = 3;
+                    payload1 = swift.memory.retain(error);
+                    break;
+            }
+        }
+        instance.exports.bjs_reject_promise_continuation(ptr, kind, payload1, payload2);
+    }
 
     return {
         /**
@@ -190,59 +264,71 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_asyncReturnVoid"] = function bjs_asyncReturnVoid() {
+            TestModule["bjs_asyncReturnVoid"] = function bjs_asyncReturnVoid(continuationPtr) {
                 try {
-                    let ret = imports.asyncReturnVoid();
-                    return swift.memory.retain(ret);
+                    const promise = imports.asyncReturnVoid();
+                    promise.then(
+                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
+                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
+                    );
                 } catch (error) {
-                    setException(error);
-                    return 0
+                    bjs_rejectPromiseContinuation(continuationPtr, error);
                 }
             }
-            TestModule["bjs_asyncRoundTripInt"] = function bjs_asyncRoundTripInt(v) {
+            TestModule["bjs_asyncRoundTripInt"] = function bjs_asyncRoundTripInt(continuationPtr, v) {
                 try {
-                    let ret = imports.asyncRoundTripInt(v);
-                    return swift.memory.retain(ret);
+                    const promise = imports.asyncRoundTripInt(v);
+                    promise.then(
+                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
+                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
+                    );
                 } catch (error) {
-                    setException(error);
-                    return 0
+                    bjs_rejectPromiseContinuation(continuationPtr, error);
                 }
             }
-            TestModule["bjs_asyncRoundTripString"] = function bjs_asyncRoundTripString(vBytes, vCount) {
+            TestModule["bjs_asyncRoundTripString"] = function bjs_asyncRoundTripString(continuationPtr, vBytes, vCount) {
                 try {
                     const string = decodeString(vBytes, vCount);
-                    let ret = imports.asyncRoundTripString(string);
-                    return swift.memory.retain(ret);
+                    const promise = imports.asyncRoundTripString(string);
+                    promise.then(
+                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
+                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
+                    );
                 } catch (error) {
-                    setException(error);
-                    return 0
+                    bjs_rejectPromiseContinuation(continuationPtr, error);
                 }
             }
-            TestModule["bjs_asyncRoundTripBool"] = function bjs_asyncRoundTripBool(v) {
+            TestModule["bjs_asyncRoundTripBool"] = function bjs_asyncRoundTripBool(continuationPtr, v) {
                 try {
-                    let ret = imports.asyncRoundTripBool(v !== 0);
-                    return swift.memory.retain(ret);
+                    const promise = imports.asyncRoundTripBool(v !== 0);
+                    promise.then(
+                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
+                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
+                    );
                 } catch (error) {
-                    setException(error);
-                    return 0
+                    bjs_rejectPromiseContinuation(continuationPtr, error);
                 }
             }
-            TestModule["bjs_asyncRoundTripDouble"] = function bjs_asyncRoundTripDouble(v) {
+            TestModule["bjs_asyncRoundTripDouble"] = function bjs_asyncRoundTripDouble(continuationPtr, v) {
                 try {
-                    let ret = imports.asyncRoundTripDouble(v);
-                    return swift.memory.retain(ret);
+                    const promise = imports.asyncRoundTripDouble(v);
+                    promise.then(
+                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
+                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
+                    );
                 } catch (error) {
-                    setException(error);
-                    return 0
+                    bjs_rejectPromiseContinuation(continuationPtr, error);
                 }
             }
-            TestModule["bjs_asyncRoundTripJSObject"] = function bjs_asyncRoundTripJSObject(v) {
+            TestModule["bjs_asyncRoundTripJSObject"] = function bjs_asyncRoundTripJSObject(continuationPtr, v) {
                 try {
-                    let ret = imports.asyncRoundTripJSObject(swift.memory.getObject(v));
-                    return swift.memory.retain(ret);
+                    const promise = imports.asyncRoundTripJSObject(swift.memory.getObject(v));
+                    promise.then(
+                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
+                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
+                    );
                 } catch (error) {
-                    setException(error);
-                    return 0
+                    bjs_rejectPromiseContinuation(continuationPtr, error);
                 }
             }
         },

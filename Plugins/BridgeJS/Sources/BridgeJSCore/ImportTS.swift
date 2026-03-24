@@ -212,7 +212,16 @@ public struct ImportTS {
             }
         }
 
-        func call() throws {
+        /// Prepends a `continuationPtr: Int32` parameter to the ABI parameter list.
+        ///
+        /// Used for async imports where the JS side needs the continuation pointer
+        /// to resolve/reject the Promise.
+        func prependContinuationPtr() {
+            abiParameterSignatures.insert(("continuationPtr", .i32), at: 0)
+            abiParameterForwardings.insert("continuationPtr", at: 0)
+        }
+
+        func call(skipExceptionCheck: Bool = false) throws {
             for stmt in stackLoweringStmts {
                 body.write(stmt.description)
             }
@@ -243,8 +252,9 @@ public struct ImportTS {
                 }
             }
 
-            // Add exception check for ImportTS context
-            if context == .importTS {
+            // Add exception check for ImportTS context (skipped for async, where
+            // errors are funneled through the JS-side reject path)
+            if !skipExceptionCheck && context == .importTS {
                 body.write("if let error = _swift_js_take_exception() { throw error }")
             }
         }
@@ -279,16 +289,27 @@ public struct ImportTS {
         }
 
         func liftAsyncReturnValue(originalReturnType: BridgeType) {
-            // For async imports, the extern function returns a Promise object ID (i32).
-            // We wrap it in JSPromise, await the resolved value, then lift to the target type.
-            abiReturnType = .i32
-            body.write(
-                "let promise = JSPromise(unsafelyWrapping: JSObject(id: UInt32(bitPattern: ret)))"
-            )
+            // For async imports, we use the continuation-pointer pattern.
+            // The extern function takes a leading `continuationPtr: Int32` and returns void.
+            // The JS side attaches .then/.catch handlers and calls back into Wasm
+            // via bjs_resolve_promise_continuation / bjs_reject_promise_continuation.
+            abiReturnType = nil
+
+            // Wrap the existing body (parameter lowering + extern call) in _bjs_awaitPromise
+            let innerBody = body
+            body = CodeFragmentPrinter()
+
             if originalReturnType == .void {
-                body.write("_ = try await promise.value")
+                body.write("_ = try await _bjs_awaitPromise { continuationPtr in")
             } else {
-                body.write("let resolved = try await promise.value")
+                body.write("let resolved = try await _bjs_awaitPromise { continuationPtr in")
+            }
+            body.indent {
+                body.write(lines: innerBody.lines)
+            }
+            body.write("}")
+
+            if originalReturnType != .void {
                 let liftExpr: String
                 switch originalReturnType {
                 case .double:
@@ -401,18 +422,21 @@ public struct ImportTS {
         _ function: ImportedFunctionSkeleton,
         topLevelDecls: inout [DeclSyntax]
     ) throws -> [DeclSyntax] {
-        // For async functions, the ABI return type is always jsObject (the Promise).
-        // We tell CallJSEmission that the return type is jsObject so it captures the return value.
-        let abiReturnType: BridgeType = function.effects.isAsync ? .jsObject(nil) : function.returnType
+        // For async functions, the extern returns void (the JS side resolves/rejects
+        // via continuation callbacks). For sync functions, use the actual return type.
+        let abiReturnType: BridgeType = function.effects.isAsync ? .void : function.returnType
         let builder = try CallJSEmission(
             moduleName: moduleName,
             abiName: function.abiName(context: nil),
             returnType: abiReturnType
         )
+        if function.effects.isAsync {
+            builder.prependContinuationPtr()
+        }
         for param in function.parameters {
             try builder.lowerParameter(param: param)
         }
-        try builder.call()
+        try builder.call(skipExceptionCheck: function.effects.isAsync)
         if function.effects.isAsync {
             builder.liftAsyncReturnValue(originalReturnType: function.returnType)
         } else {
@@ -435,17 +459,20 @@ public struct ImportTS {
         var decls: [DeclSyntax] = []
 
         func renderMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
-            let abiReturnType: BridgeType = method.effects.isAsync ? .jsObject(nil) : method.returnType
+            let abiReturnType: BridgeType = method.effects.isAsync ? .void : method.returnType
             let builder = try CallJSEmission(
                 moduleName: moduleName,
                 abiName: method.abiName(context: type),
                 returnType: abiReturnType
             )
+            if method.effects.isAsync {
+                builder.prependContinuationPtr()
+            }
             try builder.lowerParameter(param: selfParameter)
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
-            try builder.call()
+            try builder.call(skipExceptionCheck: method.effects.isAsync)
             if method.effects.isAsync {
                 builder.liftAsyncReturnValue(originalReturnType: method.returnType)
             } else {
