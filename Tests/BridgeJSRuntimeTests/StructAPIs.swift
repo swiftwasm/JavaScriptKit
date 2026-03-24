@@ -174,6 +174,34 @@ import JavaScriptKit
     }
 }
 
+extension DataPoint {
+    @JS static func origin() -> DataPoint {
+        return DataPoint(x: 0, y: 0, label: "origin", optCount: nil, optFlag: nil)
+    }
+
+    @JS static var dimensions: Int { 2 }
+}
+
+@JS struct Vector2D {
+    var dx: Double
+    var dy: Double
+
+    @JS init(dx: Double, dy: Double) {
+        self.dx = dx
+        self.dy = dy
+    }
+}
+
+extension Vector2D {
+    @JS func magnitude() -> Double {
+        return (dx * dx + dy * dy).squareRoot()
+    }
+
+    @JS func scaled(by factor: Double) -> Vector2D {
+        return Vector2D(dx: dx * factor, dy: dy * factor)
+    }
+}
+
 @JS func roundTripDataPoint(_ data: DataPoint) -> DataPoint {
     return data
 }

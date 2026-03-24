@@ -214,7 +214,28 @@
           ]
         },
         "methods" : [
+          {
+            "abiName" : "bjs_DataPoint_static_origin",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "origin",
+            "parameters" : [
 
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "DataPoint"
+              }
+            },
+            "staticContext" : {
+              "structName" : {
+                "_0" : "DataPoint"
+              }
+            }
+          }
         ],
         "name" : "DataPoint",
         "properties" : [
@@ -278,6 +299,24 @@
                   }
                 },
                 "_1" : "null"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "dimensions",
+            "staticContext" : {
+              "structName" : {
+                "_0" : "DataPoint"
+              }
+            },
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -600,6 +639,76 @@
           }
         ],
         "swiftCallName" : "Container"
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_Vector2D_magnitude",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "magnitude",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Vector2D_scaled",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "scaled",
+            "parameters" : [
+              {
+                "label" : "by",
+                "name" : "factor",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Vector2D"
+              }
+            }
+          }
+        ],
+        "name" : "Vector2D",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "dx",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "dy",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Vector2D"
       }
     ]
   },

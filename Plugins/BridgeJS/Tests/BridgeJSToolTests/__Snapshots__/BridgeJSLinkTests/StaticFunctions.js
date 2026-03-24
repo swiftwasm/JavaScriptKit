@@ -304,6 +304,14 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_MathUtils_multiply(this.pointer, x, y);
                     return ret;
                 }
+                static divide(a, b) {
+                    const ret = instance.exports.bjs_MathUtils_static_divide(a, b);
+                    return ret;
+                }
+                static get pi() {
+                    const ret = instance.exports.bjs_MathUtils_static_pi_get();
+                    return ret;
+                }
             }
             const APIResultHelpers = __bjs_createAPIResultValuesHelpers();
             enumHelpers.APIResult = APIResultHelpers;
@@ -314,6 +322,16 @@ export async function createInstantiator(options, swift) {
                     ...CalculatorValues,
                     square: function(value) {
                         const ret = instance.exports.bjs_Calculator_static_square(value);
+                        return ret;
+                    },
+                    cube: function(value) {
+                        const ret = instance.exports.bjs_Calculator_static_cube(value);
+                        return ret;
+                    },
+                    get version() {
+                        instance.exports.bjs_Calculator_static_version_get();
+                        const ret = tmpRetString;
+                        tmpRetString = undefined;
                         return ret;
                     }
                 },
