@@ -298,7 +298,9 @@ public struct ImportTS {
             body = CodeFragmentPrinter()
 
             if originalReturnType == .void {
-                body.write("_ = try await _bjs_awaitPromise(makeClosure: { JSTypedClosure($0) }) { resolveRef, rejectRef in")
+                body.write(
+                    "_ = try await _bjs_awaitPromise(makeClosure: { JSTypedClosure($0) }) { resolveRef, rejectRef in"
+                )
             } else {
                 body.write(
                     "let resolved = try await _bjs_awaitPromise(makeClosure: { JSTypedClosure($0) }) { resolveRef, rejectRef in"

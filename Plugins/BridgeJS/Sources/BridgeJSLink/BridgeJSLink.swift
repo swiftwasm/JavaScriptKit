@@ -3419,7 +3419,10 @@ extension BridgeJSLink {
             thunkBuilder.callAsyncMethod(name: method.jsName ?? method.name)
             funcLines = thunkBuilder.renderAsyncFunction(name: method.abiName(context: context))
         } else {
-            let returnExpr = try thunkBuilder.callMethod(name: method.jsName ?? method.name, returnType: method.returnType)
+            let returnExpr = try thunkBuilder.callMethod(
+                name: method.jsName ?? method.name,
+                returnType: method.returnType
+            )
             funcLines = thunkBuilder.renderFunction(
                 name: method.abiName(context: context),
                 returnExpr: returnExpr,
