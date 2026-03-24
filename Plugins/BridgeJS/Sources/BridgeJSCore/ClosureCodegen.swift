@@ -190,24 +190,68 @@ public struct ClosureCodegen {
         walker.walk(skeleton)
         var closureSignatures = walker.visitor.signatures
 
-        // When any async import exists, inject a (JSValue) -> Void closure signature
-        // so the closure infrastructure generates the make/invoke exports needed by
-        // _bjs_awaitPromise's resolve/reject callbacks.
+        // When async imports exist, inject closure signatures for the typed resolve
+        // and reject callbacks used by _bjs_awaitPromise.
+        // - Reject always uses (JSValue) -> Void
+        // - Resolve uses a typed closure matching the return type (or () -> Void for void)
         if let imported = skeleton.imported {
-            let hasAsyncImport = imported.children.contains { file in
-                file.functions.contains(where: { $0.effects.isAsync })
-                    || file.types.contains(where: { type in
-                        type.methods.contains(where: { $0.effects.isAsync })
-                    })
-            }
-            if hasAsyncImport {
-                closureSignatures.insert(
-                    ClosureSignature(
-                        parameters: [.jsValue],
-                        returnType: .void,
-                        moduleName: skeleton.moduleName
+            for file in imported.children {
+                for function in file.functions where function.effects.isAsync {
+                    // Reject callback
+                    closureSignatures.insert(
+                        ClosureSignature(
+                            parameters: [.jsValue],
+                            returnType: .void,
+                            moduleName: skeleton.moduleName
+                        )
                     )
-                )
+                    // Resolve callback (typed per return type)
+                    if function.returnType == .void {
+                        closureSignatures.insert(
+                            ClosureSignature(
+                                parameters: [],
+                                returnType: .void,
+                                moduleName: skeleton.moduleName
+                            )
+                        )
+                    } else {
+                        closureSignatures.insert(
+                            ClosureSignature(
+                                parameters: [function.returnType],
+                                returnType: .void,
+                                moduleName: skeleton.moduleName
+                            )
+                        )
+                    }
+                }
+                for type in file.types {
+                    for method in type.methods where method.effects.isAsync {
+                        closureSignatures.insert(
+                            ClosureSignature(
+                                parameters: [.jsValue],
+                                returnType: .void,
+                                moduleName: skeleton.moduleName
+                            )
+                        )
+                        if method.returnType == .void {
+                            closureSignatures.insert(
+                                ClosureSignature(
+                                    parameters: [],
+                                    returnType: .void,
+                                    moduleName: skeleton.moduleName
+                                )
+                            )
+                        } else {
+                            closureSignatures.insert(
+                                ClosureSignature(
+                                    parameters: [method.returnType],
+                                    returnType: .void,
+                                    moduleName: skeleton.moduleName
+                                )
+                            )
+                        }
+                    }
+                }
             }
         }
 

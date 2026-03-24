@@ -641,22 +641,65 @@ public struct BridgeJSLink {
                     walker.walk(unified)
                     var closureSignatures = walker.visitor.signatures
 
-                    // Inject (JSValue) -> Void closure signature when async imports exist
+                    // Inject closure signatures for async import resolve/reject callbacks
                     if let imported = unified.imported {
-                        let hasAsyncImport = imported.children.contains { file in
-                            file.functions.contains(where: { $0.effects.isAsync })
-                                || file.types.contains(where: { type in
-                                    type.methods.contains(where: { $0.effects.isAsync })
-                                })
-                        }
-                        if hasAsyncImport {
-                            closureSignatures.insert(
-                                ClosureSignature(
-                                    parameters: [.jsValue],
-                                    returnType: .void,
-                                    moduleName: moduleName
+                        for file in imported.children {
+                            for function in file.functions where function.effects.isAsync {
+                                // Reject callback
+                                closureSignatures.insert(
+                                    ClosureSignature(
+                                        parameters: [.jsValue],
+                                        returnType: .void,
+                                        moduleName: moduleName
+                                    )
                                 )
-                            )
+                                // Resolve callback (typed per return type)
+                                if function.returnType == .void {
+                                    closureSignatures.insert(
+                                        ClosureSignature(
+                                            parameters: [],
+                                            returnType: .void,
+                                            moduleName: moduleName
+                                        )
+                                    )
+                                } else {
+                                    closureSignatures.insert(
+                                        ClosureSignature(
+                                            parameters: [function.returnType],
+                                            returnType: .void,
+                                            moduleName: moduleName
+                                        )
+                                    )
+                                }
+                            }
+                            for type in file.types {
+                                for method in type.methods where method.effects.isAsync {
+                                    closureSignatures.insert(
+                                        ClosureSignature(
+                                            parameters: [.jsValue],
+                                            returnType: .void,
+                                            moduleName: moduleName
+                                        )
+                                    )
+                                    if method.returnType == .void {
+                                        closureSignatures.insert(
+                                            ClosureSignature(
+                                                parameters: [],
+                                                returnType: .void,
+                                                moduleName: moduleName
+                                            )
+                                        )
+                                    } else {
+                                        closureSignatures.insert(
+                                            ClosureSignature(
+                                                parameters: [method.returnType],
+                                                returnType: .void,
+                                                moduleName: moduleName
+                                            )
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
 

@@ -2087,35 +2087,51 @@ extension _BridgedAsOptional {
 
 // MARK: Async Promise Awaiting
 
-/// Awaits a JavaScript Promise using `JSTypedClosure<(JSValue) -> Void>` callbacks.
+/// Protocol for type-erasing `JSTypedClosure` in `_bjs_awaitPromise`.
 ///
-/// The `makeClosure` factory is dependency-injected because this library cannot
+/// The library cannot name concrete `JSTypedClosure<(Int) -> Void>` etc. because
+/// those require per-module generated convenience inits. This protocol provides
+/// access to the underlying JS object ref and cleanup.
+@_spi(BridgeJS) public protocol _BridgeJSReleasableClosure {
+    var jsObject: JSObject { get }
+    func release()
+}
+
+extension JSTypedClosure: _BridgeJSReleasableClosure {}
+
+/// Awaits a JavaScript Promise using typed resolve/reject `JSTypedClosure` callbacks.
+///
+/// The closure factories are dependency-injected because this library cannot
 /// reference per-module generated `make_swift_closure_*` externs. The generated
-/// code passes `{ JSTypedClosure($0) }` which uses the per-module convenience init.
+/// code passes `{ JSTypedClosure<(T) -> Void>($0) }` which uses the per-module
+/// convenience init.
 ///
 /// - Parameters:
-///   - makeClosure: A factory that wraps a `(JSValue) -> Void` Swift closure
-///     into a `JSTypedClosure`, creating the corresponding JS function.
+///   - makeResolveClosure: A factory that wraps a `(T) -> Void` Swift closure
+///     into a typed `JSTypedClosure`, creating the corresponding JS function.
+///   - makeRejectClosure: A factory that wraps a `(JSValue) -> Void` Swift closure
+///     into a `JSTypedClosure`, for the rejection path.
 ///   - body: A closure that receives the resolve and reject JS object refs
 ///     (as `Int32`) and should pass them to the appropriate JS extern function.
-/// - Returns: The resolved `JSValue` from the Promise.
+/// - Returns: The resolved value of type `T` from the Promise.
 /// - Throws: `JSException` if the Promise rejects.
-@_spi(BridgeJS) public func _bjs_awaitPromise(
-    makeClosure: (@escaping (JSValue) -> Void) -> JSTypedClosure<(JSValue) -> Void>,
+@_spi(BridgeJS) public func _bjs_awaitPromise<T, R: _BridgeJSReleasableClosure, E: _BridgeJSReleasableClosure>(
+    makeResolveClosure: (@escaping (T) -> Void) -> R,
+    makeRejectClosure: (@escaping (JSValue) -> Void) -> E,
     _ body: (_ resolveRef: Int32, _ rejectRef: Int32) -> Void
-) async throws(JSException) -> JSValue {
-    // Wrapper to send JSValue through the continuation.
+) async throws(JSException) -> T {
+    // Wrapper to send the result through the continuation.
     // Safe in WebAssembly's single-threaded environment.
     struct Wrapper: @unchecked Sendable {
-        let result: Result<JSValue, JSException>
+        let result: Result<T, JSException>
     }
-    var resolveClosure: JSTypedClosure<(JSValue) -> Void>?
-    var rejectClosure: JSTypedClosure<(JSValue) -> Void>?
+    var resolveClosure: R?
+    var rejectClosure: E?
     let wrapper: Wrapper = await withUnsafeContinuation { continuation in
-        resolveClosure = makeClosure { value in
+        resolveClosure = makeResolveClosure { value in
             continuation.resume(returning: Wrapper(result: .success(value)))
         }
-        rejectClosure = makeClosure { value in
+        rejectClosure = makeRejectClosure { value in
             continuation.resume(returning: Wrapper(result: .failure(JSException(value))))
         }
         body(
@@ -2126,4 +2142,37 @@ extension _BridgedAsOptional {
     resolveClosure?.release()
     rejectClosure?.release()
     return try wrapper.result.get()
+}
+
+/// Void-returning overload of `_bjs_awaitPromise`.
+///
+/// Needed because `(Void) -> Void` is not the same as `() -> Void` in Swift (SE-0110),
+/// so the generic overload cannot handle void returns.
+@_spi(BridgeJS) public func _bjs_awaitPromise<R: _BridgeJSReleasableClosure, E: _BridgeJSReleasableClosure>(
+    makeResolveClosure: (@escaping () -> Void) -> R,
+    makeRejectClosure: (@escaping (JSValue) -> Void) -> E,
+    _ body: (_ resolveRef: Int32, _ rejectRef: Int32) -> Void
+) async throws(JSException) {
+    struct Wrapper: @unchecked Sendable {
+        let error: JSException?
+    }
+    var resolveClosure: R?
+    var rejectClosure: E?
+    let wrapper: Wrapper = await withUnsafeContinuation { continuation in
+        resolveClosure = makeResolveClosure {
+            continuation.resume(returning: Wrapper(error: nil))
+        }
+        rejectClosure = makeRejectClosure { value in
+            continuation.resume(returning: Wrapper(error: JSException(value)))
+        }
+        body(
+            Int32(bitPattern: resolveClosure!.jsObject.id),
+            Int32(bitPattern: rejectClosure!.jsObject.id)
+        )
+    }
+    resolveClosure?.release()
+    rejectClosure?.release()
+    if let error = wrapper.error {
+        throw error
+    }
 }

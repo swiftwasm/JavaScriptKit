@@ -291,19 +291,26 @@ public struct ImportTS {
         func liftAsyncReturnValue(originalReturnType: BridgeType) {
             // For async imports, the extern function takes leading `resolveRef: Int32, rejectRef: Int32`
             // and returns void. The JS side calls the resolve/reject closures when the Promise settles.
+            // The resolve closure is typed to match the return type, so the ABI conversion is handled
+            // by the existing closure codegen infrastructure — no manual JSValue-to-type switch needed.
             abiReturnType = nil
 
             // Wrap the existing body (parameter lowering + extern call) in _bjs_awaitPromise
             let innerBody = body
             body = CodeFragmentPrinter()
 
+            let rejectFactory = "makeRejectClosure: { JSTypedClosure<(JSValue) -> Void>($0) }"
             if originalReturnType == .void {
+                let resolveFactory = "makeResolveClosure: { JSTypedClosure<() -> Void>($0) }"
                 body.write(
-                    "_ = try await _bjs_awaitPromise(makeClosure: { JSTypedClosure($0) }) { resolveRef, rejectRef in"
+                    "try await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
                 )
             } else {
+                let resolveSwiftType = originalReturnType.closureSwiftType
+                let resolveFactory =
+                    "makeResolveClosure: { JSTypedClosure<(\(resolveSwiftType)) -> Void>($0) }"
                 body.write(
-                    "let resolved = try await _bjs_awaitPromise(makeClosure: { JSTypedClosure($0) }) { resolveRef, rejectRef in"
+                    "let resolved = try await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
                 )
             }
             body.indent {
@@ -312,30 +319,7 @@ public struct ImportTS {
             body.write("}")
 
             if originalReturnType != .void {
-                let liftExpr: String
-                switch originalReturnType {
-                case .double:
-                    liftExpr = "Double(resolved.number!)"
-                case .float:
-                    liftExpr = "Float(resolved.number!)"
-                case .integer:
-                    liftExpr = "Int(resolved.number!)"
-                case .string:
-                    liftExpr = "resolved.string!"
-                case .bool:
-                    liftExpr = "resolved.boolean!"
-                case .jsObject(let name):
-                    if let name {
-                        liftExpr = "\(name)(unsafelyWrapping: resolved.object!)"
-                    } else {
-                        liftExpr = "resolved.object!"
-                    }
-                case .jsValue:
-                    liftExpr = "resolved"
-                default:
-                    liftExpr = "resolved.object!"
-                }
-                body.write("return \(liftExpr)")
+                body.write("return resolved")
             }
         }
 
