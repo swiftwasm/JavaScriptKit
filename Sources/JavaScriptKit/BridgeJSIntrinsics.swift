@@ -2097,7 +2097,7 @@ extension _BridgedAsOptional {
     func release()
 }
 
-extension JSTypedClosure: _BridgeJSReleasableClosure {}
+@_spi(BridgeJS) extension JSTypedClosure: _BridgeJSReleasableClosure {}
 
 /// Awaits a JavaScript Promise using typed resolve/reject `JSTypedClosure` callbacks.
 ///
@@ -2116,32 +2116,29 @@ extension JSTypedClosure: _BridgeJSReleasableClosure {}
 /// - Returns: The resolved value of type `T` from the Promise.
 /// - Throws: `JSException` if the Promise rejects.
 @_spi(BridgeJS) public func _bjs_awaitPromise<T, R: _BridgeJSReleasableClosure, E: _BridgeJSReleasableClosure>(
-    makeResolveClosure: (@escaping (T) -> Void) -> R,
-    makeRejectClosure: (@escaping (JSValue) -> Void) -> E,
+    makeResolveClosure: (@escaping (sending T) -> Void) -> R,
+    makeRejectClosure: (@escaping (sending JSValue) -> Void) -> E,
     _ body: (_ resolveRef: Int32, _ rejectRef: Int32) -> Void
 ) async throws(JSException) -> T {
-    // Wrapper to send the result through the continuation.
-    // Safe in WebAssembly's single-threaded environment.
-    struct Wrapper: @unchecked Sendable {
-        let result: Result<T, JSException>
-    }
     var resolveClosure: R?
     var rejectClosure: E?
-    let wrapper: Wrapper = await withUnsafeContinuation { continuation in
-        resolveClosure = makeResolveClosure { value in
-            continuation.resume(returning: Wrapper(result: .success(value)))
+    let result: Result<T, JSException> = await withCheckedContinuation { continuation in
+        let resolve = makeResolveClosure { value in
+            continuation.resume(returning: .success(value))
         }
-        rejectClosure = makeRejectClosure { value in
-            continuation.resume(returning: Wrapper(result: .failure(JSException(value))))
+        let reject = makeRejectClosure { value in
+            continuation.resume(returning: .failure(JSException(value)))
         }
+        resolveClosure = resolve
+        rejectClosure = reject
         body(
-            Int32(bitPattern: resolveClosure!.jsObject.id),
-            Int32(bitPattern: rejectClosure!.jsObject.id)
+            Int32(bitPattern: resolve.jsObject.id),
+            Int32(bitPattern: reject.jsObject.id)
         )
     }
     resolveClosure?.release()
     rejectClosure?.release()
-    return try wrapper.result.get()
+    return try result.get()
 }
 
 /// Void-returning overload of `_bjs_awaitPromise`.
@@ -2150,29 +2147,28 @@ extension JSTypedClosure: _BridgeJSReleasableClosure {}
 /// so the generic overload cannot handle void returns.
 @_spi(BridgeJS) public func _bjs_awaitPromise<R: _BridgeJSReleasableClosure, E: _BridgeJSReleasableClosure>(
     makeResolveClosure: (@escaping () -> Void) -> R,
-    makeRejectClosure: (@escaping (JSValue) -> Void) -> E,
+    makeRejectClosure: (@escaping (sending JSValue) -> Void) -> E,
     _ body: (_ resolveRef: Int32, _ rejectRef: Int32) -> Void
 ) async throws(JSException) {
-    struct Wrapper: @unchecked Sendable {
-        let error: JSException?
-    }
     var resolveClosure: R?
     var rejectClosure: E?
-    let wrapper: Wrapper = await withUnsafeContinuation { continuation in
-        resolveClosure = makeResolveClosure {
-            continuation.resume(returning: Wrapper(error: nil))
+    let error: JSException? = await withCheckedContinuation { continuation in
+        let resolve = makeResolveClosure {
+            continuation.resume(returning: nil)
         }
-        rejectClosure = makeRejectClosure { value in
-            continuation.resume(returning: Wrapper(error: JSException(value)))
+        let reject = makeRejectClosure { value in
+            continuation.resume(returning: JSException(value))
         }
+        resolveClosure = resolve
+        rejectClosure = reject
         body(
-            Int32(bitPattern: resolveClosure!.jsObject.id),
-            Int32(bitPattern: rejectClosure!.jsObject.id)
+            Int32(bitPattern: resolve.jsObject.id),
+            Int32(bitPattern: reject.jsObject.id)
         )
     }
     resolveClosure?.release()
     rejectClosure?.release()
-    if let error = wrapper.error {
+    if let error {
         throw error
     }
 }

@@ -12,7 +12,10 @@ public struct ClosureCodegen {
     public init() {}
 
     private func swiftClosureType(for signature: ClosureSignature) -> String {
-        let closureParams = signature.parameters.map { "\($0.closureSwiftType)" }.joined(separator: ", ")
+        let sendingPrefix = signature.sendingParameters ? "sending " : ""
+        let closureParams = signature.parameters.map { "\(sendingPrefix)\($0.closureSwiftType)" }.joined(
+            separator: ", "
+        )
         let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
         let swiftReturnType = signature.returnType.closureSwiftType
         return "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
@@ -192,8 +195,10 @@ public struct ClosureCodegen {
 
         // When async imports exist, inject closure signatures for the typed resolve
         // and reject callbacks used by _bjs_awaitPromise.
-        // - Reject always uses (JSValue) -> Void
+        // - Reject always uses (sending JSValue) -> Void
         // - Resolve uses a typed closure matching the return type (or () -> Void for void)
+        // All async callback closures use `sending` parameters so values can be
+        // transferred through the checked continuation without Sendable constraints.
         if let imported = skeleton.imported {
             for file in imported.children {
                 for function in file.functions where function.effects.isAsync {
@@ -202,7 +207,8 @@ public struct ClosureCodegen {
                         ClosureSignature(
                             parameters: [.jsValue],
                             returnType: .void,
-                            moduleName: skeleton.moduleName
+                            moduleName: skeleton.moduleName,
+                            sendingParameters: true
                         )
                     )
                     // Resolve callback (typed per return type)
@@ -219,7 +225,8 @@ public struct ClosureCodegen {
                             ClosureSignature(
                                 parameters: [function.returnType],
                                 returnType: .void,
-                                moduleName: skeleton.moduleName
+                                moduleName: skeleton.moduleName,
+                                sendingParameters: true
                             )
                         )
                     }
@@ -230,7 +237,8 @@ public struct ClosureCodegen {
                             ClosureSignature(
                                 parameters: [.jsValue],
                                 returnType: .void,
-                                moduleName: skeleton.moduleName
+                                moduleName: skeleton.moduleName,
+                                sendingParameters: true
                             )
                         )
                         if method.returnType == .void {
@@ -246,7 +254,8 @@ public struct ClosureCodegen {
                                 ClosureSignature(
                                     parameters: [method.returnType],
                                     returnType: .void,
-                                    moduleName: skeleton.moduleName
+                                    moduleName: skeleton.moduleName,
+                                    sendingParameters: true
                                 )
                             )
                         }

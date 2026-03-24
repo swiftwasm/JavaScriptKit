@@ -299,7 +299,7 @@ public struct ImportTS {
             let innerBody = body
             body = CodeFragmentPrinter()
 
-            let rejectFactory = "makeRejectClosure: { JSTypedClosure<(JSValue) -> Void>($0) }"
+            let rejectFactory = "makeRejectClosure: { JSTypedClosure<(sending JSValue) -> Void>($0) }"
             if originalReturnType == .void {
                 let resolveFactory = "makeResolveClosure: { JSTypedClosure<() -> Void>($0) }"
                 body.write(
@@ -308,7 +308,7 @@ public struct ImportTS {
             } else {
                 let resolveSwiftType = originalReturnType.closureSwiftType
                 let resolveFactory =
-                    "makeResolveClosure: { JSTypedClosure<(\(resolveSwiftType)) -> Void>($0) }"
+                    "makeResolveClosure: { JSTypedClosure<(sending \(resolveSwiftType)) -> Void>($0) }"
                 body.write(
                     "let resolved = try await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
                 )

@@ -84,7 +84,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -130,7 +131,8 @@
                 "swiftProtocol" : {
                   "_0" : "Renderable"
                 }
-              }
+              },
+              "sendingParameters" : false
             },
             "useJSTypedClosure" : false
           }
@@ -166,7 +168,8 @@
                     "swiftProtocol" : {
                       "_0" : "Renderable"
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -191,7 +194,8 @@
                 "swiftProtocol" : {
                   "_0" : "Renderable"
                 }
-              }
+              },
+              "sendingParameters" : false
             },
             "useJSTypedClosure" : false
           }
@@ -232,7 +236,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }

@@ -101,24 +101,31 @@ public struct ClosureSignature: Codable, Equatable, Hashable, Sendable {
     public let isAsync: Bool
     public let isThrows: Bool
     public let moduleName: String
+    /// When true, closure parameters are annotated with `sending` in Swift.
+    /// Used for async Promise resolve/reject callbacks where values are
+    /// transferred through a continuation.
+    public let sendingParameters: Bool
 
     public init(
         parameters: [BridgeType],
         returnType: BridgeType,
         moduleName: String,
         isAsync: Bool = false,
-        isThrows: Bool = false
+        isThrows: Bool = false,
+        sendingParameters: Bool = false
     ) {
         self.parameters = parameters
         self.returnType = returnType
         self.moduleName = moduleName
         self.isAsync = isAsync
         self.isThrows = isThrows
+        self.sendingParameters = sendingParameters
         let paramPart =
             parameters.isEmpty
             ? "y"
             : parameters.map { $0.mangleTypeName }.joined()
-        let signaturePart = "\(paramPart)_\(returnType.mangleTypeName)"
+        let sendingPart = sendingParameters ? "s" : ""
+        let signaturePart = "\(sendingPart)\(paramPart)_\(returnType.mangleTypeName)"
         self.mangleName = "\(moduleName.count)\(moduleName)\(signaturePart)"
     }
 }

@@ -48,7 +48,8 @@
                             "width" : "word"
                           }
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -108,7 +109,8 @@
                         "width" : "word"
                       }
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }

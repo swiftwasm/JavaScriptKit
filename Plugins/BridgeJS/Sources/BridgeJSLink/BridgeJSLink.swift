@@ -641,7 +641,9 @@ public struct BridgeJSLink {
                     walker.walk(unified)
                     var closureSignatures = walker.visitor.signatures
 
-                    // Inject closure signatures for async import resolve/reject callbacks
+                    // Inject closure signatures for async import resolve/reject callbacks.
+                    // All use sendingParameters: true so values can be transferred
+                    // through checked continuations without Sendable constraints.
                     if let imported = unified.imported {
                         for file in imported.children {
                             for function in file.functions where function.effects.isAsync {
@@ -650,7 +652,8 @@ public struct BridgeJSLink {
                                     ClosureSignature(
                                         parameters: [.jsValue],
                                         returnType: .void,
-                                        moduleName: moduleName
+                                        moduleName: moduleName,
+                                        sendingParameters: true
                                     )
                                 )
                                 // Resolve callback (typed per return type)
@@ -667,7 +670,8 @@ public struct BridgeJSLink {
                                         ClosureSignature(
                                             parameters: [function.returnType],
                                             returnType: .void,
-                                            moduleName: moduleName
+                                            moduleName: moduleName,
+                                            sendingParameters: true
                                         )
                                     )
                                 }
@@ -678,7 +682,8 @@ public struct BridgeJSLink {
                                         ClosureSignature(
                                             parameters: [.jsValue],
                                             returnType: .void,
-                                            moduleName: moduleName
+                                            moduleName: moduleName,
+                                            sendingParameters: true
                                         )
                                     )
                                     if method.returnType == .void {
@@ -694,7 +699,8 @@ public struct BridgeJSLink {
                                             ClosureSignature(
                                                 parameters: [method.returnType],
                                                 returnType: .void,
-                                                moduleName: moduleName
+                                                moduleName: moduleName,
+                                                sendingParameters: true
                                             )
                                         )
                                     }
@@ -2296,20 +2302,18 @@ extension BridgeJSLink {
 
         /// Generates the call expression for an async import.
         ///
-        /// Instead of lowering the return value, this assigns the result to `promise`
-        /// and passes the resolve/reject closure refs to `.then`.
+        /// Chains `.then(resolve, reject)` directly on the returned Promise.
         func callAsync(name: String, fromObjectExpr: String) {
             let calleeExpr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: name)
             let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
-            body.write("const promise = \(callExpr);")
-            body.write("promise.then(resolve, reject);")
+            body.write("\(callExpr).then(resolve, reject);")
         }
 
         /// Renders an async import function with resolve/reject closure refs.
         ///
         /// The generated function takes `resolveRef` and `rejectRef` as the first parameters,
-        /// wraps the import call in try/catch, attaches Promise handlers, and
-        /// calls reject on synchronous errors.
+        /// looks up the resolve/reject closures from memory, and executes the body which
+        /// chains `.then(resolve, reject)` on the import's returned Promise.
         func renderAsyncFunction(name: String?) -> [String] {
             let printer = CodeFragmentPrinter()
             let allParams = ["resolveRef", "rejectRef"] + parameterNames
@@ -2318,15 +2322,7 @@ extension BridgeJSLink {
                 let s = JSGlueVariableScope.reservedSwift
                 printer.write("const resolve = \(s).memory.getObject(resolveRef);")
                 printer.write("const reject = \(s).memory.getObject(rejectRef);")
-                printer.write("try {")
-                printer.indent {
-                    printer.write(contentsOf: body)
-                }
-                printer.write("} catch (error) {")
-                printer.indent {
-                    printer.write("reject(error);")
-                }
-                printer.write("}")
+                printer.write(contentsOf: body)
             }
             printer.write("}")
             return printer.lines
@@ -2390,8 +2386,7 @@ extension BridgeJSLink {
             let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
             let calleeExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
             let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
-            body.write("const promise = \(callExpr);")
-            body.write("promise.then(resolve, reject);")
+            body.write("\(callExpr).then(resolve, reject);")
         }
 
         func callStaticMethod(on objectExpr: String, name: String, returnType: BridgeType) throws -> String? {
