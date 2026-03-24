@@ -188,7 +188,28 @@ public struct ClosureCodegen {
         let collector = ClosureSignatureCollectorVisitor()
         var walker = BridgeTypeWalker(visitor: collector)
         walker.walk(skeleton)
-        let closureSignatures = walker.visitor.signatures
+        var closureSignatures = walker.visitor.signatures
+
+        // When any async import exists, inject a (JSValue) -> Void closure signature
+        // so the closure infrastructure generates the make/invoke exports needed by
+        // _bjs_awaitPromise's resolve/reject callbacks.
+        if let imported = skeleton.imported {
+            let hasAsyncImport = imported.children.contains { file in
+                file.functions.contains(where: { $0.effects.isAsync })
+                    || file.types.contains(where: { type in
+                        type.methods.contains(where: { $0.effects.isAsync })
+                    })
+            }
+            if hasAsyncImport {
+                closureSignatures.insert(
+                    ClosureSignature(
+                        parameters: [.jsValue],
+                        returnType: .void,
+                        moduleName: skeleton.moduleName
+                    )
+                )
+            }
+        }
 
         guard !closureSignatures.isEmpty else { return nil }
 

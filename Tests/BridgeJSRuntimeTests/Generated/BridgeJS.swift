@@ -392,6 +392,67 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7Gr
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y_extern(_ callback: Int32, _ param0Kind: Int32, _ param0Payload1: Int32, _ param0Payload2: Float64) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y_extern(_ callback: Int32, _ param0Kind: Int32, _ param0Payload1: Int32, _ param0Payload2: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y(_ callback: Int32, _ param0Kind: Int32, _ param0Payload1: Int32, _ param0Payload2: Float64) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y_extern(callback, param0Kind, param0Payload1, param0Payload2)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTests7JSValueV_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (JSValue) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let (param0Kind, param0Payload1, param0Payload2) = param0.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y(callbackValue, param0Kind, param0Payload1, param0Payload2)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (JSValue) -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (JSValue) -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7JSValueV_y(_ boxPtr: UnsafeMutableRawPointer, _ param0Kind: Int32, _ param0Payload1: Int32, _ param0Payload2: Float64) -> Void {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(JSValue) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(JSValue.bridgeJSLiftParameter(param0Kind, param0Payload1, param0Payload2))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests8JSObjectC_8JSObjectC_extern(_ callback: Int32, _ param0: Int32) -> Int32
 #else
@@ -11127,96 +11188,106 @@ func _$jsRoundTripFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Featur
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_runAsyncWorks")
-fileprivate func bjs_runAsyncWorks_extern(_ continuationPtr: Int32) -> Void
+fileprivate func bjs_runAsyncWorks_extern(_ resolveRef: Int32, _ rejectRef: Int32) -> Void
 #else
-fileprivate func bjs_runAsyncWorks_extern(_ continuationPtr: Int32) -> Void {
+fileprivate func bjs_runAsyncWorks_extern(_ resolveRef: Int32, _ rejectRef: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_runAsyncWorks(_ continuationPtr: Int32) -> Void {
-    return bjs_runAsyncWorks_extern(continuationPtr)
+@inline(never) fileprivate func bjs_runAsyncWorks(_ resolveRef: Int32, _ rejectRef: Int32) -> Void {
+    return bjs_runAsyncWorks_extern(resolveRef, rejectRef)
 }
 
 func _$runAsyncWorks() async throws(JSException) -> Void {
-    _ = try await _bjs_awaitPromise { continuationPtr in
-        bjs_runAsyncWorks(continuationPtr)
+    _ = try await _bjs_awaitPromise(makeClosure: {
+            JSTypedClosure($0)
+        }) { resolveRef, rejectRef in
+        bjs_runAsyncWorks(resolveRef, rejectRef)
     }
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsAsyncRoundTripVoid")
-fileprivate func bjs_jsAsyncRoundTripVoid_extern(_ continuationPtr: Int32) -> Void
+fileprivate func bjs_jsAsyncRoundTripVoid_extern(_ resolveRef: Int32, _ rejectRef: Int32) -> Void
 #else
-fileprivate func bjs_jsAsyncRoundTripVoid_extern(_ continuationPtr: Int32) -> Void {
+fileprivate func bjs_jsAsyncRoundTripVoid_extern(_ resolveRef: Int32, _ rejectRef: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsAsyncRoundTripVoid(_ continuationPtr: Int32) -> Void {
-    return bjs_jsAsyncRoundTripVoid_extern(continuationPtr)
+@inline(never) fileprivate func bjs_jsAsyncRoundTripVoid(_ resolveRef: Int32, _ rejectRef: Int32) -> Void {
+    return bjs_jsAsyncRoundTripVoid_extern(resolveRef, rejectRef)
 }
 
 func _$jsAsyncRoundTripVoid() async throws(JSException) -> Void {
-    _ = try await _bjs_awaitPromise { continuationPtr in
-        bjs_jsAsyncRoundTripVoid(continuationPtr)
+    _ = try await _bjs_awaitPromise(makeClosure: {
+            JSTypedClosure($0)
+        }) { resolveRef, rejectRef in
+        bjs_jsAsyncRoundTripVoid(resolveRef, rejectRef)
     }
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsAsyncRoundTripNumber")
-fileprivate func bjs_jsAsyncRoundTripNumber_extern(_ continuationPtr: Int32, _ v: Float64) -> Void
+fileprivate func bjs_jsAsyncRoundTripNumber_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Float64) -> Void
 #else
-fileprivate func bjs_jsAsyncRoundTripNumber_extern(_ continuationPtr: Int32, _ v: Float64) -> Void {
+fileprivate func bjs_jsAsyncRoundTripNumber_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Float64) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsAsyncRoundTripNumber(_ continuationPtr: Int32, _ v: Float64) -> Void {
-    return bjs_jsAsyncRoundTripNumber_extern(continuationPtr, v)
+@inline(never) fileprivate func bjs_jsAsyncRoundTripNumber(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Float64) -> Void {
+    return bjs_jsAsyncRoundTripNumber_extern(resolveRef, rejectRef, v)
 }
 
 func _$jsAsyncRoundTripNumber(_ v: Double) async throws(JSException) -> Double {
-    let resolved = try await _bjs_awaitPromise { continuationPtr in
+    let resolved = try await _bjs_awaitPromise(makeClosure: {
+            JSTypedClosure($0)
+        }) { resolveRef, rejectRef in
         let vValue = v.bridgeJSLowerParameter()
-        bjs_jsAsyncRoundTripNumber(continuationPtr, vValue)
+        bjs_jsAsyncRoundTripNumber(resolveRef, rejectRef, vValue)
     }
     return Double(resolved.number!)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsAsyncRoundTripBool")
-fileprivate func bjs_jsAsyncRoundTripBool_extern(_ continuationPtr: Int32, _ v: Int32) -> Void
+fileprivate func bjs_jsAsyncRoundTripBool_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Int32) -> Void
 #else
-fileprivate func bjs_jsAsyncRoundTripBool_extern(_ continuationPtr: Int32, _ v: Int32) -> Void {
+fileprivate func bjs_jsAsyncRoundTripBool_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsAsyncRoundTripBool(_ continuationPtr: Int32, _ v: Int32) -> Void {
-    return bjs_jsAsyncRoundTripBool_extern(continuationPtr, v)
+@inline(never) fileprivate func bjs_jsAsyncRoundTripBool(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Int32) -> Void {
+    return bjs_jsAsyncRoundTripBool_extern(resolveRef, rejectRef, v)
 }
 
 func _$jsAsyncRoundTripBool(_ v: Bool) async throws(JSException) -> Bool {
-    let resolved = try await _bjs_awaitPromise { continuationPtr in
+    let resolved = try await _bjs_awaitPromise(makeClosure: {
+            JSTypedClosure($0)
+        }) { resolveRef, rejectRef in
         let vValue = v.bridgeJSLowerParameter()
-        bjs_jsAsyncRoundTripBool(continuationPtr, vValue)
+        bjs_jsAsyncRoundTripBool(resolveRef, rejectRef, vValue)
     }
     return resolved.boolean!
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsAsyncRoundTripString")
-fileprivate func bjs_jsAsyncRoundTripString_extern(_ continuationPtr: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void
+fileprivate func bjs_jsAsyncRoundTripString_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void
 #else
-fileprivate func bjs_jsAsyncRoundTripString_extern(_ continuationPtr: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+fileprivate func bjs_jsAsyncRoundTripString_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsAsyncRoundTripString(_ continuationPtr: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
-    return bjs_jsAsyncRoundTripString_extern(continuationPtr, vBytes, vLength)
+@inline(never) fileprivate func bjs_jsAsyncRoundTripString(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+    return bjs_jsAsyncRoundTripString_extern(resolveRef, rejectRef, vBytes, vLength)
 }
 
 func _$jsAsyncRoundTripString(_ v: String) async throws(JSException) -> String {
-    let resolved = try await _bjs_awaitPromise { continuationPtr in
+    let resolved = try await _bjs_awaitPromise(makeClosure: {
+            JSTypedClosure($0)
+        }) { resolveRef, rejectRef in
         v.bridgeJSWithLoweredParameter { (vBytes, vLength) in
-            bjs_jsAsyncRoundTripString(continuationPtr, vBytes, vLength)
+            bjs_jsAsyncRoundTripString(resolveRef, rejectRef, vBytes, vLength)
         }
     }
     return resolved.string!
@@ -11224,20 +11295,22 @@ func _$jsAsyncRoundTripString(_ v: String) async throws(JSException) -> String {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_fetchWeatherData")
-fileprivate func bjs_fetchWeatherData_extern(_ continuationPtr: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void
+fileprivate func bjs_fetchWeatherData_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void
 #else
-fileprivate func bjs_fetchWeatherData_extern(_ continuationPtr: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void {
+fileprivate func bjs_fetchWeatherData_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_fetchWeatherData(_ continuationPtr: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void {
-    return bjs_fetchWeatherData_extern(continuationPtr, cityBytes, cityLength)
+@inline(never) fileprivate func bjs_fetchWeatherData(_ resolveRef: Int32, _ rejectRef: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void {
+    return bjs_fetchWeatherData_extern(resolveRef, rejectRef, cityBytes, cityLength)
 }
 
 func _$fetchWeatherData(_ city: String) async throws(JSException) -> WeatherData {
-    let resolved = try await _bjs_awaitPromise { continuationPtr in
+    let resolved = try await _bjs_awaitPromise(makeClosure: {
+            JSTypedClosure($0)
+        }) { resolveRef, rejectRef in
         city.bridgeJSWithLoweredParameter { (cityBytes, cityLength) in
-            bjs_fetchWeatherData(continuationPtr, cityBytes, cityLength)
+            bjs_fetchWeatherData(resolveRef, rejectRef, cityBytes, cityLength)
         }
     }
     return WeatherData(unsafelyWrapping: resolved.object!)

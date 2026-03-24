@@ -212,13 +212,13 @@ public struct ImportTS {
             }
         }
 
-        /// Prepends a `continuationPtr: Int32` parameter to the ABI parameter list.
+        /// Prepends `resolveRef: Int32, rejectRef: Int32` parameters to the ABI parameter list.
         ///
-        /// Used for async imports where the JS side needs the continuation pointer
-        /// to resolve/reject the Promise.
-        func prependContinuationPtr() {
-            abiParameterSignatures.insert(("continuationPtr", .i32), at: 0)
-            abiParameterForwardings.insert("continuationPtr", at: 0)
+        /// Used for async imports where the JS side receives closure-backed
+        /// resolve/reject callbacks as object references.
+        func prependClosureCallbackParams() {
+            abiParameterSignatures.insert(contentsOf: [("resolveRef", .i32), ("rejectRef", .i32)], at: 0)
+            abiParameterForwardings.insert(contentsOf: ["resolveRef", "rejectRef"], at: 0)
         }
 
         func call(skipExceptionCheck: Bool = false) throws {
@@ -289,10 +289,8 @@ public struct ImportTS {
         }
 
         func liftAsyncReturnValue(originalReturnType: BridgeType) {
-            // For async imports, we use the continuation-pointer pattern.
-            // The extern function takes a leading `continuationPtr: Int32` and returns void.
-            // The JS side attaches .then/.catch handlers and calls back into Wasm
-            // via bjs_resolve_promise_continuation / bjs_reject_promise_continuation.
+            // For async imports, the extern function takes leading `resolveRef: Int32, rejectRef: Int32`
+            // and returns void. The JS side calls the resolve/reject closures when the Promise settles.
             abiReturnType = nil
 
             // Wrap the existing body (parameter lowering + extern call) in _bjs_awaitPromise
@@ -300,9 +298,11 @@ public struct ImportTS {
             body = CodeFragmentPrinter()
 
             if originalReturnType == .void {
-                body.write("_ = try await _bjs_awaitPromise { continuationPtr in")
+                body.write("_ = try await _bjs_awaitPromise(makeClosure: { JSTypedClosure($0) }) { resolveRef, rejectRef in")
             } else {
-                body.write("let resolved = try await _bjs_awaitPromise { continuationPtr in")
+                body.write(
+                    "let resolved = try await _bjs_awaitPromise(makeClosure: { JSTypedClosure($0) }) { resolveRef, rejectRef in"
+                )
             }
             body.indent {
                 body.write(lines: innerBody.lines)
@@ -431,7 +431,7 @@ public struct ImportTS {
             returnType: abiReturnType
         )
         if function.effects.isAsync {
-            builder.prependContinuationPtr()
+            builder.prependClosureCallbackParams()
         }
         for param in function.parameters {
             try builder.lowerParameter(param: param)
@@ -466,7 +466,7 @@ public struct ImportTS {
                 returnType: abiReturnType
             )
             if method.effects.isAsync {
-                builder.prependContinuationPtr()
+                builder.prependClosureCallbackParams()
             }
             try builder.lowerParameter(param: selfParameter)
             for param in method.parameters {

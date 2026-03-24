@@ -2084,90 +2084,45 @@ extension _BridgedAsOptional {
     }
 }
 
-// MARK: Promise Continuation Pattern
+// MARK: Async Promise Awaiting
 
-/// A box that stores an `UnsafeContinuation` for a Promise result.
+/// Awaits a JavaScript Promise using `JSTypedClosure<(JSValue) -> Void>` callbacks.
 ///
-/// Used by the continuation-pointer pattern for async BridgeJS imports.
-/// The JS side resolves or rejects the Promise and calls back into Wasm
-/// via `bjs_resolve_promise_continuation` / `bjs_reject_promise_continuation`,
-/// which resume the continuation stored here.
-@_spi(BridgeJS) public final class _BJSPromiseContinuationBox {
-    let continuation: UnsafeContinuation<Result<JSValue, JSException>, Never>
-    init(continuation: UnsafeContinuation<Result<JSValue, JSException>, Never>) {
-        self.continuation = continuation
-    }
-}
-
-/// Awaits a JavaScript Promise using the continuation-pointer pattern.
+/// The `makeClosure` factory is dependency-injected because this library cannot
+/// reference per-module generated `make_swift_closure_*` externs. The generated
+/// code passes `{ JSTypedClosure($0) }` which uses the per-module convenience init.
 ///
-/// This creates a `_BJSPromiseContinuationBox`, passes its pointer (as `Int32`)
-/// to the `body` closure which should forward it to a JS extern function.
-/// The JS side attaches `.then`/`.catch` handlers and calls back into
-/// `bjs_resolve_promise_continuation` or `bjs_reject_promise_continuation`
-/// when the Promise settles.
-///
-/// - Parameter body: A closure that receives the continuation pointer as `Int32`
-///   and should pass it to the appropriate JS extern function.
+/// - Parameters:
+///   - makeClosure: A factory that wraps a `(JSValue) -> Void` Swift closure
+///     into a `JSTypedClosure`, creating the corresponding JS function.
+///   - body: A closure that receives the resolve and reject JS object refs
+///     (as `Int32`) and should pass them to the appropriate JS extern function.
 /// - Returns: The resolved `JSValue` from the Promise.
 /// - Throws: `JSException` if the Promise rejects.
-@_spi(BridgeJS) public func _bjs_awaitPromise(_ body: (Int32) -> Void) async throws(JSException) -> JSValue {
-    let result: Result<JSValue, JSException> = await withUnsafeContinuation { continuation in
-        let box = _BJSPromiseContinuationBox(continuation: continuation)
-        let pointer = Unmanaged.passRetained(box).toOpaque()
-        body(Int32(bitPattern: UInt32(UInt(bitPattern: pointer))))
+@_spi(BridgeJS) public func _bjs_awaitPromise(
+    makeClosure: (@escaping (JSValue) -> Void) -> JSTypedClosure<(JSValue) -> Void>,
+    _ body: (_ resolveRef: Int32, _ rejectRef: Int32) -> Void
+) async throws(JSException) -> JSValue {
+    // Wrapper to send JSValue through the continuation.
+    // Safe in WebAssembly's single-threaded environment.
+    struct Wrapper: @unchecked Sendable {
+        let result: Result<JSValue, JSException>
     }
-    return try result.get()
-}
-
-#if arch(wasm32)
-/// Wasm export called by JS when a Promise resolves.
-///
-/// The JS side encodes the resolved value as `(kind, payload1, payload2)`
-/// using the same `RawJSValue` encoding as the rest of JavaScriptKit.
-@_expose(wasm, "bjs_resolve_promise_continuation")
-@_cdecl("bjs_resolve_promise_continuation")
-public func _bjs_resolve_promise_continuation(
-    _ rawPtr: Int32,
-    _ kind: Int32,
-    _ payload1: Int32,
-    _ payload2: Float64
-) {
-    let pointer = UnsafeMutableRawPointer(bitPattern: UInt(UInt32(bitPattern: rawPtr)))!
-    let box = Unmanaged<_BJSPromiseContinuationBox>.fromOpaque(pointer).takeRetainedValue()
-    guard let kindEnum = JavaScriptValueKind(rawValue: UInt32(kind)) else {
-        fatalError("Invalid JSValue kind: \(kind)")
+    var resolveClosure: JSTypedClosure<(JSValue) -> Void>?
+    var rejectClosure: JSTypedClosure<(JSValue) -> Void>?
+    let wrapper: Wrapper = await withUnsafeContinuation { continuation in
+        resolveClosure = makeClosure { value in
+            continuation.resume(returning: Wrapper(result: .success(value)))
+        }
+        rejectClosure = makeClosure { value in
+            continuation.resume(returning: Wrapper(result: .failure(JSException(value))))
+        }
+        body(
+            Int32(bitPattern: resolveClosure!.jsObject.id),
+            Int32(bitPattern: rejectClosure!.jsObject.id)
+        )
     }
-    let rawValue = RawJSValue(
-        kind: kindEnum,
-        payload1: JavaScriptPayload1(UInt32(bitPattern: payload1)),
-        payload2: payload2
-    )
-    box.continuation.resume(returning: .success(rawValue.jsValue))
+    resolveClosure?.release()
+    rejectClosure?.release()
+    return try wrapper.result.get()
 }
-
-/// Wasm export called by JS when a Promise rejects.
-///
-/// The JS side encodes the rejection value as `(kind, payload1, payload2)`
-/// using the same `RawJSValue` encoding as the rest of JavaScriptKit.
-@_expose(wasm, "bjs_reject_promise_continuation")
-@_cdecl("bjs_reject_promise_continuation")
-public func _bjs_reject_promise_continuation(
-    _ rawPtr: Int32,
-    _ kind: Int32,
-    _ payload1: Int32,
-    _ payload2: Float64
-) {
-    let pointer = UnsafeMutableRawPointer(bitPattern: UInt(UInt32(bitPattern: rawPtr)))!
-    let box = Unmanaged<_BJSPromiseContinuationBox>.fromOpaque(pointer).takeRetainedValue()
-    guard let kindEnum = JavaScriptValueKind(rawValue: UInt32(kind)) else {
-        fatalError("Invalid JSValue kind: \(kind)")
-    }
-    let rawValue = RawJSValue(
-        kind: kindEnum,
-        payload1: JavaScriptPayload1(UInt32(bitPattern: payload1)),
-        payload2: payload2
-    )
-    box.continuation.resume(returning: .failure(JSException(rawValue.jsValue)))
-}
-#endif

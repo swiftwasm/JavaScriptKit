@@ -30,80 +30,120 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    function bjs_resolvePromiseContinuation(ptr, value) {
-        let kind, payload1 = 0, payload2 = 0;
+    function __bjs_jsValueLower(value) {
+        let kind;
+        let payload1;
+        let payload2;
         if (value === null) {
             kind = 4;
-        } else if (value === undefined) {
-            kind = 5;
+            payload1 = 0;
+            payload2 = 0;
         } else {
-            const type = typeof value;
-            switch (type) {
+            switch (typeof value) {
                 case "boolean":
                     kind = 0;
                     payload1 = value ? 1 : 0;
+                    payload2 = 0;
                     break;
                 case "number":
                     kind = 2;
+                    payload1 = 0;
                     payload2 = value;
                     break;
                 case "string":
                     kind = 1;
                     payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "undefined":
+                    kind = 5;
+                    payload1 = 0;
+                    payload2 = 0;
+                    break;
+                case "object":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "function":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
                     break;
                 case "symbol":
                     kind = 7;
                     payload1 = swift.memory.retain(value);
+                    payload2 = 0;
                     break;
                 case "bigint":
                     kind = 8;
                     payload1 = swift.memory.retain(value);
+                    payload2 = 0;
                     break;
                 default:
-                    kind = 3;
-                    payload1 = swift.memory.retain(value);
-                    break;
+                    throw new TypeError("Unsupported JSValue type");
             }
         }
-        instance.exports.bjs_resolve_promise_continuation(ptr, kind, payload1, payload2);
+        return [kind, payload1, payload2];
     }
-    function bjs_rejectPromiseContinuation(ptr, error) {
-        let kind, payload1 = 0, payload2 = 0;
-        if (error === null) {
-            kind = 4;
-        } else if (error === undefined) {
-            kind = 5;
-        } else {
-            const type = typeof error;
-            switch (type) {
-                case "boolean":
-                    kind = 0;
-                    payload1 = error ? 1 : 0;
-                    break;
-                case "number":
-                    kind = 2;
-                    payload2 = error;
-                    break;
-                case "string":
-                    kind = 1;
-                    payload1 = swift.memory.retain(error);
-                    break;
-                case "symbol":
-                    kind = 7;
-                    payload1 = swift.memory.retain(error);
-                    break;
-                case "bigint":
-                    kind = 8;
-                    payload1 = swift.memory.retain(error);
-                    break;
-                default:
-                    kind = 3;
-                    payload1 = swift.memory.retain(error);
-                    break;
-            }
+    function __bjs_jsValueLift(kind, payload1, payload2) {
+        let jsValue;
+        switch (kind) {
+            case 0:
+                jsValue = payload1 !== 0;
+                break;
+            case 1:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 2:
+                jsValue = payload2;
+                break;
+            case 3:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 4:
+                jsValue = null;
+                break;
+            case 5:
+                jsValue = undefined;
+                break;
+            case 7:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 8:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            default:
+                throw new TypeError("Unsupported JSValue kind " + kind);
         }
-        instance.exports.bjs_reject_promise_continuation(ptr, kind, payload1, payload2);
+        return jsValue;
     }
+
+    const swiftClosureRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
+        if (state.unregistered) { return; }
+        instance?.exports?.bjs_release_swift_closure(state.pointer);
+    });
+    const makeClosure = (pointer, file, line, func) => {
+        const state = { pointer, file, line, unregistered: false };
+        const real = (...args) => {
+            if (state.unregistered) {
+                const bytes = new Uint8Array(memory.buffer, state.file);
+                let length = 0;
+                while (bytes[length] !== 0) { length += 1; }
+                const fileID = decodeString(state.file, length);
+                throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);
+            }
+            return func(...args);
+        };
+        real.__unregister = () => {
+            if (state.unregistered) { return; }
+            state.unregistered = true;
+            swiftClosureRegistry.unregister(state);
+        };
+        swiftClosureRegistry.register(real, state, state);
+        return swift.memory.retain(real);
+    };
+
 
     return {
         /**
@@ -263,72 +303,92 @@ export async function createInstantiator(options, swift) {
                 return pointer || 0;
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
+            bjs["swift_js_closure_unregister"] = function(funcRef) {
+                const func = swift.memory.getObject(funcRef);
+                func.__unregister();
+            }
+            bjs["invoke_js_callback_TestModule_10TestModule7JSValueV_y"] = function(callbackId, param0Kind, param0Payload1, param0Payload2) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    const jsValue = __bjs_jsValueLift(param0Kind, param0Payload1, param0Payload2);
+                    callback(jsValue);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["make_swift_closure_TestModule_10TestModule7JSValueV_y"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModule7JSValueV_y = function(param0) {
+                    const [param0Kind, param0Payload1, param0Payload2] = __bjs_jsValueLower(param0);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModule7JSValueV_y(boxPtr, param0Kind, param0Payload1, param0Payload2);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                };
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule7JSValueV_y);
+            }
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_asyncReturnVoid"] = function bjs_asyncReturnVoid(continuationPtr) {
+            TestModule["bjs_asyncReturnVoid"] = function bjs_asyncReturnVoid(resolveRef, rejectRef) {
+                const resolve = swift.memory.getObject(resolveRef);
+                const reject = swift.memory.getObject(rejectRef);
                 try {
                     const promise = imports.asyncReturnVoid();
-                    promise.then(
-                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
-                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
-                    );
+                    promise.then(resolve, reject);
                 } catch (error) {
-                    bjs_rejectPromiseContinuation(continuationPtr, error);
+                    reject(error);
                 }
             }
-            TestModule["bjs_asyncRoundTripInt"] = function bjs_asyncRoundTripInt(continuationPtr, v) {
+            TestModule["bjs_asyncRoundTripInt"] = function bjs_asyncRoundTripInt(resolveRef, rejectRef, v) {
+                const resolve = swift.memory.getObject(resolveRef);
+                const reject = swift.memory.getObject(rejectRef);
                 try {
                     const promise = imports.asyncRoundTripInt(v);
-                    promise.then(
-                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
-                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
-                    );
+                    promise.then(resolve, reject);
                 } catch (error) {
-                    bjs_rejectPromiseContinuation(continuationPtr, error);
+                    reject(error);
                 }
             }
-            TestModule["bjs_asyncRoundTripString"] = function bjs_asyncRoundTripString(continuationPtr, vBytes, vCount) {
+            TestModule["bjs_asyncRoundTripString"] = function bjs_asyncRoundTripString(resolveRef, rejectRef, vBytes, vCount) {
+                const resolve = swift.memory.getObject(resolveRef);
+                const reject = swift.memory.getObject(rejectRef);
                 try {
                     const string = decodeString(vBytes, vCount);
                     const promise = imports.asyncRoundTripString(string);
-                    promise.then(
-                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
-                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
-                    );
+                    promise.then(resolve, reject);
                 } catch (error) {
-                    bjs_rejectPromiseContinuation(continuationPtr, error);
+                    reject(error);
                 }
             }
-            TestModule["bjs_asyncRoundTripBool"] = function bjs_asyncRoundTripBool(continuationPtr, v) {
+            TestModule["bjs_asyncRoundTripBool"] = function bjs_asyncRoundTripBool(resolveRef, rejectRef, v) {
+                const resolve = swift.memory.getObject(resolveRef);
+                const reject = swift.memory.getObject(rejectRef);
                 try {
                     const promise = imports.asyncRoundTripBool(v !== 0);
-                    promise.then(
-                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
-                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
-                    );
+                    promise.then(resolve, reject);
                 } catch (error) {
-                    bjs_rejectPromiseContinuation(continuationPtr, error);
+                    reject(error);
                 }
             }
-            TestModule["bjs_asyncRoundTripDouble"] = function bjs_asyncRoundTripDouble(continuationPtr, v) {
+            TestModule["bjs_asyncRoundTripDouble"] = function bjs_asyncRoundTripDouble(resolveRef, rejectRef, v) {
+                const resolve = swift.memory.getObject(resolveRef);
+                const reject = swift.memory.getObject(rejectRef);
                 try {
                     const promise = imports.asyncRoundTripDouble(v);
-                    promise.then(
-                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
-                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
-                    );
+                    promise.then(resolve, reject);
                 } catch (error) {
-                    bjs_rejectPromiseContinuation(continuationPtr, error);
+                    reject(error);
                 }
             }
-            TestModule["bjs_asyncRoundTripJSObject"] = function bjs_asyncRoundTripJSObject(continuationPtr, v) {
+            TestModule["bjs_asyncRoundTripJSObject"] = function bjs_asyncRoundTripJSObject(resolveRef, rejectRef, v) {
+                const resolve = swift.memory.getObject(resolveRef);
+                const reject = swift.memory.getObject(rejectRef);
                 try {
                     const promise = imports.asyncRoundTripJSObject(swift.memory.getObject(v));
-                    promise.then(
-                        (value) => { bjs_resolvePromiseContinuation(continuationPtr, value); },
-                        (error) => { bjs_rejectPromiseContinuation(continuationPtr, error); }
-                    );
+                    promise.then(resolve, reject);
                 } catch (error) {
-                    bjs_rejectPromiseContinuation(continuationPtr, error);
+                    reject(error);
                 }
             }
         },
