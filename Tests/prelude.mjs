@@ -13,6 +13,7 @@ import { getImports as getDictionarySupportImports } from './BridgeJSRuntimeTest
 import { getImports as getDefaultArgumentImports } from './BridgeJSRuntimeTests/JavaScript/DefaultArgumentTests.mjs';
 import { getImports as getJSClassSupportImports, JSClassWithArrayMembers } from './BridgeJSRuntimeTests/JavaScript/JSClassSupportTests.mjs';
 import { getImports as getIntegerTypesSupportImports } from './BridgeJSRuntimeTests/JavaScript/IntegerTypesSupportTests.mjs';
+import { getImports as getAsyncImportImports } from './BridgeJSRuntimeTests/JavaScript/AsyncImportTests.mjs';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
 export async function setupOptions(options, context) {
@@ -119,33 +120,7 @@ export async function setupOptions(options, context) {
                 },
                 StaticBox,
                 Foo: ImportedFoo,
-                "fetchWeatherData": (city) => {
-                    return Promise.resolve({
-                        temperature: city === "London" ? 15.5 : 25.0,
-                        description: city === "London" ? "Cloudy" : "Sunny",
-                        humidity: city === "London" ? 80 : 40,
-                    });
-                },
-                "jsAsyncRoundTripVoid": () => {
-                    return Promise.resolve();
-                },
-                "jsAsyncRoundTripNumber": (v) => {
-                    return Promise.resolve(v);
-                },
-                "jsAsyncRoundTripBool": (v) => {
-                    return Promise.resolve(v);
-                },
-                "jsAsyncRoundTripString": (v) => {
-                    return Promise.resolve(v);
-                },
-                runAsyncWorks: async () => {
-                    const exports = importsContext.getExports();
-                    if (!exports) {
-                        throw new Error("No exports!?");
-                    }
-                    BridgeJSRuntimeTests_runAsyncWorks(exports);
-                    return;
-                },
+                ...getAsyncImportImports(importsContext),
                 jsTranslatePoint: (point, dx, dy) => {
                     return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
                 },
@@ -1026,11 +1001,6 @@ function testStructSupport(exports) {
     const fooContainerResult2 = exports.roundTripFooContainer(fooContainer2);
     assert.equal(fooContainerResult2.foo.value, "first");
     assert.equal(fooContainerResult2.optionalFoo, null);
-}
-
-/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
-async function BridgeJSRuntimeTests_runAsyncWorks(exports) {
-    await exports.asyncRoundTripVoid();
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

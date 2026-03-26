@@ -40,6 +40,14 @@ export interface WeatherData {
 }
 export function fetchWeatherData(city: string): Promise<WeatherData>;
 
+// Async Stack ABI type round-trips
+export function jsAsyncRoundTripOptionalString(v: string | null): Promise<string | null>;
+export function jsAsyncRoundTripOptionalNumber(v: number | null): Promise<number | null>;
+export function jsAsyncRoundTripBoolArray(v: boolean[]): Promise<boolean[]>;
+export function jsAsyncRoundTripIntArray(v: number[]): Promise<number[]>;
+export function jsAsyncRoundTripStringArray(v: string[]): Promise<string[]>;
+export function jsAsyncRoundTripFeatureFlag(v: FeatureFlag): Promise<FeatureFlag>;
+
 // jsName tests
 export function $jsWeirdFunction(): number;
 

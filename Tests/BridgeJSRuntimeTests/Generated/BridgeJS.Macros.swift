@@ -62,6 +62,18 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
     @JSSetter func setHumidity(_ value: Double) throws(JSException)
 }
 
+@JSFunction func jsAsyncRoundTripOptionalString(_ v: Optional<String>) async throws(JSException) -> Optional<String>
+
+@JSFunction func jsAsyncRoundTripOptionalNumber(_ v: Optional<Double>) async throws(JSException) -> Optional<Double>
+
+@JSFunction func jsAsyncRoundTripBoolArray(_ v: [Bool]) async throws(JSException) -> [Bool]
+
+@JSFunction func jsAsyncRoundTripIntArray(_ v: [Double]) async throws(JSException) -> [Double]
+
+@JSFunction func jsAsyncRoundTripStringArray(_ v: [String]) async throws(JSException) -> [String]
+
+@JSFunction func jsAsyncRoundTripFeatureFlag(_ v: FeatureFlag) async throws(JSException) -> FeatureFlag
+
 @JSFunction(jsName: "$jsWeirdFunction") func _jsWeirdFunction() throws(JSException) -> Double
 
 @JSClass(jsName: "$WeirdClass") struct _WeirdClass {
