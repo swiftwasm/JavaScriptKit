@@ -31,6 +31,7 @@ export interface WeatherData {
     description: string;
     humidity: number;
 }
+export function fetchWeatherData(city: string): Promise<WeatherData>;
 
 // jsName tests
 export function $jsWeirdFunction(): number;
