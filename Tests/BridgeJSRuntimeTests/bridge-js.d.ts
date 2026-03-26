@@ -26,27 +26,11 @@ export class JsGreeter {
 
 export function runAsyncWorks(): Promise<void>;
 
-// Async round-trip tests
-export function jsAsyncRoundTripVoid(): Promise<void>;
-export function jsAsyncRoundTripNumber(v: number): Promise<number>;
-export function jsAsyncRoundTripBool(v: boolean): Promise<boolean>;
-export function jsAsyncRoundTripString(v: string): Promise<string>;
-
-// Async fetch-like test with structured return type
 export interface WeatherData {
     temperature: number;
     description: string;
     humidity: number;
 }
-export function fetchWeatherData(city: string): Promise<WeatherData>;
-
-// Async Stack ABI type round-trips
-export function jsAsyncRoundTripOptionalString(v: string | null): Promise<string | null>;
-export function jsAsyncRoundTripOptionalNumber(v: number | null): Promise<number | null>;
-export function jsAsyncRoundTripBoolArray(v: boolean[]): Promise<boolean[]>;
-export function jsAsyncRoundTripIntArray(v: number[]): Promise<number[]>;
-export function jsAsyncRoundTripStringArray(v: string[]): Promise<string[]>;
-export function jsAsyncRoundTripFeatureFlag(v: FeatureFlag): Promise<FeatureFlag>;
 
 // jsName tests
 export function $jsWeirdFunction(): number;

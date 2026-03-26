@@ -3,7 +3,7 @@
 import assert from 'node:assert';
 
 /**
- * @returns {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Imports}
+ * @returns {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Imports["AsyncImportImports"]}
  */
 export function getImports(importsContext) {
     return {
@@ -44,18 +44,10 @@ export function getImports(importsContext) {
                 humidity: city === "London" ? 80 : 40,
             });
         },
-        runAsyncWorks: async () => {
-            const exports = importsContext.getExports();
-            if (!exports) {
-                throw new Error("No exports!?");
-            }
-            await runAsyncWorksTests(exports);
-            return;
-        },
     };
 }
 
 /** @param {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
-async function runAsyncWorksTests(exports) {
+export async function runAsyncWorksTests(exports) {
     await exports.asyncRoundTripVoid();
 }

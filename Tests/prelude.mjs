@@ -13,7 +13,7 @@ import { getImports as getDictionarySupportImports } from './BridgeJSRuntimeTest
 import { getImports as getDefaultArgumentImports } from './BridgeJSRuntimeTests/JavaScript/DefaultArgumentTests.mjs';
 import { getImports as getJSClassSupportImports, JSClassWithArrayMembers } from './BridgeJSRuntimeTests/JavaScript/JSClassSupportTests.mjs';
 import { getImports as getIntegerTypesSupportImports } from './BridgeJSRuntimeTests/JavaScript/IntegerTypesSupportTests.mjs';
-import { getImports as getAsyncImportImports } from './BridgeJSRuntimeTests/JavaScript/AsyncImportTests.mjs';
+import { getImports as getAsyncImportImports, runAsyncWorksTests } from './BridgeJSRuntimeTests/JavaScript/AsyncImportTests.mjs';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
 export async function setupOptions(options, context) {
@@ -120,7 +120,15 @@ export async function setupOptions(options, context) {
                 },
                 StaticBox,
                 Foo: ImportedFoo,
-                ...getAsyncImportImports(importsContext),
+                runAsyncWorks: async () => {
+                    const exports = importsContext.getExports();
+                    if (!exports) {
+                        throw new Error("No exports!?");
+                    }
+                    await runAsyncWorksTests(exports);
+                    return;
+                },
+                AsyncImportImports: getAsyncImportImports(importsContext),
                 jsTranslatePoint: (point, dx, dy) => {
                     return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
                 },

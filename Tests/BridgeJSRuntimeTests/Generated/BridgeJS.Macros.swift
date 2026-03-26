@@ -43,37 +43,6 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
 
 @JSFunction func runAsyncWorks() async throws(JSException) -> Void
 
-@JSFunction func jsAsyncRoundTripVoid() async throws(JSException) -> Void
-
-@JSFunction func jsAsyncRoundTripNumber(_ v: Double) async throws(JSException) -> Double
-
-@JSFunction func jsAsyncRoundTripBool(_ v: Bool) async throws(JSException) -> Bool
-
-@JSFunction func jsAsyncRoundTripString(_ v: String) async throws(JSException) -> String
-
-@JSFunction func fetchWeatherData(_ city: String) async throws(JSException) -> WeatherData
-
-@JSClass struct WeatherData {
-    @JSGetter var temperature: Double
-    @JSSetter func setTemperature(_ value: Double) throws(JSException)
-    @JSGetter var description: String
-    @JSSetter func setDescription(_ value: String) throws(JSException)
-    @JSGetter var humidity: Double
-    @JSSetter func setHumidity(_ value: Double) throws(JSException)
-}
-
-@JSFunction func jsAsyncRoundTripOptionalString(_ v: Optional<String>) async throws(JSException) -> Optional<String>
-
-@JSFunction func jsAsyncRoundTripOptionalNumber(_ v: Optional<Double>) async throws(JSException) -> Optional<Double>
-
-@JSFunction func jsAsyncRoundTripBoolArray(_ v: [Bool]) async throws(JSException) -> [Bool]
-
-@JSFunction func jsAsyncRoundTripIntArray(_ v: [Double]) async throws(JSException) -> [Double]
-
-@JSFunction func jsAsyncRoundTripStringArray(_ v: [String]) async throws(JSException) -> [String]
-
-@JSFunction func jsAsyncRoundTripFeatureFlag(_ v: FeatureFlag) async throws(JSException) -> FeatureFlag
-
 @JSFunction(jsName: "$jsWeirdFunction") func _jsWeirdFunction() throws(JSException) -> Double
 
 @JSClass(jsName: "$WeirdClass") struct _WeirdClass {

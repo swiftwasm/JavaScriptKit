@@ -16997,6 +16997,296 @@
             "methods" : [
 
             ],
+            "name" : "AsyncImportImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripVoid",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripNumber",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripBool",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "bool" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripString",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripOptionalString",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripOptionalNumber",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripBoolArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "bool" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripIntArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripStringArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripFeatureFlag",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "rawValueEnum" : {
+                        "_0" : "FeatureFlag",
+                        "_1" : "String"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "rawValueEnum" : {
+                    "_0" : "FeatureFlag",
+                    "_1" : "String"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
             "name" : "ClosureSupportImports",
             "setters" : [
 
@@ -18328,298 +18618,6 @@
           },
           {
             "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripVoid",
-            "parameters" : [
-
-            ],
-            "returnType" : {
-              "void" : {
-
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripNumber",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "double" : {
-
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "double" : {
-
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripBool",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "bool" : {
-
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "bool" : {
-
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripString",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "string" : {
-
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "string" : {
-
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "fetchWeatherData",
-            "parameters" : [
-              {
-                "name" : "city",
-                "type" : {
-                  "string" : {
-
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "jsObject" : {
-                "_0" : "WeatherData"
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripOptionalString",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "nullable" : {
-                    "_0" : {
-                      "string" : {
-
-                      }
-                    },
-                    "_1" : "null"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "nullable" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripOptionalNumber",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "nullable" : {
-                    "_0" : {
-                      "double" : {
-
-                      }
-                    },
-                    "_1" : "null"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "nullable" : {
-                "_0" : {
-                  "double" : {
-
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripBoolArray",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "bool" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "array" : {
-                "_0" : {
-                  "bool" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripIntArray",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "double" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "array" : {
-                "_0" : {
-                  "double" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripStringArray",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "array" : {
-                    "_0" : {
-                      "string" : {
-
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "array" : {
-                "_0" : {
-                  "string" : {
-
-                  }
-                }
-              }
-            }
-          },
-          {
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsAsyncRoundTripFeatureFlag",
-            "parameters" : [
-              {
-                "name" : "v",
-                "type" : {
-                  "rawValueEnum" : {
-                    "_0" : "FeatureFlag",
-                    "_1" : "String"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "rawValueEnum" : {
-                "_0" : "FeatureFlag",
-                "_1" : "String"
-              }
-            }
-          },
-          {
-            "effects" : {
               "isAsync" : false,
               "isStatic" : false,
               "isThrows" : true
@@ -18759,70 +18757,6 @@
                 "name" : "name",
                 "type" : {
                   "string" : {
-
-                  }
-                }
-              }
-            ],
-            "staticMethods" : [
-
-            ]
-          },
-          {
-            "getters" : [
-              {
-                "name" : "temperature",
-                "type" : {
-                  "double" : {
-
-                  }
-                }
-              },
-              {
-                "name" : "description",
-                "type" : {
-                  "string" : {
-
-                  }
-                }
-              },
-              {
-                "name" : "humidity",
-                "type" : {
-                  "double" : {
-
-                  }
-                }
-              }
-            ],
-            "methods" : [
-
-            ],
-            "name" : "WeatherData",
-            "setters" : [
-              {
-                "functionName" : "temperature_set",
-                "name" : "temperature",
-                "type" : {
-                  "double" : {
-
-                  }
-                }
-              },
-              {
-                "functionName" : "description_set",
-                "name" : "description",
-                "type" : {
-                  "string" : {
-
-                  }
-                }
-              },
-              {
-                "functionName" : "humidity_set",
-                "name" : "humidity",
-                "type" : {
-                  "double" : {
 
                   }
                 }
