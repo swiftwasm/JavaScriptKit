@@ -66,10 +66,11 @@ public struct ImportTS {
         _ getter: ImportedGetterSkeleton,
         topLevelDecls: inout [DeclSyntax]
     ) throws -> [DeclSyntax] {
+        let effects = Effects(isAsync: false, isThrows: true)
         let builder = try CallJSEmission(
             moduleName: moduleName,
             abiName: getter.abiName(context: nil),
-            effects: Effects(isAsync: false, isThrows: true),
+            effects: effects,
             returnType: getter.type
         )
         try builder.call()
@@ -79,7 +80,8 @@ public struct ImportTS {
             builder.renderThunkDecl(
                 name: "_$\(getter.name)_get",
                 parameters: [],
-                returnType: getter.type
+                returnType: getter.type,
+                effects: effects
             )
             .with(\.leadingTrivia, Self.renderDocumentation(documentation: getter.documentation))
         ]
@@ -360,7 +362,7 @@ public struct ImportTS {
             name: String,
             parameters: [Parameter],
             returnType: BridgeType,
-            effects: Effects = Effects(isAsync: false, isThrows: true)
+            effects: Effects
         ) -> DeclSyntax {
             let printer = CodeFragmentPrinter()
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
@@ -496,10 +498,11 @@ public struct ImportTS {
         }
 
         func renderConstructorDecl(constructor: ImportedConstructorSkeleton) throws -> [DeclSyntax] {
+            let effects = Effects(isAsync: false, isThrows: true)
             let builder = try CallJSEmission(
                 moduleName: moduleName,
                 abiName: constructor.abiName(context: type),
-                effects: Effects(isAsync: false, isThrows: true),
+                effects: effects,
                 returnType: .jsObject(nil)
             )
             for param in constructor.parameters {
@@ -512,16 +515,18 @@ public struct ImportTS {
                 builder.renderThunkDecl(
                     name: Self.thunkName(type: type),
                     parameters: constructor.parameters,
-                    returnType: .jsObject(nil)
+                    returnType: .jsObject(nil),
+                    effects: effects
                 )
             ]
         }
 
         func renderGetterDecl(getter: ImportedGetterSkeleton) throws -> DeclSyntax {
+            let effects = Effects(isAsync: false, isThrows: true)
             let builder = try CallJSEmission(
                 moduleName: moduleName,
                 abiName: getter.abiName(context: type),
-                effects: Effects(isAsync: false, isThrows: true),
+                effects: effects,
                 returnType: getter.type
             )
             try builder.lowerParameter(param: selfParameter)
@@ -532,16 +537,18 @@ public struct ImportTS {
                 builder.renderThunkDecl(
                     name: Self.thunkName(type: type, propertyName: getter.name, operation: "get"),
                     parameters: [selfParameter],
-                    returnType: getter.type
+                    returnType: getter.type,
+                    effects: effects
                 )
             )
         }
 
         func renderSetterDecl(setter: ImportedSetterSkeleton) throws -> DeclSyntax {
+            let effects = Effects(isAsync: false, isThrows: true)
             let builder = try CallJSEmission(
                 moduleName: moduleName,
                 abiName: setter.abiName(context: type),
-                effects: Effects(isAsync: false, isThrows: true),
+                effects: effects,
                 returnType: .void
             )
             let newValue = Parameter(label: nil, name: "newValue", type: setter.type)
@@ -561,7 +568,8 @@ public struct ImportTS {
             return builder.renderThunkDecl(
                 name: Self.thunkName(type: type, propertyName: propertyNameForThunk, operation: "set"),
                 parameters: [selfParameter, newValue],
-                returnType: .void
+                returnType: .void,
+                effects: effects
             )
         }
         if let constructor = type.constructor {
