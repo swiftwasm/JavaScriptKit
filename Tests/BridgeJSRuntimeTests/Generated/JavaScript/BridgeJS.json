@@ -18618,6 +18618,29 @@
           },
           {
             "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "fetchWeatherData",
+            "parameters" : [
+              {
+                "name" : "city",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "WeatherData"
+              }
+            }
+          },
+          {
+            "effects" : {
               "isAsync" : false,
               "isStatic" : false,
               "isThrows" : true
@@ -18757,6 +18780,70 @@
                 "name" : "name",
                 "type" : {
                   "string" : {
+
+                  }
+                }
+              }
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "getters" : [
+              {
+                "name" : "temperature",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "description",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "humidity",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+
+            ],
+            "name" : "WeatherData",
+            "setters" : [
+              {
+                "functionName" : "temperature_set",
+                "name" : "temperature",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "description_set",
+                "name" : "description",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "humidity_set",
+                "name" : "humidity",
+                "type" : {
+                  "double" : {
 
                   }
                 }

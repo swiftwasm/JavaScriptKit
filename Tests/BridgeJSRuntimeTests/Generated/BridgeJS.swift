@@ -1737,6 +1737,67 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y_extern(_ callback: Int32, _ param0: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y_extern(_ callback: Int32, _ param0: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y(_ callback: Int32, _ param0: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestss11WeatherDataC_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (sending WeatherData) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0Value = param0.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y(callbackValue, param0Value)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (sending WeatherData) -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending WeatherData) -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11WeatherDataC_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending WeatherData) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(WeatherData.bridgeJSLiftParameter(param0))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss7JSValueV_y")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss7JSValueV_y_extern(_ callback: Int32, _ param0Kind: Int32, _ param0Payload1: Int32, _ param0Payload2: Float64) -> Void
 #else
@@ -12171,6 +12232,31 @@ func _$runAsyncWorks() async throws(JSException) -> Void {
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_fetchWeatherData")
+fileprivate func bjs_fetchWeatherData_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void
+#else
+fileprivate func bjs_fetchWeatherData_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_fetchWeatherData(_ resolveRef: Int32, _ rejectRef: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void {
+    return bjs_fetchWeatherData_extern(resolveRef, rejectRef, cityBytes, cityLength)
+}
+
+func _$fetchWeatherData(_ city: String) async throws(JSException) -> WeatherData {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(sending WeatherData) -> Void>($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>($0)
+        }) { resolveRef, rejectRef in
+        city.bridgeJSWithLoweredParameter { (cityBytes, cityLength) in
+            bjs_fetchWeatherData(resolveRef, rejectRef, cityBytes, cityLength)
+        }
+    }
+    return resolved
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs__jsWeirdFunction")
 fileprivate func bjs__jsWeirdFunction_extern() -> Float64
 #else
@@ -12343,6 +12429,133 @@ func _$JsGreeter_changeName(_ self: JSObject, _ name: String) throws(JSException
     name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
         bjs_JsGreeter_changeName(selfValue, nameBytes, nameLength)
     }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_WeatherData_temperature_get")
+fileprivate func bjs_WeatherData_temperature_get_extern(_ self: Int32) -> Float64
+#else
+fileprivate func bjs_WeatherData_temperature_get_extern(_ self: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_WeatherData_temperature_get(_ self: Int32) -> Float64 {
+    return bjs_WeatherData_temperature_get_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_WeatherData_description_get")
+fileprivate func bjs_WeatherData_description_get_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_WeatherData_description_get_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_WeatherData_description_get(_ self: Int32) -> Int32 {
+    return bjs_WeatherData_description_get_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_WeatherData_humidity_get")
+fileprivate func bjs_WeatherData_humidity_get_extern(_ self: Int32) -> Float64
+#else
+fileprivate func bjs_WeatherData_humidity_get_extern(_ self: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_WeatherData_humidity_get(_ self: Int32) -> Float64 {
+    return bjs_WeatherData_humidity_get_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_WeatherData_temperature_set")
+fileprivate func bjs_WeatherData_temperature_set_extern(_ self: Int32, _ newValue: Float64) -> Void
+#else
+fileprivate func bjs_WeatherData_temperature_set_extern(_ self: Int32, _ newValue: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_WeatherData_temperature_set(_ self: Int32, _ newValue: Float64) -> Void {
+    return bjs_WeatherData_temperature_set_extern(self, newValue)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_WeatherData_description_set")
+fileprivate func bjs_WeatherData_description_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+#else
+fileprivate func bjs_WeatherData_description_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_WeatherData_description_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+    return bjs_WeatherData_description_set_extern(self, newValueBytes, newValueLength)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_WeatherData_humidity_set")
+fileprivate func bjs_WeatherData_humidity_set_extern(_ self: Int32, _ newValue: Float64) -> Void
+#else
+fileprivate func bjs_WeatherData_humidity_set_extern(_ self: Int32, _ newValue: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_WeatherData_humidity_set(_ self: Int32, _ newValue: Float64) -> Void {
+    return bjs_WeatherData_humidity_set_extern(self, newValue)
+}
+
+func _$WeatherData_temperature_get(_ self: JSObject) throws(JSException) -> Double {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_WeatherData_temperature_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$WeatherData_description_get(_ self: JSObject) throws(JSException) -> String {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_WeatherData_description_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$WeatherData_humidity_get(_ self: JSObject) throws(JSException) -> Double {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_WeatherData_humidity_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$WeatherData_temperature_set(_ self: JSObject, _ newValue: Double) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let newValueValue = newValue.bridgeJSLowerParameter()
+    bjs_WeatherData_temperature_set(selfValue, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WeatherData_description_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+        bjs_WeatherData_description_set(selfValue, newValueBytes, newValueLength)
+    }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$WeatherData_humidity_set(_ self: JSObject, _ newValue: Double) throws(JSException) -> Void {
+    let selfValue = self.bridgeJSLowerParameter()
+    let newValueValue = newValue.bridgeJSLowerParameter()
+    bjs_WeatherData_humidity_set(selfValue, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
