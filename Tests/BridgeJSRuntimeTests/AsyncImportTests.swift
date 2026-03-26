@@ -12,7 +12,6 @@ import JavaScriptKit
     @JSFunction static func jsAsyncRoundTripIntArray(_ values: [Double]) async throws(JSException) -> [Double]
     @JSFunction static func jsAsyncRoundTripStringArray(_ values: [String]) async throws(JSException) -> [String]
     @JSFunction static func jsAsyncRoundTripFeatureFlag(_ v: FeatureFlag) async throws(JSException) -> FeatureFlag
-    @JSFunction static func fetchWeatherData(_ city: String) async throws(JSException) -> WeatherData
 }
 
 @Suite struct AsyncImportTests {
@@ -73,12 +72,12 @@ import JavaScriptKit
     // MARK: - Structured return type
 
     @Test func fetchWeatherData() async throws {
-        let weather = try await AsyncImportImports.fetchWeatherData("London")
+        let weather = try await BridgeJSRuntimeTests.fetchWeatherData("London")
         #expect(try weather.temperature == 15.5)
         #expect(try weather.description == "Cloudy")
         #expect(try weather.humidity == 80)
 
-        let weather2 = try await AsyncImportImports.fetchWeatherData("Tokyo")
+        let weather2 = try await BridgeJSRuntimeTests.fetchWeatherData("Tokyo")
         #expect(try weather2.temperature == 25.0)
         #expect(try weather2.description == "Sunny")
         #expect(try weather2.humidity == 40)

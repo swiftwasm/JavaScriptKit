@@ -37,13 +37,6 @@ export function getImports(importsContext) {
         jsAsyncRoundTripFeatureFlag: (v) => {
             return Promise.resolve(v);
         },
-        fetchWeatherData: (city) => {
-            return Promise.resolve({
-                temperature: city === "London" ? 15.5 : 25.0,
-                description: city === "London" ? "Cloudy" : "Sunny",
-                humidity: city === "London" ? 80 : 40,
-            });
-        },
     };
 }
 
