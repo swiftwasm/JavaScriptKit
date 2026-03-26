@@ -741,7 +741,12 @@ public struct BridgeJSLink {
         signature: ClosureSignature,
         functionName: String
     ) throws -> [String] {
-        let thunkBuilder = ImportedThunkBuilder(context: .exportSwift, intrinsicRegistry: intrinsicRegistry)
+        let thunkBuilder = ImportedThunkBuilder(
+            effects: Effects(isAsync: signature.isAsync, isThrows: signature.isThrows),
+            returnType: signature.returnType,
+            context: .exportSwift,
+            intrinsicRegistry: intrinsicRegistry
+        )
         thunkBuilder.parameterNames.append("callbackId")
         thunkBuilder.body.write("const callback = \(JSGlueVariableScope.reservedSwift).memory.getObject(callbackId);")
 
@@ -750,13 +755,9 @@ public struct BridgeJSLink {
             try thunkBuilder.liftParameter(param: Parameter(label: nil, name: paramName, type: paramType))
         }
 
-        let returnExpr = try thunkBuilder.call(calleeExpr: "callback", returnType: signature.returnType)
+        try thunkBuilder.call(calleeExpr: "callback", returnType: signature.returnType)
 
-        var functionLines = thunkBuilder.renderFunction(
-            name: nil,
-            returnExpr: returnExpr,
-            returnType: signature.returnType
-        )
+        var functionLines = thunkBuilder.renderFunction(name: nil)
         functionLines[0] = "bjs[\"\(functionName)\"] = " + functionLines[0]
 
         return functionLines
@@ -2163,15 +2164,25 @@ extension BridgeJSLink {
     class ImportedThunkBuilder {
         let body: CodeFragmentPrinter
         let scope: JSGlueVariableScope
+        let effects: Effects
+        let returnType: BridgeType
         let context: BridgeContext
         var parameterNames: [String] = []
         var parameterForwardings: [String] = []
+        var returnExpr: String?
         let printContext: IntrinsicJSFragment.PrintCodeContext
 
-        init(context: BridgeContext = .importTS, intrinsicRegistry: JSIntrinsicRegistry) {
+        init(
+            effects: Effects,
+            returnType: BridgeType,
+            context: BridgeContext = .importTS,
+            intrinsicRegistry: JSIntrinsicRegistry
+        ) {
             self.body = CodeFragmentPrinter()
             self.scope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
             self.context = context
+            self.effects = effects
+            self.returnType = returnType
             self.printContext = IntrinsicJSFragment.PrintCodeContext(
                 scope: scope,
                 printer: body,
@@ -2201,7 +2212,15 @@ extension BridgeJSLink {
             parameterForwardings.append(contentsOf: liftedValues)
         }
 
-        func renderFunction(
+        func renderFunction(name: String?) -> [String] {
+            if effects.isAsync {
+                return renderAsyncFunction(name: name)
+            } else {
+                return renderSyncFunction(name: name, returnExpr: returnExpr, returnType: returnType)
+            }
+        }
+
+        private func renderSyncFunction(
             name: String?,
             returnExpr: String?,
             returnType: BridgeType
@@ -2231,21 +2250,12 @@ extension BridgeJSLink {
             return printer.lines
         }
 
-        /// Generates the call expression for an async import.
-        ///
-        /// Chains `.then(resolve, reject)` directly on the returned Promise.
-        func callAsync(name: String, fromObjectExpr: String) {
-            let calleeExpr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: name)
-            let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
-            body.write("\(callExpr).then(resolve, reject);")
-        }
-
         /// Renders an async import function with resolve/reject closure refs.
         ///
         /// The generated function takes `resolveRef` and `rejectRef` as the first parameters,
         /// looks up the resolve/reject closures from memory, and executes the body which
         /// chains `.then(resolve, reject)` on the import's returned Promise.
-        func renderAsyncFunction(name: String?) -> [String] {
+        private func renderAsyncFunction(name: String?) -> [String] {
             let printer = CodeFragmentPrinter()
             let allParams = ["resolveRef", "rejectRef"] + parameterNames
             printer.write("function\(name.map { " \($0)" } ?? "")(\(allParams.joined(separator: ", "))) {")
@@ -2259,21 +2269,25 @@ extension BridgeJSLink {
             return printer.lines
         }
 
-        func call(name: String, fromObjectExpr: String, returnType: BridgeType) throws -> String? {
+        func call(name: String, fromObjectExpr: String, returnType: BridgeType) throws {
             let calleeExpr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: name)
             return try self.call(calleeExpr: calleeExpr, returnType: returnType)
         }
 
-        func call(name: String, returnType: BridgeType) throws -> String? {
+        func call(name: String, returnType: BridgeType) throws {
             return try call(name: name, fromObjectExpr: "imports", returnType: returnType)
         }
 
-        func call(calleeExpr: String, returnType: BridgeType) throws -> String? {
+        func call(calleeExpr: String, returnType: BridgeType) throws {
             let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
-            return try self.call(callExpr: callExpr, returnType: returnType)
+            try self.call(callExpr: callExpr, returnType: returnType)
         }
 
-        private func call(callExpr: String, returnType: BridgeType) throws -> String? {
+        private func call(callExpr: String, returnType: BridgeType) throws {
+            if effects.isAsync {
+                body.write("\(callExpr).then(resolve, reject);")
+                return
+            }
             let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType, context: context)
             let returnExpr: String?
             if loweringFragment.parameters.count == 0 {
@@ -2284,26 +2298,30 @@ extension BridgeJSLink {
                 body.write("let \(resultVariable) = \(callExpr);")
                 returnExpr = resultVariable
             }
-            return try lowerReturnValue(
+            self.returnExpr = try lowerReturnValue(
                 returnType: returnType,
                 returnExpr: returnExpr,
                 loweringFragment: loweringFragment
             )
         }
 
-        func callConstructor(jsName: String, swiftTypeName: String, fromObjectExpr: String) throws -> String? {
+        func callConstructor(jsName: String, swiftTypeName: String, fromObjectExpr: String) throws {
             let ctorExpr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: jsName)
             let call = "new \(ctorExpr)(\(parameterForwardings.joined(separator: ", ")))"
             let type: BridgeType = .jsObject(swiftTypeName)
             let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: type, context: context)
-            return try lowerReturnValue(returnType: type, returnExpr: call, loweringFragment: loweringFragment)
+            self.returnExpr = try lowerReturnValue(
+                returnType: type,
+                returnExpr: call,
+                loweringFragment: loweringFragment
+            )
         }
 
-        func callConstructor(jsName: String, swiftTypeName: String) throws -> String? {
+        func callConstructor(jsName: String, swiftTypeName: String) throws {
             return try callConstructor(jsName: jsName, swiftTypeName: swiftTypeName, fromObjectExpr: "imports")
         }
 
-        func callMethod(name: String, returnType: BridgeType) throws -> String? {
+        func callMethod(name: String, returnType: BridgeType) throws {
             let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
             let calleeExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
             return try call(
@@ -2320,7 +2338,7 @@ extension BridgeJSLink {
             body.write("\(callExpr).then(resolve, reject);")
         }
 
-        func callStaticMethod(on objectExpr: String, name: String, returnType: BridgeType) throws -> String? {
+        func callStaticMethod(on objectExpr: String, name: String, returnType: BridgeType) throws {
             let calleeExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
             return try call(
                 calleeExpr: calleeExpr,
@@ -2328,14 +2346,7 @@ extension BridgeJSLink {
             )
         }
 
-        /// Generates an async static method call with resolve/reject closure refs.
-        func callAsyncStaticMethod(on objectExpr: String, name: String) {
-            let calleeExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
-            let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
-            body.write("\(callExpr).then(resolve, reject);")
-        }
-
-        func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
+        func callPropertyGetter(name: String, returnType: BridgeType) throws {
             let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
             let accessExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
             if context == .exportSwift, returnType.usesSideChannelForOptionalReturn() {
@@ -2350,8 +2361,9 @@ extension BridgeJSLink {
 
                 let fragment = try IntrinsicJSFragment.protocolPropertyOptionalToSideChannel(wrappedType: wrappedType)
                 _ = try fragment.printCode([resultVar], printContext)
-
-                return nil  // Side-channel types return nil (no direct return value)
+                // Side-channel types return nil (no direct return value)
+                self.returnExpr = nil
+                return
             }
 
             return try call(
@@ -2367,7 +2379,7 @@ extension BridgeJSLink {
             body.write("\(call);")
         }
 
-        func getImportProperty(name: String, fromObjectExpr: String, returnType: BridgeType) throws -> String? {
+        func getImportProperty(name: String, fromObjectExpr: String, returnType: BridgeType) throws {
             if returnType == .void {
                 throw BridgeJSLinkError(message: "Void is not supported for imported JS properties")
             }
@@ -2385,14 +2397,14 @@ extension BridgeJSLink {
                 returnExpr = resultVariable
             }
 
-            return try lowerReturnValue(
+            self.returnExpr = try lowerReturnValue(
                 returnType: returnType,
                 returnExpr: returnExpr,
                 loweringFragment: loweringFragment
             )
         }
 
-        func getImportProperty(name: String, returnType: BridgeType) throws -> String? {
+        func getImportProperty(name: String, returnType: BridgeType) throws {
             return try getImportProperty(name: name, fromObjectExpr: "imports", returnType: returnType)
         }
 
@@ -3160,33 +3172,23 @@ extension BridgeJSLink {
         importObjectBuilder: ImportObjectBuilder,
         function: ImportedFunctionSkeleton
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
+        let thunkBuilder = ImportedThunkBuilder(
+            effects: function.effects,
+            returnType: function.returnType,
+            intrinsicRegistry: intrinsicRegistry
+        )
         for param in function.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
         let jsName = function.jsName ?? function.name
         let importRootExpr = function.from == .global ? "globalThis" : "imports"
 
-        let funcLines: [String]
-        if function.effects.isAsync {
-            // For async functions, use the continuation-pointer pattern.
-            // The generated function takes continuationPtr as first param,
-            // calls the import, attaches .then/.catch on the returned Promise,
-            // and calls resolve/reject continuations.
-            thunkBuilder.callAsync(name: jsName, fromObjectExpr: importRootExpr)
-            funcLines = thunkBuilder.renderAsyncFunction(name: function.abiName(context: nil))
-        } else {
-            let returnExpr = try thunkBuilder.call(
-                name: jsName,
-                fromObjectExpr: importRootExpr,
-                returnType: function.returnType
-            )
-            funcLines = thunkBuilder.renderFunction(
-                name: function.abiName(context: nil),
-                returnExpr: returnExpr,
-                returnType: function.returnType
-            )
-        }
+        try thunkBuilder.call(
+            name: jsName,
+            fromObjectExpr: importRootExpr,
+            returnType: function.returnType
+        )
+        let funcLines = thunkBuilder.renderFunction(name: function.abiName(context: nil))
         if function.from == nil {
             importObjectBuilder.appendDts(
                 [
@@ -3201,20 +3203,20 @@ extension BridgeJSLink {
         importObjectBuilder: ImportObjectBuilder,
         getter: ImportedGetterSkeleton
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
+        let thunkBuilder = ImportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: true),
+            returnType: getter.type,
+            intrinsicRegistry: intrinsicRegistry
+        )
         let jsName = getter.jsName ?? getter.name
         let importRootExpr = getter.from == .global ? "globalThis" : "imports"
-        let returnExpr = try thunkBuilder.getImportProperty(
+        try thunkBuilder.getImportProperty(
             name: jsName,
             fromObjectExpr: importRootExpr,
             returnType: getter.type
         )
         let abiName = getter.abiName(context: nil)
-        let funcLines = thunkBuilder.renderFunction(
-            name: abiName,
-            returnExpr: returnExpr,
-            returnType: getter.type
-        )
+        let funcLines = thunkBuilder.renderFunction(name: abiName)
         if getter.from == nil {
             importObjectBuilder.appendDts(["readonly \(renderTSPropertyName(jsName)): \(getter.type.tsType);"])
         }
@@ -3258,7 +3260,6 @@ extension BridgeJSLink {
                         param: Parameter(label: nil, name: "newValue", type: setter.type)
                     )
                     thunkBuilder.callPropertySetter(name: setter.jsName ?? setter.name, returnType: setter.type)
-                    return nil
                 }
             )
             importObjectBuilder.assignToImportObject(name: setterAbiName, function: js)
@@ -3302,55 +3303,54 @@ extension BridgeJSLink {
         type: ImportedTypeSkeleton,
         constructor: ImportedConstructorSkeleton
     ) throws {
-        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
+        let thunkBuilder = ImportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: true),
+            returnType: BridgeType.jsObject(type.name),
+            intrinsicRegistry: intrinsicRegistry
+        )
         for param in constructor.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let returnType = BridgeType.jsObject(type.name)
         let importRootExpr = type.from == .global ? "globalThis" : "imports"
-        let returnExpr = try thunkBuilder.callConstructor(
+        try thunkBuilder.callConstructor(
             jsName: type.jsName ?? type.name,
             swiftTypeName: type.name,
             fromObjectExpr: importRootExpr
         )
         let abiName = constructor.abiName(context: type)
-        let funcLines = thunkBuilder.renderFunction(
-            name: abiName,
-            returnExpr: returnExpr,
-            returnType: returnType
-        )
+        let funcLines = thunkBuilder.renderFunction(name: abiName)
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
     }
 
     func renderImportedGetter(
         getter: ImportedGetterSkeleton,
         abiName: String,
-        emitCall: (ImportedThunkBuilder) throws -> String?
+        emitCall: (ImportedThunkBuilder) throws -> Void
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
-        thunkBuilder.liftSelf()
-        let returnExpr = try emitCall(thunkBuilder)
-        let funcLines = thunkBuilder.renderFunction(
-            name: abiName,
-            returnExpr: returnExpr,
-            returnType: getter.type
+        let thunkBuilder = ImportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: true),
+            returnType: getter.type,
+            intrinsicRegistry: intrinsicRegistry
         )
+        thunkBuilder.liftSelf()
+        try emitCall(thunkBuilder)
+        let funcLines = thunkBuilder.renderFunction(name: abiName)
         return (funcLines, [])
     }
 
     func renderImportedSetter(
         setter: ImportedSetterSkeleton,
         abiName: String,
-        emitCall: (ImportedThunkBuilder) throws -> String?
+        emitCall: (ImportedThunkBuilder) throws -> Void
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
-        thunkBuilder.liftSelf()
-        let returnExpr = try emitCall(thunkBuilder)
-        let funcLines = thunkBuilder.renderFunction(
-            name: abiName,
-            returnExpr: returnExpr,
-            returnType: .void
+        let thunkBuilder = ImportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: true),
+            returnType: .void,
+            intrinsicRegistry: intrinsicRegistry
         )
+        thunkBuilder.liftSelf()
+        try emitCall(thunkBuilder)
+        let funcLines = thunkBuilder.renderFunction(name: abiName)
         return (funcLines, [])
     }
 
@@ -3358,7 +3358,11 @@ extension BridgeJSLink {
         context: ImportedTypeSkeleton,
         method: ImportedFunctionSkeleton
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
+        let thunkBuilder = ImportedThunkBuilder(
+            effects: method.effects,
+            returnType: method.returnType,
+            intrinsicRegistry: intrinsicRegistry
+        )
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
@@ -3368,22 +3372,12 @@ extension BridgeJSLink {
             propertyName: context.jsName ?? context.name
         )
 
-        let funcLines: [String]
-        if method.effects.isAsync {
-            thunkBuilder.callAsyncStaticMethod(on: constructorExpr, name: method.jsName ?? method.name)
-            funcLines = thunkBuilder.renderAsyncFunction(name: method.abiName(context: context, operation: "static"))
-        } else {
-            let returnExpr = try thunkBuilder.callStaticMethod(
-                on: constructorExpr,
-                name: method.jsName ?? method.name,
-                returnType: method.returnType
-            )
-            funcLines = thunkBuilder.renderFunction(
-                name: method.abiName(context: context, operation: "static"),
-                returnExpr: returnExpr,
-                returnType: method.returnType
-            )
-        }
+        try thunkBuilder.callStaticMethod(
+            on: constructorExpr,
+            name: method.jsName ?? method.name,
+            returnType: method.returnType
+        )
+        let funcLines = thunkBuilder.renderFunction(name: method.abiName(context: context, operation: "static"))
         return (funcLines, [])
     }
 
@@ -3391,27 +3385,21 @@ extension BridgeJSLink {
         context: ImportedTypeSkeleton,
         method: ImportedFunctionSkeleton
     ) throws -> (js: [String], dts: [String]) {
-        let thunkBuilder = ImportedThunkBuilder(intrinsicRegistry: intrinsicRegistry)
+        let thunkBuilder = ImportedThunkBuilder(
+            effects: method.effects,
+            returnType: method.returnType,
+            intrinsicRegistry: intrinsicRegistry
+        )
         thunkBuilder.liftSelf()
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
 
-        let funcLines: [String]
-        if method.effects.isAsync {
-            thunkBuilder.callAsyncMethod(name: method.jsName ?? method.name)
-            funcLines = thunkBuilder.renderAsyncFunction(name: method.abiName(context: context))
-        } else {
-            let returnExpr = try thunkBuilder.callMethod(
-                name: method.jsName ?? method.name,
-                returnType: method.returnType
-            )
-            funcLines = thunkBuilder.renderFunction(
-                name: method.abiName(context: context),
-                returnExpr: returnExpr,
-                returnType: method.returnType
-            )
-        }
+        try thunkBuilder.callMethod(
+            name: method.jsName ?? method.name,
+            returnType: method.returnType
+        )
+        let funcLines = thunkBuilder.renderFunction(name: method.abiName(context: context))
         return (funcLines, [])
     }
 
@@ -3429,16 +3417,14 @@ extension BridgeJSLink {
         )
 
         let getterThunkBuilder = ImportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: true),
+            returnType: property.type,
             context: .exportSwift,
             intrinsicRegistry: intrinsicRegistry
         )
         getterThunkBuilder.liftSelf()
-        let returnExpr = try getterThunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
-        let getterLines = getterThunkBuilder.renderFunction(
-            name: getterAbiName,
-            returnExpr: returnExpr,
-            returnType: property.type
-        )
+        try getterThunkBuilder.callPropertyGetter(name: property.name, returnType: property.type)
+        let getterLines = getterThunkBuilder.renderFunction(name: getterAbiName)
         importObjectBuilder.assignToImportObject(name: getterAbiName, function: getterLines)
 
         if !property.isReadonly {
@@ -3450,6 +3436,8 @@ extension BridgeJSLink {
                 className: `protocol`.name
             )
             let setterThunkBuilder = ImportedThunkBuilder(
+                effects: Effects(isAsync: false, isThrows: false),
+                returnType: .void,
                 context: .exportSwift,
                 intrinsicRegistry: intrinsicRegistry
             )
@@ -3458,11 +3446,7 @@ extension BridgeJSLink {
                 param: Parameter(label: nil, name: "value", type: property.type)
             )
             setterThunkBuilder.callPropertySetter(name: property.name, returnType: property.type)
-            let setterLines = setterThunkBuilder.renderFunction(
-                name: setterAbiName,
-                returnExpr: nil,
-                returnType: .void
-            )
+            let setterLines = setterThunkBuilder.renderFunction(name: setterAbiName)
             importObjectBuilder.assignToImportObject(name: setterAbiName, function: setterLines)
         }
     }
@@ -3473,6 +3457,8 @@ extension BridgeJSLink {
         method: ExportedFunction
     ) throws {
         let thunkBuilder = ImportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: false),
+            returnType: method.returnType,
             context: .exportSwift,
             intrinsicRegistry: intrinsicRegistry
         )
@@ -3480,12 +3466,8 @@ extension BridgeJSLink {
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let returnExpr = try thunkBuilder.callMethod(name: method.name, returnType: method.returnType)
-        let funcLines = thunkBuilder.renderFunction(
-            name: method.abiName,
-            returnExpr: returnExpr,
-            returnType: method.returnType
-        )
+        try thunkBuilder.callMethod(name: method.name, returnType: method.returnType)
+        let funcLines = thunkBuilder.renderFunction(name: method.abiName)
         importObjectBuilder.assignToImportObject(name: method.abiName, function: funcLines)
     }
 }
