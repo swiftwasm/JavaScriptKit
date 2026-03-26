@@ -395,13 +395,19 @@ public struct Parameter: Codable, Equatable, Sendable {
     }
 }
 
-// MARK: - BridgeType Visitor
+// MARK: - BridgeSkeleton Visitor
 
-public protocol BridgeTypeVisitor {
+public protocol BridgeSkeletonVisitor {
     mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool)
+    mutating func visitImportedFunction(_ function: ImportedFunctionSkeleton)
 }
 
-public struct BridgeTypeWalker<Visitor: BridgeTypeVisitor> {
+public extension BridgeSkeletonVisitor {
+    mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool) {}
+    mutating func visitImportedFunction(_ function: ImportedFunctionSkeleton) {}
+}
+
+public struct BridgeSkeletonWalker<Visitor: BridgeSkeletonVisitor> {
     public var visitor: Visitor
 
     public init(visitor: Visitor) {
@@ -487,6 +493,7 @@ public struct BridgeTypeWalker<Visitor: BridgeTypeVisitor> {
         }
     }
     public mutating func walk(_ function: ImportedFunctionSkeleton) {
+        visitor.visitImportedFunction(function)
         walk(function.parameters)
         walk(function.returnType)
     }
@@ -1160,15 +1167,56 @@ public struct ImportedModuleSkeleton: Codable {
 
 // MARK: - Closure signature collection visitor
 
-public struct ClosureSignatureCollectorVisitor: BridgeTypeVisitor {
+public struct ClosureSignatureCollectorVisitor: BridgeSkeletonVisitor {
     public var signatures: Set<ClosureSignature> = []
+    let moduleName: String
 
-    public init(signatures: Set<ClosureSignature> = []) {
+    public init(moduleName: String, signatures: Set<ClosureSignature> = []) {
+        self.moduleName = moduleName
         self.signatures = signatures
     }
 
     public mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool) {
         signatures.insert(signature)
+    }
+    public mutating func visitImportedFunction(_ function: ImportedFunctionSkeleton) {
+        guard function.effects.isAsync else { return }
+
+        // When async imports exist, inject closure signatures for the typed resolve
+        // and reject callbacks used by _bjs_awaitPromise.
+        // - Reject always uses (sending JSValue) -> Void
+        // - Resolve uses a typed closure matching the return type (or () -> Void for void)
+        // All async callback closures use `sending` parameters so values can be
+        // transferred through the checked continuation without Sendable constraints.
+
+        // Reject callback
+        signatures.insert(
+            ClosureSignature(
+                parameters: [.jsValue],
+                returnType: .void,
+                moduleName: moduleName,
+                sendingParameters: true
+            )
+        )
+        // Resolve callback (typed per return type)
+        if function.returnType == .void {
+            signatures.insert(
+                ClosureSignature(
+                    parameters: [],
+                    returnType: .void,
+                    moduleName: moduleName
+                )
+            )
+        } else {
+            signatures.insert(
+                ClosureSignature(
+                    parameters: [function.returnType],
+                    returnType: .void,
+                    moduleName: moduleName,
+                    sendingParameters: true
+                )
+            )
+        }
     }
 }
 

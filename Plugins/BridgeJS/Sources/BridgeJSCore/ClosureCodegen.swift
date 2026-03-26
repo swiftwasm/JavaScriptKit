@@ -188,82 +188,10 @@ public struct ClosureCodegen {
     }
 
     public func renderSupport(for skeleton: BridgeJSSkeleton) throws -> String? {
-        let collector = ClosureSignatureCollectorVisitor()
-        var walker = BridgeTypeWalker(visitor: collector)
+        let collector = ClosureSignatureCollectorVisitor(moduleName: skeleton.moduleName)
+        var walker = BridgeSkeletonWalker(visitor: collector)
         walker.walk(skeleton)
-        var closureSignatures = walker.visitor.signatures
-
-        // When async imports exist, inject closure signatures for the typed resolve
-        // and reject callbacks used by _bjs_awaitPromise.
-        // - Reject always uses (sending JSValue) -> Void
-        // - Resolve uses a typed closure matching the return type (or () -> Void for void)
-        // All async callback closures use `sending` parameters so values can be
-        // transferred through the checked continuation without Sendable constraints.
-        if let imported = skeleton.imported {
-            for file in imported.children {
-                for function in file.functions where function.effects.isAsync {
-                    // Reject callback
-                    closureSignatures.insert(
-                        ClosureSignature(
-                            parameters: [.jsValue],
-                            returnType: .void,
-                            moduleName: skeleton.moduleName,
-                            sendingParameters: true
-                        )
-                    )
-                    // Resolve callback (typed per return type)
-                    if function.returnType == .void {
-                        closureSignatures.insert(
-                            ClosureSignature(
-                                parameters: [],
-                                returnType: .void,
-                                moduleName: skeleton.moduleName
-                            )
-                        )
-                    } else {
-                        closureSignatures.insert(
-                            ClosureSignature(
-                                parameters: [function.returnType],
-                                returnType: .void,
-                                moduleName: skeleton.moduleName,
-                                sendingParameters: true
-                            )
-                        )
-                    }
-                }
-                for type in file.types {
-                    for method in (type.methods + type.staticMethods) where method.effects.isAsync {
-                        closureSignatures.insert(
-                            ClosureSignature(
-                                parameters: [.jsValue],
-                                returnType: .void,
-                                moduleName: skeleton.moduleName,
-                                sendingParameters: true
-                            )
-                        )
-                        if method.returnType == .void {
-                            closureSignatures.insert(
-                                ClosureSignature(
-                                    parameters: [],
-                                    returnType: .void,
-                                    moduleName: skeleton.moduleName
-                                )
-                            )
-                        } else {
-                            closureSignatures.insert(
-                                ClosureSignature(
-                                    parameters: [method.returnType],
-                                    returnType: .void,
-                                    moduleName: skeleton.moduleName,
-                                    sendingParameters: true
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
+        let closureSignatures = walker.visitor.signatures
         guard !closureSignatures.isEmpty else { return nil }
 
         var decls: [DeclSyntax] = []

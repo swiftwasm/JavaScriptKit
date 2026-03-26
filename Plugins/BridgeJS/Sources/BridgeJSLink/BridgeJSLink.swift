@@ -636,79 +636,10 @@ public struct BridgeJSLink {
 
                 for unified in skeletons {
                     let moduleName = unified.moduleName
-                    let collector = ClosureSignatureCollectorVisitor()
-                    var walker = BridgeTypeWalker(visitor: collector)
+                    let collector = ClosureSignatureCollectorVisitor(moduleName: moduleName)
+                    var walker = BridgeSkeletonWalker(visitor: collector)
                     walker.walk(unified)
-                    var closureSignatures = walker.visitor.signatures
-
-                    // Inject closure signatures for async import resolve/reject callbacks.
-                    // All use sendingParameters: true so values can be transferred
-                    // through checked continuations without Sendable constraints.
-                    if let imported = unified.imported {
-                        for file in imported.children {
-                            for function in file.functions where function.effects.isAsync {
-                                // Reject callback
-                                closureSignatures.insert(
-                                    ClosureSignature(
-                                        parameters: [.jsValue],
-                                        returnType: .void,
-                                        moduleName: moduleName,
-                                        sendingParameters: true
-                                    )
-                                )
-                                // Resolve callback (typed per return type)
-                                if function.returnType == .void {
-                                    closureSignatures.insert(
-                                        ClosureSignature(
-                                            parameters: [],
-                                            returnType: .void,
-                                            moduleName: moduleName
-                                        )
-                                    )
-                                } else {
-                                    closureSignatures.insert(
-                                        ClosureSignature(
-                                            parameters: [function.returnType],
-                                            returnType: .void,
-                                            moduleName: moduleName,
-                                            sendingParameters: true
-                                        )
-                                    )
-                                }
-                            }
-                            for type in file.types {
-                                for method in (type.methods + type.staticMethods) where method.effects.isAsync {
-                                    closureSignatures.insert(
-                                        ClosureSignature(
-                                            parameters: [.jsValue],
-                                            returnType: .void,
-                                            moduleName: moduleName,
-                                            sendingParameters: true
-                                        )
-                                    )
-                                    if method.returnType == .void {
-                                        closureSignatures.insert(
-                                            ClosureSignature(
-                                                parameters: [],
-                                                returnType: .void,
-                                                moduleName: moduleName
-                                            )
-                                        )
-                                    } else {
-                                        closureSignatures.insert(
-                                            ClosureSignature(
-                                                parameters: [method.returnType],
-                                                returnType: .void,
-                                                moduleName: moduleName,
-                                                sendingParameters: true
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-
+                    let closureSignatures = walker.visitor.signatures
                     guard !closureSignatures.isEmpty else { continue }
 
                     intrinsicRegistry.register(name: "swiftClosureHelpers") { helperPrinter in
