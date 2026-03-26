@@ -32,6 +32,7 @@ public struct ClosureCodegen {
         let builder = try ImportTS.CallJSEmission(
             moduleName: "bjs",
             abiName: externName,
+            effects: Effects(isAsync: signature.isAsync, isThrows: signature.isThrows),
             returnType: signature.returnType,
             context: .exportSwift
         )
