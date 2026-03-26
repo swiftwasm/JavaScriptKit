@@ -1,0 +1,67 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "AsyncBox",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "asyncStaticRoundTrip",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "asyncStaticVoid",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

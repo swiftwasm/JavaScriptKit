@@ -232,7 +232,7 @@ public struct ClosureCodegen {
                     }
                 }
                 for type in file.types {
-                    for method in type.methods where method.effects.isAsync {
+                    for method in (type.methods + type.staticMethods) where method.effects.isAsync {
                         closureSignatures.insert(
                             ClosureSignature(
                                 parameters: [.jsValue],

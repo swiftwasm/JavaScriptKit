@@ -677,7 +677,7 @@ public struct BridgeJSLink {
                                 }
                             }
                             for type in file.types {
-                                for method in type.methods where method.effects.isAsync {
+                                for method in (type.methods + type.staticMethods) where method.effects.isAsync {
                                     closureSignatures.insert(
                                         ClosureSignature(
                                             parameters: [.jsValue],
@@ -2397,6 +2397,13 @@ extension BridgeJSLink {
             )
         }
 
+        /// Generates an async static method call with resolve/reject closure refs.
+        func callAsyncStaticMethod(on objectExpr: String, name: String) {
+            let calleeExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
+            let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
+            body.write("\(callExpr).then(resolve, reject);")
+        }
+
         func callPropertyGetter(name: String, returnType: BridgeType) throws -> String? {
             let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
             let accessExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
@@ -3345,7 +3352,7 @@ extension BridgeJSLink {
                 for method in type.staticMethods {
                     let methodName = method.jsName ?? method.name
                     let signature =
-                        "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                        "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                     dtsPrinter.write(signature)
                 }
             }
@@ -3429,16 +3436,23 @@ extension BridgeJSLink {
             objectExpr: importRootExpr,
             propertyName: context.jsName ?? context.name
         )
-        let returnExpr = try thunkBuilder.callStaticMethod(
-            on: constructorExpr,
-            name: method.jsName ?? method.name,
-            returnType: method.returnType
-        )
-        let funcLines = thunkBuilder.renderFunction(
-            name: method.abiName(context: context, operation: "static"),
-            returnExpr: returnExpr,
-            returnType: method.returnType
-        )
+
+        let funcLines: [String]
+        if method.effects.isAsync {
+            thunkBuilder.callAsyncStaticMethod(on: constructorExpr, name: method.jsName ?? method.name)
+            funcLines = thunkBuilder.renderAsyncFunction(name: method.abiName(context: context, operation: "static"))
+        } else {
+            let returnExpr = try thunkBuilder.callStaticMethod(
+                on: constructorExpr,
+                name: method.jsName ?? method.name,
+                returnType: method.returnType
+            )
+            funcLines = thunkBuilder.renderFunction(
+                name: method.abiName(context: context, operation: "static"),
+                returnExpr: returnExpr,
+                returnType: method.returnType
+            )
+        }
         return (funcLines, [])
     }
 

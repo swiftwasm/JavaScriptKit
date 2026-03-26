@@ -477,12 +477,15 @@ public struct ImportTS {
 
         func renderStaticMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
             let abiName = method.abiName(context: type, operation: "static")
-            let abiReturnType: BridgeType = method.effects.isAsync ? .jsObject(nil) : method.returnType
+            let abiReturnType: BridgeType = method.effects.isAsync ? .void : method.returnType
             let builder = try CallJSEmission(moduleName: moduleName, abiName: abiName, returnType: abiReturnType)
+            if method.effects.isAsync {
+                builder.prependClosureCallbackParams()
+            }
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
-            try builder.call()
+            try builder.call(skipExceptionCheck: method.effects.isAsync)
             if method.effects.isAsync {
                 builder.liftAsyncReturnValue(originalReturnType: method.returnType)
             } else {
