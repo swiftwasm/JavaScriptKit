@@ -242,6 +242,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "createTS2Swift",
             "parameters" : [
 
@@ -260,6 +265,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "convert",
                 "parameters" : [
                   {

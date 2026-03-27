@@ -4,6 +4,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "from" : "global",
             "jsName" : "parseInt",
             "name" : "parseInt",
@@ -42,6 +47,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "log",
                 "parameters" : [
                   {
@@ -87,6 +97,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "close",
                 "parameters" : [
 

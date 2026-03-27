@@ -4,6 +4,7 @@
 /// by the BridgeJS system.
 
 import _CJavaScriptKit
+import _Concurrency
 
 #if !arch(wasm32)
 @usableFromInline func _onlyAvailableOnWasm() -> Never {
@@ -2081,5 +2082,93 @@ extension _BridgedAsOptional {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn<Value>() -> Void
     where Wrapped == Dictionary<String, Value>, Value: _BridgedSwiftStackType, Value.StackLiftResult == Value {
         Wrapped.bridgeJSStackPushAsOptional(asOptional)
+    }
+}
+
+// MARK: Async Promise Awaiting
+
+/// Protocol for type-erasing `JSTypedClosure` in `_bjs_awaitPromise`.
+///
+/// The library cannot name concrete `JSTypedClosure<(Int) -> Void>` etc. because
+/// those require per-module generated convenience inits. This protocol provides
+/// access to the underlying JS object ref and cleanup.
+@_spi(BridgeJS) public protocol _BridgeJSReleasableClosure {
+    var jsObject: JSObject { get }
+    func release()
+}
+
+@_spi(BridgeJS) extension JSTypedClosure: _BridgeJSReleasableClosure {}
+
+/// Awaits a JavaScript Promise using typed resolve/reject `JSTypedClosure` callbacks.
+///
+/// The closure factories are dependency-injected because this library cannot
+/// reference per-module generated `make_swift_closure_*` externs. The generated
+/// code passes `{ JSTypedClosure<(T) -> Void>($0) }` which uses the per-module
+/// convenience init.
+///
+/// - Parameters:
+///   - makeResolveClosure: A factory that wraps a `(T) -> Void` Swift closure
+///     into a typed `JSTypedClosure`, creating the corresponding JS function.
+///   - makeRejectClosure: A factory that wraps a `(JSValue) -> Void` Swift closure
+///     into a `JSTypedClosure`, for the rejection path.
+///   - body: A closure that receives the resolve and reject JS object refs
+///     (as `Int32`) and should pass them to the appropriate JS extern function.
+/// - Returns: The resolved value of type `T` from the Promise.
+/// - Throws: `JSException` if the Promise rejects.
+@_spi(BridgeJS) public func _bjs_awaitPromise<T, R: _BridgeJSReleasableClosure, E: _BridgeJSReleasableClosure>(
+    makeResolveClosure: (@escaping (sending T) -> Void) -> R,
+    makeRejectClosure: (@escaping (sending JSValue) -> Void) -> E,
+    _ body: (_ resolveRef: Int32, _ rejectRef: Int32) -> Void
+) async throws(JSException) -> T {
+    var resolveClosure: R?
+    var rejectClosure: E?
+    let result: Result<T, JSException> = await withCheckedContinuation { continuation in
+        let resolve = makeResolveClosure { value in
+            continuation.resume(returning: .success(value))
+        }
+        let reject = makeRejectClosure { value in
+            continuation.resume(returning: .failure(JSException(value)))
+        }
+        resolveClosure = resolve
+        rejectClosure = reject
+        body(
+            Int32(bitPattern: resolve.jsObject.id),
+            Int32(bitPattern: reject.jsObject.id)
+        )
+    }
+    resolveClosure?.release()
+    rejectClosure?.release()
+    return try result.get()
+}
+
+/// Void-returning overload of `_bjs_awaitPromise`.
+///
+/// Needed because `(Void) -> Void` is not the same as `() -> Void` in Swift (SE-0110),
+/// so the generic overload cannot handle void returns.
+@_spi(BridgeJS) public func _bjs_awaitPromise<R: _BridgeJSReleasableClosure, E: _BridgeJSReleasableClosure>(
+    makeResolveClosure: (@escaping () -> Void) -> R,
+    makeRejectClosure: (@escaping (sending JSValue) -> Void) -> E,
+    _ body: (_ resolveRef: Int32, _ rejectRef: Int32) -> Void
+) async throws(JSException) {
+    var resolveClosure: R?
+    var rejectClosure: E?
+    let error: JSException? = await withCheckedContinuation { continuation in
+        let resolve = makeResolveClosure {
+            continuation.resume(returning: nil)
+        }
+        let reject = makeRejectClosure { value in
+            continuation.resume(returning: JSException(value))
+        }
+        resolveClosure = resolve
+        rejectClosure = reject
+        body(
+            Int32(bitPattern: resolve.jsObject.id),
+            Int32(bitPattern: reject.jsObject.id)
+        )
+    }
+    resolveClosure?.release()
+    rejectClosure?.release()
+    if let error {
+        throw error
     }
 }

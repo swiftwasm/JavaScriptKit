@@ -4,6 +4,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "applyInt",
             "parameters" : [
               {
@@ -43,7 +48,8 @@
                             "width" : "word"
                           }
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -60,6 +66,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "makeAdder",
             "parameters" : [
               {
@@ -98,7 +109,8 @@
                         "width" : "word"
                       }
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }

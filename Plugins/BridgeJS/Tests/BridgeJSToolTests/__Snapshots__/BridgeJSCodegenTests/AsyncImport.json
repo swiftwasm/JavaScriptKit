@@ -1,0 +1,151 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "asyncReturnVoid",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "asyncRoundTripInt",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "asyncRoundTripString",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "asyncRoundTripBool",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "asyncRoundTripDouble",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "asyncRoundTripJSObject",
+            "parameters" : [
+              {
+                "name" : "v",
+                "type" : {
+                  "jsObject" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsObject" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

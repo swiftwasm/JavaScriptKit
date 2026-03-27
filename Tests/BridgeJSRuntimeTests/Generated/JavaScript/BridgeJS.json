@@ -49,7 +49,8 @@
                         "width" : "word"
                       }
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -97,7 +98,8 @@
                     "double" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -145,7 +147,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -202,7 +205,8 @@
                         "width" : "word"
                       }
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : true
               }
@@ -250,7 +254,8 @@
                     "double" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : true
               }
@@ -298,7 +303,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : true
               }
@@ -591,7 +597,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -641,7 +648,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -684,7 +692,8 @@
                     "swiftHeapObject" : {
                       "_0" : "Greeter"
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -724,7 +733,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -2931,7 +2941,8 @@
                       "string" : {
 
                       }
-                    }
+                    },
+                    "sendingParameters" : false
                   },
                   "useJSTypedClosure" : false
                 }
@@ -3017,7 +3028,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3059,7 +3071,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3100,7 +3113,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3151,7 +3165,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3199,7 +3214,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3246,7 +3262,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3282,7 +3299,8 @@
                       },
                       "_1" : "null"
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3318,7 +3336,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3362,7 +3381,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3409,7 +3429,8 @@
                             "width" : "word"
                           }
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3455,7 +3476,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3497,7 +3519,8 @@
                     "bool" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3533,7 +3556,8 @@
                     "bool" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3572,7 +3596,8 @@
                         "width" : "word"
                       }
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3607,7 +3632,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3648,7 +3674,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3697,7 +3724,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3745,7 +3773,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3792,7 +3821,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3828,7 +3858,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3866,7 +3897,8 @@
                     "swiftProtocol" : {
                       "_0" : "DataProcessor"
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3902,7 +3934,8 @@
                         "swiftProtocol" : {
                           "_0" : "DataProcessor"
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -3927,7 +3960,8 @@
                     "swiftProtocol" : {
                       "_0" : "DataProcessor"
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -3968,7 +4002,8 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -10604,7 +10639,8 @@
                           },
                           "_1" : "null"
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
@@ -13606,7 +13642,8 @@
                     "string" : {
 
                     }
-                  }
+                  },
+                  "sendingParameters" : false
                 },
                 "useJSTypedClosure" : false
               }
@@ -13656,7 +13693,8 @@
                 "string" : {
 
                 }
-              }
+              },
+              "sendingParameters" : false
             },
             "useJSTypedClosure" : false
           }
@@ -13708,7 +13746,8 @@
                     "width" : "word"
                   }
                 }
-              }
+              },
+              "sendingParameters" : false
             },
             "useJSTypedClosure" : false
           }
@@ -16372,6 +16411,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsIntArrayLength",
                 "parameters" : [
                   {
@@ -16400,6 +16444,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripIntArray",
                 "parameters" : [
                   {
@@ -16432,6 +16481,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripNumberArray",
                 "parameters" : [
                   {
@@ -16458,6 +16512,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripStringArray",
                 "parameters" : [
                   {
@@ -16484,6 +16543,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripBoolArray",
                 "parameters" : [
                   {
@@ -16510,6 +16574,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripJSValueArray",
                 "parameters" : [
                   {
@@ -16536,6 +16605,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripJSObjectArray",
                 "parameters" : [
                   {
@@ -16562,6 +16636,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripJSClassArray",
                 "parameters" : [
                   {
@@ -16588,6 +16667,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalIntArray",
                 "parameters" : [
                   {
@@ -16630,6 +16714,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalStringArray",
                 "parameters" : [
                   {
@@ -16666,6 +16755,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalBoolArray",
                 "parameters" : [
                   {
@@ -16702,6 +16796,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalJSValueArray",
                 "parameters" : [
                   {
@@ -16738,6 +16837,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalJSObjectArray",
                 "parameters" : [
                   {
@@ -16774,6 +16878,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalJSClassArray",
                 "parameters" : [
                   {
@@ -16810,6 +16919,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsSumNumberArray",
                 "parameters" : [
                   {
@@ -16832,6 +16946,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsCreateNumberArray",
                 "parameters" : [
 
@@ -16847,6 +16966,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "runJsArraySupportTests",
                 "parameters" : [
 
@@ -16873,12 +16997,307 @@
             "methods" : [
 
             ],
+            "name" : "AsyncImportImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripVoid",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripNumber",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripBool",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "bool" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripString",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripOptionalString",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripOptionalNumber",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripBoolArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "bool" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "bool" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripIntArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripStringArray",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripFeatureFlag",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "rawValueEnum" : {
+                        "_0" : "FeatureFlag",
+                        "_1" : "String"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "rawValueEnum" : {
+                    "_0" : "FeatureFlag",
+                    "_1" : "String"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
             "name" : "ClosureSupportImports",
             "setters" : [
 
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsApplyVoid",
                 "parameters" : [
                   {
@@ -16897,7 +17316,8 @@
                             "void" : {
 
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -16911,6 +17331,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsApplyBool",
                 "parameters" : [
                   {
@@ -16929,7 +17354,8 @@
                             "bool" : {
 
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -16943,6 +17369,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsApplyInt",
                 "parameters" : [
                   {
@@ -16982,7 +17413,8 @@
                                 "width" : "word"
                               }
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -16999,6 +17431,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsApplyDouble",
                 "parameters" : [
                   {
@@ -17029,7 +17466,8 @@
                             "double" : {
 
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -17043,6 +17481,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsApplyString",
                 "parameters" : [
                   {
@@ -17073,7 +17516,8 @@
                             "string" : {
 
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -17087,6 +17531,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsApplyJSObject",
                 "parameters" : [
                   {
@@ -17117,7 +17566,8 @@
                             "jsObject" : {
 
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -17131,6 +17581,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsMakeIntToInt",
                 "parameters" : [
                   {
@@ -17169,13 +17624,19 @@
                             "width" : "word"
                           }
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsMakeDoubleToDouble",
                 "parameters" : [
                   {
@@ -17205,13 +17666,19 @@
                         "double" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsMakeStringToString",
                 "parameters" : [
                   {
@@ -17241,13 +17708,19 @@
                         "string" : {
 
                         }
-                      }
+                      },
+                      "sendingParameters" : false
                     },
                     "useJSTypedClosure" : false
                   }
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsCallTwice",
                 "parameters" : [
                   {
@@ -17284,7 +17757,8 @@
                             "void" : {
 
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -17301,6 +17775,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsCallBinary",
                 "parameters" : [
                   {
@@ -17337,7 +17816,8 @@
                                 "width" : "word"
                               }
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -17354,6 +17834,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsCallTriple",
                 "parameters" : [
                   {
@@ -17398,7 +17883,8 @@
                                 "width" : "word"
                               }
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -17415,6 +17901,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsCallAfterRelease",
                 "parameters" : [
                   {
@@ -17433,7 +17924,8 @@
                             "void" : {
 
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -17447,6 +17939,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsOptionalInvoke",
                 "parameters" : [
                   {
@@ -17467,7 +17964,8 @@
                                 "bool" : {
 
                                 }
-                              }
+                              },
+                              "sendingParameters" : false
                             },
                             "useJSTypedClosure" : true
                           }
@@ -17484,6 +17982,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsStoreClosure",
                 "parameters" : [
                   {
@@ -17502,7 +18005,8 @@
                             "void" : {
 
                             }
-                          }
+                          },
+                          "sendingParameters" : false
                         },
                         "useJSTypedClosure" : true
                       }
@@ -17516,6 +18020,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsCallStoredClosure",
                 "parameters" : [
 
@@ -17527,6 +18036,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsHeapCount",
                 "parameters" : [
 
@@ -17541,6 +18055,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "runJsClosureSupportTests",
                 "parameters" : [
 
@@ -17573,6 +18092,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "runJsDefaultArgumentTests",
                 "parameters" : [
 
@@ -17605,6 +18129,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripDictionaryInt",
                 "parameters" : [
                   {
@@ -17637,6 +18166,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripDictionaryBool",
                 "parameters" : [
                   {
@@ -17663,6 +18197,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripDictionaryDouble",
                 "parameters" : [
                   {
@@ -17689,6 +18228,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripDictionaryJSObject",
                 "parameters" : [
                   {
@@ -17715,6 +18259,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripDictionaryJSValue",
                 "parameters" : [
                   {
@@ -17741,6 +18290,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripDictionaryDoubleArray",
                 "parameters" : [
                   {
@@ -17822,6 +18376,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsRoundTripVoid",
             "parameters" : [
 
@@ -17833,6 +18392,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsRoundTripNumber",
             "parameters" : [
               {
@@ -17851,6 +18415,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsRoundTripBool",
             "parameters" : [
               {
@@ -17869,6 +18438,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsRoundTripString",
             "parameters" : [
               {
@@ -17887,6 +18461,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsRoundTripJSValue",
             "parameters" : [
               {
@@ -17905,6 +18484,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsThrowOrVoid",
             "parameters" : [
               {
@@ -17923,6 +18507,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsThrowOrNumber",
             "parameters" : [
               {
@@ -17941,6 +18530,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsThrowOrBool",
             "parameters" : [
               {
@@ -17959,6 +18553,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsThrowOrString",
             "parameters" : [
               {
@@ -17977,6 +18576,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsRoundTripFeatureFlag",
             "parameters" : [
               {
@@ -17997,17 +18601,50 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "runAsyncWorks",
             "parameters" : [
 
             ],
             "returnType" : {
-              "jsObject" : {
-                "_0" : "JSPromise"
+              "void" : {
+
               }
             }
           },
           {
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "fetchWeatherData",
+            "parameters" : [
+              {
+                "name" : "city",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "WeatherData"
+              }
+            }
+          },
+          {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "jsName" : "$jsWeirdFunction",
             "name" : "_jsWeirdFunction",
             "parameters" : [
@@ -18020,6 +18657,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "from" : "global",
             "name" : "parseInt",
             "parameters" : [
@@ -18092,6 +18734,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "greet",
                 "parameters" : [
 
@@ -18103,6 +18750,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "changeName",
                 "parameters" : [
                   {
@@ -18138,6 +18790,70 @@
             ]
           },
           {
+            "getters" : [
+              {
+                "name" : "temperature",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "description",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "humidity",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+
+            ],
+            "name" : "WeatherData",
+            "setters" : [
+              {
+                "functionName" : "temperature_set",
+                "name" : "temperature",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "description_set",
+                "name" : "description",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "functionName" : "humidity_set",
+                "name" : "humidity",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
             "constructor" : {
               "parameters" : [
 
@@ -18149,6 +18865,11 @@
             "jsName" : "$WeirdClass",
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "jsName" : "method-with-dashes",
                 "name" : "method_with_dashes",
                 "parameters" : [
@@ -18187,6 +18908,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "value",
                 "parameters" : [
 
@@ -18204,6 +18930,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "create",
                 "parameters" : [
                   {
@@ -18222,6 +18953,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "value",
                 "parameters" : [
 
@@ -18233,6 +18969,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "makeDefault",
                 "parameters" : [
 
@@ -18244,6 +18985,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "jsName" : "with-dashes",
                 "name" : "with_dashes",
                 "parameters" : [
@@ -18315,6 +19061,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "bark",
                 "parameters" : [
 
@@ -18326,6 +19077,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "getIsCat",
                 "parameters" : [
 
@@ -18376,6 +19132,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsTranslatePoint",
             "parameters" : [
               {
@@ -18438,6 +19199,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripInt",
                 "parameters" : [
                   {
@@ -18462,6 +19228,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripUInt",
                 "parameters" : [
                   {
@@ -18486,6 +19257,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripInt8",
                 "parameters" : [
                   {
@@ -18510,6 +19286,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripUInt8",
                 "parameters" : [
                   {
@@ -18534,6 +19315,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripInt16",
                 "parameters" : [
                   {
@@ -18558,6 +19344,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripUInt16",
                 "parameters" : [
                   {
@@ -18582,6 +19373,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripInt32",
                 "parameters" : [
                   {
@@ -18606,6 +19402,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripUInt32",
                 "parameters" : [
                   {
@@ -18630,6 +19431,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripInt64",
                 "parameters" : [
                   {
@@ -18654,6 +19460,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripUInt64",
                 "parameters" : [
                   {
@@ -18678,6 +19489,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "runJsIntegerTypesSupportTests",
                 "parameters" : [
 
@@ -18760,6 +19576,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "concatNumbers",
                 "parameters" : [
                   {
@@ -18792,6 +19613,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "concatLabels",
                 "parameters" : [
                   {
@@ -18818,6 +19644,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "firstLabel",
                 "parameters" : [
                   {
@@ -18889,6 +19720,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "makeJSClassWithArrayMembers",
                 "parameters" : [
                   {
@@ -19002,6 +19838,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsFunctionWithPackageAccess",
             "parameters" : [
 
@@ -19013,6 +19854,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsFunctionWithPublicAccess",
             "parameters" : [
 
@@ -19024,6 +19870,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsFunctionWithInternalAccess",
             "parameters" : [
 
@@ -19035,6 +19886,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsFunctionWithFilePrivateAccess",
             "parameters" : [
 
@@ -19046,6 +19902,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "jsFunctionWithPrivateAccess",
             "parameters" : [
 
@@ -19079,6 +19940,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalNumberNull",
                 "parameters" : [
                   {
@@ -19113,6 +19979,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalNumberUndefined",
                 "parameters" : [
                   {
@@ -19147,6 +20018,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalStringNull",
                 "parameters" : [
                   {
@@ -19175,6 +20051,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalStringUndefined",
                 "parameters" : [
                   {
@@ -19203,6 +20084,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalJSValueArrayNull",
                 "parameters" : [
                   {
@@ -19239,6 +20125,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalJSValueArrayUndefined",
                 "parameters" : [
                   {
@@ -19275,6 +20166,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalStringToStringDictionaryNull",
                 "parameters" : [
                   {
@@ -19311,6 +20207,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalStringToStringDictionaryUndefined",
                 "parameters" : [
                   {
@@ -19347,6 +20248,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "runJsOptionalSupportTests",
                 "parameters" : [
 
@@ -19364,6 +20270,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "from" : "global",
             "name" : "gc",
             "parameters" : [
@@ -19390,6 +20301,11 @@
             ],
             "staticMethods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripGreeter",
                 "parameters" : [
                   {
@@ -19408,6 +20324,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripUUID",
                 "parameters" : [
                   {
@@ -19426,6 +20347,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsRoundTripOptionalGreeter",
                 "parameters" : [
                   {
@@ -19454,6 +20380,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsConsumeLeakCheck",
                 "parameters" : [
                   {
@@ -19472,6 +20403,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "jsConsumeOptionalLeakCheck",
                 "parameters" : [
                   {

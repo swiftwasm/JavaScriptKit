@@ -66,9 +66,11 @@ public struct ImportTS {
         _ getter: ImportedGetterSkeleton,
         topLevelDecls: inout [DeclSyntax]
     ) throws -> [DeclSyntax] {
+        let effects = Effects(isAsync: false, isThrows: true)
         let builder = try CallJSEmission(
             moduleName: moduleName,
             abiName: getter.abiName(context: nil),
+            effects: effects,
             returnType: getter.type
         )
         try builder.call()
@@ -78,7 +80,8 @@ public struct ImportTS {
             builder.renderThunkDecl(
                 name: "_$\(getter.name)_get",
                 parameters: [],
-                returnType: getter.type
+                returnType: getter.type,
+                effects: effects
             )
             .with(\.leadingTrivia, Self.renderDocumentation(documentation: getter.documentation))
         ]
@@ -94,13 +97,14 @@ public struct ImportTS {
 
         let abiName: String
         let moduleName: String
+        let effects: Effects
         let returnType: BridgeType
         let context: BridgeContext
 
         var body = CodeFragmentPrinter()
         var abiParameterForwardings: [String] = []
         var abiParameterSignatures: [(name: String, type: WasmCoreType)] = []
-        var abiReturnType: WasmCoreType?
+        let abiReturnType: WasmCoreType?
         // Track destructured variable names for multiple lowered parameters
         var destructuredVarNames: [String] = []
         // Stack-lowered parameters should be evaluated in reverse order to match LIFO stacks
@@ -111,15 +115,29 @@ public struct ImportTS {
         private var borrowedArguments: [BorrowedArgument] = []
         private let needsReturnVariable: Bool
 
-        init(moduleName: String, abiName: String, returnType: BridgeType, context: BridgeContext = .importTS) throws {
+        init(
+            moduleName: String,
+            abiName: String,
+            effects: Effects,
+            returnType: BridgeType,
+            context: BridgeContext = .importTS
+        ) throws {
             self.moduleName = moduleName
             self.abiName = abiName
+            self.effects = effects
             self.returnType = returnType
             self.context = context
             let liftingInfo = try returnType.liftingReturnInfo(context: context)
-            needsReturnVariable =
-                !(returnType == .void || returnType.usesSideChannelForOptionalReturn()
-                || liftingInfo.valueToLift == nil)
+            if effects.isAsync || returnType == .void || returnType.usesSideChannelForOptionalReturn() {
+                abiReturnType = nil
+            } else {
+                abiReturnType = liftingInfo.valueToLift
+            }
+            needsReturnVariable = abiReturnType != nil
+
+            if effects.isAsync {
+                prependClosureCallbackParams()
+            }
         }
 
         func lowerParameter(param: Parameter) throws {
@@ -212,6 +230,15 @@ public struct ImportTS {
             }
         }
 
+        /// Prepends `resolveRef: Int32, rejectRef: Int32` parameters to the ABI parameter list.
+        ///
+        /// Used for async imports where the JS side receives closure-backed
+        /// resolve/reject callbacks as object references.
+        private func prependClosureCallbackParams() {
+            abiParameterSignatures.insert(contentsOf: [("resolveRef", .i32), ("rejectRef", .i32)], at: 0)
+            abiParameterForwardings.insert(contentsOf: ["resolveRef", "rejectRef"], at: 0)
+        }
+
         func call() throws {
             for stmt in stackLoweringStmts {
                 body.write(stmt.description)
@@ -243,26 +270,32 @@ public struct ImportTS {
                 }
             }
 
-            // Add exception check for ImportTS context
-            if context == .importTS {
+            // Add exception check for ImportTS context (skipped for async, where
+            // errors are funneled through the JS-side reject path)
+            if !effects.isAsync && context == .importTS {
                 body.write("if let error = _swift_js_take_exception() { throw error }")
             }
         }
 
         func liftReturnValue() throws {
+            if effects.isAsync {
+                liftAsyncReturnValue()
+            } else {
+                try liftSyncReturnValue()
+            }
+        }
+
+        private func liftSyncReturnValue() throws {
             let liftingInfo = try returnType.liftingReturnInfo(context: context)
 
             if returnType == .void {
-                abiReturnType = nil
                 return
             }
 
             if returnType.usesSideChannelForOptionalReturn() {
                 // Side channel returns: extern function returns Void, value is retrieved via side channel
-                abiReturnType = nil
                 body.write("return \(returnType.swiftType).bridgeJSLiftReturnFromSideChannel()")
             } else {
-                abiReturnType = liftingInfo.valueToLift
                 let liftExpr: String
                 switch returnType {
                 case .closure(let signature, _):
@@ -278,12 +311,38 @@ public struct ImportTS {
             }
         }
 
-        func assignThis(returnType: BridgeType) {
-            guard case .jsObject = returnType else {
-                preconditionFailure("assignThis can only be called with a jsObject return type")
+        private func liftAsyncReturnValue() {
+            // For async imports, the extern function takes leading `resolveRef: Int32, rejectRef: Int32`
+            // and returns void. The JS side calls the resolve/reject closures when the Promise settles.
+            // The resolve closure is typed to match the return type, so the ABI conversion is handled
+            // by the existing closure codegen infrastructure — no manual JSValue-to-type switch needed.
+
+            // Wrap the existing body (parameter lowering + extern call) in _bjs_awaitPromise
+            let innerBody = body
+            body = CodeFragmentPrinter()
+
+            let rejectFactory = "makeRejectClosure: { JSTypedClosure<(sending JSValue) -> Void>($0) }"
+            if returnType == .void {
+                let resolveFactory = "makeResolveClosure: { JSTypedClosure<() -> Void>($0) }"
+                body.write(
+                    "try await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
+                )
+            } else {
+                let resolveSwiftType = returnType.closureSwiftType
+                let resolveFactory =
+                    "makeResolveClosure: { JSTypedClosure<(sending \(resolveSwiftType)) -> Void>($0) }"
+                body.write(
+                    "let resolved = try await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
+                )
             }
-            abiReturnType = .i32
-            body.write("self.jsObject = JSObject(id: UInt32(bitPattern: ret))")
+            body.indent {
+                body.write(lines: innerBody.lines)
+            }
+            body.write("}")
+
+            if returnType != .void {
+                body.write("return resolved")
+            }
         }
 
         func renderImportDecl() -> DeclSyntax {
@@ -299,9 +358,13 @@ public struct ImportTS {
             return "\(raw: printer.lines.joined(separator: "\n"))"
         }
 
-        func renderThunkDecl(name: String, parameters: [Parameter], returnType: BridgeType) -> DeclSyntax {
+        func renderThunkDecl(
+            name: String,
+            parameters: [Parameter],
+            returnType: BridgeType,
+            effects: Effects
+        ) -> DeclSyntax {
             let printer = CodeFragmentPrinter()
-            let effects = Effects(isAsync: false, isThrows: true)
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
                 parameters: parameters,
                 returnType: returnType,
@@ -362,6 +425,7 @@ public struct ImportTS {
         let builder = try CallJSEmission(
             moduleName: moduleName,
             abiName: function.abiName(context: nil),
+            effects: function.effects,
             returnType: function.returnType
         )
         for param in function.parameters {
@@ -374,7 +438,8 @@ public struct ImportTS {
             builder.renderThunkDecl(
                 name: Self.thunkName(function: function),
                 parameters: function.parameters,
-                returnType: function.returnType
+                returnType: function.returnType,
+                effects: function.effects
             )
             .with(\.leadingTrivia, Self.renderDocumentation(documentation: function.documentation))
         ]
@@ -388,6 +453,7 @@ public struct ImportTS {
             let builder = try CallJSEmission(
                 moduleName: moduleName,
                 abiName: method.abiName(context: type),
+                effects: method.effects,
                 returnType: method.returnType
             )
             try builder.lowerParameter(param: selfParameter)
@@ -401,14 +467,20 @@ public struct ImportTS {
                 builder.renderThunkDecl(
                     name: Self.thunkName(type: type, method: method),
                     parameters: [selfParameter] + method.parameters,
-                    returnType: method.returnType
+                    returnType: method.returnType,
+                    effects: method.effects
                 )
             ]
         }
 
         func renderStaticMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
             let abiName = method.abiName(context: type, operation: "static")
-            let builder = try CallJSEmission(moduleName: moduleName, abiName: abiName, returnType: method.returnType)
+            let builder = try CallJSEmission(
+                moduleName: moduleName,
+                abiName: abiName,
+                effects: method.effects,
+                returnType: method.returnType
+            )
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
@@ -419,15 +491,18 @@ public struct ImportTS {
                 builder.renderThunkDecl(
                     name: Self.thunkName(type: type, method: method),
                     parameters: method.parameters,
-                    returnType: method.returnType
+                    returnType: method.returnType,
+                    effects: method.effects
                 )
             ]
         }
 
         func renderConstructorDecl(constructor: ImportedConstructorSkeleton) throws -> [DeclSyntax] {
+            let effects = Effects(isAsync: false, isThrows: true)
             let builder = try CallJSEmission(
                 moduleName: moduleName,
                 abiName: constructor.abiName(context: type),
+                effects: effects,
                 returnType: .jsObject(nil)
             )
             for param in constructor.parameters {
@@ -440,15 +515,18 @@ public struct ImportTS {
                 builder.renderThunkDecl(
                     name: Self.thunkName(type: type),
                     parameters: constructor.parameters,
-                    returnType: .jsObject(nil)
+                    returnType: .jsObject(nil),
+                    effects: effects
                 )
             ]
         }
 
         func renderGetterDecl(getter: ImportedGetterSkeleton) throws -> DeclSyntax {
+            let effects = Effects(isAsync: false, isThrows: true)
             let builder = try CallJSEmission(
                 moduleName: moduleName,
                 abiName: getter.abiName(context: type),
+                effects: effects,
                 returnType: getter.type
             )
             try builder.lowerParameter(param: selfParameter)
@@ -459,15 +537,18 @@ public struct ImportTS {
                 builder.renderThunkDecl(
                     name: Self.thunkName(type: type, propertyName: getter.name, operation: "get"),
                     parameters: [selfParameter],
-                    returnType: getter.type
+                    returnType: getter.type,
+                    effects: effects
                 )
             )
         }
 
         func renderSetterDecl(setter: ImportedSetterSkeleton) throws -> DeclSyntax {
+            let effects = Effects(isAsync: false, isThrows: true)
             let builder = try CallJSEmission(
                 moduleName: moduleName,
                 abiName: setter.abiName(context: type),
+                effects: effects,
                 returnType: .void
             )
             let newValue = Parameter(label: nil, name: "newValue", type: setter.type)
@@ -487,7 +568,8 @@ public struct ImportTS {
             return builder.renderThunkDecl(
                 name: Self.thunkName(type: type, propertyName: propertyNameForThunk, operation: "set"),
                 parameters: [selfParameter, newValue],
-                returnType: .void
+                returnType: .void,
+                effects: effects
             )
         }
         if let constructor = type.constructor {

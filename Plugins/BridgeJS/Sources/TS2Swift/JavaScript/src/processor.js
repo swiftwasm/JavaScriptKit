@@ -313,8 +313,8 @@ export class TypeProcessor {
                 const parameters = signature.getParameters();
                 const parameterNameMap = this.buildParameterNameMap(parameters);
                 const params = this.renderParameters(parameters, decl);
-                const returnType = this.visitType(signature.getReturnType(), decl);
-                const effects = this.renderEffects({ isAsync: false });
+                const { returnType, isAsync } = this.unwrapPromiseReturnType(signature.getReturnType(), decl);
+                const effects = this.renderEffects({ isAsync });
                 const annotation = this.renderMacroAnnotation("JSFunction", args);
 
                 this.emitDocComment(decl, { indent: "", parameterNameMap });
@@ -581,8 +581,8 @@ export class TypeProcessor {
         const parameters = signature.getParameters();
         const parameterNameMap = this.buildParameterNameMap(parameters);
         const params = this.renderParameters(parameters, node);
-        const returnType = this.visitType(signature.getReturnType(), node);
-        const effects = this.renderEffects({ isAsync: false });
+        const { returnType, isAsync } = this.unwrapPromiseReturnType(signature.getReturnType(), node);
+        const effects = this.renderEffects({ isAsync });
         const swiftFuncName = this.renderIdentifier(swiftName);
 
         this.emitDocComment(node, { parameterNameMap });
@@ -1210,8 +1210,8 @@ export class TypeProcessor {
         const parameters = signature.getParameters();
         const parameterNameMap = this.buildParameterNameMap(parameters);
         const params = this.renderParameters(parameters, node);
-        const returnType = this.visitType(signature.getReturnType(), node);
-        const effects = this.renderEffects({ isAsync: false });
+        const { returnType, isAsync } = this.unwrapPromiseReturnType(signature.getReturnType(), node);
+        const effects = this.renderEffects({ isAsync });
         const swiftMethodName = this.renderIdentifier(swiftName);
         const isStatic = node.modifiers?.some(
             (modifier) => modifier.kind === ts.SyntaxKind.StaticKeyword
@@ -1279,6 +1279,27 @@ export class TypeProcessor {
         }
         parts.push("throws(JSException)");
         return parts.join(" ");
+    }
+
+    /**
+     * Check if a type is Promise<T> and extract the return type and async flag.
+     * @param {ts.Type} type - The return type to check
+     * @param {ts.Node} node - The node for type visiting context
+     * @returns {{ returnType: string, isAsync: boolean }}
+     * @private
+     */
+    unwrapPromiseReturnType(type, node) {
+        if (isTypeReference(type)) {
+            const symbol = type.target?.getSymbol();
+            if (symbol?.name === "Promise") {
+                const typeArgs = this.checker.getTypeArguments(/** @type {ts.TypeReference} */ (type));
+                const innerType = typeArgs && typeArgs.length > 0
+                    ? this.visitType(typeArgs[0], node)
+                    : "Void";
+                return { returnType: innerType, isAsync: true };
+            }
+        }
+        return { returnType: this.visitType(type, node), isAsync: false };
     }
 
     /**

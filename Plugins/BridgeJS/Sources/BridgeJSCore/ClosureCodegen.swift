@@ -12,7 +12,10 @@ public struct ClosureCodegen {
     public init() {}
 
     private func swiftClosureType(for signature: ClosureSignature) -> String {
-        let closureParams = signature.parameters.map { "\($0.closureSwiftType)" }.joined(separator: ", ")
+        let sendingPrefix = signature.sendingParameters ? "sending " : ""
+        let closureParams = signature.parameters.map { "\(sendingPrefix)\($0.closureSwiftType)" }.joined(
+            separator: ", "
+        )
         let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
         let swiftReturnType = signature.returnType.closureSwiftType
         return "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
@@ -29,6 +32,7 @@ public struct ClosureCodegen {
         let builder = try ImportTS.CallJSEmission(
             moduleName: "bjs",
             abiName: externName,
+            effects: Effects(isAsync: signature.isAsync, isThrows: signature.isThrows),
             returnType: signature.returnType,
             context: .exportSwift
         )
@@ -185,11 +189,10 @@ public struct ClosureCodegen {
     }
 
     public func renderSupport(for skeleton: BridgeJSSkeleton) throws -> String? {
-        let collector = ClosureSignatureCollectorVisitor()
-        var walker = BridgeTypeWalker(visitor: collector)
+        let collector = ClosureSignatureCollectorVisitor(moduleName: skeleton.moduleName)
+        var walker = BridgeSkeletonWalker(visitor: collector)
         walker.walk(skeleton)
         let closureSignatures = walker.visitor.signatures
-
         guard !closureSignatures.isEmpty else { return nil }
 
         var decls: [DeclSyntax] = []

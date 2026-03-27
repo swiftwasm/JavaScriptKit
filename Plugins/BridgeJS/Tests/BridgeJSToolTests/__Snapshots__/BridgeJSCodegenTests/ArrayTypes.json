@@ -1331,6 +1331,11 @@
       {
         "functions" : [
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "checkArray",
             "parameters" : [
               {
@@ -1349,6 +1354,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "checkArrayWithLength",
             "parameters" : [
               {
@@ -1375,6 +1385,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "importProcessNumbers",
             "parameters" : [
               {
@@ -1397,6 +1412,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "importGetNumbers",
             "parameters" : [
 
@@ -1412,6 +1432,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "importTransformNumbers",
             "parameters" : [
               {
@@ -1438,6 +1463,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "importProcessStrings",
             "parameters" : [
               {
@@ -1464,6 +1494,11 @@
             }
           },
           {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
             "name" : "importProcessBooleans",
             "parameters" : [
               {

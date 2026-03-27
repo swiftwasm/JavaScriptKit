@@ -1228,6 +1228,7 @@ struct ProtocolCodegen {
             let builder = try ImportTS.CallJSEmission(
                 moduleName: moduleName,
                 abiName: "_extern_\(method.name)",
+                effects: method.effects,
                 returnType: method.returnType,
                 context: .exportSwift
             )
@@ -1327,6 +1328,7 @@ struct ProtocolCodegen {
         let getterBuilder = try ImportTS.CallJSEmission(
             moduleName: moduleName,
             abiName: getterAbiName,
+            effects: Effects(isAsync: false, isThrows: false),
             returnType: property.type,
             context: .exportSwift
         )
@@ -1360,6 +1362,7 @@ struct ProtocolCodegen {
             let setterBuilder = try ImportTS.CallJSEmission(
                 moduleName: moduleName,
                 abiName: setterAbiName,
+                effects: Effects(isAsync: false, isThrows: false),
                 returnType: .void,
                 context: .exportSwift
             )

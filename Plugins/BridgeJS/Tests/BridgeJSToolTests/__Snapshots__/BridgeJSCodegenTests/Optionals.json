@@ -1152,6 +1152,11 @@
             ],
             "methods" : [
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "roundTripStringOrNull",
                 "parameters" : [
                   {
@@ -1180,6 +1185,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "roundTripStringOrUndefined",
                 "parameters" : [
                   {
@@ -1208,6 +1218,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "roundTripDoubleOrNull",
                 "parameters" : [
                   {
@@ -1236,6 +1251,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "roundTripDoubleOrUndefined",
                 "parameters" : [
                   {
@@ -1264,6 +1284,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "roundTripBoolOrNull",
                 "parameters" : [
                   {
@@ -1292,6 +1317,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "roundTripBoolOrUndefined",
                 "parameters" : [
                   {
@@ -1320,6 +1350,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "roundTripIntOrNull",
                 "parameters" : [
                   {
@@ -1354,6 +1389,11 @@
                 }
               },
               {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
                 "name" : "roundTripIntOrUndefined",
                 "parameters" : [
                   {

@@ -26,6 +26,13 @@ export class JsGreeter {
 
 export function runAsyncWorks(): Promise<void>;
 
+export interface WeatherData {
+    temperature: number;
+    description: string;
+    humidity: number;
+}
+export function fetchWeatherData(city: string): Promise<WeatherData>;
+
 // jsName tests
 export function $jsWeirdFunction(): number;
 
