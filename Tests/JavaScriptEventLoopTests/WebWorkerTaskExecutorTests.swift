@@ -618,6 +618,152 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         XCTAssertEqual(object["test"].string!, "Hello, World!")
     }
 
+    func testRemoteMainToWorkerAccess() async throws {
+        let object = JSObject.global.Object.function!.new()
+        object["value"] = 42
+        let remote = JSRemote(object)
+
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        let task = Task(executorPreference: executor) {
+            try await remote.withJSObject { object in
+                object["value"].number!
+            }
+        }
+
+        let value = try await task.value
+        XCTAssertEqual(value, 42)
+    }
+
+    func testRemoteWorkerToMainAccess() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        let task = Task(executorPreference: executor) {
+            let object = JSObject.global.Object.function!.new()
+            object["value"] = 99
+            let remote = JSRemote(object)
+            return remote
+        }
+
+        let remote = await task.value
+        let result = try await remote.withJSObject { object in
+            object["value"].number!
+        }
+        XCTAssertEqual(result, 99)
+    }
+
+    func testRemoteSameThreadFastPath() async throws {
+        let object = JSObject.global.Object.function!.new()
+        object["flag"] = 1
+        let remote = JSRemote(object)
+
+        let result = try await remote.withJSObject { object in
+            object["flag"].number!
+        }
+        XCTAssertEqual(result, 1)
+    }
+
+    func testRemoteCanBeUsedMultipleTimesAcrossThreads() async throws {
+        let object = JSObject.global.Object.function!.new()
+        object["count"] = 0
+        let remote = JSRemote(object)
+
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        let task = Task(executorPreference: executor) {
+            let first = try await remote.withJSObject { object in
+                let nextValue = object["count"].number! + 1
+                object["count"] = .number(nextValue)
+                return nextValue
+            }
+            let second = try await remote.withJSObject { object in
+                let nextValue = object["count"].number! + 1
+                object["count"] = .number(nextValue)
+                return nextValue
+            }
+            return (first, second)
+        }
+
+        let (first, second) = try await task.value
+        XCTAssertEqual(first, 1)
+        XCTAssertEqual(second, 2)
+        XCTAssertEqual(object["count"].number!, 2)
+    }
+
+    func testRemoteConcurrentAccessFromWorkerTasks() async throws {
+        let object = JSObject.global.Object.function!.new()
+        object["value"] = 42
+        let remote = JSRemote(object)
+
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 2)
+        defer { executor.terminate() }
+
+        let results = try await withThrowingTaskGroup(of: Int.self, returning: [Int].self) { group in
+            for _ in 0..<8 {
+                group.addTask(executorPreference: executor) {
+                    try await remote.withJSObject { object in
+                        Int(object["value"].number!)
+                    }
+                }
+            }
+
+            var results: [Int] = []
+            for try await value in group {
+                results.append(value)
+            }
+            return results
+        }
+
+        XCTAssertEqual(results.count, 8)
+        XCTAssertEqual(results, Array(repeating: 42, count: 8))
+    }
+
+    func testRemoteMutationIsVisibleOnOwnerThread() async throws {
+        let object = JSObject.global.Object.function!.new()
+        object["value"] = 10
+        let remote = JSRemote(object)
+
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        let task = Task(executorPreference: executor) {
+            try await remote.withJSObject { object in
+                object["value"] = .number(object["value"].number! + 5)
+            }
+        }
+
+        _ = try await task.value
+        XCTAssertEqual(object["value"].number!, 15)
+    }
+
+    func testRemoteThrowsTypedError() async throws {
+        struct TestError: Error, Equatable {
+            let message: String
+        }
+
+        let object = JSObject.global.Object.function!.new()
+        let remote = JSRemote(object)
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        let task = Task<String, Error>(executorPreference: executor) {
+            do {
+                _ = try await remote.withJSObject { _ in
+                    throw TestError(message: "boom")
+                }
+                return "unexpected"
+            } catch {
+                return String(describing: error)
+            }
+        }
+
+        let errorDescription = try await task.value
+        XCTAssertTrue(errorDescription.contains("boom"), errorDescription)
+    }
+
     func testThrowJSExceptionAcrossThreads() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         let task = Task(executorPreference: executor) {

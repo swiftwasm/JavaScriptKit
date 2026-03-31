@@ -135,6 +135,9 @@ class ITCInterface {
         const transfer = transferringObjects.map((ref) => this.memory.getObject(ref));
         return { object: objects, sendingContext, transfer };
     }
+    invokeRemoteJSObjectBody(invocationContext) {
+        return { object: undefined, transfer: [] };
+    }
     release(objectRef) {
         this.memory.release(objectRef);
         return { object: undefined, transfer: [] };
@@ -455,13 +458,51 @@ class SwiftRuntime {
             if (broker)
                 return broker;
             const itcInterface = new ITCInterface(this.memory);
+            const defaultRequestHandler = (message) => {
+                const request = message.data.request;
+                // @ts-ignore dynamic dispatch by method name
+                const result = itcInterface[request.method].apply(itcInterface, request.parameters);
+                return { ok: true, value: result };
+            };
+            const requestHandlers = {
+                invokeRemoteJSObjectBody: (message) => {
+                    const invocationContext = message.data.request
+                        .parameters[0];
+                    const hasError = this.exports.swjs_invoke_remote_jsobject_body(invocationContext);
+                    return {
+                        ok: true,
+                        value: {
+                            object: hasError,
+                            sendingContext: message.data.context,
+                            transfer: [],
+                        },
+                    };
+                },
+            };
+            const defaultResponseHandler = (message) => {
+                if (message.data.response.ok) {
+                    const object = this.memory.retain(message.data.response.value.object);
+                    this.exports.swjs_receive_response(object, message.data.context);
+                }
+                else {
+                    const error = deserializeError(message.data.response.error);
+                    const errorObject = this.memory.retain(error);
+                    this.exports.swjs_receive_error(errorObject, message.data.context);
+                }
+            };
+            const responseHandlers = {
+                invokeRemoteJSObjectBody: (_message) => {
+                    // Swift continuation is resumed on the owner thread.
+                },
+            };
             const newBroker = new MessageBroker((_a = this.tid) !== null && _a !== void 0 ? _a : -1, threadChannel, {
                 onRequest: (message) => {
+                    var _a;
                     let returnValue;
                     try {
-                        // @ts-ignore
-                        const result = itcInterface[message.data.request.method](...message.data.request.parameters);
-                        returnValue = { ok: true, value: result };
+                        const method = message.data.request.method;
+                        const handler = (_a = requestHandlers[method]) !== null && _a !== void 0 ? _a : defaultRequestHandler;
+                        returnValue = handler(message);
                     }
                     catch (error) {
                         returnValue = {
@@ -474,6 +515,7 @@ class SwiftRuntime {
                         data: {
                             sourceTid: message.data.sourceTid,
                             context: message.data.context,
+                            requestMethod: message.data.request.method,
                             response: returnValue,
                         },
                     };
@@ -489,15 +531,10 @@ class SwiftRuntime {
                     }
                 },
                 onResponse: (message) => {
-                    if (message.data.response.ok) {
-                        const object = this.memory.retain(message.data.response.value.object);
-                        this.exports.swjs_receive_response(object, message.data.context);
-                    }
-                    else {
-                        const error = deserializeError(message.data.response.error);
-                        const errorObject = this.memory.retain(error);
-                        this.exports.swjs_receive_error(errorObject, message.data.context);
-                    }
+                    var _a;
+                    const method = message.data.requestMethod;
+                    const handler = (_a = responseHandlers[method]) !== null && _a !== void 0 ? _a : defaultResponseHandler;
+                    handler(message);
                 },
             });
             broker = newBroker;
@@ -838,6 +875,25 @@ class SwiftRuntime {
                                 transferringObjects,
                                 sending_context,
                             ],
+                        },
+                    },
+                });
+            },
+            swjs_request_remote_jsobject_body: (object_source_tid, invocation_context) => {
+                var _a;
+                if (!this.options.threadChannel) {
+                    throw new Error("threadChannel is not set in options given to SwiftRuntime. Please set it to request remote JSObject access.");
+                }
+                const broker = getMessageBroker(this.options.threadChannel);
+                broker.request({
+                    type: "request",
+                    data: {
+                        sourceTid: (_a = this.tid) !== null && _a !== void 0 ? _a : MAIN_THREAD_TID,
+                        targetTid: object_source_tid,
+                        context: invocation_context,
+                        request: {
+                            method: "invokeRemoteJSObjectBody",
+                            parameters: [invocation_context],
                         },
                     },
                 });

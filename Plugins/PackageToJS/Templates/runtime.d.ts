@@ -97,6 +97,10 @@ declare class ITCInterface {
         sendingContext: pointer;
         transfer: Transferable[];
     };
+    invokeRemoteJSObjectBody(invocationContext: pointer): {
+        object: undefined;
+        transfer: Transferable[];
+    };
     release(objectRef: ref): {
         object: undefined;
         transfer: Transferable[];
@@ -140,6 +144,8 @@ type ResponseMessage = {
         sourceTid: number;
         /** The context pointer of the request */
         context: pointer;
+        /** The request method this response corresponds to */
+        requestMethod: keyof ITCInterface;
         /** The response content */
         response: {
             ok: true;

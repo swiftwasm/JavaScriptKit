@@ -6,7 +6,7 @@ let package = Package(
     name: "Example",
     platforms: [.macOS("15"), .iOS("18"), .watchOS("11"), .tvOS("18"), .visionOS("2")],
     dependencies: [
-        .package(path: "../../")
+        .package(name: "JavaScriptKit", path: "../../")
     ],
     targets: [
         .executableTarget(

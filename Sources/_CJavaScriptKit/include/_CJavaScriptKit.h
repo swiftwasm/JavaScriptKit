@@ -355,4 +355,9 @@ IMPORT_JS_FUNCTION(swjs_request_sending_objects, void, (const JavaScriptObjectRe
                                                        int object_source_tid,
                                                        void * _Nonnull sending_context))
 
+/// Requests invoking a Swift closure associated with `invocation_context` on `object_source_tid`.
+/// This must be called from a non-owner thread and will asynchronously notify completion.
+IMPORT_JS_FUNCTION(swjs_request_remote_jsobject_body, void, (int object_source_tid,
+                                                             void * _Nonnull invocation_context))
+
 #endif /* _CJavaScriptKit_h */
