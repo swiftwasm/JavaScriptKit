@@ -22,6 +22,7 @@ export interface ExportedFunctions {
     swjs_wake_worker_thread(): void;
     swjs_receive_response(object: ref, transferring: pointer): void;
     swjs_receive_error(error: ref, context: number): void;
+    swjs_invoke_remote_jsobject_body(context: pointer): number;
 }
 
 export const enum LibraryFeatures {

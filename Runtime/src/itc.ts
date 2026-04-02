@@ -117,6 +117,13 @@ export class ITCInterface {
         return { object: objects, sendingContext, transfer };
     }
 
+    invokeRemoteJSObjectBody(invocationContext: pointer): {
+        object: undefined;
+        transfer: Transferable[];
+    } {
+        return { object: undefined, transfer: [] };
+    }
+
     release(objectRef: ref): { object: undefined; transfer: Transferable[] } {
         this.memory.release(objectRef);
         return { object: undefined, transfer: [] };
@@ -163,6 +170,8 @@ export type ResponseMessage = {
         sourceTid: number;
         /** The context pointer of the request */
         context: pointer;
+        /** The request method this response corresponds to */
+        requestMethod: keyof ITCInterface;
         /** The response content */
         response:
             | {
