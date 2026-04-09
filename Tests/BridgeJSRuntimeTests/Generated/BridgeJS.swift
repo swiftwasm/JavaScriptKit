@@ -8617,7 +8617,7 @@ public func _bjs___Swift_Foundation_UUID_static_fromValue(_ valueBytes: Int32, _
 @_cdecl("bjs___Swift_Foundation_UUID_static_placeholder_get")
 public func _bjs___Swift_Foundation_UUID_static_placeholder_get() -> Void {
     #if arch(wasm32)
-    let ret = __Swift_Foundation_UUID.placeholder
+    let ret = UUID.placeholder
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

@@ -57,7 +57,7 @@ public func _bjs___Swift_Foundation_Greeter_static_makeDefault() -> UnsafeMutabl
 @_cdecl("bjs___Swift_Foundation_Greeter_static_defaultGreeting_get")
 public func _bjs___Swift_Foundation_Greeter_static_defaultGreeting_get() -> Void {
     #if arch(wasm32)
-    let ret = __Swift_Foundation_Greeter.defaultGreeting
+    let ret = Greeter.defaultGreeting
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
