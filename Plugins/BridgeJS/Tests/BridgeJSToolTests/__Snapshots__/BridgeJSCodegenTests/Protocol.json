@@ -317,6 +317,20 @@
                 }
               }
             }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "delegatesByName",
+            "type" : {
+              "dictionary" : {
+                "_0" : {
+                  "swiftProtocol" : {
+                    "_0" : "MyViewControllerDelegate"
+                  }
+                }
+              }
+            }
           }
         ],
         "swiftCallName" : "DelegateManager"
@@ -495,6 +509,39 @@
         ],
         "returnType" : {
           "array" : {
+            "_0" : {
+              "swiftProtocol" : {
+                "_0" : "MyViewControllerDelegate"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_processDelegatesByName",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processDelegatesByName",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "delegates",
+            "type" : {
+              "dictionary" : {
+                "_0" : {
+                  "swiftProtocol" : {
+                    "_0" : "MyViewControllerDelegate"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "dictionary" : {
             "_0" : {
               "swiftProtocol" : {
                 "_0" : "MyViewControllerDelegate"

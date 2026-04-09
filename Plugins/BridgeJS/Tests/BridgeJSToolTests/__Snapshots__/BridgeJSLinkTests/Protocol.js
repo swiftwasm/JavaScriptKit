@@ -718,6 +718,33 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(value.length);
                     instance.exports.bjs_DelegateManager_delegates_set(this.pointer);
                 }
+                get delegatesByName() {
+                    instance.exports.bjs_DelegateManager_delegatesByName_get(this.pointer);
+                    const dictLen = i32Stack.pop();
+                    const dictResult = {};
+                    for (let i = 0; i < dictLen; i++) {
+                        const objId = i32Stack.pop();
+                        const obj = swift.memory.getObject(objId);
+                        swift.memory.release(objId);
+                        const string = strStack.pop();
+                        dictResult[string] = obj;
+                    }
+                    return dictResult;
+                }
+                set delegatesByName(value) {
+                    const entries = Object.entries(value);
+                    for (const entry of entries) {
+                        const [key, value1] = entry;
+                        const bytes = textEncoder.encode(key);
+                        const id = swift.memory.retain(bytes);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
+                        const objId = swift.memory.retain(value1);
+                        i32Stack.push(objId);
+                    }
+                    i32Stack.push(entries.length);
+                    instance.exports.bjs_DelegateManager_delegatesByName_set(this.pointer);
+                }
             }
             const ResultHelpers = __bjs_createResultValuesHelpers();
             enumHelpers.Result = ResultHelpers;
@@ -743,6 +770,30 @@ export async function createInstantiator(options, swift) {
                     }
                     arrayResult.reverse();
                     return arrayResult;
+                },
+                processDelegatesByName: function bjs_processDelegatesByName(delegates) {
+                    const entries = Object.entries(delegates);
+                    for (const entry of entries) {
+                        const [key, value] = entry;
+                        const bytes = textEncoder.encode(key);
+                        const id = swift.memory.retain(bytes);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
+                        const objId = swift.memory.retain(value);
+                        i32Stack.push(objId);
+                    }
+                    i32Stack.push(entries.length);
+                    instance.exports.bjs_processDelegatesByName();
+                    const dictLen = i32Stack.pop();
+                    const dictResult = {};
+                    for (let i = 0; i < dictLen; i++) {
+                        const objId1 = i32Stack.pop();
+                        const obj = swift.memory.getObject(objId1);
+                        swift.memory.release(objId1);
+                        const string = strStack.pop();
+                        dictResult[string] = obj;
+                    }
+                    return dictResult;
                 },
                 Direction: DirectionValues,
                 ExampleEnum: ExampleEnumValues,

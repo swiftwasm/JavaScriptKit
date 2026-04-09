@@ -3420,7 +3420,8 @@ public func _bjs_ArraySupportExports_static_roundTripProtocolArray() -> Void {
     #if arch(wasm32)
     let ret = ArraySupportExports.roundTripProtocolArray(_: [AnyArrayElementProtocol].bridgeJSStackPop())
     for __bjs_elem_ret in ret {
-    _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())}
+        _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -10089,7 +10090,8 @@ public func _bjs_ProtocolReturnTests_static_createNativeProcessorArray() -> Void
     #if arch(wasm32)
     let ret = ProtocolReturnTests.createNativeProcessorArray()
     for __bjs_elem_ret in ret {
-    _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())}
+        _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")
@@ -10102,8 +10104,9 @@ public func _bjs_ProtocolReturnTests_static_createNativeProcessorDictionary() ->
     #if arch(wasm32)
     let ret = ProtocolReturnTests.createNativeProcessorDictionary()
     for __bjs_kv_ret in ret {
-    __bjs_kv_ret.key.bridgeJSStackPush()
-    _swift_js_push_i32((__bjs_kv_ret.value as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())}
+        __bjs_kv_ret.key.bridgeJSStackPush()
+        _swift_js_push_i32((__bjs_kv_ret.value as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+    }
     _swift_js_push_i32(Int32(ret.count))
     #else
     fatalError("Only available on WebAssembly")

@@ -93,6 +93,7 @@ export interface MyViewController extends SwiftHeapObject {
 export interface DelegateManager extends SwiftHeapObject {
     notifyAll(): void;
     delegates: MyViewControllerDelegate[];
+    delegatesByName: Record<string, MyViewControllerDelegate>;
 }
 export type Exports = {
     Helper: {
@@ -105,6 +106,7 @@ export type Exports = {
         new(delegates: MyViewControllerDelegate[]): DelegateManager;
     }
     processDelegates(delegates: MyViewControllerDelegate[]): MyViewControllerDelegate[];
+    processDelegatesByName(delegates: Record<string, MyViewControllerDelegate>): Record<string, MyViewControllerDelegate>;
     Direction: DirectionObject
     ExampleEnum: ExampleEnumObject
     Result: ResultObject
