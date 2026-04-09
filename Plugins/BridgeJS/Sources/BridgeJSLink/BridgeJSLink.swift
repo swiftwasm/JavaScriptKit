@@ -130,6 +130,7 @@ public struct BridgeJSLink {
         var classLines: [String] = []
         var dtsExportLines: [String] = []
         var dtsClassLines: [String] = []
+        var namespacedClassDtsExportEntries: [String: [String]] = [:]
         var topLevelTypeLines: [String] = []
         var topLevelDtsTypeLines: [String] = []
         var importObjectBuilders: [ImportObjectBuilder] = []
@@ -161,13 +162,14 @@ public struct BridgeJSLink {
             for klass in skeleton.classes {
                 let (jsType, dtsType, dtsExportEntry) = try renderExportedClass(klass)
                 data.classLines.append(contentsOf: jsType)
+                data.dtsClassLines.append(contentsOf: dtsType)
 
                 if klass.namespace == nil {
                     data.exportsLines.append("\(klass.name),")
                     data.dtsExportLines.append(contentsOf: dtsExportEntry)
+                } else {
+                    data.namespacedClassDtsExportEntries[klass.name] = dtsExportEntry
                 }
-
-                data.dtsClassLines.append(contentsOf: dtsType)
             }
 
             // Process enums - collect top-level definitions and export entries
@@ -796,7 +798,7 @@ public struct BridgeJSLink {
         return printer.lines
     }
 
-    private func generateTypeScript(data: LinkData) throws -> String {
+    private func generateTypeScript(data: LinkData) -> String {
         let header = """
             // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
             // DO NOT EDIT.
@@ -884,11 +886,10 @@ public struct BridgeJSLink {
         printer.write(lines: generateImportedTypeDefinitions())
 
         // Exports type
-        let hierarchicalExportLines = try namespaceBuilder.buildHierarchicalExportsType(
+        let hierarchicalExportLines = namespaceBuilder.buildHierarchicalExportsType(
             exportedSkeletons: exportedSkeletons,
             renderClassEntry: { klass in
-                let (_, _, dtsExportEntry) = try self.renderExportedClass(klass)
-                return dtsExportEntry
+                data.namespacedClassDtsExportEntries[klass.name] ?? []
             },
             renderFunctionSignature: { function in
                 "\(function.name)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
@@ -1095,7 +1096,7 @@ public struct BridgeJSLink {
         }
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
-        let outputDts = try generateTypeScript(data: data)
+        let outputDts = generateTypeScript(data: data)
         return (outputJs, outputDts)
     }
 
@@ -2647,16 +2648,16 @@ extension BridgeJSLink {
 
         fileprivate func buildHierarchicalExportsType(
             exportedSkeletons: [ExportedSkeleton],
-            renderClassEntry: (ExportedClass) throws -> [String],
+            renderClassEntry: (ExportedClass) -> [String],
             renderFunctionSignature: (ExportedFunction) -> String
-        ) throws -> [String] {
+        ) -> [String] {
             let printer = CodeFragmentPrinter()
             let rootNode = NamespaceNode(name: "")
 
             buildExportsTree(rootNode: rootNode, exportedSkeletons: exportedSkeletons)
 
             for (_, node) in rootNode.children {
-                try populateTypeScriptExportLines(
+                populateTypeScriptExportLines(
                     node: node,
                     renderClassEntry: renderClassEntry,
                     renderFunctionSignature: renderFunctionSignature
@@ -2670,16 +2671,16 @@ extension BridgeJSLink {
 
         private func populateTypeScriptExportLines(
             node: NamespaceNode,
-            renderClassEntry: (ExportedClass) throws -> [String],
+            renderClassEntry: (ExportedClass) -> [String],
             renderFunctionSignature: (ExportedFunction) -> String
-        ) throws {
+        ) {
             for function in node.content.functions {
                 let signature = renderFunctionSignature(function)
                 node.content.functionDtsLines.append((function.name, [signature]))
             }
 
             for klass in node.content.classes {
-                let entry = try renderClassEntry(klass)
+                let entry = renderClassEntry(klass)
                 node.content.classDtsLines.append((klass.name, entry))
             }
 
@@ -2688,7 +2689,7 @@ extension BridgeJSLink {
             }
 
             for (_, childNode) in node.children {
-                try populateTypeScriptExportLines(
+                populateTypeScriptExportLines(
                     node: childNode,
                     renderClassEntry: renderClassEntry,
                     renderFunctionSignature: renderFunctionSignature
