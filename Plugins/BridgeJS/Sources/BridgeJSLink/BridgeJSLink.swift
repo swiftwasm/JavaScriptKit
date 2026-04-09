@@ -796,7 +796,7 @@ public struct BridgeJSLink {
         return printer.lines
     }
 
-    private func generateTypeScript(data: LinkData) -> String {
+    private func generateTypeScript(data: LinkData) throws -> String {
         let header = """
             // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
             // DO NOT EDIT.
@@ -884,45 +884,22 @@ public struct BridgeJSLink {
         printer.write(lines: generateImportedTypeDefinitions())
 
         // Exports type
+        let hierarchicalExportLines = try namespaceBuilder.buildHierarchicalExportsType(
+            exportedSkeletons: exportedSkeletons,
+            renderClassEntry: { klass in
+                let (_, _, dtsExportEntry) = try self.renderExportedClass(klass)
+                return dtsExportEntry
+            },
+            renderFunctionSignature: { function in
+                "\(function.name)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+            }
+        )
         printer.write("export type Exports = {")
         printer.indent {
             // Add non-namespaced items
             printer.write(lines: data.dtsExportLines)
-
             // Add hierarchical namespaced items
-            let hierarchicalLines = namespaceBuilder.buildHierarchicalExportsType(
-                exportedSkeletons: exportedSkeletons,
-                renderClassEntry: { klass in
-                    let printer = CodeFragmentPrinter()
-                    printer.write("\(klass.name): {")
-                    printer.indent {
-                        if let constructor = klass.constructor {
-                            printer.write(
-                                "new\(self.renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name), effects: constructor.effects));"
-                            )
-                        }
-                        // Static methods and static properties belong on the namespace
-                        // entry alongside the constructor (same shape that
-                        // `renderExportedClass` produces for non-namespaced classes via
-                        // `dtsExportEntryPrinter`).
-                        for method in klass.methods where method.effects.isStatic {
-                            printer.write(
-                                "\(method.name)\(self.renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
-                            )
-                        }
-                        for property in klass.properties where property.isStatic {
-                            let readonly = property.isReadonly ? "readonly " : ""
-                            printer.write("\(readonly)\(property.name): \(property.type.tsType);")
-                        }
-                    }
-                    printer.write("}")
-                    return printer.lines
-                },
-                renderFunctionSignature: { function in
-                    "\(function.name)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
-                }
-            )
-            printer.write(lines: hierarchicalLines)
+            printer.write(lines: hierarchicalExportLines)
         }
         printer.write("}")
 
@@ -1118,7 +1095,7 @@ public struct BridgeJSLink {
         }
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
-        let outputDts = generateTypeScript(data: data)
+        let outputDts = try generateTypeScript(data: data)
         return (outputJs, outputDts)
     }
 
@@ -2670,16 +2647,16 @@ extension BridgeJSLink {
 
         fileprivate func buildHierarchicalExportsType(
             exportedSkeletons: [ExportedSkeleton],
-            renderClassEntry: (ExportedClass) -> [String],
+            renderClassEntry: (ExportedClass) throws -> [String],
             renderFunctionSignature: (ExportedFunction) -> String
-        ) -> [String] {
+        ) throws -> [String] {
             let printer = CodeFragmentPrinter()
             let rootNode = NamespaceNode(name: "")
 
             buildExportsTree(rootNode: rootNode, exportedSkeletons: exportedSkeletons)
 
             for (_, node) in rootNode.children {
-                populateTypeScriptExportLines(
+                try populateTypeScriptExportLines(
                     node: node,
                     renderClassEntry: renderClassEntry,
                     renderFunctionSignature: renderFunctionSignature
@@ -2693,16 +2670,16 @@ extension BridgeJSLink {
 
         private func populateTypeScriptExportLines(
             node: NamespaceNode,
-            renderClassEntry: (ExportedClass) -> [String],
+            renderClassEntry: (ExportedClass) throws -> [String],
             renderFunctionSignature: (ExportedFunction) -> String
-        ) {
+        ) throws {
             for function in node.content.functions {
                 let signature = renderFunctionSignature(function)
                 node.content.functionDtsLines.append((function.name, [signature]))
             }
 
             for klass in node.content.classes {
-                let entry = renderClassEntry(klass)
+                let entry = try renderClassEntry(klass)
                 node.content.classDtsLines.append((klass.name, entry))
             }
 
@@ -2711,7 +2688,7 @@ extension BridgeJSLink {
             }
 
             for (_, childNode) in node.children {
-                populateTypeScriptExportLines(
+                try populateTypeScriptExportLines(
                     node: childNode,
                     renderClassEntry: renderClassEntry,
                     renderFunctionSignature: renderFunctionSignature
