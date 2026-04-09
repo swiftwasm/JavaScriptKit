@@ -81,6 +81,8 @@ jobs:
             swift-syntax-version: "601.0.0"
           - image: "swift:6.2"
             swift-syntax-version: "602.0.0"
+          - image: "swift:6.3"
+            swift-syntax-version: "603.0.0"
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.entry.image }}
