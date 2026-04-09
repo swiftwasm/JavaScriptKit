@@ -1,4 +1,4 @@
-// swift-tools-version:6.1
+// swift-tools-version:6.2
 
 import CompilerPluginSupport
 import PackageDescription
@@ -7,6 +7,13 @@ import PackageDescription
 let shouldBuildForEmbedded = Context.environment["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM"].flatMap(Bool.init) ?? false
 let useLegacyResourceBundling =
     Context.environment["JAVASCRIPTKIT_USE_LEGACY_RESOURCE_BUNDLING"].flatMap(Bool.init) ?? false
+let enableTracingByEnv = Context.environment["JAVASCRIPTKIT_ENABLE_TRACING"].flatMap(Bool.init) ?? false
+
+let tracingTrait = Trait(
+    name: "Tracing",
+    description: "Enable opt-in Swift <-> JavaScript bridge tracing hooks.",
+    enabledTraits: []
+)
 
 let testingLinkerFlags: [LinkerSetting] = [
     .unsafeFlags(
@@ -39,6 +46,7 @@ let package = Package(
         .plugin(name: "BridgeJS", targets: ["BridgeJS"]),
         .plugin(name: "BridgeJSCommandPlugin", targets: ["BridgeJSCommandPlugin"]),
     ],
+    traits: [tracingTrait],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"603.0.0")
     ],
@@ -53,8 +61,10 @@ let package = Package(
                     .unsafeFlags(["-fdeclspec"])
                 ] : nil,
             swiftSettings: [
-                .enableExperimentalFeature("Extern")
+                .enableExperimentalFeature("Extern"),
+                .define("Tracing", .when(traits: ["Tracing"])),
             ]
+                + (enableTracingByEnv ? [.define("Tracing")] : [])
                 + (shouldBuildForEmbedded
                     ? [
                         .enableExperimentalFeature("Embedded"),
@@ -74,8 +84,9 @@ let package = Package(
             name: "JavaScriptKitTests",
             dependencies: ["JavaScriptKit"],
             swiftSettings: [
-                .enableExperimentalFeature("Extern")
-            ],
+                .enableExperimentalFeature("Extern"),
+                .define("Tracing", .when(traits: ["Tracing"])),
+            ] + (enableTracingByEnv ? [.define("Tracing")] : []),
             linkerSettings: testingLinkerFlags
         ),
 
