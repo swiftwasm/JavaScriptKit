@@ -433,6 +433,12 @@ class UUID {
     @JS func uuidString() -> String {
         return value
     }
+
+    @JS static func fromValue(_ value: String) -> UUID {
+        return UUID(value: value)
+    }
+
+    @JS static var placeholder: String { "00000000-0000-0000-0000-000000000000" }
 }
 
 @JS func createUUID(value: String) -> UUID {

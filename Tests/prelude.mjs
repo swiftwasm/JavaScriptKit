@@ -624,6 +624,13 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     roundTrippedUUID.release();
     uuid.release();
 
+    // Static method and property on a namespaced class (@JS(namespace:) + @JS static).
+    // These must be callable via the namespace path, not as instance members.
+    const uuidFromStatic = exports.__Swift.Foundation.UUID.fromValue("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+    assert.equal(uuidFromStatic.uuidString(), "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+    uuidFromStatic.release();
+    assert.equal(exports.__Swift.Foundation.UUID.placeholder, "00000000-0000-0000-0000-000000000000");
+
     const createdServer = exports.createHTTPServer();
     createdServer.call(exports.Networking.API.Method.Get);
     createdServer.release();
