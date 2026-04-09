@@ -1108,6 +1108,36 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs___Swift_Foundation_UUID_static_fromValue",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "fromValue",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "UUID"
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "__Swift_Foundation_UUID"
+              }
+            }
           }
         ],
         "name" : "UUID",
@@ -1116,7 +1146,21 @@
           "Foundation"
         ],
         "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "placeholder",
+            "staticContext" : {
+              "className" : {
+                "_0" : "__Swift_Foundation_UUID"
+              }
+            },
+            "type" : {
+              "string" : {
 
+              }
+            }
+          }
         ],
         "swiftCallName" : "UUID"
       },

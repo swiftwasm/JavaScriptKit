@@ -130,6 +130,7 @@ public struct BridgeJSLink {
         var classLines: [String] = []
         var dtsExportLines: [String] = []
         var dtsClassLines: [String] = []
+        var namespacedClassDtsExportEntries: [String: [String]] = [:]
         var topLevelTypeLines: [String] = []
         var topLevelDtsTypeLines: [String] = []
         var importObjectBuilders: [ImportObjectBuilder] = []
@@ -161,13 +162,14 @@ public struct BridgeJSLink {
             for klass in skeleton.classes {
                 let (jsType, dtsType, dtsExportEntry) = try renderExportedClass(klass)
                 data.classLines.append(contentsOf: jsType)
+                data.dtsClassLines.append(contentsOf: dtsType)
 
                 if klass.namespace == nil {
                     data.exportsLines.append("\(klass.name),")
                     data.dtsExportLines.append(contentsOf: dtsExportEntry)
+                } else {
+                    data.namespacedClassDtsExportEntries[klass.name] = dtsExportEntry
                 }
-
-                data.dtsClassLines.append(contentsOf: dtsType)
             }
 
             // Process enums - collect top-level definitions and export entries
@@ -884,32 +886,21 @@ public struct BridgeJSLink {
         printer.write(lines: generateImportedTypeDefinitions())
 
         // Exports type
+        let hierarchicalExportLines = namespaceBuilder.buildHierarchicalExportsType(
+            exportedSkeletons: exportedSkeletons,
+            renderClassEntry: { klass in
+                data.namespacedClassDtsExportEntries[klass.name] ?? []
+            },
+            renderFunctionSignature: { function in
+                "\(function.name)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+            }
+        )
         printer.write("export type Exports = {")
         printer.indent {
             // Add non-namespaced items
             printer.write(lines: data.dtsExportLines)
-
             // Add hierarchical namespaced items
-            let hierarchicalLines = namespaceBuilder.buildHierarchicalExportsType(
-                exportedSkeletons: exportedSkeletons,
-                renderClassEntry: { klass in
-                    let printer = CodeFragmentPrinter()
-                    printer.write("\(klass.name): {")
-                    printer.indent {
-                        if let constructor = klass.constructor {
-                            printer.write(
-                                "new\(self.renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name), effects: constructor.effects));"
-                            )
-                        }
-                    }
-                    printer.write("}")
-                    return printer.lines
-                },
-                renderFunctionSignature: { function in
-                    "\(function.name)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
-                }
-            )
-            printer.write(lines: hierarchicalLines)
+            printer.write(lines: hierarchicalExportLines)
         }
         printer.write("}")
 

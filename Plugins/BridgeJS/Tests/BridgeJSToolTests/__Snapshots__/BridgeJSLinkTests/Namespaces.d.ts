@@ -47,6 +47,8 @@ export type Exports = {
         Foundation: {
             Greeter: {
                 new(name: string): Greeter;
+                makeDefault(): Greeter;
+                readonly defaultGreeting: string;
             }
             UUID: {
             }

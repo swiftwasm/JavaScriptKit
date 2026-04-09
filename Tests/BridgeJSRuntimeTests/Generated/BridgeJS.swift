@@ -8603,6 +8603,28 @@ public func _bjs___Swift_Foundation_UUID_uuidString(_ _self: UnsafeMutableRawPoi
     #endif
 }
 
+@_expose(wasm, "bjs___Swift_Foundation_UUID_static_fromValue")
+@_cdecl("bjs___Swift_Foundation_UUID_static_fromValue")
+public func _bjs___Swift_Foundation_UUID_static_fromValue(_ valueBytes: Int32, _ valueLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = UUID.fromValue(_: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs___Swift_Foundation_UUID_static_placeholder_get")
+@_cdecl("bjs___Swift_Foundation_UUID_static_placeholder_get")
+public func _bjs___Swift_Foundation_UUID_static_placeholder_get() -> Void {
+    #if arch(wasm32)
+    let ret = UUID.placeholder
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs___Swift_Foundation_UUID_deinit")
 @_cdecl("bjs___Swift_Foundation_UUID_deinit")
 public func _bjs___Swift_Foundation_UUID_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {

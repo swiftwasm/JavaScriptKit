@@ -16,6 +16,17 @@
     func changeName(name: String) {
         self.name = name
     }
+
+    // Static methods and properties on a namespaced class must land on the
+    // class's namespace entry (alongside `new`), not on the instance
+    // interface and not silently dropped. Regression test for the
+    // `@JS(namespace:)` + `@JS static func` bug where the hierarchical
+    // exports builder only emitted the constructor.
+    @JS static func makeDefault() -> Greeter {
+        return Greeter(name: "World")
+    }
+
+    @JS static var defaultGreeting: String { "Hello, world!" }
 }
 
 @JS(namespace: "Utils.Converters") class Converter {
