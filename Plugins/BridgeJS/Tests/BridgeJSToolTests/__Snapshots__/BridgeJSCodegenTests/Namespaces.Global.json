@@ -38,6 +38,28 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs___Swift_Foundation_Greeter_static_makeDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "makeDefault",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "Greeter"
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "__Swift_Foundation_Greeter"
+              }
+            }
           }
         ],
         "name" : "Greeter",
@@ -46,7 +68,21 @@
           "Foundation"
         ],
         "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "defaultGreeting",
+            "staticContext" : {
+              "className" : {
+                "_0" : "__Swift_Foundation_Greeter"
+              }
+            },
+            "type" : {
+              "string" : {
 
+              }
+            }
+          }
         ],
         "swiftCallName" : "Greeter"
       },

@@ -268,6 +268,16 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 }
+                static makeDefault() {
+                    const ret = instance.exports.bjs___Swift_Foundation_Greeter_static_makeDefault();
+                    return Greeter.__construct(ret);
+                }
+                static get defaultGreeting() {
+                    instance.exports.bjs___Swift_Foundation_Greeter_static_defaultGreeting_get();
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                }
             }
             class Converter extends SwiftHeapObject {
                 static __construct(ptr) {

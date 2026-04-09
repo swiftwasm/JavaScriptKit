@@ -34,6 +34,7 @@ declare global {
             class Greeter {
                 constructor(name: string);
                 greet(): string;
+                makeDefault(): Greeter;
                 release(): void;
             }
             class UUID {
@@ -87,6 +88,8 @@ export type Exports = {
         Foundation: {
             Greeter: {
                 new(name: string): Greeter;
+                makeDefault(): Greeter;
+                readonly defaultGreeting: string;
             }
             UUID: {
             }

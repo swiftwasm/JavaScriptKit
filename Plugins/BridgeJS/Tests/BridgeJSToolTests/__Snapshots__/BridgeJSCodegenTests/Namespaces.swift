@@ -42,6 +42,28 @@ public func _bjs___Swift_Foundation_Greeter_greet(_ _self: UnsafeMutableRawPoint
     #endif
 }
 
+@_expose(wasm, "bjs___Swift_Foundation_Greeter_static_makeDefault")
+@_cdecl("bjs___Swift_Foundation_Greeter_static_makeDefault")
+public func _bjs___Swift_Foundation_Greeter_static_makeDefault() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Greeter.makeDefault()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs___Swift_Foundation_Greeter_static_defaultGreeting_get")
+@_cdecl("bjs___Swift_Foundation_Greeter_static_defaultGreeting_get")
+public func _bjs___Swift_Foundation_Greeter_static_defaultGreeting_get() -> Void {
+    #if arch(wasm32)
+    let ret = __Swift_Foundation_Greeter.defaultGreeting
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs___Swift_Foundation_Greeter_deinit")
 @_cdecl("bjs___Swift_Foundation_Greeter_deinit")
 public func _bjs___Swift_Foundation_Greeter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {

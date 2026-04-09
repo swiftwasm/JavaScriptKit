@@ -901,6 +901,19 @@ public struct BridgeJSLink {
                                 "new\(self.renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name), effects: constructor.effects));"
                             )
                         }
+                        // Static methods and static properties belong on the namespace
+                        // entry alongside the constructor (same shape that
+                        // `renderExportedClass` produces for non-namespaced classes via
+                        // `dtsExportEntryPrinter`).
+                        for method in klass.methods where method.effects.isStatic {
+                            printer.write(
+                                "\(method.name)\(self.renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                            )
+                        }
+                        for property in klass.properties where property.isStatic {
+                            let readonly = property.isReadonly ? "readonly " : ""
+                            printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                        }
                     }
                     printer.write("}")
                     return printer.lines
