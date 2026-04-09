@@ -221,13 +221,78 @@
             }
           }
         }
+      },
+      {
+        "abiName" : "bjs_roundtripCounters",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripCounters",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "counters",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "Counters"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "Counters"
+          }
+        }
       }
     ],
     "protocols" : [
 
     ],
     "structs" : [
+      {
+        "methods" : [
 
+        ],
+        "name" : "Counters",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "counts",
+            "type" : {
+              "dictionary" : {
+                "_0" : {
+                  "nullable" : {
+                    "_0" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Counters"
+      }
     ]
   },
   "imported" : {

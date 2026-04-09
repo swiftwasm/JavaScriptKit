@@ -4,6 +4,10 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export interface Counters {
+    name: string;
+    counts: Record<string, number | null>;
+}
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
     /// Release the heap object.
@@ -21,6 +25,7 @@ export type Exports = {
     nestedDictionary(values: Record<string, number[]>): Record<string, number[]>;
     boxDictionary(boxes: Record<string, Box>): Record<string, Box>;
     optionalBoxDictionary(boxes: Record<string, Box | null>): Record<string, Box | null>;
+    roundtripCounters(counters: Counters): Counters;
 }
 export type Imports = {
     importMirrorDictionary(values: Record<string, number>): Record<string, number>;

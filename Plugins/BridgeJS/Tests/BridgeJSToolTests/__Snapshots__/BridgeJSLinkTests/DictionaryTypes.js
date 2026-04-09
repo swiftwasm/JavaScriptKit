@@ -30,6 +30,46 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    const __bjs_createCountersHelpers = () => ({
+        lower: (value) => {
+            const bytes = textEncoder.encode(value.name);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+            const entries = Object.entries(value.counts);
+            for (const entry of entries) {
+                const [key, value] = entry;
+                const bytes1 = textEncoder.encode(key);
+                const id1 = swift.memory.retain(bytes1);
+                i32Stack.push(bytes1.length);
+                i32Stack.push(id1);
+                const isSome = value != null ? 1 : 0;
+                if (isSome) {
+                    i32Stack.push((value | 0));
+                }
+                i32Stack.push(isSome);
+            }
+            i32Stack.push(entries.length);
+        },
+        lift: () => {
+            const dictLen = i32Stack.pop();
+            const dictResult = {};
+            for (let i = 0; i < dictLen; i++) {
+                const isSome = i32Stack.pop();
+                let optValue;
+                if (isSome === 0) {
+                    optValue = null;
+                } else {
+                    const int = i32Stack.pop();
+                    optValue = int;
+                }
+                const string = strStack.pop();
+                dictResult[string] = optValue;
+            }
+            const string1 = strStack.pop();
+            return { name: string1, counts: dictResult };
+        }
+    });
 
     return {
         /**
@@ -98,6 +138,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_i64"] = function() {
                 return i64Stack.pop();
+            }
+            bjs["swift_js_struct_lower_Counters"] = function(objectId) {
+                structHelpers.Counters.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Counters"] = function() {
+                const value = structHelpers.Counters.lift();
+                return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -271,6 +318,9 @@ export async function createInstantiator(options, swift) {
                 }
 
             }
+            const CountersHelpers = __bjs_createCountersHelpers();
+            structHelpers.Counters = CountersHelpers;
+
             const exports = {
                 Box,
                 mirrorDictionary: function bjs_mirrorDictionary(values) {
@@ -413,6 +463,12 @@ export async function createInstantiator(options, swift) {
                         dictResult[string] = optValue;
                     }
                     return dictResult;
+                },
+                roundtripCounters: function bjs_roundtripCounters(counters) {
+                    structHelpers.Counters.lower(counters);
+                    instance.exports.bjs_roundtripCounters();
+                    const structValue = structHelpers.Counters.lift();
+                    return structValue;
                 },
             };
             _exports = exports;

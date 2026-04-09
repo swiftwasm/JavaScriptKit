@@ -827,15 +827,15 @@ struct StackCodegen {
         accessor: String,
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
-        var statements: [CodeBlockItemSyntax] = []
         let elemVar = "__bjs_elem_\(varPrefix)"
-        statements.append("for \(raw: elemVar) in \(raw: accessor) {")
-        statements.append(
-            "    _swift_js_push_i32((\(raw: elemVar) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
-        )
-        statements.append("}")
-        statements.append("_swift_js_push_i32(Int32(\(raw: accessor).count))")
-        return statements
+        return [
+            """
+            for \(raw: elemVar) in \(raw: accessor) {
+                _swift_js_push_i32((\(raw: elemVar) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+            }
+            """,
+            "_swift_js_push_i32(Int32(\(raw: accessor).count))",
+        ]
     }
 
     private func lowerDictionaryStatements(
@@ -866,49 +866,58 @@ struct StackCodegen {
         accessor: String,
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
-        var statements: [CodeBlockItemSyntax] = []
         let pairVarName = "__bjs_kv_\(varPrefix)"
-        statements.append("for \(raw: pairVarName) in \(raw: accessor) {")
-        statements.append("let __bjs_key_\(raw: varPrefix) = \(raw: pairVarName).key")
-        statements.append("let __bjs_value_\(raw: varPrefix) = \(raw: pairVarName).value")
+        let keyVarName = "__bjs_key_\(varPrefix)"
+        let valueVarName = "__bjs_value_\(varPrefix)"
 
-        let keyStatements = lowerStatements(
-            for: .string,
-            accessor: "__bjs_key_\(varPrefix)",
-            varPrefix: "\(varPrefix)_key"
+        // The dispatch in `lowerDictionaryStatements` routes only .nullable and .closure value
+        // types into this helper, both of which produce single-line lowering statements, so we can
+        // join their descriptions into the for-body as plain lines without worrying about nested
+        // multi-statement lowering.
+        var bodyLines: [String] = [
+            "let \(keyVarName) = \(pairVarName).key",
+            "let \(valueVarName) = \(pairVarName).value",
+        ]
+        bodyLines.append(
+            contentsOf: lowerStatements(
+                for: .string,
+                accessor: keyVarName,
+                varPrefix: "\(varPrefix)_key"
+            ).map { $0.description }
         )
-        for stmt in keyStatements {
-            statements.append(stmt)
-        }
-
-        let valueStatements = lowerStatements(
-            for: valueType,
-            accessor: "__bjs_value_\(varPrefix)",
-            varPrefix: "\(varPrefix)_value"
+        bodyLines.append(
+            contentsOf: lowerStatements(
+                for: valueType,
+                accessor: valueVarName,
+                varPrefix: "\(varPrefix)_value"
+            ).map { $0.description }
         )
-        for stmt in valueStatements {
-            statements.append(stmt)
-        }
+        let body = bodyLines.joined(separator: "\n    ")
 
-        statements.append("}")
-        statements.append("_swift_js_push_i32(Int32(\(raw: accessor).count))")
-        return statements
+        return [
+            """
+            for \(raw: pairVarName) in \(raw: accessor) {
+                \(raw: body)
+            }
+            """,
+            "_swift_js_push_i32(Int32(\(raw: accessor).count))",
+        ]
     }
 
     private func lowerProtocolDictionaryStatements(
         accessor: String,
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
-        var statements: [CodeBlockItemSyntax] = []
         let pairVar = "__bjs_kv_\(varPrefix)"
-        statements.append("for \(raw: pairVar) in \(raw: accessor) {")
-        statements.append("    \(raw: pairVar).key.bridgeJSStackPush()")
-        statements.append(
-            "    _swift_js_push_i32((\(raw: pairVar).value as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
-        )
-        statements.append("}")
-        statements.append("_swift_js_push_i32(Int32(\(raw: accessor).count))")
-        return statements
+        return [
+            """
+            for \(raw: pairVar) in \(raw: accessor) {
+                \(raw: pairVar).key.bridgeJSStackPush()
+                _swift_js_push_i32((\(raw: pairVar).value as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+            }
+            """,
+            "_swift_js_push_i32(Int32(\(raw: accessor).count))",
+        ]
     }
 }
 
@@ -1073,7 +1082,9 @@ struct EnumCodegen {
                 accessor: paramName,
                 varPrefix: paramName
             )
-            printer.write(multilineString: CodeBlockItemListSyntax(statements).description)
+            for statement in statements {
+                printer.write(multilineString: statement.description)
+            }
         }
     }
 
@@ -1207,7 +1218,9 @@ struct StructCodegen {
                 accessor: accessor,
                 varPrefix: property.name
             )
-            printer.write(multilineString: CodeBlockItemListSyntax(statements).description)
+            for statement in statements {
+                printer.write(multilineString: statement.description)
+            }
         }
 
         return printer.lines

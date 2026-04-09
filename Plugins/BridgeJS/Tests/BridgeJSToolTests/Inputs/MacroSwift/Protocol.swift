@@ -102,8 +102,12 @@ import JavaScriptKit
     @JS
     var delegates: [MyViewControllerDelegate]
 
+    @JS
+    var delegatesByName: [String: MyViewControllerDelegate]
+
     @JS init(delegates: [MyViewControllerDelegate]) {
         self.delegates = delegates
+        self.delegatesByName = [:]
     }
 
     @JS func notifyAll() {
@@ -114,3 +118,7 @@ import JavaScriptKit
 }
 
 @JS func processDelegates(_ delegates: [MyViewControllerDelegate]) -> [MyViewControllerDelegate]
+
+@JS func processDelegatesByName(
+    _ delegates: [String: MyViewControllerDelegate]
+) -> [String: MyViewControllerDelegate]
