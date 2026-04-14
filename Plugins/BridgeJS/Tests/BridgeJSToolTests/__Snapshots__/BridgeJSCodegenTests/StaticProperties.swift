@@ -12,7 +12,7 @@ extension PropertyEnum: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .value1
@@ -23,7 +23,7 @@ extension PropertyEnum: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .value1:
             return 0

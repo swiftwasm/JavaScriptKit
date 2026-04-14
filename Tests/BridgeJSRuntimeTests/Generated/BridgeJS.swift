@@ -3868,7 +3868,7 @@ extension Direction: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .north
@@ -3883,7 +3883,7 @@ extension Direction: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .north:
             return 0
@@ -3911,7 +3911,7 @@ extension Status: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .loading
@@ -3924,7 +3924,7 @@ extension Status: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .loading:
             return 0
@@ -3968,7 +3968,7 @@ extension TSDirection: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .north
@@ -3983,7 +3983,7 @@ extension TSDirection: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .north:
             return 0
@@ -4036,7 +4036,7 @@ extension Networking.API.Method: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .get
@@ -4051,7 +4051,7 @@ extension Networking.API.Method: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .get:
             return 0
@@ -4085,7 +4085,7 @@ extension Internal.SupportedMethod: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .get
@@ -4096,7 +4096,7 @@ extension Internal.SupportedMethod: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .get:
             return 0
@@ -4369,7 +4369,7 @@ extension StaticCalculator: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .scientific
@@ -4380,7 +4380,7 @@ extension StaticCalculator: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .scientific:
             return 0
@@ -4470,7 +4470,7 @@ extension StaticPropertyEnum: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .option1
@@ -4481,7 +4481,7 @@ extension StaticPropertyEnum: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .option1:
             return 0

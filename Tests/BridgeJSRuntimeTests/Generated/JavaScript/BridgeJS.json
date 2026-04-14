@@ -7235,6 +7235,7 @@
           }
         ],
         "emitStyle" : "const",
+        "explicitAccessControl" : "public",
         "name" : "Direction",
         "staticMethods" : [
 

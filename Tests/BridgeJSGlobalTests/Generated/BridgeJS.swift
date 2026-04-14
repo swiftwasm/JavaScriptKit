@@ -21,7 +21,7 @@ extension GlobalNetworking.API.CallMethod: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .get
@@ -36,7 +36,7 @@ extension GlobalNetworking.API.CallMethod: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .get:
             return 0
@@ -70,7 +70,7 @@ extension Internal.SupportedServerMethod: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .get
@@ -81,7 +81,7 @@ extension Internal.SupportedServerMethod: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .get:
             return 0
