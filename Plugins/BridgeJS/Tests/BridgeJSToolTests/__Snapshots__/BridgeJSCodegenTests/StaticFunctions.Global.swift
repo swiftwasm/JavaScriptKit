@@ -12,7 +12,7 @@ extension Calculator: _BridgedSwiftCaseEnum {
         return bridgeJSLowerParameter()
     }
 
-    private init?(bridgeJSRawValue: Int32) {
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
         switch bridgeJSRawValue {
         case 0:
             self = .scientific
@@ -23,7 +23,7 @@ extension Calculator: _BridgedSwiftCaseEnum {
         }
     }
 
-    private var bridgeJSRawValue: Int32 {
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
         switch self {
         case .scientific:
             return 0

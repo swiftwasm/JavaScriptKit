@@ -207,7 +207,7 @@ extension Greeter {
 
 // MARK: - Enum Tests
 
-@JS enum Direction {
+@JS public enum Direction {
     case north
     case south
     case east

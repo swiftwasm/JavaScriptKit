@@ -966,7 +966,7 @@ struct EnumCodegen {
             )
             printer.nextLine()
 
-            printer.write("private init?(bridgeJSRawValue: Int32) {")
+            printer.write("@_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {")
             printer.indent {
                 printer.write("switch bridgeJSRawValue {")
                 for (index, enumCase) in enumDef.cases.enumerated() {
@@ -984,7 +984,7 @@ struct EnumCodegen {
             printer.write("}")
             printer.nextLine()
 
-            printer.write("private var bridgeJSRawValue: Int32 {")
+            printer.write("@_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {")
             printer.indent {
                 printer.write("switch self {")
                 for (index, enumCase) in enumDef.cases.enumerated() {
