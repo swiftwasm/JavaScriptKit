@@ -11585,6 +11585,23 @@
         }
       },
       {
+        "abiName" : "bjs_throwsStringError",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "throwsStringError",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_throwsSwiftError",
         "effects" : {
           "isAsync" : false,

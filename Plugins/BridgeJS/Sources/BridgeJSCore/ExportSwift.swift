@@ -330,20 +330,25 @@ public class ExportSwift {
 
         func render(abiName: String) -> DeclSyntax {
             let body: CodeBlockItemListSyntax
-            if effects.isAsync {
+            if effects.isAsync, effects.isThrows {
                 // Explicit closure type annotation needed when throws is present
                 // so Swift infers throws(JSException) instead of throws(any Error)
                 // See: https://github.com/swiftlang/swift/issues/76165
-                let closureHead: String
-                if effects.isThrows {
-                    let hasReturn = self.body.contains { $0.description.contains("return ") }
-                    let ret = hasReturn ? " -> JSValue" : ""
-                    closureHead = " () async throws(JSException)\(ret) in"
-                } else {
-                    closureHead = ""
-                }
+                let hasReturn = self.body.contains { $0.description.contains("return ") }
+                let ret = hasReturn ? " -> JSValue" : ""
                 body = """
-                    let ret = JSPromise.async {\(raw: closureHead)
+                    let ret = JSPromise.async { () async throws(JSException)\(raw: ret) in
+                        do {
+                            \(CodeBlockItemListSyntax(self.body))
+                        } catch let error {
+                            throw error.bridgeJSLowerThrowAsync()
+                        }
+                    }.jsObject
+                    return ret.bridgeJSLowerReturn()
+                    """
+            } else if effects.isAsync {
+                body = """
+                    let ret = JSPromise.async {
                         \(CodeBlockItemListSyntax(self.body))
                     }.jsObject
                     return ret.bridgeJSLowerReturn()
@@ -353,16 +358,7 @@ public class ExportSwift {
                     do {
                         \(CodeBlockItemListSyntax(self.body))
                     } catch let error {
-                        if let error = error.thrownValue.object {
-                            withExtendedLifetime(error) {
-                                _swift_js_throw(Int32(bitPattern: $0.id))
-                            }
-                        } else {
-                            let jsError = JSError(message: String(describing: error))
-                            withExtendedLifetime(jsError.jsObject) {
-                                _swift_js_throw(Int32(bitPattern: $0.id))
-                            }
-                        }
+                        error.bridgeJSLowerThrow()
                         \(raw: returnPlaceholderStmt())
                     }
                     """

@@ -56,3 +56,7 @@ public struct JSException: Error, Equatable, CustomStringConvertible {
         self.init(JSError(message: message).jsValue)
     }
 }
+
+extension JSException: ConvertibleToJSException {
+    public var jsException: JSException { self }
+}
