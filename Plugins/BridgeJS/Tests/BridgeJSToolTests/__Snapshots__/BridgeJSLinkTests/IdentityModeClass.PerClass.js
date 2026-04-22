@@ -4,50 +4,6 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const MethodValues = {
-    Get: 0,
-    Post: 1,
-    Put: 2,
-    Delete: 3,
-};
-
-export const LogLevelValues = {
-    Debug: "debug",
-    Info: "info",
-    Warning: "warning",
-    Error: "error",
-};
-
-export const PortValues = {
-    Http: 80,
-    Https: 443,
-    Development: 3000,
-};
-
-export const SupportedMethodValues = {
-    Get: 0,
-    Post: 1,
-};
-
-if (typeof globalThis.Configuration === 'undefined') {
-    globalThis.Configuration = {};
-}
-if (typeof globalThis.Networking === 'undefined') {
-    globalThis.Networking = {};
-}
-if (typeof globalThis.Networking.API === 'undefined') {
-    globalThis.Networking.API = {};
-}
-if (typeof globalThis.Networking.APIV2 === 'undefined') {
-    globalThis.Networking.APIV2 = {};
-}
-if (typeof globalThis.Networking.APIV2.Internal === 'undefined') {
-    globalThis.Networking.APIV2.Internal = {};
-}
-globalThis.Networking.API.MethodValues = MethodValues;
-globalThis.Configuration.LogLevelValues = LogLevelValues;
-globalThis.Configuration.PortValues = PortValues;
-globalThis.Networking.APIV2.Internal.SupportedMethodValues = SupportedMethodValues;
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -236,20 +192,16 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
-            importObject["TestModule"]["bjs_Utils_Converter_wrap"] = function(pointer) {
-                const obj = _exports.Utils.Converter.__construct(pointer);
+            importObject["TestModule"]["bjs_CachedModel_wrap"] = function(pointer) {
+                const obj = _exports['CachedModel'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
-            importObject["TestModule"]["bjs_Formatting_Converter_wrap"] = function(pointer) {
-                const obj = _exports.Formatting.Converter.__construct(pointer);
+            importObject["TestModule"]["bjs_ExplicitlyUncachedModel_wrap"] = function(pointer) {
+                const obj = _exports['ExplicitlyUncachedModel'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
-            importObject["TestModule"]["bjs_Networking_API_HTTPServer_wrap"] = function(pointer) {
-                const obj = _exports.Networking.API.HTTPServer.__construct(pointer);
-                return swift.memory.retain(obj);
-            };
-            importObject["TestModule"]["bjs_Networking_APIV2_Internal_TestServer_wrap"] = function(pointer) {
-                const obj = _exports.Networking.APIV2.Internal.TestServer.__construct(pointer);
+            importObject["TestModule"]["bjs_UncachedModel_wrap"] = function(pointer) {
+                const obj = _exports['UncachedModel'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },
@@ -317,157 +269,71 @@ export async function createInstantiator(options, swift) {
                     state.deinit(state.pointer);
                 }
             }
-            class Converter extends SwiftHeapObject {
+            class CachedModel extends SwiftHeapObject {
+                static __identityCache = new Map();
+
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Utils_Converter_deinit, Converter.prototype, null);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_CachedModel_deinit, CachedModel.prototype, CachedModel.__identityCache);
                 }
 
-                constructor() {
-                    const ret = instance.exports.bjs_Utils_Converter_init();
-                    return Converter.__construct(ret);
+                constructor(name) {
+                    const nameBytes = textEncoder.encode(name);
+                    const nameId = swift.memory.retain(nameBytes);
+                    const ret = instance.exports.bjs_CachedModel_init(nameId, nameBytes.length);
+                    return CachedModel.__construct(ret);
                 }
-                toString(value) {
-                    instance.exports.bjs_Utils_Converter_toString(this.pointer, value);
+                get name() {
+                    instance.exports.bjs_CachedModel_name_get(this.pointer);
                     const ret = tmpRetString;
                     tmpRetString = undefined;
                     return ret;
                 }
-                get precision() {
-                    const ret = instance.exports.bjs_Utils_Converter_precision_get(this.pointer);
+                set name(value) {
+                    const valueBytes = textEncoder.encode(value);
+                    const valueId = swift.memory.retain(valueBytes);
+                    instance.exports.bjs_CachedModel_name_set(this.pointer, valueId, valueBytes.length);
+                }
+            }
+            class UncachedModel extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_UncachedModel_deinit, UncachedModel.prototype, null);
+                }
+
+                constructor(value) {
+                    const ret = instance.exports.bjs_UncachedModel_init(value);
+                    return UncachedModel.__construct(ret);
+                }
+                get value() {
+                    const ret = instance.exports.bjs_UncachedModel_value_get(this.pointer);
                     return ret;
                 }
-                set precision(value) {
-                    instance.exports.bjs_Utils_Converter_precision_set(this.pointer, value);
+                set value(value) {
+                    instance.exports.bjs_UncachedModel_value_set(this.pointer, value);
                 }
             }
-            class HTTPServer extends SwiftHeapObject {
+            class ExplicitlyUncachedModel extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Networking_API_HTTPServer_deinit, HTTPServer.prototype, null);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_ExplicitlyUncachedModel_deinit, ExplicitlyUncachedModel.prototype, null);
                 }
 
-                constructor() {
-                    const ret = instance.exports.bjs_Networking_API_HTTPServer_init();
-                    return HTTPServer.__construct(ret);
+                constructor(count) {
+                    const ret = instance.exports.bjs_ExplicitlyUncachedModel_init(count);
+                    return ExplicitlyUncachedModel.__construct(ret);
                 }
-                call(method) {
-                    instance.exports.bjs_Networking_API_HTTPServer_call(this.pointer, method);
-                }
-            }
-            class TestServer extends SwiftHeapObject {
-                static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Networking_APIV2_Internal_TestServer_deinit, TestServer.prototype, null);
-                }
-
-                constructor() {
-                    const ret = instance.exports.bjs_Networking_APIV2_Internal_TestServer_init();
-                    return TestServer.__construct(ret);
-                }
-                call(method) {
-                    instance.exports.bjs_Networking_APIV2_Internal_TestServer_call(this.pointer, method);
-                }
-            }
-            class Converter extends SwiftHeapObject {
-                static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Formatting_Converter_deinit, Converter.prototype, null);
-                }
-
-                constructor() {
-                    const ret = instance.exports.bjs_Formatting_Converter_init();
-                    return Converter.__construct(ret);
-                }
-                format(value) {
-                    instance.exports.bjs_Formatting_Converter_format(this.pointer, value);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
+                get count() {
+                    const ret = instance.exports.bjs_ExplicitlyUncachedModel_count_get(this.pointer);
                     return ret;
                 }
-            }
-            if (typeof globalThis.Configuration === 'undefined') {
-                globalThis.Configuration = {};
-            }
-            if (typeof globalThis.Formatting === 'undefined') {
-                globalThis.Formatting = {};
-            }
-            if (typeof globalThis.Networking === 'undefined') {
-                globalThis.Networking = {};
-            }
-            if (typeof globalThis.Networking.API === 'undefined') {
-                globalThis.Networking.API = {};
-            }
-            if (typeof globalThis.Networking.APIV2 === 'undefined') {
-                globalThis.Networking.APIV2 = {};
-            }
-            if (typeof globalThis.Networking.APIV2.Internal === 'undefined') {
-                globalThis.Networking.APIV2.Internal = {};
-            }
-            if (typeof globalThis.Services === 'undefined') {
-                globalThis.Services = {};
-            }
-            if (typeof globalThis.Services.Graph === 'undefined') {
-                globalThis.Services.Graph = {};
-            }
-            if (typeof globalThis.Services.Graph.GraphOperations === 'undefined') {
-                globalThis.Services.Graph.GraphOperations = {};
-            }
-            if (typeof globalThis.Utils === 'undefined') {
-                globalThis.Utils = {};
+                set count(value) {
+                    instance.exports.bjs_ExplicitlyUncachedModel_count_set(this.pointer, value);
+                }
             }
             const exports = {
-                Configuration: {
-                    LogLevel: LogLevelValues,
-                    Port: PortValues,
-                },
-                Formatting: {
-                    Converter,
-                },
-                Networking: {
-                    API: {
-                        HTTPServer,
-                        Method: MethodValues,
-                    },
-                    APIV2: {
-                        Internal: {
-                            TestServer,
-                            SupportedMethod: SupportedMethodValues,
-                        },
-                    },
-                },
-                Services: {
-                    Graph: {
-                        GraphOperations: {
-                            createGraph: function bjs_Services_Graph_GraphOperations_static_createGraph(rootId) {
-                                const ret = instance.exports.bjs_Services_Graph_GraphOperations_static_createGraph(rootId);
-                                return ret;
-                            },
-                            nodeCount: function bjs_Services_Graph_GraphOperations_static_nodeCount(graphId) {
-                                const ret = instance.exports.bjs_Services_Graph_GraphOperations_static_nodeCount(graphId);
-                                return ret;
-                            },
-                            validate: function bjs_Services_Graph_GraphOperations_static_validate(graphId) {
-                                const ret = instance.exports.bjs_Services_Graph_GraphOperations_static_validate(graphId);
-                                if (tmpRetException) {
-                                    const error = swift.memory.getObject(tmpRetException);
-                                    swift.memory.release(tmpRetException);
-                                    tmpRetException = undefined;
-                                    throw error;
-                                }
-                                return ret !== 0;
-                            },
-                        },
-                    },
-                },
-                Utils: {
-                    Converter,
-                },
+                CachedModel,
+                UncachedModel,
+                ExplicitlyUncachedModel,
             };
             _exports = exports;
-            globalThis.Utils.Converter = exports.Utils.Converter;
-            globalThis.Networking.API.HTTPServer = exports.Networking.API.HTTPServer;
-            globalThis.Networking.APIV2.Internal.TestServer = exports.Networking.APIV2.Internal.TestServer;
-            globalThis.Formatting.Converter = exports.Formatting.Converter;
-            globalThis.Services.Graph.GraphOperations.createGraph = exports.Services.Graph.GraphOperations.createGraph;
-            globalThis.Services.Graph.GraphOperations.nodeCount = exports.Services.Graph.GraphOperations.nodeCount;
-            globalThis.Services.Graph.GraphOperations.validate = exports.Services.Graph.GraphOperations.validate;
             return exports;
         },
     }

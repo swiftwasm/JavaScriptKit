@@ -113,7 +113,8 @@ public enum JSImportFrom: String {
 ///
 /// - Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
 @attached(peer)
-public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const) = Builtin.ExternalMacro
+public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const, identityMode: Bool = false) =
+    Builtin.ExternalMacro
 
 /// A macro that generates a Swift getter that reads a value from JavaScript.
 ///

@@ -135,6 +135,46 @@ Classes use **reference semantics** when crossing the Swift/JavaScript boundary:
 
 This differs from structs, which use copy semantics and transfer data by value.
 
+## Identity Mode
+
+By default, each boundary crossing creates a new JavaScript wrapper for the same Swift object. This means `===` identity checks fail even when the underlying Swift object is the same:
+
+```javascript
+const a = exports.getModel();
+const b = exports.getModel(); // same Swift object
+console.log(a === b); // false — different wrappers
+```
+
+For classes where wrapper identity matters, enable identity mode with the `identityMode` parameter:
+
+```swift
+@JS(identityMode: true)
+class Model {
+    @JS var name: String
+    @JS init(name: String) { self.name = name }
+}
+```
+
+With identity mode, BridgeJS maintains a per-class `WeakRef`-based cache keyed by the Swift heap pointer. The same pointer always returns the same JavaScript wrapper:
+
+```javascript
+const a = exports.getModel();
+const b = exports.getModel(); // same Swift object
+console.log(a === b); // true — same wrapper
+```
+
+Identity mode is opt-in per class. Non-annotated classes have zero overhead. To enable it for all classes in a target, use `bridge-js.config.json` instead:
+
+```json
+{ "identityMode": "pointer" }
+```
+
+Per-class `@JS(identityMode: true/false)` overrides the config setting.
+
+### Tradeoffs
+
+Identity mode improves performance for reuse-heavy workloads (same objects crossing repeatedly) but adds overhead for create-heavy workloads (many short-lived objects). The cache infrastructure (`Map`, `WeakRef`, `FinalizationRegistry`) has a per-object cost that is only worthwhile when objects are returned multiple times.
+
 ## Supported Features
 
 | Swift Feature | Status |

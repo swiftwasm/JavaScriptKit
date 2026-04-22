@@ -165,7 +165,8 @@ import BridgeJSUtilities
             let swiftToSkeleton = SwiftToSkeleton(
                 progress: progress,
                 moduleName: moduleName,
-                exposeToGlobal: config.exposeToGlobal
+                exposeToGlobal: config.exposeToGlobal,
+                identityMode: config.identityMode
             )
             for inputFile in inputFiles.sorted() {
                 try withSpan("Parsing \(inputFile)") {

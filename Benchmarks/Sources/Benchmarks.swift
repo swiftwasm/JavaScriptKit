@@ -257,6 +257,109 @@ enum ComplexResult {
     }
 }
 
+// MARK: - Class Array Performance Tests
+
+nonisolated(unsafe) var _classArrayPool: [SimpleClass] = []
+
+@JS class ClassArrayRoundtrip {
+    @JS init() {}
+
+    @JS func setupPool(_ count: Int) {
+        _classArrayPool = (0..<count).map {
+            SimpleClass(name: "Item \($0)", count: $0, flag: true, rate: 0.5, precise: 3.14)
+        }
+    }
+
+    @JS func getPool() -> [SimpleClass] {
+        return _classArrayPool
+    }
+
+    @JS func makeClassArray() -> [SimpleClass] {
+        return (0..<100).map {
+            SimpleClass(name: "Item \($0)", count: $0, flag: true, rate: 0.5, precise: 3.14)
+        }
+    }
+
+    @JS func takeClassArray(_ values: [SimpleClass]) {}
+
+    @JS func roundtripClassArray(_ values: [SimpleClass]) -> [SimpleClass] {
+        return values
+    }
+}
+
+// MARK: - Identity Cache Benchmark
+
+nonisolated(unsafe) var _cachedPool: [SimpleClass] = []
+
+@JS class IdentityCacheBenchmark {
+    @JS init() {}
+
+    @JS func setupPool(_ count: Int) {
+        _cachedPool = (0..<count).map {
+            SimpleClass(name: "Item \($0)", count: $0, flag: true, rate: 0.5, precise: 3.14)
+        }
+    }
+
+    @JS func getPoolRepeated() -> [SimpleClass] {
+        return _cachedPool
+    }
+}
+
+// MARK: - Identity Mode Benchmark Variants
+// These classes use @JS(identityMode: true) so that identity cache benchmarks
+// can run in the SAME build alongside the non-identity classes above.
+
+@JS(identityMode: true)
+class SimpleClassIdentity {
+    @JS var name: String
+    @JS var count: Int
+    @JS var flag: Bool
+    @JS var rate: Float
+    @JS var precise: Double
+
+    @JS init(name: String, count: Int, flag: Bool, rate: Float, precise: Double) {
+        self.name = name
+        self.count = count
+        self.flag = flag
+        self.rate = rate
+        self.precise = precise
+    }
+}
+
+@JS(identityMode: true)
+class ClassRoundtripIdentity {
+    @JS init() {}
+
+    @JS func roundtripSimpleClassIdentity(_ obj: SimpleClassIdentity) -> SimpleClassIdentity {
+        return obj
+    }
+
+    @JS func makeSimpleClassIdentity() -> SimpleClassIdentity {
+        return SimpleClassIdentity(name: "Hello", count: 42, flag: true, rate: 0.5, precise: 3.14159)
+    }
+
+    @JS func takeSimpleClassIdentity(_ obj: SimpleClassIdentity) {
+        // consume without returning
+    }
+}
+
+nonisolated(unsafe) var _cachedPoolIdentity: [SimpleClassIdentity] = []
+
+@JS(identityMode: true)
+class IdentityCacheBenchmarkIdentity {
+    @JS init() {}
+
+    @JS func setupPool(_ count: Int) {
+        _cachedPoolIdentity = (0..<count).map {
+            SimpleClassIdentity(name: "Item \($0)", count: $0, flag: true, rate: 0.5, precise: 3.14)
+        }
+    }
+
+    @JS func getPoolRepeated() -> [SimpleClassIdentity] {
+        return _cachedPoolIdentity
+    }
+}
+
 // MARK: - Array Performance Tests
 
 @JS struct Point {

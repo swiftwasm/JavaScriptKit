@@ -342,20 +342,32 @@ public struct BridgeJSConfig: Codable {
     /// Default: `false`
     public var exposeToGlobal: Bool
 
-    public init(tools: [String: String]? = nil, exposeToGlobal: Bool = false) {
+    /// The identity mode to use for exported Swift heap objects.
+    ///
+    /// When `"pointer"`, Swift heap objects are tracked by pointer identity,
+    /// enabling identity-based caching. When `"none"` or `nil`, no identity
+    /// tracking is performed.
+    ///
+    /// Default: `nil` (treated as `"none"`)
+    public var identityMode: String?
+
+    public init(tools: [String: String]? = nil, exposeToGlobal: Bool = false, identityMode: String? = nil) {
         self.tools = tools
         self.exposeToGlobal = exposeToGlobal
+        self.identityMode = identityMode
     }
 
     enum CodingKeys: String, CodingKey {
         case tools
         case exposeToGlobal
+        case identityMode
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         tools = try container.decodeIfPresent([String: String].self, forKey: .tools)
         exposeToGlobal = try container.decodeIfPresent(Bool.self, forKey: .exposeToGlobal) ?? false
+        identityMode = try container.decodeIfPresent(String.self, forKey: .identityMode)
     }
 
     /// Load the configuration file from the SwiftPM package target directory.
@@ -398,7 +410,8 @@ public struct BridgeJSConfig: Codable {
     func merging(overrides: BridgeJSConfig) -> BridgeJSConfig {
         return BridgeJSConfig(
             tools: (tools ?? [:]).merging(overrides.tools ?? [:], uniquingKeysWith: { $1 }),
-            exposeToGlobal: overrides.exposeToGlobal
+            exposeToGlobal: overrides.exposeToGlobal,
+            identityMode: overrides.identityMode ?? identityMode
         )
     }
 }

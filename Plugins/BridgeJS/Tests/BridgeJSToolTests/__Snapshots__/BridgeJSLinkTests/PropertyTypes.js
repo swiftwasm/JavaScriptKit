@@ -215,18 +215,39 @@ export async function createInstantiator(options, swift) {
                     return;
                 }
                 state.hasReleased = true;
+                state.identityMap?.delete(state.pointer);
                 state.deinit(state.pointer);
             });
 
             /// Represents a Swift heap object like a class instance or an actor instance.
             class SwiftHeapObject {
-                static __wrap(pointer, deinit, prototype) {
-                    const obj = Object.create(prototype);
-                    const state = { pointer, deinit, hasReleased: false };
-                    obj.pointer = pointer;
-                    obj.__swiftHeapObjectState = state;
-                    swiftHeapObjectFinalizationRegistry.register(obj, state, state);
-                    return obj;
+                static __wrap(pointer, deinit, prototype, identityCache) {
+                    const makeFresh = (identityMap) => {
+                        const obj = Object.create(prototype);
+                        const state = { pointer, deinit, hasReleased: false, identityMap };
+                        obj.pointer = pointer;
+                        obj.__swiftHeapObjectState = state;
+                        swiftHeapObjectFinalizationRegistry.register(obj, state, state);
+                        if (identityMap) {
+                            identityMap.set(pointer, new WeakRef(obj));
+                        }
+                        return obj;
+                    };
+
+                    if (!identityCache) {
+                        return makeFresh(null);
+                    }
+
+                    const cached = identityCache.get(pointer)?.deref();
+                    if (cached && !cached.__swiftHeapObjectState.hasReleased) {
+                        deinit(pointer);
+                        return cached;
+                    }
+                    if (identityCache.has(pointer)) {
+                        identityCache.delete(pointer);
+                    }
+
+                    return makeFresh(identityCache);
                 }
 
                 release() {
@@ -236,12 +257,13 @@ export async function createInstantiator(options, swift) {
                     }
                     state.hasReleased = true;
                     swiftHeapObjectFinalizationRegistry.unregister(state);
+                    state.identityMap?.delete(state.pointer);
                     state.deinit(state.pointer);
                 }
             }
             class PropertyHolder extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PropertyHolder_deinit, PropertyHolder.prototype);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_PropertyHolder_deinit, PropertyHolder.prototype, null);
                 }
 
                 constructor(intValue, floatValue, doubleValue, boolValue, stringValue, jsObject) {

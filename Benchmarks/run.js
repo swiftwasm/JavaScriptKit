@@ -282,7 +282,7 @@ async function singleRun(results, nameFilter, iterations) {
             return;
         }
         // Warmup to reduce JIT/IC noise.
-        body();
+        body()
         if (typeof globalThis.gc === "function") {
             globalThis.gc();
         }
@@ -869,6 +869,96 @@ async function singleRun(results, nameFilter, iterations) {
             arrayRoundtrip.roundtripOptionalArray(null)
         }
     })
+
+    // Identity mode benchmarks - compare classes with and without @JS(identityMode: true)
+
+    // Non-identity baseline (mode = "none")
+    const classRoundtripNone = new exports.ClassRoundtrip()
+    const baseObjNone = new exports.SimpleClass('Hello', 42, true, 0.5, 3.14159)
+
+    benchmarkRunner("Identity/none/passBothWaysRoundtrip", () => {
+        let current = baseObjNone
+        for (let i = 0; i < iterations; i++) {
+            current = classRoundtripNone.roundtripSimpleClass(current)
+        }
+    })
+
+    benchmarkRunner("Identity/none/swiftCreatesObject", () => {
+        for (let i = 0; i < iterations; i++) {
+            classRoundtripNone.makeSimpleClass()
+        }
+    })
+
+    benchmarkRunner("Identity/none/swiftConsumesSameObject", () => {
+        for (let i = 0; i < iterations; i++) {
+            classRoundtripNone.takeSimpleClass(baseObjNone)
+        }
+    })
+
+    benchmarkRunner("Identity/none/churnObjects", () => {
+        for (let i = 0; i < iterations; i++) {
+            const obj = new exports.SimpleClass(`temp ${i}`, i, true, 0.5, 3.14159)
+            classRoundtripNone.roundtripSimpleClass(obj)
+            obj.release()
+        }
+    })
+
+    const identityCacheNone = new exports.IdentityCacheBenchmark()
+    identityCacheNone.setupPool(100)
+    identityCacheNone.getPoolRepeated() // warm the cache
+    benchmarkRunner("Identity/none/getPoolRepeated_100", () => {
+        for (let i = 0; i < Math.floor(iterations / 100); i++) {
+            identityCacheNone.getPoolRepeated()
+        }
+    })
+    identityCacheNone.release()
+
+    baseObjNone.release()
+    classRoundtripNone.release()
+
+    // Identity mode (mode = "pointer")
+    const classRoundtripId = new exports.ClassRoundtripIdentity()
+    const baseObjId = new exports.SimpleClassIdentity('Hello', 42, true, 0.5, 3.14159)
+
+    benchmarkRunner("Identity/pointer/passBothWaysRoundtrip", () => {
+        let current = baseObjId
+        for (let i = 0; i < iterations; i++) {
+            current = classRoundtripId.roundtripSimpleClassIdentity(current)
+        }
+    })
+
+    benchmarkRunner("Identity/pointer/swiftCreatesObject", () => {
+        for (let i = 0; i < iterations; i++) {
+            classRoundtripId.makeSimpleClassIdentity()
+        }
+    })
+
+    benchmarkRunner("Identity/pointer/swiftConsumesSameObject", () => {
+        for (let i = 0; i < iterations; i++) {
+            classRoundtripId.takeSimpleClassIdentity(baseObjId)
+        }
+    })
+
+    benchmarkRunner("Identity/pointer/churnObjects", () => {
+        for (let i = 0; i < iterations; i++) {
+            const obj = new exports.SimpleClassIdentity(`temp ${i}`, i, true, 0.5, 3.14159)
+            classRoundtripId.roundtripSimpleClassIdentity(obj)
+            obj.release()
+        }
+    })
+
+    const identityCacheId = new exports.IdentityCacheBenchmarkIdentity()
+    identityCacheId.setupPool(100)
+    identityCacheId.getPoolRepeated() // warm the cache
+    benchmarkRunner("Identity/pointer/getPoolRepeated_100", () => {
+        for (let i = 0; i < Math.floor(iterations / 100); i++) {
+            identityCacheId.getPoolRepeated()
+        }
+    })
+    identityCacheId.release()
+
+    baseObjId.release()
+    classRoundtripId.release()
 }
 
 /**
@@ -984,7 +1074,7 @@ async function main() {
             'min-runs': { type: 'string', default: '5' },
             'max-runs': { type: 'string', default: '50' },
             'target-cv': { type: 'string', default: '5' },
-            filter: { type: 'string' }
+            filter: { type: 'string' },
         }
     });
 
@@ -1017,7 +1107,7 @@ async function main() {
             console.log(`Results will be saved to: ${args.values.output}`);
         }
 
-        await runUntilStable(results, options, width, nameFilter, filterArg, iterations);
+        await runUntilStable(results, options, width, nameFilter, filterArg, iterations)
     } else {
         // Fixed number of runs mode
         const runs = parseInt(args.values.runs, 10);
@@ -1039,7 +1129,7 @@ async function main() {
         console.log("\nOverall Progress:");
         for (let i = 0; i < runs; i++) {
             updateProgress(i, runs, "Benchmark Runs:", width);
-            await singleRun(results, nameFilter, iterations);
+            await singleRun(results, nameFilter, iterations)
             if (i === 0 && Object.keys(results).length === 0) {
                 process.stdout.write("\n");
                 console.error(`No benchmarks matched filter: ${filterArg}`);

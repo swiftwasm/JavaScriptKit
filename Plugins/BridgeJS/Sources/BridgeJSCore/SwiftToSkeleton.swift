@@ -16,14 +16,16 @@ public final class SwiftToSkeleton {
     public let progress: ProgressReporting
     public let moduleName: String
     public let exposeToGlobal: Bool
+    public let identityMode: String?
 
     private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
     let typeDeclResolver: TypeDeclResolver
 
-    public init(progress: ProgressReporting, moduleName: String, exposeToGlobal: Bool) {
+    public init(progress: ProgressReporting, moduleName: String, exposeToGlobal: Bool, identityMode: String? = nil) {
         self.progress = progress
         self.moduleName = moduleName
         self.exposeToGlobal = exposeToGlobal
+        self.identityMode = identityMode
         self.typeDeclResolver = TypeDeclResolver()
 
         // Index known types provided by JavaScriptKit
@@ -42,7 +44,13 @@ public final class SwiftToSkeleton {
     public func finalize() throws -> BridgeJSSkeleton {
         var perSourceErrors: [(inputFilePath: String, errors: [DiagnosticError])] = []
         var importedFiles: [ImportedFileSkeleton] = []
-        var exported = ExportedSkeleton(functions: [], classes: [], enums: [], exposeToGlobal: exposeToGlobal)
+        var exported = ExportedSkeleton(
+            functions: [],
+            classes: [],
+            enums: [],
+            exposeToGlobal: exposeToGlobal,
+            identityMode: identityMode
+        )
         var exportCollectors: [ExportSwiftAPICollector] = []
 
         for (sourceFile, inputFilePath) in sourceFiles {
@@ -1189,6 +1197,14 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         return nil
     }
 
+    private func extractIdentityMode(from jsAttribute: AttributeSyntax) -> Bool? {
+        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+            let identityArg = arguments.first(where: { $0.label?.text == "identityMode" })
+        else { return nil }
+        let text = identityArg.expression.trimmedDescription
+        return text == "true"
+    }
+
     override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
         guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
 
@@ -1376,6 +1392,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             for: node,
             message: "Class visibility must be at least internal"
         )
+        let classIdentityMode = extractIdentityMode(from: jsAttribute)
         let exportedClass = ExportedClass(
             name: name,
             swiftCallName: swiftCallName,
@@ -1383,7 +1400,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             constructor: nil,
             methods: [],
             properties: [],
-            namespace: namespaceResult.namespace
+            namespace: namespaceResult.namespace,
+            identityMode: classIdentityMode
         )
         let uniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
 
