@@ -1,0 +1,447 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_IdentityTestSubject_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "IdentityTestSubject",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "value",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "currentValue",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "IdentityTestSubject"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_RetainLeakSubject_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "tag",
+              "name" : "tag",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "RetainLeakSubject",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "tag",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "RetainLeakSubject"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_ArrayIdentityElement_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "tag",
+              "name" : "tag",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "ArrayIdentityElement",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "tag",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "ArrayIdentityElement"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_getSharedSubject",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getSharedSubject",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "IdentityTestSubject"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_resetSharedSubject",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "resetSharedSubject",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getRetainLeakSubject",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getRetainLeakSubject",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "RetainLeakSubject"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_resetRetainLeakSubject",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "resetRetainLeakSubject",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getRetainLeakDeinits",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getRetainLeakDeinits",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_resetRetainLeakDeinits",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "resetRetainLeakDeinits",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_setupArrayPool",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "setupArrayPool",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getArrayPool",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getArrayPool",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "swiftHeapObject" : {
+                "_0" : "ArrayIdentityElement"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getArrayPoolElement",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getArrayPoolElement",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "index",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "swiftHeapObject" : {
+                "_0" : "ArrayIdentityElement"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getArrayPoolDeinits",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getArrayPoolDeinits",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_resetArrayPoolDeinits",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "resetArrayPoolDeinits",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_clearArrayPool",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "clearArrayPool",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      }
+    ],
+    "identityMode" : "pointer",
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "IdentityModeTestImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "runJsIdentityModeTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "BridgeJSIdentityTests"
+}

@@ -25,6 +25,21 @@ public struct BridgeJSLink {
         self.sharedMemory = sharedMemory
     }
 
+    /// The identity mode from the config file, resolved from skeletons.
+    var configIdentityMode: String {
+        skeletons.compactMap(\.exported).compactMap(\.identityMode).first ?? "none"
+    }
+
+    /// Whether a class should use identity caching based on its annotation and the config default.
+    private func shouldUseIdentityCache(for klass: ExportedClass) -> Bool {
+        // Per-class annotation takes priority
+        if let classOverride = klass.identityMode {
+            return classOverride
+        }
+        // Fall back to config default
+        return configIdentityMode == "pointer"
+    }
+
     mutating func addSkeletonFile(data: Data) throws {
         do {
             let unified = try JSONDecoder().decode(BridgeJSSkeleton.self, from: data)
@@ -85,31 +100,52 @@ public struct BridgeJSLink {
                     return;
                 }
                 state.hasReleased = true;
+                state.identityMap?.delete(state.pointer);
                 state.deinit(state.pointer);
             });
 
             /// Represents a Swift heap object like a class instance or an actor instance.
             class SwiftHeapObject {
-                static __wrap(pointer, deinit, prototype) {
-                    const obj = Object.create(prototype);
-                    const state = { pointer, deinit, hasReleased: false };
+                static __wrap(pointer, deinit, prototype, identityCache) {
+                    const makeFresh = (identityMap) => {
+                        const obj = Object.create(prototype);
+                        const state = { pointer, deinit, hasReleased: false, identityMap };
 
             """
         if enableLifetimeTracking {
-            output += "        TRACKING.wrap(pointer, deinit, prototype, state);\n"
+            output += "            TRACKING.wrap(pointer, deinit, prototype, state);\n"
         }
         output += """
-                    obj.pointer = pointer;
-                    obj.__swiftHeapObjectState = state;
-                    swiftHeapObjectFinalizationRegistry.register(obj, state, state);
-                    return obj;
+                        obj.pointer = pointer;
+                        obj.__swiftHeapObjectState = state;
+                        swiftHeapObjectFinalizationRegistry.register(obj, state, state);
+                        if (identityMap) {
+                            identityMap.set(pointer, new WeakRef(obj));
+                        }
+                        return obj;
+                    };
+
+                    if (!identityCache) {
+                        return makeFresh(null);
+                    }
+
+                    const cached = identityCache.get(pointer)?.deref();
+                    if (cached && !cached.__swiftHeapObjectState.hasReleased) {
+                        deinit(pointer);
+                        return cached;
+                    }
+                    if (identityCache.has(pointer)) {
+                        identityCache.delete(pointer);
+                    }
+
+                    return makeFresh(identityCache);
                 }
 
                 release() {
 
             """
         if enableLifetimeTracking {
-            output += "        TRACKING.release(this);\n"
+            output += "            TRACKING.release(this);\n"
         }
         output += """
                     const state = this.__swiftHeapObjectState;
@@ -118,6 +154,7 @@ public struct BridgeJSLink {
                     }
                     state.hasReleased = true;
                     swiftHeapObjectFinalizationRegistry.unregister(state);
+                    state.identityMap?.delete(state.pointer);
                     state.deinit(state.pointer);
                 }
             }
@@ -1965,13 +2002,24 @@ extension BridgeJSLink {
         dtsExportEntryPrinter.write("\(klass.name): {")
         jsPrinter.write("class \(klass.name) extends SwiftHeapObject {")
 
-        // Always add __construct and constructor methods for all classes
+        // Per-class identity mode: determine at codegen time whether this class uses identity caching
+        let useIdentity = shouldUseIdentityCache(for: klass)
         jsPrinter.indent {
+            if useIdentity {
+                jsPrinter.write("static __identityCache = new Map();")
+                jsPrinter.nextLine()
+            }
             jsPrinter.write("static __construct(ptr) {")
             jsPrinter.indent {
-                jsPrinter.write(
-                    "return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_\(klass.abiName)_deinit, \(klass.name).prototype);"
-                )
+                if useIdentity {
+                    jsPrinter.write(
+                        "return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_\(klass.abiName)_deinit, \(klass.name).prototype, \(klass.name).__identityCache);"
+                    )
+                } else {
+                    jsPrinter.write(
+                        "return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_\(klass.abiName)_deinit, \(klass.name).prototype, null);"
+                    )
+                }
             }
             jsPrinter.write("}")
             jsPrinter.nextLine()
@@ -1991,10 +2039,11 @@ extension BridgeJSLink {
             jsPrinter.indent {
                 jsPrinter.write("constructor(\(constructorParamList)) {")
                 let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
+                let constructCall = "\(klass.name).__construct(\(returnExpr))"
                 jsPrinter.indent {
                     thunkBuilder.renderFunctionBody(
                         into: jsPrinter,
-                        returnExpr: "\(klass.name).__construct(\(returnExpr))"
+                        returnExpr: constructCall
                     )
                 }
                 jsPrinter.write("}")

@@ -1373,6 +1373,448 @@ fileprivate func _bjs_ClassRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPoin
     return _bjs_ClassRoundtrip_wrap_extern(pointer)
 }
 
+@_expose(wasm, "bjs_ClassArrayRoundtrip_init")
+@_cdecl("bjs_ClassArrayRoundtrip_init")
+public func _bjs_ClassArrayRoundtrip_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ClassArrayRoundtrip()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassArrayRoundtrip_setupPool")
+@_cdecl("bjs_ClassArrayRoundtrip_setupPool")
+public func _bjs_ClassArrayRoundtrip_setupPool(_ _self: UnsafeMutableRawPointer, _ count: Int32) -> Void {
+    #if arch(wasm32)
+    ClassArrayRoundtrip.bridgeJSLiftParameter(_self).setupPool(_: Int.bridgeJSLiftParameter(count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassArrayRoundtrip_getPool")
+@_cdecl("bjs_ClassArrayRoundtrip_getPool")
+public func _bjs_ClassArrayRoundtrip_getPool(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = ClassArrayRoundtrip.bridgeJSLiftParameter(_self).getPool()
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassArrayRoundtrip_makeClassArray")
+@_cdecl("bjs_ClassArrayRoundtrip_makeClassArray")
+public func _bjs_ClassArrayRoundtrip_makeClassArray(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = ClassArrayRoundtrip.bridgeJSLiftParameter(_self).makeClassArray()
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassArrayRoundtrip_takeClassArray")
+@_cdecl("bjs_ClassArrayRoundtrip_takeClassArray")
+public func _bjs_ClassArrayRoundtrip_takeClassArray(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    ClassArrayRoundtrip.bridgeJSLiftParameter(_self).takeClassArray(_: [SimpleClass].bridgeJSStackPop())
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassArrayRoundtrip_roundtripClassArray")
+@_cdecl("bjs_ClassArrayRoundtrip_roundtripClassArray")
+public func _bjs_ClassArrayRoundtrip_roundtripClassArray(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = ClassArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripClassArray(_: [SimpleClass].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassArrayRoundtrip_deinit")
+@_cdecl("bjs_ClassArrayRoundtrip_deinit")
+public func _bjs_ClassArrayRoundtrip_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<ClassArrayRoundtrip>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension ClassArrayRoundtrip: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_ClassArrayRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_ClassArrayRoundtrip_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_ClassArrayRoundtrip_wrap")
+fileprivate func _bjs_ClassArrayRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_ClassArrayRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_ClassArrayRoundtrip_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ClassArrayRoundtrip_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_IdentityCacheBenchmark_init")
+@_cdecl("bjs_IdentityCacheBenchmark_init")
+public func _bjs_IdentityCacheBenchmark_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = IdentityCacheBenchmark()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IdentityCacheBenchmark_setupPool")
+@_cdecl("bjs_IdentityCacheBenchmark_setupPool")
+public func _bjs_IdentityCacheBenchmark_setupPool(_ _self: UnsafeMutableRawPointer, _ count: Int32) -> Void {
+    #if arch(wasm32)
+    IdentityCacheBenchmark.bridgeJSLiftParameter(_self).setupPool(_: Int.bridgeJSLiftParameter(count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IdentityCacheBenchmark_getPoolRepeated")
+@_cdecl("bjs_IdentityCacheBenchmark_getPoolRepeated")
+public func _bjs_IdentityCacheBenchmark_getPoolRepeated(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = IdentityCacheBenchmark.bridgeJSLiftParameter(_self).getPoolRepeated()
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IdentityCacheBenchmark_deinit")
+@_cdecl("bjs_IdentityCacheBenchmark_deinit")
+public func _bjs_IdentityCacheBenchmark_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<IdentityCacheBenchmark>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension IdentityCacheBenchmark: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_IdentityCacheBenchmark_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_IdentityCacheBenchmark_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_IdentityCacheBenchmark_wrap")
+fileprivate func _bjs_IdentityCacheBenchmark_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_IdentityCacheBenchmark_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_IdentityCacheBenchmark_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_IdentityCacheBenchmark_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_init")
+@_cdecl("bjs_SimpleClassIdentity_init")
+public func _bjs_SimpleClassIdentity_init(_ nameBytes: Int32, _ nameLength: Int32, _ count: Int32, _ flag: Int32, _ rate: Float32, _ precise: Float64) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = SimpleClassIdentity(name: String.bridgeJSLiftParameter(nameBytes, nameLength), count: Int.bridgeJSLiftParameter(count), flag: Bool.bridgeJSLiftParameter(flag), rate: Float.bridgeJSLiftParameter(rate), precise: Double.bridgeJSLiftParameter(precise))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_name_get")
+@_cdecl("bjs_SimpleClassIdentity_name_get")
+public func _bjs_SimpleClassIdentity_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).name
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_name_set")
+@_cdecl("bjs_SimpleClassIdentity_name_set")
+public func _bjs_SimpleClassIdentity_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    SimpleClassIdentity.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_count_get")
+@_cdecl("bjs_SimpleClassIdentity_count_get")
+public func _bjs_SimpleClassIdentity_count_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).count
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_count_set")
+@_cdecl("bjs_SimpleClassIdentity_count_set")
+public func _bjs_SimpleClassIdentity_count_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    SimpleClassIdentity.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_flag_get")
+@_cdecl("bjs_SimpleClassIdentity_flag_get")
+public func _bjs_SimpleClassIdentity_flag_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).flag
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_flag_set")
+@_cdecl("bjs_SimpleClassIdentity_flag_set")
+public func _bjs_SimpleClassIdentity_flag_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    SimpleClassIdentity.bridgeJSLiftParameter(_self).flag = Bool.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_rate_get")
+@_cdecl("bjs_SimpleClassIdentity_rate_get")
+public func _bjs_SimpleClassIdentity_rate_get(_ _self: UnsafeMutableRawPointer) -> Float32 {
+    #if arch(wasm32)
+    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).rate
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_rate_set")
+@_cdecl("bjs_SimpleClassIdentity_rate_set")
+public func _bjs_SimpleClassIdentity_rate_set(_ _self: UnsafeMutableRawPointer, _ value: Float32) -> Void {
+    #if arch(wasm32)
+    SimpleClassIdentity.bridgeJSLiftParameter(_self).rate = Float.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_precise_get")
+@_cdecl("bjs_SimpleClassIdentity_precise_get")
+public func _bjs_SimpleClassIdentity_precise_get(_ _self: UnsafeMutableRawPointer) -> Float64 {
+    #if arch(wasm32)
+    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).precise
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_precise_set")
+@_cdecl("bjs_SimpleClassIdentity_precise_set")
+public func _bjs_SimpleClassIdentity_precise_set(_ _self: UnsafeMutableRawPointer, _ value: Float64) -> Void {
+    #if arch(wasm32)
+    SimpleClassIdentity.bridgeJSLiftParameter(_self).precise = Double.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SimpleClassIdentity_deinit")
+@_cdecl("bjs_SimpleClassIdentity_deinit")
+public func _bjs_SimpleClassIdentity_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<SimpleClassIdentity>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension SimpleClassIdentity: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_SimpleClassIdentity_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_SimpleClassIdentity_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_SimpleClassIdentity_wrap")
+fileprivate func _bjs_SimpleClassIdentity_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_SimpleClassIdentity_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_SimpleClassIdentity_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_SimpleClassIdentity_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_ClassRoundtripIdentity_init")
+@_cdecl("bjs_ClassRoundtripIdentity_init")
+public func _bjs_ClassRoundtripIdentity_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ClassRoundtripIdentity()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtripIdentity_roundtripSimpleClassIdentity")
+@_cdecl("bjs_ClassRoundtripIdentity_roundtripSimpleClassIdentity")
+public func _bjs_ClassRoundtripIdentity_roundtripSimpleClassIdentity(_ _self: UnsafeMutableRawPointer, _ obj: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ClassRoundtripIdentity.bridgeJSLiftParameter(_self).roundtripSimpleClassIdentity(_: SimpleClassIdentity.bridgeJSLiftParameter(obj))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtripIdentity_makeSimpleClassIdentity")
+@_cdecl("bjs_ClassRoundtripIdentity_makeSimpleClassIdentity")
+public func _bjs_ClassRoundtripIdentity_makeSimpleClassIdentity(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ClassRoundtripIdentity.bridgeJSLiftParameter(_self).makeSimpleClassIdentity()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtripIdentity_takeSimpleClassIdentity")
+@_cdecl("bjs_ClassRoundtripIdentity_takeSimpleClassIdentity")
+public func _bjs_ClassRoundtripIdentity_takeSimpleClassIdentity(_ _self: UnsafeMutableRawPointer, _ obj: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    ClassRoundtripIdentity.bridgeJSLiftParameter(_self).takeSimpleClassIdentity(_: SimpleClassIdentity.bridgeJSLiftParameter(obj))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ClassRoundtripIdentity_deinit")
+@_cdecl("bjs_ClassRoundtripIdentity_deinit")
+public func _bjs_ClassRoundtripIdentity_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<ClassRoundtripIdentity>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension ClassRoundtripIdentity: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_ClassRoundtripIdentity_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_ClassRoundtripIdentity_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_ClassRoundtripIdentity_wrap")
+fileprivate func _bjs_ClassRoundtripIdentity_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_ClassRoundtripIdentity_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_ClassRoundtripIdentity_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ClassRoundtripIdentity_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_IdentityCacheBenchmarkIdentity_init")
+@_cdecl("bjs_IdentityCacheBenchmarkIdentity_init")
+public func _bjs_IdentityCacheBenchmarkIdentity_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = IdentityCacheBenchmarkIdentity()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IdentityCacheBenchmarkIdentity_setupPool")
+@_cdecl("bjs_IdentityCacheBenchmarkIdentity_setupPool")
+public func _bjs_IdentityCacheBenchmarkIdentity_setupPool(_ _self: UnsafeMutableRawPointer, _ count: Int32) -> Void {
+    #if arch(wasm32)
+    IdentityCacheBenchmarkIdentity.bridgeJSLiftParameter(_self).setupPool(_: Int.bridgeJSLiftParameter(count))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IdentityCacheBenchmarkIdentity_getPoolRepeated")
+@_cdecl("bjs_IdentityCacheBenchmarkIdentity_getPoolRepeated")
+public func _bjs_IdentityCacheBenchmarkIdentity_getPoolRepeated(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = IdentityCacheBenchmarkIdentity.bridgeJSLiftParameter(_self).getPoolRepeated()
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_IdentityCacheBenchmarkIdentity_deinit")
+@_cdecl("bjs_IdentityCacheBenchmarkIdentity_deinit")
+public func _bjs_IdentityCacheBenchmarkIdentity_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<IdentityCacheBenchmarkIdentity>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension IdentityCacheBenchmarkIdentity: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_IdentityCacheBenchmarkIdentity_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_IdentityCacheBenchmarkIdentity_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_IdentityCacheBenchmarkIdentity_wrap")
+fileprivate func _bjs_IdentityCacheBenchmarkIdentity_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_IdentityCacheBenchmarkIdentity_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_IdentityCacheBenchmarkIdentity_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_IdentityCacheBenchmarkIdentity_wrap_extern(pointer)
+}
+
 @_expose(wasm, "bjs_ArrayRoundtrip_init")
 @_cdecl("bjs_ArrayRoundtrip_init")
 public func _bjs_ArrayRoundtrip_init() -> UnsafeMutableRawPointer {

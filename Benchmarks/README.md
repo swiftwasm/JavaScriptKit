@@ -4,8 +4,6 @@ This directory contains performance benchmarks for JavaScriptKit.
 
 ## Building Benchmarks
 
-Before running the benchmarks, you need to build the test suite:
-
 ```bash
 swift package --swift-sdk $SWIFT_SDK_ID js -c release
 ```
@@ -19,19 +17,38 @@ node run.js
 # Save results to a JSON file
 node run.js --output=results.json
 
-# Specify number of iterations
-node run.js --runs=20
-
 # Run in adaptive mode until results stabilize
 node run.js --adaptive --output=stable-results.json
 
-# Run benchmarks and compare with previous results
+# Compare with previous results
 node run.js --baseline=previous-results.json
 
-# Run only a subset of benchmarks
-# Substring match
+# Filter benchmarks by name
 node run.js --filter=Call
-# Regex (with flags)
 node run.js --filter=/^Property access\//
-node run.js --filter=/string/i
 ```
+
+## Identity Mode Benchmarks
+
+The benchmark suite includes identity-mode variants (`@JS(identityMode: true)`) of the core classes to measure pointer identity caching. Both variants are in the same build and run as regular benchmarks alongside everything else.
+
+```bash
+# Run only identity benchmarks
+node --expose-gc run.js --filter=Identity
+
+# Run only pointer-mode identity benchmarks
+node --expose-gc run.js --filter=Identity/pointer
+
+# Run only non-identity baseline
+node --expose-gc run.js --filter=Identity/none
+```
+
+### Identity Scenarios
+
+| Scenario | What it measures |
+|----------|-----------------|
+| `passBothWaysRoundtrip` | Same object crossing boundary repeatedly (cache hit path) |
+| `getPoolRepeated_100` | Bulk return of 100 cached objects (model collection pattern) |
+| `churnObjects` | Create, roundtrip, release cycle (FinalizationRegistry cleanup pressure) |
+| `swiftConsumesSameObject` | JS passes same object to Swift repeatedly |
+| `swiftCreatesObject` | Fresh object creation overhead (cache miss path) |

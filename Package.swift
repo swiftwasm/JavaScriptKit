@@ -217,5 +217,17 @@ let package = Package(
             ],
             linkerSettings: testingLinkerFlags
         ),
+        .testTarget(
+            name: "BridgeJSIdentityTests",
+            dependencies: ["JavaScriptKit", "JavaScriptEventLoop"],
+            exclude: [
+                "bridge-js.config.json",
+                "Generated/JavaScript",
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("Extern")
+            ],
+            linkerSettings: testingLinkerFlags
+        ),
     ]
 )

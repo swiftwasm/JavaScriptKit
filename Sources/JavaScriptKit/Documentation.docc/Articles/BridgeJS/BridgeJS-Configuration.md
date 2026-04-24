@@ -73,6 +73,36 @@ const greeter = new exports.MyModule.Greeter("World");
 // globalThis.MyModule is undefined
 ```
 
+### `identityMode`
+
+Controls whether exported Swift class instances use pointer-based identity mapping.
+
+When set to `"pointer"`, every class in the target uses identity caching — the same Swift heap pointer always returns the same JavaScript wrapper object. This makes `===` identity checks work across boundary crossings.
+
+```json
+{
+  "identityMode": "pointer"
+}
+```
+
+**With `identityMode: "pointer"`:**
+
+```javascript
+const a = exports.getModel();
+const b = exports.getModel(); // same Swift object
+console.log(a === b); // true
+```
+
+**Without (default):**
+
+```javascript
+const a = exports.getModel();
+const b = exports.getModel(); // same Swift object
+console.log(a === b); // false — different JS wrapper each time
+```
+
+For finer control, use the `@JS(identityMode:)` parameter on individual classes instead of the project-wide config. See <doc:Exporting-Swift-Class> for details.
+
 ### `tools`
 
 Specify custom paths for external executables. This is particularly useful when working in environments like Xcode where the system PATH may not be inherited, or when you need to use a specific version of tools for your project.
