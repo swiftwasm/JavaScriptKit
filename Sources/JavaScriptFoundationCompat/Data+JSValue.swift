@@ -1,4 +1,8 @@
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 import JavaScriptKit
 
 /// Data <-> Uint8Array conversion. The conversion is lossless and copies the bytes at most once per conversion
