@@ -4,6 +4,7 @@
       {
         "functions" : [
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -22,7 +23,9 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
                 {
                   "name" : "name",
@@ -36,6 +39,7 @@
             },
             "getters" : [
               {
+                "accessLevel" : "internal",
                 "name" : "name",
                 "type" : {
                   "string" : {
@@ -44,6 +48,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "age",
                 "type" : {
                   "double" : {
@@ -54,6 +59,7 @@
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -70,6 +76,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -96,6 +103,7 @@
             "name" : "Greeter",
             "setters" : [
               {
+                "accessLevel" : "internal",
                 "functionName" : "name_set",
                 "name" : "name",
                 "type" : {
@@ -110,11 +118,13 @@
             ]
           },
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -146,6 +156,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,

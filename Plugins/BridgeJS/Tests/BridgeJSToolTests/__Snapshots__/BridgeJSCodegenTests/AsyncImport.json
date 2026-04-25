@@ -4,6 +4,7 @@
       {
         "functions" : [
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : true,
               "isStatic" : false,
@@ -20,6 +21,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : true,
               "isStatic" : false,
@@ -49,6 +51,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : true,
               "isStatic" : false,
@@ -72,6 +75,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : true,
               "isStatic" : false,
@@ -95,6 +99,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : true,
               "isStatic" : false,
@@ -118,6 +123,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : true,
               "isStatic" : false,

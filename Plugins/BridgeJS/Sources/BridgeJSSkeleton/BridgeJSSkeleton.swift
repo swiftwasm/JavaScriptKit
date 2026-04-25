@@ -89,6 +89,38 @@ public enum BridgeContext: Sendable {
     case exportSwift
 }
 
+/// Access level applied to bridge-generated declarations.
+///
+/// Ordering (`Comparable`) reflects visibility breadth, so taking `max` of two
+/// levels yields the more permissive one — used to merge a single closure
+/// signature seen across surfaces with different declared access.
+public enum BridgeJSAccessLevel: String, Codable, Equatable, Hashable, Sendable, Comparable {
+    case `internal`
+    case package
+    case `public`
+
+    public static func < (lhs: BridgeJSAccessLevel, rhs: BridgeJSAccessLevel) -> Bool {
+        lhs.order < rhs.order
+    }
+
+    private var order: Int {
+        switch self {
+        case .internal: return 0
+        case .package: return 1
+        case .public: return 2
+        }
+    }
+
+    /// Returns the modifier keyword to emit, or nil for the default (internal).
+    public var modifierKeyword: String? {
+        switch self {
+        case .internal: return nil
+        case .package: return "package"
+        case .public: return "public"
+        }
+    }
+}
+
 public struct ClosureSignature: Codable, Equatable, Hashable, Sendable {
     public let parameters: [BridgeType]
     public let returnType: BridgeType
@@ -398,17 +430,34 @@ public struct Parameter: Codable, Equatable, Sendable {
 // MARK: - BridgeSkeleton Visitor
 
 public protocol BridgeSkeletonVisitor {
-    mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool)
+    /// Called when a closure type is encountered during traversal.
+    ///
+    /// `accessLevel` reflects the source access of the enclosing declaration,
+    /// so visitors can derive an appropriate access level for any
+    /// bridge-generated helpers tied to this signature (e.g. typed closure
+    /// inits in `ClosureCodegen`).
+    mutating func visitClosure(
+        _ signature: ClosureSignature,
+        useJSTypedClosure: Bool,
+        accessLevel: BridgeJSAccessLevel
+    )
     mutating func visitImportedFunction(_ function: ImportedFunctionSkeleton)
 }
 
 public extension BridgeSkeletonVisitor {
-    mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool) {}
+    mutating func visitClosure(
+        _ signature: ClosureSignature,
+        useJSTypedClosure: Bool,
+        accessLevel: BridgeJSAccessLevel
+    ) {}
     mutating func visitImportedFunction(_ function: ImportedFunctionSkeleton) {}
 }
 
 public struct BridgeSkeletonWalker<Visitor: BridgeSkeletonVisitor> {
     public var visitor: Visitor
+    /// Tracks the access level of the enclosing declaration during traversal.
+    /// Saved/restored around each declaration that introduces an access boundary.
+    private var currentAccessLevel: BridgeJSAccessLevel = .internal
 
     public init(visitor: Visitor) {
         self.visitor = visitor
@@ -417,7 +466,11 @@ public struct BridgeSkeletonWalker<Visitor: BridgeSkeletonVisitor> {
     public mutating func walk(_ type: BridgeType) {
         switch type {
         case .closure(let signature, let useJSTypedClosure):
-            visitor.visitClosure(signature, useJSTypedClosure: useJSTypedClosure)
+            visitor.visitClosure(
+                signature,
+                useJSTypedClosure: useJSTypedClosure,
+                accessLevel: currentAccessLevel
+            )
             for paramType in signature.parameters {
                 walk(paramType)
             }
@@ -449,14 +502,16 @@ public struct BridgeSkeletonWalker<Visitor: BridgeSkeletonVisitor> {
             walk(function)
         }
         for klass in skeleton.classes {
-            if let constructor = klass.constructor {
-                walk(constructor.parameters)
-            }
-            for method in klass.methods {
-                walk(method)
-            }
-            for property in klass.properties {
-                walk(property.type)
+            withAccessLevel(klass.explicitAccessControl) {
+                if let constructor = klass.constructor {
+                    $0.walk(constructor.parameters)
+                }
+                for method in klass.methods {
+                    $0.walk(method)
+                }
+                for property in klass.properties {
+                    $0.walk(property.type)
+                }
             }
         }
         for proto in skeleton.protocols {
@@ -468,58 +523,66 @@ public struct BridgeSkeletonWalker<Visitor: BridgeSkeletonVisitor> {
             }
         }
         for structDecl in skeleton.structs {
-            for property in structDecl.properties {
-                walk(property.type)
-            }
-            if let constructor = structDecl.constructor {
-                walk(constructor.parameters)
-            }
-            for method in structDecl.methods {
-                walk(method)
+            withAccessLevel(structDecl.explicitAccessControl) {
+                for property in structDecl.properties {
+                    $0.walk(property.type)
+                }
+                if let constructor = structDecl.constructor {
+                    $0.walk(constructor.parameters)
+                }
+                for method in structDecl.methods {
+                    $0.walk(method)
+                }
             }
         }
         for enumDecl in skeleton.enums {
-            for enumCase in enumDecl.cases {
-                for associatedValue in enumCase.associatedValues {
-                    walk(associatedValue.type)
+            withAccessLevel(enumDecl.explicitAccessControl) {
+                for enumCase in enumDecl.cases {
+                    for associatedValue in enumCase.associatedValues {
+                        $0.walk(associatedValue.type)
+                    }
                 }
-            }
-            for method in enumDecl.staticMethods {
-                walk(method)
-            }
-            for property in enumDecl.staticProperties {
-                walk(property.type)
+                for method in enumDecl.staticMethods {
+                    $0.walk(method)
+                }
+                for property in enumDecl.staticProperties {
+                    $0.walk(property.type)
+                }
             }
         }
     }
     public mutating func walk(_ function: ImportedFunctionSkeleton) {
         visitor.visitImportedFunction(function)
-        walk(function.parameters)
-        walk(function.returnType)
+        withAccessLevel(function.accessLevel) {
+            $0.walk(function.parameters)
+            $0.walk(function.returnType)
+        }
     }
     public mutating func walk(_ skeleton: ImportedModuleSkeleton) {
         for fileSkeleton in skeleton.children {
             for getter in fileSkeleton.globalGetters {
-                walk(getter.type)
+                withAccessLevel(getter.accessLevel) { $0.walk(getter.type) }
             }
             for setter in fileSkeleton.globalSetters {
-                walk(setter.type)
+                withAccessLevel(setter.accessLevel) { $0.walk(setter.type) }
             }
             for function in fileSkeleton.functions {
                 walk(function)
             }
             for type in fileSkeleton.types {
-                if let constructor = type.constructor {
-                    walk(constructor.parameters)
-                }
-                for getter in type.getters {
-                    walk(getter.type)
-                }
-                for setter in type.setters {
-                    walk(setter.type)
-                }
-                for method in type.methods + type.staticMethods {
-                    walk(method)
+                withAccessLevel(type.accessLevel) {
+                    if let constructor = type.constructor {
+                        $0.withAccessLevel(constructor.accessLevel) { $0.walk(constructor.parameters) }
+                    }
+                    for getter in type.getters {
+                        $0.withAccessLevel(getter.accessLevel) { $0.walk(getter.type) }
+                    }
+                    for setter in type.setters {
+                        $0.withAccessLevel(setter.accessLevel) { $0.walk(setter.type) }
+                    }
+                    for method in type.methods + type.staticMethods {
+                        $0.walk(method)
+                    }
                 }
             }
         }
@@ -531,6 +594,30 @@ public struct BridgeSkeletonWalker<Visitor: BridgeSkeletonVisitor> {
         if let imported = skeleton.imported {
             walk(imported)
         }
+    }
+
+    /// Sets `currentAccessLevel` to `level` for the duration of `body`, restoring
+    /// the prior value afterward. A nil level (e.g. for exported decls without
+    /// an explicit modifier) inherits the outer level rather than overwriting it.
+    private mutating func withAccessLevel(
+        _ level: BridgeJSAccessLevel?,
+        _ body: (inout BridgeSkeletonWalker) -> Void
+    ) {
+        let saved = currentAccessLevel
+        if let level {
+            currentAccessLevel = level
+        }
+        body(&self)
+        currentAccessLevel = saved
+    }
+
+    /// String-typed convenience: maps `"public"`/`"package"`/`"internal"` from
+    /// `Exported*.explicitAccessControl` to the typed enum.
+    private mutating func withAccessLevel(
+        _ rawLevel: String?,
+        _ body: (inout BridgeSkeletonWalker) -> Void
+    ) {
+        withAccessLevel(rawLevel.flatMap(BridgeJSAccessLevel.init(rawValue:)), body)
     }
 }
 
@@ -951,6 +1038,10 @@ public struct ImportedFunctionSkeleton: Codable {
     public let returnType: BridgeType
     public let effects: Effects
     public let documentation: String?
+    /// Source access level of the originating Swift declaration. Used to
+    /// determine the access level of bridge-generated helpers (e.g. typed
+    /// closure inits) that surface through this function's signature.
+    public let accessLevel: BridgeJSAccessLevel
 
     public init(
         name: String,
@@ -959,7 +1050,8 @@ public struct ImportedFunctionSkeleton: Codable {
         parameters: [Parameter],
         returnType: BridgeType,
         effects: Effects = Effects(isAsync: false, isThrows: true),
-        documentation: String? = nil
+        documentation: String? = nil,
+        accessLevel: BridgeJSAccessLevel = .internal
     ) {
         self.name = name
         self.jsName = jsName
@@ -968,6 +1060,7 @@ public struct ImportedFunctionSkeleton: Codable {
         self.returnType = returnType
         self.effects = effects
         self.documentation = documentation
+        self.accessLevel = accessLevel
     }
 
     public func abiName(context: ImportedTypeSkeleton?) -> String {
@@ -985,9 +1078,13 @@ public struct ImportedFunctionSkeleton: Codable {
 
 public struct ImportedConstructorSkeleton: Codable {
     public let parameters: [Parameter]
+    /// Source access level of the originating Swift `init`. Inherits from the
+    /// enclosing `@JSClass` type when not annotated explicitly.
+    public let accessLevel: BridgeJSAccessLevel
 
-    public init(parameters: [Parameter]) {
+    public init(parameters: [Parameter], accessLevel: BridgeJSAccessLevel = .internal) {
         self.parameters = parameters
+        self.accessLevel = accessLevel
     }
 
     public func abiName(context: ImportedTypeSkeleton) -> String {
@@ -1008,6 +1105,8 @@ public struct ImportedGetterSkeleton: Codable {
     public let documentation: String?
     /// Name of the getter function if it's a separate function (from @JSGetter)
     public let functionName: String?
+    /// Source access level of the originating Swift declaration.
+    public let accessLevel: BridgeJSAccessLevel
 
     public init(
         name: String,
@@ -1015,7 +1114,8 @@ public struct ImportedGetterSkeleton: Codable {
         from: JSImportFrom? = nil,
         type: BridgeType,
         documentation: String? = nil,
-        functionName: String? = nil
+        functionName: String? = nil,
+        accessLevel: BridgeJSAccessLevel = .internal
     ) {
         self.name = name
         self.jsName = jsName
@@ -1023,6 +1123,7 @@ public struct ImportedGetterSkeleton: Codable {
         self.type = type
         self.documentation = documentation
         self.functionName = functionName
+        self.accessLevel = accessLevel
     }
 
     public func abiName(context: ImportedTypeSkeleton?) -> String {
@@ -1049,19 +1150,23 @@ public struct ImportedSetterSkeleton: Codable {
     public let documentation: String?
     /// Name of the setter function if it's a separate function (from @JSSetter)
     public let functionName: String?
+    /// Source access level of the originating Swift declaration.
+    public let accessLevel: BridgeJSAccessLevel
 
     public init(
         name: String,
         jsName: String? = nil,
         type: BridgeType,
         documentation: String? = nil,
-        functionName: String? = nil
+        functionName: String? = nil,
+        accessLevel: BridgeJSAccessLevel = .internal
     ) {
         self.name = name
         self.jsName = jsName
         self.type = type
         self.documentation = documentation
         self.functionName = functionName
+        self.accessLevel = accessLevel
     }
 
     public func abiName(context: ImportedTypeSkeleton?) -> String {
@@ -1093,6 +1198,8 @@ public struct ImportedTypeSkeleton: Codable {
     public let getters: [ImportedGetterSkeleton]
     public let setters: [ImportedSetterSkeleton]
     public let documentation: String?
+    /// Source access level of the originating Swift `@JSClass` declaration.
+    public let accessLevel: BridgeJSAccessLevel
 
     public init(
         name: String,
@@ -1103,7 +1210,8 @@ public struct ImportedTypeSkeleton: Codable {
         staticMethods: [ImportedFunctionSkeleton] = [],
         getters: [ImportedGetterSkeleton] = [],
         setters: [ImportedSetterSkeleton] = [],
-        documentation: String? = nil
+        documentation: String? = nil,
+        accessLevel: BridgeJSAccessLevel = .internal
     ) {
         self.name = name
         self.jsName = jsName
@@ -1114,6 +1222,7 @@ public struct ImportedTypeSkeleton: Codable {
         self.getters = getters
         self.setters = setters
         self.documentation = documentation
+        self.accessLevel = accessLevel
     }
 }
 
@@ -1180,16 +1289,32 @@ public struct ImportedModuleSkeleton: Codable {
 // MARK: - Closure signature collection visitor
 
 public struct ClosureSignatureCollectorVisitor: BridgeSkeletonVisitor {
-    public var signatures: Set<ClosureSignature> = []
+    /// Each unique closure signature mapped to the most-permissive access level
+    /// observed across all surfaces that reference it. The codegen reads this
+    /// to choose the access modifier for the synthesized typed-closure init.
+    public private(set) var signatureAccessLevels: [ClosureSignature: BridgeJSAccessLevel] = [:]
+    /// Convenience view for callers (e.g. `BridgeJSLink`) that only need the
+    /// set of unique signatures, without access metadata.
+    public var signatures: Set<ClosureSignature> { Set(signatureAccessLevels.keys) }
     let moduleName: String
 
     public init(moduleName: String, signatures: Set<ClosureSignature> = []) {
         self.moduleName = moduleName
-        self.signatures = signatures
+        for signature in signatures {
+            signatureAccessLevels[signature] = .internal
+        }
     }
 
-    public mutating func visitClosure(_ signature: ClosureSignature, useJSTypedClosure: Bool) {
-        signatures.insert(signature)
+    public mutating func visitClosure(
+        _ signature: ClosureSignature,
+        useJSTypedClosure: Bool,
+        accessLevel: BridgeJSAccessLevel
+    ) {
+        if let existing = signatureAccessLevels[signature] {
+            signatureAccessLevels[signature] = max(existing, accessLevel)
+        } else {
+            signatureAccessLevels[signature] = accessLevel
+        }
     }
     public mutating func visitImportedFunction(_ function: ImportedFunctionSkeleton) {
         guard function.effects.isAsync else { return }
@@ -1202,32 +1327,50 @@ public struct ClosureSignatureCollectorVisitor: BridgeSkeletonVisitor {
         // transferred through the checked continuation without Sendable constraints.
 
         // Reject callback
-        signatures.insert(
+        recordInjectedSignature(
             ClosureSignature(
                 parameters: [.jsValue],
                 returnType: .void,
                 moduleName: moduleName,
                 sendingParameters: true
-            )
+            ),
+            for: function
         )
         // Resolve callback (typed per return type)
         if function.returnType == .void {
-            signatures.insert(
+            recordInjectedSignature(
                 ClosureSignature(
                     parameters: [],
                     returnType: .void,
                     moduleName: moduleName
-                )
+                ),
+                for: function
             )
         } else {
-            signatures.insert(
+            recordInjectedSignature(
                 ClosureSignature(
                     parameters: [function.returnType],
                     returnType: .void,
                     moduleName: moduleName,
                     sendingParameters: true
-                )
+                ),
+                for: function
             )
+        }
+    }
+
+    /// Inject a closure signature derived from an async import (e.g. Promise
+    /// resolve/reject callbacks). The injected signature inherits the access
+    /// level of the originating function so its synthesized init matches the
+    /// visibility of the async API surface.
+    private mutating func recordInjectedSignature(
+        _ signature: ClosureSignature,
+        for function: ImportedFunctionSkeleton
+    ) {
+        if let existing = signatureAccessLevels[signature] {
+            signatureAccessLevels[signature] = max(existing, function.accessLevel)
+        } else {
+            signatureAccessLevels[signature] = function.accessLevel
         }
     }
 }

@@ -1008,7 +1008,9 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
                 {
                   "name" : "valueOrNull",
@@ -1040,6 +1042,7 @@
             },
             "getters" : [
               {
+                "accessLevel" : "internal",
                 "name" : "stringOrNull",
                 "type" : {
                   "nullable" : {
@@ -1053,6 +1056,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "stringOrUndefined",
                 "type" : {
                   "nullable" : {
@@ -1066,6 +1070,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "doubleOrNull",
                 "type" : {
                   "nullable" : {
@@ -1079,6 +1084,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "doubleOrUndefined",
                 "type" : {
                   "nullable" : {
@@ -1092,6 +1098,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "boolOrNull",
                 "type" : {
                   "nullable" : {
@@ -1105,6 +1112,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "boolOrUndefined",
                 "type" : {
                   "nullable" : {
@@ -1118,6 +1126,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "intOrNull",
                 "type" : {
                   "nullable" : {
@@ -1134,6 +1143,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "intOrUndefined",
                 "type" : {
                   "nullable" : {
@@ -1152,6 +1162,7 @@
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -1185,6 +1196,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -1218,6 +1230,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -1251,6 +1264,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -1284,6 +1298,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -1317,6 +1332,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -1350,6 +1366,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -1389,6 +1406,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -1431,6 +1449,7 @@
             "name" : "WithOptionalJSClass",
             "setters" : [
               {
+                "accessLevel" : "internal",
                 "functionName" : "stringOrNull_set",
                 "name" : "stringOrNull",
                 "type" : {
@@ -1445,6 +1464,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "stringOrUndefined_set",
                 "name" : "stringOrUndefined",
                 "type" : {
@@ -1459,6 +1479,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "doubleOrNull_set",
                 "name" : "doubleOrNull",
                 "type" : {
@@ -1473,6 +1494,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "doubleOrUndefined_set",
                 "name" : "doubleOrUndefined",
                 "type" : {
@@ -1487,6 +1509,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "boolOrNull_set",
                 "name" : "boolOrNull",
                 "type" : {
@@ -1501,6 +1524,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "boolOrUndefined_set",
                 "name" : "boolOrUndefined",
                 "type" : {
@@ -1515,6 +1539,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "intOrNull_set",
                 "name" : "intOrNull",
                 "type" : {
@@ -1532,6 +1557,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "intOrUndefined_set",
                 "name" : "intOrUndefined",
                 "type" : {
