@@ -12,14 +12,37 @@ Thank you for considering contributing to JavaScriptKit! We welcome contribution
   - Relevant error messages or logs
 
 ### Setting Up the Development Environment
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/swiftwasm/JavaScriptKit.git
-   cd JavaScriptKit
-   ```
 
-2. Install **OSS** Swift toolchain via `swiftly`
-3. Install Swift SDK for Wasm corresponding to the Swift version:
+Clone the repository:
+
+```bash
+git clone https://github.com/swiftwasm/JavaScriptKit.git
+cd JavaScriptKit
+```
+
+#### Quick start (recommended)
+
+If you already have an **OSS** Swift toolchain installed via [`swiftly`](https://www.swift.org/install/macos/swiftly), run:
+
+```bash
+./Utilities/setup-dev.sh
+```
+
+The script verifies prerequisites, installs a matching Wasm Swift SDK from
+[swift-sdk-index](https://github.com/swiftwasm/swift-sdk-index), runs `make bootstrap`,
+and prints the `SWIFT_SDK_ID` to use with `make unittest`. Re-running it is
+idempotent.
+
+If a `.swift-version` file is present in the repo root, the script will install
+that toolchain via `swiftly` automatically. Create one to pin your local dev
+toolchain to an indexed release (e.g. `echo 6.3.0 > .swift-version`). The repo
+does not track `.swift-version`; if you'd like git to ignore it locally, add it
+to `.git/info/exclude`.
+
+#### Manual setup
+
+1. Install an **OSS** Swift toolchain via `swiftly`.
+2. Install the Swift SDK for Wasm corresponding to the Swift version:
     ```bash
     (
       set -eo pipefail; \
@@ -35,7 +58,7 @@ Thank you for considering contributing to JavaScriptKit! We welcome contribution
       jq -r '.["swift-sdks"]["wasm32-unknown-wasip1"]["id"]'
     )
     ```
-4. Install dependencies:
+3. Install dependencies:
    ```bash
    make bootstrap
    ```
