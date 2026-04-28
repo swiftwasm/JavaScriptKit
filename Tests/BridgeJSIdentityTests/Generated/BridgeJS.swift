@@ -334,6 +334,25 @@ fileprivate func _bjs_ArrayIdentityElement_wrap_extern(_ pointer: UnsafeMutableR
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSIdentityTests", name: "bjs_gc")
+fileprivate func bjs_gc_extern() -> Void
+#else
+fileprivate func bjs_gc_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_gc() -> Void {
+    return bjs_gc_extern()
+}
+
+func _$gc() throws(JSException) -> Void {
+    bjs_gc()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSIdentityTests", name: "bjs_IdentityModeTestImports_runJsIdentityModeTests_static")
 fileprivate func bjs_IdentityModeTestImports_runJsIdentityModeTests_static_extern() -> Void
 #else
