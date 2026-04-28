@@ -164,6 +164,15 @@ extension BridgeJSCommandPlugin.Context {
             guard let dependencyTarget = bridgeJSTargets[dependency.name] else { continue }
             let dependencySkeletonPath = dependencyTarget.directoryURL
                 .appending(path: "Generated/JavaScript/BridgeJS.json")
+            guard FileManager.default.fileExists(atPath: dependencySkeletonPath.path) else {
+                throw BridgeJSCommandPluginError(
+                    """
+                    Dependency '\(dependencyTarget.name)' is configured for BridgeJS, but its AOT skeleton has not been generated yet. \
+                    Run `swift package bridge-js --target \(dependencyTarget.name)` to generate it first, \
+                    or run without `--target` to process in dependency order.
+                    """
+                )
+            }
             generateArguments.append(contentsOf: [
                 "--dependency-skeleton",
                 "\(dependencyTarget.name)=\(dependencySkeletonPath.path)",
@@ -204,6 +213,14 @@ extension BridgeJSCommandPlugin.Context {
 
 private func printStderr(_ message: String) {
     fputs(message + "\n", stderr)
+}
+
+struct BridgeJSCommandPluginError: Error, CustomStringConvertible {
+    let description: String
+
+    init(_ message: String) {
+        self.description = message
+    }
 }
 
 extension SwiftSourceModuleTarget {
