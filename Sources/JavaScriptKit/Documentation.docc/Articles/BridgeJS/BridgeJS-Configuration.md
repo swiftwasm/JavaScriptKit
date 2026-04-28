@@ -12,6 +12,8 @@ The configuration system supports two complementary files:
 - `bridge-js.config.json` - Base configuration (checked into version control)
 - `bridge-js.config.local.json` - Local overrides (intended to be ignored by git, for developer-specific settings)
 
+> Note: The presence of a configuration file, even if empty, is required to expose `@JS` types to other modules in the package. See `Examples/MultiModule/` for an example.
+
 ## Configuration Loading
 
 ### File Locations

@@ -49,7 +49,12 @@ import Testing
         let name = url.deletingPathExtension().lastPathComponent
 
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let importSwift = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let importSwift = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).swift")
         let importResult = try importSwift.finalize()
         var bridgeJSLink = BridgeJSLink(sharedMemory: false)
@@ -69,7 +74,12 @@ import Testing
     func snapshotExportWithGlobal(inputFile: String) throws {
         let url = Self.inputsDirectory.appendingPathComponent(inputFile)
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: true)
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: true,
+            externalModuleIndex: .empty
+        )
         swiftAPI.addSourceFile(sourceFile, inputFilePath: inputFile)
         let name = url.deletingPathExtension().lastPathComponent
         let outputSkeleton = try swiftAPI.finalize()
@@ -86,13 +96,23 @@ import Testing
     func snapshotMixedModuleExposure() throws {
         let globalURL = Self.inputsDirectory.appendingPathComponent("MixedGlobal.swift")
         let globalSourceFile = Parser.parse(source: try String(contentsOf: globalURL, encoding: .utf8))
-        let globalAPI = SwiftToSkeleton(progress: .silent, moduleName: "GlobalModule", exposeToGlobal: true)
+        let globalAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "GlobalModule",
+            exposeToGlobal: true,
+            externalModuleIndex: .empty
+        )
         globalAPI.addSourceFile(globalSourceFile, inputFilePath: "MixedGlobal.swift")
         let globalSkeleton = try globalAPI.finalize()
 
         let privateURL = Self.inputsDirectory.appendingPathComponent("MixedPrivate.swift")
         let privateSourceFile = Parser.parse(source: try String(contentsOf: privateURL, encoding: .utf8))
-        let privateAPI = SwiftToSkeleton(progress: .silent, moduleName: "PrivateModule", exposeToGlobal: false)
+        let privateAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "PrivateModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         privateAPI.addSourceFile(privateSourceFile, inputFilePath: "MixedPrivate.swift")
         let privateSkeleton = try privateAPI.finalize()
 
@@ -114,6 +134,7 @@ import Testing
             progress: .silent,
             moduleName: "TestModule",
             exposeToGlobal: false,
+            externalModuleIndex: .empty,
             identityMode: nil  // no config default
         )
         swiftAPI.addSourceFile(sourceFile, inputFilePath: "IdentityModeClass.swift")
@@ -140,6 +161,7 @@ import Testing
             progress: .silent,
             moduleName: "TestModule",
             exposeToGlobal: false,
+            externalModuleIndex: .empty,
             identityMode: "pointer"  // config says pointer for all classes
         )
         swiftAPI.addSourceFile(sourceFile, inputFilePath: "IdentityModeClass.swift")

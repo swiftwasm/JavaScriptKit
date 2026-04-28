@@ -20481,5 +20481,8 @@
       }
     ]
   },
-  "moduleName" : "BridgeJSRuntimeTests"
+  "moduleName" : "BridgeJSRuntimeTests",
+  "usedExternalModules" : [
+
+  ]
 }

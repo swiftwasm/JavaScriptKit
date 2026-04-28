@@ -748,15 +748,15 @@ class SkeletonCollector {
             }
         }
         if let target = target as? SwiftSourceModuleTarget {
-            let directories = [
-                target.directoryURL.appending(path: "Generated/JavaScript"),
-                // context.pluginWorkDirectoryURL: ".build/plugins/PackageToJS/outputs/"
-                // .build/plugins/outputs/[package]/[target]/destination/BridgeJS/JavaScript/BridgeJS.json
-                context.pluginWorkDirectoryURL.deletingLastPathComponent().deletingLastPathComponent()
-                    .appending(path: "outputs/\(package.id)/\(target.name)/destination/BridgeJS/JavaScript"),
+            let candidates = [
+                target.directoryURL.appending(path: "Generated/JavaScript").appending(path: skeletonFile),
+                BridgeJSPluginPaths.skeletonURL(
+                    targetName: target.name,
+                    packageID: package.id,
+                    commandPluginWorkDirectoryURL: context.pluginWorkDirectoryURL
+                ),
             ]
-            for directory in directories {
-                let skeletonURL = directory.appending(path: skeletonFile)
+            for skeletonURL in candidates {
                 if FileManager.default.fileExists(atPath: skeletonURL.path) {
                     skeletons.append(skeletonURL)
                 }

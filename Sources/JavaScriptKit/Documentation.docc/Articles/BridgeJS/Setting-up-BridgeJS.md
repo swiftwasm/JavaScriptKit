@@ -58,3 +58,7 @@ For package layout and how to consume the output from JavaScript, see <doc:Packa
 ## Larger projects
 
 The build plugin runs on every build. For larger projects, generating bridge code ahead of time can improve build performance. See <doc:Ahead-of-Time-Code-Generation>.
+
+## Multiple targets in one package
+
+A single package can have multiple targets that use `@JS`. Apply the BridgeJS plugin to every target that contains `@JS` declarations. To make a target's `@JS` types visible to other targets in the same package, also add a `bridge-js.config.json` file (`{}` is enough) to that target’s source directory. See `Examples/MultiModule/` for an example.

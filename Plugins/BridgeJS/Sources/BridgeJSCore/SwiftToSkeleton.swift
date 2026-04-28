@@ -18,15 +18,25 @@ public final class SwiftToSkeleton {
     public let exposeToGlobal: Bool
     public let identityMode: String?
 
-    private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
     let typeDeclResolver: TypeDeclResolver
+    let externalModuleIndex: ExternalModuleIndex
 
-    public init(progress: ProgressReporting, moduleName: String, exposeToGlobal: Bool, identityMode: String? = nil) {
+    private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
+    private var usedExternalModules = Set<String>()
+
+    public init(
+        progress: ProgressReporting,
+        moduleName: String,
+        exposeToGlobal: Bool,
+        externalModuleIndex: ExternalModuleIndex,
+        identityMode: String? = nil
+    ) {
         self.progress = progress
         self.moduleName = moduleName
         self.exposeToGlobal = exposeToGlobal
         self.identityMode = identityMode
         self.typeDeclResolver = TypeDeclResolver()
+        self.externalModuleIndex = externalModuleIndex
 
         // Index known types provided by JavaScriptKit
         self.typeDeclResolver.addSourceFile(
@@ -110,7 +120,12 @@ public final class SwiftToSkeleton {
         }()
 
         let exportedSkeleton: ExportedSkeleton? = exported.isEmpty ? nil : exported
-        return BridgeJSSkeleton(moduleName: moduleName, exported: exportedSkeleton, imported: importedSkeleton)
+        return BridgeJSSkeleton(
+            moduleName: moduleName,
+            exported: exportedSkeleton,
+            imported: importedSkeleton,
+            usedExternalModules: usedExternalModules.sorted()
+        )
     }
 
     func lookupType(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {
@@ -303,79 +318,130 @@ public final class SwiftToSkeleton {
             return primitiveType
         }
 
-        guard let typeDecl = typeDeclResolver.resolve(type) else {
+        if let typeDecl = typeDeclResolver.resolve(type) {
+            if typeDecl.is(ProtocolDeclSyntax.self) {
+                let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
+                return .swiftProtocol(swiftCallName)
+            }
+
+            if let enumDecl = typeDecl.as(EnumDeclSyntax.self) {
+                let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: enumDecl, itemName: enumDecl.name.text)
+                let rawTypeString = enumDecl.inheritanceClause?.inheritedTypes.first { inheritedType in
+                    let typeName = inheritedType.type.trimmedDescription
+                    return ExportSwiftConstants.supportedRawTypes.contains(typeName)
+                }?.type.trimmedDescription
+
+                if let rawType = SwiftEnumRawType(rawTypeString) {
+                    return .rawValueEnum(swiftCallName, rawType)
+                } else {
+                    let hasAnyCases = enumDecl.memberBlock.members.contains { member in
+                        member.decl.is(EnumCaseDeclSyntax.self)
+                    }
+                    if !hasAnyCases {
+                        return .namespaceEnum(swiftCallName)
+                    }
+                    let hasAssociatedValues =
+                        enumDecl.memberBlock.members.contains { member in
+                            guard let caseDecl = member.decl.as(EnumCaseDeclSyntax.self) else { return false }
+                            return caseDecl.elements.contains { element in
+                                if let params = element.parameterClause?.parameters {
+                                    return !params.isEmpty
+                                }
+                                return false
+                            }
+                        }
+                    if hasAssociatedValues {
+                        return .associatedValueEnum(swiftCallName)
+                    } else {
+                        return .caseEnum(swiftCallName)
+                    }
+                }
+            }
+
+            if let structDecl = typeDecl.as(StructDeclSyntax.self) {
+                let swiftCallName = SwiftToSkeleton.computeSwiftCallName(
+                    for: structDecl,
+                    itemName: structDecl.name.text
+                )
+                if structDecl.attributes.hasAttribute(name: "JSClass") {
+                    return .jsObject(swiftCallName)
+                }
+                return .swiftStruct(swiftCallName)
+            }
+
+            guard typeDecl.is(ClassDeclSyntax.self) || typeDecl.is(ActorDeclSyntax.self) else {
+                return nil
+            }
+            let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
+
+            // A type annotated with @JSClass is a JavaScript object wrapper (imported),
+            // even if it is declared as a Swift class.
+            if let classDecl = typeDecl.as(ClassDeclSyntax.self), classDecl.attributes.hasAttribute(name: "JSClass") {
+                return .jsObject(swiftCallName)
+            }
+            if let actorDecl = typeDecl.as(ActorDeclSyntax.self), actorDecl.attributes.hasAttribute(name: "JSClass") {
+                return .jsObject(swiftCallName)
+            }
+
+            return .swiftHeapObject(swiftCallName)
+        }
+
+        if let externalType = resolveExternal(for: type, errors: &errors) {
+            return externalType
+        }
+
+        errors.append(
+            DiagnosticError(
+                node: type,
+                message: "Unsupported type '\(type.trimmedDescription)'.",
+                hint:
+                    "Only primitive types, types defined in the same module, and "
+                    + "`@JS` types from dependency targets that apply the BridgeJS plugin are allowed"
+            )
+        )
+        return nil
+    }
+
+    private func resolveExternal(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {
+        guard
+            !externalModuleIndex.isEmpty,
+            var components = typeDeclResolver.qualifiedComponents(from: type)
+        else {
+            return nil
+        }
+
+        var scopedModule: String? = nil
+        if components.count >= 2, externalModuleIndex.isKnownModule(components[0]) {
+            scopedModule = components[0]
+            components.removeFirst()
+        }
+
+        let dotPath = components.joined(separator: ".")
+        let lookupResult: ExternalModuleIndex.LookupResult?
+        if let moduleName = scopedModule {
+            lookupResult = externalModuleIndex.lookup(dotPath: dotPath, module: moduleName)
+        } else {
+            lookupResult = externalModuleIndex.lookup(dotPath: dotPath)
+        }
+
+        guard let lookupResult else { return nil }
+        switch lookupResult {
+        case .unique(let externalType):
+            usedExternalModules.insert(externalType.moduleName)
+            return externalType.bridgeType
+        case .ambiguous(let candidates):
+            let moduleNames = candidates.map(\.moduleName).sorted().joined(separator: ", ")
             errors.append(
                 DiagnosticError(
                     node: type,
-                    message: "Unsupported type '\(type.trimmedDescription)'.",
-                    hint: "Only primitive types and types defined in the same module are allowed"
+                    message: "ambiguous use of '\(type.trimmedDescription)'",
+                    hint:
+                        "'\(dotPath)' is exported by multiple dependency modules: \(moduleNames). "
+                        + "Qualify with a module name (e.g. '<Module>.\(dotPath)') to disambiguate."
                 )
             )
             return nil
         }
-
-        if typeDecl.is(ProtocolDeclSyntax.self) {
-            let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
-            return .swiftProtocol(swiftCallName)
-        }
-
-        if let enumDecl = typeDecl.as(EnumDeclSyntax.self) {
-            let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: enumDecl, itemName: enumDecl.name.text)
-            let rawTypeString = enumDecl.inheritanceClause?.inheritedTypes.first { inheritedType in
-                let typeName = inheritedType.type.trimmedDescription
-                return ExportSwiftConstants.supportedRawTypes.contains(typeName)
-            }?.type.trimmedDescription
-
-            if let rawType = SwiftEnumRawType(rawTypeString) {
-                return .rawValueEnum(swiftCallName, rawType)
-            } else {
-                let hasAnyCases = enumDecl.memberBlock.members.contains { member in
-                    member.decl.is(EnumCaseDeclSyntax.self)
-                }
-                if !hasAnyCases {
-                    return .namespaceEnum(swiftCallName)
-                }
-                let hasAssociatedValues =
-                    enumDecl.memberBlock.members.contains { member in
-                        guard let caseDecl = member.decl.as(EnumCaseDeclSyntax.self) else { return false }
-                        return caseDecl.elements.contains { element in
-                            if let params = element.parameterClause?.parameters {
-                                return !params.isEmpty
-                            }
-                            return false
-                        }
-                    }
-                if hasAssociatedValues {
-                    return .associatedValueEnum(swiftCallName)
-                } else {
-                    return .caseEnum(swiftCallName)
-                }
-            }
-        }
-
-        if let structDecl = typeDecl.as(StructDeclSyntax.self) {
-            let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: structDecl, itemName: structDecl.name.text)
-            if structDecl.attributes.hasAttribute(name: "JSClass") {
-                return .jsObject(swiftCallName)
-            }
-            return .swiftStruct(swiftCallName)
-        }
-
-        guard typeDecl.is(ClassDeclSyntax.self) || typeDecl.is(ActorDeclSyntax.self) else {
-            return nil
-        }
-        let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
-
-        // A type annotated with @JSClass is a JavaScript object wrapper (imported),
-        // even if it is declared as a Swift class.
-        if let classDecl = typeDecl.as(ClassDeclSyntax.self), classDecl.attributes.hasAttribute(name: "JSClass") {
-            return .jsObject(swiftCallName)
-        }
-        if let actorDecl = typeDecl.as(ActorDeclSyntax.self), actorDecl.attributes.hasAttribute(name: "JSClass") {
-            return .jsObject(swiftCallName)
-        }
-
-        return .swiftHeapObject(swiftCallName)
     }
 
     fileprivate static func parseUnsafePointerType(_ type: TypeSyntax) -> UnsafePointerType? {

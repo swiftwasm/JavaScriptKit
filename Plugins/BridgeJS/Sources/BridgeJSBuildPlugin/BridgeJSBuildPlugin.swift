@@ -20,6 +20,7 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
 
     private func createGenerateCommand(context: PluginContext, target: SwiftSourceModuleTarget) throws -> Command {
         let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.swift")
+        let outputSkeletonPath = context.pluginWorkDirectoryURL.appending(path: "JavaScript/BridgeJS.json")
 
         let inputSwiftFiles = target.sourceFiles.filter {
             !$0.url.path.hasPrefix(context.pluginWorkDirectoryURL.path + "/")
@@ -63,6 +64,14 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
             ])
         }
 
+        for skeleton in dependencySkeletons(context: context, target: target) {
+            arguments.append(contentsOf: [
+                "--dependency-skeleton",
+                "\(skeleton.moduleName)=\(skeleton.url.path)",
+            ])
+            inputFiles.append(skeleton.url)
+        }
+
         let allSwiftFiles = inputSwiftFiles + pluginGeneratedSwiftFiles
         arguments.append(contentsOf: allSwiftFiles.map(\.path))
 
@@ -71,8 +80,47 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
             executable: try context.tool(named: "BridgeJSTool").url,
             arguments: arguments,
             inputFiles: inputFiles,
-            outputFiles: [outputSwiftPath]
+            outputFiles: [outputSwiftPath, outputSkeletonPath]
         )
+    }
+
+    private struct DependencySkeleton {
+        let moduleName: String
+        let url: URL
+    }
+
+    /// We only read skeletons from dependencies with a `bridge-js.config.json` file.
+    /// For the build system to correctly order the plugins, we need to set the skeleton
+    /// files as input. However, I don’t think we have enough information here to determine
+    /// whether the plugin which generates this is applied to the dependency, so we use
+    /// the presence of `bridge-js.config.json` instead.
+    private func dependencySkeletons(
+        context: PluginContext,
+        target: SwiftSourceModuleTarget
+    ) -> [DependencySkeleton] {
+        let localTargets: [SwiftSourceModuleTarget] = target.recursiveTargetDependencies
+            .compactMap { dependency in
+                guard
+                    let swiftTarget = dependency as? SwiftSourceModuleTarget,
+                    context.package.targets.contains(where: { $0.id == swiftTarget.id }),
+                    FileManager.default.fileExists(atPath: pathToConfigFile(target: swiftTarget).path)
+                else {
+                    return nil
+                }
+                return swiftTarget
+            }
+
+        var skeletons: [DependencySkeleton] = []
+        var seenTargetNames = Set<String>()
+        for swiftTarget in localTargets where seenTargetNames.insert(swiftTarget.name).inserted {
+            let skeletonURL = BridgeJSPluginPaths.skeletonURL(
+                targetName: swiftTarget.name,
+                packageID: context.package.id,
+                buildPluginWorkDirectoryURL: context.pluginWorkDirectoryURL
+            )
+            skeletons.append(DependencySkeleton(moduleName: swiftTarget.name, url: skeletonURL))
+        }
+        return skeletons
     }
 }
 #endif
