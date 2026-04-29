@@ -13,11 +13,12 @@ enum BridgeJSPluginPaths {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
-        return skeletonURL(
+        return bridgeJSDirectoryURL(
             targetName: targetName,
             packageID: packageID,
             pluginsOutputsRootURL: pluginsOutputsRootURL
         )
+        .appending(path: "JavaScript/BridgeJS.json")
     }
 
     static func skeletonURL(
@@ -32,14 +33,34 @@ enum BridgeJSPluginPaths {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appending(path: "outputs")
-        return skeletonURL(
+        return bridgeJSDirectoryURL(
             targetName: targetName,
             packageID: packageID,
             pluginsOutputsRootURL: pluginsOutputsRootURL
         )
+        .appending(path: "JavaScript/BridgeJS.json")
     }
 
-    private static func skeletonURL(
+    static func bridgeJSSwiftURL(
+        targetName: String,
+        packageID: String,
+        buildPluginWorkDirectoryURL workDirectoryURL: URL
+    ) -> URL {
+        let pluginsOutputsRootURL =
+            workDirectoryURL
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        return bridgeJSDirectoryURL(
+            targetName: targetName,
+            packageID: packageID,
+            pluginsOutputsRootURL: pluginsOutputsRootURL
+        )
+        .appending(path: "BridgeJS.swift")
+    }
+
+    private static func bridgeJSDirectoryURL(
         targetName: String,
         packageID: String,
         pluginsOutputsRootURL: URL
@@ -47,7 +68,7 @@ enum BridgeJSPluginPaths {
         pluginsOutputsRootURL
             .appending(path: packageID)
             .appending(path: targetName)
-            .appending(path: "destination/BridgeJS/JavaScript/BridgeJS.json")
+            .appending(path: "destination/BridgeJS")
     }
 }
 #endif

@@ -20,7 +20,6 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
 
     private func createGenerateCommand(context: PluginContext, target: SwiftSourceModuleTarget) throws -> Command {
         let outputSwiftPath = context.pluginWorkDirectoryURL.appending(path: "BridgeJS.swift")
-        let outputSkeletonPath = context.pluginWorkDirectoryURL.appending(path: "JavaScript/BridgeJS.json")
 
         let inputSwiftFiles = target.sourceFiles.filter {
             !$0.url.path.hasPrefix(context.pluginWorkDirectoryURL.path + "/")
@@ -67,9 +66,14 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
         for skeleton in dependencySkeletons(context: context, target: target) {
             arguments.append(contentsOf: [
                 "--dependency-skeleton",
-                "\(skeleton.moduleName)=\(skeleton.url.path)",
+                "\(skeleton.moduleName)=\(skeleton.skeletonURL.path)",
             ])
-            inputFiles.append(skeleton.url)
+            // We have to use the Swift file, not the skeleton, as the input file,
+            // since we can’t make the skeleton file an output file without it being
+            // treated as a resource by the build system (and thus included in the
+            // resource bundle). We need to use something as the inputFile to maintain
+            // correct ordering.
+            inputFiles.append(skeleton.bridgeJSSwiftURL)
         }
 
         let allSwiftFiles = inputSwiftFiles + pluginGeneratedSwiftFiles
@@ -80,13 +84,14 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
             executable: try context.tool(named: "BridgeJSTool").url,
             arguments: arguments,
             inputFiles: inputFiles,
-            outputFiles: [outputSwiftPath, outputSkeletonPath]
+            outputFiles: [outputSwiftPath]
         )
     }
 
     private struct DependencySkeleton {
         let moduleName: String
-        let url: URL
+        let skeletonURL: URL
+        let bridgeJSSwiftURL: URL
     }
 
     /// We only read skeletons from dependencies with a `bridge-js.config.json` file.
@@ -118,7 +123,18 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
                 packageID: context.package.id,
                 buildPluginWorkDirectoryURL: context.pluginWorkDirectoryURL
             )
-            skeletons.append(DependencySkeleton(moduleName: swiftTarget.name, url: skeletonURL))
+            let bridgeJSSwiftURL = BridgeJSPluginPaths.bridgeJSSwiftURL(
+                targetName: swiftTarget.name,
+                packageID: context.package.id,
+                buildPluginWorkDirectoryURL: context.pluginWorkDirectoryURL
+            )
+            skeletons.append(
+                DependencySkeleton(
+                    moduleName: swiftTarget.name,
+                    skeletonURL: skeletonURL,
+                    bridgeJSSwiftURL: bridgeJSSwiftURL
+                )
+            )
         }
         return skeletons
     }

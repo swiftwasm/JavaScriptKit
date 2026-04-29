@@ -250,7 +250,14 @@ import BridgeJSUtilities
                 }
             }
 
-            // Write unified skeleton
+            // Write unified skeleton.
+            // Note that for the build system to sequence the BridgeJSBuildPlugin correctly,
+            // the skeleton-to-Swift-output mapping must be injective, i.e. any change to
+            // the skeleton must produce a change in the Swift output. This is because we
+            // can’t use the BridgeJS.json file as an outputFile, since it would then be
+            // treated as a resource and thus included in the generated bundle. The
+            // invariant currently holds, but if this ever changes the BridgeJS.swift file
+            // could include a hash of the skeleton to maintain it.
             let outputSkeletonURL = outputDirectory.appending(path: "JavaScript/BridgeJS.json")
             try withSpan("Writing output skeleton") {
                 try FileManager.default.createDirectory(
