@@ -1,6 +1,8 @@
 import XCTest
 import JavaScriptKit
 
+@JSFunction(from: .global) func gc() throws(JSException) -> Void
+
 @JSClass struct IdentityModeTestImports {
     @JSFunction static func runJsIdentityModeTests() throws(JSException)
 }
@@ -8,6 +10,44 @@ import JavaScriptKit
 final class IdentityModeTests: XCTestCase {
     func testRunJsIdentityModeTests() throws {
         try IdentityModeTestImports.runJsIdentityModeTests()
+    }
+
+    /// Verifies that identity-cached wrappers are properly reclaimed by GC.
+    ///
+    /// Creates an identity-mode object, crosses it multiple times (filling the
+    /// identity cache), drops all references, triggers GC + event loop ticks,
+    /// and verifies the Swift object is deallocated. This proves that the
+    /// WeakRef-based identity cache does not prevent garbage collection.
+    func testIdentityCachedWrapperIsReclaimedByGC() async throws {
+        RetainLeakSubject.deinits = 0
+
+        // Create object and cross it multiple times to fill identity cache
+        _retainLeakSubject = RetainLeakSubject(tag: 99)
+        weak var weakSubject = _retainLeakSubject
+
+        // Cross to JS 5 times (populates identity cache with WeakRef)
+        for _ in 0..<5 {
+            _ = getRetainLeakSubject()
+        }
+
+        // Drop Swift-side strong reference
+        _retainLeakSubject = nil
+
+        // JS wrapper should still be alive via the identity cache's WeakRef,
+        // but WeakRef doesn't prevent GC. Trigger GC + event loop ticks to
+        // let FinalizationRegistry fire and call deinit.
+        for _ in 0..<100 {
+            try gc()
+            try await Task.sleep(for: .milliseconds(0))
+            if weakSubject == nil {
+                break
+            }
+        }
+
+        // The identity-cached wrapper should have been collected,
+        // FinalizationRegistry should have fired, deinit should have run.
+        XCTAssertNil(weakSubject, "Identity-cached object should be deallocated after GC")
+        XCTAssertEqual(RetainLeakSubject.deinits, 1, "Deinit should fire exactly once")
     }
 }
 

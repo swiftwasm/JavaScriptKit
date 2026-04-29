@@ -406,7 +406,23 @@
     "children" : [
       {
         "functions" : [
+          {
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : "global",
+            "name" : "gc",
+            "parameters" : [
 
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
         ],
         "types" : [
           {
