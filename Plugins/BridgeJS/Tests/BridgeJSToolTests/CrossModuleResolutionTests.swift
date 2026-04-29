@@ -457,7 +457,7 @@ import Testing
         }
     }
 
-    // MARK: - Utillities
+    // MARK: - Utillites
 
     private func resolveApp(
         source appSource: String,
