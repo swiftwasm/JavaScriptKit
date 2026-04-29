@@ -27,6 +27,10 @@ extension LibPoint {
 }
 ```
 
-### From another Swift package
+### Exporting Swift: non-`@JS` types from another Swift module
+
+While using `@JS` types from another Swift module is supported, it is not possible to use non-`@JS` types defined in other modules: this will fail at type lookup.
+
+### Exporting Swift: types from another Swift package
 
 Types defined in a separate Swift package cannot yet be referenced from `@JS` declarations in your package.
