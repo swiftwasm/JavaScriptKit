@@ -612,12 +612,22 @@ public struct BridgeSkeletonWalker<Visitor: BridgeSkeletonVisitor> {
     }
 
     /// String-typed convenience: maps `"public"`/`"package"`/`"internal"` from
-    /// `Exported*.explicitAccessControl` to the typed enum.
+    /// `Exported*.explicitAccessControl` to the typed enum. Unknown strings
+    /// (e.g. `"open"`, `"private"`) hit the assert in debug builds and inherit
+    /// the outer level in release — the `@JSExport` macros reject those cases
+    /// upstream, so this is a defensive guard against future schema drift.
     private mutating func withAccessLevel(
         _ rawLevel: String?,
         _ body: (inout BridgeSkeletonWalker) -> Void
     ) {
-        withAccessLevel(rawLevel.flatMap(BridgeJSAccessLevel.init(rawValue:)), body)
+        let level: BridgeJSAccessLevel?
+        if let rawLevel {
+            level = BridgeJSAccessLevel(rawValue: rawLevel)
+            assert(level != nil, "Unexpected access level string: \(rawLevel)")
+        } else {
+            level = nil
+        }
+        withAccessLevel(level, body)
     }
 }
 
@@ -1063,6 +1073,22 @@ public struct ImportedFunctionSkeleton: Codable {
         self.accessLevel = accessLevel
     }
 
+    private enum CodingKeys: String, CodingKey {
+        case name, jsName, from, parameters, returnType, effects, documentation, accessLevel
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.jsName = try container.decodeIfPresent(String.self, forKey: .jsName)
+        self.from = try container.decodeIfPresent(JSImportFrom.self, forKey: .from)
+        self.parameters = try container.decode([Parameter].self, forKey: .parameters)
+        self.returnType = try container.decode(BridgeType.self, forKey: .returnType)
+        self.effects = try container.decode(Effects.self, forKey: .effects)
+        self.documentation = try container.decodeIfPresent(String.self, forKey: .documentation)
+        self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
+    }
+
     public func abiName(context: ImportedTypeSkeleton?) -> String {
         return abiName(context: context, operation: nil)
     }
@@ -1085,6 +1111,16 @@ public struct ImportedConstructorSkeleton: Codable {
     public init(parameters: [Parameter], accessLevel: BridgeJSAccessLevel = .internal) {
         self.parameters = parameters
         self.accessLevel = accessLevel
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case parameters, accessLevel
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.parameters = try container.decode([Parameter].self, forKey: .parameters)
+        self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
     }
 
     public func abiName(context: ImportedTypeSkeleton) -> String {
@@ -1124,6 +1160,21 @@ public struct ImportedGetterSkeleton: Codable {
         self.documentation = documentation
         self.functionName = functionName
         self.accessLevel = accessLevel
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case name, jsName, from, type, documentation, functionName, accessLevel
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.jsName = try container.decodeIfPresent(String.self, forKey: .jsName)
+        self.from = try container.decodeIfPresent(JSImportFrom.self, forKey: .from)
+        self.type = try container.decode(BridgeType.self, forKey: .type)
+        self.documentation = try container.decodeIfPresent(String.self, forKey: .documentation)
+        self.functionName = try container.decodeIfPresent(String.self, forKey: .functionName)
+        self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
     }
 
     public func abiName(context: ImportedTypeSkeleton?) -> String {
@@ -1167,6 +1218,20 @@ public struct ImportedSetterSkeleton: Codable {
         self.documentation = documentation
         self.functionName = functionName
         self.accessLevel = accessLevel
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case name, jsName, type, documentation, functionName, accessLevel
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.jsName = try container.decodeIfPresent(String.self, forKey: .jsName)
+        self.type = try container.decode(BridgeType.self, forKey: .type)
+        self.documentation = try container.decodeIfPresent(String.self, forKey: .documentation)
+        self.functionName = try container.decodeIfPresent(String.self, forKey: .functionName)
+        self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
     }
 
     public func abiName(context: ImportedTypeSkeleton?) -> String {
@@ -1223,6 +1288,24 @@ public struct ImportedTypeSkeleton: Codable {
         self.setters = setters
         self.documentation = documentation
         self.accessLevel = accessLevel
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case name, jsName, from, constructor, methods, staticMethods, getters, setters, documentation, accessLevel
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.jsName = try container.decodeIfPresent(String.self, forKey: .jsName)
+        self.from = try container.decodeIfPresent(JSImportFrom.self, forKey: .from)
+        self.constructor = try container.decodeIfPresent(ImportedConstructorSkeleton.self, forKey: .constructor)
+        self.methods = try container.decode([ImportedFunctionSkeleton].self, forKey: .methods)
+        self.staticMethods = try container.decode([ImportedFunctionSkeleton].self, forKey: .staticMethods)
+        self.getters = try container.decode([ImportedGetterSkeleton].self, forKey: .getters)
+        self.setters = try container.decode([ImportedSetterSkeleton].self, forKey: .setters)
+        self.documentation = try container.decodeIfPresent(String.self, forKey: .documentation)
+        self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
     }
 }
 
@@ -1298,6 +1381,12 @@ public struct ClosureSignatureCollectorVisitor: BridgeSkeletonVisitor {
     public var signatures: Set<ClosureSignature> { Set(signatureAccessLevels.keys) }
     let moduleName: String
 
+    /// Convenience for callers that only need to seed signatures without
+    /// access metadata (e.g. exported-side walking, where closure init access
+    /// is irrelevant because the synthesized init isn't surfaced to consumers).
+    /// All seeded signatures default to `.internal`; if a seeded signature is
+    /// later observed with a more permissive access level, the merge in
+    /// `recordSignature` upgrades it.
     public init(moduleName: String, signatures: Set<ClosureSignature> = []) {
         self.moduleName = moduleName
         for signature in signatures {
@@ -1308,6 +1397,18 @@ public struct ClosureSignatureCollectorVisitor: BridgeSkeletonVisitor {
     public mutating func visitClosure(
         _ signature: ClosureSignature,
         useJSTypedClosure: Bool,
+        accessLevel: BridgeJSAccessLevel
+    ) {
+        recordSignature(signature, accessLevel: accessLevel)
+    }
+
+    /// Insert `signature` at `accessLevel`, or upgrade the existing level to
+    /// the more permissive of the two. Centralizing the merge here keeps
+    /// `visitClosure` and `recordInjectedSignature` in lockstep — if the
+    /// merge policy ever needs to change (e.g. adding a diagnostic for
+    /// conflicting levels), there's only one place to update.
+    private mutating func recordSignature(
+        _ signature: ClosureSignature,
         accessLevel: BridgeJSAccessLevel
     ) {
         if let existing = signatureAccessLevels[signature] {
@@ -1367,11 +1468,7 @@ public struct ClosureSignatureCollectorVisitor: BridgeSkeletonVisitor {
         _ signature: ClosureSignature,
         for function: ImportedFunctionSkeleton
     ) {
-        if let existing = signatureAccessLevels[signature] {
-            signatureAccessLevels[signature] = max(existing, function.accessLevel)
-        } else {
-            signatureAccessLevels[signature] = function.accessLevel
-        }
+        recordSignature(signature, accessLevel: function.accessLevel)
     }
 }
 
