@@ -3,6 +3,7 @@ import SwiftSyntax
 import Testing
 
 @testable import BridgeJSCore
+@testable import BridgeJSSkeleton
 
 @Suite struct DiagnosticsTests {
     /// Returns the first parameter's type node from a function in the source (the first `@JS func`-like decl), for pinpointing diagnostics.
@@ -221,6 +222,76 @@ import Testing
                     var x: Double
                     var y: Double
                 }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        let skeleton = try swiftAPI.finalize()
+        #expect(skeleton.exported != nil)
+    }
+
+    // MARK: - Struct init order validation
+
+    @Test
+    func structInitMismatchedOrderProducesDiagnostic() throws {
+        let source = """
+            @JS struct Animal {
+                var size: Double
+                var age: Int
+
+                @JS init(age: Int, size: Double) {
+                    self.age = age
+                    self.size = size
+                }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        #expect(throws: BridgeJSCoreDiagnosticError.self) {
+            _ = try swiftAPI.finalize()
+        }
+    }
+
+    @Test
+    func structInitMatchingOrderSucceeds() throws {
+        let source = """
+            @JS struct Point {
+                var x: Double
+                var y: Double
+
+                @JS init(x: Double, y: Double) {
+                    self.x = x
+                    self.y = y
+                }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        let skeleton = try swiftAPI.finalize()
+        #expect(skeleton.exported != nil)
+    }
+
+    @Test
+    func structWithoutExplicitInitSucceeds() throws {
+        let source = """
+            @JS struct Point {
+                var x: Double
+                var y: Double
             }
             """
         let swiftAPI = SwiftToSkeleton(
