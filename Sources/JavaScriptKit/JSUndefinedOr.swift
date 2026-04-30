@@ -53,4 +53,4 @@ extension JSUndefinedOr: ConvertibleToJSValue where Wrapped: ConvertibleToJSValu
 
 // MARK: - BridgeJS (via _BridgedAsOptional in BridgeJSIntrinsics)
 
-@_spi(BridgeJS) extension JSUndefinedOr: _BridgedAsOptional {}
+extension JSUndefinedOr: _BridgedAsOptional {}
