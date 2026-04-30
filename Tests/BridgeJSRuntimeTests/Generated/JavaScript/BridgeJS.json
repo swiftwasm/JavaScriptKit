@@ -16410,7 +16410,9 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
                 {
                   "name" : "id",
@@ -16424,6 +16426,7 @@
             },
             "getters" : [
               {
+                "accessLevel" : "internal",
                 "name" : "id",
                 "type" : {
                   "string" : {
@@ -16444,6 +16447,7 @@
             ]
           },
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -16456,6 +16460,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16489,6 +16494,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16526,6 +16532,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16557,6 +16564,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16588,6 +16596,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16619,6 +16628,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16650,6 +16660,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16681,6 +16692,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16712,6 +16724,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16759,6 +16772,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16800,6 +16814,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16841,6 +16856,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16882,6 +16898,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16923,6 +16940,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16964,6 +16982,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -16991,6 +17010,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17011,6 +17031,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17036,6 +17057,7 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -17048,6 +17070,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17064,6 +17087,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17087,6 +17111,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17110,6 +17135,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17133,6 +17159,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17166,6 +17193,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17199,6 +17227,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17230,6 +17259,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17261,6 +17291,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17292,6 +17323,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -17326,6 +17358,7 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -17338,6 +17371,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17376,6 +17410,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17414,6 +17449,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17476,6 +17512,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17526,6 +17563,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17576,6 +17614,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17626,6 +17665,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17677,6 +17717,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17719,6 +17760,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17761,6 +17803,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17820,6 +17863,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17879,6 +17923,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17946,6 +17991,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -17984,6 +18030,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18027,6 +18074,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18065,6 +18113,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18081,6 +18130,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18100,6 +18150,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18125,6 +18176,7 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -18137,6 +18189,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18162,6 +18215,7 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -18174,6 +18228,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18211,6 +18266,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18242,6 +18298,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18273,6 +18330,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18304,6 +18362,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18335,6 +18394,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18383,7 +18443,9 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
                 {
                   "name" : "value",
@@ -18397,6 +18459,7 @@
             },
             "getters" : [
               {
+                "accessLevel" : "internal",
                 "name" : "value",
                 "type" : {
                   "string" : {
@@ -18421,6 +18484,7 @@
       {
         "functions" : [
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18437,6 +18501,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18460,6 +18525,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18483,6 +18549,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18506,6 +18573,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18529,6 +18597,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18552,6 +18621,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18575,6 +18645,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18598,6 +18669,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18621,6 +18693,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18646,6 +18719,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : true,
               "isStatic" : false,
@@ -18662,6 +18736,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : true,
               "isStatic" : false,
@@ -18685,6 +18760,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18702,6 +18778,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -18728,6 +18805,7 @@
         ],
         "globalGetters" : [
           {
+            "accessLevel" : "internal",
             "from" : "global",
             "name" : "globalObject1",
             "type" : {
@@ -18739,7 +18817,9 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
                 {
                   "name" : "name",
@@ -18761,6 +18841,7 @@
             },
             "getters" : [
               {
+                "accessLevel" : "internal",
                 "name" : "name",
                 "type" : {
                   "string" : {
@@ -18769,6 +18850,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "prefix",
                 "type" : {
                   "string" : {
@@ -18779,6 +18861,7 @@
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18795,6 +18878,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18821,6 +18905,7 @@
             "name" : "JsGreeter",
             "setters" : [
               {
+                "accessLevel" : "internal",
                 "functionName" : "name_set",
                 "name" : "name",
                 "type" : {
@@ -18835,8 +18920,10 @@
             ]
           },
           {
+            "accessLevel" : "internal",
             "getters" : [
               {
+                "accessLevel" : "internal",
                 "name" : "temperature",
                 "type" : {
                   "double" : {
@@ -18845,6 +18932,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "description",
                 "type" : {
                   "string" : {
@@ -18853,6 +18941,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "humidity",
                 "type" : {
                   "double" : {
@@ -18867,6 +18956,7 @@
             "name" : "WeatherData",
             "setters" : [
               {
+                "accessLevel" : "internal",
                 "functionName" : "temperature_set",
                 "name" : "temperature",
                 "type" : {
@@ -18876,6 +18966,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "description_set",
                 "name" : "description",
                 "type" : {
@@ -18885,6 +18976,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "humidity_set",
                 "name" : "humidity",
                 "type" : {
@@ -18899,7 +18991,9 @@
             ]
           },
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
 
               ]
@@ -18910,6 +19004,7 @@
             "jsName" : "$WeirdClass",
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18936,7 +19031,9 @@
             ]
           },
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
                 {
                   "name" : "value",
@@ -18953,6 +19050,7 @@
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18975,6 +19073,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -18998,6 +19097,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19014,6 +19114,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19030,6 +19131,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19049,7 +19151,9 @@
             ]
           },
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
                 {
                   "name" : "name",
@@ -19080,6 +19184,7 @@
             "from" : "global",
             "getters" : [
               {
+                "accessLevel" : "internal",
                 "name" : "name",
                 "type" : {
                   "string" : {
@@ -19088,6 +19193,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "age",
                 "type" : {
                   "double" : {
@@ -19096,6 +19202,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "isCat",
                 "type" : {
                   "bool" : {
@@ -19106,6 +19213,7 @@
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19122,6 +19230,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19141,6 +19250,7 @@
             "name" : "Animal",
             "setters" : [
               {
+                "accessLevel" : "internal",
                 "functionName" : "name_set",
                 "name" : "name",
                 "type" : {
@@ -19150,6 +19260,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "age_set",
                 "name" : "age",
                 "type" : {
@@ -19159,6 +19270,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "isCat_set",
                 "name" : "isCat",
                 "type" : {
@@ -19177,6 +19289,7 @@
       {
         "functions" : [
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -19232,6 +19345,7 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -19244,6 +19358,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19273,6 +19388,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19302,6 +19418,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19331,6 +19448,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19360,6 +19478,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19389,6 +19508,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19418,6 +19538,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19447,6 +19568,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19476,6 +19598,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19505,6 +19628,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19534,6 +19658,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19559,7 +19684,9 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
                 {
                   "name" : "numbers",
@@ -19592,6 +19719,7 @@
             },
             "getters" : [
               {
+                "accessLevel" : "internal",
                 "name" : "numbers",
                 "type" : {
                   "array" : {
@@ -19607,6 +19735,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "labels",
                 "type" : {
                   "array" : {
@@ -19621,6 +19750,7 @@
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19658,6 +19788,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19689,6 +19820,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19719,6 +19851,7 @@
             "name" : "JSClassWithArrayMembers",
             "setters" : [
               {
+                "accessLevel" : "internal",
                 "functionName" : "numbers_set",
                 "name" : "numbers",
                 "type" : {
@@ -19735,6 +19868,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "labels_set",
                 "name" : "labels",
                 "type" : {
@@ -19753,6 +19887,7 @@
             ]
           },
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -19765,6 +19900,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -19816,7 +19952,9 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
 
               ]
@@ -19837,7 +19975,9 @@
             ]
           },
           {
+            "accessLevel" : "public",
             "constructor" : {
+              "accessLevel" : "public",
               "parameters" : [
 
               ]
@@ -19858,7 +19998,9 @@
             ]
           },
           {
+            "accessLevel" : "package",
             "constructor" : {
+              "accessLevel" : "package",
               "parameters" : [
 
               ]
@@ -19883,6 +20025,7 @@
       {
         "functions" : [
           {
+            "accessLevel" : "package",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -19899,6 +20042,7 @@
             }
           },
           {
+            "accessLevel" : "public",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -19915,6 +20059,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -19931,6 +20076,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -19947,6 +20093,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -19973,6 +20120,7 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -19985,6 +20133,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20024,6 +20173,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20063,6 +20213,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20096,6 +20247,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20129,6 +20281,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20170,6 +20323,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20211,6 +20365,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20252,6 +20407,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20293,6 +20449,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20315,6 +20472,7 @@
       {
         "functions" : [
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -20334,6 +20492,7 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -20346,6 +20505,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20369,6 +20529,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20392,6 +20553,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20425,6 +20587,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -20448,6 +20611,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,

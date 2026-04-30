@@ -242,6 +242,7 @@
       {
         "functions" : [
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -260,11 +261,13 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,

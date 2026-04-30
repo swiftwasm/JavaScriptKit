@@ -369,7 +369,7 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests7GreeterC_SS {
 }
 
 extension JSTypedClosure where Signature == (Greeter) -> String {
-    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Greeter) -> String) {
+    public init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Greeter) -> String) {
         self.init(
             makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests7GreeterC_SS,
             body: body,
@@ -687,7 +687,7 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_7GreeterC {
 }
 
 extension JSTypedClosure where Signature == (String) -> Greeter {
-    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (String) -> Greeter) {
+    public init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (String) -> Greeter) {
         self.init(
             makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC,
             body: body,
@@ -753,7 +753,7 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_SS {
 }
 
 extension JSTypedClosure where Signature == (String) -> String {
-    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (String) -> String) {
+    public init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (String) -> String) {
         self.init(
             makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS,
             body: body,

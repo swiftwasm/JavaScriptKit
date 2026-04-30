@@ -21,7 +21,10 @@ public struct ClosureCodegen {
         return "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
     }
 
-    func renderClosureHelpers(_ signature: ClosureSignature) throws -> [DeclSyntax] {
+    func renderClosureHelpers(
+        _ signature: ClosureSignature,
+        accessLevel: BridgeJSAccessLevel = .internal
+    ) throws -> [DeclSyntax] {
         let mangledName = signature.mangleName
         let helperName = "_BJS_Closure_\(mangledName)"
         let swiftClosureType = swiftClosureType(for: signature)
@@ -99,9 +102,10 @@ public struct ClosureCodegen {
 
         let helperEnumDecl: DeclSyntax = "\(raw: helperEnumDeclPrinter.lines.joined(separator: "\n"))"
 
+        let initAccessModifier = accessLevel.modifierKeyword.map { "\($0) " } ?? ""
         let typedClosureExtension: DeclSyntax = """
             extension JSTypedClosure where Signature == \(raw: swiftClosureType) {
-                init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping \(raw: swiftClosureType)) {
+                \(raw: initAccessModifier)init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping \(raw: swiftClosureType)) {
                     self.init(
                         makeClosure: \(raw: externABIName),
                         body: body,
@@ -192,12 +196,13 @@ public struct ClosureCodegen {
         let collector = ClosureSignatureCollectorVisitor(moduleName: skeleton.moduleName)
         var walker = BridgeSkeletonWalker(visitor: collector)
         walker.walk(skeleton)
-        let closureSignatures = walker.visitor.signatures
-        guard !closureSignatures.isEmpty else { return nil }
+        let signatureAccessLevels = walker.visitor.signatureAccessLevels
+        guard !signatureAccessLevels.isEmpty else { return nil }
 
         var decls: [DeclSyntax] = []
-        for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
-            decls.append(contentsOf: try renderClosureHelpers(signature))
+        for signature in signatureAccessLevels.keys.sorted(by: { $0.mangleName < $1.mangleName }) {
+            let accessLevel = signatureAccessLevels[signature] ?? .internal
+            decls.append(contentsOf: try renderClosureHelpers(signature, accessLevel: accessLevel))
             decls.append(try renderClosureInvokeHandler(signature))
         }
 

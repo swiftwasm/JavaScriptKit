@@ -7,6 +7,7 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
@@ -19,6 +20,7 @@
             ],
             "staticMethods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,
@@ -42,6 +44,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : true,
                   "isStatic" : false,

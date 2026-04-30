@@ -1,0 +1,285 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "public",
+            "getters" : [
+
+            ],
+            "jsName" : "PublicEvent",
+            "methods" : [
+
+            ],
+            "name" : "JSPublicEvent",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "package",
+            "getters" : [
+
+            ],
+            "jsName" : "PackageEvent",
+            "methods" : [
+
+            ],
+            "name" : "JSPackageEvent",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "jsName" : "InternalEvent",
+            "methods" : [
+
+            ],
+            "name" : "JSInternalEvent",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "public",
+            "getters" : [
+
+            ],
+            "jsName" : "PublicTarget",
+            "methods" : [
+              {
+                "accessLevel" : "public",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "addPublicListener",
+                "parameters" : [
+                  {
+                    "name" : "handler",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "10TestModule13JSPublicEventC_y",
+                          "moduleName" : "TestModule",
+                          "parameters" : [
+                            {
+                              "jsObject" : {
+                                "_0" : "JSPublicEvent"
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "addInternalListener",
+                "parameters" : [
+                  {
+                    "name" : "handler",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "10TestModule13JSPublicEventC_y",
+                          "moduleName" : "TestModule",
+                          "parameters" : [
+                            {
+                              "jsObject" : {
+                                "_0" : "JSPublicEvent"
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "JSPublicTarget",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "package",
+            "getters" : [
+
+            ],
+            "jsName" : "PackageTarget",
+            "methods" : [
+              {
+                "accessLevel" : "package",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "addPackageListener",
+                "parameters" : [
+                  {
+                    "name" : "handler",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "10TestModule14JSPackageEventC_y",
+                          "moduleName" : "TestModule",
+                          "parameters" : [
+                            {
+                              "jsObject" : {
+                                "_0" : "JSPackageEvent"
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "JSPackageTarget",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "jsName" : "InternalTarget",
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "addInternalListener",
+                "parameters" : [
+                  {
+                    "name" : "handler",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "10TestModule15JSInternalEventC_y",
+                          "moduleName" : "TestModule",
+                          "parameters" : [
+                            {
+                              "jsObject" : {
+                                "_0" : "JSInternalEvent"
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "JSInternalTarget",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule"
+}

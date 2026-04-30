@@ -2122,6 +2122,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         let name: String
         let jsName: String?
         let from: JSImportFrom?
+        let accessLevel: BridgeJSAccessLevel
         var constructor: ImportedConstructorSkeleton?
         var methods: [ImportedFunctionSkeleton]
         var staticMethods: [ImportedFunctionSkeleton]
@@ -2337,6 +2338,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             name: typeName,
             jsName: nil,
             from: nil,
+            accessLevel: .internal,
             constructor: nil,
             methods: [],
             staticMethods: [],
@@ -2345,12 +2347,18 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         )
     }
 
-    private func enterJSClass(_ typeName: String, jsName: String?, from: JSImportFrom?) {
+    private func enterJSClass(
+        _ typeName: String,
+        jsName: String?,
+        from: JSImportFrom?,
+        accessLevel: BridgeJSAccessLevel
+    ) {
         stateStack.append(.jsClassBody(name: typeName))
         currentType = CurrentType(
             name: typeName,
             jsName: jsName,
             from: from,
+            accessLevel: accessLevel,
             constructor: nil,
             methods: [],
             staticMethods: [],
@@ -2371,7 +2379,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                     staticMethods: type.staticMethods,
                     getters: type.getters,
                     setters: type.setters,
-                    documentation: nil
+                    documentation: nil,
+                    accessLevel: type.accessLevel
                 )
             )
             currentType = nil
@@ -2384,7 +2393,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
             let jsName = attribute.flatMap(AttributeChecker.extractJSName)
             let from = attribute.flatMap(AttributeChecker.extractJSImportFrom)
-            enterJSClass(node.name.text, jsName: jsName, from: from)
+            let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
+            enterJSClass(node.name.text, jsName: jsName, from: from, accessLevel: accessLevel)
         }
         return .visitChildren
     }
@@ -2400,7 +2410,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
             let jsName = attribute.flatMap(AttributeChecker.extractJSName)
             let from = attribute.flatMap(AttributeChecker.extractJSImportFrom)
-            enterJSClass(node.name.text, jsName: jsName, from: from)
+            let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
+            enterJSClass(node.name.text, jsName: jsName, from: from, accessLevel: accessLevel)
         }
         return .visitChildren
     }
@@ -2565,8 +2576,14 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         else {
             return nil
         }
+        // Initializers without an explicit modifier inherit access from the
+        // enclosing `@JSClass` (the user's example pattern: `public init(...)`
+        // inside `public struct JSDocument`).
+        let parentLevel = currentType?.accessLevel ?? .internal
+        let accessLevel = Self.bridgeAccessLevel(from: initializer.modifiers, default: parentLevel)
         return ImportedConstructorSkeleton(
-            parameters: parseParameters(from: initializer.signature.parameterClause)
+            parameters: parseParameters(from: initializer.signature.parameterClause),
+            accessLevel: accessLevel
         )
     }
 
@@ -2599,6 +2616,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         } else {
             returnType = .void
         }
+        let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
         return ImportedFunctionSkeleton(
             name: name,
             jsName: jsName,
@@ -2606,7 +2624,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             parameters: parameters,
             returnType: returnType,
             effects: effects,
-            documentation: nil
+            documentation: nil,
+            accessLevel: accessLevel
         )
     }
 
@@ -2638,13 +2657,15 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         let propertyName = SwiftToSkeleton.normalizeIdentifier(identifier.identifier.text)
         let jsName = AttributeChecker.extractJSName(from: jsGetter)
         let from = AttributeChecker.extractJSImportFrom(from: jsGetter)
+        let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
         return ImportedGetterSkeleton(
             name: propertyName,
             jsName: jsName,
             from: from,
             type: propertyType,
             documentation: nil,
-            functionName: nil
+            functionName: nil,
+            accessLevel: accessLevel
         )
     }
 
@@ -2667,12 +2688,14 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
 
+        let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
         return ImportedSetterSkeleton(
             name: propertyName,
             jsName: validation.jsName,
             type: validation.valueType,
             documentation: nil,
-            functionName: "\(functionBaseName)_set"
+            functionName: "\(functionBaseName)_set",
+            accessLevel: accessLevel
         )
     }
 
@@ -2717,6 +2740,31 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         return modifiers.contains { modifier in
             modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
         }
+    }
+
+    /// Maps Swift's declaration modifiers to a `BridgeJSAccessLevel` for
+    /// recording on imported skeleton entries. Falls back to `default` when no
+    /// access modifier is present (typically `.internal`, but the caller may
+    /// override — e.g. an `init` inheriting from its enclosing `@JSClass`).
+    /// `private`/`fileprivate` are mapped to the fallback because the macros
+    /// already reject those access levels for `@JS*` declarations.
+    fileprivate static func bridgeAccessLevel(
+        from modifiers: DeclModifierListSyntax,
+        default fallback: BridgeJSAccessLevel = .internal
+    ) -> BridgeJSAccessLevel {
+        for modifier in modifiers {
+            switch modifier.name.tokenKind {
+            case .keyword(.public), .keyword(.open):
+                return .public
+            case .keyword(.package):
+                return .package
+            case .keyword(.internal):
+                return .internal
+            default:
+                continue
+            }
+        }
+        return fallback
     }
 }
 

@@ -4,6 +4,7 @@
       {
         "functions" : [
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -20,6 +21,7 @@
             }
           },
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -38,8 +40,10 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
               {
+                "accessLevel" : "internal",
                 "name" : "normalProperty",
                 "type" : {
                   "string" : {
@@ -48,6 +52,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "jsName" : "property-with-dashes",
                 "name" : "property_with_dashes",
                 "type" : {
@@ -57,6 +62,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "jsName" : "123invalidStart",
                 "name" : "_123invalidStart",
                 "type" : {
@@ -66,6 +72,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "jsName" : "property with spaces",
                 "name" : "property_with_spaces",
                 "type" : {
@@ -75,6 +82,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "jsName" : "@specialChar",
                 "name" : "_specialChar",
                 "type" : {
@@ -84,6 +92,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "constructor",
                 "type" : {
                   "string" : {
@@ -92,6 +101,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "for",
                 "type" : {
                   "string" : {
@@ -100,6 +110,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "name" : "Any",
                 "type" : {
                   "string" : {
@@ -110,6 +121,7 @@
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -126,6 +138,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -145,6 +158,7 @@
             "name" : "WeirdNaming",
             "setters" : [
               {
+                "accessLevel" : "internal",
                 "functionName" : "normalProperty_set",
                 "name" : "normalProperty",
                 "type" : {
@@ -154,6 +168,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "property_with_dashes_set",
                 "jsName" : "property-with-dashes",
                 "name" : "property_with_dashes",
@@ -164,6 +179,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "_123invalidStart_set",
                 "jsName" : "123invalidStart",
                 "name" : "_123invalidStart",
@@ -174,6 +190,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "property_with_spaces_set",
                 "jsName" : "property with spaces",
                 "name" : "property_with_spaces",
@@ -184,6 +201,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "_specialChar_set",
                 "jsName" : "@specialChar",
                 "name" : "_specialChar",
@@ -194,6 +212,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "constructor_set",
                 "name" : "constructor",
                 "type" : {
@@ -203,6 +222,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "for_set",
                 "name" : "for",
                 "type" : {
@@ -212,6 +232,7 @@
                 }
               },
               {
+                "accessLevel" : "internal",
                 "functionName" : "any_set",
                 "jsName" : "Any",
                 "name" : "any",
@@ -227,7 +248,9 @@
             ]
           },
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
 
               ]
@@ -238,6 +261,7 @@
             "jsName" : "$Weird",
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,

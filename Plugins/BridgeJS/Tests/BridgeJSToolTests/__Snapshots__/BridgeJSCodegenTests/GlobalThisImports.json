@@ -4,6 +4,7 @@
       {
         "functions" : [
           {
+            "accessLevel" : "internal",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -31,6 +32,7 @@
         ],
         "globalGetters" : [
           {
+            "accessLevel" : "internal",
             "from" : "global",
             "name" : "console",
             "type" : {
@@ -42,11 +44,13 @@
         ],
         "types" : [
           {
+            "accessLevel" : "internal",
             "getters" : [
 
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
@@ -79,7 +83,9 @@
             ]
           },
           {
+            "accessLevel" : "internal",
             "constructor" : {
+              "accessLevel" : "internal",
               "parameters" : [
                 {
                   "name" : "url",
@@ -97,6 +103,7 @@
             ],
             "methods" : [
               {
+                "accessLevel" : "internal",
                 "effects" : {
                   "isAsync" : false,
                   "isStatic" : false,
