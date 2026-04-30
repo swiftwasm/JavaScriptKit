@@ -296,6 +296,19 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
+            TestModule["bjs_WithOptionalJSClass_childOrNull_get"] = function bjs_WithOptionalJSClass_childOrNull_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).childOrNull;
+                    const isSome = ret != null;
+                    if (isSome) {
+                        const objId = swift.memory.retain(ret);
+                        i32Stack.push(objId);
+                    }
+                    i32Stack.push(isSome ? 1 : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
             TestModule["bjs_WithOptionalJSClass_stringOrNull_set"] = function bjs_WithOptionalJSClass_stringOrNull_set(self, newValueIsSome, newValueBytes, newValueCount) {
                 try {
                     let optResult;
@@ -362,6 +375,22 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_WithOptionalJSClass_intOrUndefined_set"] = function bjs_WithOptionalJSClass_intOrUndefined_set(self, newValueIsSome, newValueWrappedValue) {
                 try {
                     swift.memory.getObject(self).intOrUndefined = newValueIsSome ? newValueWrappedValue : undefined;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_childOrNull_set"] = function bjs_WithOptionalJSClass_childOrNull_set(self, newValue) {
+                try {
+                    let optResult;
+                    if (newValue) {
+                        const objId = i32Stack.pop();
+                        const obj = swift.memory.getObject(objId);
+                        swift.memory.release(objId);
+                        optResult = obj;
+                    } else {
+                        optResult = null;
+                    }
+                    swift.memory.getObject(self).childOrNull = optResult;
                 } catch (error) {
                     setException(error);
                 }
@@ -448,6 +477,28 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).roundTripIntOrUndefined(valueIsSome ? valueWrappedValue : undefined);
                     const isSome = ret !== undefined;
                     bjs["swift_js_return_optional_int"](isSome ? 1 : 0, isSome ? (ret | 0) : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_WithOptionalJSClass_roundTripChildOrNull"] = function bjs_WithOptionalJSClass_roundTripChildOrNull(self, value) {
+                try {
+                    let optResult;
+                    if (value) {
+                        const objId = i32Stack.pop();
+                        const obj = swift.memory.getObject(objId);
+                        swift.memory.release(objId);
+                        optResult = obj;
+                    } else {
+                        optResult = null;
+                    }
+                    let ret = swift.memory.getObject(self).roundTripChildOrNull(optResult);
+                    const isSome = ret != null;
+                    if (isSome) {
+                        const objId1 = swift.memory.retain(ret);
+                        i32Stack.push(objId1);
+                    }
+                    i32Stack.push(isSome ? 1 : 0);
                 } catch (error) {
                     setException(error);
                 }

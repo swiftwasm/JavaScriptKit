@@ -155,4 +155,10 @@ func testMixedOptionals(firstName: String?, lastName: String?, age: Int?, active
     @JSSetter func setIntOrUndefined(_ value: JSUndefinedOr<Int>) throws(JSException)
     @JSFunction func roundTripIntOrNull(value: Int?) throws(JSException) -> Int?
     @JSFunction func roundTripIntOrUndefined(value: JSUndefinedOr<Int>) throws(JSException) -> JSUndefinedOr<Int>
+
+    @JSGetter var childOrNull: WithOptionalJSClass?
+    @JSSetter func setChildOrNull(_ value: WithOptionalJSClass?) throws(JSException)
+    @JSFunction func roundTripChildOrNull(
+        value: WithOptionalJSClass?
+    ) throws(JSException) -> WithOptionalJSClass?
 }
