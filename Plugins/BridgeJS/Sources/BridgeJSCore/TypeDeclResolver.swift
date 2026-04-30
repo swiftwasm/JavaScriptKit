@@ -161,7 +161,7 @@ class TypeDeclResolver {
         return nil
     }
 
-    private func qualifiedComponents(from type: TypeSyntax) -> QualifiedName? {
+    func qualifiedComponents(from type: TypeSyntax) -> QualifiedName? {
         if let m = type.as(MemberTypeSyntax.self) {
             guard let base = qualifiedComponents(from: TypeSyntax(m.baseType)) else { return nil }
             return base + [m.name.text]

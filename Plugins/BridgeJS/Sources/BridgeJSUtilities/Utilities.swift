@@ -13,7 +13,7 @@ public enum BridgeJSGeneratedFile {
         content.starts(with: skipLine + "\n")
     }
 
-    public static var swiftPreamble: String {
+    public static var swiftHeader: String {
         // The generated Swift file itself should not be processed by BridgeJS again.
         """
         \(skipLine)
@@ -22,9 +22,11 @@ public enum BridgeJSGeneratedFile {
         //
         // To update this file, just rebuild your project or run
         // `swift package bridge-js`.
-
-        @_spi(BridgeJS) import JavaScriptKit
         """
+    }
+
+    public static func swiftImports(_ moduleNames: [String]) -> String {
+        moduleNames.map { "@_spi(BridgeJS) import \($0)" }.joined(separator: "\n")
     }
 }
 

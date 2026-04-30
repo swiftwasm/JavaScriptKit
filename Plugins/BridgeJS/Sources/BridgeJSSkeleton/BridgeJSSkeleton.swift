@@ -1239,11 +1239,18 @@ public struct BridgeJSSkeleton: Codable {
     public let moduleName: String
     public let exported: ExportedSkeleton?
     public let imported: ImportedModuleSkeleton?
+    public let usedExternalModules: [String]
 
-    public init(moduleName: String, exported: ExportedSkeleton? = nil, imported: ImportedModuleSkeleton? = nil) {
+    public init(
+        moduleName: String,
+        exported: ExportedSkeleton? = nil,
+        imported: ImportedModuleSkeleton? = nil,
+        usedExternalModules: [String] = []
+    ) {
         self.moduleName = moduleName
         self.exported = exported
         self.imported = imported
+        self.usedExternalModules = usedExternalModules
     }
 }
 

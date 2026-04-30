@@ -559,5 +559,8 @@
 
     ]
   },
-  "moduleName" : "BridgeJSGlobalTests"
+  "moduleName" : "BridgeJSGlobalTests",
+  "usedExternalModules" : [
+
+  ]
 }

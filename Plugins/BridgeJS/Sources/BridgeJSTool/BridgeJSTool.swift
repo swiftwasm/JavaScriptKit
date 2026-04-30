@@ -112,10 +112,18 @@ import BridgeJSUtilities
                         help: "The path to the TypeScript project configuration file (required for .d.ts files)",
                         required: false
                     ),
+                    "dependency-skeleton": OptionRule(
+                        help: "Path to a dependency module's BridgeJS.json, as '<ModuleName>=<path>'. Repeatable.",
+                        required: false,
+                        repeatable: true
+                    ),
                 ]
             )
-            let (positionalArguments, _, doubleDashOptions) = try parser.parse(
-                arguments: Array(arguments.dropFirst())
+            let parsedArguments = try parser.parse(arguments: Array(arguments.dropFirst()))
+            let positionalArguments = parsedArguments.positionalArguments
+            let doubleDashOptions = parsedArguments.doubleDashOptions
+            let dependencySkeletons = try loadDependencySkeletons(
+                parsedArguments.repeatedDoubleDashOptions["dependency-skeleton", default: []]
             )
             let progress = ProgressReporting(verbose: doubleDashOptions["verbose"] == "true")
             let moduleName = doubleDashOptions["module-name"]!
@@ -162,10 +170,12 @@ import BridgeJSUtilities
                     inputFiles.append(macrosPath)
                 }
             }
+            let externalModuleIndex = ExternalModuleIndex(dependencies: dependencySkeletons)
             let swiftToSkeleton = SwiftToSkeleton(
                 progress: progress,
                 moduleName: moduleName,
                 exposeToGlobal: config.exposeToGlobal,
+                externalModuleIndex: externalModuleIndex,
                 identityMode: config.identityMode
             )
             for inputFile in inputFiles.sorted() {
@@ -224,7 +234,10 @@ import BridgeJSUtilities
             // Combine and write unified Swift output
             let outputSwiftURL = outputDirectory.appending(path: "BridgeJS.swift")
             let combinedSwift = [closureSupport, exportResult, importResult].compactMap { $0 }
-            let outputSwift = combineGeneratedSwift(combinedSwift)
+            let outputSwift = combineGeneratedSwift(
+                combinedSwift,
+                importingExternalModules: skeleton.usedExternalModules
+            )
             let shouldWrite = doubleDashOptions["always-write"] == "true" || !outputSwift.isEmpty
             if shouldWrite {
                 try withSpan("Writing output Swift") {
@@ -237,7 +250,14 @@ import BridgeJSUtilities
                 }
             }
 
-            // Write unified skeleton
+            // Write unified skeleton.
+            // Note that for the build system to sequence the BridgeJSBuildPlugin correctly,
+            // the skeleton-to-Swift-output mapping must be injective, i.e. any change to
+            // the skeleton must produce a change in the Swift output. This is because we
+            // can’t use the BridgeJS.json file as an outputFile, since it would then be
+            // treated as a resource and thus included in the generated bundle. The
+            // invariant currently holds, but if this ever changes the BridgeJS.swift file
+            // could include a hash of the skeleton to maintain it.
             let outputSkeletonURL = outputDirectory.appending(path: "JavaScript/BridgeJS.json")
             try withSpan("Writing output skeleton") {
                 try FileManager.default.createDirectory(
@@ -302,14 +322,45 @@ private func writeIfChanged(_ data: Data, to url: URL) throws {
     try data.write(to: url)
 }
 
-private func combineGeneratedSwift(_ pieces: [String]) -> String {
+private func loadDependencySkeletons(
+    _ rawArguments: [String]
+) throws -> [(moduleName: String, skeleton: BridgeJSSkeleton)] {
+    var loadedSkeletons: [(moduleName: String, skeleton: BridgeJSSkeleton)] = []
+    let decoder = JSONDecoder()
+    for rawArgument in rawArguments {
+        guard let equalIndex = rawArgument.firstIndex(of: "="), equalIndex != rawArgument.startIndex else {
+            throw BridgeJSToolError(
+                "--dependency-skeleton expects '<ModuleName>=<path>'; got invalid value '\(rawArgument)'"
+            )
+        }
+        let moduleName = String(rawArgument[..<equalIndex])
+        let path = String(rawArgument[rawArgument.index(after: equalIndex)...])
+        let url = URL(fileURLWithPath: path)
+        do {
+            let data = try Data(contentsOf: url)
+            let skeleton = try decoder.decode(BridgeJSSkeleton.self, from: data)
+            loadedSkeletons.append((moduleName: moduleName, skeleton: skeleton))
+        } catch {
+            throw BridgeJSToolError(
+                "Failed to load dependency skeleton for module '\(moduleName)' at \(path): \(error)."
+            )
+        }
+    }
+    return loadedSkeletons
+}
+
+private func combineGeneratedSwift(
+    _ pieces: [String],
+    importingExternalModules externalModules: [String] = []
+) -> String {
     let trimmedPieces =
         pieces
         .map { $0.trimmingCharacters(in: .newlines) }
         .filter { !$0.isEmpty }
     guard !trimmedPieces.isEmpty else { return "" }
 
-    return ([BridgeJSGeneratedFile.swiftPreamble] + trimmedPieces).joined(separator: "\n\n")
+    let imports = BridgeJSGeneratedFile.swiftImports(["JavaScriptKit"] + externalModules)
+    return ([BridgeJSGeneratedFile.swiftHeader, imports] + trimmedPieces).joined(separator: "\n\n")
 }
 
 private func recursivelyCollectSwiftFiles(from directory: URL) -> [URL] {
@@ -365,6 +416,7 @@ extension Profiling {
 struct OptionRule {
     var help: String
     var required: Bool = false
+    var repeatable: Bool = false
 }
 
 struct ArgumentParser {
@@ -377,11 +429,12 @@ struct ArgumentParser {
         self.doubleDashOptions = doubleDashOptions
     }
 
-    typealias ParsedArguments = (
-        positionalArguments: [String],
-        singleDashOptions: [String: String],
-        doubleDashOptions: [String: String]
-    )
+    struct ParsedArguments {
+        var positionalArguments: [String]
+        var singleDashOptions: [String: String]
+        var doubleDashOptions: [String: String]
+        var repeatedDoubleDashOptions: [String: [String]]
+    }
 
     func help() -> String {
         var help = "Usage: \(CommandLine.arguments.first ?? "bridge-js-tool") [options] <positional arguments>\n\n"
@@ -404,6 +457,7 @@ struct ArgumentParser {
         var positionalArguments: [String] = []
         var singleDashOptions: [String: String] = [:]
         var doubleDashOptions: [String: String] = [:]
+        var repeatedDoubleDashOptions: [String: [String]] = [:]
 
         var arguments = arguments.makeIterator()
 
@@ -412,7 +466,12 @@ struct ArgumentParser {
                 if arg.starts(with: "--") {
                     let key = String(arg.dropFirst(2))
                     let value = arguments.next()
-                    doubleDashOptions[key] = value
+                    if self.doubleDashOptions[key]?.repeatable ?? false {
+                        guard let value else { continue }
+                        repeatedDoubleDashOptions[key, default: []].append(value)
+                    } else {
+                        doubleDashOptions[key] = value
+                    }
                 } else {
                     let key = String(arg.dropFirst(1))
                     let value = arguments.next()
@@ -424,11 +483,16 @@ struct ArgumentParser {
         }
 
         for (key, rule) in self.doubleDashOptions {
-            if rule.required, doubleDashOptions[key] == nil {
+            if rule.required, doubleDashOptions[key] == nil, repeatedDoubleDashOptions[key] == nil {
                 throw BridgeJSToolError("Option --\(key) is required")
             }
         }
 
-        return (positionalArguments, singleDashOptions, doubleDashOptions)
+        return ParsedArguments(
+            positionalArguments: positionalArguments,
+            singleDashOptions: singleDashOptions,
+            doubleDashOptions: doubleDashOptions,
+            repeatedDoubleDashOptions: repeatedDoubleDashOptions
+        )
     }
 }

@@ -483,5 +483,8 @@
 
     ]
   },
-  "moduleName" : "TestModule"
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
 }

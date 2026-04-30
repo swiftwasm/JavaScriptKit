@@ -45,7 +45,12 @@ import class Foundation.JSONDecoder
     func _update(swiftSource: String, dtsSource: String) throws -> PlayBridgeJSOutput {
         let moduleName = "Playground"
 
-        let swiftToSkeleton = SwiftToSkeleton(progress: .silent, moduleName: moduleName, exposeToGlobal: false)
+        let swiftToSkeleton = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: moduleName,
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         swiftToSkeleton.addSourceFile(Parser.parse(source: swiftSource), inputFilePath: "Playground.swift")
 
         let ts2swift = try createTS2Swift()

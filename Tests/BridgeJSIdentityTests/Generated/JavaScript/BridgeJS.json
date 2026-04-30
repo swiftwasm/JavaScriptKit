@@ -459,5 +459,8 @@
       }
     ]
   },
-  "moduleName" : "BridgeJSIdentityTests"
+  "moduleName" : "BridgeJSIdentityTests",
+  "usedExternalModules" : [
+
+  ]
 }

@@ -77,7 +77,12 @@ import Testing
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let name = url.deletingPathExtension().lastPathComponent
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
         let skeleton = try swiftAPI.finalize()
         try snapshotCodegen(skeleton: skeleton, name: name)
@@ -93,7 +98,12 @@ import Testing
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let name = url.deletingPathExtension().lastPathComponent
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: true)
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: true,
+            externalModuleIndex: .empty
+        )
         swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
         let skeleton = try swiftAPI.finalize()
         try snapshotCodegen(skeleton: skeleton, name: name + ".Global")
@@ -101,7 +111,12 @@ import Testing
 
     @Test
     func codegenCrossFileTypeResolution() throws {
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         let classBURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileClassB.swift")
         swiftAPI.addSourceFile(
             Parser.parse(source: try String(contentsOf: classBURL, encoding: .utf8)),
@@ -118,7 +133,12 @@ import Testing
 
     @Test
     func codegenCrossFileTypeResolutionReverseOrder() throws {
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         let classAURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileClassA.swift")
         swiftAPI.addSourceFile(
             Parser.parse(source: try String(contentsOf: classAURL, encoding: .utf8)),
@@ -135,7 +155,12 @@ import Testing
 
     @Test
     func codegenCrossFileFunctionTypes() throws {
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         let functionBURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileFunctionB.swift")
         swiftAPI.addSourceFile(
             Parser.parse(source: try String(contentsOf: functionBURL, encoding: .utf8)),
@@ -152,7 +177,12 @@ import Testing
 
     @Test
     func codegenCrossFileFunctionTypesReverseOrder() throws {
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         let functionAURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileFunctionA.swift")
         swiftAPI.addSourceFile(
             Parser.parse(source: try String(contentsOf: functionAURL, encoding: .utf8)),
@@ -169,7 +199,12 @@ import Testing
 
     @Test
     func codegenCrossFileExtension() throws {
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         let classURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileExtensionClass.swift")
         swiftAPI.addSourceFile(
             Parser.parse(source: try String(contentsOf: classURL, encoding: .utf8)),
@@ -186,7 +221,12 @@ import Testing
 
     @Test
     func codegenSkipsEmptySkeletons() throws {
-        let swiftAPI = SwiftToSkeleton(progress: .silent, moduleName: "TestModule", exposeToGlobal: false)
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
         let importedURL = Self.multifileInputsDirectory.appendingPathComponent("ImportedFunctions.swift")
         swiftAPI.addSourceFile(
             Parser.parse(source: try String(contentsOf: importedURL, encoding: .utf8)),

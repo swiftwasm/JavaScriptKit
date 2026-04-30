@@ -74,28 +74,62 @@ struct BridgeJSCommandPlugin: CommandPlugin {
 }
 
 extension BridgeJSCommandPlugin.Context {
+    private func collectBridgeJSTargets() -> [String: SwiftSourceModuleTarget] {
+        var bridgeJSTargets: [String: SwiftSourceModuleTarget] = [:]
+        for target in context.package.targets {
+            guard
+                let swiftTarget = target as? SwiftSourceModuleTarget,
+                FileManager.default.fileExists(
+                    atPath: swiftTarget.directoryURL.appending(path: "bridge-js.config.json").path
+                )
+            else {
+                continue
+            }
+            bridgeJSTargets[swiftTarget.name] = swiftTarget
+        }
+        return bridgeJSTargets
+    }
+
+    private func targetsInDependencyOrder(
+        _ bridgeJSTargets: [String: SwiftSourceModuleTarget]
+    ) -> [SwiftSourceModuleTarget] {
+        var visitedTargetNames = Set<String>()
+        var orderedTargets: [SwiftSourceModuleTarget] = []
+        func visit(_ target: SwiftSourceModuleTarget) {
+            if !visitedTargetNames.insert(target.name).inserted {
+                return
+            }
+            for dependency in target.recursiveTargetDependencies {
+                if let dependencyTarget = bridgeJSTargets[dependency.name] {
+                    visit(dependencyTarget)
+                }
+            }
+            orderedTargets.append(target)
+        }
+        for target in bridgeJSTargets.values.sorted(by: { $0.name < $1.name }) {
+            visit(target)
+        }
+        return orderedTargets
+    }
+
     func runOnTargets(
         remainingArguments: [String],
         where predicate: (SwiftSourceModuleTarget) -> Bool
     ) throws {
-        for target in context.package.targets {
-            guard let target = target as? SwiftSourceModuleTarget else {
-                continue
-            }
-            let configFilePath = target.directoryURL.appending(path: "bridge-js.config.json")
-            if !FileManager.default.fileExists(atPath: configFilePath.path) {
-                printVerbose("No bridge-js.config.json found for \(target.name), skipping...")
-                continue
-            }
-            guard predicate(target) else {
-                continue
-            }
-            try runSingleTarget(target: target, remainingArguments: remainingArguments)
+        let allBridgeJSTargets = collectBridgeJSTargets()
+        let requestedTargets = allBridgeJSTargets.filter { predicate($1) }
+        for target in targetsInDependencyOrder(requestedTargets) {
+            try runSingleTarget(
+                target: target,
+                bridgeJSTargets: allBridgeJSTargets,
+                remainingArguments: remainingArguments
+            )
         }
     }
 
     private func runSingleTarget(
         target: SwiftSourceModuleTarget,
+        bridgeJSTargets: [String: SwiftSourceModuleTarget],
         remainingArguments: [String]
     ) throws {
         printStderr("Generating bridge code for \(target.name)...")
@@ -123,6 +157,25 @@ extension BridgeJSCommandPlugin.Context {
                 "--project",
                 tsconfigPath.path,
                 bridgeDtsPath.path,
+            ])
+        }
+
+        for dependency in target.recursiveTargetDependencies {
+            guard let dependencyTarget = bridgeJSTargets[dependency.name] else { continue }
+            let dependencySkeletonPath = dependencyTarget.directoryURL
+                .appending(path: "Generated/JavaScript/BridgeJS.json")
+            guard FileManager.default.fileExists(atPath: dependencySkeletonPath.path) else {
+                throw BridgeJSCommandPluginError(
+                    """
+                    Dependency '\(dependencyTarget.name)' is configured for BridgeJS, but its AOT skeleton has not been generated yet. \
+                    Run `swift package bridge-js --target \(dependencyTarget.name)` to generate it first, \
+                    or run without `--target` to process in dependency order.
+                    """
+                )
+            }
+            generateArguments.append(contentsOf: [
+                "--dependency-skeleton",
+                "\(dependencyTarget.name)=\(dependencySkeletonPath.path)",
             ])
         }
 
@@ -160,6 +213,14 @@ extension BridgeJSCommandPlugin.Context {
 
 private func printStderr(_ message: String) {
     fputs(message + "\n", stderr)
+}
+
+struct BridgeJSCommandPluginError: Error, CustomStringConvertible {
+    let description: String
+
+    init(_ message: String) {
+        self.description = message
+    }
 }
 
 extension SwiftSourceModuleTarget {

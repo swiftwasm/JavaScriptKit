@@ -48,7 +48,8 @@ import ArgumentParser
             let swiftToSkeleton = SwiftToSkeleton(
                 progress: ProgressReporting(verbose: false),
                 moduleName: "InternalModule",
-                exposeToGlobal: false
+                exposeToGlobal: false,
+                externalModuleIndex: .empty
             )
             for inputFile in inputFiles.sorted() {
                 let content = try String(decoding: readData(from: inputFile), as: UTF8.self)
