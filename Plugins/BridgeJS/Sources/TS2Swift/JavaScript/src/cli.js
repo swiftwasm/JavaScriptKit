@@ -149,6 +149,7 @@ export function run(filePaths, options) {
     }
 
     const prelude = [
+        "// swift-format-ignore-file",
         "// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,",
         "// DO NOT EDIT.",
         "//",
