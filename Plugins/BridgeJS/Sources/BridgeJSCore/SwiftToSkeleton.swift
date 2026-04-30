@@ -1843,9 +1843,44 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     }
 
     override func visitPost(_ node: StructDeclSyntax) {
-        if case .structBody(_, _) = stateStack.current {
+        if case .structBody(_, let structKey) = stateStack.current {
             stateStack.pop()
+            validateStructInitOrder(node: node, structKey: structKey)
         }
+    }
+
+    private func validateStructInitOrder(node: StructDeclSyntax, structKey: String) {
+        guard let exportedStruct = exportedStructByName[structKey],
+            let constructor = exportedStruct.constructor
+        else {
+            // No explicit @JS init — synthesized memberwise init is assumed,
+            // which always matches declaration order.
+            return
+        }
+
+        let instanceProps = exportedStruct.properties.filter { !$0.isStatic }
+        let expectedLabels = instanceProps.map(\.name)
+        let actualLabels = constructor.parameters.compactMap(\.label)
+
+        guard expectedLabels != actualLabels else { return }
+
+        // Find the @JS init node so we can point the diagnostic at it.
+        let initNode: (any SyntaxProtocol) =
+            node.memberBlock.members
+            .compactMap { $0.decl.as(InitializerDeclSyntax.self) }
+            .first(where: { $0.attributes.hasJSAttribute() })
+            ?? node
+
+        let expectedOrder = expectedLabels.joined(separator: ", ")
+        let actualOrder = actualLabels.joined(separator: ", ")
+
+        diagnose(
+            node: initNode,
+            message:
+                "@JS struct initializer parameters must match stored properties in declaration order. Expected (\(expectedOrder)), got (\(actualOrder))",
+            hint:
+                "Reorder the initializer parameters to match the property declaration order, or remove the @JS init to use the synthesized memberwise initializer"
+        )
     }
 
     private func visitProtocolMethod(
