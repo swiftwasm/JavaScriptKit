@@ -17,6 +17,7 @@ public enum BridgeJSGeneratedFile {
         // The generated Swift file itself should not be processed by BridgeJS again.
         """
         \(skipLine)
+        // swift-format-ignore-file
         // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
         // DO NOT EDIT.
         //
