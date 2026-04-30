@@ -445,6 +445,64 @@ import BridgeJSMacros
         )
     }
 
+    @Test func nestedJSClassStruct() {
+        let combinedSpecs: [String: MacroSpec] = [
+            "JSClass": MacroSpec(type: JSClassMacro.self, conformances: ["_JSBridgedClass"]),
+            "JSGetter": MacroSpec(type: JSGetterMacro.self),
+        ]
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            struct User {
+                @JSGetter
+                var stats: Stats
+
+                @JSClass
+                struct Stats {
+                    @JSGetter
+                    var health: Int
+                }
+            }
+            """,
+            expandedSource: """
+                struct User {
+                    var stats: Stats {
+                        get throws(JSException) {
+                            return try _$User_stats_get(self.jsObject)
+                        }
+                    }
+                    struct Stats {
+                        var health: Int {
+                            get throws(JSException) {
+                                return try _$Stats_health_get(self.jsObject)
+                            }
+                        }
+
+                        let jsObject: JSObject
+
+                        init(unsafelyWrapping jsObject: JSObject) {
+                            self.jsObject = jsObject
+                        }
+                    }
+
+                    let jsObject: JSObject
+
+                    init(unsafelyWrapping jsObject: JSObject) {
+                        self.jsObject = jsObject
+                    }
+                }
+
+                extension User.Stats: _JSBridgedClass {
+                }
+
+                extension User: _JSBridgedClass {
+                }
+                """,
+            macroSpecs: combinedSpecs,
+            indentationWidth: indentationWidth
+        )
+    }
+
     @Test func fileprivateStructIsRejected() {
         TestSupport.assertMacroExpansion(
             """

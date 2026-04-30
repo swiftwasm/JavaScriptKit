@@ -165,6 +165,75 @@ import Testing
         #expect(description.contains("<stdin>:2:"))
     }
 
+    // MARK: - Nested type validation
+
+    @Test
+    func nestedStructInsideClassSucceeds() throws {
+        let source = """
+            @JS class User {
+                @JS struct Stats {
+                    var health: Int
+                }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        let skeleton = try swiftAPI.finalize()
+        #expect(skeleton.exported != nil)
+        let structs = skeleton.exported?.structs ?? []
+        #expect(structs.count == 1)
+        #expect(structs.first?.swiftCallName == "User.Stats")
+    }
+
+    @Test
+    func nestedClassInsideStructSucceeds() throws {
+        let source = """
+            @JS struct Container {
+                var value: Int
+                @JS class Inner {
+                }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        let skeleton = try swiftAPI.finalize()
+        #expect(skeleton.exported != nil)
+        let classes = skeleton.exported?.classes ?? []
+        #expect(classes.count == 1)
+        #expect(classes.first?.swiftCallName == "Container.Inner")
+    }
+
+    @Test
+    func structInsideEnumNamespaceSucceeds() throws {
+        let source = """
+            @JS enum API {
+                @JS struct Point {
+                    var x: Double
+                    var y: Double
+                }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        let skeleton = try swiftAPI.finalize()
+        #expect(skeleton.exported != nil)
+    }
+
     @Test
     func omitsNextLineWhenErrorIsOnLastLine() throws {
         let source = """

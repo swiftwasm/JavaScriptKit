@@ -504,6 +504,14 @@ public final class SwiftToSkeleton {
                 enumDecl.attributes.hasJSAttribute()
             {
                 swiftPath.insert(enumDecl.name.text, at: 0)
+            } else if let structDecl = parent.as(StructDeclSyntax.self),
+                structDecl.attributes.hasJSAttribute()
+            {
+                swiftPath.insert(structDecl.name.text, at: 0)
+            } else if let classDecl = parent.as(ClassDeclSyntax.self),
+                classDecl.attributes.hasJSAttribute()
+            {
+                swiftPath.insert(classDecl.name.text, at: 0)
             }
             currentNode = parent.parent
         }
@@ -648,6 +656,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     var state: State {
         return stateStack.current
     }
+
     let parent: SwiftToSkeleton
 
     init(parent: SwiftToSkeleton) {
@@ -1453,6 +1462,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         guard namespaceResult.isValid else {
             return .skipChildren
         }
+        let effectiveNamespace = effectiveNamespace(
+            resolvedNamespace: namespaceResult.namespace,
+            parentTypeNamespace: computeParentTypeNamespace(for: node)
+        )
         let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: node, itemName: name)
         let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
             for: node,
@@ -1466,10 +1479,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             constructor: nil,
             methods: [],
             properties: [],
-            namespace: namespaceResult.namespace,
+            namespace: effectiveNamespace,
             identityMode: classIdentityMode
         )
-        let uniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
+        let uniqueKey = makeKey(name: name, namespace: effectiveNamespace)
 
         stateStack.push(state: .classBody(name: name, key: uniqueKey))
         exportedClassByName[uniqueKey] = exportedClass
@@ -1558,6 +1571,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         guard namespaceResult.isValid else {
             return .skipChildren
         }
+        let effectiveNamespace = effectiveNamespace(
+            resolvedNamespace: namespaceResult.namespace,
+            parentTypeNamespace: computeParentTypeNamespace(for: node)
+        )
         let emitStyle = extractEnumStyle(from: jsAttribute) ?? .const
         let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: node, itemName: name)
         let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
@@ -1566,7 +1583,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         )
 
         let tsFullPath: String
-        if let namespace = namespaceResult.namespace, !namespace.isEmpty {
+        if let namespace = effectiveNamespace, !namespace.isEmpty {
             tsFullPath = namespace.joined(separator: ".") + "." + name
         } else {
             tsFullPath = name
@@ -1580,13 +1597,13 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             explicitAccessControl: explicitAccessControl,
             cases: [],  // Will be populated in visit(EnumCaseDeclSyntax)
             rawType: SwiftEnumRawType(rawType),
-            namespace: namespaceResult.namespace,
+            namespace: effectiveNamespace,
             emitStyle: emitStyle,
             staticMethods: [],
             staticProperties: []
         )
 
-        let enumUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
+        let enumUniqueKey = makeKey(name: name, namespace: effectiveNamespace)
         exportedEnumByName[enumUniqueKey] = exportedEnum
         exportedEnumNames.append(enumUniqueKey)
 
@@ -1685,18 +1702,22 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         guard namespaceResult.isValid else {
             return .skipChildren
         }
+        let effectiveNamespace = effectiveNamespace(
+            resolvedNamespace: namespaceResult.namespace,
+            parentTypeNamespace: computeParentTypeNamespace(for: node)
+        )
         _ = computeExplicitAtLeastInternalAccessControl(
             for: node,
             message: "Protocol visibility must be at least internal"
         )
 
-        let protocolUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
+        let protocolUniqueKey = makeKey(name: name, namespace: effectiveNamespace)
 
         exportedProtocolByName[protocolUniqueKey] = ExportedProtocol(
             name: name,
             methods: [],
             properties: [],
-            namespace: namespaceResult.namespace
+            namespace: effectiveNamespace
         )
 
         stateStack.push(state: .protocolBody(name: name, key: protocolUniqueKey))
@@ -1707,7 +1728,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 if let exportedFunction = visitProtocolMethod(
                     node: funcDecl,
                     protocolName: name,
-                    namespace: namespaceResult.namespace
+                    namespace: effectiveNamespace
                 ) {
                     methods.append(exportedFunction)
                 }
@@ -1720,7 +1741,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             name: name,
             methods: methods,
             properties: exportedProtocolByName[protocolUniqueKey]?.properties ?? [],
-            namespace: namespaceResult.namespace
+            namespace: effectiveNamespace
         )
 
         exportedProtocolByName[protocolUniqueKey] = exportedProtocol
@@ -1742,6 +1763,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         guard namespaceResult.isValid else {
             return .skipChildren
         }
+        let effectiveNamespace = effectiveNamespace(
+            resolvedNamespace: namespaceResult.namespace,
+            parentTypeNamespace: computeParentTypeNamespace(for: node)
+        )
         let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: node, itemName: name)
         let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
             for: node,
@@ -1791,7 +1816,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                         type: fieldType,
                         isReadonly: true,
                         isStatic: false,
-                        namespace: namespaceResult.namespace,
+                        namespace: effectiveNamespace,
                         staticContext: nil
                     )
                     properties.append(property)
@@ -1799,14 +1824,14 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             }
         }
 
-        let structUniqueKey = makeKey(name: name, namespace: namespaceResult.namespace)
+        let structUniqueKey = makeKey(name: name, namespace: effectiveNamespace)
         let exportedStruct = ExportedStruct(
             name: name,
             swiftCallName: swiftCallName,
             explicitAccessControl: explicitAccessControl,
             properties: properties,
             methods: [],
-            namespace: namespaceResult.namespace
+            namespace: effectiveNamespace
         )
 
         exportedStructByName[structUniqueKey] = exportedStruct
@@ -2033,6 +2058,34 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
 
         return namespace.isEmpty ? nil : namespace
+    }
+
+    private func computeParentTypeNamespace(for node: some SyntaxProtocol) -> [String]? {
+        var path: [String] = []
+        var currentNode: Syntax? = node.parent
+
+        while let parent = currentNode {
+            if let structDecl = parent.as(StructDeclSyntax.self),
+                structDecl.attributes.hasJSAttribute()
+            {
+                path.insert(structDecl.name.text, at: 0)
+            } else if let classDecl = parent.as(ClassDeclSyntax.self),
+                classDecl.attributes.hasJSAttribute()
+            {
+                path.insert(classDecl.name.text, at: 0)
+            }
+            currentNode = parent.parent
+        }
+
+        return path.isEmpty ? nil : path
+    }
+
+    private func effectiveNamespace(
+        resolvedNamespace: [String]?,
+        parentTypeNamespace: [String]?
+    ) -> [String]? {
+        let combined = (parentTypeNamespace ?? []) + (resolvedNamespace ?? [])
+        return combined.isEmpty ? nil : combined
     }
 
     /// Requires the node to have at least internal access control.
