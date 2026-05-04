@@ -285,6 +285,152 @@
     "exposeToGlobal" : false,
     "functions" : [
       {
+        "abiName" : "bjs_roundtripAnimal",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripAnimal",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "animalClosure",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModule6AnimalV_6AnimalV",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "swiftStruct" : {
+                        "_0" : "Animal"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "swiftStruct" : {
+                      "_0" : "Animal"
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : false,
+              "mangleName" : "10TestModule6AnimalV_6AnimalV",
+              "moduleName" : "TestModule",
+              "parameters" : [
+                {
+                  "swiftStruct" : {
+                    "_0" : "Animal"
+                  }
+                }
+              ],
+              "returnType" : {
+                "swiftStruct" : {
+                  "_0" : "Animal"
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : false
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundtripOptionalAnimal",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripOptionalAnimal",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "animalClosure",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModuleSq6AnimalV_Sq6AnimalV",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "nullable" : {
+                        "_0" : {
+                          "swiftStruct" : {
+                            "_0" : "Animal"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "nullable" : {
+                      "_0" : {
+                        "swiftStruct" : {
+                          "_0" : "Animal"
+                        }
+                      },
+                      "_1" : "null"
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : false,
+              "mangleName" : "10TestModuleSq6AnimalV_Sq6AnimalV",
+              "moduleName" : "TestModule",
+              "parameters" : [
+                {
+                  "nullable" : {
+                    "_0" : {
+                      "swiftStruct" : {
+                        "_0" : "Animal"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              ],
+              "returnType" : {
+                "nullable" : {
+                  "_0" : {
+                    "swiftStruct" : {
+                      "_0" : "Animal"
+                    }
+                  },
+                  "_1" : "null"
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : false
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundtripString",
         "effects" : {
           "isAsync" : false,
@@ -1872,7 +2018,45 @@
 
     ],
     "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Animal_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "type",
+              "name" : "type",
+              "type" : {
+                "string" : {
 
+                }
+              }
+            }
+          ]
+        },
+        "explicitAccessControl" : "public",
+        "methods" : [
+
+        ],
+        "name" : "Animal",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "type",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Animal"
+      }
     ]
   },
   "moduleName" : "TestModule",

@@ -41,6 +41,9 @@ export const APIResultValues: {
 export type APIResultTag =
   { tag: typeof APIResultValues.Tag.Success; param0: string } | { tag: typeof APIResultValues.Tag.Failure; param0: number } | { tag: typeof APIResultValues.Tag.Flag; param0: boolean } | { tag: typeof APIResultValues.Tag.Rate; param0: number } | { tag: typeof APIResultValues.Tag.Precise; param0: number } | { tag: typeof APIResultValues.Tag.Info }
 
+export interface Animal {
+    type: string;
+}
 export type DirectionObject = typeof DirectionValues;
 
 export type ThemeObject = typeof ThemeValues;
@@ -67,6 +70,8 @@ export type Exports = {
     TestProcessor: {
         new(transform: (arg0: string) => string): TestProcessor;
     }
+    roundtripAnimal(animalClosure: (arg0: AnimalTag) => AnimalTag): (arg0: AnimalTag) => AnimalTag;
+    roundtripOptionalAnimal(animalClosure: (arg0: AnimalTag | null) => AnimalTag | null): (arg0: AnimalTag | null) => AnimalTag | null;
     roundtripString(stringClosure: (arg0: string) => string): (arg0: string) => string;
     roundtripInt(intClosure: (arg0: number) => number): (arg0: number) => number;
     roundtripBool(boolClosure: (arg0: boolean) => boolean): (arg0: boolean) => boolean;
@@ -92,6 +97,9 @@ export type Exports = {
     Theme: ThemeObject
     HttpStatus: HttpStatusObject
     APIResult: APIResultObject
+    Animal: {
+        init(type: string): Animal;
+    }
 }
 export type Imports = {
 }

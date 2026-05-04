@@ -8,9 +8,20 @@ import JavaScriptKit
     }
 }
 
+@JS public struct Animal {
+    public let type: String
+
+    @JS public init(type: String) {
+        self.type = type
+    }
+}
+
 @JS class TestProcessor {
     @JS init(transform: @escaping (String) -> String) {}
 }
+
+@JS func roundtripAnimal(_ animalClosure: (Animal) -> Animal) -> (Animal) -> Animal
+@JS func roundtripOptionalAnimal(_ animalClosure: (Animal?) -> Animal?) -> (Animal?) -> Animal?
 
 @JS func roundtripString(_ stringClosure: (String) -> String) -> (String) -> String
 @JS func roundtripInt(_ intClosure: (Int) -> Int) -> (Int) -> Int

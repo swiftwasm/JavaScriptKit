@@ -4059,6 +4059,99 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_TextProcessor_processVector",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "processVector",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "callback",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTestsSd_8Vector2DV",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "double" : {
+
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "swiftStruct" : {
+                          "_0" : "Vector2D"
+                        }
+                      },
+                      "sendingParameters" : false
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_TextProcessor_processOptionalVector",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "processOptionalVector",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "callback",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTestsSd_Sq8Vector2DV",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "double" : {
+
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "nullable" : {
+                          "_0" : {
+                            "swiftStruct" : {
+                              "_0" : "Vector2D"
+                            }
+                          },
+                          "_1" : "null"
+                        }
+                      },
+                      "sendingParameters" : false
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
           }
         ],
         "name" : "TextProcessor",

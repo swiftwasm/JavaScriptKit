@@ -777,6 +777,69 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV_extern(_ callback: Int32, _ param0: Float64) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV_extern(_ callback: Int32, _ param0: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV(_ callback: Int32, _ param0: Float64) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSd_8Vector2DV {
+    static func bridgeJSLift(_ callbackId: Int32) -> (Double) -> Vector2D {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0Value = param0.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV(callbackValue, param0Value)
+            return Vector2D.bridgeJSLiftReturn()
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (Double) -> Vector2D {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Double) -> Vector2D) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_8Vector2DV(_ boxPtr: UnsafeMutableRawPointer, _ param0: Float64) -> Void {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Double) -> Vector2D>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Double.bridgeJSLiftParameter(param0))
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd_extern(_ callback: Int32, _ param0: Float64) -> Float64
 #else
@@ -832,6 +895,69 @@ extension JSTypedClosure where Signature == (Double) -> Double {
 public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sd(_ boxPtr: UnsafeMutableRawPointer, _ param0: Float64) -> Float64 {
     #if arch(wasm32)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Double) -> Double>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Double.bridgeJSLiftParameter(param0))
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV_extern(_ callback: Int32, _ param0: Float64) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV_extern(_ callback: Int32, _ param0: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV(_ callback: Int32, _ param0: Float64) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSd_Sq8Vector2DV {
+    static func bridgeJSLift(_ callbackId: Int32) -> (Double) -> Optional<Vector2D> {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0Value = param0.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV(callbackValue, param0Value)
+            return Optional<Vector2D>.bridgeJSLiftReturn()
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (Double) -> Optional<Vector2D> {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Double) -> Optional<Vector2D>) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_Sq8Vector2DV(_ boxPtr: UnsafeMutableRawPointer, _ param0: Float64) -> Void {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Double) -> Optional<Vector2D>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     let result = closure(Double.bridgeJSLiftParameter(param0))
     return result.bridgeJSLowerReturn()
     #else
@@ -10436,6 +10562,28 @@ public func _bjs_TextProcessor_roundtripDataProcessor(_ _self: UnsafeMutableRawP
 public func _bjs_TextProcessor_processOptionalDataProcessor(_ _self: UnsafeMutableRawPointer, _ callback: Int32) -> Void {
     #if arch(wasm32)
     let ret = TextProcessor.bridgeJSLiftParameter(_self).processOptionalDataProcessor(_: _BJS_Closure_20BridgeJSRuntimeTestsSq13DataProcessorP_SS.bridgeJSLift(callback))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_TextProcessor_processVector")
+@_cdecl("bjs_TextProcessor_processVector")
+public func _bjs_TextProcessor_processVector(_ _self: UnsafeMutableRawPointer, _ callback: Int32) -> Float64 {
+    #if arch(wasm32)
+    let ret = TextProcessor.bridgeJSLiftParameter(_self).processVector(_: _BJS_Closure_20BridgeJSRuntimeTestsSd_8Vector2DV.bridgeJSLift(callback))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_TextProcessor_processOptionalVector")
+@_cdecl("bjs_TextProcessor_processOptionalVector")
+public func _bjs_TextProcessor_processOptionalVector(_ _self: UnsafeMutableRawPointer, _ callback: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = TextProcessor.bridgeJSLiftParameter(_self).processOptionalVector(_: _BJS_Closure_20BridgeJSRuntimeTestsSd_Sq8Vector2DV.bridgeJSLift(callback))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

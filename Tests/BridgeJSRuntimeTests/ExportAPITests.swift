@@ -1285,6 +1285,18 @@ enum GraphOperations {
         processor.increment(by: 7)
         return callback(processor) + " | " + callback(nil)
     }
+
+    @JS func processVector(_ callback: (Double) -> Vector2D) -> Double {
+        return callback(3.0).magnitude()
+    }
+
+    @JS func processOptionalVector(_ callback: (Double) -> Vector2D?) -> String {
+        let some = callback(2.0)
+        let none = callback(-1.0)
+        let someStr = some.map { "(\($0.dx),\($0.dy))" } ?? "nil"
+        let noneStr = none.map { "(\($0.dx),\($0.dy))" } ?? "nil"
+        return "\(someStr) | \(noneStr)"
+    }
 }
 
 class ExportAPITests: XCTestCase {

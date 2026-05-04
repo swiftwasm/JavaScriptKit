@@ -85,6 +85,18 @@ export async function createInstantiator(options, swift) {
         return swift.memory.retain(real);
     };
 
+    const __bjs_createAnimalHelpers = () => ({
+        lower: (value) => {
+            const bytes = textEncoder.encode(value.type);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+        },
+        lift: () => {
+            const string = strStack.pop();
+            return { type: string };
+        }
+    });
     const __bjs_createAPIResultValuesHelpers = () => ({
         lower: (value) => {
             const enumTag = value.tag;
@@ -213,6 +225,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_i64"] = function() {
                 return i64Stack.pop();
+            }
+            bjs["swift_js_struct_lower_Animal"] = function(objectId) {
+                structHelpers.Animal.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Animal"] = function() {
+                const value = structHelpers.Animal.lift();
+                return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -358,6 +377,31 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule5ThemeO_5ThemeO);
+            }
+            bjs["invoke_js_callback_TestModule_10TestModule6AnimalV_6AnimalV"] = function(callbackId) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    const structValue = structHelpers.Animal.lift();
+                    let ret = callback(structValue);
+                    structHelpers.Animal.lower(ret);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["make_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModule6AnimalV_6AnimalV = function(param0) {
+                    structHelpers.Animal.lower(param0);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV(boxPtr);
+                    const structValue = structHelpers.Animal.lift();
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                    return structValue;
+                };
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule6AnimalV_6AnimalV);
             }
             bjs["invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC"] = function(callbackId, param0) {
                 try {
@@ -619,6 +663,46 @@ export async function createInstantiator(options, swift) {
                     return optResult;
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO);
+            }
+            bjs["invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV"] = function(callbackId, param0) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    let optResult;
+                    if (param0) {
+                        const struct = structHelpers.Animal.lift();
+                        optResult = struct;
+                    } else {
+                        optResult = null;
+                    }
+                    let ret = callback(optResult);
+                    const isSome = ret != null;
+                    if (isSome) {
+                        structHelpers.Animal.lower(ret);
+                    }
+                    i32Stack.push(isSome ? 1 : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["make_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV = function(param0) {
+                    const isSome = param0 != null;
+                    if (isSome) {
+                        structHelpers.Animal.lower(param0);
+                    }
+                    i32Stack.push(+isSome);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV(boxPtr);
+                    const isSome1 = i32Stack.pop();
+                    const optResult = isSome1 ? structHelpers.Animal.lift() : null;
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                    return optResult;
+                };
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV);
             }
             bjs["invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC"] = function(callbackId, param0IsSome, param0Pointer) {
                 try {
@@ -971,12 +1055,25 @@ export async function createInstantiator(options, swift) {
                     return TestProcessor.__construct(ret);
                 }
             }
+            const AnimalHelpers = __bjs_createAnimalHelpers();
+            structHelpers.Animal = AnimalHelpers;
+
             const APIResultHelpers = __bjs_createAPIResultValuesHelpers();
             enumHelpers.APIResult = APIResultHelpers;
 
             const exports = {
                 Person,
                 TestProcessor,
+                roundtripAnimal: function bjs_roundtripAnimal(animalClosure) {
+                    const callbackId = swift.memory.retain(animalClosure);
+                    const ret = instance.exports.bjs_roundtripAnimal(callbackId);
+                    return swift.memory.getObject(ret);
+                },
+                roundtripOptionalAnimal: function bjs_roundtripOptionalAnimal(animalClosure) {
+                    const callbackId = swift.memory.retain(animalClosure);
+                    const ret = instance.exports.bjs_roundtripOptionalAnimal(callbackId);
+                    return swift.memory.getObject(ret);
+                },
                 roundtripString: function bjs_roundtripString(stringClosure) {
                     const callbackId = swift.memory.retain(stringClosure);
                     const ret = instance.exports.bjs_roundtripString(callbackId);
@@ -1086,6 +1183,15 @@ export async function createInstantiator(options, swift) {
                 Theme: ThemeValues,
                 HttpStatus: HttpStatusValues,
                 APIResult: APIResultValues,
+                Animal: {
+                    init: function(type) {
+                        const typeBytes = textEncoder.encode(type);
+                        const typeId = swift.memory.retain(typeBytes);
+                        instance.exports.bjs_Animal_init(typeId, typeBytes.length);
+                        const structValue = structHelpers.Animal.lift();
+                        return structValue;
+                    },
+                },
             };
             _exports = exports;
             return exports;
