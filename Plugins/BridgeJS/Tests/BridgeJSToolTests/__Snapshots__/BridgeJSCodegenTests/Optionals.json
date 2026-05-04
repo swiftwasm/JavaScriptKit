@@ -1158,6 +1158,20 @@
                     "_1" : "undefined"
                   }
                 }
+              },
+              {
+                "accessLevel" : "internal",
+                "name" : "childOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsObject" : {
+                        "_0" : "WithOptionalJSClass"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
               }
             ],
             "methods" : [
@@ -1444,6 +1458,40 @@
                     "_1" : "undefined"
                   }
                 }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "roundTripChildOrNull",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "jsObject" : {
+                            "_0" : "WithOptionalJSClass"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsObject" : {
+                        "_0" : "WithOptionalJSClass"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
               }
             ],
             "name" : "WithOptionalJSClass",
@@ -1571,6 +1619,21 @@
                       }
                     },
                     "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "functionName" : "childOrNull_set",
+                "name" : "childOrNull",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsObject" : {
+                        "_0" : "WithOptionalJSClass"
+                      }
+                    },
+                    "_1" : "null"
                   }
                 }
               }

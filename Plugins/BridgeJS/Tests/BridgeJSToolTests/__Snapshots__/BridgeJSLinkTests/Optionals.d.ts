@@ -30,6 +30,7 @@ export interface WithOptionalJSClass {
     roundTripBoolOrUndefined(value: boolean | undefined): boolean | undefined;
     roundTripIntOrNull(value: number | null): number | null;
     roundTripIntOrUndefined(value: number | undefined): number | undefined;
+    roundTripChildOrNull(value: WithOptionalJSClass | null): WithOptionalJSClass | null;
     stringOrNull: string | null;
     stringOrUndefined: string | undefined;
     doubleOrNull: number | null;
@@ -38,6 +39,7 @@ export interface WithOptionalJSClass {
     boolOrUndefined: boolean | undefined;
     intOrNull: number | null;
     intOrUndefined: number | undefined;
+    childOrNull: WithOptionalJSClass | null;
 }
 export type Exports = {
     Greeter: {

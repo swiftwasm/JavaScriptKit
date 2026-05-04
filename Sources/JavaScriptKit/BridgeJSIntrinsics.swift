@@ -1693,11 +1693,7 @@ extension _BridgedAsOptional where Wrapped == JSObject {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        asOptional._bridgeJSLowerReturn(
-            noneValue: 0,
-            lowerWrapped: { $0.bridgeJSLowerReturn() },
-            write: _swift_js_return_optional_object
-        )
+        Wrapped.bridgeJSStackPushAsOptional(asOptional)
     }
 }
 

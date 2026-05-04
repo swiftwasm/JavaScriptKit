@@ -128,7 +128,9 @@ public struct ImportTS {
             self.returnType = returnType
             self.context = context
             let liftingInfo = try returnType.liftingReturnInfo(context: context)
-            if effects.isAsync || returnType == .void || returnType.usesSideChannelForOptionalReturn() {
+            if effects.isAsync || returnType == .void || returnType.usesSideChannelForOptionalReturn()
+                || liftingInfo.valueToLift == nil
+            {
                 abiReturnType = nil
             } else {
                 abiReturnType = liftingInfo.valueToLift
@@ -1032,6 +1034,10 @@ extension BridgeType {
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as return values")
         case .nullable(let wrappedType, _):
+            // jsObject uses stack ABI for optionals — returns void, value goes through stacks
+            if case .jsObject = wrappedType {
+                return LiftingReturnInfo(valueToLift: nil)
+            }
             let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
             return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
         case .array, .dictionary:

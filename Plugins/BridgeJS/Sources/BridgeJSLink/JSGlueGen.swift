@@ -2648,7 +2648,7 @@ private extension BridgeType {
         case .string:
             return .sideChannelReturn(.storage)
         case .jsObject:
-            return .sideChannelReturn(.retainedObject)
+            return .stackABI
         case .jsValue:
             return .inlineFlag
         case .swiftHeapObject:
@@ -2685,7 +2685,7 @@ private extension BridgeType {
 
     var nilSentinel: NilSentinel {
         switch self {
-        case .jsObject, .swiftProtocol:
+        case .swiftProtocol:
             return .i32(0)
         case .swiftHeapObject:
             return .pointer
