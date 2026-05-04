@@ -182,13 +182,13 @@ extension _BridgedSwiftStackType {
 
 /// Types that bridge with the same (isSome, value) ABI as Optional.
 /// Used by JSUndefinedOr so all bridge methods delegate to Optional<Wrapped>.
-@_spi(BridgeJS) public protocol _BridgedAsOptional {
+public protocol _BridgedAsOptional {
     associatedtype Wrapped
     var asOptional: Wrapped? { get }
     init(optional: Wrapped?)
 }
 
-@_spi(BridgeJS) extension Optional: _BridgedAsOptional {
+extension Optional: _BridgedAsOptional {
     public var asOptional: Wrapped? { self }
     public init(optional: Wrapped?) { self = optional }
 }
