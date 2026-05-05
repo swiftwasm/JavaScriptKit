@@ -70,8 +70,8 @@ export type Exports = {
     TestProcessor: {
         new(transform: (arg0: string) => string): TestProcessor;
     }
-    roundtripAnimal(animalClosure: (arg0: AnimalTag) => AnimalTag): (arg0: AnimalTag) => AnimalTag;
-    roundtripOptionalAnimal(animalClosure: (arg0: AnimalTag | null) => AnimalTag | null): (arg0: AnimalTag | null) => AnimalTag | null;
+    roundtripAnimal(animalClosure: (arg0: Animal) => Animal): (arg0: Animal) => Animal;
+    roundtripOptionalAnimal(animalClosure: (arg0: Animal | null) => Animal | null): (arg0: Animal | null) => Animal | null;
     roundtripString(stringClosure: (arg0: string) => string): (arg0: string) => string;
     roundtripInt(intClosure: (arg0: number) => number): (arg0: number) => number;
     roundtripBool(boolClosure: (arg0: boolean) => boolean): (arg0: boolean) => boolean;

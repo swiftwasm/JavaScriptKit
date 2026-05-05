@@ -1441,8 +1441,6 @@ public struct BridgeJSLink {
                 }
             }
             return type.tsType
-        case .swiftStruct(let name):
-            return name.components(separatedBy: ".").last ?? name
         case .nullable(let wrapped, let kind):
             let base = resolveTypeScriptType(wrapped, exportedSkeletons: exportedSkeletons)
             return "\(base) | \(kind.absenceLiteral)"
@@ -3612,7 +3610,7 @@ extension BridgeType {
         case .associatedValueEnum(let name):
             return "\(name)Tag"
         case .swiftStruct(let name):
-            return "\(name)Tag"
+            return name.components(separatedBy: ".").last ?? name
         case .namespaceEnum(let name):
             return name
         case .swiftProtocol(let name):
