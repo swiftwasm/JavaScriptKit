@@ -789,5 +789,30 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
     //     await task.value
     //     executor.terminate()
     // }
+
+    func testDeinitJSStringOnDifferentThread() async throws {
+        final class Box: @unchecked Sendable {
+            var string: JSString?
+            init(_ string: JSString) { self.string = string }
+        }
+
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        // Force JS ref allocation on the main thread so ownerTid = main thread.
+        var string: JSString? = JSString("main-thread-owned-key")
+        _ = string!.asInternalJSRef()
+
+        let box = Box(string!)
+        string = nil
+
+        // Drop the last reference on a worker — deinit fires on the worker.
+        // Before the fix this crashed: TypeError: Cannot read properties of undefined (reading 'rc')
+        let task = Task(executorPreference: executor) {
+            XCTAssertFalse(isMainThread())
+            box.string = nil
+        }
+        await task.value
+    }
 }
 #endif
