@@ -272,7 +272,17 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case namespaceEnum(String)
     case swiftProtocol(String)
     case swiftStruct(String)
+    case swiftBoxedStruct(String)
     indirect case closure(ClosureSignature, useJSTypedClosure: Bool)
+}
+
+extension BridgeType {
+    public var heapObjectName: String? {
+        switch self {
+        case .swiftHeapObject(let name), .swiftBoxedStruct(let name): return name
+        default: return nil
+        }
+    }
 }
 
 public enum WasmCoreType: String, Codable, Sendable {
@@ -664,6 +674,13 @@ public struct StructField: Codable, Equatable, Sendable {
     }
 }
 
+public enum JSStructStyle: String, Codable, Equatable, Sendable {
+    case fields
+    case reference
+
+    public static var `default`: JSStructStyle { .fields }
+}
+
 public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedType {
     public let name: String
     public let swiftCallName: String
@@ -672,6 +689,14 @@ public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedTy
     public var constructor: ExportedConstructor?
     public var methods: [ExportedFunction]
     public let namespace: [String]?
+    public var structStyle: JSStructStyle?
+
+    public var bridgeType: BridgeType {
+        switch structStyle ?? .default {
+        case .reference: return .swiftBoxedStruct(swiftCallName)
+        case .fields: return .swiftStruct(swiftCallName)
+        }
+    }
 
     public init(
         name: String,
@@ -680,7 +705,8 @@ public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedTy
         properties: [ExportedProperty] = [],
         constructor: ExportedConstructor? = nil,
         methods: [ExportedFunction] = [],
-        namespace: [String]?
+        namespace: [String]?,
+        structStyle: JSStructStyle? = nil
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
@@ -689,6 +715,7 @@ public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedTy
         self.constructor = constructor
         self.methods = methods
         self.namespace = namespace
+        self.structStyle = structStyle
     }
 }
 
@@ -774,6 +801,17 @@ public struct ExportedEnum: Codable, Equatable, Sendable, NamespacedExportedType
 
     public var objectTypeName: String {
         "\(name)\(Self.objectSuffix)"
+    }
+
+    public var bridgeType: BridgeType? {
+        switch enumType {
+        case .simple: return .caseEnum(swiftCallName)
+        case .rawValue:
+            guard let rawType else { return nil }
+            return .rawValueEnum(swiftCallName, rawType)
+        case .associatedValue: return .associatedValueEnum(swiftCallName)
+        case .namespace: return .namespaceEnum(swiftCallName)
+        }
     }
 
     public init(
@@ -882,6 +920,8 @@ public struct ExportedClass: Codable, NamespacedExportedType {
     public var properties: [ExportedProperty]
     public var namespace: [String]?
     public var identityMode: Bool?  // nil = use config default, true/false = override
+
+    public var bridgeType: BridgeType { .swiftHeapObject(swiftCallName) }
 
     public init(
         name: String,
@@ -1545,7 +1585,7 @@ extension BridgeType {
         case .string: return nil
         case .jsObject: return .i32
         case .jsValue: return nil
-        case .swiftHeapObject:
+        case .swiftHeapObject, .swiftBoxedStruct:
             // UnsafeMutableRawPointer is returned as an i32 pointer
             return .pointer
         case .unsafePointer:
@@ -1599,7 +1639,7 @@ extension BridgeType {
             return "\(typeName.count)\(typeName)C"
         case .jsValue:
             return "7JSValueV"
-        case .swiftHeapObject(let name):
+        case .swiftHeapObject(let name), .swiftBoxedStruct(let name):
             return "\(name.count)\(name)C"
         case .unsafePointer(let ptr):
             func sanitize(_ s: String) -> String {
@@ -1666,7 +1706,7 @@ extension BridgeType {
             default:
                 return false
             }
-        case .bool, .caseEnum, .swiftHeapObject, .associatedValueEnum, .jsObject:
+        case .bool, .caseEnum, .swiftHeapObject, .swiftBoxedStruct, .associatedValueEnum, .jsObject:
             return false
         default:
             return false

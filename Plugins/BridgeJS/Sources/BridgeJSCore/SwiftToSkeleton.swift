@@ -366,6 +366,11 @@ public final class SwiftToSkeleton {
                 if structDecl.attributes.hasAttribute(name: "JSClass") {
                     return .jsObject(swiftCallName)
                 }
+                if let jsAttribute = structDecl.attributes.firstJSAttribute,
+                    SwiftToSkeleton.extractStructStyle(from: jsAttribute) == .reference
+                {
+                    return .swiftBoxedStruct(swiftCallName)
+                }
                 return .swiftStruct(swiftCallName)
             }
 
@@ -521,6 +526,22 @@ public final class SwiftToSkeleton {
         } else {
             return swiftPath.joined(separator: ".") + "." + itemName
         }
+    }
+
+    static func extractStructStyle(from jsAttribute: AttributeSyntax) -> JSStructStyle? {
+        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+            let styleArg = arguments.first(where: { $0.label?.text == "structStyle" })
+        else {
+            return nil
+        }
+        let text = styleArg.expression.trimmedDescription
+        if text.contains("reference") {
+            return .reference
+        }
+        if text.contains("fields") {
+            return .fields
+        }
+        return nil
     }
 
     /// Strips surrounding backticks from an identifier (e.g. "`Foo`" -> "Foo").
@@ -1397,8 +1418,17 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 let structAbiName = exportedStructByName[structKey]?.abiName ?? "unknown"
                 staticContext = .structName(structAbiName)
             } else {
-                diagnose(node: node, message: "@JS var must be static in structs (instance fields don't need @JS)")
-                return .skipChildren
+                switch exportedStructByName[structKey]?.structStyle ?? .default {
+                case .reference:
+                    staticContext = nil
+                case .fields:
+                    diagnose(
+                        node: node,
+                        message: "@JS var must be static in structs (instance fields don't need @JS)",
+                        hint: "Export the struct using @JS(structStyle: .reference) instead"
+                    )
+                    return .skipChildren
+                }
             }
         }
 
@@ -1661,12 +1691,12 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 for associatedValue in enumCase.associatedValues {
                     switch associatedValue.type {
                     case .string, .integer, .float, .double, .bool, .caseEnum, .rawValueEnum,
-                        .swiftStruct, .swiftHeapObject, .jsObject, .associatedValueEnum, .array:
+                        .swiftStruct, .swiftHeapObject, .swiftBoxedStruct, .jsObject, .associatedValueEnum, .array:
                         break
                     case .nullable(let wrappedType, _):
                         switch wrappedType {
                         case .string, .integer, .float, .double, .bool, .caseEnum, .rawValueEnum,
-                            .swiftStruct, .swiftHeapObject, .jsObject, .associatedValueEnum, .array:
+                            .swiftStruct, .swiftHeapObject, .swiftBoxedStruct, .jsObject, .associatedValueEnum, .array:
                             break
                         default:
                             diagnose(
@@ -1772,54 +1802,61 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             for: node,
             message: "Struct visibility must be at least internal"
         )
+        let structStyle = SwiftToSkeleton.extractStructStyle(from: jsAttribute)
 
         var properties: [ExportedProperty] = []
 
-        // Process all variables in struct as readonly (value semantics) and don't require @JS
-        for member in node.memberBlock.members {
-            if let varDecl = member.decl.as(VariableDeclSyntax.self) {
-                let isStatic = varDecl.modifiers.contains { modifier in
-                    modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
-                }
+        switch structStyle ?? .default {
+        case .reference:
+            // Reference structs require @JS on variables to export
+            break
+        case .fields:
+            // Process all variables in struct as readonly (value semantics) and don't require @JS
+            for member in node.memberBlock.members {
+                if let varDecl = member.decl.as(VariableDeclSyntax.self) {
+                    let isStatic = varDecl.modifiers.contains { modifier in
+                        modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
+                    }
 
-                // Handled with error in visitVariable
-                if varDecl.attributes.hasJSAttribute() {
-                    continue
-                }
-                // Skips static non-@JS properties
-                if isStatic {
-                    continue
-                }
-
-                for binding in varDecl.bindings {
-                    guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
+                    // Handled with error in visitVariable
+                    if varDecl.attributes.hasJSAttribute() {
+                        continue
+                    }
+                    // Skips static non-@JS properties
+                    if isStatic {
                         continue
                     }
 
-                    let fieldName = pattern.identifier.text
+                    for binding in varDecl.bindings {
+                        guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
+                            continue
+                        }
 
-                    guard let typeAnnotation = binding.typeAnnotation else {
-                        diagnose(node: binding, message: "Struct field must have explicit type annotation")
-                        continue
+                        let fieldName = pattern.identifier.text
+
+                        guard let typeAnnotation = binding.typeAnnotation else {
+                            diagnose(node: binding, message: "Struct field must have explicit type annotation")
+                            continue
+                        }
+
+                        guard
+                            let fieldType = withLookupErrors({
+                                self.parent.lookupType(for: typeAnnotation.type, errors: &$0)
+                            })
+                        else {
+                            continue
+                        }
+
+                        let property = ExportedProperty(
+                            name: fieldName,
+                            type: fieldType,
+                            isReadonly: true,
+                            isStatic: false,
+                            namespace: effectiveNamespace,
+                            staticContext: nil
+                        )
+                        properties.append(property)
                     }
-
-                    guard
-                        let fieldType = withLookupErrors({
-                            self.parent.lookupType(for: typeAnnotation.type, errors: &$0)
-                        })
-                    else {
-                        continue
-                    }
-
-                    let property = ExportedProperty(
-                        name: fieldName,
-                        type: fieldType,
-                        isReadonly: true,
-                        isStatic: false,
-                        namespace: effectiveNamespace,
-                        staticContext: nil
-                    )
-                    properties.append(property)
                 }
             }
         }
@@ -1831,7 +1868,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             explicitAccessControl: explicitAccessControl,
             properties: properties,
             methods: [],
-            namespace: effectiveNamespace
+            namespace: effectiveNamespace,
+            structStyle: structStyle
         )
 
         exportedStructByName[structUniqueKey] = exportedStruct
@@ -1855,6 +1893,11 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         else {
             // No explicit @JS init — synthesized memberwise init is assumed,
             // which always matches declaration order.
+            return
+        }
+
+        guard exportedStruct.structStyle ?? .default == .fields else {
+            // This validation is only required for fields structs.
             return
         }
 

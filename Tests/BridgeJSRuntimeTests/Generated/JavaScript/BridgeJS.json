@@ -2,6 +2,136 @@
   "exported" : {
     "classes" : [
       {
+        "constructor" : {
+          "abiName" : "bjs_BoxedStructConsumer_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_BoxedStructConsumer_formatSummary",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "formatSummary",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_BoxedStructConsumer_mergeLabels",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "mergeLabels",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "a",
+                "type" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                }
+              },
+              {
+                "label" : "_",
+                "name" : "b",
+                "type" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "BoxedStructConsumer",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "BoxedStructConsumer"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_TrackedThing_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "id",
+              "name" : "id",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_TrackedThing_getId",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "getId",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "TrackedThing",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "TrackedThing"
+      },
+      {
         "methods" : [
           {
             "abiName" : "bjs_ClosureSupportExports_static_makeIntToInt",
@@ -11059,6 +11189,654 @@
     "exposeToGlobal" : false,
     "functions" : [
       {
+        "abiName" : "bjs_makeBoxedSummary",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeBoxedSummary",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "values",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftBoxedStruct" : {
+            "_0" : "BoxedSummary"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeValueWithBoxedField",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeValueWithBoxedField",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "values",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "payloadLabel",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "outerLabel",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "ValueWithBoxedField"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundtripValueWithBoxedField",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripValueWithBoxedField",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "ValueWithBoxedField"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "ValueWithBoxedField"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeValueWithOptionalBoxedField",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeValueWithOptionalBoxedField",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "flag",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "tag",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "ValueWithOptionalBoxedField"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundtripValueWithOptionalBoxedField",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripValueWithOptionalBoxedField",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "ValueWithOptionalBoxedField"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "ValueWithOptionalBoxedField"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_consumeBoxedArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "consumeBoxedArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "items",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxedSummary"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeBoxedArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeBoxedArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxedSummary"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_consumeBoxedDictionary",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "consumeBoxedDictionary",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "items",
+            "type" : {
+              "dictionary" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "dictionary" : {
+            "_0" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxedSummary"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_optionalBoxedArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "optionalBoxedArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "flag",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "array" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_arrayOfOptionalBoxed",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "arrayOfOptionalBoxed",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "flag",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundtripBoxedSummary",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripBoxedSummary",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxedSummary"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftBoxedStruct" : {
+            "_0" : "BoxedSummary"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_boxedSummaryLabel",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "boxedSummaryLabel",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxedSummary"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_optionalBoxedSummary",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "optionalBoxedSummary",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "flag",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxedSummary"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundtripOptionalBoxedSummary",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripOptionalBoxedSummary",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxedSummary"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeLeakCheckBoxed",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeLeakCheckBoxed",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "id",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftBoxedStruct" : {
+            "_0" : "LeakCheckBoxed"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeMutableCounter",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeMutableCounter",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "initial",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftBoxedStruct" : {
+            "_0" : "MutableCounter"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeDirectMutable",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeDirectMutable",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftBoxedStruct" : {
+            "_0" : "DirectMutable"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_getTrackedDeinitCount",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "getTrackedDeinitCount",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_resetTrackedDeinitCount",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "resetTrackedDeinitCount",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeBoxWithFreshTracked",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeBoxWithFreshTracked",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "id",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftBoxedStruct" : {
+            "_0" : "BoxWithTrackedClass"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundtripBoxWithTrackedClass",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripBoxWithTrackedClass",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "box",
+            "type" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxWithTrackedClass"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftBoxedStruct" : {
+            "_0" : "BoxWithTrackedClass"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripVoid",
         "effects" : {
           "isAsync" : false,
@@ -14797,6 +15575,551 @@
       }
     ],
     "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_BoxedSummary_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "largeContents",
+              "name" : "largeContents",
+              "type" : {
+                "array" : {
+                  "_0" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "label" : "label",
+              "name" : "label",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_BoxedSummary_summarize",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "summarize",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_BoxedSummary_appendingZero",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "appendingZero",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxedSummary"
+              }
+            }
+          }
+        ],
+        "name" : "BoxedSummary",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "largeContents",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "BoxedSummary"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_LeakCheckBoxed_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "id",
+              "name" : "id",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_LeakCheckBoxed_incremented",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "incremented",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftBoxedStruct" : {
+                "_0" : "LeakCheckBoxed"
+              }
+            }
+          }
+        ],
+        "name" : "LeakCheckBoxed",
+        "properties" : [
+
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "LeakCheckBoxed"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_ValueWithBoxedField_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "payload",
+              "name" : "payload",
+              "type" : {
+                "swiftBoxedStruct" : {
+                  "_0" : "BoxedSummary"
+                }
+              }
+            },
+            {
+              "label" : "label",
+              "name" : "label",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "ValueWithBoxedField",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "payload",
+            "type" : {
+              "swiftBoxedStruct" : {
+                "_0" : "BoxedSummary"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "ValueWithBoxedField"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_ValueWithOptionalBoxedField_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "payload",
+              "name" : "payload",
+              "type" : {
+                "nullable" : {
+                  "_0" : {
+                    "swiftBoxedStruct" : {
+                      "_0" : "BoxedSummary"
+                    }
+                  },
+                  "_1" : "null"
+                }
+              }
+            },
+            {
+              "label" : "tag",
+              "name" : "tag",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "ValueWithOptionalBoxedField",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "payload",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "tag",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "ValueWithOptionalBoxedField"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_MutableCounter_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "count",
+              "name" : "count",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_MutableCounter_bump",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "bump",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MutableCounter_currentCount",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "currentCount",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "MutableCounter",
+        "properties" : [
+
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "MutableCounter"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_DirectMutable_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "count",
+              "name" : "count",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            },
+            {
+              "label" : "label",
+              "name" : "label",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_DirectMutable_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "DirectMutable",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "DirectMutable"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_BoxedConsumer_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "tag",
+              "name" : "tag",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_BoxedConsumer_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "other",
+                "type" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "BoxedSummary"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "BoxedConsumer",
+        "properties" : [
+
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "BoxedConsumer"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_BoxWithTrackedClass_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "tracked",
+              "name" : "tracked",
+              "type" : {
+                "swiftHeapObject" : {
+                  "_0" : "TrackedThing"
+                }
+              }
+            },
+            {
+              "label" : "label",
+              "name" : "label",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_BoxWithTrackedClass_describeTracked",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describeTracked",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "BoxWithTrackedClass",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "tracked",
+            "type" : {
+              "swiftHeapObject" : {
+                "_0" : "TrackedThing"
+              }
+            }
+          }
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "BoxWithTrackedClass"
+      },
       {
         "methods" : [
 

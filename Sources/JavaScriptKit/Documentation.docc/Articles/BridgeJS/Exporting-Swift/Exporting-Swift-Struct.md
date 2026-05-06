@@ -153,6 +153,26 @@ Structs use **copy semantics** when crossing the Swift/JavaScript boundary:
 
 This differs from classes, which use reference semantics and share state across the boundary.
 
+## Structs Exported as References
+
+By default, every field of the struct will be copied on every boundary crossing. For a struct that holds a large payload (e.g. a large array, `String`), this copy can be very inefficient. Marking a struct with `@JS(structStyle: .reference)` opts into boxing: the struct lives on the Swift heap and JavaScript holds an opaque handle to it, so no field-by-field copy is performed.
+
+### Syntax
+
+```swift
+@JS(structStyle: .reference) struct Dataset {
+    @JS let values: [Int]
+
+    @JS init(values: [Int]) {
+        self.values = values
+    }
+
+    @JS func summarize() -> String {
+        "\(values.count) values, with a sum of \(values.reduce(0, +))"
+    }
+}
+```
+
 ## Supported Features
 
 | Swift Feature | Status |
@@ -166,7 +186,7 @@ This differs from classes, which use reference semantics and share state across 
 | Static methods | ✅ |
 | Static properties | ✅ |
 | Extension methods/properties | ✅ |
-| Property observers (`willSet`, `didSet`) | ❌ |
+| Property observers (`willSet`, `didSet`) | ✅ (reference mode only) |
 | Generics | ❌ |
 | Conformances | ❌ |
 

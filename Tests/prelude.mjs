@@ -5,6 +5,7 @@ import {
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 import { ImportedFoo } from './BridgeJSRuntimeTests/JavaScript/Types.mjs';
 import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
+import { runBoxedStructWorks } from './BridgeJSRuntimeTests/JavaScript/BoxedStructTests.mjs';
 import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/JavaScript/ClosureSupportTests.mjs';
 import { getImports as getSwiftClassSupportImports } from './BridgeJSRuntimeTests/JavaScript/SwiftClassSupportTests.mjs';
 import { getImports as getOptionalSupportImports } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
@@ -179,6 +180,13 @@ export async function setupOptions(options, context) {
                     throw new Error("No exports!?");
                 }
                 return BridgeJSRuntimeTests_runJsStructWorks(exports);
+            }
+            bridgeJSRuntimeTests["runBoxedStructWorks"] = () => {
+                const exports = getExports();
+                if (!exports) {
+                    throw new Error("No exports!?");
+                }
+                runBoxedStructWorks(exports);
             }
             const bridgeJSGlobalTests = importObject["BridgeJSGlobalTests"] || {};
             bridgeJSGlobalTests["runJsWorksGlobal"] = () => {

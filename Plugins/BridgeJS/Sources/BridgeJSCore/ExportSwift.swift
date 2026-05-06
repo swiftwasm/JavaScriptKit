@@ -77,10 +77,15 @@ public class ExportSwift {
         }
 
         try withSpan("Render Structs") { [self] in
-            let structCodegen = StructCodegen()
+            let fieldsStructCodegen = FieldsStructCodegen()
             for structDef in skeleton.structs {
-                decls.append(contentsOf: structCodegen.renderStructHelpers(structDef))
-                decls.append(contentsOf: try renderSingleExportedStruct(struct: structDef))
+                switch structDef.structStyle ?? .default {
+                case .fields:
+                    decls.append(contentsOf: fieldsStructCodegen.renderHelpers(structDef))
+                    decls.append(contentsOf: try renderSingleExportedFieldsStruct(struct: structDef))
+                case .reference:
+                    decls.append(contentsOf: try renderSingleExportedBoxedStruct(struct: structDef))
+                }
             }
 
             for function in skeleton.functions {
@@ -127,34 +132,29 @@ public class ExportSwift {
                 argumentsToLift = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
             }
 
-            let typeNameForIntrinsic: String
             let liftingExpr: ExprSyntax
 
             switch param.type {
             case .closure(let signature, _):
-                typeNameForIntrinsic = param.type.swiftType
                 liftingExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.name))")
             case .swiftStruct(let structName):
-                typeNameForIntrinsic = structName
                 liftingExpr = ExprSyntax("\(raw: structName).bridgeJSLiftParameter()")
             case .array:
-                typeNameForIntrinsic = param.type.swiftType
                 liftingExpr = StackCodegen().liftExpression(for: param.type)
-            case .nullable(let wrappedType, let kind):
-                let optionalSwiftType: String
-                if case .null = kind {
-                    optionalSwiftType = "Optional"
-                } else {
-                    optionalSwiftType = "JSUndefinedOr"
-                }
-                typeNameForIntrinsic = "\(optionalSwiftType)<\(wrappedType.swiftType)>"
+            case .swiftBoxedStruct(let underlying):
+                // We inline this instead of going through a `bridgeJSLiftParameter` helper, so we can get a lvalue for mutating functions.
                 liftingExpr = ExprSyntax(
-                    "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                    "\(raw: argumentsToLift.joined(separator: ", ")).assumingMemoryBound(to: \(raw: underlying).self).pointee"
+                )
+            case .nullable(let wrappedType, let kind):
+                let optionalSwiftType = kind == .null ? "Optional" : "JSUndefinedOr"
+                let typeName = "\(optionalSwiftType)<\(wrappedType.swiftType)>"
+                liftingExpr = ExprSyntax(
+                    "\(raw: typeName).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
             default:
-                typeNameForIntrinsic = param.type.swiftType
                 liftingExpr = ExprSyntax(
-                    "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                    "\(raw: param.type.swiftType).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
                 )
             }
 
@@ -397,12 +397,13 @@ public class ExportSwift {
         case classStatic(klass: ExportedClass)
         case classInstance(klass: ExportedClass)
         case structStatic(structDef: ExportedStruct)
+        case boxedStructInstance(structDef: ExportedStruct)
 
         var isStatic: Bool {
             switch self {
             case .enumStatic, .classStatic, .structStatic:
                 return true
-            case .classInstance:
+            case .classInstance, .boxedStructInstance:
                 return false
             }
         }
@@ -413,7 +414,7 @@ public class ExportSwift {
                 return enumDef.name
             case .classStatic(let klass), .classInstance(let klass):
                 return klass.abiName
-            case .structStatic(let structDef):
+            case .structStatic(let structDef), .boxedStructInstance(let structDef):
                 return structDef.abiName
             }
         }
@@ -424,7 +425,7 @@ public class ExportSwift {
                 return enumDef.swiftCallName
             case .classStatic(let klass), .classInstance(let klass):
                 return klass.swiftCallName
-            case .structStatic(let structDef):
+            case .structStatic(let structDef), .boxedStructInstance(let structDef):
                 return structDef.swiftCallName
             }
         }
@@ -437,10 +438,21 @@ public class ExportSwift {
                 // property.callName() would use staticContext (the ABI name) as prefix;
                 // use swiftCallName directly so the emitted expression is valid Swift.
                 return "\(klass.swiftCallName).\(property.name)"
-            case .classInstance:
+            case .classInstance, .boxedStructInstance:
                 return property.callName()
             case .structStatic(let structDef):
                 return property.callName(prefix: structDef.swiftCallName)
+            }
+        }
+
+        var selfBridgeType: BridgeType? {
+            switch self {
+            case .classInstance(let klass):
+                return .swiftHeapObject(klass.swiftCallName)
+            case .boxedStructInstance(let structDef):
+                return .swiftBoxedStruct(structDef.swiftCallName)
+            case .enumStatic, .classStatic, .structStatic:
+                return nil
             }
         }
     }
@@ -457,11 +469,13 @@ public class ExportSwift {
         let className = context.className
         let isStatic = context.isStatic
 
-        let getterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic))
+        let getterBuilder = ExportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic)
+        )
 
-        if !isStatic {
+        if let selfBridgeType = context.selfBridgeType {
             try getterBuilder.liftParameter(
-                param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(context.swiftCallName))
+                param: Parameter(label: nil, name: "_self", type: selfBridgeType)
             )
         }
 
@@ -480,11 +494,9 @@ public class ExportSwift {
                 effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic)
             )
 
-            // Lift parameters based on property type
-            if !isStatic {
-                // Instance properties need _self parameter
+            if let selfBridgeType = context.selfBridgeType {
                 try setterBuilder.liftParameter(
-                    param: Parameter(label: nil, name: "_self", type: .swiftHeapObject(context.swiftCallName))
+                    param: Parameter(label: nil, name: "_self", type: selfBridgeType)
                 )
             }
 
@@ -547,7 +559,6 @@ public class ExportSwift {
 
     private func renderSingleExportedMethod(
         method: ExportedFunction,
-        ownerTypeName: String,
         instanceSelfType: BridgeType
     ) throws -> DeclSyntax {
         let builder = ExportedThunkBuilder(effects: method.effects)
@@ -559,7 +570,7 @@ public class ExportSwift {
         }
 
         if method.effects.isStatic {
-            builder.call(name: "\(ownerTypeName).\(method.name)", returnType: method.returnType)
+            builder.call(name: "\(instanceSelfType.swiftType).\(method.name)", returnType: method.returnType)
         } else {
             builder.callMethod(methodName: method.name, returnType: method.returnType)
         }
@@ -567,7 +578,7 @@ public class ExportSwift {
         return builder.render(abiName: method.abiName)
     }
 
-    func renderSingleExportedStruct(struct structDef: ExportedStruct) throws -> [DeclSyntax] {
+    private func renderSingleExportedFieldsStruct(struct structDef: ExportedStruct) throws -> [DeclSyntax] {
         var decls: [DeclSyntax] = []
 
         if let constructor = structDef.constructor {
@@ -593,11 +604,70 @@ public class ExportSwift {
             decls.append(
                 try renderSingleExportedMethod(
                     method: method,
-                    ownerTypeName: structDef.swiftCallName,
                     instanceSelfType: .swiftStruct(structDef.swiftCallName)
                 )
             )
         }
+
+        return decls
+    }
+
+    private func renderSingleExportedBoxedStruct(struct structDef: ExportedStruct) throws -> [DeclSyntax] {
+        var decls: [DeclSyntax] = []
+
+        if let constructor = structDef.constructor {
+            decls.append(
+                try renderSingleExportedConstructor(
+                    constructor: constructor,
+                    callName: structDef.swiftCallName,
+                    returnType: .swiftBoxedStruct(structDef.swiftCallName)
+                )
+            )
+        }
+
+        for property in structDef.properties {
+            let context: PropertyRenderingContext =
+                property.isStatic
+                ? .structStatic(structDef: structDef)
+                : .boxedStructInstance(structDef: structDef)
+            decls.append(contentsOf: try renderSingleExportedProperty(property: property, context: context))
+        }
+
+        for method in structDef.methods {
+            decls.append(
+                try renderSingleExportedMethod(
+                    method: method,
+                    instanceSelfType: .swiftBoxedStruct(structDef.swiftCallName)
+                )
+            )
+        }
+
+        do {
+            let copyDecl = SwiftCodePattern.buildExposedFunctionDecl(
+                abiName: "bjs_\(structDef.abiName)_copy",
+                signature: SwiftSignatureBuilder.buildABIFunctionSignature(
+                    abiParameters: [("pointer", .pointer)],
+                    returnType: .pointer
+                )
+            ) { printer in
+                printer.write("return \(structDef.swiftCallName).bridgeJSCopyBox(pointer)")
+            }
+            decls.append(DeclSyntax(copyDecl))
+        }
+        do {
+            let deinitDecl = SwiftCodePattern.buildExposedFunctionDecl(
+                abiName: "bjs_\(structDef.abiName)_deinit",
+                signature: SwiftSignatureBuilder.buildABIFunctionSignature(
+                    abiParameters: [("pointer", .pointer)],
+                    returnType: nil
+                )
+            ) { printer in
+                printer.write("\(structDef.swiftCallName).bridgeJSReleaseBox(pointer)")
+            }
+            decls.append(DeclSyntax(deinitDecl))
+        }
+
+        decls.append("extension \(raw: structDef.swiftCallName): _BridgedSwiftBoxedValueStruct {}")
 
         return decls
     }
@@ -665,7 +735,6 @@ public class ExportSwift {
             decls.append(
                 try renderSingleExportedMethod(
                     method: method,
-                    ownerTypeName: klass.swiftCallName,
                     instanceSelfType: .swiftHeapObject(klass.swiftCallName)
                 )
             )
@@ -753,7 +822,7 @@ struct StackCodegen {
     func liftExpression(for type: BridgeType) -> ExprSyntax {
         switch type {
         case .string, .integer, .bool, .float, .double,
-            .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject, .unsafePointer,
+            .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject, .swiftBoxedStruct, .unsafePointer,
             .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum, .array, .dictionary:
             return "\(raw: type.swiftType).bridgeJSStackPop()"
         case .jsObject(let className?):
@@ -771,7 +840,7 @@ struct StackCodegen {
         let typeName = kind == .null ? "Optional" : "JSUndefinedOr"
         switch wrappedType {
         case .string, .integer, .bool, .float, .double, .jsObject(nil), .jsValue,
-            .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum,
+            .swiftStruct, .swiftHeapObject, .swiftBoxedStruct, .caseEnum, .associatedValueEnum, .rawValueEnum,
             .array, .dictionary:
             return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
         case .jsObject(let className?):
@@ -794,7 +863,7 @@ struct StackCodegen {
     ) -> [CodeBlockItemSyntax] {
         switch type {
         case .string, .integer, .bool, .float, .double, .jsValue,
-            .jsObject(nil), .swiftHeapObject, .unsafePointer, .closure,
+            .jsObject(nil), .swiftHeapObject, .swiftBoxedStruct, .unsafePointer, .closure,
             .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct, .nullable:
             return ["\(raw: accessor).bridgeJSStackPush()"]
         case .jsObject(_?):
@@ -1115,12 +1184,12 @@ struct EnumCodegen {
     }
 }
 
-// MARK: - StructCodegen
+// MARK: - FieldsStructCodegen
 
-struct StructCodegen {
+struct FieldsStructCodegen {
     private let stackCodegen = StackCodegen()
 
-    func renderStructHelpers(_ structDef: ExportedStruct) -> [DeclSyntax] {
+    func renderHelpers(_ structDef: ExportedStruct) -> [DeclSyntax] {
         let typeName = structDef.swiftCallName
 
         let lowerExternName = "swift_js_struct_lower_\(structDef.abiName)"
@@ -1453,6 +1522,7 @@ extension BridgeType {
         case .jsObject(nil): return "JSObject"
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
+        case .swiftBoxedStruct(let name): return name
         case .unsafePointer(let ptr): return ptr.swiftType
         case .swiftProtocol(let name): return "Any\(name)"
         case .void: return "Void"
@@ -1510,6 +1580,7 @@ extension BridgeType {
         static let jsObject = LiftingIntrinsicInfo(parameters: [("value", .i32)])
         static let jsValue = LiftingIntrinsicInfo(parameters: [("kind", .i32), ("payload1", .i32), ("payload2", .f64)])
         static let swiftHeapObject = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
+        static let swiftBoxedStruct = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
         static let unsafePointer = LiftingIntrinsicInfo(parameters: [("pointer", .pointer)])
         static let void = LiftingIntrinsicInfo(parameters: [])
         static let caseEnum = LiftingIntrinsicInfo(parameters: [("value", .i32)])
@@ -1528,6 +1599,7 @@ extension BridgeType {
         case .jsObject: return .jsObject
         case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
+        case .swiftBoxedStruct: return .swiftBoxedStruct
         case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject
         case .void: return .void
@@ -1566,6 +1638,7 @@ extension BridgeType {
         static let jsObject = LoweringIntrinsicInfo(returnType: .i32)
         static let jsValue = LoweringIntrinsicInfo(returnType: nil)
         static let swiftHeapObject = LoweringIntrinsicInfo(returnType: .pointer)
+        static let swiftBoxedStruct = LoweringIntrinsicInfo(returnType: .pointer)
         static let unsafePointer = LoweringIntrinsicInfo(returnType: .pointer)
         static let void = LoweringIntrinsicInfo(returnType: nil)
         static let caseEnum = LoweringIntrinsicInfo(returnType: .i32)
@@ -1586,6 +1659,7 @@ extension BridgeType {
         case .jsObject: return .jsObject
         case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
+        case .swiftBoxedStruct: return .swiftBoxedStruct
         case .unsafePointer: return .unsafePointer
         case .swiftProtocol: return .jsObject
         case .void: return .void

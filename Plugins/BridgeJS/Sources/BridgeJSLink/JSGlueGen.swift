@@ -972,7 +972,7 @@ struct IntrinsicJSFragment: Sendable {
             return optionalLiftReturnFromStorage(storage: JSGlueVariableScope.reservedStorageToReturnString)
         }
 
-        if case .swiftHeapObject(let className) = wrappedType {
+        if let className = wrappedType.heapObjectName {
             return optionalLiftReturnHeapObject(className: className, kind: kind)
         }
 
@@ -1290,7 +1290,7 @@ struct IntrinsicJSFragment: Sendable {
         case .string: return .stringLowerParameter
         case .jsObject: return .jsObjectLowerParameter
         case .jsValue: return .jsValueLower
-        case .swiftHeapObject: return .swiftHeapObjectLowerParameter
+        case .swiftHeapObject, .swiftBoxedStruct: return .swiftHeapObjectLowerParameter
         case .swiftProtocol: return .jsObjectLowerParameter
         case .void: return .void
         case .nullable(let wrappedType, let kind):
@@ -1350,7 +1350,7 @@ struct IntrinsicJSFragment: Sendable {
         case .string: return .stringLiftReturn
         case .jsObject: return .jsObjectLiftReturn
         case .jsValue: return .jsValueLift
-        case .swiftHeapObject(let name): return .swiftHeapObjectLiftReturn(name)
+        case .swiftHeapObject(let name), .swiftBoxedStruct(let name): return .swiftHeapObjectLiftReturn(name)
         case .swiftProtocol: return .jsObjectLiftReturn
         case .void: return .void
         case .nullable(let wrappedType, let kind):
@@ -1409,7 +1409,7 @@ struct IntrinsicJSFragment: Sendable {
         case .string: return .stringLiftParameter
         case .jsObject: return .jsObjectLiftParameter
         case .jsValue: return .jsValueLiftParameter
-        case .swiftHeapObject(let name):
+        case .swiftHeapObject(let name), .swiftBoxedStruct(let name):
             return .swiftHeapObjectLiftParameter(name)
         case .swiftProtocol: return .jsObjectLiftParameter
         case .void:
@@ -1493,7 +1493,7 @@ struct IntrinsicJSFragment: Sendable {
         case .string: return .stringLowerReturn
         case .jsObject: return .jsObjectLowerReturn
         case .jsValue: return .jsValueLowerReturn(context: context)
-        case .swiftHeapObject: return .swiftHeapObjectLowerReturn
+        case .swiftHeapObject, .swiftBoxedStruct: return .swiftHeapObjectLowerReturn
         case .swiftProtocol: return .jsObjectLowerReturn
         case .void: return .void
         case .nullable(let wrappedType, let kind):
@@ -2033,7 +2033,7 @@ struct IntrinsicJSFragment: Sendable {
                     return [resultVar]
                 }
             )
-        case .swiftHeapObject(let className):
+        case .swiftHeapObject(let className), .swiftBoxedStruct(let className):
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, context in
@@ -2158,7 +2158,7 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
-        case .swiftHeapObject:
+        case .swiftHeapObject, .swiftBoxedStruct:
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
@@ -2651,7 +2651,7 @@ private extension BridgeType {
             return .stackABI
         case .jsValue:
             return .inlineFlag
-        case .swiftHeapObject:
+        case .swiftHeapObject, .swiftBoxedStruct:
             return .inlineFlag
         case .unsafePointer:
             return .inlineFlag
@@ -2687,7 +2687,7 @@ private extension BridgeType {
         switch self {
         case .swiftProtocol:
             return .i32(0)
-        case .swiftHeapObject:
+        case .swiftHeapObject, .swiftBoxedStruct:
             return .pointer
         case .caseEnum, .associatedValueEnum:
             return .i32(-1)
@@ -2729,7 +2729,7 @@ private extension BridgeType {
             return [("value", .i32)]
         case .jsValue:
             return [("kind", .i32), ("payload1", .i32), ("payload2", .f64)]
-        case .swiftHeapObject:
+        case .swiftHeapObject, .swiftBoxedStruct:
             return [("pointer", .pointer)]
         case .unsafePointer:
             return [("pointer", .pointer)]
