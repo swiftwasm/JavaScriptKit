@@ -16,25 +16,26 @@ import _CJavaScriptKit
 ///
 public struct JSString: LosslessStringConvertible, Equatable {
     /// The internal representation of JS compatible string
-    /// The initializers of this type must initialize `jsRef` or `buffer`.
+    /// The initializers of this type must initialize `jsObject` or `buffer`.
     /// And the uninitialized one will be lazily initialized
     class Guts {
-        var shouldDeallocateRef: Bool = false
-        lazy var jsRef: JavaScriptObjectRef = {
-            self.shouldDeallocateRef = true
-            return buffer.withUTF8 { bufferPtr in
+        // Owns the JS-side ref via JSObject, whose deinit routes the release to
+        // the correct thread via swjs_release_remote when destroyed off-owner-thread.
+        lazy var jsObject: JSObject = {
+            let ref = buffer.withUTF8 { bufferPtr in
                 return swjs_decode_string(bufferPtr.baseAddress!, Int32(bufferPtr.count))
             }
+            return JSObject(id: ref)  // captures ownerTid = current thread here
         }()
 
         lazy var buffer: String = {
             var bytesRef: JavaScriptObjectRef = 0
-            let bytesLength = Int(swjs_encode_string(jsRef, &bytesRef))
+            let bytesLength = Int(swjs_encode_string(jsObject.id, &bytesRef))
             // +1 for null terminator
             let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bytesLength + 1)
             defer {
                 buffer.deallocate()
-                swjs_release(bytesRef)
+                swjs_release(bytesRef)  // bytesRef is a same-thread temporary
             }
             swjs_load_string(bytesRef, buffer)
             buffer[bytesLength] = 0
@@ -46,13 +47,7 @@ public struct JSString: LosslessStringConvertible, Equatable {
         }
 
         init(from jsRef: JavaScriptObjectRef) {
-            self.jsRef = jsRef
-            self.shouldDeallocateRef = true
-        }
-
-        deinit {
-            guard shouldDeallocateRef else { return }
-            swjs_release(jsRef)
+            self.jsObject = JSObject(id: jsRef)
         }
     }
 
@@ -79,7 +74,7 @@ public struct JSString: LosslessStringConvertible, Equatable {
     public static func == (lhs: JSString, rhs: JSString) -> Bool {
         withExtendedLifetime(lhs.guts) { lhsGuts in
             withExtendedLifetime(rhs.guts) { rhsGuts in
-                return swjs_value_equals(lhsGuts.jsRef, rhsGuts.jsRef)
+                return swjs_value_equals(lhsGuts.jsObject.id, rhsGuts.jsObject.id)
             }
         }
     }
@@ -95,6 +90,6 @@ extension JSString: ExpressibleByStringLiteral {
 extension JSString {
 
     func asInternalJSRef() -> JavaScriptObjectRef {
-        guts.jsRef
+        guts.jsObject.id
     }
 }
