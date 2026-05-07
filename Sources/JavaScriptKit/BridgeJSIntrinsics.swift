@@ -607,6 +607,62 @@ extension JSValue: _BridgedSwiftStackType {
 /// The conformance is automatically synthesized by the BridgeJS code generator.
 public protocol _BridgedSwiftHeapObject: AnyObject, _BridgedSwiftStackType {}
 
+/// Allocate a box and assign a value for a `@JS(structStyle: .reference)` struct.
+@_spi(BridgeJS) @_transparent
+public func _bridgeJSAllocateBox<T>(_ value: consuming T) -> UnsafeMutableRawPointer {
+    let p = UnsafeMutablePointer<T>.allocate(capacity: 1)
+    p.initialize(to: value)
+    return UnsafeMutableRawPointer(p)
+}
+
+@_spi(BridgeJS) @_transparent
+public func _bridgeJSDeallocateBox<T>(_ pointer: UnsafeMutableRawPointer, as: T.Type) {
+    let p = pointer.assumingMemoryBound(to: T.self)
+    p.deinitialize(count: 1)
+    p.deallocate()
+}
+
+public protocol _BridgedSwiftBoxedValueStruct: _BridgedSwiftStackType where StackLiftResult == Self {}
+
+extension _BridgedSwiftBoxedValueStruct {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
+        return _bridgeJSAllocateBox(self)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer) -> Self {
+        return pointer.assumingMemoryBound(to: Self.self).pointee
+    }
+
+    // MARK: ExportSwift
+
+    // `bridgeJSLiftParameter` is not provided here, the codegen emits the
+    // explicit `p.assumingMemoryBound(to: Self.self).pointee` chain instead, so
+    // we have an l-value for mutating methods.
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> UnsafeMutableRawPointer {
+        return _bridgeJSAllocateBox(self)
+    }
+
+    // MARK: Stack ABI
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        _swift_js_pop_pointer().assumingMemoryBound(to: Self.self).pointee
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        _swift_js_push_pointer(_bridgeJSAllocateBox(self))
+    }
+
+    // MARK: Per-struct `bjs_<abi>_copy` / `bjs_<abi>_deinit` thunks
+    @_spi(BridgeJS) @_transparent public static func bridgeJSCopyBox(
+        _ pointer: UnsafeMutableRawPointer
+    ) -> UnsafeMutableRawPointer {
+        return _bridgeJSAllocateBox(pointer.assumingMemoryBound(to: Self.self).pointee)
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSReleaseBox(_ pointer: UnsafeMutableRawPointer) {
+        _bridgeJSDeallocateBox(pointer, as: Self.self)
+    }
+}
+
 /// Define the lowering/lifting for `_BridgedSwiftHeapObject`
 extension _BridgedSwiftHeapObject {
 
@@ -1768,6 +1824,58 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftHeapObject {
         case .some(let value):
             let retainedPointer: UnsafeMutableRawPointer = value.bridgeJSLowerReturn()
             _swift_js_return_optional_heap_object(1, retainedPointer)
+        }
+    }
+}
+
+extension _BridgedAsOptional where Wrapped: _BridgedSwiftBoxedValueStruct {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
+        isSome: Int32, pointer: UnsafeMutableRawPointer
+    ) {
+        switch asOptional {
+        case .none:
+            return (isSome: 0, pointer: UnsafeMutableRawPointer(bitPattern: 1)!)
+        case .some(let value):
+            return (isSome: 1, pointer: _bridgeJSAllocateBox(value))
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer) -> Self {
+        if pointer == UnsafeMutableRawPointer(bitPattern: 0) {
+            return Self(optional: nil)
+        } else {
+            return Self(optional: Wrapped.bridgeJSLiftReturn(pointer))
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(
+        _ isSome: Int32,
+        _ pointer: UnsafeMutableRawPointer
+    ) -> Self {
+        Self(
+            optional: Optional<Wrapped>._bridgeJSLiftParameter(
+                isSome,
+                pointer,
+                liftWrapped: { $0.assumingMemoryBound(to: Wrapped.self).pointee }
+            )
+        )
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
+        let pointer = _swift_js_get_optional_heap_object_pointer()
+        if pointer == UnsafeMutableRawPointer(bitPattern: 0) {
+            return Self(optional: nil)
+        } else {
+            return Self(optional: Wrapped.bridgeJSLiftReturn(pointer))
+        }
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        switch asOptional {
+        case .none:
+            _swift_js_return_optional_heap_object(0, nil)
+        case .some(let value):
+            _swift_js_return_optional_heap_object(1, _bridgeJSAllocateBox(value))
         }
     }
 }

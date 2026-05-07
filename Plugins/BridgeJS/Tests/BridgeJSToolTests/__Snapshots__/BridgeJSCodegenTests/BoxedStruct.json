@@ -1,0 +1,406 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_roundtripBoxed",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripBoxed",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "p",
+            "type" : {
+              "swiftBoxedStruct" : {
+                "_0" : "LargePayload"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftBoxedStruct" : {
+            "_0" : "LargePayload"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_mayMakeHi",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "mayMakeHi",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "flag",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "swiftBoxedStruct" : {
+                "_0" : "Hi"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_consumeBoxedArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "consumeBoxedArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "items",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "Hi"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "swiftBoxedStruct" : {
+                "_0" : "Hi"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_consumeBoxedDictionary",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "consumeBoxedDictionary",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "items",
+            "type" : {
+              "dictionary" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "Hi"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "dictionary" : {
+            "_0" : {
+              "swiftBoxedStruct" : {
+                "_0" : "Hi"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_optionalBoxedArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "optionalBoxedArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "flag",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "array" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "Hi"
+                  }
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_arrayOfOptionalBoxed",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "arrayOfOptionalBoxed",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "flag",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftBoxedStruct" : {
+                    "_0" : "Hi"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "LargePayload",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "largeContents",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "LargePayload"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Hi_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "largeContents",
+              "name" : "largeContents",
+              "type" : {
+                "array" : {
+                  "_0" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Hi_summarize",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "summarize",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Hi_appendingZero",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "appendingZero",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftBoxedStruct" : {
+                "_0" : "Hi"
+              }
+            }
+          }
+        ],
+        "name" : "Hi",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "largeContents",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "Hi"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Container",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "payload",
+            "type" : {
+              "swiftBoxedStruct" : {
+                "_0" : "LargePayload"
+              }
+            }
+          }
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "Container"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "MutableBox",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "counter",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "structStyle" : "reference",
+        "swiftCallName" : "MutableBox"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "ValueWithBoxedField",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "payload",
+            "type" : {
+              "swiftBoxedStruct" : {
+                "_0" : "Hi"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "ValueWithBoxedField"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

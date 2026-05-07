@@ -6,6 +6,17 @@ public enum JSEnumStyle: String {
     case tsEnum
 }
 
+/// Controls how Swift structs annotated with `@JS` cross the JavaScript/Swift
+/// boundary.
+/// - `fields`: Field-by-field copy on each crossing. The JS side sees a plain
+///   object. Every stored property is auto-exported.
+/// - `reference`: Heap-allocate the struct and pass a pointer across the
+///   boundary. Stored properties need `@JS` to be visible.
+public enum JSStructStyle: String {
+    case fields
+    case reference
+}
+
 /// Controls where BridgeJS reads imported JS values from.
 ///
 /// - `global`: Read from `globalThis`.
@@ -110,11 +121,18 @@ public enum JSImportFrom: String {
 ///                        or `.tsEnum` to emit a TypeScript `enum`.
 ///                        `.tsEnum` is supported for case enums and raw-value enums with String or numeric raw types.
 ///                        Bool raw-value enums are not supported with `.tsEnum` and will produce an error.
+/// - Parameter structStyle: Controls how the struct crosses the boundary: `.fields` (default when
+///                          unspecified) copies each stored property, while `.reference` heap-allocates
+///                          the struct and exposes it as a JS reference.
 ///
 /// - Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
 @attached(peer)
-public macro JS(namespace: String? = nil, enumStyle: JSEnumStyle = .const, identityMode: Bool = false) =
-    Builtin.ExternalMacro
+public macro JS(
+    namespace: String? = nil,
+    enumStyle: JSEnumStyle = .const,
+    identityMode: Bool = false,
+    structStyle: JSStructStyle? = nil
+) = Builtin.ExternalMacro
 
 /// A macro that generates a Swift getter that reads a value from JavaScript.
 ///

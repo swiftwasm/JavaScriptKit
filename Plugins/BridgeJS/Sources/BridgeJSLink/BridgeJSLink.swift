@@ -178,8 +178,17 @@ public struct BridgeJSLink {
     private func collectLinkData() throws -> LinkData {
         var data = LinkData()
 
-        // Swift heap object class definitions
-        if skeletons.contains(where: { $0.exported?.classes.isEmpty == false }) {
+        let hasAnyReferenceStruct =
+            skeletons
+            .contains { skeleton in
+                skeleton.exported?.structs.contains(where: { $0.structStyle ?? .default == .reference }) ?? false
+            }
+        let hasAnyClasses =
+            skeletons
+            .contains { $0.exported?.classes.isEmpty == false }
+        let hasAnyHeapObject = hasAnyClasses || hasAnyReferenceStruct
+
+        if hasAnyHeapObject {
             data.classLines.append(
                 contentsOf: swiftHeapObjectClassJs.split(separator: "\n", omittingEmptySubsequences: false).map {
                     String($0)
@@ -231,11 +240,25 @@ public struct BridgeJSLink {
 
             var structExportEntries: [(js: [String], dts: [String])] = []
             for structDefinition in skeleton.structs {
-                let (jsStruct, dtsType, dtsExportEntry) = try renderExportedStruct(structDefinition)
-                data.topLevelDtsTypeLines.append(contentsOf: dtsType)
+                switch structDefinition.structStyle ?? .default {
+                case .reference:
+                    let (jsType, dtsType, dtsExportEntry) = try renderExportedBoxedStruct(structDefinition)
+                    data.classLines.append(contentsOf: jsType)
+                    data.dtsClassLines.append(contentsOf: dtsType)
 
-                if structDefinition.namespace == nil && (!jsStruct.isEmpty || !dtsExportEntry.isEmpty) {
-                    structExportEntries.append((js: jsStruct, dts: dtsExportEntry))
+                    if structDefinition.namespace == nil {
+                        data.exportsLines.append("\(structDefinition.name),")
+                        data.dtsExportLines.append(contentsOf: dtsExportEntry)
+                    } else {
+                        data.namespacedClassDtsExportEntries[structDefinition.name] = dtsExportEntry
+                    }
+                case .fields:
+                    let (jsStruct, dtsType, dtsExportEntry) = try renderExportedStruct(structDefinition)
+                    data.topLevelDtsTypeLines.append(contentsOf: dtsType)
+
+                    if structDefinition.namespace == nil && (!jsStruct.isEmpty || !dtsExportEntry.isEmpty) {
+                        structExportEntries.append((js: jsStruct, dts: dtsExportEntry))
+                    }
                 }
             }
 
@@ -355,7 +378,11 @@ public struct BridgeJSLink {
 
     private func generateAddImports(needsImportsObject: Bool) throws -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
-        let allStructs = skeletons.compactMap { $0.exported?.structs }.flatMap { $0 }
+        let allFieldsStructs =
+            skeletons
+            .compactMap { $0.exported?.structs }
+            .flatMap { $0 }
+            .filter { $0.structStyle ?? .default == .fields }
         printer.write("return {")
         try printer.indent {
             printer.write(lines: [
@@ -487,8 +514,8 @@ public struct BridgeJSLink {
                     printer.write("return \(JSGlueVariableScope.reservedI64Stack).pop();")
                 }
                 printer.write("}")
-                if !allStructs.isEmpty {
-                    for structDef in allStructs {
+                if !allFieldsStructs.isEmpty {
+                    for structDef in allFieldsStructs {
                         printer.write("bjs[\"swift_js_struct_lower_\(structDef.abiName)\"] = function(objectId) {")
                         printer.indent {
                             printer.write(
@@ -999,11 +1026,16 @@ public struct BridgeJSLink {
             printer.write(lines: generateVariableDeclarations())
 
             let bodyPrinter = CodeFragmentPrinter()
-            let allStructs = exportedSkeletons.flatMap { $0.structs }
-            for structDef in allStructs {
+            let allFieldsStructs = exportedSkeletons.flatMap {
+                $0.structs.filter { $0.structStyle ?? .default == .fields }
+            }
+            for structDef in allFieldsStructs {
                 let structPrinter = CodeFragmentPrinter()
                 let structScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-                let fragment = IntrinsicJSFragment.structHelper(structDefinition: structDef, allStructs: allStructs)
+                let fragment = IntrinsicJSFragment.structHelper(
+                    structDefinition: structDef,
+                    allStructs: allFieldsStructs
+                )
                 _ = try fragment.printCode(
                     [structDef.name],
                     IntrinsicJSFragment.PrintCodeContext(
@@ -1048,9 +1080,7 @@ public struct BridgeJSLink {
 
         printer.indent {
             printer.indent {
-                // Swift class wrappers
-                let swiftClassWrappers = renderSwiftClassWrappers()
-                printer.write(lines: swiftClassWrappers)
+                printer.write(lines: renderSwiftClassWrappers())
 
                 // Import object builders
                 for importBuilder in data.importObjectBuilders {
@@ -1157,7 +1187,7 @@ public struct BridgeJSLink {
         let printer = CodeFragmentPrinter()
 
         for skeleton in skeletons.compactMap(\.exported) {
-            for structDef in skeleton.structs {
+            for structDef in skeleton.structs where structDef.structStyle ?? .default == .fields {
                 printer.write(
                     "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers();"
                 )
@@ -1441,7 +1471,7 @@ public struct BridgeJSLink {
                 }
             }
             return type.tsType
-        case .swiftStruct(let name):
+        case .swiftStruct(let name), .swiftBoxedStruct(let name):
             return name.components(separatedBy: ".").last ?? name
         case .nullable(let wrapped, let kind):
             let base = resolveTypeScriptType(wrapped, exportedSkeletons: exportedSkeletons)
@@ -2026,100 +2056,26 @@ extension BridgeJSLink {
         }
 
         if let constructor: ExportedConstructor = klass.constructor {
-            let thunkBuilder = ExportedThunkBuilder(
-                effects: constructor.effects,
-                intrinsicRegistry: intrinsicRegistry
+            try renderHeapObjectConstructor(
+                constructor: constructor,
+                ownerName: klass.name,
+                constructorReturnType: .swiftHeapObject(klass.name),
+                jsPrinter: jsPrinter,
+                dtsExportEntryPrinter: dtsExportEntryPrinter
             )
-            for param in constructor.parameters {
-                try thunkBuilder.lowerParameter(param: param)
-            }
-
-            let constructorParamList = DefaultValueUtils.formatParameterList(constructor.parameters)
-
-            jsPrinter.indent {
-                jsPrinter.write("constructor(\(constructorParamList)) {")
-                let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
-                let constructCall = "\(klass.name).__construct(\(returnExpr))"
-                jsPrinter.indent {
-                    thunkBuilder.renderFunctionBody(
-                        into: jsPrinter,
-                        returnExpr: constructCall
-                    )
-                }
-                jsPrinter.write("}")
-            }
-
-            dtsExportEntryPrinter.indent {
-                let jsDocLines = DefaultValueUtils.formatJSDoc(for: constructor.parameters)
-                for line in jsDocLines {
-                    dtsExportEntryPrinter.write(line)
-                }
-                dtsExportEntryPrinter.write(
-                    "new\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftHeapObject(klass.name), effects: constructor.effects));"
-                )
-            }
         }
 
         for method in klass.methods {
-            if method.effects.isStatic {
-                let thunkBuilder = ExportedThunkBuilder(
-                    effects: method.effects,
-                    intrinsicRegistry: intrinsicRegistry
-                )
-                for param in method.parameters {
-                    try thunkBuilder.lowerParameter(param: param)
-                }
-                let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
-
-                jsPrinter.indent {
-                    jsPrinter.write(
-                        lines: thunkBuilder.renderFunction(
-                            name: method.name,
-                            parameters: method.parameters,
-                            returnExpr: returnExpr,
-                            declarationPrefixKeyword: "static"
-                        )
-                    )
-                }
-
-                dtsExportEntryPrinter.indent {
-                    dtsExportEntryPrinter.write(
-                        "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
-                    )
-                }
-            } else {
-                let thunkBuilder = ExportedThunkBuilder(
-                    effects: method.effects,
-                    intrinsicRegistry: intrinsicRegistry
-                )
-                thunkBuilder.lowerSelf()
-                for param in method.parameters {
-                    try thunkBuilder.lowerParameter(param: param)
-                }
-                let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
-
-                jsPrinter.indent {
-                    jsPrinter.write(
-                        lines: thunkBuilder.renderFunction(
-                            name: method.name,
-                            parameters: method.parameters,
-                            returnExpr: returnExpr,
-                            declarationPrefixKeyword: nil
-                        )
-                    )
-                }
-
-                dtsTypePrinter.indent {
-                    dtsTypePrinter.write(
-                        "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
-                    )
-                }
-            }
+            try renderHeapObjectMethod(
+                method: method,
+                jsPrinter: jsPrinter,
+                dtsTypePrinter: dtsTypePrinter,
+                dtsExportEntryPrinter: dtsExportEntryPrinter
+            )
         }
 
-        // Generate property getters and setters
         for property in klass.properties {
-            try renderClassProperty(
+            try renderHeapObjectProperty(
                 property: property,
                 className: klass.abiName,
                 isStatic: property.isStatic,
@@ -2135,7 +2091,159 @@ extension BridgeJSLink {
         return (jsPrinter.lines, dtsTypePrinter.lines, dtsExportEntryPrinter.lines)
     }
 
-    private func renderClassProperty(
+    func renderExportedBoxedStruct(
+        _ structDef: ExportedStruct
+    ) throws -> (js: [String], dtsType: [String], dtsExportEntry: [String]) {
+        let jsPrinter = CodeFragmentPrinter()
+        let dtsTypePrinter = CodeFragmentPrinter()
+        let dtsExportEntryPrinter = CodeFragmentPrinter()
+
+        dtsTypePrinter.write("export interface \(structDef.name) extends SwiftHeapObject {")
+        dtsExportEntryPrinter.write("\(structDef.name): {")
+        jsPrinter.write("class \(structDef.name) extends SwiftHeapObject {")
+
+        // Synthesized copy
+
+        dtsTypePrinter.indent {
+            dtsTypePrinter.write("copy(): this;")
+        }
+
+        jsPrinter.indent {
+            jsPrinter.write("copy() {")
+            jsPrinter.indent {
+                jsPrinter.write(
+                    "return \(structDef.name).__construct(instance.exports.bjs_\(structDef.abiName)_copy(this.pointer));"
+                )
+            }
+            jsPrinter.write("}")
+            jsPrinter.nextLine()
+        }
+
+        // Constructor
+
+        jsPrinter.indent {
+            jsPrinter.write("static __construct(ptr) {")
+            jsPrinter.indent {
+                jsPrinter.write(
+                    "return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_\(structDef.abiName)_deinit, \(structDef.name).prototype, null);"
+                )
+            }
+            jsPrinter.write("}")
+            jsPrinter.nextLine()
+        }
+
+        if let constructor = structDef.constructor {
+            try renderHeapObjectConstructor(
+                constructor: constructor,
+                ownerName: structDef.name,
+                constructorReturnType: .swiftBoxedStruct(structDef.name),
+                jsPrinter: jsPrinter,
+                dtsExportEntryPrinter: dtsExportEntryPrinter
+            )
+        }
+
+        for method in structDef.methods {
+            try renderHeapObjectMethod(
+                method: method,
+                jsPrinter: jsPrinter,
+                dtsTypePrinter: dtsTypePrinter,
+                dtsExportEntryPrinter: dtsExportEntryPrinter
+            )
+        }
+
+        for property in structDef.properties {
+            try renderHeapObjectProperty(
+                property: property,
+                className: structDef.abiName,
+                isStatic: property.isStatic,
+                jsPrinter: jsPrinter,
+                dtsPrinter: property.isStatic ? dtsExportEntryPrinter : dtsTypePrinter
+            )
+        }
+
+        jsPrinter.write("}")
+        dtsTypePrinter.write("}")
+        dtsExportEntryPrinter.write("}")
+
+        return (jsPrinter.lines, dtsTypePrinter.lines, dtsExportEntryPrinter.lines)
+    }
+
+    // Used by classes and boxed structs.
+    private func renderHeapObjectConstructor(
+        constructor: ExportedConstructor,
+        ownerName: String,
+        constructorReturnType: BridgeType,
+        jsPrinter: CodeFragmentPrinter,
+        dtsExportEntryPrinter: CodeFragmentPrinter
+    ) throws {
+        let thunkBuilder = ExportedThunkBuilder(
+            effects: constructor.effects,
+            intrinsicRegistry: intrinsicRegistry
+        )
+        for param in constructor.parameters {
+            try thunkBuilder.lowerParameter(param: param)
+        }
+
+        let constructorParamList = DefaultValueUtils.formatParameterList(constructor.parameters)
+
+        jsPrinter.indent {
+            jsPrinter.write("constructor(\(constructorParamList)) {")
+            let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
+            let constructCall = "\(ownerName).__construct(\(returnExpr))"
+            jsPrinter.indent {
+                thunkBuilder.renderFunctionBody(into: jsPrinter, returnExpr: constructCall)
+            }
+            jsPrinter.write("}")
+        }
+
+        dtsExportEntryPrinter.indent {
+            for line in DefaultValueUtils.formatJSDoc(for: constructor.parameters) {
+                dtsExportEntryPrinter.write(line)
+            }
+            dtsExportEntryPrinter.write(
+                "new\(renderTSSignature(parameters: constructor.parameters, returnType: constructorReturnType, effects: constructor.effects));"
+            )
+        }
+    }
+
+    // Used by classes and boxed structs.
+    private func renderHeapObjectMethod(
+        method: ExportedFunction,
+        jsPrinter: CodeFragmentPrinter,
+        dtsTypePrinter: CodeFragmentPrinter,
+        dtsExportEntryPrinter: CodeFragmentPrinter
+    ) throws {
+        let thunkBuilder = ExportedThunkBuilder(
+            effects: method.effects,
+            intrinsicRegistry: intrinsicRegistry
+        )
+        if !method.effects.isStatic {
+            thunkBuilder.lowerSelf()
+        }
+        for param in method.parameters {
+            try thunkBuilder.lowerParameter(param: param)
+        }
+        let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
+
+        jsPrinter.indent {
+            jsPrinter.write(
+                lines: thunkBuilder.renderFunction(
+                    name: method.name,
+                    parameters: method.parameters,
+                    returnExpr: returnExpr,
+                    declarationPrefixKeyword: method.effects.isStatic ? "static" : nil
+                )
+            )
+        }
+
+        let dtsLine =
+            "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+        let targetPrinter = method.effects.isStatic ? dtsExportEntryPrinter : dtsTypePrinter
+        targetPrinter.indent { targetPrinter.write(dtsLine) }
+    }
+
+    // Used by classes and boxed structs.
+    private func renderHeapObjectProperty(
         property: ExportedProperty,
         className: String,
         isStatic: Bool,
@@ -2197,7 +2305,7 @@ extension BridgeJSLink {
         // Add instance property to TypeScript interface definition
         let readonly = property.isReadonly ? "readonly " : ""
         dtsPrinter.indent {
-            dtsPrinter.write("\(readonly)\(property.name): \(property.type.tsType);")
+            dtsPrinter.write("\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
         }
     }
 
@@ -3599,7 +3707,7 @@ extension BridgeType {
             return name ?? "any"
         case .jsValue:
             return "any"
-        case .swiftHeapObject(let name):
+        case .swiftHeapObject(let name), .swiftBoxedStruct(let name):
             return name
         case .unsafePointer:
             return "number"

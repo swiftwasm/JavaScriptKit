@@ -40,24 +40,13 @@ public struct ExternalModuleIndex {
             }
 
             for klass in exported.classes {
-                register(dotPath: klass.swiftCallName, bridgeType: .swiftHeapObject(klass.swiftCallName))
+                register(dotPath: klass.swiftCallName, bridgeType: klass.bridgeType)
             }
             for structDef in exported.structs {
-                register(dotPath: structDef.swiftCallName, bridgeType: .swiftStruct(structDef.swiftCallName))
+                register(dotPath: structDef.swiftCallName, bridgeType: structDef.bridgeType)
             }
             for enumDef in exported.enums {
-                let bridgeType: BridgeType
-                switch enumDef.enumType {
-                case .simple:
-                    bridgeType = .caseEnum(enumDef.swiftCallName)
-                case .rawValue:
-                    guard let rawType = enumDef.rawType else { continue }
-                    bridgeType = .rawValueEnum(enumDef.swiftCallName, rawType)
-                case .associatedValue:
-                    bridgeType = .associatedValueEnum(enumDef.swiftCallName)
-                case .namespace:
-                    bridgeType = .namespaceEnum(enumDef.swiftCallName)
-                }
+                guard let bridgeType = enumDef.bridgeType else { continue }
                 register(dotPath: enumDef.swiftCallName, bridgeType: bridgeType)
             }
             for proto in exported.protocols {

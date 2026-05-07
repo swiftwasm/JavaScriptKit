@@ -5193,6 +5193,474 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
     }
 }
 
+@_expose(wasm, "bjs_BoxedSummary_init")
+@_cdecl("bjs_BoxedSummary_init")
+public func _bjs_BoxedSummary_init(_ labelBytes: Int32, _ labelLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = BoxedSummary(largeContents: [Int].bridgeJSStackPop(), label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedSummary_largeContents_get")
+@_cdecl("bjs_BoxedSummary_largeContents_get")
+public func _bjs_BoxedSummary_largeContents_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: BoxedSummary.self).pointee.largeContents
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedSummary_label_get")
+@_cdecl("bjs_BoxedSummary_label_get")
+public func _bjs_BoxedSummary_label_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: BoxedSummary.self).pointee.label
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedSummary_summarize")
+@_cdecl("bjs_BoxedSummary_summarize")
+public func _bjs_BoxedSummary_summarize(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: BoxedSummary.self).pointee.summarize()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedSummary_appendingZero")
+@_cdecl("bjs_BoxedSummary_appendingZero")
+public func _bjs_BoxedSummary_appendingZero(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: BoxedSummary.self).pointee.appendingZero()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedSummary_copy")
+@_cdecl("bjs_BoxedSummary_copy")
+public func _bjs_BoxedSummary_copy(_ pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    return BoxedSummary.bridgeJSCopyBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedSummary_deinit")
+@_cdecl("bjs_BoxedSummary_deinit")
+public func _bjs_BoxedSummary_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    BoxedSummary.bridgeJSReleaseBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension BoxedSummary: _BridgedSwiftBoxedValueStruct {}
+
+@_expose(wasm, "bjs_LeakCheckBoxed_init")
+@_cdecl("bjs_LeakCheckBoxed_init")
+public func _bjs_LeakCheckBoxed_init(_ id: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = LeakCheckBoxed(id: Int.bridgeJSLiftParameter(id))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_LeakCheckBoxed_incremented")
+@_cdecl("bjs_LeakCheckBoxed_incremented")
+public func _bjs_LeakCheckBoxed_incremented(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: LeakCheckBoxed.self).pointee.incremented()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_LeakCheckBoxed_copy")
+@_cdecl("bjs_LeakCheckBoxed_copy")
+public func _bjs_LeakCheckBoxed_copy(_ pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    return LeakCheckBoxed.bridgeJSCopyBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_LeakCheckBoxed_deinit")
+@_cdecl("bjs_LeakCheckBoxed_deinit")
+public func _bjs_LeakCheckBoxed_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    LeakCheckBoxed.bridgeJSReleaseBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension LeakCheckBoxed: _BridgedSwiftBoxedValueStruct {}
+
+extension ValueWithBoxedField: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> ValueWithBoxedField {
+        let label = String.bridgeJSStackPop()
+        let payload = BoxedSummary.bridgeJSStackPop()
+        return ValueWithBoxedField(payload: payload, label: label)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.payload.bridgeJSStackPush()
+        self.label.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_ValueWithBoxedField(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_ValueWithBoxedField()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_ValueWithBoxedField")
+fileprivate func _bjs_struct_lower_ValueWithBoxedField_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_ValueWithBoxedField_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_ValueWithBoxedField(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_ValueWithBoxedField_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_ValueWithBoxedField")
+fileprivate func _bjs_struct_lift_ValueWithBoxedField_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_ValueWithBoxedField_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_ValueWithBoxedField() -> Int32 {
+    return _bjs_struct_lift_ValueWithBoxedField_extern()
+}
+
+@_expose(wasm, "bjs_ValueWithBoxedField_init")
+@_cdecl("bjs_ValueWithBoxedField_init")
+public func _bjs_ValueWithBoxedField_init(_ payload: UnsafeMutableRawPointer, _ labelBytes: Int32, _ labelLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = ValueWithBoxedField(payload: payload.assumingMemoryBound(to: BoxedSummary.self).pointee, label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension ValueWithOptionalBoxedField: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> ValueWithOptionalBoxedField {
+        let tag = String.bridgeJSStackPop()
+        let payload = Optional<BoxedSummary>.bridgeJSStackPop()
+        return ValueWithOptionalBoxedField(payload: payload, tag: tag)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.payload.bridgeJSStackPush()
+        self.tag.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_ValueWithOptionalBoxedField(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_ValueWithOptionalBoxedField()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_ValueWithOptionalBoxedField")
+fileprivate func _bjs_struct_lower_ValueWithOptionalBoxedField_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_ValueWithOptionalBoxedField_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_ValueWithOptionalBoxedField(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_ValueWithOptionalBoxedField_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_ValueWithOptionalBoxedField")
+fileprivate func _bjs_struct_lift_ValueWithOptionalBoxedField_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_ValueWithOptionalBoxedField_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_ValueWithOptionalBoxedField() -> Int32 {
+    return _bjs_struct_lift_ValueWithOptionalBoxedField_extern()
+}
+
+@_expose(wasm, "bjs_ValueWithOptionalBoxedField_init")
+@_cdecl("bjs_ValueWithOptionalBoxedField_init")
+public func _bjs_ValueWithOptionalBoxedField_init(_ payloadIsSome: Int32, _ payloadValue: UnsafeMutableRawPointer, _ tagBytes: Int32, _ tagLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = ValueWithOptionalBoxedField(payload: Optional<BoxedSummary>.bridgeJSLiftParameter(payloadIsSome, payloadValue), tag: String.bridgeJSLiftParameter(tagBytes, tagLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MutableCounter_init")
+@_cdecl("bjs_MutableCounter_init")
+public func _bjs_MutableCounter_init(_ count: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = MutableCounter(count: Int.bridgeJSLiftParameter(count))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MutableCounter_bump")
+@_cdecl("bjs_MutableCounter_bump")
+public func _bjs_MutableCounter_bump(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    _self.assumingMemoryBound(to: MutableCounter.self).pointee.bump()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MutableCounter_currentCount")
+@_cdecl("bjs_MutableCounter_currentCount")
+public func _bjs_MutableCounter_currentCount(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: MutableCounter.self).pointee.currentCount()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MutableCounter_copy")
+@_cdecl("bjs_MutableCounter_copy")
+public func _bjs_MutableCounter_copy(_ pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    return MutableCounter.bridgeJSCopyBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_MutableCounter_deinit")
+@_cdecl("bjs_MutableCounter_deinit")
+public func _bjs_MutableCounter_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    MutableCounter.bridgeJSReleaseBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension MutableCounter: _BridgedSwiftBoxedValueStruct {}
+
+@_expose(wasm, "bjs_DirectMutable_init")
+@_cdecl("bjs_DirectMutable_init")
+public func _bjs_DirectMutable_init(_ count: Int32, _ labelBytes: Int32, _ labelLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = DirectMutable(count: Int.bridgeJSLiftParameter(count), label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DirectMutable_count_get")
+@_cdecl("bjs_DirectMutable_count_get")
+public func _bjs_DirectMutable_count_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: DirectMutable.self).pointee.count
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DirectMutable_count_set")
+@_cdecl("bjs_DirectMutable_count_set")
+public func _bjs_DirectMutable_count_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    _self.assumingMemoryBound(to: DirectMutable.self).pointee.count = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DirectMutable_label_get")
+@_cdecl("bjs_DirectMutable_label_get")
+public func _bjs_DirectMutable_label_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: DirectMutable.self).pointee.label
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DirectMutable_describe")
+@_cdecl("bjs_DirectMutable_describe")
+public func _bjs_DirectMutable_describe(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: DirectMutable.self).pointee.describe()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DirectMutable_copy")
+@_cdecl("bjs_DirectMutable_copy")
+public func _bjs_DirectMutable_copy(_ pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    return DirectMutable.bridgeJSCopyBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DirectMutable_deinit")
+@_cdecl("bjs_DirectMutable_deinit")
+public func _bjs_DirectMutable_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    DirectMutable.bridgeJSReleaseBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension DirectMutable: _BridgedSwiftBoxedValueStruct {}
+
+@_expose(wasm, "bjs_BoxedConsumer_init")
+@_cdecl("bjs_BoxedConsumer_init")
+public func _bjs_BoxedConsumer_init(_ tagBytes: Int32, _ tagLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = BoxedConsumer(tag: String.bridgeJSLiftParameter(tagBytes, tagLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedConsumer_describe")
+@_cdecl("bjs_BoxedConsumer_describe")
+public func _bjs_BoxedConsumer_describe(_ _self: UnsafeMutableRawPointer, _ other: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: BoxedConsumer.self).pointee.describe(_: other.assumingMemoryBound(to: BoxedSummary.self).pointee)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedConsumer_copy")
+@_cdecl("bjs_BoxedConsumer_copy")
+public func _bjs_BoxedConsumer_copy(_ pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    return BoxedConsumer.bridgeJSCopyBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedConsumer_deinit")
+@_cdecl("bjs_BoxedConsumer_deinit")
+public func _bjs_BoxedConsumer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    BoxedConsumer.bridgeJSReleaseBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension BoxedConsumer: _BridgedSwiftBoxedValueStruct {}
+
+@_expose(wasm, "bjs_BoxWithTrackedClass_init")
+@_cdecl("bjs_BoxWithTrackedClass_init")
+public func _bjs_BoxWithTrackedClass_init(_ tracked: UnsafeMutableRawPointer, _ labelBytes: Int32, _ labelLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = BoxWithTrackedClass(tracked: TrackedThing.bridgeJSLiftParameter(tracked), label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxWithTrackedClass_tracked_get")
+@_cdecl("bjs_BoxWithTrackedClass_tracked_get")
+public func _bjs_BoxWithTrackedClass_tracked_get(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: BoxWithTrackedClass.self).pointee.tracked
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxWithTrackedClass_describeTracked")
+@_cdecl("bjs_BoxWithTrackedClass_describeTracked")
+public func _bjs_BoxWithTrackedClass_describeTracked(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = _self.assumingMemoryBound(to: BoxWithTrackedClass.self).pointee.describeTracked()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxWithTrackedClass_copy")
+@_cdecl("bjs_BoxWithTrackedClass_copy")
+public func _bjs_BoxWithTrackedClass_copy(_ pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    return BoxWithTrackedClass.bridgeJSCopyBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxWithTrackedClass_deinit")
+@_cdecl("bjs_BoxWithTrackedClass_deinit")
+public func _bjs_BoxWithTrackedClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    BoxWithTrackedClass.bridgeJSReleaseBox(pointer)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension BoxWithTrackedClass: _BridgedSwiftBoxedValueStruct {}
+
 extension Point: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Point {
         let y = Int.bridgeJSStackPop()
@@ -6435,6 +6903,236 @@ public func _bjs_ArrayMembers_sumValues() -> Int32 {
 public func _bjs_ArrayMembers_firstString() -> Void {
     #if arch(wasm32)
     let ret = ArrayMembers.bridgeJSLiftParameter().firstString(_: [String].bridgeJSStackPop())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeBoxedSummary")
+@_cdecl("bjs_makeBoxedSummary")
+public func _bjs_makeBoxedSummary(_ labelBytes: Int32, _ labelLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = makeBoxedSummary(_: [Int].bridgeJSStackPop(), _: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeValueWithBoxedField")
+@_cdecl("bjs_makeValueWithBoxedField")
+public func _bjs_makeValueWithBoxedField(_ payloadLabelBytes: Int32, _ payloadLabelLength: Int32, _ outerLabelBytes: Int32, _ outerLabelLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = makeValueWithBoxedField(_: [Int].bridgeJSStackPop(), _: String.bridgeJSLiftParameter(payloadLabelBytes, payloadLabelLength), _: String.bridgeJSLiftParameter(outerLabelBytes, outerLabelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripValueWithBoxedField")
+@_cdecl("bjs_roundtripValueWithBoxedField")
+public func _bjs_roundtripValueWithBoxedField() -> Void {
+    #if arch(wasm32)
+    let ret = roundtripValueWithBoxedField(_: ValueWithBoxedField.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeValueWithOptionalBoxedField")
+@_cdecl("bjs_makeValueWithOptionalBoxedField")
+public func _bjs_makeValueWithOptionalBoxedField(_ flag: Int32, _ tagBytes: Int32, _ tagLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = makeValueWithOptionalBoxedField(_: Bool.bridgeJSLiftParameter(flag), _: String.bridgeJSLiftParameter(tagBytes, tagLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripValueWithOptionalBoxedField")
+@_cdecl("bjs_roundtripValueWithOptionalBoxedField")
+public func _bjs_roundtripValueWithOptionalBoxedField() -> Void {
+    #if arch(wasm32)
+    let ret = roundtripValueWithOptionalBoxedField(_: ValueWithOptionalBoxedField.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_consumeBoxedArray")
+@_cdecl("bjs_consumeBoxedArray")
+public func _bjs_consumeBoxedArray() -> Void {
+    #if arch(wasm32)
+    let ret = consumeBoxedArray(_: [BoxedSummary].bridgeJSStackPop())
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeBoxedArray")
+@_cdecl("bjs_makeBoxedArray")
+public func _bjs_makeBoxedArray(_ count: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = makeBoxedArray(_: Int.bridgeJSLiftParameter(count))
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_consumeBoxedDictionary")
+@_cdecl("bjs_consumeBoxedDictionary")
+public func _bjs_consumeBoxedDictionary() -> Void {
+    #if arch(wasm32)
+    let ret = consumeBoxedDictionary(_: [String: BoxedSummary].bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_optionalBoxedArray")
+@_cdecl("bjs_optionalBoxedArray")
+public func _bjs_optionalBoxedArray(_ flag: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = optionalBoxedArray(_: Bool.bridgeJSLiftParameter(flag))
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_arrayOfOptionalBoxed")
+@_cdecl("bjs_arrayOfOptionalBoxed")
+public func _bjs_arrayOfOptionalBoxed(_ flag: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = arrayOfOptionalBoxed(_: Bool.bridgeJSLiftParameter(flag))
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripBoxedSummary")
+@_cdecl("bjs_roundtripBoxedSummary")
+public func _bjs_roundtripBoxedSummary(_ value: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = roundtripBoxedSummary(_: value.assumingMemoryBound(to: BoxedSummary.self).pointee)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_boxedSummaryLabel")
+@_cdecl("bjs_boxedSummaryLabel")
+public func _bjs_boxedSummaryLabel(_ value: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = boxedSummaryLabel(_: value.assumingMemoryBound(to: BoxedSummary.self).pointee)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_optionalBoxedSummary")
+@_cdecl("bjs_optionalBoxedSummary")
+public func _bjs_optionalBoxedSummary(_ flag: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = optionalBoxedSummary(_: Bool.bridgeJSLiftParameter(flag))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripOptionalBoxedSummary")
+@_cdecl("bjs_roundtripOptionalBoxedSummary")
+public func _bjs_roundtripOptionalBoxedSummary(_ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = roundtripOptionalBoxedSummary(_: Optional<BoxedSummary>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeLeakCheckBoxed")
+@_cdecl("bjs_makeLeakCheckBoxed")
+public func _bjs_makeLeakCheckBoxed(_ id: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = makeLeakCheckBoxed(_: Int.bridgeJSLiftParameter(id))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeMutableCounter")
+@_cdecl("bjs_makeMutableCounter")
+public func _bjs_makeMutableCounter(_ initial: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = makeMutableCounter(_: Int.bridgeJSLiftParameter(initial))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeDirectMutable")
+@_cdecl("bjs_makeDirectMutable")
+public func _bjs_makeDirectMutable(_ count: Int32, _ labelBytes: Int32, _ labelLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = makeDirectMutable(_: Int.bridgeJSLiftParameter(count), _: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_getTrackedDeinitCount")
+@_cdecl("bjs_getTrackedDeinitCount")
+public func _bjs_getTrackedDeinitCount() -> Int32 {
+    #if arch(wasm32)
+    let ret = getTrackedDeinitCount()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_resetTrackedDeinitCount")
+@_cdecl("bjs_resetTrackedDeinitCount")
+public func _bjs_resetTrackedDeinitCount() -> Void {
+    #if arch(wasm32)
+    resetTrackedDeinitCount()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeBoxWithFreshTracked")
+@_cdecl("bjs_makeBoxWithFreshTracked")
+public func _bjs_makeBoxWithFreshTracked(_ id: Int32, _ labelBytes: Int32, _ labelLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = makeBoxWithFreshTracked(_: Int.bridgeJSLiftParameter(id), _: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripBoxWithTrackedClass")
+@_cdecl("bjs_roundtripBoxWithTrackedClass")
+public func _bjs_roundtripBoxWithTrackedClass(_ box: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = roundtripBoxWithTrackedClass(_: box.assumingMemoryBound(to: BoxWithTrackedClass.self).pointee)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -7870,6 +8568,123 @@ public func _bjs_arrayMembersFirst() -> Void {
     #else
     fatalError("Only available on WebAssembly")
     #endif
+}
+
+@_expose(wasm, "bjs_BoxedStructConsumer_init")
+@_cdecl("bjs_BoxedStructConsumer_init")
+public func _bjs_BoxedStructConsumer_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = BoxedStructConsumer()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedStructConsumer_formatSummary")
+@_cdecl("bjs_BoxedStructConsumer_formatSummary")
+public func _bjs_BoxedStructConsumer_formatSummary(_ _self: UnsafeMutableRawPointer, _ value: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = BoxedStructConsumer.bridgeJSLiftParameter(_self).formatSummary(_: value.assumingMemoryBound(to: BoxedSummary.self).pointee)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedStructConsumer_mergeLabels")
+@_cdecl("bjs_BoxedStructConsumer_mergeLabels")
+public func _bjs_BoxedStructConsumer_mergeLabels(_ _self: UnsafeMutableRawPointer, _ a: UnsafeMutableRawPointer, _ b: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = BoxedStructConsumer.bridgeJSLiftParameter(_self).mergeLabels(_: a.assumingMemoryBound(to: BoxedSummary.self).pointee, _: b.assumingMemoryBound(to: BoxedSummary.self).pointee)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_BoxedStructConsumer_deinit")
+@_cdecl("bjs_BoxedStructConsumer_deinit")
+public func _bjs_BoxedStructConsumer_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<BoxedStructConsumer>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension BoxedStructConsumer: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_BoxedStructConsumer_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_BoxedStructConsumer_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_BoxedStructConsumer_wrap")
+fileprivate func _bjs_BoxedStructConsumer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_BoxedStructConsumer_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_BoxedStructConsumer_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_BoxedStructConsumer_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_TrackedThing_init")
+@_cdecl("bjs_TrackedThing_init")
+public func _bjs_TrackedThing_init(_ id: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = TrackedThing(id: Int.bridgeJSLiftParameter(id))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_TrackedThing_getId")
+@_cdecl("bjs_TrackedThing_getId")
+public func _bjs_TrackedThing_getId(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = TrackedThing.bridgeJSLiftParameter(_self).getId()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_TrackedThing_deinit")
+@_cdecl("bjs_TrackedThing_deinit")
+public func _bjs_TrackedThing_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<TrackedThing>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension TrackedThing: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_TrackedThing_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_TrackedThing_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_TrackedThing_wrap")
+fileprivate func _bjs_TrackedThing_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_TrackedThing_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_TrackedThing_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_TrackedThing_wrap_extern(pointer)
 }
 
 @_expose(wasm, "bjs_ClosureSupportExports_static_makeIntToInt")

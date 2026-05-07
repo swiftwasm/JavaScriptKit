@@ -918,7 +918,7 @@ extension BridgeType {
             return LoweringParameterInfo(loweredParameters: [("funcRef", .i32)])
         case .unsafePointer:
             return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
-        case .swiftHeapObject:
+        case .swiftHeapObject, .swiftBoxedStruct:
             return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
         case .swiftProtocol:
             switch context {
@@ -997,7 +997,7 @@ extension BridgeType {
             return LiftingReturnInfo(valueToLift: .i32)
         case .unsafePointer:
             return LiftingReturnInfo(valueToLift: .pointer)
-        case .swiftHeapObject:
+        case .swiftHeapObject, .swiftBoxedStruct:
             return LiftingReturnInfo(valueToLift: .pointer)
         case .swiftProtocol:
             switch context {
