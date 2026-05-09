@@ -1198,7 +1198,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             className: classNameForABI
         )
 
-        guard let effects = collectEffects(signature: node.signature, isStatic: isStatic) else {
+        let isMutating = node.modifiers.contains { $0.name.tokenKind == .keyword(.mutating) }
+        guard let effects = collectEffects(signature: node.signature, isStatic: isStatic, isMutating: isMutating) else {
             return nil
         }
 
@@ -1213,7 +1214,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         )
     }
 
-    private func collectEffects(signature: FunctionSignatureSyntax, isStatic: Bool = false) -> Effects? {
+    private func collectEffects(signature: FunctionSignatureSyntax, isStatic: Bool = false, isMutating: Bool = false) -> Effects? {
         let isAsync = signature.effectSpecifiers?.asyncSpecifier != nil
         var isThrows = false
         if let throwsClause: ThrowsClauseSyntax = signature.effectSpecifiers?.throwsClause {
@@ -1234,7 +1235,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             }
             isThrows = true
         }
-        return Effects(isAsync: isAsync, isThrows: isThrows, isStatic: isStatic)
+        return Effects(isAsync: isAsync, isThrows: isThrows, isStatic: isStatic, isMutating: isMutating)
     }
 
     private func extractNamespace(
@@ -1522,7 +1523,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
     }
 
-    /// Walks extension members under the matching type’s state, returning whether the type was found.
+    /// Walks extension members under the matching type's state, returning whether the type was found.
     ///
     /// Note: The lookup scans dictionaries keyed by `makeKey(name:namespace:)`, matching only by
     /// plain name. If two types share a name but differ by namespace, `.first(where:)` picks
