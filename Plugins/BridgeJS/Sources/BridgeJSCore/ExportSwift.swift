@@ -228,14 +228,24 @@ public class ExportSwift {
             }
         }
 
-        func callMethod(methodName: String, returnType: BridgeType) {
-            let (_, selfExpr) = removeFirstLiftedParameter()
-            generateParameterLifting()
-            let item = renderCallStatement(
-                callee: "\(raw: selfExpr).\(raw: methodName)",
-                returnType: returnType
-            )
-            append(item)
+        func callMethod(methodName: String, returnType: BridgeType, isMutating: Bool = false) {
+            let (selfParam, selfExpr) = removeFirstLiftedParameter()
+            if isMutating, case .swiftStruct = selfParam.type {
+                append("var _self = \(selfExpr)")
+                generateParameterLifting()
+                let item = renderCallStatement(
+                    callee: "_self.\(raw: methodName)",
+                    returnType: returnType
+                )
+                append(item)
+            } else {
+                generateParameterLifting()
+                let item = renderCallStatement(
+                    callee: "\(raw: selfExpr).\(raw: methodName)",
+                    returnType: returnType
+                )
+                append(item)
+            }
         }
 
         /// Generates intermediate variables for stack-using parameters if needed for LIFO compatibility
@@ -561,7 +571,7 @@ public class ExportSwift {
         if method.effects.isStatic {
             builder.call(name: "\(ownerTypeName).\(method.name)", returnType: method.returnType)
         } else {
-            builder.callMethod(methodName: method.name, returnType: method.returnType)
+            builder.callMethod(methodName: method.name, returnType: method.returnType, isMutating: method.effects.isMutating)
         }
         try builder.lowerReturnValue(returnType: method.returnType)
         return builder.render(abiName: method.abiName)
