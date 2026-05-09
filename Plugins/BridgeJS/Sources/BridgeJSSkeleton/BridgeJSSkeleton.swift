@@ -635,11 +635,35 @@ public struct Effects: Codable, Equatable, Sendable {
     public var isAsync: Bool
     public var isThrows: Bool
     public var isStatic: Bool
+    public var isMutating: Bool
 
-    public init(isAsync: Bool, isThrows: Bool, isStatic: Bool = false) {
+    public init(isAsync: Bool, isThrows: Bool, isStatic: Bool = false, isMutating: Bool = false) {
         self.isAsync = isAsync
         self.isThrows = isThrows
         self.isStatic = isStatic
+        self.isMutating = isMutating
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case isAsync, isThrows, isStatic, isMutating
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.isAsync = try container.decode(Bool.self, forKey: .isAsync)
+        self.isThrows = try container.decode(Bool.self, forKey: .isThrows)
+        self.isStatic = try container.decode(Bool.self, forKey: .isStatic)
+        self.isMutating = try container.decodeIfPresent(Bool.self, forKey: .isMutating) ?? false
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(isAsync, forKey: .isAsync)
+        try container.encode(isThrows, forKey: .isThrows)
+        try container.encode(isStatic, forKey: .isStatic)
+        if isMutating {
+            try container.encode(isMutating, forKey: .isMutating)
+        }
     }
 }
 
