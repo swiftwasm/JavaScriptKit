@@ -20,7 +20,7 @@ import {
 } from "./itc.js";
 import { decodeObjectRefs } from "./js-value.js";
 import { JSObjectSpace } from "./object-heap.js";
-export { SwiftRuntimeThreadChannel };
+export type { SwiftRuntimeThreadChannel };
 
 export type SwiftRuntimeOptions = {
     /**
