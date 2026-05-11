@@ -128,6 +128,69 @@ public func _invoke_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO(_ boxPt
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModule6AnimalV_6AnimalV")
+fileprivate func invoke_js_callback_TestModule_10TestModule6AnimalV_6AnimalV_extern(_ callback: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_TestModule_10TestModule6AnimalV_6AnimalV_extern(_ callback: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModule6AnimalV_6AnimalV(_ callback: Int32) -> Void {
+    return invoke_js_callback_TestModule_10TestModule6AnimalV_6AnimalV_extern(callback)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV")
+fileprivate func make_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_10TestModule6AnimalV_6AnimalV {
+    static func bridgeJSLift(_ callbackId: Int32) -> (Animal) -> Animal {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let _ = param0.bridgeJSLowerParameter()
+            invoke_js_callback_TestModule_10TestModule6AnimalV_6AnimalV(callbackValue)
+            return Animal.bridgeJSLiftReturn()
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (Animal) -> Animal {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Animal) -> Animal) {
+        self.init(
+            makeClosure: make_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV")
+@_cdecl("invoke_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV")
+public func _invoke_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV(_ boxPtr: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Animal) -> Animal>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Animal.bridgeJSLiftParameter())
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC")
 fileprivate func invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC_extern(_ callback: Int32, _ param0: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
 #else
@@ -762,6 +825,69 @@ public func _invoke_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(_ b
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV")
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV_extern(_ callback: Int32, _ param0: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV_extern(_ callback: Int32, _ param0: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV(_ callback: Int32, _ param0: Int32) -> Void {
+    return invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV")
+fileprivate func make_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_10TestModuleSq6AnimalV_Sq6AnimalV {
+    static func bridgeJSLift(_ callbackId: Int32) -> (Optional<Animal>) -> Optional<Animal> {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0IsSome = param0.bridgeJSLowerParameter()
+            invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV(callbackValue, param0IsSome)
+            return Optional<Animal>.bridgeJSLiftReturn()
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (Optional<Animal>) -> Optional<Animal> {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (Optional<Animal>) -> Optional<Animal>) {
+        self.init(
+            makeClosure: make_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV")
+@_cdecl("invoke_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV")
+public func _invoke_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV(_ boxPtr: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Animal>) -> Optional<Animal>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let result = closure(Optional<Animal>.bridgeJSLiftParameter())
+    return result.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC")
 fileprivate func invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer
 #else
@@ -1356,6 +1482,85 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
             return Int32(5)
         }
     }
+}
+
+extension Animal: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Animal {
+        let type = String.bridgeJSStackPop()
+        return Animal(type: type)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.type.bridgeJSStackPush()
+    }
+
+    public init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_Animal(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    public func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Animal()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Animal")
+fileprivate func _bjs_struct_lower_Animal_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_Animal_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_Animal(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Animal_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Animal")
+fileprivate func _bjs_struct_lift_Animal_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_Animal_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_Animal() -> Int32 {
+    return _bjs_struct_lift_Animal_extern()
+}
+
+@_expose(wasm, "bjs_Animal_init")
+@_cdecl("bjs_Animal_init")
+public func _bjs_Animal_init(_ typeBytes: Int32, _ typeLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = Animal(type: String.bridgeJSLiftParameter(typeBytes, typeLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripAnimal")
+@_cdecl("bjs_roundtripAnimal")
+public func _bjs_roundtripAnimal(_ animalClosure: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = roundtripAnimal(_: _BJS_Closure_10TestModule6AnimalV_6AnimalV.bridgeJSLift(animalClosure))
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundtripOptionalAnimal")
+@_cdecl("bjs_roundtripOptionalAnimal")
+public func _bjs_roundtripOptionalAnimal(_ animalClosure: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = roundtripOptionalAnimal(_: _BJS_Closure_10TestModuleSq6AnimalV_Sq6AnimalV.bridgeJSLift(animalClosure))
+    return JSTypedClosure(ret).bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 @_expose(wasm, "bjs_roundtripString")

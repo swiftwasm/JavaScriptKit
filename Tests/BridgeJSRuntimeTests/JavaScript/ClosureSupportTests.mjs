@@ -355,6 +355,17 @@ export function runJsClosureSupportTests(exports) {
     });
     assert.equal(optDpResult, "DP: 7 | DP: null");
 
+    const vectorMagnitude = processor.processVector((value) => ({
+        dx: value,
+        dy: 4.0,
+    }));
+    assert.equal(vectorMagnitude, 5.0);
+
+    const optVectorResult = processor.processOptionalVector((value) =>
+        value > 0 ? { dx: value, dy: value * 2 } : null,
+    );
+    assert.equal(optVectorResult, "(2.0,4.0) | nil");
+
     processor.release();
 
     const intToInt = exports.ClosureSupportExports.makeIntToInt(10);
