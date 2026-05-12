@@ -9569,6 +9569,152 @@
 
         ],
         "emitStyle" : "const",
+        "name" : "JSTypedArrayExports",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_JSTypedArrayExports_static_roundTripUint8Array",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripUint8Array",
+            "namespace" : [
+              "JSTypedArrayExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "jsObject" : {
+                    "_0" : "JSUint8Array"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "JSUint8Array"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "JSTypedArrayExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_JSTypedArrayExports_static_roundTripFloat32Array",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripFloat32Array",
+            "namespace" : [
+              "JSTypedArrayExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "jsObject" : {
+                    "_0" : "JSFloat32Array"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "JSFloat32Array"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "JSTypedArrayExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_JSTypedArrayExports_static_roundTripFloat64Array",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripFloat64Array",
+            "namespace" : [
+              "JSTypedArrayExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "jsObject" : {
+                    "_0" : "JSFloat64Array"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "JSFloat64Array"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "JSTypedArrayExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_JSTypedArrayExports_static_roundTripInt32Array",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundTripInt32Array",
+            "namespace" : [
+              "JSTypedArrayExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "v",
+                "type" : {
+                  "jsObject" : {
+                    "_0" : "JSInt32Array"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsObject" : {
+                "_0" : "JSInt32Array"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "JSTypedArrayExports"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "JSTypedArrayExports",
+        "tsFullPath" : "JSTypedArrayExports"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
         "name" : "OptionalSupportExports",
         "staticMethods" : [
           {
@@ -20032,6 +20178,158 @@
                 "returnType" : {
                   "jsObject" : {
                     "_0" : "JSClassWithArrayMembers"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "JSTypedArrayImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsCreateUint8Array",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "JSUint8Array"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripUint8Array",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "JSUint8Array"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "JSUint8Array"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripFloat32Array",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "JSFloat32Array"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "JSFloat32Array"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripFloat64Array",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "JSFloat64Array"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "JSFloat64Array"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripInt32Array",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "JSInt32Array"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "JSInt32Array"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "runJsTypedArrayTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
                   }
                 }
               }

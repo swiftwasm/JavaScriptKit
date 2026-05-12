@@ -204,3 +204,12 @@ public enum JSUInt8Clamped: TypedArrayElement {
 }
 
 public typealias JSUInt8ClampedArray = JSTypedArray<JSUInt8Clamped>
+
+public typealias JSInt8Array = JSTypedArray<Int8>
+public typealias JSUint8Array = JSTypedArray<UInt8>
+public typealias JSInt16Array = JSTypedArray<Int16>
+public typealias JSUint16Array = JSTypedArray<UInt16>
+public typealias JSInt32Array = JSTypedArray<Int32>
+public typealias JSUint32Array = JSTypedArray<UInt32>
+public typealias JSFloat32Array = JSTypedArray<Float32>
+public typealias JSFloat64Array = JSTypedArray<Float64>

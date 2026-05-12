@@ -42,6 +42,14 @@ public final class SwiftToSkeleton {
         self.typeDeclResolver.addSourceFile(
             """
             @JSClass struct JSPromise {}
+            @JSClass struct JSInt8Array {}
+            @JSClass struct JSUint8Array {}
+            @JSClass struct JSInt16Array {}
+            @JSClass struct JSUint16Array {}
+            @JSClass struct JSInt32Array {}
+            @JSClass struct JSUint32Array {}
+            @JSClass struct JSFloat32Array {}
+            @JSClass struct JSFloat64Array {}
             """
         )
     }
@@ -128,9 +136,33 @@ public final class SwiftToSkeleton {
         )
     }
 
+    private static let jsTypedArrayTypealiasNames: [String: String] = [
+        "Int8": "JSInt8Array",
+        "UInt8": "JSUint8Array",
+        "Int16": "JSInt16Array",
+        "UInt16": "JSUint16Array",
+        "Int32": "JSInt32Array",
+        "UInt32": "JSUint32Array",
+        "Float": "JSFloat32Array",
+        "Float32": "JSFloat32Array",
+        "Double": "JSFloat64Array",
+        "Float64": "JSFloat64Array",
+    ]
+
     func lookupType(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {
         if let attributedType = type.as(AttributedTypeSyntax.self) {
             return lookupType(for: attributedType.baseType, errors: &errors)
+        }
+
+        // JSTypedArray<T>
+        if let identifierType = type.as(IdentifierTypeSyntax.self),
+            identifierType.name.text == "JSTypedArray",
+            let genericArgs = identifierType.genericArgumentClause?.arguments,
+            genericArgs.count == 1,
+            let elementName = genericArgs.first?.argument.as(IdentifierTypeSyntax.self)?.name.text,
+            let typealiasName = Self.jsTypedArrayTypealiasNames[elementName]
+        {
+            return .jsObject(typealiasName)
         }
 
         if let identifierType = type.as(IdentifierTypeSyntax.self),

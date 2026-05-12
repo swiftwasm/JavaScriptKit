@@ -1,0 +1,123 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_processBytes",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processBytes",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "data",
+            "type" : {
+              "jsObject" : {
+                "_0" : "JSUint8Array"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsObject" : {
+            "_0" : "JSUint8Array"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_processFloats",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processFloats",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "data",
+            "type" : {
+              "jsObject" : {
+                "_0" : "JSFloat32Array"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsObject" : {
+            "_0" : "JSFloat32Array"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_processGenericDoubles",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processGenericDoubles",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "data",
+            "type" : {
+              "jsObject" : {
+                "_0" : "JSFloat64Array"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsObject" : {
+            "_0" : "JSFloat64Array"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_processGenericInts",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "processGenericInts",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "data",
+            "type" : {
+              "jsObject" : {
+                "_0" : "JSInt32Array"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsObject" : {
+            "_0" : "JSInt32Array"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}
