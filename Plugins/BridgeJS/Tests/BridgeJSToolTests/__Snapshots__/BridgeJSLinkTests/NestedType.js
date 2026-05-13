@@ -30,7 +30,7 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createStatsHelpers = () => ({
+    const __bjs_createUser_StatsHelpers = () => ({
         lower: (value) => {
             i32Stack.push((value.health | 0));
             f64Stack.push(value.score);
@@ -39,6 +39,20 @@ export async function createInstantiator(options, swift) {
             const f64 = f64Stack.pop();
             const int = i32Stack.pop();
             return { health: int, score: f64 };
+        }
+    });
+    const __bjs_createPlayer_StatsHelpers = () => ({
+        lower: (value) => {
+            i32Stack.push((value.level | 0));
+            const bytes = textEncoder.encode(value.rating);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+        },
+        lift: () => {
+            const string = strStack.pop();
+            const int = i32Stack.pop();
+            return { level: int, rating: string };
         }
     });
 
@@ -110,10 +124,17 @@ export async function createInstantiator(options, swift) {
                 return i64Stack.pop();
             }
             bjs["swift_js_struct_lower_User_Stats"] = function(objectId) {
-                structHelpers.Stats.lower(swift.memory.getObject(objectId));
+                structHelpers.User_Stats.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_User_Stats"] = function() {
-                const value = structHelpers.Stats.lift();
+                const value = structHelpers.User_Stats.lift();
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Player_Stats"] = function(objectId) {
+                structHelpers.Player_Stats.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Player_Stats"] = function() {
+                const value = structHelpers.Player_Stats.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
@@ -210,6 +231,10 @@ export async function createInstantiator(options, swift) {
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
+            importObject["TestModule"]["bjs_Player_wrap"] = function(pointer) {
+                const obj = _exports['Player'].__construct(pointer);
+                return swift.memory.retain(obj);
+            };
             importObject["TestModule"]["bjs_User_wrap"] = function(pointer) {
                 const obj = _exports['User'].__construct(pointer);
                 return swift.memory.retain(obj);
@@ -291,11 +316,31 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-            const StatsHelpers = __bjs_createStatsHelpers();
-            structHelpers.Stats = StatsHelpers;
+            class Player extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Player_deinit, Player.prototype, null);
+                }
+
+                getTag() {
+                    instance.exports.bjs_Player_getTag(this.pointer);
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
+                    return ret;
+                }
+            }
+            const User_StatsHelpers = __bjs_createUser_StatsHelpers();
+            structHelpers.User_Stats = User_StatsHelpers;
+
+            const Player_StatsHelpers = __bjs_createPlayer_StatsHelpers();
+            structHelpers.Player_Stats = Player_StatsHelpers;
 
             const exports = {
                 User,
+                Player,
+                Player: {
+                },
+                User: {
+                },
             };
             _exports = exports;
             return exports;

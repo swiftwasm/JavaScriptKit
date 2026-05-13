@@ -8,3 +8,14 @@
         var score: Double
     }
 }
+
+@JS class Player {
+    @JS func getTag() -> String {
+        return "player"
+    }
+
+    @JS struct Stats {
+        var level: Int
+        var rating: String
+    }
+}

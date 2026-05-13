@@ -1299,6 +1299,24 @@ enum GraphOperations {
     }
 }
 
+@JS enum NestedStructGroupA {
+    @JS struct Metadata {
+        var label: String
+        var count: Int
+    }
+
+    @JS static func roundtripMetadata(_ m: Metadata) -> Metadata { m }
+}
+
+@JS enum NestedStructGroupB {
+    @JS struct Metadata {
+        var tag: String
+        var value: Double
+    }
+
+    @JS static func roundtripMetadata(_ m: Metadata) -> Metadata { m }
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

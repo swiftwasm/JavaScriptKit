@@ -1023,6 +1023,17 @@ function testStructSupport(exports) {
     const fooContainerResult2 = exports.roundTripFooContainer(fooContainer2);
     assert.equal(fooContainerResult2.foo.value, "first");
     assert.equal(fooContainerResult2.optionalFoo, null);
+
+    // Test nested structs with same short name under different parents
+    const metaA = { label: "hello", count: 42 };
+    const metaAResult = exports.NestedStructGroupA.roundtripMetadata(metaA);
+    assert.equal(metaAResult.label, "hello");
+    assert.equal(metaAResult.count, 42);
+
+    const metaB = { tag: "world", value: 3.14 };
+    const metaBResult = exports.NestedStructGroupB.roundtripMetadata(metaB);
+    assert.equal(metaBResult.tag, "world");
+    assert.equal(metaBResult.value, 3.14);
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */

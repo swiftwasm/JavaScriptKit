@@ -4,9 +4,17 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export interface Stats {
-    health: number;
-    score: number;
+export namespace Player {
+    export interface Stats {
+        level: number;
+        rating: string;
+    }
+}
+export namespace User {
+    export interface Stats {
+        health: number;
+        score: number;
+    }
 }
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
@@ -18,8 +26,13 @@ export interface SwiftHeapObject {
 export interface User extends SwiftHeapObject {
     getName(): string;
 }
+export interface Player extends SwiftHeapObject {
+    getTag(): string;
+}
 export type Exports = {
     User: {
+    }
+    Player: {
     }
 }
 export type Imports = {
