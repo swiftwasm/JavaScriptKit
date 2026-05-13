@@ -25,6 +25,7 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
+    let taStack = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -136,6 +137,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_i64"] = function() {
                 return i64Stack.pop();
+            }
+            const taCtors = [Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array];
+            bjs["swift_js_push_typed_array"] = function(kind, ptr, count) {
+                const Ctor = taCtors[kind];
+                const byteLen = count * Ctor.BYTES_PER_ELEMENT;
+                const copy = memory.buffer.slice(ptr, ptr + byteLen);
+                taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_FooContainer"] = function(objectId) {
                 structHelpers.FooContainer.lower(swift.memory.getObject(objectId));
@@ -281,14 +289,19 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(foos.length);
                     instance.exports.bjs_processFooArray();
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const objId1 = i32Stack.pop();
-                        const obj = swift.memory.getObject(objId1);
-                        swift.memory.release(objId1);
-                        arrayResult.push(obj);
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const objId1 = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId1);
+                            swift.memory.release(objId1);
+                            arrayResult.push(obj);
+                        }
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 },
                 processOptionalFooArray: function bjs_processOptionalFooArray(foos) {
@@ -303,21 +316,26 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(foos.length);
                     instance.exports.bjs_processOptionalFooArray();
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const isSome1 = i32Stack.pop();
-                        let optValue;
-                        if (isSome1 === 0) {
-                            optValue = null;
-                        } else {
-                            const objId1 = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId1);
-                            swift.memory.release(objId1);
-                            optValue = obj;
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const isSome1 = i32Stack.pop();
+                            let optValue;
+                            if (isSome1 === 0) {
+                                optValue = null;
+                            } else {
+                                const objId1 = i32Stack.pop();
+                                const obj = swift.memory.getObject(objId1);
+                                swift.memory.release(objId1);
+                                optValue = obj;
+                            }
+                            arrayResult.push(optValue);
                         }
-                        arrayResult.push(optValue);
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 },
                 roundtripFooContainer: function bjs_roundtripFooContainer(container) {

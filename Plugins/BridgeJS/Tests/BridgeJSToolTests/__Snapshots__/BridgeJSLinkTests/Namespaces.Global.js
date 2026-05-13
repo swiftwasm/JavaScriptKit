@@ -25,6 +25,7 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
+    let taStack = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -97,6 +98,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_i64"] = function() {
                 return i64Stack.pop();
+            }
+            const taCtors = [Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array];
+            bjs["swift_js_push_typed_array"] = function(kind, ptr, count) {
+                const Ctor = taCtors[kind];
+                const byteLen = count * Ctor.BYTES_PER_ELEMENT;
+                const copy = memory.buffer.slice(ptr, ptr + byteLen);
+                taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -341,13 +349,18 @@ export async function createInstantiator(options, swift) {
                 getItems() {
                     instance.exports.bjs_Collections_Container_getItems(this.pointer);
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const ptr = ptrStack.pop();
-                        const obj = Greeter.__construct(ptr);
-                        arrayResult.push(obj);
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const ptr = ptrStack.pop();
+                            const obj = Greeter.__construct(ptr);
+                            arrayResult.push(obj);
+                        }
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 }
                 addItem(item) {
