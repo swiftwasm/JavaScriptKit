@@ -14,6 +14,7 @@ import { getImports as getDefaultArgumentImports } from './BridgeJSRuntimeTests/
 import { getImports as getJSClassSupportImports, JSClassWithArrayMembers } from './BridgeJSRuntimeTests/JavaScript/JSClassSupportTests.mjs';
 import { getImports as getIntegerTypesSupportImports } from './BridgeJSRuntimeTests/JavaScript/IntegerTypesSupportTests.mjs';
 import { getImports as getAsyncImportImports, runAsyncWorksTests } from './BridgeJSRuntimeTests/JavaScript/AsyncImportTests.mjs';
+import { getImports as getJSTypedArrayImports } from './BridgeJSRuntimeTests/JavaScript/JSTypedArrayTests.mjs';
 import { getImports as getIdentityModeTestImports } from './BridgeJSIdentityTests/JavaScript/IdentityModeTests.mjs';
 
 /** @type {import('../.build/plugins/PackageToJS/outputs/PackageTests/test.d.ts').SetupOptionsFn} */
@@ -156,6 +157,7 @@ export async function setupOptions(options, context) {
                 DefaultArgumentImports: getDefaultArgumentImports(importsContext),
                 JSClassSupportImports: getJSClassSupportImports(importsContext),
                 IntegerTypesSupportImports: getIntegerTypesSupportImports(importsContext),
+                JSTypedArrayImports: getJSTypedArrayImports(importsContext),
                 IdentityModeTestImports: getIdentityModeTestImports(importsContext),
             };
         },

@@ -4941,6 +4941,50 @@ public func _bjs_IntegerTypesSupportExports_static_roundTripUInt64(_ v: Int64) -
     #endif
 }
 
+@_expose(wasm, "bjs_JSTypedArrayExports_static_roundTripUint8Array")
+@_cdecl("bjs_JSTypedArrayExports_static_roundTripUint8Array")
+public func _bjs_JSTypedArrayExports_static_roundTripUint8Array(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSTypedArrayExports.roundTripUint8Array(_: JSUint8Array.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_JSTypedArrayExports_static_roundTripFloat32Array")
+@_cdecl("bjs_JSTypedArrayExports_static_roundTripFloat32Array")
+public func _bjs_JSTypedArrayExports_static_roundTripFloat32Array(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSTypedArrayExports.roundTripFloat32Array(_: JSFloat32Array.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_JSTypedArrayExports_static_roundTripFloat64Array")
+@_cdecl("bjs_JSTypedArrayExports_static_roundTripFloat64Array")
+public func _bjs_JSTypedArrayExports_static_roundTripFloat64Array(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSTypedArrayExports.roundTripFloat64Array(_: JSFloat64Array.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_JSTypedArrayExports_static_roundTripInt32Array")
+@_cdecl("bjs_JSTypedArrayExports_static_roundTripInt32Array")
+public func _bjs_JSTypedArrayExports_static_roundTripInt32Array(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSTypedArrayExports.roundTripInt32Array(_: JSInt32Array.bridgeJSLiftParameter(v))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_OptionalSupportExports_static_roundTripOptionalString")
 @_cdecl("bjs_OptionalSupportExports_static_roundTripOptionalString")
 public func _bjs_OptionalSupportExports_static_roundTripOptionalString(_ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
@@ -13656,6 +13700,129 @@ func _$JSClassSupportImports_makeJSClassWithArrayMembers(_ numbers: [Int], _ lab
         throw error
     }
     return JSClassWithArrayMembers.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSTypedArrayImports_jsCreateUint8Array_static")
+fileprivate func bjs_JSTypedArrayImports_jsCreateUint8Array_static_extern() -> Int32
+#else
+fileprivate func bjs_JSTypedArrayImports_jsCreateUint8Array_static_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSTypedArrayImports_jsCreateUint8Array_static() -> Int32 {
+    return bjs_JSTypedArrayImports_jsCreateUint8Array_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSTypedArrayImports_jsRoundTripUint8Array_static")
+fileprivate func bjs_JSTypedArrayImports_jsRoundTripUint8Array_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_JSTypedArrayImports_jsRoundTripUint8Array_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSTypedArrayImports_jsRoundTripUint8Array_static(_ v: Int32) -> Int32 {
+    return bjs_JSTypedArrayImports_jsRoundTripUint8Array_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSTypedArrayImports_jsRoundTripFloat32Array_static")
+fileprivate func bjs_JSTypedArrayImports_jsRoundTripFloat32Array_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_JSTypedArrayImports_jsRoundTripFloat32Array_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSTypedArrayImports_jsRoundTripFloat32Array_static(_ v: Int32) -> Int32 {
+    return bjs_JSTypedArrayImports_jsRoundTripFloat32Array_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSTypedArrayImports_jsRoundTripFloat64Array_static")
+fileprivate func bjs_JSTypedArrayImports_jsRoundTripFloat64Array_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_JSTypedArrayImports_jsRoundTripFloat64Array_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSTypedArrayImports_jsRoundTripFloat64Array_static(_ v: Int32) -> Int32 {
+    return bjs_JSTypedArrayImports_jsRoundTripFloat64Array_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSTypedArrayImports_jsRoundTripInt32Array_static")
+fileprivate func bjs_JSTypedArrayImports_jsRoundTripInt32Array_static_extern(_ v: Int32) -> Int32
+#else
+fileprivate func bjs_JSTypedArrayImports_jsRoundTripInt32Array_static_extern(_ v: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSTypedArrayImports_jsRoundTripInt32Array_static(_ v: Int32) -> Int32 {
+    return bjs_JSTypedArrayImports_jsRoundTripInt32Array_static_extern(v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSTypedArrayImports_runJsTypedArrayTests_static")
+fileprivate func bjs_JSTypedArrayImports_runJsTypedArrayTests_static_extern() -> Void
+#else
+fileprivate func bjs_JSTypedArrayImports_runJsTypedArrayTests_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_JSTypedArrayImports_runJsTypedArrayTests_static() -> Void {
+    return bjs_JSTypedArrayImports_runJsTypedArrayTests_static_extern()
+}
+
+func _$JSTypedArrayImports_jsCreateUint8Array() throws(JSException) -> JSUint8Array {
+    let ret = bjs_JSTypedArrayImports_jsCreateUint8Array_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUint8Array.bridgeJSLiftReturn(ret)
+}
+
+func _$JSTypedArrayImports_jsRoundTripUint8Array(_ v: JSUint8Array) throws(JSException) -> JSUint8Array {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_JSTypedArrayImports_jsRoundTripUint8Array_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUint8Array.bridgeJSLiftReturn(ret)
+}
+
+func _$JSTypedArrayImports_jsRoundTripFloat32Array(_ v: JSFloat32Array) throws(JSException) -> JSFloat32Array {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_JSTypedArrayImports_jsRoundTripFloat32Array_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSFloat32Array.bridgeJSLiftReturn(ret)
+}
+
+func _$JSTypedArrayImports_jsRoundTripFloat64Array(_ v: JSFloat64Array) throws(JSException) -> JSFloat64Array {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_JSTypedArrayImports_jsRoundTripFloat64Array_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSFloat64Array.bridgeJSLiftReturn(ret)
+}
+
+func _$JSTypedArrayImports_jsRoundTripInt32Array(_ v: JSInt32Array) throws(JSException) -> JSInt32Array {
+    let vValue = v.bridgeJSLowerParameter()
+    let ret = bjs_JSTypedArrayImports_jsRoundTripInt32Array_static(vValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSInt32Array.bridgeJSLiftReturn(ret)
+}
+
+func _$JSTypedArrayImports_runJsTypedArrayTests() throws(JSException) -> Void {
+    bjs_JSTypedArrayImports_runJsTypedArrayTests_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 #if arch(wasm32)

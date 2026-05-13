@@ -3632,6 +3632,9 @@ extension BridgeType {
         case .bool:
             return "boolean"
         case .jsObject(let name):
+            if let name, let tsName = Self.jsTypedArrayTSNames[name] {
+                return tsName
+            }
             return name ?? "any"
         case .jsValue:
             return "any"
@@ -3668,6 +3671,18 @@ extension BridgeType {
             return "Record<string, \(valueType.tsType)>"
         }
     }
+
+    /// Maps JSTypedArray Swift typealias names to their JavaScript TypedArray constructor names.
+    private static let jsTypedArrayTSNames: [String: String] = [
+        "JSInt8Array": "Int8Array",
+        "JSUint8Array": "Uint8Array",
+        "JSInt16Array": "Int16Array",
+        "JSUint16Array": "Uint16Array",
+        "JSInt32Array": "Int32Array",
+        "JSUint32Array": "Uint32Array",
+        "JSFloat32Array": "Float32Array",
+        "JSFloat64Array": "Float64Array",
+    ]
 }
 
 extension WasmCoreType {

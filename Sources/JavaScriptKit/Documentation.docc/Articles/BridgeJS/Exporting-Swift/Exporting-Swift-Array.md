@@ -95,6 +95,42 @@ TypeScript definitions:
 - `[Int]?` becomes `number[] | null`
 - `[[Int]]` becomes `number[][]`
 
+## Using TypedArrays
+
+When you need the JavaScript API to use native TypedArray types (e.g., `Uint8Array` for `fetch` body, `Float32Array` for WebGPU), use ``JSTypedArray`` instead of a plain Swift array:
+
+```swift
+import JavaScriptKit
+
+@JS func processData(_ data: JSTypedArray<UInt8>) -> JSTypedArray<UInt8> {
+    return data
+}
+
+// Convenience typealiases also work:
+@JS func processFloats(_ data: JSFloat32Array) -> JSFloat32Array {
+    return data
+}
+```
+
+Generated TypeScript:
+
+```typescript
+export type Exports = {
+    processData(data: Uint8Array): Uint8Array;
+    processFloats(data: Float32Array): Float32Array;
+}
+```
+
+Unlike plain arrays which use copy semantics, `JSTypedArray` uses **reference semantics** — it wraps a JavaScript TypedArray object and passes it by reference (no data copying). This is ideal for large binary data or when interacting with JavaScript APIs that expect TypedArrays.
+
+| Swift | TypeScript |
+|:------|:-----------|
+| `JSTypedArray<UInt8>` / `JSUint8Array` | `Uint8Array` |
+| `JSTypedArray<Int8>` / `JSInt8Array` | `Int8Array` |
+| `JSTypedArray<Int32>` / `JSInt32Array` | `Int32Array` |
+| `JSTypedArray<Float>` / `JSFloat32Array` | `Float32Array` |
+| `JSTypedArray<Double>` / `JSFloat64Array` | `Float64Array` |
+
 ## How It Works
 
 Arrays use **copy semantics** when crossing the Swift/JavaScript boundary:
