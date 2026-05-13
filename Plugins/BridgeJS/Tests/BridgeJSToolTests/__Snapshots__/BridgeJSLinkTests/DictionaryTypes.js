@@ -25,6 +25,7 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
+    let taStack = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -138,6 +139,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_i64"] = function() {
                 return i64Stack.pop();
+            }
+            const taCtors = [Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array];
+            bjs["swift_js_push_typed_array"] = function(kind, ptr, count) {
+                const Ctor = taCtors[kind];
+                const byteLen = count * Ctor.BYTES_PER_ELEMENT;
+                const copy = memory.buffer.slice(ptr, ptr + byteLen);
+                taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Counters"] = function(objectId) {
                 structHelpers.Counters.lower(swift.memory.getObject(objectId));
@@ -420,12 +428,17 @@ export async function createInstantiator(options, swift) {
                     const dictResult = {};
                     for (let i = 0; i < dictLen; i++) {
                         const arrayLen = i32Stack.pop();
-                        const arrayResult = [];
-                        for (let i1 = 0; i1 < arrayLen; i1++) {
-                            const int = i32Stack.pop();
-                            arrayResult.push(int);
+                        let arrayResult;
+                        if (arrayLen === -1) {
+                            arrayResult = taStack.pop();
+                        } else {
+                            arrayResult = [];
+                            for (let i1 = 0; i1 < arrayLen; i1++) {
+                                const int = i32Stack.pop();
+                                arrayResult.push(int);
+                            }
+                            arrayResult.reverse();
                         }
-                        arrayResult.reverse();
                         const string = strStack.pop();
                         dictResult[string] = arrayResult;
                     }

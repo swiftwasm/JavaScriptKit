@@ -347,6 +347,7 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedF32Stack) = [];",
             "let \(JSGlueVariableScope.reservedF64Stack) = [];",
             "let \(JSGlueVariableScope.reservedPointerStack) = [];",
+            "let \(JSGlueVariableScope.reservedTaStack) = [];",
             "const \(JSGlueVariableScope.reservedEnumHelpers) = {};",
             "const \(JSGlueVariableScope.reservedStructHelpers) = {};",
             "",
@@ -487,6 +488,21 @@ public struct BridgeJSLink {
                 printer.write("bjs[\"swift_js_pop_i64\"] = function() {")
                 printer.indent {
                     printer.write("return \(JSGlueVariableScope.reservedI64Stack).pop();")
+                }
+                printer.write("}")
+                // Typed array constructors indexed by kind (must match _BridgedNumericArrayKind)
+                printer.write(
+                    "const taCtors = [Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array];"
+                )
+                printer.write("bjs[\"swift_js_push_typed_array\"] = function(kind, ptr, count) {")
+                printer.indent {
+                    printer.write("const Ctor = taCtors[kind];")
+                    printer.write("const byteLen = count * Ctor.BYTES_PER_ELEMENT;")
+                    // slice() copies the bytes into a new ArrayBuffer that is properly aligned
+                    printer.write(
+                        "const copy = \(JSGlueVariableScope.reservedMemory).buffer.slice(ptr, ptr + byteLen);"
+                    )
+                    printer.write("\(JSGlueVariableScope.reservedTaStack).push(Array.from(new Ctor(copy)));")
                 }
                 printer.write("}")
                 if !allStructs.isEmpty {

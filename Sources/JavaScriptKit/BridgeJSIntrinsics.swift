@@ -154,6 +154,11 @@ public protocol _BridgedSwiftStackType {
     static func bridgeJSStackPopAsOptional() -> StackLiftResult?
     /// Specialization point for pushing an `Optional<Self>`
     static func bridgeJSStackPushAsOptional(_ value: consuming Self?)
+
+    /// Specialization point for popping an `Array<Self>` from the bridge stack
+    static func bridgeJSStackPopAsArray() -> [StackLiftResult]
+    /// Specialization point for pushing an `Array<Self>` onto the bridge stack
+    static func bridgeJSStackPushAsArray(_ value: consuming [Self])
 }
 
 extension _BridgedSwiftStackType {
@@ -177,6 +182,25 @@ extension _BridgedSwiftStackType {
             value.bridgeJSStackPush()
             _swift_js_push_i32(1)
         }
+    }
+
+    public static func bridgeJSStackPopAsArray() -> [StackLiftResult] {
+        let count = Int(_swift_js_pop_i32())
+        var result: [StackLiftResult] = []
+        result.reserveCapacity(count)
+        for _ in 0..<count {
+            result.append(Self.bridgeJSStackPop())
+        }
+        result.reverse()
+        return result
+    }
+
+    public static func bridgeJSStackPushAsArray(_ value: consuming [Self]) {
+        let count = value.count
+        for elem in value {
+            elem.bridgeJSStackPush()
+        }
+        _swift_js_push_i32(Int32(count))
     }
 }
 
@@ -1006,6 +1030,107 @@ private func _swift_js_pop_f64_extern() -> Float64 {
 
 @_spi(BridgeJS) @inline(never) public func _swift_js_pop_f64() -> Float64 {
     _swift_js_pop_f64_extern()
+}
+
+// MARK: Typed array bulk push extern
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_push_typed_array")
+private func _swift_js_push_typed_array_extern(_ kind: Int32, _ ptr: UnsafeRawPointer, _ count: Int32)
+#else
+private func _swift_js_push_typed_array_extern(_ kind: Int32, _ ptr: UnsafeRawPointer, _ count: Int32) {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+/// Pushes a typed array onto the JS typed-array stack via bulk copy.
+@_spi(BridgeJS) @inline(never) public func _swift_js_push_typed_array(
+    _ kind: Int32,
+    _ ptr: UnsafeRawPointer,
+    _ count: Int32
+) {
+    _swift_js_push_typed_array_extern(kind, ptr, count)
+}
+
+/// Numeric TypedArray kind identifiers (must match the JS `taCtors` table in BridgeJSLink).
+public enum _BridgedNumericArrayKind: Int32 {
+    case int8 = 0
+    case uint8 = 1
+    case int16 = 2
+    case uint16 = 3
+    case int32 = 4
+    case uint32 = 5
+    case float32 = 6
+    case float64 = 7
+}
+
+// MARK: - Numeric typed-array bulk push
+
+/// Numeric types that opt into bulk typed-array push.
+public protocol _BridgedNumericArray: _BridgedSwiftStackType where StackLiftResult == Self {
+    static var _bridgedNumericArrayKind: _BridgedNumericArrayKind { get }
+}
+
+extension _BridgedNumericArray {
+    @_spi(BridgeJS)
+    public static func bridgeJSStackPushAsArray(_ value: consuming [Self]) {
+        value.withUnsafeBufferPointer { buffer in
+            guard let base = buffer.baseAddress else {
+                _swift_js_push_i32(0)
+                return
+            }
+            _swift_js_push_typed_array(
+                Self._bridgedNumericArrayKind.rawValue,
+                UnsafeRawPointer(base),
+                Int32(buffer.count)
+            )
+            // -1 discriminator tells JS arrayLift to pop from the typed-array stack
+            _swift_js_push_i32(-1)
+        }
+    }
+}
+
+extension Int8: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind { .int8 }
+}
+extension UInt8: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind { .uint8 }
+}
+extension Int16: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind { .int16 }
+}
+extension UInt16: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind { .uint16 }
+}
+extension Int32: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind { .int32 }
+}
+extension UInt32: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind { .uint32 }
+}
+extension Float: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind { .float32 }
+}
+extension Double: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind { .float64 }
+}
+extension Int: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind {
+        #if _pointerBitWidth(_32)
+        return .int32
+        #else
+        return .int32
+        #endif
+    }
+}
+extension UInt: _BridgedNumericArray {
+    public static var _bridgedNumericArrayKind: _BridgedNumericArrayKind {
+        #if _pointerBitWidth(_32)
+        return .uint32
+        #else
+        return .uint32
+        #endif
+    }
 }
 
 // MARK: Wasm externs used by type lowering/lifting
@@ -1973,22 +2098,11 @@ extension Array: _BridgedSwiftStackType where Element: _BridgedSwiftStackType, E
     public typealias StackLiftResult = [Element]
 
     @_spi(BridgeJS) public static func bridgeJSStackPop() -> [Element] {
-        let count = Int(_swift_js_pop_i32())
-        var result: [Element] = []
-        result.reserveCapacity(count)
-        for _ in 0..<count {
-            result.append(Element.bridgeJSStackPop())
-        }
-        result.reverse()
-        return result
+        Element.bridgeJSStackPopAsArray()
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
-        let array = self
-        for elem in array {
-            elem.bridgeJSStackPush()
-        }
-        _swift_js_push_i32(Int32(array.count))
+        Element.bridgeJSStackPushAsArray(self)
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> [Element] {

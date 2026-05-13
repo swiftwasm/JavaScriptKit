@@ -31,6 +31,7 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
+    let taStack = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -139,6 +140,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_i64"] = function() {
                 return i64Stack.pop();
+            }
+            const taCtors = [Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array];
+            bjs["swift_js_push_typed_array"] = function(kind, ptr, count) {
+                const Ctor = taCtors[kind];
+                const byteLen = count * Ctor.BYTES_PER_ELEMENT;
+                const copy = memory.buffer.slice(ptr, ptr + byteLen);
+                taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Config"] = function(objectId) {
                 structHelpers.Config.lower(swift.memory.getObject(objectId));
@@ -550,12 +558,17 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(values.length);
                     instance.exports.bjs_testIntArrayDefault();
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const int = i32Stack.pop();
-                        arrayResult.push(int);
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const int = i32Stack.pop();
+                            arrayResult.push(int);
+                        }
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 },
                 testStringArrayDefault: function bjs_testStringArrayDefault(names = ["a", "b", "c"]) {
@@ -568,12 +581,17 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(names.length);
                     instance.exports.bjs_testStringArrayDefault();
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const string = strStack.pop();
-                        arrayResult.push(string);
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const string = strStack.pop();
+                            arrayResult.push(string);
+                        }
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 },
                 testDoubleArrayDefault: function bjs_testDoubleArrayDefault(values = [1.5, 2.5, 3.5]) {
@@ -583,12 +601,17 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(values.length);
                     instance.exports.bjs_testDoubleArrayDefault();
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const f64 = f64Stack.pop();
-                        arrayResult.push(f64);
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const f64 = f64Stack.pop();
+                            arrayResult.push(f64);
+                        }
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 },
                 testBoolArrayDefault: function bjs_testBoolArrayDefault(flags = [true, false, true]) {
@@ -598,12 +621,17 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(flags.length);
                     instance.exports.bjs_testBoolArrayDefault();
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const bool = i32Stack.pop() !== 0;
-                        arrayResult.push(bool);
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const bool = i32Stack.pop() !== 0;
+                            arrayResult.push(bool);
+                        }
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 },
                 testEmptyArrayDefault: function bjs_testEmptyArrayDefault(items = []) {
@@ -613,12 +641,17 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(items.length);
                     instance.exports.bjs_testEmptyArrayDefault();
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const int = i32Stack.pop();
-                        arrayResult.push(int);
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const int = i32Stack.pop();
+                            arrayResult.push(int);
+                        }
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 },
                 testMixedWithArrayDefault: function bjs_testMixedWithArrayDefault(name = "test", values = [10, 20, 30], enabled = true) {

@@ -34,6 +34,7 @@ final class JSGlueVariableScope {
     static let reservedStructHelpers = "structHelpers"
     static let reservedSwiftClosureRegistry = "swiftClosureRegistry"
     static let reservedMakeSwiftClosure = "makeClosure"
+    static let reservedTaStack = "taStack"
 
     private let intrinsicRegistry: JSIntrinsicRegistry
 
@@ -63,6 +64,7 @@ final class JSGlueVariableScope {
         reservedStructHelpers,
         reservedSwiftClosureRegistry,
         reservedMakeSwiftClosure,
+        reservedTaStack,
     ]
 
     init(intrinsicRegistry: JSIntrinsicRegistry) {
@@ -1896,20 +1898,31 @@ struct IntrinsicJSFragment: Sendable {
                 let (scope, printer) = (context.scope, context.printer)
                 let resultVar = scope.variable("arrayResult")
                 let lenVar = scope.variable("arrayLen")
-                let iVar = scope.variable("i")
 
                 printer.write("const \(lenVar) = \(scope.popI32());")
-                printer.write("const \(resultVar) = [];")
-                printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
+                printer.write("let \(resultVar);")
+                printer.write("if (\(lenVar) === -1) {")
+                printer.indent {
+                    // Bulk path: Swift pushed a typed array onto the typed-array stack
+                    printer.write("\(resultVar) = \(JSGlueVariableScope.reservedTaStack).pop();")
+                }
+                printer.write("} else {")
                 try printer.indent {
-                    let elementFragment = try stackLiftFragment(elementType: elementType)
-                    let elementResults = try elementFragment.printCode([], context)
-                    if let elementExpr = elementResults.first {
-                        printer.write("\(resultVar).push(\(elementExpr));")
+                    // Element-by-element path (original behavior)
+                    let iVar = scope.variable("i")
+                    printer.write("\(resultVar) = [];")
+                    printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
+                    try printer.indent {
+                        let elementFragment = try stackLiftFragment(elementType: elementType)
+                        let elementResults = try elementFragment.printCode([], context)
+                        if let elementExpr = elementResults.first {
+                            printer.write("\(resultVar).push(\(elementExpr));")
+                        }
                     }
+                    printer.write("}")
+                    printer.write("\(resultVar).reverse();")
                 }
                 printer.write("}")
-                printer.write("\(resultVar).reverse();")
                 return [resultVar]
             }
         )

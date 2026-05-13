@@ -49,6 +49,7 @@ export async function createInstantiator(options, swift) {
     let f32Stack = [];
     let f64Stack = [];
     let ptrStack = [];
+    let taStack = [];
     const enumHelpers = {};
     const structHelpers = {};
 
@@ -154,6 +155,13 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_pop_i64"] = function() {
                 return i64Stack.pop();
+            }
+            const taCtors = [Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array];
+            bjs["swift_js_push_typed_array"] = function(kind, ptr, count) {
+                const Ctor = taCtors[kind];
+                const byteLen = count * Ctor.BYTES_PER_ELEMENT;
+                const copy = memory.buffer.slice(ptr, ptr + byteLen);
+                taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -722,14 +730,19 @@ export async function createInstantiator(options, swift) {
                 get delegates() {
                     instance.exports.bjs_DelegateManager_delegates_get(this.pointer);
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const objId = i32Stack.pop();
-                        const obj = swift.memory.getObject(objId);
-                        swift.memory.release(objId);
-                        arrayResult.push(obj);
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const objId = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId);
+                            swift.memory.release(objId);
+                            arrayResult.push(obj);
+                        }
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 }
                 set delegates(value) {
@@ -783,14 +796,19 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(delegates.length);
                     instance.exports.bjs_processDelegates();
                     const arrayLen = i32Stack.pop();
-                    const arrayResult = [];
-                    for (let i = 0; i < arrayLen; i++) {
-                        const objId1 = i32Stack.pop();
-                        const obj = swift.memory.getObject(objId1);
-                        swift.memory.release(objId1);
-                        arrayResult.push(obj);
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const objId1 = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId1);
+                            swift.memory.release(objId1);
+                            arrayResult.push(obj);
+                        }
+                        arrayResult.reverse();
                     }
-                    arrayResult.reverse();
                     return arrayResult;
                 },
                 processDelegatesByName: function bjs_processDelegatesByName(delegates) {
