@@ -4809,6 +4809,28 @@ public func _bjs_StaticPropertyNamespace_NestedProperties_static_nestedDouble_se
     #endif
 }
 
+@_expose(wasm, "bjs_NestedStructGroupA_static_roundtripMetadata")
+@_cdecl("bjs_NestedStructGroupA_static_roundtripMetadata")
+public func _bjs_NestedStructGroupA_static_roundtripMetadata() -> Void {
+    #if arch(wasm32)
+    let ret = NestedStructGroupA.roundtripMetadata(_: NestedStructGroupA.Metadata.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NestedStructGroupB_static_roundtripMetadata")
+@_cdecl("bjs_NestedStructGroupB_static_roundtripMetadata")
+public func _bjs_NestedStructGroupB_static_roundtripMetadata() -> Void {
+    #if arch(wasm32)
+    let ret = NestedStructGroupB.roundtripMetadata(_: NestedStructGroupB.Metadata.bridgeJSLiftParameter())
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripInt")
 @_cdecl("bjs_IntegerTypesSupportExports_static_roundTripInt")
 public func _bjs_IntegerTypesSupportExports_static_roundTripInt(_ v: Int32) -> Int32 {
@@ -5317,6 +5339,102 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
             return Int32(2)
         }
     }
+}
+
+extension NestedStructGroupA.Metadata: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> NestedStructGroupA.Metadata {
+        let count = Int.bridgeJSStackPop()
+        let label = String.bridgeJSStackPop()
+        return NestedStructGroupA.Metadata(label: label, count: count)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.label.bridgeJSStackPush()
+        self.count.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_NestedStructGroupA_Metadata(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_NestedStructGroupA_Metadata()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_NestedStructGroupA_Metadata")
+fileprivate func _bjs_struct_lower_NestedStructGroupA_Metadata_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_NestedStructGroupA_Metadata_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_NestedStructGroupA_Metadata(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_NestedStructGroupA_Metadata_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_NestedStructGroupA_Metadata")
+fileprivate func _bjs_struct_lift_NestedStructGroupA_Metadata_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_NestedStructGroupA_Metadata_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_NestedStructGroupA_Metadata() -> Int32 {
+    return _bjs_struct_lift_NestedStructGroupA_Metadata_extern()
+}
+
+extension NestedStructGroupB.Metadata: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> NestedStructGroupB.Metadata {
+        let value = Double.bridgeJSStackPop()
+        let tag = String.bridgeJSStackPop()
+        return NestedStructGroupB.Metadata(tag: tag, value: value)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.tag.bridgeJSStackPush()
+        self.value.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_NestedStructGroupB_Metadata(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_NestedStructGroupB_Metadata()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_NestedStructGroupB_Metadata")
+fileprivate func _bjs_struct_lower_NestedStructGroupB_Metadata_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_NestedStructGroupB_Metadata_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_NestedStructGroupB_Metadata(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_NestedStructGroupB_Metadata_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_NestedStructGroupB_Metadata")
+fileprivate func _bjs_struct_lift_NestedStructGroupB_Metadata_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_NestedStructGroupB_Metadata_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_NestedStructGroupB_Metadata() -> Int32 {
+    return _bjs_struct_lift_NestedStructGroupB_Metadata_extern()
 }
 
 extension Point: _BridgedSwiftStruct {

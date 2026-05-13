@@ -26,6 +26,32 @@
 
         ],
         "swiftCallName" : "User"
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_Player_getTag",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "getTag",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Player",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Player"
       }
     ],
     "enums" : [
@@ -79,6 +105,47 @@
           }
         ],
         "swiftCallName" : "User.Stats"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Stats",
+        "namespace" : [
+          "Player"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "level",
+            "namespace" : [
+              "Player"
+            ],
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "rating",
+            "namespace" : [
+              "Player"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Player.Stats"
       }
     ]
   },

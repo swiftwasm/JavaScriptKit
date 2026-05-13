@@ -944,7 +944,7 @@ struct IntrinsicJSFragment: Sendable {
         fullName: String,
         kind: JSOptionalKind
     ) -> IntrinsicJSFragment {
-        let base = fullName.components(separatedBy: ".").last ?? fullName
+        let base = fullName.replacingOccurrences(of: ".", with: "_")
         let absenceLiteral = kind.absenceLiteral
         return IntrinsicJSFragment(
             parameters: [],
@@ -1300,7 +1300,7 @@ struct IntrinsicJSFragment: Sendable {
             let base = fullName.components(separatedBy: ".").last ?? fullName
             return .associatedEnumLowerParameter(enumBase: base)
         case .swiftStruct(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
+            let base = fullName.replacingOccurrences(of: ".", with: "_")
             return swiftStructLowerParameter(structBase: base)
         case .closure:
             return IntrinsicJSFragment(
@@ -1360,7 +1360,7 @@ struct IntrinsicJSFragment: Sendable {
             let base = fullName.components(separatedBy: ".").last ?? fullName
             return .associatedEnumLiftReturn(enumBase: base)
         case .swiftStruct(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
+            let base = fullName.replacingOccurrences(of: ".", with: "_")
             return swiftStructLiftReturn(structBase: base)
         case .closure:
             return IntrinsicJSFragment(
@@ -1446,7 +1446,7 @@ struct IntrinsicJSFragment: Sendable {
             case .importTS:
                 return .jsObjectLiftRetainedObjectId
             case .exportSwift:
-                let base = fullName.components(separatedBy: ".").last ?? fullName
+                let base = fullName.replacingOccurrences(of: ".", with: "_")
                 return IntrinsicJSFragment(
                     parameters: [],
                     printCode: { arguments, context in
@@ -1805,7 +1805,7 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     static func swiftStructLowerReturn(fullName: String) -> IntrinsicJSFragment {
-        swiftStructLower(structBase: fullName.components(separatedBy: ".").last ?? fullName)
+        swiftStructLower(structBase: fullName.replacingOccurrences(of: ".", with: "_"))
     }
 
     static func swiftStructLowerParameter(structBase: String) -> IntrinsicJSFragment {
@@ -2008,7 +2008,7 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         case .swiftStruct(let fullName):
-            let structBase = fullName.components(separatedBy: ".").last ?? fullName
+            let structBase = fullName.replacingOccurrences(of: ".", with: "_")
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, context in
@@ -2130,7 +2130,7 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         case .swiftStruct(let fullName):
-            let structBase = fullName.components(separatedBy: ".").last ?? fullName
+            let structBase = fullName.replacingOccurrences(of: ".", with: "_")
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
@@ -2426,7 +2426,7 @@ struct IntrinsicJSFragment: Sendable {
                 )
                 try printer.indent {
                     printer.write(
-                        "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lower(this);"
+                        "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName).lower(this);"
                     )
 
                     var paramForwardings: [String] = []
@@ -2502,7 +2502,7 @@ struct IntrinsicJSFragment: Sendable {
                     let printer = context.printer
                     let value = arguments[0]
                     printer.write(
-                        "\(JSGlueVariableScope.reservedStructHelpers).\(nestedName).lower(\(value));"
+                        "\(JSGlueVariableScope.reservedStructHelpers).\(nestedName.replacingOccurrences(of: ".", with: "_")).lower(\(value));"
                     )
                     return []
                 }
@@ -2540,7 +2540,7 @@ struct IntrinsicJSFragment: Sendable {
                     let (scope, printer) = (context.scope, context.printer)
                     let structVar = scope.variable("struct")
                     printer.write(
-                        "const \(structVar) = \(JSGlueVariableScope.reservedStructHelpers).\(nestedName).lift();"
+                        "const \(structVar) = \(JSGlueVariableScope.reservedStructHelpers).\(nestedName.replacingOccurrences(of: ".", with: "_")).lift();"
                     )
                     return [structVar]
                 }

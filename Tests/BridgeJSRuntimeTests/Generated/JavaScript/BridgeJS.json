@@ -9165,6 +9165,100 @@
 
         ],
         "emitStyle" : "const",
+        "name" : "NestedStructGroupA",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_NestedStructGroupA_static_roundtripMetadata",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundtripMetadata",
+            "namespace" : [
+              "NestedStructGroupA"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "m",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "NestedStructGroupA.Metadata"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "NestedStructGroupA.Metadata"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "NestedStructGroupA"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "NestedStructGroupA",
+        "tsFullPath" : "NestedStructGroupA"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "NestedStructGroupB",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_NestedStructGroupB_static_roundtripMetadata",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "roundtripMetadata",
+            "namespace" : [
+              "NestedStructGroupB"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "m",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "NestedStructGroupB.Metadata"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "NestedStructGroupB.Metadata"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "NestedStructGroupB"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "NestedStructGroupB",
+        "tsFullPath" : "NestedStructGroupB"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
         "name" : "IntegerTypesSupportExports",
         "staticMethods" : [
           {
@@ -14890,6 +14984,85 @@
       }
     ],
     "structs" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "Metadata",
+        "namespace" : [
+          "NestedStructGroupA"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "namespace" : [
+              "NestedStructGroupA"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "count",
+            "namespace" : [
+              "NestedStructGroupA"
+            ],
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "NestedStructGroupA.Metadata"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Metadata",
+        "namespace" : [
+          "NestedStructGroupB"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "tag",
+            "namespace" : [
+              "NestedStructGroupB"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "value",
+            "namespace" : [
+              "NestedStructGroupB"
+            ],
+            "type" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "NestedStructGroupB.Metadata"
+      },
       {
         "methods" : [
 

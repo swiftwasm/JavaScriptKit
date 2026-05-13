@@ -232,7 +232,9 @@ public struct BridgeJSLink {
             var structExportEntries: [(js: [String], dts: [String])] = []
             for structDefinition in skeleton.structs {
                 let (jsStruct, dtsType, dtsExportEntry) = try renderExportedStruct(structDefinition)
-                data.topLevelDtsTypeLines.append(contentsOf: dtsType)
+                if structDefinition.namespace == nil {
+                    data.topLevelDtsTypeLines.append(contentsOf: dtsType)
+                }
 
                 if structDefinition.namespace == nil && (!jsStruct.isEmpty || !dtsExportEntry.isEmpty) {
                     structExportEntries.append((js: jsStruct, dts: dtsExportEntry))
@@ -492,7 +494,7 @@ public struct BridgeJSLink {
                         printer.write("bjs[\"swift_js_struct_lower_\(structDef.abiName)\"] = function(objectId) {")
                         printer.indent {
                             printer.write(
-                                "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
+                                "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
                             )
                         }
                         printer.write("}")
@@ -500,7 +502,7 @@ public struct BridgeJSLink {
                         printer.write("bjs[\"swift_js_struct_lift_\(structDef.abiName)\"] = function() {")
                         printer.indent {
                             printer.write(
-                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.name).lift();"
+                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName).lift();"
                             )
                             printer.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(value);")
                         }
@@ -1005,7 +1007,7 @@ public struct BridgeJSLink {
                 let structScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
                 let fragment = IntrinsicJSFragment.structHelper(structDefinition: structDef, allStructs: allStructs)
                 _ = try fragment.printCode(
-                    [structDef.name],
+                    [structDef.abiName],
                     IntrinsicJSFragment.PrintCodeContext(
                         scope: structScope,
                         printer: structPrinter,
@@ -1159,10 +1161,10 @@ public struct BridgeJSLink {
         for skeleton in skeletons.compactMap(\.exported) {
             for structDef in skeleton.structs {
                 printer.write(
-                    "const \(structDef.name)Helpers = __bjs_create\(structDef.name)Helpers();"
+                    "const \(structDef.abiName)Helpers = __bjs_create\(structDef.abiName)Helpers();"
                 )
                 printer.write(
-                    "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.name) = \(structDef.name)Helpers;"
+                    "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName) = \(structDef.abiName)Helpers;"
                 )
                 printer.nextLine()
             }
@@ -2616,6 +2618,7 @@ extension BridgeJSLink {
             var functions: [ExportedFunction] = []
             var classes: [ExportedClass] = []
             var enums: [ExportedEnum] = []
+            var structs: [ExportedStruct] = []
             var staticProperties: [ExportedProperty] = []
             var functionJsLines: [(name: String, lines: [String])] = []
             var functionDtsLines: [(name: String, lines: [String])] = []
@@ -2662,6 +2665,14 @@ extension BridgeJSLink {
                         currentNode = currentNode.addChild(part)
                     }
                     currentNode.content.classes.append(klass)
+                }
+
+                for structDef in skeleton.structs where structDef.namespace != nil {
+                    var currentNode = rootNode
+                    for part in structDef.namespace! {
+                        currentNode = currentNode.addChild(part)
+                    }
+                    currentNode.content.structs.append(structDef)
                 }
 
                 for enumDef in skeleton.enums where enumDef.namespace != nil && enumDef.enumType != .namespace {
@@ -2845,8 +2856,18 @@ extension BridgeJSLink {
             }
         }
 
+        private func hasExportContent(node: NamespaceNode) -> Bool {
+            if !node.content.classDtsLines.isEmpty || !node.content.enumDtsLines.isEmpty
+                || !node.content.functionDtsLines.isEmpty || !node.content.staticProperties.isEmpty
+            {
+                return true
+            }
+            return node.children.values.contains(where: { hasExportContent(node: $0) })
+        }
+
         private func printExportsTypeHierarchy(node: NamespaceNode, printer: CodeFragmentPrinter) {
             for (childName, childNode) in node.children.sorted(by: { $0.key < $1.key }) {
+                guard hasExportContent(node: childNode) else { continue }
                 printer.write("\(childName): {")
                 printer.indent {
                     for (_, lines) in childNode.content.classDtsLines.sorted(by: { $0.name < $1.name }) {
@@ -2983,8 +3004,8 @@ extension BridgeJSLink {
             renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String
         ) {
             func hasContent(node: NamespaceNode) -> Bool {
-                // Enums are always included
-                if !node.content.enums.isEmpty {
+                // Enums and structs are always included
+                if !node.content.enums.isEmpty || !node.content.structs.isEmpty {
                     return true
                 }
 
@@ -3162,6 +3183,23 @@ extension BridgeJSLink {
                         case .namespace:
                             continue
                         }
+                    }
+
+                    // Generate struct interface definitions
+                    let sortedStructs = childNode.content.structs.sorted { $0.name < $1.name }
+                    for structDef in sortedStructs {
+                        let instanceProps = structDef.properties.filter { !$0.isStatic }
+                        printer.write("export interface \(structDef.name) {")
+                        printer.indent {
+                            for property in instanceProps {
+                                let tsType = BridgeJSLink.resolveTypeScriptType(
+                                    property.type,
+                                    exportedSkeletons: exportedSkeletons
+                                )
+                                printer.write("\(property.name): \(tsType);")
+                            }
+                        }
+                        printer.write("}")
                     }
 
                     // Only include functions and properties when exposeToGlobal is true
@@ -3610,7 +3648,7 @@ extension BridgeType {
         case .associatedValueEnum(let name):
             return "\(name)Tag"
         case .swiftStruct(let name):
-            return name.components(separatedBy: ".").last ?? name
+            return name
         case .namespaceEnum(let name):
             return name
         case .swiftProtocol(let name):
