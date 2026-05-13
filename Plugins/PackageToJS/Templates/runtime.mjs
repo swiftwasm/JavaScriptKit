@@ -241,7 +241,7 @@ function deserializeError(error) {
 
 const globalVariable = globalThis;
 
-const SLOT_BITS = 22;
+const SLOT_BITS = 24;
 const SLOT_MASK = (1 << SLOT_BITS) - 1;
 const GEN_MASK = (1 << (32 - SLOT_BITS)) - 1;
 class JSObjectSpace {
@@ -250,6 +250,7 @@ class JSObjectSpace {
         this._values = [];
         this._stateBySlot = [];
         this._freeSlotStack = [];
+        // Note: 0 is preserved for invalid references, 1 is preserved for globalThis
         this._values[0] = undefined;
         this._values[1] = globalVariable;
         this._slotByValue.set(globalVariable, 1);
@@ -316,13 +317,13 @@ class JSObjectSpace {
     _getValidatedSlotState(reference) {
         const slot = reference & SLOT_MASK;
         if (slot === 0)
-            throw new ReferenceError("Attempted to use invalid reference " + reference);
+            throw new ReferenceError(`Attempted to use invalid reference ${reference}`);
         const state = this._stateBySlot[slot];
         if (state === undefined || (state & SLOT_MASK) === 0) {
-            throw new ReferenceError("Attempted to use invalid reference " + reference);
+            throw new ReferenceError(`Attempted to use invalid reference ${reference}`);
         }
-        if ((state >>> SLOT_BITS) !== (reference >>> SLOT_BITS)) {
-            throw new ReferenceError("Attempted to use stale reference " + reference);
+        if (state >>> SLOT_BITS !== reference >>> SLOT_BITS) {
+            throw new ReferenceError(`Attempted to use stale reference ${reference}`);
         }
         return state;
     }
