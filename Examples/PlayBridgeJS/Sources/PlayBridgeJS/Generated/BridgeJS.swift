@@ -183,16 +183,7 @@ public func _bjs_PlayBridgeJS_updateDetailed(_ _self: UnsafeMutableRawPointer, _
         let ret = try PlayBridgeJS.bridgeJSLiftParameter(_self).updateDetailed(swiftSource: String.bridgeJSLiftParameter(swiftSourceBytes, swiftSourceLength), dtsSource: String.bridgeJSLiftParameter(dtsSourceBytes, dtsSourceLength))
         return ret.bridgeJSLowerReturn()
     } catch let error {
-        if let error = error.thrownValue.object {
-            withExtendedLifetime(error) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        } else {
-            let jsError = JSError(message: String(describing: error))
-            withExtendedLifetime(jsError.jsObject) {
-                _swift_js_throw(Int32(bitPattern: $0.id))
-            }
-        }
+        error.bridgeJSLowerThrow()
         return
     }
     #else

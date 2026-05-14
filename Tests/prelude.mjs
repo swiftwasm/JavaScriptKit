@@ -527,6 +527,15 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
         assert.fail("Expected no error");
     }
 
+    // Test ConvertibleToJSException with custom error type
+    try {
+        exports.throwsStringError();
+        assert.fail("Expected error");
+    } catch (error) {
+        assert.ok(error instanceof Error, "Custom error should be an Error instance");
+        assert.equal(error.message, "Custom string error");
+    }
+
     // Test enums
     assert.equal(exports.Direction.North, 0);
     assert.equal(exports.Direction.South, 1);
