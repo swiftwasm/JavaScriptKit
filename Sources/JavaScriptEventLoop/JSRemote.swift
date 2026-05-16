@@ -42,8 +42,38 @@ public struct JSRemote<T>: @unchecked Sendable {
 
     private let storage: Storage
 
-    fileprivate init(sourceObject: JSObject, sourceTid: Int32) {
+    fileprivate init(sourceObject: JSObject) {
+        let sourceTid: Int32
+        #if compiler(>=6.1) && _runtime(_multithreaded)
+        sourceTid = sourceObject.ownerTid
+        #else
+        sourceTid = -1
+        #endif
         self.storage = Storage(sourceObject: sourceObject, sourceTid: sourceTid)
+    }
+
+    fileprivate func _withJSObject<R: Sendable, E: Error>(
+        _ body: @Sendable @escaping (JSObject) throws(E) -> R
+    ) async throws(E) -> sending R {
+        #if compiler(>=6.1) && _runtime(_multithreaded)
+        if storage.sourceTid == swjs_get_worker_thread_id_cached() {
+            return try body(storage.sourceObject)
+        }
+        let result: Result<R, E> = await withCheckedContinuation { continuation in
+            let context = _JSRemoteContext(
+                sourceObject: storage.sourceObject,
+                body: body,
+                continuation: continuation
+            )
+            swjs_request_remote_jsobject_body(
+                storage.sourceTid,
+                Unmanaged.passRetained(context).toOpaque()
+            )
+        }
+        return try result.get()
+        #else
+        return try body(storage.sourceObject)
+        #endif
     }
 }
 
@@ -62,11 +92,7 @@ extension JSRemote where T == JSObject {
     ///
     /// - Parameter object: The JavaScript object to reference remotely.
     public init(_ object: JSObject) {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
-        self.init(sourceObject: object, sourceTid: object.ownerTid)
-        #else
-        self.init(sourceObject: object, sourceTid: -1)
-        #endif
+        self.init(sourceObject: object)
     }
 
     /// Performs an operation with the underlying `JSObject` on its owning thread.
@@ -92,27 +118,65 @@ extension JSRemote where T == JSObject {
     public func withJSObject<R: Sendable, E: Error>(
         _ body: @Sendable @escaping (JSObject) throws(E) -> R
     ) async throws(E) -> sending R {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
-        if storage.sourceTid == swjs_get_worker_thread_id_cached() {
-            return try body(storage.sourceObject)
-        }
-        let result: Result<R, E> = await withCheckedContinuation { continuation in
-            let context = _JSRemoteContext(
-                sourceObject: storage.sourceObject,
-                body: body,
-                continuation: continuation
-            )
-            swjs_request_remote_jsobject_body(
-                storage.sourceTid,
-                Unmanaged.passRetained(context).toOpaque()
-            )
-        }
-        return try result.get()
-        #else
-        return try body(storage.sourceObject)
-        #endif
+        try await _withJSObject(body)
     }
 }
+
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+extension JSRemote where T: _JSBridgedClass {
+    /// Creates a remote handle for a `@JSClass`-imported object.
+    ///
+    /// The object remains owned by its current JavaScript thread. Access it later by calling
+    /// `withJSObject(_:)`, which executes the closure on the owning thread when necessary.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// @JSClass struct Window {
+    ///     @JSGetter var location: Location
+    /// }
+    /// let remoteWindow = JSRemote(Window(unsafelyWrapping: JSObject.global))
+    /// remoteWindow.withJSObject { window in
+    ///     print(window.location.href.string ?? "")
+    /// }
+    /// ```
+    ///
+    /// - Parameter object: The JavaScript object to reference remotely.
+    public init(_ object: T) {
+        self.init(sourceObject: object.jsObject)
+    }
+
+
+    /// Performs an operation with the underlying `T` object on its owning thread.
+    ///
+    /// If the caller is already running on the thread that owns the object, `body` executes
+    /// immediately. Otherwise, this method asynchronously requests execution on the owner and
+    /// resumes when the closure completes.
+    ///
+    /// Use this API when the object must stay on its original thread but a result derived from
+    /// that object needs to be produced in another Swift concurrency context.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// let location = try await remoteWindow.withJSObject { window in
+    ///     window.location.href.string ?? ""
+    /// }
+    /// ```
+    ///
+    /// - Parameter body: A sendable closure that receives the owned `T` object.
+    /// - Returns: The value produced by `body`.
+    /// - Throws: Any error thrown by `body`.
+    public func withJSObject<R: Sendable, E: Error>(
+        _ body: @Sendable @escaping (T) throws(E) -> R
+    ) async throws(E) -> sending R where T: SendableMetatype {
+        try await _withJSObject { jsObject throws(E) -> R in
+            let object = T(unsafelyWrapping: jsObject)
+            return try body(object)
+        }
+    }
+}
+
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 private final class _JSRemoteContext: @unchecked Sendable {
