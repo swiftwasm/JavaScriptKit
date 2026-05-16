@@ -1198,8 +1198,15 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             className: classNameForABI
         )
 
-        let isMutating = node.modifiers.contains { $0.name.tokenKind == .keyword(.mutating) }
-        guard let effects = collectEffects(signature: node.signature, isStatic: isStatic, isMutating: isMutating) else {
+        if let mutatingModifier = node.modifiers.first(where: { $0.name.tokenKind == .keyword(.mutating) }) {
+            diagnose(
+                node: mutatingModifier,
+                message: "@JS does not support mutating struct methods: mutations to 'self' cannot be propagated back to JavaScript",
+                hint: "Remove the mutating keyword or redesign the API to return the updated value instead"
+            )
+            return nil
+        }
+        guard let effects = collectEffects(signature: node.signature, isStatic: isStatic) else {
             return nil
         }
 
@@ -1214,7 +1221,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         )
     }
 
-    private func collectEffects(signature: FunctionSignatureSyntax, isStatic: Bool = false, isMutating: Bool = false) -> Effects? {
+    private func collectEffects(signature: FunctionSignatureSyntax, isStatic: Bool = false) -> Effects? {
         let isAsync = signature.effectSpecifiers?.asyncSpecifier != nil
         var isThrows = false
         if let throwsClause: ThrowsClauseSyntax = signature.effectSpecifiers?.throwsClause {
@@ -1235,7 +1242,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             }
             isThrows = true
         }
-        return Effects(isAsync: isAsync, isThrows: isThrows, isStatic: isStatic, isMutating: isMutating)
+        return Effects(isAsync: isAsync, isThrows: isThrows, isStatic: isStatic)
     }
 
     private func extractNamespace(
