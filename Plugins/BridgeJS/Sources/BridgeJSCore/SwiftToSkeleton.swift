@@ -1230,6 +1230,14 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             className: classNameForABI
         )
 
+        if let mutatingModifier = node.modifiers.first(where: { $0.name.tokenKind == .keyword(.mutating) }) {
+            diagnose(
+                node: mutatingModifier,
+                message: "@JS does not support mutating struct methods: mutations to 'self' cannot be propagated back to JavaScript",
+                hint: "Remove the mutating keyword or redesign the API to return the updated value instead"
+            )
+            return nil
+        }
         guard let effects = collectEffects(signature: node.signature, isStatic: isStatic) else {
             return nil
         }
@@ -1554,7 +1562,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
     }
 
-    /// Walks extension members under the matching type’s state, returning whether the type was found.
+    /// Walks extension members under the matching type's state, returning whether the type was found.
     ///
     /// Note: The lookup scans dictionaries keyed by `makeKey(name:namespace:)`, matching only by
     /// plain name. If two types share a name but differ by namespace, `.first(where:)` picks
