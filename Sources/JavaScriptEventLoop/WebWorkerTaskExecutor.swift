@@ -114,6 +114,10 @@ import WASILibc
 @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)  // For `Atomic` and `TaskExecutor` types
 public final class WebWorkerTaskExecutor: TaskExecutor {
 
+    internal static var currentExecutorPreference: (any TaskExecutor)? {
+        Worker.currentThread?.parentTaskExecutor
+    }
+
     /// An error that occurs when spawning a worker thread fails.
     public struct SpawnError: Error {
         /// The reason for the error.
