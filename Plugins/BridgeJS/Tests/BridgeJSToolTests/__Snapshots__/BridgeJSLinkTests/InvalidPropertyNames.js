@@ -11,6 +11,9 @@ export async function createInstantiator(options, swift) {
     let decodeString;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
+    const _strEncCache = new Map();
+    const _strEncCacheMax = 256;
+    function _cachedEncode(s) { let b = _strEncCache.get(s); if (b) { _strEncCache.delete(s); _strEncCache.set(s, b); return b; } b = textEncoder.encode(s); if (_strEncCache.size >= _strEncCacheMax) { _strEncCache.delete(_strEncCache.keys().next().value); } _strEncCache.set(s, b); return b; };
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
@@ -46,7 +49,11 @@ export async function createInstantiator(options, swift) {
                 const source = swift.memory.getObject(sourceId);
                 swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
+                if (typeof source === 'string') {
+                    return textEncoder.encodeInto(source, bytes).written;
+                }
                 bytes.set(source);
+                return source.length;
             }
             bjs["swift_js_make_js_string"] = function(ptr, len) {
                 return swift.memory.retain(decodeString(ptr, len));
@@ -211,7 +218,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_WeirdNaming_normalProperty_get"] = function bjs_WeirdNaming_normalProperty_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).normalProperty;
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -238,7 +245,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_WeirdNaming_property_with_spaces_get"] = function bjs_WeirdNaming_property_with_spaces_get(self) {
                 try {
                     let ret = swift.memory.getObject(self)["property with spaces"];
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -256,7 +263,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_WeirdNaming_constructor_get"] = function bjs_WeirdNaming_constructor_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).constructor;
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -265,7 +272,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_WeirdNaming_for_get"] = function bjs_WeirdNaming_for_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).for;
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -274,7 +281,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_WeirdNaming_Any_get"] = function bjs_WeirdNaming_Any_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).Any;
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);

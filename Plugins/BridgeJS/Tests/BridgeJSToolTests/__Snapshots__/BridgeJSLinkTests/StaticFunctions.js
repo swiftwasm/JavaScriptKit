@@ -22,6 +22,9 @@ export async function createInstantiator(options, swift) {
     let decodeString;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
+    const _strEncCache = new Map();
+    const _strEncCacheMax = 256;
+    function _cachedEncode(s) { let b = _strEncCache.get(s); if (b) { _strEncCache.delete(s); _strEncCache.set(s, b); return b; } b = textEncoder.encode(s); if (_strEncCache.size >= _strEncCacheMax) { _strEncCache.delete(_strEncCache.keys().next().value); } _strEncCache.set(s, b); return b; };
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
@@ -46,9 +49,8 @@ export async function createInstantiator(options, swift) {
             const enumTag = value.tag;
             switch (enumTag) {
                 case APIResultValues.Tag.Success: {
-                    const bytes = textEncoder.encode(value.param0);
-                    const id = swift.memory.retain(bytes);
-                    i32Stack.push(bytes.length);
+                    const id = swift.memory.retain(value.param0);
+                    i32Stack.push(value.param0.length * 3);
                     i32Stack.push(id);
                     return APIResultValues.Tag.Success;
                 }
@@ -89,7 +91,11 @@ export async function createInstantiator(options, swift) {
                 const source = swift.memory.getObject(sourceId);
                 swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
+                if (typeof source === 'string') {
+                    return textEncoder.encodeInto(source, bytes).written;
+                }
                 bytes.set(source);
+                return source.length;
             }
             bjs["swift_js_make_js_string"] = function(ptr, len) {
                 return swift.memory.retain(decodeString(ptr, len));
@@ -369,7 +375,7 @@ export async function createInstantiator(options, swift) {
                 Utils: {
                     String: {
                         uppercase: function bjs_Utils_String_static_uppercase(text) {
-                            const textBytes = textEncoder.encode(text);
+                            const textBytes = _cachedEncode(text);
                             const textId = swift.memory.retain(textBytes);
                             instance.exports.bjs_Utils_String_static_uppercase(textId, textBytes.length);
                             const ret = tmpRetString;

@@ -331,6 +331,9 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedDecodeString);",
             "const \(JSGlueVariableScope.reservedTextDecoder) = new TextDecoder(\"utf-8\");",
             "const \(JSGlueVariableScope.reservedTextEncoder) = new TextEncoder(\"utf-8\");",
+            "const \(JSGlueVariableScope.reservedStrEncCache) = new Map();",
+            "const \(JSGlueVariableScope.reservedStrEncCacheMax) = 256;",
+            "function \(JSGlueVariableScope.reservedCachedEncode)(s) { let b = \(JSGlueVariableScope.reservedStrEncCache).get(s); if (b) { \(JSGlueVariableScope.reservedStrEncCache).delete(s); \(JSGlueVariableScope.reservedStrEncCache).set(s, b); return b; } b = \(JSGlueVariableScope.reservedTextEncoder).encode(s); if (\(JSGlueVariableScope.reservedStrEncCache).size >= \(JSGlueVariableScope.reservedStrEncCacheMax)) { \(JSGlueVariableScope.reservedStrEncCache).delete(\(JSGlueVariableScope.reservedStrEncCache).keys().next().value); } \(JSGlueVariableScope.reservedStrEncCache).set(s, b); return b; };",
             "let \(JSGlueVariableScope.reservedStorageToReturnString);",
             "let \(JSGlueVariableScope.reservedStorageToReturnBytes);",
             "let \(JSGlueVariableScope.reservedStorageToReturnException);",
@@ -393,7 +396,15 @@ public struct BridgeJSLink {
                     printer.write(
                         "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, bytesPtr);"
                     )
+                    printer.write("if (typeof source === 'string') {")
+                    printer.indent {
+                        printer.write(
+                            "return \(JSGlueVariableScope.reservedTextEncoder).encodeInto(source, bytes).written;"
+                        )
+                    }
+                    printer.write("}")
                     printer.write("bytes.set(source);")
+                    printer.write("return source.length;")
                 }
                 printer.write("}")
                 printer.write("bjs[\"swift_js_make_js_string\"] = function(ptr, len) {")

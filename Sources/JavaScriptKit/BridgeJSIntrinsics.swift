@@ -472,8 +472,8 @@ extension String: _BridgedSwiftStackType {
         guard #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) else { _onlyAvailableOnWasm() }
         #endif
         return String(unsafeUninitializedCapacity: Int(count)) { b in
-            _swift_js_init_memory(bytes, b.baseAddress.unsafelyUnwrapped)
-            return Int(count)
+            let written = _swift_js_init_memory(bytes, b.baseAddress.unsafelyUnwrapped)
+            return Int(written)
         }
     }
 
@@ -899,22 +899,27 @@ where Self: RawRepresentable, RawValue: _BridgedSwiftTypeLoweredIntoSingleWasmCo
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_init_memory")
-private func _swift_js_init_memory_extern(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>)
+private func _swift_js_init_memory_extern(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>) -> Int32
 #else
-private func _swift_js_init_memory_extern(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>) {
+private func _swift_js_init_memory_extern(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>) -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
 
-/// Initializes WebAssembly memory with a Uint8Array referenced by `sourceId` at `ptr`.
-/// Note that the ownership of the source Uint8Array id is taken by the callee, so callers
-/// must not release the source Uint8Array id by themselves.
+/// Initializes WebAssembly memory with a source referenced by `sourceId` at `ptr`.
+/// The source may be a Uint8Array or a string. If a string, the JS side uses `encodeInto()`
+/// and returns the actual byte count written.
+/// Note that the ownership of the source id is taken by the callee, so callers
+/// must not release it by themselves.
 ///
-/// - Parameter sourceId: The object ID of the source Uint8Array.
+/// - Parameter sourceId: The object ID of the source (Uint8Array or string).
 /// - Parameter ptr: The pointer to the WebAssembly memory to initialize.
-@_spi(BridgeJS) @inline(never) public func _swift_js_init_memory(_ sourceId: Int32, _ ptr: UnsafeMutablePointer<UInt8>)
-{
-    _swift_js_init_memory_extern(sourceId, ptr)
+/// - Returns: The number of bytes actually written.
+@_spi(BridgeJS) @inline(never) public func _swift_js_init_memory(
+    _ sourceId: Int32,
+    _ ptr: UnsafeMutablePointer<UInt8>
+) -> Int32 {
+    return _swift_js_init_memory_extern(sourceId, ptr)
 }
 
 #if arch(wasm32)

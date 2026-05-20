@@ -35,6 +35,9 @@ export async function createInstantiator(options, swift) {
     let decodeString;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
+    const _strEncCache = new Map();
+    const _strEncCacheMax = 256;
+    function _cachedEncode(s) { let b = _strEncCache.get(s); if (b) { _strEncCache.delete(s); _strEncCache.set(s, b); return b; } b = textEncoder.encode(s); if (_strEncCache.size >= _strEncCacheMax) { _strEncCache.delete(_strEncCache.keys().next().value); } _strEncCache.set(s, b); return b; };
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
@@ -59,9 +62,8 @@ export async function createInstantiator(options, swift) {
             const enumTag = value.tag;
             switch (enumTag) {
                 case ResultValues.Tag.Success: {
-                    const bytes = textEncoder.encode(value.param0);
-                    const id = swift.memory.retain(bytes);
-                    i32Stack.push(bytes.length);
+                    const id = swift.memory.retain(value.param0);
+                    i32Stack.push(value.param0.length * 3);
                     i32Stack.push(id);
                     return ResultValues.Tag.Success;
                 }
@@ -102,7 +104,11 @@ export async function createInstantiator(options, swift) {
                 const source = swift.memory.getObject(sourceId);
                 swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
+                if (typeof source === 'string') {
+                    return textEncoder.encodeInto(source, bytes).written;
+                }
                 bytes.set(source);
+                return source.length;
             }
             bjs["swift_js_make_js_string"] = function(ptr, len) {
                 return swift.memory.retain(decodeString(ptr, len));
@@ -281,7 +287,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_MyViewControllerDelegate_delegateName_get"] = function bjs_MyViewControllerDelegate_delegateName_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).delegateName;
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -334,7 +340,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_MyViewControllerDelegate_rawStringEnum_get"] = function bjs_MyViewControllerDelegate_rawStringEnum_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).rawStringEnum;
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -533,7 +539,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_MyViewControllerDelegate_createEnum"] = function bjs_MyViewControllerDelegate_createEnum(self) {
                 try {
                     let ret = swift.memory.getObject(self).createEnum();
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -654,7 +660,7 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_MyViewController_triggerEvent(this.pointer);
                 }
                 updateValue(value) {
-                    const valueBytes = textEncoder.encode(value);
+                    const valueBytes = _cachedEncode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_MyViewController_updateValue(this.pointer, valueId, valueBytes.length);
                 }
@@ -663,9 +669,9 @@ export async function createInstantiator(options, swift) {
                     return ret !== 0;
                 }
                 updateLabel(prefix, suffix) {
-                    const prefixBytes = textEncoder.encode(prefix);
+                    const prefixBytes = _cachedEncode(prefix);
                     const prefixId = swift.memory.retain(prefixBytes);
-                    const suffixBytes = textEncoder.encode(suffix);
+                    const suffixBytes = _cachedEncode(suffix);
                     const suffixId = swift.memory.retain(suffixBytes);
                     instance.exports.bjs_MyViewController_updateLabel(this.pointer, prefixId, prefixBytes.length, suffixId, suffixBytes.length);
                 }
@@ -757,9 +763,8 @@ export async function createInstantiator(options, swift) {
                     const entries = Object.entries(value);
                     for (const entry of entries) {
                         const [key, value1] = entry;
-                        const bytes = textEncoder.encode(key);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
+                        const id = swift.memory.retain(key);
+                        i32Stack.push(key.length * 3);
                         i32Stack.push(id);
                         const objId = swift.memory.retain(value1);
                         i32Stack.push(objId);
@@ -797,9 +802,8 @@ export async function createInstantiator(options, swift) {
                     const entries = Object.entries(delegates);
                     for (const entry of entries) {
                         const [key, value] = entry;
-                        const bytes = textEncoder.encode(key);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
+                        const id = swift.memory.retain(key);
+                        i32Stack.push(key.length * 3);
                         i32Stack.push(id);
                         const objId = swift.memory.retain(value);
                         i32Stack.push(objId);

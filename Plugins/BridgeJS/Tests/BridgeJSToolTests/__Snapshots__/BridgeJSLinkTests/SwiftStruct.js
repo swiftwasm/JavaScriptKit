@@ -16,6 +16,9 @@ export async function createInstantiator(options, swift) {
     let decodeString;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
+    const _strEncCache = new Map();
+    const _strEncCacheMax = 256;
+    function _cachedEncode(s) { let b = _strEncCache.get(s); if (b) { _strEncCache.delete(s); _strEncCache.set(s, b); return b; } b = textEncoder.encode(s); if (_strEncCache.size >= _strEncCacheMax) { _strEncCache.delete(_strEncCache.keys().next().value); } _strEncCache.set(s, b); return b; };
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
@@ -39,9 +42,8 @@ export async function createInstantiator(options, swift) {
         lower: (value) => {
             f64Stack.push(value.x);
             f64Stack.push(value.y);
-            const bytes = textEncoder.encode(value.label);
-            const id = swift.memory.retain(bytes);
-            i32Stack.push(bytes.length);
+            const id = swift.memory.retain(value.label);
+            i32Stack.push(value.label.length * 3);
             i32Stack.push(id);
             const isSome = value.optCount != null ? 1 : 0;
             if (isSome) {
@@ -79,13 +81,11 @@ export async function createInstantiator(options, swift) {
     });
     const __bjs_createAddressHelpers = () => ({
         lower: (value) => {
-            const bytes = textEncoder.encode(value.street);
-            const id = swift.memory.retain(bytes);
-            i32Stack.push(bytes.length);
+            const id = swift.memory.retain(value.street);
+            i32Stack.push(value.street.length * 3);
             i32Stack.push(id);
-            const bytes1 = textEncoder.encode(value.city);
-            const id1 = swift.memory.retain(bytes1);
-            i32Stack.push(bytes1.length);
+            const id1 = swift.memory.retain(value.city);
+            i32Stack.push(value.city.length * 3);
             i32Stack.push(id1);
             const isSome = value.zipCode != null ? 1 : 0;
             if (isSome) {
@@ -109,17 +109,15 @@ export async function createInstantiator(options, swift) {
     });
     const __bjs_createPersonHelpers = () => ({
         lower: (value) => {
-            const bytes = textEncoder.encode(value.name);
-            const id = swift.memory.retain(bytes);
-            i32Stack.push(bytes.length);
+            const id = swift.memory.retain(value.name);
+            i32Stack.push(value.name.length * 3);
             i32Stack.push(id);
             i32Stack.push((value.age | 0));
             structHelpers.Address.lower(value.address);
             const isSome = value.email != null ? 1 : 0;
             if (isSome) {
-                const bytes1 = textEncoder.encode(value.email);
-                const id1 = swift.memory.retain(bytes1);
-                i32Stack.push(bytes1.length);
+                const id1 = swift.memory.retain(value.email);
+                i32Stack.push(value.email.length * 3);
                 i32Stack.push(id1);
             }
             i32Stack.push(isSome);
@@ -258,7 +256,11 @@ export async function createInstantiator(options, swift) {
                 const source = swift.memory.getObject(sourceId);
                 swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
+                if (typeof source === 'string') {
+                    return textEncoder.encodeInto(source, bytes).written;
+                }
                 bytes.set(source);
+                return source.length;
             }
             bjs["swift_js_make_js_string"] = function(ptr, len) {
                 return swift.memory.retain(decodeString(ptr, len));
@@ -536,7 +538,7 @@ export async function createInstantiator(options, swift) {
                 }
 
                 constructor(name) {
-                    const nameBytes = textEncoder.encode(name);
+                    const nameBytes = _cachedEncode(name);
                     const nameId = swift.memory.retain(nameBytes);
                     const ret = instance.exports.bjs_Greeter_init(nameId, nameBytes.length);
                     return Greeter.__construct(ret);
@@ -554,7 +556,7 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
                 set name(value) {
-                    const valueBytes = textEncoder.encode(value);
+                    const valueBytes = _cachedEncode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_Greeter_name_set(this.pointer, valueId, valueBytes.length);
                 }
@@ -600,7 +602,7 @@ export async function createInstantiator(options, swift) {
                 Precision: PrecisionValues,
                 DataPoint: {
                     init: function(x, y, label, optCount, optFlag) {
-                        const labelBytes = textEncoder.encode(label);
+                        const labelBytes = _cachedEncode(label);
                         const labelId = swift.memory.retain(labelBytes);
                         const isSome = optCount != null;
                         const isSome1 = optFlag != null;
@@ -630,7 +632,7 @@ export async function createInstantiator(options, swift) {
                         return ret;
                     },
                     set defaultConfig(value) {
-                        const valueBytes = textEncoder.encode(value);
+                        const valueBytes = _cachedEncode(value);
                         const valueId = swift.memory.retain(valueBytes);
                         instance.exports.bjs_ConfigStruct_static_defaultConfig_set(valueId, valueBytes.length);
                     },

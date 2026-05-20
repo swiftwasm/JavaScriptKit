@@ -11,6 +11,9 @@ export async function createInstantiator(options, swift) {
     let decodeString;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
+    const _strEncCache = new Map();
+    const _strEncCacheMax = 256;
+    function _cachedEncode(s) { let b = _strEncCache.get(s); if (b) { _strEncCache.delete(s); _strEncCache.set(s, b); return b; } b = textEncoder.encode(s); if (_strEncCache.size >= _strEncCacheMax) { _strEncCache.delete(_strEncCache.keys().next().value); } _strEncCache.set(s, b); return b; };
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
@@ -70,7 +73,11 @@ export async function createInstantiator(options, swift) {
                 const source = swift.memory.getObject(sourceId);
                 swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
+                if (typeof source === 'string') {
+                    return textEncoder.encodeInto(source, bytes).written;
+                }
                 bytes.set(source);
+                return source.length;
             }
             bjs["swift_js_make_js_string"] = function(ptr, len) {
                 return swift.memory.retain(decodeString(ptr, len));
@@ -246,7 +253,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let ret = callback(swift.memory.getObject(param0));
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -271,7 +278,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let ret = callback(param0IsSome ? swift.memory.getObject(param0ObjectId) : null);
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -336,7 +343,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_Renderable_render"] = function bjs_Renderable_render(self) {
                 try {
                     let ret = swift.memory.getObject(self).render();
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -413,7 +420,7 @@ export async function createInstantiator(options, swift) {
                 }
 
                 constructor(name) {
-                    const nameBytes = textEncoder.encode(name);
+                    const nameBytes = _cachedEncode(name);
                     const nameId = swift.memory.retain(nameBytes);
                     const ret = instance.exports.bjs_Widget_init(nameId, nameBytes.length);
                     return Widget.__construct(ret);
@@ -425,7 +432,7 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
                 set name(value) {
-                    const valueBytes = textEncoder.encode(value);
+                    const valueBytes = _cachedEncode(value);
                     const valueId = swift.memory.retain(valueBytes);
                     instance.exports.bjs_Widget_name_set(this.pointer, valueId, valueBytes.length);
                 }
@@ -440,7 +447,7 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 makeRenderableFactory: function bjs_makeRenderableFactory(defaultName) {
-                    const defaultNameBytes = textEncoder.encode(defaultName);
+                    const defaultNameBytes = _cachedEncode(defaultName);
                     const defaultNameId = swift.memory.retain(defaultNameBytes);
                     const ret = instance.exports.bjs_makeRenderableFactory(defaultNameId, defaultNameBytes.length);
                     return swift.memory.getObject(ret);

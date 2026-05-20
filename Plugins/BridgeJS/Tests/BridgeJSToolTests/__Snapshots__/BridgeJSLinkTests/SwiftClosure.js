@@ -41,6 +41,9 @@ export async function createInstantiator(options, swift) {
     let decodeString;
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
+    const _strEncCache = new Map();
+    const _strEncCacheMax = 256;
+    function _cachedEncode(s) { let b = _strEncCache.get(s); if (b) { _strEncCache.delete(s); _strEncCache.set(s, b); return b; } b = textEncoder.encode(s); if (_strEncCache.size >= _strEncCacheMax) { _strEncCache.delete(_strEncCache.keys().next().value); } _strEncCache.set(s, b); return b; };
     let tmpRetString;
     let tmpRetBytes;
     let tmpRetException;
@@ -87,9 +90,8 @@ export async function createInstantiator(options, swift) {
 
     const __bjs_createAnimalHelpers = () => ({
         lower: (value) => {
-            const bytes = textEncoder.encode(value.type);
-            const id = swift.memory.retain(bytes);
-            i32Stack.push(bytes.length);
+            const id = swift.memory.retain(value.type);
+            i32Stack.push(value.type.length * 3);
             i32Stack.push(id);
         },
         lift: () => {
@@ -102,9 +104,8 @@ export async function createInstantiator(options, swift) {
             const enumTag = value.tag;
             switch (enumTag) {
                 case APIResultValues.Tag.Success: {
-                    const bytes = textEncoder.encode(value.param0);
-                    const id = swift.memory.retain(bytes);
-                    i32Stack.push(bytes.length);
+                    const id = swift.memory.retain(value.param0);
+                    i32Stack.push(value.param0.length * 3);
                     i32Stack.push(id);
                     return APIResultValues.Tag.Success;
                 }
@@ -173,7 +174,11 @@ export async function createInstantiator(options, swift) {
                 const source = swift.memory.getObject(sourceId);
                 swift.memory.release(sourceId);
                 const bytes = new Uint8Array(memory.buffer, bytesPtr);
+                if (typeof source === 'string') {
+                    return textEncoder.encodeInto(source, bytes).written;
+                }
                 bytes.set(source);
+                return source.length;
             }
             bjs["swift_js_make_js_string"] = function(ptr, len) {
                 return swift.memory.retain(decodeString(ptr, len));
@@ -355,7 +360,7 @@ export async function createInstantiator(options, swift) {
                     const callback = swift.memory.getObject(callbackId);
                     const string = decodeString(param0Bytes, param0Count);
                     let ret = callback(string);
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -363,7 +368,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["make_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModule5ThemeO_5ThemeO = function(param0) {
-                    const param0Bytes = textEncoder.encode(param0);
+                    const param0Bytes = _cachedEncode(param0);
                     const param0Id = swift.memory.retain(param0Bytes);
                     instance.exports.invoke_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO(boxPtr, param0Id, param0Bytes.length);
                     const ret = tmpRetString;
@@ -480,7 +485,7 @@ export async function createInstantiator(options, swift) {
                     const callback = swift.memory.getObject(callbackId);
                     const string = decodeString(param0Bytes, param0Count);
                     let ret = callback(string);
-                    tmpRetBytes = textEncoder.encode(ret);
+                    tmpRetBytes = _cachedEncode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
@@ -488,7 +493,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["make_swift_closure_TestModule_10TestModuleSS_SS"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSS_SS = function(param0) {
-                    const param0Bytes = textEncoder.encode(param0);
+                    const param0Bytes = _cachedEncode(param0);
                     const param0Id = swift.memory.retain(param0Bytes);
                     instance.exports.invoke_swift_closure_TestModule_10TestModuleSS_SS(boxPtr, param0Id, param0Bytes.length);
                     const ret = tmpRetString;
@@ -643,7 +648,7 @@ export async function createInstantiator(options, swift) {
                     const isSome = param0 != null;
                     let result, result1;
                     if (isSome) {
-                        const param0Bytes = textEncoder.encode(param0);
+                        const param0Bytes = _cachedEncode(param0);
                         const param0Id = swift.memory.retain(param0Bytes);
                         result = param0Id;
                         result1 = param0Bytes.length;
@@ -830,7 +835,7 @@ export async function createInstantiator(options, swift) {
                     const isSome = param0 != null;
                     let result, result1;
                     if (isSome) {
-                        const param0Bytes = textEncoder.encode(param0);
+                        const param0Bytes = _cachedEncode(param0);
                         const param0Id = swift.memory.retain(param0Bytes);
                         result = param0Id;
                         result1 = param0Bytes.length;
@@ -1038,7 +1043,7 @@ export async function createInstantiator(options, swift) {
                 }
 
                 constructor(name) {
-                    const nameBytes = textEncoder.encode(name);
+                    const nameBytes = _cachedEncode(name);
                     const nameId = swift.memory.retain(nameBytes);
                     const ret = instance.exports.bjs_Person_init(nameId, nameBytes.length);
                     return Person.__construct(ret);
@@ -1185,7 +1190,7 @@ export async function createInstantiator(options, swift) {
                 APIResult: APIResultValues,
                 Animal: {
                     init: function(type) {
-                        const typeBytes = textEncoder.encode(type);
+                        const typeBytes = _cachedEncode(type);
                         const typeId = swift.memory.retain(typeBytes);
                         instance.exports.bjs_Animal_init(typeId, typeBytes.length);
                         const structValue = structHelpers.Animal.lift();
