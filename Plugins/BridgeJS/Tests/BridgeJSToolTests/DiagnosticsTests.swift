@@ -319,4 +319,97 @@ import Testing
         // No line 3 in source, so output must not show a "  3 |" context line after the pointer
         #expect(!description.contains("  3 |"))
     }
+
+    // MARK: - Mutating struct method diagnostic
+
+    /// `@JS` on a `mutating` struct method cannot be supported: the JS-side
+    /// bridge calls a Swift function whose `self` was lowered across the WASM
+    /// boundary, so mutations to `self` cannot be propagated back to the
+    /// JavaScript caller. The codegen detects the `mutating` modifier and
+    /// emits an explicit diagnostic pointing the user at the right fix,
+    /// rather than silently producing a thunk that would discard their
+    /// mutations at runtime.
+    @Test
+    func mutatingStructMethodEmitsDiagnostic() throws {
+        let source = """
+            @JS struct Counter {
+                var number: Int
+
+                @JS public mutating func increment() {
+                    number += 1
+                }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        #expect(throws: BridgeJSCoreDiagnosticError.self) {
+            _ = try swiftAPI.finalize()
+        }
+    }
+
+    @Test
+    func mutatingStructMethodDiagnosticMessageAndHint() throws {
+        let source = """
+            @JS struct Counter {
+                var number: Int
+
+                @JS public mutating func increment() {
+                    number += 1
+                }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        do {
+            _ = try swiftAPI.finalize()
+            Issue.record("Expected finalize() to throw for a mutating @JS struct method")
+        } catch let error as BridgeJSCoreDiagnosticError {
+            let allMessages = error.diagnostics.map { $0.diagnostic.message }.joined(separator: "\n")
+            #expect(
+                allMessages.contains(
+                    "@JS does not support mutating struct methods: mutations to 'self' cannot be propagated back to JavaScript"
+                )
+            )
+            let allHints = error.diagnostics.compactMap { $0.diagnostic.hint }.joined(separator: "\n")
+            #expect(
+                allHints.contains(
+                    "Remove the mutating keyword or redesign the API to return the updated value instead"
+                )
+            )
+        }
+    }
+
+    @Test
+    func nonMutatingStructMethodSucceeds() throws {
+        // Regression guard: an otherwise-identical struct method WITHOUT the
+        // `mutating` modifier should still pass through the codegen cleanly.
+        let source = """
+            @JS struct Counter {
+                var number: Int
+
+                @JS public func describe() -> String {
+                    return "Counter(\\(number))"
+                }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        let skeleton = try swiftAPI.finalize()
+        #expect(skeleton.exported != nil)
+    }
 }
