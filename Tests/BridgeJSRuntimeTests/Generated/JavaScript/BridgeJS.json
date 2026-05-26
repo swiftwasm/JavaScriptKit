@@ -1,6 +1,559 @@
 {
   "exported" : {
+    "aliases" : [
+      {
+        "swiftCallName" : "Polygon",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "PolygonReference"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Tag",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "TagReference"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Token",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "TokenReference"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "TagHolder",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "TagHolderReference"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Coordinate",
+        "underlying" : {
+          "swiftStruct" : {
+            "_0" : "JSCoordinate"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Priority",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "PriorityReference"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Alert",
+        "underlying" : {
+          "caseEnum" : {
+            "_0" : "Severity"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Session",
+        "underlying" : {
+          "swiftStruct" : {
+            "_0" : "SessionState"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Tagged",
+        "underlying" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Canvas",
+        "underlying" : {
+          "jsObject" : {
+            "_0" : "Surface"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "AliasedTag",
+        "underlying" : {
+          "associatedValueEnum" : {
+            "_0" : "InnerTag"
+          }
+        }
+      }
+    ],
     "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_PolygonReference_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "verticesData",
+              "name" : "verticesData",
+              "type" : {
+                "array" : {
+                  "_0" : {
+                    "double" : {
+
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "label" : "label",
+              "name" : "label",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_PolygonReference_vertexCount",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "vertexCount",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PolygonReference_summary",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "summary",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PolygonReference_snapshot",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "snapshot",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PolygonReference_merge",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "merge",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "other",
+                "type" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PolygonReference_static_origin",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "origin",
+            "parameters" : [
+              {
+                "label" : "label",
+                "name" : "label",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "PolygonReference"
+              }
+            }
+          }
+        ],
+        "name" : "PolygonReference",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "PolygonReference"
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_TagReference_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "TagReference",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "TagReference"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_TokenReference_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_TokenReference_read",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "read",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "TokenReference",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "TokenReference"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_TagHolderReference_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "tag",
+              "name" : "tag",
+              "type" : {
+                "alias" : {
+                  "name" : "Tag",
+                  "underlying" : {
+                    "swiftHeapObject" : {
+                      "_0" : "TagReference"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "label" : "version",
+              "name" : "version",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_TagHolderReference_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "TagHolderReference",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "tag",
+            "type" : {
+              "alias" : {
+                "name" : "Tag",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "TagReference"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "version",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "TagHolderReference"
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_PriorityReference_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PriorityReference_weight",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "weight",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PriorityReference_static_low",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "low",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Priority",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PriorityReference"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "PriorityReference"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PriorityReference_static_medium",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "medium",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Priority",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PriorityReference"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "PriorityReference"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PriorityReference_static_high",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "high",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Priority",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PriorityReference"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "PriorityReference"
+              }
+            }
+          }
+        ],
+        "name" : "PriorityReference",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "PriorityReference"
+      },
       {
         "methods" : [
           {
@@ -906,46 +1459,6 @@
                   "isSigned" : true,
                   "width" : "word"
                 }
-              }
-            }
-          },
-          {
-            "abiName" : "bjs_Calculator_asyncMakePoint",
-            "effects" : {
-              "isAsync" : true,
-              "isStatic" : false,
-              "isThrows" : false
-            },
-            "name" : "asyncMakePoint",
-            "parameters" : [
-              {
-                "label" : "x",
-                "name" : "x",
-                "type" : {
-                  "integer" : {
-                    "_0" : {
-                      "isSigned" : true,
-                      "width" : "word"
-                    }
-                  }
-                }
-              },
-              {
-                "label" : "y",
-                "name" : "y",
-                "type" : {
-                  "integer" : {
-                    "_0" : {
-                      "isSigned" : true,
-                      "width" : "word"
-                    }
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "swiftStruct" : {
-                "_0" : "PublicPoint"
               }
             }
           }
@@ -4451,6 +4964,110 @@
     "enums" : [
       {
         "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "notice"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "warning"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "error"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Severity",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Severity",
+        "tsFullPath" : "Severity"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "polygon"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "empty"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Shape",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Shape",
+        "tsFullPath" : "Shape"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "payload"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "empty"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "InnerTag",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "InnerTag",
+        "tsFullPath" : "InnerTag"
+      },
+      {
+        "cases" : [
 
         ],
         "emitStyle" : "const",
@@ -6552,53 +7169,6 @@
       },
       {
         "cases" : [
-          {
-            "associatedValues" : [
-              {
-                "type" : {
-                  "string" : {
-
-                  }
-                }
-              }
-            ],
-            "name" : "success"
-          },
-          {
-            "associatedValues" : [
-              {
-                "type" : {
-                  "integer" : {
-                    "_0" : {
-                      "isSigned" : true,
-                      "width" : "word"
-                    }
-                  }
-                }
-              }
-            ],
-            "name" : "failure"
-          },
-          {
-            "associatedValues" : [
-
-            ],
-            "name" : "idle"
-          }
-        ],
-        "emitStyle" : "const",
-        "name" : "AsyncImportedPayloadResult",
-        "staticMethods" : [
-
-        ],
-        "staticProperties" : [
-
-        ],
-        "swiftCallName" : "AsyncImportedPayloadResult",
-        "tsFullPath" : "AsyncImportedPayloadResult"
-      },
-      {
-        "cases" : [
 
         ],
         "emitStyle" : "const",
@@ -7761,53 +8331,6 @@
         ],
         "swiftCallName" : "TSTheme",
         "tsFullPath" : "TSTheme"
-      },
-      {
-        "cases" : [
-          {
-            "associatedValues" : [
-              {
-                "type" : {
-                  "string" : {
-
-                  }
-                }
-              }
-            ],
-            "name" : "success"
-          },
-          {
-            "associatedValues" : [
-              {
-                "type" : {
-                  "integer" : {
-                    "_0" : {
-                      "isSigned" : true,
-                      "width" : "word"
-                    }
-                  }
-                }
-              }
-            ],
-            "name" : "failure"
-          },
-          {
-            "associatedValues" : [
-
-            ],
-            "name" : "idle"
-          }
-        ],
-        "emitStyle" : "const",
-        "name" : "AsyncPayloadResult",
-        "staticMethods" : [
-
-        ],
-        "staticProperties" : [
-
-        ],
-        "swiftCallName" : "AsyncPayloadResult",
-        "tsFullPath" : "AsyncPayloadResult"
       },
       {
         "cases" : [
@@ -9387,85 +9910,6 @@
         ],
         "swiftCallName" : "NestedStructGroupB",
         "tsFullPath" : "NestedStructGroupB"
-      },
-      {
-        "cases" : [
-          {
-            "associatedValues" : [
-
-            ],
-            "name" : "red"
-          },
-          {
-            "associatedValues" : [
-
-            ],
-            "name" : "yellow"
-          },
-          {
-            "associatedValues" : [
-
-            ],
-            "name" : "green"
-          }
-        ],
-        "emitStyle" : "const",
-        "name" : "LightColor",
-        "staticMethods" : [
-
-        ],
-        "staticProperties" : [
-
-        ],
-        "swiftCallName" : "LightColor",
-        "tsFullPath" : "LightColor"
-      },
-      {
-        "cases" : [
-          {
-            "associatedValues" : [
-              {
-                "type" : {
-                  "string" : {
-
-                  }
-                }
-              }
-            ],
-            "name" : "start"
-          },
-          {
-            "associatedValues" : [
-              {
-                "type" : {
-                  "integer" : {
-                    "_0" : {
-                      "isSigned" : true,
-                      "width" : "word"
-                    }
-                  }
-                }
-              }
-            ],
-            "name" : "stop"
-          },
-          {
-            "associatedValues" : [
-
-            ],
-            "name" : "idle"
-          }
-        ],
-        "emitStyle" : "const",
-        "name" : "ImportedPayloadSignal",
-        "staticMethods" : [
-
-        ],
-        "staticProperties" : [
-
-        ],
-        "swiftCallName" : "ImportedPayloadSignal",
-        "tsFullPath" : "ImportedPayloadSignal"
       },
       {
         "cases" : [
@@ -11605,298 +12049,424 @@
     "exposeToGlobal" : false,
     "functions" : [
       {
-        "abiName" : "bjs_awaitAsyncCallback",
+        "abiName" : "bjs_makeTag",
         "effects" : {
-          "isAsync" : true,
+          "isAsync" : false,
           "isStatic" : false,
-          "isThrows" : true
+          "isThrows" : false
         },
-        "name" : "awaitAsyncCallback",
+        "name" : "makeTag",
         "parameters" : [
           {
             "label" : "_",
-            "name" : "fetch",
+            "name" : "name",
             "type" : {
-              "closure" : {
-                "_0" : {
-                  "isAsync" : true,
-                  "isThrows" : true,
-                  "mangleName" : "20BridgeJSRuntimeTestsYaKSS_SS",
-                  "moduleName" : "BridgeJSRuntimeTests",
-                  "parameters" : [
-                    {
-                      "string" : {
+              "string" : {
 
-                      }
-                    }
-                  ],
-                  "returnType" : {
-                    "string" : {
-
-                    }
-                  },
-                  "sendingParameters" : false
-                },
-                "useJSTypedClosure" : false
               }
             }
           }
         ],
         "returnType" : {
-          "string" : {
-
+          "alias" : {
+            "name" : "Tag",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "TagReference"
+              }
+            }
           }
         }
       },
       {
-        "abiName" : "bjs_makeAsyncParser",
+        "abiName" : "bjs_roundTripPolygon",
         "effects" : {
           "isAsync" : false,
           "isStatic" : false,
           "isThrows" : false
         },
-        "name" : "makeAsyncParser",
-        "parameters" : [
-
-        ],
-        "returnType" : {
-          "closure" : {
-            "_0" : {
-              "isAsync" : true,
-              "isThrows" : true,
-              "mangleName" : "20BridgeJSRuntimeTestsYaKSS_SS",
-              "moduleName" : "BridgeJSRuntimeTests",
-              "parameters" : [
-                {
-                  "string" : {
-
-                  }
-                }
-              ],
-              "returnType" : {
-                "string" : {
-
-                }
-              },
-              "sendingParameters" : false
-            },
-            "useJSTypedClosure" : true
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_makeAsyncEcho",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "makeAsyncEcho",
-        "parameters" : [
-
-        ],
-        "returnType" : {
-          "closure" : {
-            "_0" : {
-              "isAsync" : true,
-              "isThrows" : false,
-              "mangleName" : "20BridgeJSRuntimeTestsYaSS_SS",
-              "moduleName" : "BridgeJSRuntimeTests",
-              "parameters" : [
-                {
-                  "string" : {
-
-                  }
-                }
-              ],
-              "returnType" : {
-                "string" : {
-
-                }
-              },
-              "sendingParameters" : false
-            },
-            "useJSTypedClosure" : true
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_makeAsyncRecorder",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "makeAsyncRecorder",
-        "parameters" : [
-
-        ],
-        "returnType" : {
-          "closure" : {
-            "_0" : {
-              "isAsync" : true,
-              "isThrows" : true,
-              "mangleName" : "20BridgeJSRuntimeTestsYaKSS_y",
-              "moduleName" : "BridgeJSRuntimeTests",
-              "parameters" : [
-                {
-                  "string" : {
-
-                  }
-                }
-              ],
-              "returnType" : {
-                "void" : {
-
-                }
-              },
-              "sendingParameters" : false
-            },
-            "useJSTypedClosure" : true
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_lastRecordedValue",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "lastRecordedValue",
-        "parameters" : [
-
-        ],
-        "returnType" : {
-          "string" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_makeAsyncPayloadLoader",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "makeAsyncPayloadLoader",
-        "parameters" : [
-
-        ],
-        "returnType" : {
-          "closure" : {
-            "_0" : {
-              "isAsync" : true,
-              "isThrows" : true,
-              "mangleName" : "20BridgeJSRuntimeTestsYaKSb_18AsyncPayloadResultO",
-              "moduleName" : "BridgeJSRuntimeTests",
-              "parameters" : [
-                {
-                  "bool" : {
-
-                  }
-                }
-              ],
-              "returnType" : {
-                "associatedValueEnum" : {
-                  "_0" : "AsyncPayloadResult"
-                }
-              },
-              "sendingParameters" : false
-            },
-            "useJSTypedClosure" : true
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_awaitPayloadCallback",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : true
-        },
-        "name" : "awaitPayloadCallback",
+        "name" : "roundTripPolygon",
         "parameters" : [
           {
             "label" : "_",
-            "name" : "load",
+            "name" : "polygon",
             "type" : {
-              "closure" : {
-                "_0" : {
-                  "isAsync" : true,
-                  "isThrows" : true,
-                  "mangleName" : "20BridgeJSRuntimeTestsYaKSb_18AsyncPayloadResultO",
-                  "moduleName" : "BridgeJSRuntimeTests",
-                  "parameters" : [
-                    {
-                      "bool" : {
-
-                      }
-                    }
-                  ],
-                  "returnType" : {
-                    "associatedValueEnum" : {
-                      "_0" : "AsyncPayloadResult"
-                    }
-                  },
-                  "sendingParameters" : false
-                },
-                "useJSTypedClosure" : false
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
               }
             }
           }
         ],
         "returnType" : {
-          "string" : {
-
+          "alias" : {
+            "name" : "Polygon",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "PolygonReference"
+              }
+            }
           }
         }
       },
       {
-        "abiName" : "bjs_makeAsyncPointMaker",
+        "abiName" : "bjs_appendVertex",
         "effects" : {
           "isAsync" : false,
           "isStatic" : false,
           "isThrows" : false
         },
-        "name" : "makeAsyncPointMaker",
+        "name" : "appendVertex",
         "parameters" : [
-
-        ],
-        "returnType" : {
-          "closure" : {
-            "_0" : {
-              "isAsync" : true,
-              "isThrows" : false,
-              "mangleName" : "20BridgeJSRuntimeTestsYaSd_9DataPointV",
-              "moduleName" : "BridgeJSRuntimeTests",
-              "parameters" : [
-                {
-                  "double" : {
-
+          {
+            "label" : "_",
+            "name" : "polygon",
+            "type" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
                   }
                 }
-              ],
-              "returnType" : {
-                "swiftStruct" : {
-                  "_0" : "DataPoint"
-                }
-              },
-              "sendingParameters" : false
-            },
-            "useJSTypedClosure" : true
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Polygon",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "PolygonReference"
+              }
+            }
           }
         }
       },
       {
-        "abiName" : "bjs_makeThrowingParser",
+        "abiName" : "bjs_optionalRoundTripPolygon",
         "effects" : {
           "isAsync" : false,
           "isStatic" : false,
           "isThrows" : false
         },
-        "name" : "makeThrowingParser",
+        "name" : "optionalRoundTripPolygon",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygon",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_polygonVertexCount",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "polygonVertexCount",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygon",
+            "type" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripPolygonArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripPolygonArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygons",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_concatPolygons",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "concatPolygons",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygons",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Polygon",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "PolygonReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_validatePolygon",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "validatePolygon",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygon",
+            "type" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Polygon",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "PolygonReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_splitPolygon",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "splitPolygon",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygon",
+            "type" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_incrementToken",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "incrementToken",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "token",
+            "type" : {
+              "alias" : {
+                "name" : "Token",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "TokenReference"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Token",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "TokenReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeToken",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeToken",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Token",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "TokenReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makePolygonInspector",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makePolygonInspector",
         "parameters" : [
 
         ],
@@ -11904,13 +12474,18 @@
           "closure" : {
             "_0" : {
               "isAsync" : false,
-              "isThrows" : true,
-              "mangleName" : "20BridgeJSRuntimeTestsKSS_Si",
+              "isThrows" : false,
+              "mangleName" : "20BridgeJSRuntimeTestsAl7Polygon_Si",
               "moduleName" : "BridgeJSRuntimeTests",
               "parameters" : [
                 {
-                  "string" : {
-
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
                   }
                 }
               ],
@@ -11924,51 +12499,404 @@
               },
               "sendingParameters" : false
             },
-            "useJSTypedClosure" : true
+            "useJSTypedClosure" : false
           }
         }
       },
       {
-        "abiName" : "bjs_runValidator",
+        "abiName" : "bjs_asyncMakePolygon",
         "effects" : {
-          "isAsync" : false,
+          "isAsync" : true,
           "isStatic" : false,
-          "isThrows" : true
+          "isThrows" : false
         },
-        "name" : "runValidator",
+        "name" : "asyncMakePolygon",
         "parameters" : [
           {
             "label" : "_",
-            "name" : "validate",
+            "name" : "label",
             "type" : {
-              "closure" : {
-                "_0" : {
-                  "isAsync" : false,
-                  "isThrows" : true,
-                  "mangleName" : "20BridgeJSRuntimeTestsKSS_Sb",
-                  "moduleName" : "BridgeJSRuntimeTests",
-                  "parameters" : [
-                    {
-                      "string" : {
+              "string" : {
 
-                      }
-                    }
-                  ],
-                  "returnType" : {
-                    "bool" : {
-
-                    }
-                  },
-                  "sendingParameters" : false
-                },
-                "useJSTypedClosure" : false
               }
             }
           }
         ],
         "returnType" : {
-          "bool" : {
+          "alias" : {
+            "name" : "Polygon",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "PolygonReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripOptionalPolygonArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalPolygonArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygons",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "nullable" : {
+                    "_0" : {
+                      "alias" : {
+                        "name" : "Polygon",
+                        "underlying" : {
+                          "swiftHeapObject" : {
+                            "_0" : "PolygonReference"
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "nullable" : {
+                "_0" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeTagHolder",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeTagHolder",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "name",
+            "type" : {
+              "string" : {
 
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "version",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "TagHolder",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "TagHolderReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripCoordinate",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripCoordinate",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "coordinate",
+            "type" : {
+              "alias" : {
+                "name" : "Coordinate",
+                "underlying" : {
+                  "swiftStruct" : {
+                    "_0" : "JSCoordinate"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Coordinate",
+            "underlying" : {
+              "swiftStruct" : {
+                "_0" : "JSCoordinate"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripPriority",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripPriority",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "priority",
+            "type" : {
+              "alias" : {
+                "name" : "Priority",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PriorityReference"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Priority",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "PriorityReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripAlert",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripAlert",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "alert",
+            "type" : {
+              "alias" : {
+                "name" : "Alert",
+                "underlying" : {
+                  "caseEnum" : {
+                    "_0" : "Severity"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Alert",
+            "underlying" : {
+              "caseEnum" : {
+                "_0" : "Severity"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeAlert",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeAlert",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "level",
+            "type" : {
+              "caseEnum" : {
+                "_0" : "Severity"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Alert",
+            "underlying" : {
+              "caseEnum" : {
+                "_0" : "Severity"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripSession",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripSession",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "session",
+            "type" : {
+              "alias" : {
+                "name" : "Session",
+                "underlying" : {
+                  "swiftStruct" : {
+                    "_0" : "SessionState"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Session",
+            "underlying" : {
+              "swiftStruct" : {
+                "_0" : "SessionState"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeSession",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeSession",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "token",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Session",
+            "underlying" : {
+              "swiftStruct" : {
+                "_0" : "SessionState"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripShape",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripShape",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "s",
+            "type" : {
+              "associatedValueEnum" : {
+                "_0" : "Shape"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "associatedValueEnum" : {
+            "_0" : "Shape"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeShapePolygon",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeShapePolygon",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygon",
+            "type" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "associatedValueEnum" : {
+            "_0" : "Shape"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeShapeEmpty",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeShapeEmpty",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "associatedValueEnum" : {
+            "_0" : "Shape"
           }
         }
       },
@@ -12499,41 +13427,6 @@
         }
       },
       {
-        "abiName" : "bjs_roundTripOptionalImportedClass",
-        "effects" : {
-          "isAsync" : false,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "roundTripOptionalImportedClass",
-        "parameters" : [
-          {
-            "label" : "v",
-            "name" : "v",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "jsObject" : {
-                    "_0" : "Foo"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "jsObject" : {
-                "_0" : "Foo"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
         "abiName" : "bjs_throwsSwiftError",
         "effects" : {
           "isAsync" : false,
@@ -12676,23 +13569,6 @@
         ],
         "returnType" : {
           "jsObject" : {
-
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_zeroArgAsyncThrows",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : true
-        },
-        "name" : "zeroArgAsyncThrows",
-        "parameters" : [
-
-        ],
-        "returnType" : {
-          "string" : {
 
           }
         }
@@ -13166,390 +14042,6 @@
           "rawValueEnum" : {
             "_0" : "Theme",
             "_1" : "String"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripTheme",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripTheme",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "rawValueEnum" : {
-                "_0" : "Theme",
-                "_1" : "String"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "rawValueEnum" : {
-            "_0" : "Theme",
-            "_1" : "String"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripDirection",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripDirection",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "caseEnum" : {
-                "_0" : "Direction"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "caseEnum" : {
-            "_0" : "Direction"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripOptionalTheme",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripOptionalTheme",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "rawValueEnum" : {
-                    "_0" : "Theme",
-                    "_1" : "String"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "rawValueEnum" : {
-                "_0" : "Theme",
-                "_1" : "String"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripOptionalDirection",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripOptionalDirection",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "caseEnum" : {
-                    "_0" : "Direction"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "caseEnum" : {
-                "_0" : "Direction"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripDirectionArray",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripDirectionArray",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "array" : {
-                "_0" : {
-                  "caseEnum" : {
-                    "_0" : "Direction"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "array" : {
-            "_0" : {
-              "caseEnum" : {
-                "_0" : "Direction"
-              }
-            }
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripDirectionDict",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripDirectionDict",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "dictionary" : {
-                "_0" : {
-                  "caseEnum" : {
-                    "_0" : "Direction"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "dictionary" : {
-            "_0" : {
-              "caseEnum" : {
-                "_0" : "Direction"
-              }
-            }
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripThemeArray",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripThemeArray",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "array" : {
-                "_0" : {
-                  "rawValueEnum" : {
-                    "_0" : "Theme",
-                    "_1" : "String"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "array" : {
-            "_0" : {
-              "rawValueEnum" : {
-                "_0" : "Theme",
-                "_1" : "String"
-              }
-            }
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripThemeDict",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripThemeDict",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "dictionary" : {
-                "_0" : {
-                  "rawValueEnum" : {
-                    "_0" : "Theme",
-                    "_1" : "String"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "dictionary" : {
-            "_0" : {
-              "rawValueEnum" : {
-                "_0" : "Theme",
-                "_1" : "String"
-              }
-            }
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripFileSize",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripFileSize",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "rawValueEnum" : {
-                "_0" : "FileSize",
-                "_1" : "Int64"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "rawValueEnum" : {
-            "_0" : "FileSize",
-            "_1" : "Int64"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripOptionalFileSize",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripOptionalFileSize",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "rawValueEnum" : {
-                    "_0" : "FileSize",
-                    "_1" : "Int64"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "rawValueEnum" : {
-                "_0" : "FileSize",
-                "_1" : "Int64"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripAssociatedValueEnum",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripAssociatedValueEnum",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "associatedValueEnum" : {
-                "_0" : "AsyncPayloadResult"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "associatedValueEnum" : {
-            "_0" : "AsyncPayloadResult"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripOptionalAssociatedValueEnum",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripOptionalAssociatedValueEnum",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "v",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "AsyncPayloadResult"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "associatedValueEnum" : {
-                "_0" : "AsyncPayloadResult"
-              }
-            },
-            "_1" : "null"
           }
         }
       },
@@ -15346,241 +15838,6 @@
         }
       },
       {
-        "abiName" : "bjs_asyncRoundTripPublicPoint",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripPublicPoint",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "point",
-            "type" : {
-              "swiftStruct" : {
-                "_0" : "PublicPoint"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftStruct" : {
-            "_0" : "PublicPoint"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripPublicPointThrows",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : true
-        },
-        "name" : "asyncRoundTripPublicPointThrows",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "point",
-            "type" : {
-              "swiftStruct" : {
-                "_0" : "PublicPoint"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftStruct" : {
-            "_0" : "PublicPoint"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncStructOrThrow",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : true
-        },
-        "name" : "asyncStructOrThrow",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "shouldThrow",
-            "type" : {
-              "bool" : {
-
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftStruct" : {
-            "_0" : "PublicPoint"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncCombinePublicPoints",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncCombinePublicPoints",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "a",
-            "type" : {
-              "swiftStruct" : {
-                "_0" : "PublicPoint"
-              }
-            }
-          },
-          {
-            "label" : "_",
-            "name" : "b",
-            "type" : {
-              "swiftStruct" : {
-                "_0" : "PublicPoint"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftStruct" : {
-            "_0" : "PublicPoint"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripContact",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripContact",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "contact",
-            "type" : {
-              "swiftStruct" : {
-                "_0" : "Contact"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "swiftStruct" : {
-            "_0" : "Contact"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripPublicPointArray",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripPublicPointArray",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "points",
-            "type" : {
-              "array" : {
-                "_0" : {
-                  "swiftStruct" : {
-                    "_0" : "PublicPoint"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "array" : {
-            "_0" : {
-              "swiftStruct" : {
-                "_0" : "PublicPoint"
-              }
-            }
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripOptionalPublicPoint",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripOptionalPublicPoint",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "point",
-            "type" : {
-              "nullable" : {
-                "_0" : {
-                  "swiftStruct" : {
-                    "_0" : "PublicPoint"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "nullable" : {
-            "_0" : {
-              "swiftStruct" : {
-                "_0" : "PublicPoint"
-              }
-            },
-            "_1" : "null"
-          }
-        }
-      },
-      {
-        "abiName" : "bjs_asyncRoundTripPublicPointDict",
-        "effects" : {
-          "isAsync" : true,
-          "isStatic" : false,
-          "isThrows" : false
-        },
-        "name" : "asyncRoundTripPublicPointDict",
-        "parameters" : [
-          {
-            "label" : "_",
-            "name" : "points",
-            "type" : {
-              "dictionary" : {
-                "_0" : {
-                  "swiftStruct" : {
-                    "_0" : "PublicPoint"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "returnType" : {
-          "dictionary" : {
-            "_0" : {
-              "swiftStruct" : {
-                "_0" : "PublicPoint"
-              }
-            }
-          }
-        }
-      },
-      {
         "abiName" : "bjs_roundTripContact",
         "effects" : {
           "isAsync" : false,
@@ -16382,6 +16639,101 @@
       }
     ],
     "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_JSCoordinate_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "latitude",
+              "name" : "latitude",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            },
+            {
+              "label" : "longitude",
+              "name" : "longitude",
+              "type" : {
+                "double" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "JSCoordinate",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "latitude",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "longitude",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "JSCoordinate"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_SessionState_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "token",
+              "name" : "token",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "SessionState",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "token",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "SessionState"
+      },
       {
         "methods" : [
 
@@ -18079,6 +18431,302 @@
               "accessLevel" : "internal",
               "parameters" : [
                 {
+                  "name" : "label",
+                  "type" : {
+                    "string" : {
+
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+              {
+                "accessLevel" : "internal",
+                "name" : "label",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+
+            ],
+            "name" : "Surface",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "AliasImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripTagged",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "alias" : {
+                        "name" : "Tagged",
+                        "underlying" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "alias" : {
+                    "name" : "Tagged",
+                    "underlying" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripOptionalTagged",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "alias" : {
+                            "name" : "Tagged",
+                            "underlying" : {
+                              "string" : {
+
+                              }
+                            }
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "alias" : {
+                        "name" : "Tagged",
+                        "underlying" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsProduceOptionalCanvas",
+                "parameters" : [
+                  {
+                    "name" : "label",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "alias" : {
+                        "name" : "Canvas",
+                        "underlying" : {
+                          "jsObject" : {
+                            "_0" : "Surface"
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripAliasedTags",
+                "parameters" : [
+                  {
+                    "name" : "values",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "nullable" : {
+                            "_0" : {
+                              "alias" : {
+                                "name" : "AliasedTag",
+                                "underlying" : {
+                                  "associatedValueEnum" : {
+                                    "_0" : "InnerTag"
+                                  }
+                                }
+                              }
+                            },
+                            "_1" : "null"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "nullable" : {
+                        "_0" : {
+                          "alias" : {
+                            "name" : "AliasedTag",
+                            "underlying" : {
+                              "associatedValueEnum" : {
+                                "_0" : "InnerTag"
+                              }
+                            }
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripPolygon",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "alias" : {
+                        "name" : "Polygon",
+                        "underlying" : {
+                          "swiftHeapObject" : {
+                            "_0" : "PolygonReference"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripCoordinate",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "alias" : {
+                        "name" : "Coordinate",
+                        "underlying" : {
+                          "swiftStruct" : {
+                            "_0" : "JSCoordinate"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "alias" : {
+                    "name" : "Coordinate",
+                    "underlying" : {
+                      "swiftStruct" : {
+                        "_0" : "JSCoordinate"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
                   "name" : "id",
                   "type" : {
                     "string" : {
@@ -19011,103 +19659,6 @@
                     "_1" : "String"
                   }
                 }
-              },
-              {
-                "accessLevel" : "internal",
-                "effects" : {
-                  "isAsync" : true,
-                  "isStatic" : false,
-                  "isThrows" : true
-                },
-                "name" : "jsAsyncRoundTripAssociatedValueEnum",
-                "parameters" : [
-                  {
-                    "name" : "v",
-                    "type" : {
-                      "associatedValueEnum" : {
-                        "_0" : "AsyncImportedPayloadResult"
-                      }
-                    }
-                  }
-                ],
-                "returnType" : {
-                  "associatedValueEnum" : {
-                    "_0" : "AsyncImportedPayloadResult"
-                  }
-                }
-              },
-              {
-                "accessLevel" : "internal",
-                "effects" : {
-                  "isAsync" : true,
-                  "isStatic" : false,
-                  "isThrows" : true
-                },
-                "name" : "jsAsyncRoundTripOptionalAssociatedValueEnum",
-                "parameters" : [
-                  {
-                    "name" : "v",
-                    "type" : {
-                      "nullable" : {
-                        "_0" : {
-                          "associatedValueEnum" : {
-                            "_0" : "AsyncImportedPayloadResult"
-                          }
-                        },
-                        "_1" : "null"
-                      }
-                    }
-                  }
-                ],
-                "returnType" : {
-                  "nullable" : {
-                    "_0" : {
-                      "associatedValueEnum" : {
-                        "_0" : "AsyncImportedPayloadResult"
-                      }
-                    },
-                    "_1" : "null"
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "functions" : [
-
-        ],
-        "types" : [
-          {
-            "accessLevel" : "internal",
-            "getters" : [
-
-            ],
-            "methods" : [
-
-            ],
-            "name" : "ClosureAsyncImports",
-            "setters" : [
-
-            ],
-            "staticMethods" : [
-              {
-                "accessLevel" : "internal",
-                "effects" : {
-                  "isAsync" : true,
-                  "isStatic" : false,
-                  "isThrows" : true
-                },
-                "name" : "runJsClosureAsyncTests",
-                "parameters" : [
-
-                ],
-                "returnType" : {
-                  "void" : {
-
-                  }
-                }
               }
             ]
           }
@@ -19944,45 +20495,6 @@
             "methods" : [
 
             ],
-            "name" : "ClosureThrowsImports",
-            "setters" : [
-
-            ],
-            "staticMethods" : [
-              {
-                "accessLevel" : "internal",
-                "effects" : {
-                  "isAsync" : false,
-                  "isStatic" : false,
-                  "isThrows" : true
-                },
-                "name" : "runJsClosureThrowsTests",
-                "parameters" : [
-
-                ],
-                "returnType" : {
-                  "void" : {
-
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "functions" : [
-
-        ],
-        "types" : [
-          {
-            "accessLevel" : "internal",
-            "getters" : [
-
-            ],
-            "methods" : [
-
-            ],
             "name" : "DefaultArgumentImports",
             "setters" : [
 
@@ -20526,6 +21038,23 @@
               "isThrows" : true
             },
             "name" : "runAsyncWorks",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "runAliasAsyncWorks",
             "parameters" : [
 
             ],
@@ -21095,95 +21624,6 @@
               "isStatic" : false,
               "isThrows" : true
             },
-            "name" : "jsRoundTripLightColor",
-            "parameters" : [
-              {
-                "name" : "value",
-                "type" : {
-                  "caseEnum" : {
-                    "_0" : "LightColor"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "caseEnum" : {
-                "_0" : "LightColor"
-              }
-            }
-          },
-          {
-            "accessLevel" : "internal",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsRoundTripImportedPayloadSignal",
-            "parameters" : [
-              {
-                "name" : "value",
-                "type" : {
-                  "associatedValueEnum" : {
-                    "_0" : "ImportedPayloadSignal"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "associatedValueEnum" : {
-                "_0" : "ImportedPayloadSignal"
-              }
-            }
-          },
-          {
-            "accessLevel" : "internal",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsRoundTripOptionalImportedPayloadSignal",
-            "parameters" : [
-              {
-                "name" : "value",
-                "type" : {
-                  "nullable" : {
-                    "_0" : {
-                      "associatedValueEnum" : {
-                        "_0" : "ImportedPayloadSignal"
-                      }
-                    },
-                    "_1" : "null"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "nullable" : {
-                "_0" : {
-                  "associatedValueEnum" : {
-                    "_0" : "ImportedPayloadSignal"
-                  }
-                },
-                "_1" : "null"
-              }
-            }
-          }
-        ],
-        "types" : [
-
-        ]
-      },
-      {
-        "functions" : [
-          {
-            "accessLevel" : "internal",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : true
-            },
             "name" : "jsTranslatePoint",
             "parameters" : [
               {
@@ -21220,40 +21660,6 @@
             "returnType" : {
               "swiftStruct" : {
                 "_0" : "Point"
-              }
-            }
-          },
-          {
-            "accessLevel" : "internal",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "name" : "jsRoundTripOptionalPoint",
-            "parameters" : [
-              {
-                "name" : "point",
-                "type" : {
-                  "nullable" : {
-                    "_0" : {
-                      "swiftStruct" : {
-                        "_0" : "Point"
-                      }
-                    },
-                    "_1" : "null"
-                  }
-                }
-              }
-            ],
-            "returnType" : {
-              "nullable" : {
-                "_0" : {
-                  "swiftStruct" : {
-                    "_0" : "Point"
-                  }
-                },
-                "_1" : "null"
               }
             }
           }
@@ -22520,40 +22926,6 @@
                       }
                     },
                     "_1" : "undefined"
-                  }
-                }
-              },
-              {
-                "accessLevel" : "internal",
-                "effects" : {
-                  "isAsync" : false,
-                  "isStatic" : false,
-                  "isThrows" : true
-                },
-                "name" : "jsRoundTripOptionalJSObjectNull",
-                "parameters" : [
-                  {
-                    "name" : "value",
-                    "type" : {
-                      "nullable" : {
-                        "_0" : {
-                          "jsObject" : {
-
-                          }
-                        },
-                        "_1" : "null"
-                      }
-                    }
-                  }
-                ],
-                "returnType" : {
-                  "nullable" : {
-                    "_0" : {
-                      "jsObject" : {
-
-                      }
-                    },
-                    "_1" : "null"
                   }
                 }
               },

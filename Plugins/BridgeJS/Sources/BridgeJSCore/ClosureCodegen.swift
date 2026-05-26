@@ -153,7 +153,8 @@ public struct ClosureCodegen {
             let argNames = liftInfo.parameters.map { (argName, _) in
                 liftInfo.parameters.count > 1 ? "\(paramName)\(argName.capitalizedFirstLetter)" : paramName
             }
-            liftedParams.append("\(paramType.swiftType).bridgeJSLiftParameter(\(argNames.joined(separator: ", ")))")
+            let liftCall = "\(paramType.unaliased.swiftType).bridgeJSLiftParameter(\(argNames.joined(separator: ", ")))"
+            liftedParams.append(paramType.liftAliases(expression: liftCall))
         }
 
         let tryPrefix = signature.isThrows ? "try " : ""
@@ -197,7 +198,8 @@ public struct ClosureCodegen {
                     }
                     printer.write("}")
                 default:
-                    printer.write("return result.bridgeJSLowerReturn()")
+                    let lowered = signature.returnType.lowerAliases(expression: "result")
+                    printer.write("return \(lowered).bridgeJSLowerReturn()")
                 }
             }
         }

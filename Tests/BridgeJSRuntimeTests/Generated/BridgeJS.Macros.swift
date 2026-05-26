@@ -44,6 +44,8 @@ extension FeatureFlag: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {}
 
 @JSFunction func runAsyncWorks() async throws(JSException) -> Void
 
+@JSFunction func runAliasAsyncWorks() async throws(JSException) -> Void
+
 @JSFunction func fetchWeatherData(_ city: String) async throws(JSException) -> WeatherData
 
 @JSClass struct WeatherData {

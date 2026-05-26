@@ -355,6 +355,78 @@ import Testing
     }
 
     @Test
+    func chainedJSAsDiagnostic() throws {
+        let source = """
+            @JS(as: B.self) struct A {
+                consuming func bridgeToJS() -> B { fatalError() }
+                static func bridgeFromJS(_ value: consuming B) -> A { fatalError() }
+            }
+            @JS(as: C.self) struct B {
+                consuming func bridgeToJS() -> C { fatalError() }
+                static func bridgeFromJS(_ value: consuming C) -> B { fatalError() }
+            }
+            @JS class C { @JS init() {} }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        #expect(throws: BridgeJSCoreDiagnosticError.self) {
+            _ = try swiftAPI.finalize()
+        }
+    }
+
+    @Test
+    func cyclicJSAsDiagnostic() throws {
+        let source = """
+            @JS(as: B.self) struct A {
+                consuming func bridgeToJS() -> B { fatalError() }
+                static func bridgeFromJS(_ value: consuming B) -> A { fatalError() }
+            }
+            @JS(as: A.self) struct B {
+                consuming func bridgeToJS() -> A { fatalError() }
+                static func bridgeFromJS(_ value: consuming A) -> B { fatalError() }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        #expect(throws: BridgeJSCoreDiagnosticError.self) {
+            _ = try swiftAPI.finalize()
+        }
+    }
+
+    @Test
+    func jsAsProtocolTargetDiagnostic() throws {
+        let source = """
+            @JS protocol Audible {
+                func play()
+            }
+            @JS(as: Audible.self) struct AudibleTag {
+                consuming func bridgeToJS() -> any Audible { fatalError() }
+                static func bridgeFromJS(_ value: consuming any Audible) -> AudibleTag { fatalError() }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        #expect(throws: BridgeJSCoreDiagnosticError.self) {
+            _ = try swiftAPI.finalize()
+        }
+    }
+
+    @Test
     func omitsNextLineWhenErrorIsOnLastLine() throws {
         let source = """
             preamble

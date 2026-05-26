@@ -399,6 +399,11 @@ public final class SwiftToSkeleton {
 
             if let enumDecl = typeDecl.as(EnumDeclSyntax.self) {
                 let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: enumDecl, itemName: enumDecl.name.text)
+                if let jsAttribute = enumDecl.attributes.firstJSAttribute,
+                    let aliasTarget = extractAliasTarget(from: jsAttribute)
+                {
+                    return aliasType(target: aliasTarget, swiftCallName: swiftCallName, errors: &errors)
+                }
                 let rawTypeString = enumDecl.inheritanceClause?.inheritedTypes.first { inheritedType in
                     let typeName = inheritedType.type.trimmedDescription
                     return ExportSwiftConstants.supportedRawTypes.contains(typeName)
@@ -439,6 +444,11 @@ public final class SwiftToSkeleton {
                 if structDecl.attributes.hasAttribute(name: "JSClass") {
                     return .jsObject(swiftCallName)
                 }
+                if let jsAttribute = structDecl.attributes.firstJSAttribute,
+                    let aliasTarget = extractAliasTarget(from: jsAttribute)
+                {
+                    return aliasType(target: aliasTarget, swiftCallName: swiftCallName, errors: &errors)
+                }
                 return .swiftStruct(swiftCallName)
             }
 
@@ -454,6 +464,13 @@ public final class SwiftToSkeleton {
             }
             if let actorDecl = typeDecl.as(ActorDeclSyntax.self), actorDecl.attributes.hasAttribute(name: "JSClass") {
                 return .jsObject(swiftCallName)
+            }
+
+            if let classDecl = typeDecl.as(ClassDeclSyntax.self),
+                let jsAttribute = classDecl.attributes.firstJSAttribute,
+                let aliasTarget = extractAliasTarget(from: jsAttribute)
+            {
+                return aliasType(target: aliasTarget, swiftCallName: swiftCallName, errors: &errors)
             }
 
             return .swiftHeapObject(swiftCallName)
@@ -515,6 +532,50 @@ public final class SwiftToSkeleton {
             )
             return nil
         }
+    }
+
+    fileprivate func extractAliasTarget(from jsAttribute: AttributeSyntax) -> TypeSyntax? {
+        guard
+            let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+            let asArg = arguments.first(where: { $0.label?.text == "as" }),
+            let memberAccess = asArg.expression.as(MemberAccessExprSyntax.self),
+            memberAccess.declName.baseName.text == "self",
+            let base = memberAccess.base
+        else {
+            return nil
+        }
+        return TypeSyntax(stringLiteral: base.trimmedDescription)
+    }
+
+    fileprivate func aliasType(
+        target aliasTarget: TypeSyntax,
+        swiftCallName: String,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        if let targetDecl = typeDeclResolver.resolve(aliasTarget),
+            let targetJSAttribute = targetDecl.attributes.firstJSAttribute,
+            extractAliasTarget(from: targetJSAttribute) != nil
+        {
+            errors.append(
+                DiagnosticError(
+                    node: aliasTarget,
+                    message: "`@JS(as:)` target must be a `@JS` type, not another `@JS(as:)` type",
+                    hint: "Use the underlying `@JS` type directly"
+                )
+            )
+            return nil
+        }
+        guard let targetType = lookupType(for: aliasTarget, errors: &errors) else { return nil }
+        if case .swiftProtocol = targetType {
+            errors.append(
+                DiagnosticError(
+                    node: aliasTarget,
+                    message: "`@JS(as:)` cannot target a `@JS protocol`"
+                )
+            )
+            return nil
+        }
+        return .alias(name: swiftCallName, underlying: targetType)
     }
 
     fileprivate static func parseUnsafePointerType(_ type: TypeSyntax) -> UnsafePointerType? {
@@ -650,6 +711,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     /// The names of the exported structs, in the order they were written in the source file
     var exportedStructNames: [String] = []
     var exportedStructByName: [String: ExportedStruct] = [:]
+    var exportedAliases: [ExportedAlias] = []
     var errors: [DiagnosticError] = []
     /// Extensions collected during the walk, to be resolved after all files have been walked
     var deferredExtensions: [ExtensionDeclSyntax] = []
@@ -660,6 +722,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         result.enums.append(contentsOf: exportedEnumNames.map { exportedEnumByName[$0]! })
         result.structs.append(contentsOf: exportedStructNames.map { exportedStructByName[$0]! })
         result.protocols.append(contentsOf: exportedProtocolNames.map { exportedProtocolByName[$0]! })
+        result.aliases.append(contentsOf: exportedAliases)
     }
 
     /// Creates a unique key by combining name and namespace
@@ -1564,6 +1627,11 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return .skipChildren
         }
 
+        if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
+            recordAlias(node: node, aliasTarget: aliasTarget)
+            return .skipChildren
+        }
+
         let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "class")
         guard namespaceResult.isValid else {
             return .skipChildren
@@ -1662,8 +1730,35 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         return true
     }
 
+    private func recordAlias(
+        node: some SyntaxProtocol & NamedDeclSyntax,
+        aliasTarget: TypeSyntax
+    ) {
+        let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: node, itemName: node.name.text)
+        var lookupErrors: [DiagnosticError] = []
+        guard
+            let aliasBridgeType = parent.aliasType(
+                target: aliasTarget,
+                swiftCallName: swiftCallName,
+                errors: &lookupErrors
+            ),
+            case .alias(_, let underlying) = aliasBridgeType
+        else {
+            errors.append(contentsOf: lookupErrors)
+            return
+        }
+        exportedAliases.append(
+            ExportedAlias(swiftCallName: swiftCallName, underlying: underlying)
+        )
+    }
+
     override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
         guard let jsAttribute = node.attributes.firstJSAttribute else {
+            return .skipChildren
+        }
+
+        if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
+            recordAlias(node: node, aliasTarget: aliasTarget)
             return .skipChildren
         }
 
@@ -1767,24 +1862,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             }
             for enumCase in exportedEnum.cases {
                 for associatedValue in enumCase.associatedValues {
-                    switch associatedValue.type {
-                    case .string, .integer, .float, .double, .bool, .caseEnum, .rawValueEnum,
-                        .swiftStruct, .swiftHeapObject, .jsObject, .associatedValueEnum, .array:
-                        break
-                    case .nullable(let wrappedType, _):
-                        switch wrappedType {
-                        case .string, .integer, .float, .double, .bool, .caseEnum, .rawValueEnum,
-                            .swiftStruct, .swiftHeapObject, .jsObject, .associatedValueEnum, .array:
-                            break
-                        default:
-                            diagnose(
-                                node: node,
-                                message: "Unsupported associated value type: \(associatedValue.type.swiftType)",
-                                hint:
-                                    "Only primitive types, enums, structs, classes, JSObject, arrays, and their optionals are supported in associated-value enums"
-                            )
-                        }
-                    default:
+                    if !associatedValue.type.isSupportedAsAssociatedValue() {
                         diagnose(
                             node: node,
                             message: "Unsupported associated value type: \(associatedValue.type.swiftType)",
@@ -1864,6 +1942,11 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
         guard let jsAttribute = node.attributes.firstJSAttribute else {
+            return .skipChildren
+        }
+
+        if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
+            recordAlias(node: node, aliasTarget: aliasTarget)
             return .skipChildren
         }
 
@@ -2968,6 +3051,22 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             }
         }
         return fallback
+    }
+}
+
+extension BridgeType {
+    fileprivate func isSupportedAsAssociatedValue(allowNullable: Bool = true) -> Bool {
+        switch self {
+        case .string, .integer, .float, .double, .bool, .caseEnum, .rawValueEnum,
+            .swiftStruct, .swiftHeapObject, .jsObject, .associatedValueEnum, .array:
+            return true
+        case .alias(_, let underlying):
+            return underlying.isSupportedAsAssociatedValue(allowNullable: false)
+        case .nullable(let wrapped, _) where allowNullable:
+            return wrapped.isSupportedAsAssociatedValue(allowNullable: false)
+        default:
+            return false
+        }
     }
 }
 

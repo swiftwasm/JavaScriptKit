@@ -26,6 +26,8 @@ export class JsGreeter {
 
 export function runAsyncWorks(): Promise<void>;
 
+export function runAliasAsyncWorks(): Promise<void>;
+
 export interface WeatherData {
     temperature: number;
     description: string;

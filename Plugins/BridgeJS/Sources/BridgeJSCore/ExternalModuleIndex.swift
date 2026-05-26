@@ -63,6 +63,12 @@ public struct ExternalModuleIndex {
             for proto in exported.protocols {
                 register(dotPath: proto.name, bridgeType: .swiftProtocol(proto.name))
             }
+            for alias in exported.aliases {
+                register(
+                    dotPath: alias.swiftCallName,
+                    bridgeType: .alias(name: alias.swiftCallName, underlying: alias.underlying)
+                )
+            }
 
             entriesByModule[moduleName] = moduleEntries
         }
