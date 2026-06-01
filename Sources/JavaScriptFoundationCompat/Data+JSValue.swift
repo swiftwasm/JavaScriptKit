@@ -22,7 +22,7 @@ extension Data: ConvertibleToJSValue, ConstructibleFromJSValue {
     public var jsValue: JSValue { jsTypedArray.jsValue }
 
     /// Construct a Data from a JSTypedArray<UInt8>.
-    public static func construct(from uint8Array: JSTypedArray<UInt8>) -> Data? {
+    public static func construct(from uint8Array: JSTypedArray<UInt8>) -> Data {
         // First, allocate the data storage
         var data = Data(count: uint8Array.lengthInBytes)
         // Then, copy the byte contents into the Data buffer
