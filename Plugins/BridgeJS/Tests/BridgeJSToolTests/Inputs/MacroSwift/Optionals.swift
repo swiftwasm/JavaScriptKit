@@ -30,6 +30,13 @@ class OptionalPropertyHolder {
 
 @JS func testOptionalPropertyRoundtrip(_ holder: OptionalPropertyHolder?) -> OptionalPropertyHolder?
 
+// Exported functions taking an optional jsObject use the direct (isSome, objId)
+// parameter ABI; the return value travels through the stack ABI.
+@JS func roundTripExportedOptionalJSObject(value: JSObject?) -> JSObject?
+
+// Exported function taking/returning an optional imported @JSClass (issue #751).
+@JS func roundTripExportedOptionalJSClass(value: WithOptionalJSClass?) -> WithOptionalJSClass?
+
 @JS
 func roundTripString(name: String?) -> String? {
     return name

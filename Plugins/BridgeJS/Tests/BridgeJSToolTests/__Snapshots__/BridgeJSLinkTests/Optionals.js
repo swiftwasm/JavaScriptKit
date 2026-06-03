@@ -725,6 +725,48 @@ export async function createInstantiator(options, swift) {
                     const optResult = pointer === null ? null : OptionalPropertyHolder.__construct(pointer);
                     return optResult;
                 },
+                roundTripExportedOptionalJSObject: function bjs_roundTripExportedOptionalJSObject(value) {
+                    const isSome = value != null;
+                    let result;
+                    if (isSome) {
+                        result = swift.memory.retain(value);
+                    } else {
+                        result = 0;
+                    }
+                    instance.exports.bjs_roundTripExportedOptionalJSObject(+isSome, result);
+                    const isSome1 = i32Stack.pop();
+                    let optResult;
+                    if (isSome1) {
+                        const objId = i32Stack.pop();
+                        const obj = swift.memory.getObject(objId);
+                        swift.memory.release(objId);
+                        optResult = obj;
+                    } else {
+                        optResult = null;
+                    }
+                    return optResult;
+                },
+                roundTripExportedOptionalJSClass: function bjs_roundTripExportedOptionalJSClass(value) {
+                    const isSome = value != null;
+                    let result;
+                    if (isSome) {
+                        result = swift.memory.retain(value);
+                    } else {
+                        result = 0;
+                    }
+                    instance.exports.bjs_roundTripExportedOptionalJSClass(+isSome, result);
+                    const isSome1 = i32Stack.pop();
+                    let optResult;
+                    if (isSome1) {
+                        const objId = i32Stack.pop();
+                        const obj = swift.memory.getObject(objId);
+                        swift.memory.release(objId);
+                        optResult = obj;
+                    } else {
+                        optResult = null;
+                    }
+                    return optResult;
+                },
                 roundTripString: function bjs_roundTripString(name) {
                     const isSome = name != null;
                     let result, result1;

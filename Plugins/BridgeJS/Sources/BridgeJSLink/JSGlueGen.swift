@@ -762,7 +762,7 @@ struct IntrinsicJSFragment: Sendable {
         }
 
         let innerFragment =
-            if wrappedType.optionalConvention == .stackABI {
+            if wrappedType.optionalParameterUsesStackABI {
                 try stackLowerFragment(elementType: wrappedType)
             } else {
                 try lowerParameter(type: wrappedType)
@@ -779,7 +779,7 @@ struct IntrinsicJSFragment: Sendable {
         kind: JSOptionalKind,
         innerFragment: IntrinsicJSFragment
     ) throws -> IntrinsicJSFragment {
-        let isStackConvention = wrappedType.optionalConvention == .stackABI
+        let isStackConvention = wrappedType.optionalParameterUsesStackABI
 
         return IntrinsicJSFragment(
             parameters: ["value"],
@@ -2693,6 +2693,24 @@ private extension BridgeType {
             return .stackABI
         case .nullable(let wrapped, _):
             return wrapped.optionalConvention
+        }
+    }
+
+    /// Whether an optional of this type pushes its payload onto the bridge stack
+    /// when passed as a *parameter*.
+    ///
+    /// This usually matches `optionalConvention == .stackABI`, but `jsObject`
+    /// optionals are the exception: their return values travel through the stack
+    /// while their parameters use the direct `(isSome, objId)` ABI, matching plain
+    /// `Optional<JSObject>` and exported `@JS class` parameters.
+    var optionalParameterUsesStackABI: Bool {
+        switch self {
+        case .jsObject:
+            return false
+        case .nullable(let wrapped, _):
+            return wrapped.optionalParameterUsesStackABI
+        default:
+            return optionalConvention == .stackABI
         }
     }
 

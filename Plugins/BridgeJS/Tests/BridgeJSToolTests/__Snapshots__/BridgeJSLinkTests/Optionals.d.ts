@@ -50,6 +50,8 @@ export type Exports = {
     }
     roundTripOptionalClass(value: Greeter | null): Greeter | null;
     testOptionalPropertyRoundtrip(holder: OptionalPropertyHolder | null): OptionalPropertyHolder | null;
+    roundTripExportedOptionalJSObject(value: any | null): any | null;
+    roundTripExportedOptionalJSClass(value: WithOptionalJSClass | null): WithOptionalJSClass | null;
     roundTripString(name: string | null): string | null;
     roundTripInt(value: number | null): number | null;
     roundTripInt8(value: number | null): number | null;

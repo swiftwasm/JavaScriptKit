@@ -6940,6 +6940,17 @@ public func _bjs_makeImportedFoo(_ valueBytes: Int32, _ valueLength: Int32) -> I
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripOptionalImportedClass")
+@_cdecl("bjs_roundTripOptionalImportedClass")
+public func _bjs_roundTripOptionalImportedClass(_ vIsSome: Int32, _ vValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripOptionalImportedClass(v: Optional<Foo>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_throwsSwiftError")
 @_cdecl("bjs_throwsSwiftError")
 public func _bjs_throwsSwiftError(_ shouldThrow: Int32) -> Void {
