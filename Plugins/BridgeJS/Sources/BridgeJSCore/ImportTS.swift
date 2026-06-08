@@ -957,6 +957,10 @@ extension BridgeType {
             }
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
+        case .nullable(.swiftStruct, _) where context == .importTS:
+            // Optional `@JS struct`s bridge through the stack (isSome discriminator + fields),
+            // like optional arrays/dictionaries, rather than the non-optional object-id ABI.
+            return LoweringParameterInfo(loweredParameters: [("isSome", .i32)])
         case .nullable(let wrappedType, _):
             let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
             var params = [("isSome", WasmCoreType.i32)]
@@ -1034,8 +1038,12 @@ extension BridgeType {
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as return values")
         case .nullable(let wrappedType, _):
-            // jsObject uses stack ABI for optionals — returns void, value goes through stacks
+            // jsObject and `@JS struct` use the stack ABI for optionals — the thunk returns
+            // void and the value (plus isSome discriminator) flows through the stacks.
             if case .jsObject = wrappedType {
+                return LiftingReturnInfo(valueToLift: nil)
+            }
+            if case .swiftStruct = wrappedType, context == .importTS {
                 return LiftingReturnInfo(valueToLift: nil)
             }
             let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)

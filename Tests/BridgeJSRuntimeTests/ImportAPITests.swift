@@ -59,6 +59,13 @@ class ImportAPITests: XCTestCase {
         }
     }
 
+    func testRoundTripOptionalStruct() throws {
+        let p = try jsRoundTripOptionalPoint(Point(x: 3, y: 4))
+        XCTAssertEqual(p?.x, 3)
+        XCTAssertEqual(p?.y, 4)
+        XCTAssertNil(try jsRoundTripOptionalPoint(nil))
+    }
+
     func ensureThrows<T>(_ f: (Bool) throws(JSException) -> T) throws {
         do {
             _ = try f(true)
