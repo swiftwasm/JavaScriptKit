@@ -258,7 +258,7 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 } catch (error) {
                     setException(error);
-                    return 0
+                    return 0n
                 }
             }
             TestModule["bjs_roundTripUInt64"] = function bjs_roundTripUInt64(v) {
@@ -267,7 +267,7 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 } catch (error) {
                     setException(error);
-                    return 0
+                    return 0n
                 }
             }
         },

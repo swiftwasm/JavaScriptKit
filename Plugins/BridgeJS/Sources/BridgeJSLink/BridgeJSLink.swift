@@ -3704,7 +3704,10 @@ extension BridgeType {
 extension WasmCoreType {
     fileprivate var placeholderValue: String {
         switch self {
-        case .i32, .i64, .f32, .f64, .pointer: return "0"
+        // A Wasm `i64` return is a JavaScript `BigInt`, so the error-path placeholder
+        // must be a BigInt literal rather than a plain number.
+        case .i64: return "0n"
+        case .i32, .f32, .f64, .pointer: return "0"
         }
     }
 }
