@@ -1,0 +1,139 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "start"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "stop"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Signal",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Signal",
+        "tsFullPath" : "Signal"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "send",
+                "parameters" : [
+                  {
+                    "name" : "signal",
+                    "type" : {
+                      "caseEnum" : {
+                        "_0" : "Signal"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "current",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "caseEnum" : {
+                    "_0" : "Signal"
+                  }
+                }
+              }
+            ],
+            "name" : "SignalControls",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "roundTrip",
+                "parameters" : [
+                  {
+                    "name" : "signal",
+                    "type" : {
+                      "caseEnum" : {
+                        "_0" : "Signal"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "caseEnum" : {
+                    "_0" : "Signal"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

@@ -88,6 +88,9 @@ export async function setupOptions(options, context) {
                 "jsRoundTripFeatureFlag": (flag) => {
                     return flag;
                 },
+                "jsRoundTripLightColor": (value) => {
+                    return value;
+                },
                 "jsEchoJSValue": (v) => {
                     return v;
                 },

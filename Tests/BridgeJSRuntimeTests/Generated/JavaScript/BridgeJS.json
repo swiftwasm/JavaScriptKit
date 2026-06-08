@@ -9256,6 +9256,38 @@
       },
       {
         "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "red"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "yellow"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "green"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "LightColor",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "LightColor",
+        "tsFullPath" : "LightColor"
+      },
+      {
+        "cases" : [
 
         ],
         "emitStyle" : "const",
@@ -19696,6 +19728,37 @@
 
             ]
           }
+        ]
+      },
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "jsRoundTripLightColor",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "caseEnum" : {
+                    "_0" : "LightColor"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "caseEnum" : {
+                "_0" : "LightColor"
+              }
+            }
+          }
+        ],
+        "types" : [
+
         ]
       },
       {
