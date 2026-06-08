@@ -17,3 +17,66 @@
 @JS func asyncRoundTripJSObject(_ v: JSObject) async -> JSObject {
     return v
 }
+
+@JS struct AsyncPoint {
+    var x: Int
+    var y: Int
+}
+
+@JS func asyncRoundTripStruct(_ v: AsyncPoint) async -> AsyncPoint {
+    return v
+}
+
+@JS func asyncRoundTripStructThrows(_ v: AsyncPoint) async throws(JSException) -> AsyncPoint {
+    return v
+}
+
+@JS func asyncCombineStructs(_ a: AsyncPoint, _ b: AsyncPoint) async -> AsyncPoint {
+    return AsyncPoint(x: a.x + b.x, y: a.y + b.y)
+}
+
+@JS enum AsyncDirection {
+    case north
+    case south
+}
+
+@JS func asyncRoundTripEnum(_ v: AsyncDirection) async -> AsyncDirection {
+    return v
+}
+
+@JS enum AsyncTheme: String {
+    case light
+    case dark
+}
+
+@JS func asyncRoundTripRawEnum(_ v: AsyncTheme) async -> AsyncTheme {
+    return v
+}
+
+@JS func asyncRoundTripOptionalEnum(_ v: AsyncDirection?) async -> AsyncDirection? {
+    return v
+}
+
+@JS func asyncRoundTripOptionalRawEnum(_ v: AsyncTheme?) async -> AsyncTheme? {
+    return v
+}
+
+@JS func asyncRoundTripOptionalStruct(_ v: AsyncPoint?) async -> AsyncPoint? {
+    return v
+}
+
+@JS func asyncRoundTripStructArray(_ v: [AsyncPoint]) async -> [AsyncPoint] {
+    return v
+}
+
+@JS func asyncRoundTripEnumArray(_ v: [AsyncDirection]) async -> [AsyncDirection] {
+    return v
+}
+
+@JS func asyncRoundTripStructDictionary(_ v: [String: AsyncPoint]) async -> [String: AsyncPoint] {
+    return v
+}
+
+@JS func asyncRoundTripEnumDictionary(_ v: [String: AsyncDirection]) async -> [String: AsyncDirection] {
+    return v
+}

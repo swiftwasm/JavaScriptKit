@@ -2286,3 +2286,67 @@ extension _BridgedAsOptional {
         throw error
     }
 }
+
+// MARK: Async Promise Creation
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_make_promise")
+private func _swift_js_make_promise_extern() -> Int32
+#else
+private func _swift_js_make_promise_extern() -> Int32 { _onlyAvailableOnWasm() }
+#endif
+
+// `@unchecked Sendable` is safe because the Wasm runtime is single-threaded.
+private struct _BridgeJSMakePromiseContext<T>: @unchecked Sendable {
+    let promise: JSObject
+    let resolve: (JSObject, T) throws(JSException) -> Void
+    let reject: (JSObject, JSValue) throws(JSException) -> Void
+    let body: () async throws(JSException) -> T
+}
+
+/// Returns a `Promise` synchronously and settles it from a `Task` via the generated
+/// `resolve` / `reject` thunks, which this library cannot name directly.
+@_spi(BridgeJS) public func _bjs_makePromise<T>(
+    resolve: @escaping (JSObject, T) throws(JSException) -> Void,
+    reject: @escaping (JSObject, JSValue) throws(JSException) -> Void,
+    _ body: @escaping () async throws(JSException) -> T
+) -> Int32 {
+    let promise = JSObject(id: JavaScriptObjectRef(bitPattern: _swift_js_make_promise_extern()))
+    let context = _BridgeJSMakePromiseContext(promise: promise, resolve: resolve, reject: reject, body: body)
+    Task {
+        do throws(JSException) {
+            let value = try await context.body()
+            try context.resolve(context.promise, value)
+        } catch {
+            try? context.reject(context.promise, error.thrownValue)
+        }
+    }
+    return promise.bridgeJSLowerReturn()
+}
+
+private struct _BridgeJSMakeVoidPromiseContext: @unchecked Sendable {
+    let promise: JSObject
+    let resolve: (JSObject) throws(JSException) -> Void
+    let reject: (JSObject, JSValue) throws(JSException) -> Void
+    let body: () async throws(JSException) -> Void
+}
+
+/// `Void`-returning overload: a `Void` value can't cross the bridge as a parameter, so the
+/// generated `resolve` thunk takes only the promise and settles it with `undefined`.
+@_spi(BridgeJS) public func _bjs_makePromise(
+    resolve: @escaping (JSObject) throws(JSException) -> Void,
+    reject: @escaping (JSObject, JSValue) throws(JSException) -> Void,
+    _ body: @escaping () async throws(JSException) -> Void
+) -> Int32 {
+    let promise = JSObject(id: JavaScriptObjectRef(bitPattern: _swift_js_make_promise_extern()))
+    let context = _BridgeJSMakeVoidPromiseContext(promise: promise, resolve: resolve, reject: reject, body: body)
+    Task {
+        do throws(JSException) {
+            try await context.body()
+            try context.resolve(context.promise)
+        } catch {
+            try? context.reject(context.promise, error.thrownValue)
+        }
+    }
+    return promise.bridgeJSLowerReturn()
+}

@@ -90,9 +90,75 @@ public class ExportSwift {
                 decls.append(contentsOf: try renderSingleExportedClass(klass: klass))
             }
         }
+
+        try withSpan("Render Async Promise Helpers") { [self] in
+            let asyncResolveTypes = skeleton.asyncPromiseResolveReturnTypes
+            if !asyncResolveTypes.isEmpty {
+                decls.append(contentsOf: try renderPromiseRejectHelper())
+                for type in asyncResolveTypes {
+                    decls.append(contentsOf: try renderPromiseResolveHelper(type))
+                }
+            }
+        }
         return withSpan("Format Export Glue") {
             return decls.map { $0.description }.joined(separator: "\n\n")
         }
+    }
+
+    /// Generates the per-type `Promise_resolve_<mangled>` settlement helper.
+    private func renderPromiseResolveHelper(_ type: BridgeType) throws -> [DeclSyntax] {
+        try renderPromiseSettleHelper(
+            functionName: "Promise_resolve_\(type.mangleTypeName)",
+            externName: "promise_resolve_\(moduleName)_\(type.mangleTypeName)",
+            valueType: type
+        )
+    }
+
+    /// Generates the shared `Promise_reject` settlement helper.
+    private func renderPromiseRejectHelper() throws -> [DeclSyntax] {
+        try renderPromiseSettleHelper(
+            functionName: "Promise_reject",
+            externName: "promise_reject_\(moduleName)",
+            valueType: .jsValue
+        )
+    }
+
+    /// Generates a `@JSFunction func <functionName>(_ promise: JSObject, _ value: T)` and its
+    /// glue, lowering `value` through the standard imported-parameter ABI.
+    private func renderPromiseSettleHelper(
+        functionName: String,
+        externName: String,
+        valueType: BridgeType
+    ) throws -> [DeclSyntax] {
+        let effects = Effects(isAsync: false, isThrows: true)
+        // `Void` can't cross the bridge as a parameter, so the void helper takes only the promise.
+        var parameters = [Parameter(label: nil, name: "promise", type: .jsObject(nil))]
+        if valueType != .void {
+            parameters.append(Parameter(label: nil, name: "value", type: valueType))
+        }
+        let builder = try ImportTS.CallJSEmission(
+            moduleName: "bjs",
+            abiName: externName,
+            effects: effects,
+            returnType: .void,
+            context: .importTS
+        )
+        for parameter in parameters {
+            try builder.lowerParameter(param: parameter)
+        }
+        try builder.call()
+        try builder.liftReturnValue()
+
+        let valueParam = valueType == .void ? "" : ", _ value: \(valueType.swiftType)"
+        let macroDecl: DeclSyntax =
+            "@JSFunction func \(raw: functionName)(_ promise: JSObject\(raw: valueParam)) throws(JSException)"
+        let glueDecl = builder.renderThunkDecl(
+            name: "_$\(functionName)",
+            parameters: parameters,
+            returnType: .void,
+            effects: effects
+        )
+        return [macroDecl, builder.renderImportDecl(), glueDecl]
     }
 
     class ExportedThunkBuilder {
@@ -104,8 +170,22 @@ public class ExportSwift {
         var externDecls: [DeclSyntax] = []
         let effects: Effects
 
-        init(effects: Effects) {
+        /// The async return type settled through `_bjs_makePromise`'s `Promise_resolve_<mangled>`
+        /// helper. Set for every `async` thunk.
+        var asyncResolveReturnType: BridgeType?
+
+        /// Stack-using parameter lifts hoisted ahead of the deferred async closure.
+        var asyncHoistedBindings: [CodeBlockItemSyntax] = []
+
+        init(effects: Effects, returnType: BridgeType) throws {
             self.effects = effects
+            guard effects.isAsync else { return }
+            guard returnType.isAsyncResolvable else {
+                throw BridgeJSCoreError(
+                    "Returning '\(returnType.swiftType)' from an async exported function is not yet supported"
+                )
+            }
+            self.asyncResolveReturnType = returnType
         }
 
         private func append(_ item: CodeBlockItemSyntax) {
@@ -200,7 +280,7 @@ public class ExportSwift {
             }
 
             if effects.isAsync, returnType != .void {
-                return CodeBlockItemSyntax(item: .init(StmtSyntax("return \(raw: callExpr).jsValue")))
+                return CodeBlockItemSyntax(item: .init(StmtSyntax("return \(raw: callExpr)")))
             }
 
             if returnType == .void {
@@ -242,6 +322,22 @@ public class ExportSwift {
         private func generateParameterLifting() {
             let stackParamIndices = parameters.enumerated().compactMap { index, param -> Int? in
                 param.type.isStackUsingParameter ? index : nil
+            }
+
+            if effects.isAsync {
+                // Drain stack parameters before the deferred `Task` or the shared stack is corrupted.
+                for index in stackParamIndices.reversed() {
+                    let param = parameters[index]
+                    let expr = liftedParameterExprs[index]
+                    let varName = "_tmp_\(param.name)"
+                    var binding: CodeBlockItemSyntax = "let \(raw: varName) = \(expr)"
+                    if !asyncHoistedBindings.isEmpty {
+                        binding = binding.with(\.leadingTrivia, .newline)
+                    }
+                    asyncHoistedBindings.append(binding)
+                    liftedParameterExprs[index] = ExprSyntax(DeclReferenceExprSyntax(baseName: .identifier(varName)))
+                }
+                return
             }
 
             guard stackParamIndices.count > 1 else { return }
@@ -293,8 +389,7 @@ public class ExportSwift {
                 return
             }
             if effects.isAsync {
-                // The return value of async function (T of `(...) async -> T`) is
-                // handled by the JSPromise.async, so we don't need to do anything here.
+                // The async return value is lowered by the generated `Promise_resolve_*` helper.
                 return
             }
 
@@ -328,25 +423,25 @@ public class ExportSwift {
             }
         }
 
+        /// A throwing async body needs an explicit closure type, otherwise Swift infers
+        /// `throws(any Error)` instead of `throws(JSException)`.
+        /// See: https://github.com/swiftlang/swift/issues/76165
+        private func asyncThrowsClosureHead(returnSpelling: String?) -> String {
+            guard effects.isThrows else { return "" }
+            let returns = returnSpelling.map { " -> \($0)" } ?? ""
+            return " () async throws(JSException)\(returns) in"
+        }
+
         func render(abiName: String) -> DeclSyntax {
             let body: CodeBlockItemListSyntax
-            if effects.isAsync {
-                // Explicit closure type annotation needed when throws is present
-                // so Swift infers throws(JSException) instead of throws(any Error)
-                // See: https://github.com/swiftlang/swift/issues/76165
-                let closureHead: String
-                if effects.isThrows {
-                    let hasReturn = self.body.contains { $0.description.contains("return ") }
-                    let ret = hasReturn ? " -> JSValue" : ""
-                    closureHead = " () async throws(JSException)\(ret) in"
-                } else {
-                    closureHead = ""
-                }
+            if effects.isAsync, let resolveType = asyncResolveReturnType {
+                let resolveName = "Promise_resolve_\(resolveType.mangleTypeName)"
+                let closureHead = asyncThrowsClosureHead(returnSpelling: resolveType.swiftType)
                 body = """
-                    let ret = JSPromise.async {\(raw: closureHead)
+                    \(CodeBlockItemListSyntax(asyncHoistedBindings))
+                    return _bjs_makePromise(resolve: \(raw: resolveName), reject: Promise_reject) {\(raw: closureHead)
                         \(CodeBlockItemListSyntax(self.body))
-                    }.jsObject
-                    return ret.bridgeJSLowerReturn()
+                    }
                     """
             } else if effects.isThrows {
                 body = """
@@ -457,7 +552,10 @@ public class ExportSwift {
         let className = context.className
         let isStatic = context.isStatic
 
-        let getterBuilder = ExportedThunkBuilder(effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic))
+        let getterBuilder = try ExportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic),
+            returnType: property.type
+        )
 
         if !isStatic {
             try getterBuilder.liftParameter(
@@ -476,8 +574,9 @@ public class ExportSwift {
 
         // Generate property setter if not readonly
         if !property.isReadonly {
-            let setterBuilder = ExportedThunkBuilder(
-                effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic)
+            let setterBuilder = try ExportedThunkBuilder(
+                effects: Effects(isAsync: false, isThrows: false, isStatic: isStatic),
+                returnType: .void
             )
 
             // Lift parameters based on property type
@@ -507,7 +606,7 @@ public class ExportSwift {
     }
 
     func renderSingleExportedFunction(function: ExportedFunction) throws -> DeclSyntax {
-        let builder = ExportedThunkBuilder(effects: function.effects)
+        let builder = try ExportedThunkBuilder(effects: function.effects, returnType: function.returnType)
         for param in function.parameters {
             try builder.liftParameter(param: param)
         }
@@ -536,7 +635,7 @@ public class ExportSwift {
         callName: String,
         returnType: BridgeType
     ) throws -> DeclSyntax {
-        let builder = ExportedThunkBuilder(effects: constructor.effects)
+        let builder = try ExportedThunkBuilder(effects: constructor.effects, returnType: returnType)
         for param in constructor.parameters {
             try builder.liftParameter(param: param)
         }
@@ -550,7 +649,7 @@ public class ExportSwift {
         ownerTypeName: String,
         instanceSelfType: BridgeType
     ) throws -> DeclSyntax {
-        let builder = ExportedThunkBuilder(effects: method.effects)
+        let builder = try ExportedThunkBuilder(effects: method.effects, returnType: method.returnType)
         if !method.effects.isStatic {
             try builder.liftParameter(param: Parameter(label: nil, name: "_self", type: instanceSelfType))
         }

@@ -174,6 +174,10 @@ extension Greeter {
         return a + b
     }
 
+    @JS func asyncMakePoint(x: Int, y: Int) async -> PublicPoint {
+        return PublicPoint(x: x, y: y)
+    }
+
     deinit {
         Self.onDeinit()
     }
@@ -301,6 +305,26 @@ extension StaticCalculator {
 @JS func getTheme() -> Theme {
     return .light
 }
+
+@JS func asyncRoundTripTheme(_ v: Theme) async -> Theme { v }
+
+@JS func asyncRoundTripDirection(_ v: Direction) async -> Direction { v }
+
+@JS func asyncRoundTripOptionalTheme(_ v: Theme?) async -> Theme? { v }
+
+@JS func asyncRoundTripOptionalDirection(_ v: Direction?) async -> Direction? { v }
+
+@JS func asyncRoundTripDirectionArray(_ v: [Direction]) async -> [Direction] { v }
+
+@JS func asyncRoundTripDirectionDict(_ v: [String: Direction]) async -> [String: Direction] { v }
+
+@JS func asyncRoundTripThemeArray(_ v: [Theme]) async -> [Theme] { v }
+
+@JS func asyncRoundTripThemeDict(_ v: [String: Theme]) async -> [String: Theme] { v }
+
+@JS func asyncRoundTripFileSize(_ v: FileSize) async -> FileSize { v }
+
+@JS func asyncRoundTripOptionalFileSize(_ v: FileSize?) async -> FileSize? { v }
 
 @JS func setHttpStatus(_ status: HttpStatus) -> HttpStatus {
     return status

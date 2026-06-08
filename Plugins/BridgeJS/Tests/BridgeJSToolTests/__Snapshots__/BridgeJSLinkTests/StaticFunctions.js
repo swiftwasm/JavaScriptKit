@@ -150,6 +150,13 @@ export async function createInstantiator(options, swift) {
                 const copy = memory.buffer.slice(ptr, ptr + byteLen);
                 taStack.push(Array.from(new Ctor(copy)));
             }
+            const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
+            bjs["swift_js_make_promise"] = function() {
+                let resolve, reject;
+                const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
+                promise[__bjs_promiseSettlers] = { resolve, reject };
+                return swift.memory.retain(promise);
+            }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
                     tmpRetOptionalBool = null;
