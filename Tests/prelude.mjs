@@ -141,6 +141,7 @@ export async function setupOptions(options, context) {
                 jsTranslatePoint: (point, dx, dy) => {
                     return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
                 },
+                jsRoundTripOptionalPoint: (point) => point,
                 roundTripArrayMembers: (value) => {
                     return value;
                 },

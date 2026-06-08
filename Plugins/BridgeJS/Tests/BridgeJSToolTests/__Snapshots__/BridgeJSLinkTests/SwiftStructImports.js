@@ -226,6 +226,25 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
+            TestModule["bjs_roundTripOptional"] = function bjs_roundTripOptional(point) {
+                try {
+                    let optResult;
+                    if (point) {
+                        const struct = structHelpers.Point.lift();
+                        optResult = struct;
+                    } else {
+                        optResult = null;
+                    }
+                    let ret = imports.roundTripOptional(optResult);
+                    const isSome = ret != null;
+                    if (isSome) {
+                        structHelpers.Point.lower(ret);
+                    }
+                    i32Stack.push(isSome ? 1 : 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;

@@ -13280,6 +13280,27 @@ func _$jsTranslatePoint(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalPoint")
+fileprivate func bjs_jsRoundTripOptionalPoint_extern(_ point: Int32) -> Void
+#else
+fileprivate func bjs_jsRoundTripOptionalPoint_extern(_ point: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsRoundTripOptionalPoint(_ point: Int32) -> Void {
+    return bjs_jsRoundTripOptionalPoint_extern(point)
+}
+
+func _$jsRoundTripOptionalPoint(_ point: Optional<Point>) throws(JSException) -> Optional<Point> {
+    let pointIsSome = point.bridgeJSLowerParameter()
+    bjs_jsRoundTripOptionalPoint(pointIsSome)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<Point>.bridgeJSLiftReturn()
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_IntegerTypesSupportImports_jsRoundTripInt_static")
 fileprivate func bjs_IntegerTypesSupportImports_jsRoundTripInt_static_extern(_ v: Int32) -> Int32
 #else

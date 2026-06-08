@@ -12,6 +12,7 @@ export type Exports = {
 }
 export type Imports = {
     translate(point: Point, dx: number, dy: number): Point;
+    roundTripOptional(point: Point | null): Point | null;
 }
 export function createInstantiator(options: {
     imports: Imports;
