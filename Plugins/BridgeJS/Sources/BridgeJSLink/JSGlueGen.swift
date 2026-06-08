@@ -2603,7 +2603,10 @@ fileprivate extension WasmCoreType {
     var jsZeroLiteral: String {
         switch self {
         case .f32, .f64: return "0.0"
-        case .i32, .i64, .pointer: return "0"
+        // A Wasm `i64` parameter is passed as a JavaScript `BigInt`, so its zero
+        // placeholder must be a BigInt literal rather than a plain number.
+        case .i64: return "0n"
+        case .i32, .pointer: return "0"
         }
     }
 }

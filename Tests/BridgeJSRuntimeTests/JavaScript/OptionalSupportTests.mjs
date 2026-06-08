@@ -80,6 +80,10 @@ export function runJsOptionalSupportTests(rootExports) {
     assert.equal(exports.roundTripOptionalIntRawValueEnum(HttpStatus.Ok), HttpStatusValues.Ok);
     assert.equal(exports.roundTripOptionalInt64RawValueEnum(FileSize.Tiny), FileSizeValues.Tiny);
     assert.equal(exports.roundTripOptionalUInt64RawValueEnum(SessionId.Active), SessionIdValues.Active);
+    // The `none` case lowers the i64/u64 placeholder as a BigInt (`0n`); a plain `0`
+    // would throw "Cannot convert 0 to a BigInt" when calling the Wasm export.
+    assert.equal(exports.roundTripOptionalInt64RawValueEnum(null), null);
+    assert.equal(exports.roundTripOptionalUInt64RawValueEnum(null), null);
     assert.equal(exports.roundTripOptionalTSEnum(TSDirection.North), TSDirection.North);
     assert.equal(exports.roundTripOptionalTSStringEnum(TSTheme.Light), TSTheme.Light);
     assert.equal(exports.roundTripOptionalNamespacedEnum(Networking.API.Method.Get), Networking.API.Method.Get);

@@ -440,7 +440,7 @@ export async function createInstantiator(options, swift) {
                 },
                 roundTripOptionalFileSize: function bjs_roundTripOptionalFileSize(input) {
                     const isSome = input != null;
-                    instance.exports.bjs_roundTripOptionalFileSize(+isSome, isSome ? input : 0);
+                    instance.exports.bjs_roundTripOptionalFileSize(+isSome, isSome ? input : 0n);
                     const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
@@ -488,7 +488,7 @@ export async function createInstantiator(options, swift) {
                 },
                 roundTripOptionalSessionId: function bjs_roundTripOptionalSessionId(input) {
                     const isSome = input != null;
-                    instance.exports.bjs_roundTripOptionalSessionId(+isSome, isSome ? input : 0);
+                    instance.exports.bjs_roundTripOptionalSessionId(+isSome, isSome ? input : 0n);
                     const isSome1 = i32Stack.pop();
                     let optResult;
                     if (isSome1) {
