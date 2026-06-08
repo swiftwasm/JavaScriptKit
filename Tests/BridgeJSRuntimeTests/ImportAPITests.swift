@@ -1,6 +1,14 @@
 import XCTest
 import JavaScriptKit
 
+@JS enum LightColor {
+    case red
+    case yellow
+    case green
+}
+
+@JSFunction func jsRoundTripLightColor(_ value: LightColor) throws(JSException) -> LightColor
+
 class ImportAPITests: XCTestCase {
     func testRoundTripVoid() throws {
         try jsRoundTripVoid()
@@ -64,6 +72,12 @@ class ImportAPITests: XCTestCase {
         XCTAssertEqual(p?.x, 3)
         XCTAssertEqual(p?.y, 4)
         XCTAssertNil(try jsRoundTripOptionalPoint(nil))
+    }
+
+    func testRoundTripCaseEnum() throws {
+        for v in [LightColor.red, .yellow, .green] {
+            try XCTAssertEqual(jsRoundTripLightColor(v), v)
+        }
     }
 
     func ensureThrows<T>(_ f: (Bool) throws(JSException) -> T) throws {

@@ -928,12 +928,7 @@ extension BridgeType {
                 return LoweringParameterInfo(loweredParameters: [("objectId", .i32)])
             }
         case .caseEnum:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                return LoweringParameterInfo(loweredParameters: [("value", .i32)])
-            }
+            return LoweringParameterInfo(loweredParameters: [("value", .i32)])
         case .rawValueEnum(_, let rawType):
             if rawType == .string {
                 return .string
@@ -1011,12 +1006,7 @@ extension BridgeType {
                 return LiftingReturnInfo(valueToLift: .i32)
             }
         case .caseEnum:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("Enum types are not yet supported in TypeScript imports")
-            case .exportSwift:
-                return LiftingReturnInfo(valueToLift: .i32)
-            }
+            return LiftingReturnInfo(valueToLift: .i32)
         case .rawValueEnum(_, let rawType):
             let wasmType = rawType.wasmCoreType ?? .i32
             return LiftingReturnInfo(valueToLift: wasmType)

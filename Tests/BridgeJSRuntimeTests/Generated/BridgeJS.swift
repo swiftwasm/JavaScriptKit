@@ -4831,6 +4831,45 @@ public func _bjs_NestedStructGroupB_static_roundtripMetadata() -> Void {
     #endif
 }
 
+extension LightColor: _BridgedSwiftCaseEnum {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> LightColor {
+        return bridgeJSLiftParameter(value)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> LightColor {
+        return LightColor(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSLowerParameter()
+    }
+
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .red
+        case 1:
+            self = .yellow
+        case 2:
+            self = .green
+        default:
+            return nil
+        }
+    }
+
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
+        switch self {
+        case .red:
+            return 0
+        case .yellow:
+            return 1
+        case .green:
+            return 2
+        }
+    }
+}
+
 @_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripInt")
 @_cdecl("bjs_IntegerTypesSupportExports_static_roundTripInt")
 public func _bjs_IntegerTypesSupportExports_static_roundTripInt(_ v: Int32) -> Int32 {
@@ -13254,6 +13293,27 @@ func _$Animal_getIsCat(_ self: JSObject) throws(JSException) -> Bool {
         throw error
     }
     return Bool.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripLightColor")
+fileprivate func bjs_jsRoundTripLightColor_extern(_ value: Int32) -> Int32
+#else
+fileprivate func bjs_jsRoundTripLightColor_extern(_ value: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsRoundTripLightColor(_ value: Int32) -> Int32 {
+    return bjs_jsRoundTripLightColor_extern(value)
+}
+
+func _$jsRoundTripLightColor(_ value: LightColor) throws(JSException) -> LightColor {
+    let valueValue = value.bridgeJSLowerParameter()
+    let ret = bjs_jsRoundTripLightColor(valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return LightColor.bridgeJSLiftReturn(ret)
 }
 
 #if arch(wasm32)
