@@ -394,18 +394,9 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WithOptionalJSClass_childOrNull_set"] = function bjs_WithOptionalJSClass_childOrNull_set(self, newValue) {
+            TestModule["bjs_WithOptionalJSClass_childOrNull_set"] = function bjs_WithOptionalJSClass_childOrNull_set(self, newValueIsSome, newValueObjectId) {
                 try {
-                    let optResult;
-                    if (newValue) {
-                        const objId = i32Stack.pop();
-                        const obj = swift.memory.getObject(objId);
-                        swift.memory.release(objId);
-                        optResult = obj;
-                    } else {
-                        optResult = null;
-                    }
-                    swift.memory.getObject(self).childOrNull = optResult;
+                    swift.memory.getObject(self).childOrNull = newValueIsSome ? swift.memory.getObject(newValueObjectId) : null;
                 } catch (error) {
                     setException(error);
                 }
@@ -496,22 +487,13 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_WithOptionalJSClass_roundTripChildOrNull"] = function bjs_WithOptionalJSClass_roundTripChildOrNull(self, value) {
+            TestModule["bjs_WithOptionalJSClass_roundTripChildOrNull"] = function bjs_WithOptionalJSClass_roundTripChildOrNull(self, valueIsSome, valueObjectId) {
                 try {
-                    let optResult;
-                    if (value) {
-                        const objId = i32Stack.pop();
-                        const obj = swift.memory.getObject(objId);
-                        swift.memory.release(objId);
-                        optResult = obj;
-                    } else {
-                        optResult = null;
-                    }
-                    let ret = swift.memory.getObject(self).roundTripChildOrNull(optResult);
+                    let ret = swift.memory.getObject(self).roundTripChildOrNull(valueIsSome ? swift.memory.getObject(valueObjectId) : null);
                     const isSome = ret != null;
                     if (isSome) {
-                        const objId1 = swift.memory.retain(ret);
-                        i32Stack.push(objId1);
+                        const objId = swift.memory.retain(ret);
+                        i32Stack.push(objId);
                     }
                     i32Stack.push(isSome ? 1 : 0);
                 } catch (error) {
@@ -730,6 +712,48 @@ export async function createInstantiator(options, swift) {
                     const pointer = tmpRetOptionalHeapObject;
                     tmpRetOptionalHeapObject = undefined;
                     const optResult = pointer === null ? null : OptionalPropertyHolder.__construct(pointer);
+                    return optResult;
+                },
+                roundTripExportedOptionalJSObject: function bjs_roundTripExportedOptionalJSObject(value) {
+                    const isSome = value != null;
+                    let result;
+                    if (isSome) {
+                        result = swift.memory.retain(value);
+                    } else {
+                        result = 0;
+                    }
+                    instance.exports.bjs_roundTripExportedOptionalJSObject(+isSome, result);
+                    const isSome1 = i32Stack.pop();
+                    let optResult;
+                    if (isSome1) {
+                        const objId = i32Stack.pop();
+                        const obj = swift.memory.getObject(objId);
+                        swift.memory.release(objId);
+                        optResult = obj;
+                    } else {
+                        optResult = null;
+                    }
+                    return optResult;
+                },
+                roundTripExportedOptionalJSClass: function bjs_roundTripExportedOptionalJSClass(value) {
+                    const isSome = value != null;
+                    let result;
+                    if (isSome) {
+                        result = swift.memory.retain(value);
+                    } else {
+                        result = 0;
+                    }
+                    instance.exports.bjs_roundTripExportedOptionalJSClass(+isSome, result);
+                    const isSome1 = i32Stack.pop();
+                    let optResult;
+                    if (isSome1) {
+                        const objId = i32Stack.pop();
+                        const obj = swift.memory.getObject(objId);
+                        swift.memory.release(objId);
+                        optResult = obj;
+                    } else {
+                        optResult = null;
+                    }
                     return optResult;
                 },
                 roundTripString: function bjs_roundTripString(name) {

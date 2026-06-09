@@ -46,6 +46,9 @@ export function getImports(importsContext) {
         jsRoundTripOptionalStringToStringDictionaryUndefined: (v) => {
             return v === undefined ? undefined : v;
         },
+        jsRoundTripOptionalJSObjectNull: (v) => {
+            return v ?? null;
+        },
         runJsOptionalSupportTests: () => {
             const exports = importsContext.getExports();
             if (!exports) { throw new Error("No exports!?"); }

@@ -6979,6 +6979,17 @@ public func _bjs_makeImportedFoo(_ valueBytes: Int32, _ valueLength: Int32) -> I
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripOptionalImportedClass")
+@_cdecl("bjs_roundTripOptionalImportedClass")
+public func _bjs_roundTripOptionalImportedClass(_ vIsSome: Int32, _ vValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripOptionalImportedClass(v: Optional<Foo>.bridgeJSLiftParameter(vIsSome, vValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_throwsSwiftError")
 @_cdecl("bjs_throwsSwiftError")
 public func _bjs_throwsSwiftError(_ shouldThrow: Int32) -> Void {
@@ -14896,6 +14907,18 @@ fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDic
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalJSObjectNull_static")
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSObjectNull_static_extern(_ valueIsSome: Int32, _ valueValue: Int32) -> Void
+#else
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSObjectNull_static_extern(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSObjectNull_static(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalJSObjectNull_static_extern(valueIsSome, valueValue)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_runJsOptionalSupportTests_static")
 fileprivate func bjs_OptionalSupportImports_runJsOptionalSupportTests_static_extern() -> Void
 #else
@@ -14979,6 +15002,15 @@ func _$OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefin
         throw error
     }
     return JSUndefinedOr<[String: String]>.bridgeJSLiftReturn()
+}
+
+func _$OptionalSupportImports_jsRoundTripOptionalJSObjectNull(_ value: Optional<JSObject>) throws(JSException) -> Optional<JSObject> {
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    bjs_OptionalSupportImports_jsRoundTripOptionalJSObjectNull_static(valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<JSObject>.bridgeJSLiftReturn()
 }
 
 func _$OptionalSupportImports_runJsOptionalSupportTests() throws(JSException) -> Void {

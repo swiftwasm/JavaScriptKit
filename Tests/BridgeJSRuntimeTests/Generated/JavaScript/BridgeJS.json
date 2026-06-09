@@ -11990,6 +11990,41 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripOptionalImportedClass",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripOptionalImportedClass",
+        "parameters" : [
+          {
+            "label" : "v",
+            "name" : "v",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsObject" : {
+                    "_0" : "Foo"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "jsObject" : {
+                "_0" : "Foo"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_throwsSwiftError",
         "effects" : {
           "isAsync" : false,
@@ -21705,6 +21740,40 @@
                       }
                     },
                     "_1" : "undefined"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsRoundTripOptionalJSObjectNull",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "jsObject" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsObject" : {
+
+                      }
+                    },
+                    "_1" : "null"
                   }
                 }
               },

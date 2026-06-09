@@ -20,6 +20,28 @@ public func _bjs_testOptionalPropertyRoundtrip(_ holderIsSome: Int32, _ holderVa
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripExportedOptionalJSObject")
+@_cdecl("bjs_roundTripExportedOptionalJSObject")
+public func _bjs_roundTripExportedOptionalJSObject(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripExportedOptionalJSObject(value: Optional<JSObject>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_roundTripExportedOptionalJSClass")
+@_cdecl("bjs_roundTripExportedOptionalJSClass")
+public func _bjs_roundTripExportedOptionalJSClass(_ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripExportedOptionalJSClass(value: Optional<WithOptionalJSClass>.bridgeJSLiftParameter(valueIsSome, valueValue))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripString")
 @_cdecl("bjs_roundTripString")
 public func _bjs_roundTripString(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {

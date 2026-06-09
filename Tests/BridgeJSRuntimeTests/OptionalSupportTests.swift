@@ -24,6 +24,8 @@ import JavaScriptEventLoop
         _ v: JSUndefinedOr<[String: String]>
     ) throws(JSException) -> JSUndefinedOr<[String: String]>
 
+    @JSFunction static func jsRoundTripOptionalJSObjectNull(_ value: JSObject?) throws(JSException) -> JSObject?
+
     @JSFunction static func runJsOptionalSupportTests() throws(JSException)
 }
 
@@ -83,6 +85,15 @@ final class OptionalSupportTests: XCTestCase {
 
     func testRoundTripOptionalStringToStringDictionaryUndefined() throws {
         try roundTripTest(OptionalSupportImports.jsRoundTripOptionalStringToStringDictionaryUndefined, ["key": "value"])
+    }
+
+    func testRoundTripOptionalJSObjectNull() throws {
+        try XCTAssertNil(OptionalSupportImports.jsRoundTripOptionalJSObjectNull(nil))
+
+        let object = JSObject.global.Object.function!.new()
+        object.testProp = "hello"
+        let result = try OptionalSupportImports.jsRoundTripOptionalJSObjectNull(object)
+        XCTAssertEqual(result?.testProp.string, "hello")
     }
 }
 

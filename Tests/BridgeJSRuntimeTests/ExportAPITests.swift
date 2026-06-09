@@ -75,6 +75,10 @@ func runJsWorks() -> Void
     return try Foo(value)
 }
 
+@JS func roundTripOptionalImportedClass(v: Foo?) -> Foo? {
+    return v
+}
+
 struct TestError: Error {
     let message: String
 }

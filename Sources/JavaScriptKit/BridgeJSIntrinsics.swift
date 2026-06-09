@@ -1826,6 +1826,29 @@ extension _BridgedAsOptional where Wrapped == JSObject {
     }
 }
 
+extension _BridgedAsOptional where Wrapped: _JSBridgedClass {
+    // `@JSClass` wrappers (`_JSBridgedClass`) bridge an underlying `JSObject`, so an
+    // optional wrapper mirrors `Optional<JSObject>`: parameters use the direct
+    // (`isSome`, object id) ABI while returns travel through the bridge stack.
+    //
+    // Stack push/pop is provided by the generic `Wrapped: _BridgedSwiftStackType`
+    // extension; only the direct parameter lift and the export return lowering need
+    // dedicated implementations here.
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> Self {
+        Self(
+            optional: Optional<Wrapped>._bridgeJSLiftParameter(
+                isSome,
+                objectId,
+                liftWrapped: Wrapped.bridgeJSLiftParameter
+            )
+        )
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        Wrapped.bridgeJSStackPushAsOptional(asOptional)
+    }
+}
+
 extension _BridgedAsOptional where Wrapped: _BridgedSwiftProtocolWrapper {
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> Self {
         Self(

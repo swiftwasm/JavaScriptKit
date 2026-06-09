@@ -240,6 +240,76 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripExportedOptionalJSObject",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripExportedOptionalJSObject",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsObject" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "jsObject" : {
+
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundTripExportedOptionalJSClass",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripExportedOptionalJSClass",
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsObject" : {
+                    "_0" : "WithOptionalJSClass"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "jsObject" : {
+                "_0" : "WithOptionalJSClass"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripString",
         "effects" : {
           "isAsync" : false,

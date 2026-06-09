@@ -305,6 +305,13 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.ok(foo instanceof ImportedFoo);
     assert.equal(foo.value, "hello");
 
+    // Optional @JSClass directly as an exported function parameter/return value (issue #751)
+    const optFoo = new ImportedFoo("optional-foo");
+    const optFooResult = exports.roundTripOptionalImportedClass(optFoo);
+    assert.ok(optFooResult instanceof ImportedFoo);
+    assert.equal(optFooResult.value, "optional-foo");
+    assert.equal(exports.roundTripOptionalImportedClass(null), null);
+
     // Test PropertyHolder with various types
     const testObj = { testProp: "test" };
     const sibling = new exports.SimplePropertyHolder(999);
