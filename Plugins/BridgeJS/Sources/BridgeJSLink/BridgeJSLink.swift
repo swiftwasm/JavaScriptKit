@@ -356,6 +356,40 @@ public struct BridgeJSLink {
         ]
     }
 
+    /// JS const (in the import glue scope) holding the `Symbol` under which a promise's
+    /// resolve/reject settlers are stashed.
+    private static let promiseSettlersSymbol = "__bjs_promiseSettlers"
+
+    /// Renders a `bjs[...]` settlement handler that lifts `(promise, value)` and calls the
+    /// promise's stashed `resolve` / `reject` settler.
+    private func renderPromiseSettleHandler(
+        externName: String,
+        valueType: BridgeType,
+        settle: String,
+        into printer: CodeFragmentPrinter
+    ) throws {
+        let builder = ImportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: true),
+            returnType: .void,
+            intrinsicRegistry: intrinsicRegistry
+        )
+        try builder.liftParameter(param: Parameter(label: nil, name: "promise", type: .jsObject(nil)))
+        // `Void` can't cross the bridge as a parameter, so the void resolve settles with `undefined`.
+        let valueArg: String
+        if valueType == .void {
+            valueArg = ""
+        } else {
+            try builder.liftParameter(param: Parameter(label: nil, name: "value", type: valueType))
+            valueArg = builder.parameterForwardings[1]
+        }
+        builder.body.write(
+            "\(builder.parameterForwardings[0])[\(Self.promiseSettlersSymbol)].\(settle)(\(valueArg));"
+        )
+        var lines = builder.renderFunction(name: nil)
+        lines[0] = "bjs[\"\(externName)\"] = \(lines[0])"
+        printer.write(lines: lines)
+    }
+
     private func generateAddImports(needsImportsObject: Bool) throws -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
         let allStructs = skeletons.compactMap { $0.exported?.structs }.flatMap { $0 }
@@ -524,6 +558,39 @@ public struct BridgeJSLink {
                         }
                         printer.write("}")
                     }
+                }
+
+                // Always provided: the runtime's `_bjs_makePromise` imports it unconditionally.
+                // The settlers are stored under a Symbol to avoid clashing with promise fields.
+                printer.write("const \(Self.promiseSettlersSymbol) = Symbol(\"JavaScriptKit.promiseSettlers\");")
+                printer.write("bjs[\"swift_js_make_promise\"] = function() {")
+                printer.indent {
+                    printer.write("let resolve, reject;")
+                    printer.write("const promise = new Promise((res, rej) => { resolve = res; reject = rej; });")
+                    printer.write("promise[\(Self.promiseSettlersSymbol)] = { resolve, reject };")
+                    printer.write(
+                        "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(promise);"
+                    )
+                }
+                printer.write("}")
+                for skeleton in skeletons {
+                    guard let exported = skeleton.exported else { continue }
+                    let asyncResolveTypes = exported.asyncPromiseResolveReturnTypes
+                    guard !asyncResolveTypes.isEmpty else { continue }
+                    for type in asyncResolveTypes {
+                        try renderPromiseSettleHandler(
+                            externName: "promise_resolve_\(skeleton.moduleName)_\(type.mangleTypeName)",
+                            valueType: type,
+                            settle: "resolve",
+                            into: printer
+                        )
+                    }
+                    try renderPromiseSettleHandler(
+                        externName: "promise_reject_\(skeleton.moduleName)",
+                        valueType: .jsValue,
+                        settle: "reject",
+                        into: printer
+                    )
                 }
 
                 printer.write("bjs[\"swift_js_return_optional_bool\"] = function(isSome, value) {")

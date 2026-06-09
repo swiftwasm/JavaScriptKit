@@ -210,6 +210,41 @@ extension Vector2D {
     point
 }
 
+@JS public func asyncRoundTripPublicPoint(_ point: PublicPoint) async -> PublicPoint {
+    point
+}
+
+@JS public func asyncRoundTripPublicPointThrows(_ point: PublicPoint) async throws(JSException) -> PublicPoint {
+    point
+}
+
+@JS public func asyncStructOrThrow(_ shouldThrow: Bool) async throws(JSException) -> PublicPoint {
+    if shouldThrow {
+        throw JSException(JSError(message: "async struct failure").jsValue)
+    }
+    return PublicPoint(x: 1, y: 2)
+}
+
+@JS public func asyncCombinePublicPoints(_ a: PublicPoint, _ b: PublicPoint) async -> PublicPoint {
+    PublicPoint(x: a.x + b.x, y: a.y + b.y)
+}
+
+@JS func asyncRoundTripContact(_ contact: Contact) async -> Contact {
+    contact
+}
+
+@JS public func asyncRoundTripPublicPointArray(_ points: [PublicPoint]) async -> [PublicPoint] {
+    points
+}
+
+@JS public func asyncRoundTripOptionalPublicPoint(_ point: PublicPoint?) async -> PublicPoint? {
+    point
+}
+
+@JS public func asyncRoundTripPublicPointDict(_ points: [String: PublicPoint]) async -> [String: PublicPoint] {
+    points
+}
+
 @JS func roundTripContact(_ contact: Contact) -> Contact {
     return contact
 }

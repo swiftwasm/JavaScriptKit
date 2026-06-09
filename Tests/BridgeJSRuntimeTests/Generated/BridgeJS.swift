@@ -7182,10 +7182,9 @@ public func _bjs_throwsWithJSObjectResult() -> Int32 {
 @_cdecl("bjs_asyncRoundTripVoid")
 public func _bjs_asyncRoundTripVoid() -> Int32 {
     #if arch(wasm32)
-    let ret = JSPromise.async {
+    return _bjs_makePromise(resolve: Promise_resolve_y, reject: Promise_reject) {
         await asyncRoundTripVoid()
-    }.jsObject
-    return ret.bridgeJSLowerReturn()
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -7195,10 +7194,9 @@ public func _bjs_asyncRoundTripVoid() -> Int32 {
 @_cdecl("bjs_asyncRoundTripInt")
 public func _bjs_asyncRoundTripInt(_ v: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = JSPromise.async {
-        return await asyncRoundTripInt(v: Int.bridgeJSLiftParameter(v)).jsValue
-    }.jsObject
-    return ret.bridgeJSLowerReturn()
+    return _bjs_makePromise(resolve: Promise_resolve_Si, reject: Promise_reject) {
+        return await asyncRoundTripInt(v: Int.bridgeJSLiftParameter(v))
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -7208,10 +7206,9 @@ public func _bjs_asyncRoundTripInt(_ v: Int32) -> Int32 {
 @_cdecl("bjs_asyncRoundTripFloat")
 public func _bjs_asyncRoundTripFloat(_ v: Float32) -> Int32 {
     #if arch(wasm32)
-    let ret = JSPromise.async {
-        return await asyncRoundTripFloat(v: Float.bridgeJSLiftParameter(v)).jsValue
-    }.jsObject
-    return ret.bridgeJSLowerReturn()
+    return _bjs_makePromise(resolve: Promise_resolve_Sf, reject: Promise_reject) {
+        return await asyncRoundTripFloat(v: Float.bridgeJSLiftParameter(v))
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -7221,10 +7218,9 @@ public func _bjs_asyncRoundTripFloat(_ v: Float32) -> Int32 {
 @_cdecl("bjs_asyncRoundTripDouble")
 public func _bjs_asyncRoundTripDouble(_ v: Float64) -> Int32 {
     #if arch(wasm32)
-    let ret = JSPromise.async {
-        return await asyncRoundTripDouble(v: Double.bridgeJSLiftParameter(v)).jsValue
-    }.jsObject
-    return ret.bridgeJSLowerReturn()
+    return _bjs_makePromise(resolve: Promise_resolve_Sd, reject: Promise_reject) {
+        return await asyncRoundTripDouble(v: Double.bridgeJSLiftParameter(v))
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -7234,10 +7230,9 @@ public func _bjs_asyncRoundTripDouble(_ v: Float64) -> Int32 {
 @_cdecl("bjs_asyncRoundTripBool")
 public func _bjs_asyncRoundTripBool(_ v: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = JSPromise.async {
-        return await asyncRoundTripBool(v: Bool.bridgeJSLiftParameter(v)).jsValue
-    }.jsObject
-    return ret.bridgeJSLowerReturn()
+    return _bjs_makePromise(resolve: Promise_resolve_Sb, reject: Promise_reject) {
+        return await asyncRoundTripBool(v: Bool.bridgeJSLiftParameter(v))
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -7247,10 +7242,9 @@ public func _bjs_asyncRoundTripBool(_ v: Int32) -> Int32 {
 @_cdecl("bjs_asyncRoundTripString")
 public func _bjs_asyncRoundTripString(_ vBytes: Int32, _ vLength: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = JSPromise.async {
-        return await asyncRoundTripString(v: String.bridgeJSLiftParameter(vBytes, vLength)).jsValue
-    }.jsObject
-    return ret.bridgeJSLowerReturn()
+    return _bjs_makePromise(resolve: Promise_resolve_SS, reject: Promise_reject) {
+        return await asyncRoundTripString(v: String.bridgeJSLiftParameter(vBytes, vLength))
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -7260,10 +7254,9 @@ public func _bjs_asyncRoundTripString(_ vBytes: Int32, _ vLength: Int32) -> Int3
 @_cdecl("bjs_asyncRoundTripSwiftHeapObject")
 public func _bjs_asyncRoundTripSwiftHeapObject(_ v: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = JSPromise.async {
-        return await asyncRoundTripSwiftHeapObject(v: Greeter.bridgeJSLiftParameter(v)).jsValue
-    }.jsObject
-    return ret.bridgeJSLowerReturn()
+    return _bjs_makePromise(resolve: Promise_resolve_7GreeterC, reject: Promise_reject) {
+        return await asyncRoundTripSwiftHeapObject(v: Greeter.bridgeJSLiftParameter(v))
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -7273,10 +7266,9 @@ public func _bjs_asyncRoundTripSwiftHeapObject(_ v: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_asyncRoundTripJSObject")
 public func _bjs_asyncRoundTripJSObject(_ v: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = JSPromise.async {
-        return await asyncRoundTripJSObject(v: JSObject.bridgeJSLiftParameter(v)).jsValue
-    }.jsObject
-    return ret.bridgeJSLowerReturn()
+    return _bjs_makePromise(resolve: Promise_resolve_8JSObjectC, reject: Promise_reject) {
+        return await asyncRoundTripJSObject(v: JSObject.bridgeJSLiftParameter(v))
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -7397,6 +7389,130 @@ public func _bjs_getTheme() -> Void {
     #if arch(wasm32)
     let ret = getTheme()
     return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripTheme")
+@_cdecl("bjs_asyncRoundTripTheme")
+public func _bjs_asyncRoundTripTheme(_ vBytes: Int32, _ vLength: Int32) -> Int32 {
+    #if arch(wasm32)
+    return _bjs_makePromise(resolve: Promise_resolve_5ThemeO, reject: Promise_reject) {
+        return await asyncRoundTripTheme(_: Theme.bridgeJSLiftParameter(vBytes, vLength))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripDirection")
+@_cdecl("bjs_asyncRoundTripDirection")
+public func _bjs_asyncRoundTripDirection(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    return _bjs_makePromise(resolve: Promise_resolve_9DirectionO, reject: Promise_reject) {
+        return await asyncRoundTripDirection(_: Direction.bridgeJSLiftParameter(v))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripOptionalTheme")
+@_cdecl("bjs_asyncRoundTripOptionalTheme")
+public func _bjs_asyncRoundTripOptionalTheme(_ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Int32 {
+    #if arch(wasm32)
+    return _bjs_makePromise(resolve: Promise_resolve_Sq5ThemeO, reject: Promise_reject) {
+        return await asyncRoundTripOptionalTheme(_: Optional<Theme>.bridgeJSLiftParameter(vIsSome, vBytes, vLength))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripOptionalDirection")
+@_cdecl("bjs_asyncRoundTripOptionalDirection")
+public func _bjs_asyncRoundTripOptionalDirection(_ vIsSome: Int32, _ vValue: Int32) -> Int32 {
+    #if arch(wasm32)
+    return _bjs_makePromise(resolve: Promise_resolve_Sq9DirectionO, reject: Promise_reject) {
+        return await asyncRoundTripOptionalDirection(_: Optional<Direction>.bridgeJSLiftParameter(vIsSome, vValue))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripDirectionArray")
+@_cdecl("bjs_asyncRoundTripDirectionArray")
+public func _bjs_asyncRoundTripDirectionArray() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_v = [Direction].bridgeJSStackPop()
+    return _bjs_makePromise(resolve: Promise_resolve_Sa9DirectionO, reject: Promise_reject) {
+        return await asyncRoundTripDirectionArray(_: _tmp_v)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripDirectionDict")
+@_cdecl("bjs_asyncRoundTripDirectionDict")
+public func _bjs_asyncRoundTripDirectionDict() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_v = [String: Direction].bridgeJSLiftParameter()
+    return _bjs_makePromise(resolve: Promise_resolve_SD9DirectionO, reject: Promise_reject) {
+        return await asyncRoundTripDirectionDict(_: _tmp_v)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripThemeArray")
+@_cdecl("bjs_asyncRoundTripThemeArray")
+public func _bjs_asyncRoundTripThemeArray() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_v = [Theme].bridgeJSStackPop()
+    return _bjs_makePromise(resolve: Promise_resolve_Sa5ThemeO, reject: Promise_reject) {
+        return await asyncRoundTripThemeArray(_: _tmp_v)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripThemeDict")
+@_cdecl("bjs_asyncRoundTripThemeDict")
+public func _bjs_asyncRoundTripThemeDict() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_v = [String: Theme].bridgeJSLiftParameter()
+    return _bjs_makePromise(resolve: Promise_resolve_SD5ThemeO, reject: Promise_reject) {
+        return await asyncRoundTripThemeDict(_: _tmp_v)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripFileSize")
+@_cdecl("bjs_asyncRoundTripFileSize")
+public func _bjs_asyncRoundTripFileSize(_ v: Int64) -> Int32 {
+    #if arch(wasm32)
+    return _bjs_makePromise(resolve: Promise_resolve_8FileSizeO, reject: Promise_reject) {
+        return await asyncRoundTripFileSize(_: FileSize.bridgeJSLiftParameter(v))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripOptionalFileSize")
+@_cdecl("bjs_asyncRoundTripOptionalFileSize")
+public func _bjs_asyncRoundTripOptionalFileSize(_ vIsSome: Int32, _ vValue: Int64) -> Int32 {
+    #if arch(wasm32)
+    return _bjs_makePromise(resolve: Promise_resolve_Sq8FileSizeO, reject: Promise_reject) {
+        return await asyncRoundTripOptionalFileSize(_: Optional<FileSize>.bridgeJSLiftParameter(vIsSome, vValue))
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -8050,6 +8166,110 @@ public func _bjs_roundTripPublicPoint() -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_asyncRoundTripPublicPoint")
+@_cdecl("bjs_asyncRoundTripPublicPoint")
+public func _bjs_asyncRoundTripPublicPoint() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_point = PublicPoint.bridgeJSLiftParameter()
+    return _bjs_makePromise(resolve: Promise_resolve_11PublicPointV, reject: Promise_reject) {
+        return await asyncRoundTripPublicPoint(_: _tmp_point)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripPublicPointThrows")
+@_cdecl("bjs_asyncRoundTripPublicPointThrows")
+public func _bjs_asyncRoundTripPublicPointThrows() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_point = PublicPoint.bridgeJSLiftParameter()
+    return _bjs_makePromise(resolve: Promise_resolve_11PublicPointV, reject: Promise_reject) { () async throws(JSException) -> PublicPoint in
+        return try await asyncRoundTripPublicPointThrows(_: _tmp_point)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncStructOrThrow")
+@_cdecl("bjs_asyncStructOrThrow")
+public func _bjs_asyncStructOrThrow(_ shouldThrow: Int32) -> Int32 {
+    #if arch(wasm32)
+    return _bjs_makePromise(resolve: Promise_resolve_11PublicPointV, reject: Promise_reject) { () async throws(JSException) -> PublicPoint in
+        return try await asyncStructOrThrow(_: Bool.bridgeJSLiftParameter(shouldThrow))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncCombinePublicPoints")
+@_cdecl("bjs_asyncCombinePublicPoints")
+public func _bjs_asyncCombinePublicPoints() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_b = PublicPoint.bridgeJSLiftParameter()
+    let _tmp_a = PublicPoint.bridgeJSLiftParameter()
+    return _bjs_makePromise(resolve: Promise_resolve_11PublicPointV, reject: Promise_reject) {
+        return await asyncCombinePublicPoints(_: _tmp_a, _: _tmp_b)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripContact")
+@_cdecl("bjs_asyncRoundTripContact")
+public func _bjs_asyncRoundTripContact() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_contact = Contact.bridgeJSLiftParameter()
+    return _bjs_makePromise(resolve: Promise_resolve_7ContactV, reject: Promise_reject) {
+        return await asyncRoundTripContact(_: _tmp_contact)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripPublicPointArray")
+@_cdecl("bjs_asyncRoundTripPublicPointArray")
+public func _bjs_asyncRoundTripPublicPointArray() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_points = [PublicPoint].bridgeJSStackPop()
+    return _bjs_makePromise(resolve: Promise_resolve_Sa11PublicPointV, reject: Promise_reject) {
+        return await asyncRoundTripPublicPointArray(_: _tmp_points)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripOptionalPublicPoint")
+@_cdecl("bjs_asyncRoundTripOptionalPublicPoint")
+public func _bjs_asyncRoundTripOptionalPublicPoint() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_point = Optional<PublicPoint>.bridgeJSLiftParameter()
+    return _bjs_makePromise(resolve: Promise_resolve_Sq11PublicPointV, reject: Promise_reject) {
+        return await asyncRoundTripOptionalPublicPoint(_: _tmp_point)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripPublicPointDict")
+@_cdecl("bjs_asyncRoundTripPublicPointDict")
+public func _bjs_asyncRoundTripPublicPointDict() -> Int32 {
+    #if arch(wasm32)
+    let _tmp_points = [String: PublicPoint].bridgeJSLiftParameter()
+    return _bjs_makePromise(resolve: Promise_resolve_SD11PublicPointV, reject: Promise_reject) {
+        return await asyncRoundTripPublicPointDict(_: _tmp_points)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripContact")
 @_cdecl("bjs_roundTripContact")
 public func _bjs_roundTripContact() -> Void {
@@ -8654,6 +8874,18 @@ public func _bjs_Calculator_add(_ _self: UnsafeMutableRawPointer, _ a: Int32, _ 
     #if arch(wasm32)
     let ret = Calculator.bridgeJSLiftParameter(_self).add(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
     return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Calculator_asyncMakePoint")
+@_cdecl("bjs_Calculator_asyncMakePoint")
+public func _bjs_Calculator_asyncMakePoint(_ _self: UnsafeMutableRawPointer, _ x: Int32, _ y: Int32) -> Int32 {
+    #if arch(wasm32)
+    return _bjs_makePromise(resolve: Promise_resolve_11PublicPointV, reject: Promise_reject) {
+        return await Calculator.bridgeJSLiftParameter(_self).asyncMakePoint(x: Int.bridgeJSLiftParameter(x), y: Int.bridgeJSLiftParameter(y))
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -11137,6 +11369,512 @@ fileprivate func _bjs_LeakCheck_wrap_extern(_ pointer: UnsafeMutableRawPointer) 
 #endif
 @inline(never) fileprivate func _bjs_LeakCheck_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_LeakCheck_wrap_extern(pointer)
+}
+
+@JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_reject_BridgeJSRuntimeTests")
+fileprivate func promise_reject_BridgeJSRuntimeTests_extern(_ promise: Int32, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void
+#else
+fileprivate func promise_reject_BridgeJSRuntimeTests_extern(_ promise: Int32, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_reject_BridgeJSRuntimeTests(_ promise: Int32, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
+    return promise_reject_BridgeJSRuntimeTests_extern(promise, valueKind, valuePayload1, valuePayload2)
+}
+
+func _$Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let (valueKind, valuePayload1, valuePayload2) = value.bridgeJSLowerParameter()
+    promise_reject_BridgeJSRuntimeTests(promiseValue, valueKind, valuePayload1, valuePayload2)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_y(_ promise: JSObject) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_y")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_y_extern(_ promise: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_y_extern(_ promise: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_y(_ promise: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_y_extern(promise)
+}
+
+func _$Promise_resolve_y(_ promise: JSObject) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_y(promiseValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Si(_ promise: JSObject, _ value: Int) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Si")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Si_extern(_ promise: Int32, _ value: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Si_extern(_ promise: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Si(_ promise: Int32, _ value: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Si_extern(promise, value)
+}
+
+func _$Promise_resolve_Si(_ promise: JSObject, _ value: Int) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueValue = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Si(promiseValue, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sf(_ promise: JSObject, _ value: Float) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sf")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sf_extern(_ promise: Int32, _ value: Float32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sf_extern(_ promise: Int32, _ value: Float32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sf(_ promise: Int32, _ value: Float32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sf_extern(promise, value)
+}
+
+func _$Promise_resolve_Sf(_ promise: JSObject, _ value: Float) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueValue = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sf(promiseValue, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sd(_ promise: JSObject, _ value: Double) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sd")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sd_extern(_ promise: Int32, _ value: Float64) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sd_extern(_ promise: Int32, _ value: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sd(_ promise: Int32, _ value: Float64) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sd_extern(promise, value)
+}
+
+func _$Promise_resolve_Sd(_ promise: JSObject, _ value: Double) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueValue = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sd(promiseValue, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sb(_ promise: JSObject, _ value: Bool) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sb")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sb_extern(_ promise: Int32, _ value: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sb_extern(_ promise: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sb(_ promise: Int32, _ value: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sb_extern(promise, value)
+}
+
+func _$Promise_resolve_Sb(_ promise: JSObject, _ value: Bool) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueValue = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sb(promiseValue, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_SS")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_SS(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_SS_extern(promise, valueBytes, valueLength)
+}
+
+func _$Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        promise_resolve_BridgeJSRuntimeTests_SS(promiseValue, valueBytes, valueLength)
+    }
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_7GreeterC(_ promise: JSObject, _ value: Greeter) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_7GreeterC")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_7GreeterC_extern(_ promise: Int32, _ value: UnsafeMutableRawPointer) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_7GreeterC_extern(_ promise: Int32, _ value: UnsafeMutableRawPointer) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_7GreeterC(_ promise: Int32, _ value: UnsafeMutableRawPointer) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_7GreeterC_extern(promise, value)
+}
+
+func _$Promise_resolve_7GreeterC(_ promise: JSObject, _ value: Greeter) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valuePointer = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_7GreeterC(promiseValue, valuePointer)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_8JSObjectC(_ promise: JSObject, _ value: JSObject) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_8JSObjectC")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_8JSObjectC_extern(_ promise: Int32, _ value: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_8JSObjectC_extern(_ promise: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_8JSObjectC(_ promise: Int32, _ value: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_8JSObjectC_extern(promise, value)
+}
+
+func _$Promise_resolve_8JSObjectC(_ promise: JSObject, _ value: JSObject) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueValue = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_8JSObjectC(promiseValue, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_5ThemeO(_ promise: JSObject, _ value: Theme) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_5ThemeO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_5ThemeO_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_5ThemeO_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_5ThemeO(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_5ThemeO_extern(promise, valueBytes, valueLength)
+}
+
+func _$Promise_resolve_5ThemeO(_ promise: JSObject, _ value: Theme) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        promise_resolve_BridgeJSRuntimeTests_5ThemeO(promiseValue, valueBytes, valueLength)
+    }
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_9DirectionO(_ promise: JSObject, _ value: Direction) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_9DirectionO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_9DirectionO_extern(_ promise: Int32, _ value: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_9DirectionO_extern(_ promise: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_9DirectionO(_ promise: Int32, _ value: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_9DirectionO_extern(promise, value)
+}
+
+func _$Promise_resolve_9DirectionO(_ promise: JSObject, _ value: Direction) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueValue = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_9DirectionO(promiseValue, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sq5ThemeO(_ promise: JSObject, _ value: Optional<Theme>) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO(_ promise: Int32, _ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO_extern(promise, valueIsSome, valueBytes, valueLength)
+}
+
+func _$Promise_resolve_Sq5ThemeO(_ promise: JSObject, _ value: Optional<Theme>) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    value.bridgeJSWithLoweredParameter { (valueIsSome, valueBytes, valueLength) in
+        promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO(promiseValue, valueIsSome, valueBytes, valueLength)
+    }
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sq9DirectionO(_ promise: JSObject, _ value: Optional<Direction>) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sq9DirectionO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq9DirectionO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq9DirectionO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq9DirectionO(_ promise: Int32, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sq9DirectionO_extern(promise, valueIsSome, valueValue)
+}
+
+func _$Promise_resolve_Sq9DirectionO(_ promise: JSObject, _ value: Optional<Direction>) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sq9DirectionO(promiseValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sa9DirectionO(_ promise: JSObject, _ value: [Direction]) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sa9DirectionO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa9DirectionO_extern(_ promise: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa9DirectionO_extern(_ promise: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa9DirectionO(_ promise: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sa9DirectionO_extern(promise)
+}
+
+func _$Promise_resolve_Sa9DirectionO(_ promise: JSObject, _ value: [Direction]) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let _ = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sa9DirectionO(promiseValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_SD9DirectionO(_ promise: JSObject, _ value: [String: Direction]) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_SD9DirectionO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SD9DirectionO_extern(_ promise: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SD9DirectionO_extern(_ promise: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_SD9DirectionO(_ promise: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_SD9DirectionO_extern(promise)
+}
+
+func _$Promise_resolve_SD9DirectionO(_ promise: JSObject, _ value: [String: Direction]) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let _ = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_SD9DirectionO(promiseValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sa5ThemeO(_ promise: JSObject, _ value: [Theme]) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sa5ThemeO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa5ThemeO_extern(_ promise: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa5ThemeO_extern(_ promise: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa5ThemeO(_ promise: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sa5ThemeO_extern(promise)
+}
+
+func _$Promise_resolve_Sa5ThemeO(_ promise: JSObject, _ value: [Theme]) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let _ = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sa5ThemeO(promiseValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_SD5ThemeO(_ promise: JSObject, _ value: [String: Theme]) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_SD5ThemeO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SD5ThemeO_extern(_ promise: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SD5ThemeO_extern(_ promise: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_SD5ThemeO(_ promise: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_SD5ThemeO_extern(promise)
+}
+
+func _$Promise_resolve_SD5ThemeO(_ promise: JSObject, _ value: [String: Theme]) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let _ = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_SD5ThemeO(promiseValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_8FileSizeO(_ promise: JSObject, _ value: FileSize) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_8FileSizeO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_8FileSizeO_extern(_ promise: Int32, _ value: Int64) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_8FileSizeO_extern(_ promise: Int32, _ value: Int64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_8FileSizeO(_ promise: Int32, _ value: Int64) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_8FileSizeO_extern(promise, value)
+}
+
+func _$Promise_resolve_8FileSizeO(_ promise: JSObject, _ value: FileSize) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueValue = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_8FileSizeO(promiseValue, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sq8FileSizeO(_ promise: JSObject, _ value: Optional<FileSize>) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sq8FileSizeO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq8FileSizeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueValue: Int64) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq8FileSizeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueValue: Int64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq8FileSizeO(_ promise: Int32, _ valueIsSome: Int32, _ valueValue: Int64) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sq8FileSizeO_extern(promise, valueIsSome, valueValue)
+}
+
+func _$Promise_resolve_Sq8FileSizeO(_ promise: JSObject, _ value: Optional<FileSize>) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sq8FileSizeO(promiseValue, valueIsSome, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_11PublicPointV(_ promise: JSObject, _ value: PublicPoint) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_11PublicPointV")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_11PublicPointV_extern(_ promise: Int32, _ value: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_11PublicPointV_extern(_ promise: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_11PublicPointV(_ promise: Int32, _ value: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_11PublicPointV_extern(promise, value)
+}
+
+func _$Promise_resolve_11PublicPointV(_ promise: JSObject, _ value: PublicPoint) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueObjectId = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_11PublicPointV(promiseValue, valueObjectId)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_7ContactV(_ promise: JSObject, _ value: Contact) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_7ContactV")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_7ContactV_extern(_ promise: Int32, _ value: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_7ContactV_extern(_ promise: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_7ContactV(_ promise: Int32, _ value: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_7ContactV_extern(promise, value)
+}
+
+func _$Promise_resolve_7ContactV(_ promise: JSObject, _ value: Contact) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueObjectId = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_7ContactV(promiseValue, valueObjectId)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sa11PublicPointV(_ promise: JSObject, _ value: [PublicPoint]) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sa11PublicPointV")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa11PublicPointV_extern(_ promise: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa11PublicPointV_extern(_ promise: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa11PublicPointV(_ promise: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sa11PublicPointV_extern(promise)
+}
+
+func _$Promise_resolve_Sa11PublicPointV(_ promise: JSObject, _ value: [PublicPoint]) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let _ = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sa11PublicPointV(promiseValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sq11PublicPointV(_ promise: JSObject, _ value: Optional<PublicPoint>) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV_extern(_ promise: Int32, _ value: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV_extern(_ promise: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV(_ promise: Int32, _ value: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV_extern(promise, value)
+}
+
+func _$Promise_resolve_Sq11PublicPointV(_ promise: JSObject, _ value: Optional<PublicPoint>) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueIsSome = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV(promiseValue, valueIsSome)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_SD11PublicPointV(_ promise: JSObject, _ value: [String: PublicPoint]) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_SD11PublicPointV")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SD11PublicPointV_extern(_ promise: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SD11PublicPointV_extern(_ promise: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_SD11PublicPointV(_ promise: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_SD11PublicPointV_extern(promise)
+}
+
+func _$Promise_resolve_SD11PublicPointV(_ promise: JSObject, _ value: [String: PublicPoint]) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let _ = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_SD11PublicPointV(promiseValue)
+    if let error = _swift_js_take_exception() { throw error }
 }
 
 #if arch(wasm32)

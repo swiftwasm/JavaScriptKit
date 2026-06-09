@@ -1027,6 +1027,30 @@ public struct ExportedSkeleton: Codable {
     public var isEmpty: Bool {
         functions.isEmpty && classes.isEmpty && enums.isEmpty && structs.isEmpty && protocols.isEmpty
     }
+
+    /// Distinct `async` return types needing a `Promise_resolve_<mangled>` helper, deduplicated
+    /// by mangled name. Shared by the Swift codegen and JS link.
+    public var asyncPromiseResolveReturnTypes: [BridgeType] {
+        var seen = Set<String>()
+        var result: [BridgeType] = []
+        func consider(_ returnType: BridgeType, _ effects: Effects) {
+            guard effects.isAsync, returnType.isAsyncResolvable,
+                seen.insert(returnType.mangleTypeName).inserted
+            else { return }
+            result.append(returnType)
+        }
+        for function in functions { consider(function.returnType, function.effects) }
+        for klass in classes {
+            for method in klass.methods { consider(method.returnType, method.effects) }
+        }
+        for structDef in structs {
+            for method in structDef.methods { consider(method.returnType, method.effects) }
+        }
+        for enumDef in enums {
+            for method in enumDef.staticMethods { consider(method.returnType, method.effects) }
+        }
+        return result
+    }
 }
 
 // MARK: - Imported Skeleton
@@ -1582,6 +1606,25 @@ extension BridgeType {
     public var isOptional: Bool {
         if case .nullable = self { return true }
         return false
+    }
+
+    /// Whether a value of this type can be passed to a generated `Promise_resolve_<mangled>`
+    /// settlement helper, i.e. lowered through the imported-parameter ABI. Every `async`
+    /// exported return settles through `_bjs_makePromise`; the few types that cannot be lowered
+    /// (associated-value enums, protocols, namespace enums, and their compositions) are diagnosed.
+    public var isAsyncResolvable: Bool {
+        switch self {
+        case .associatedValueEnum, .swiftProtocol, .namespaceEnum:
+            return false
+        case .nullable(let wrapped, _):
+            return wrapped.isAsyncResolvable
+        case .array(let element):
+            return element.isAsyncResolvable
+        case .dictionary(let value):
+            return value.isAsyncResolvable
+        default:
+            return true
+        }
     }
 
     /// Simplified Swift ABI-style mangled name

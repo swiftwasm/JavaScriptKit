@@ -4,6 +4,16 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export const AsyncDirectionValues = {
+    North: 0,
+    South: 1,
+};
+
+export const AsyncThemeValues = {
+    Light: "light",
+    Dark: "dark",
+};
+
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -31,6 +41,106 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    function __bjs_jsValueLower(value) {
+        let kind;
+        let payload1;
+        let payload2;
+        if (value === null) {
+            kind = 4;
+            payload1 = 0;
+            payload2 = 0;
+        } else {
+            switch (typeof value) {
+                case "boolean":
+                    kind = 0;
+                    payload1 = value ? 1 : 0;
+                    payload2 = 0;
+                    break;
+                case "number":
+                    kind = 2;
+                    payload1 = 0;
+                    payload2 = value;
+                    break;
+                case "string":
+                    kind = 1;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "undefined":
+                    kind = 5;
+                    payload1 = 0;
+                    payload2 = 0;
+                    break;
+                case "object":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "function":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "symbol":
+                    kind = 7;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "bigint":
+                    kind = 8;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                default:
+                    throw new TypeError("Unsupported JSValue type");
+            }
+        }
+        return [kind, payload1, payload2];
+    }
+    function __bjs_jsValueLift(kind, payload1, payload2) {
+        let jsValue;
+        switch (kind) {
+            case 0:
+                jsValue = payload1 !== 0;
+                break;
+            case 1:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 2:
+                jsValue = payload2;
+                break;
+            case 3:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 4:
+                jsValue = null;
+                break;
+            case 5:
+                jsValue = undefined;
+                break;
+            case 7:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 8:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            default:
+                throw new TypeError("Unsupported JSValue kind " + kind);
+        }
+        return jsValue;
+    }
+
+    const __bjs_createAsyncPointHelpers = () => ({
+        lower: (value) => {
+            i32Stack.push((value.x | 0));
+            i32Stack.push((value.y | 0));
+        },
+        lift: () => {
+            const int = i32Stack.pop();
+            const int1 = i32Stack.pop();
+            return { x: int1, y: int };
+        }
+    });
 
     return {
         /**
@@ -105,6 +215,203 @@ export async function createInstantiator(options, swift) {
                 const byteLen = count * Ctor.BYTES_PER_ELEMENT;
                 const copy = memory.buffer.slice(ptr, ptr + byteLen);
                 taStack.push(Array.from(new Ctor(copy)));
+            }
+            bjs["swift_js_struct_lower_AsyncPoint"] = function(objectId) {
+                structHelpers.AsyncPoint.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_AsyncPoint"] = function() {
+                const value = structHelpers.AsyncPoint.lift();
+                return swift.memory.retain(value);
+            }
+            const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
+            bjs["swift_js_make_promise"] = function() {
+                let resolve, reject;
+                const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
+                promise[__bjs_promiseSettlers] = { resolve, reject };
+                return swift.memory.retain(promise);
+            }
+            bjs["promise_resolve_TestModule_y"] = function(promise) {
+                try {
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve();
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_Si"] = function(promise, value) {
+                try {
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(value);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_SS"] = function(promise, valueBytes, valueCount) {
+                try {
+                    const string = decodeString(valueBytes, valueCount);
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(string);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_Sb"] = function(promise, value) {
+                try {
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(value !== 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_Sf"] = function(promise, value) {
+                try {
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(value);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_Sd"] = function(promise, value) {
+                try {
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(value);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_8JSObjectC"] = function(promise, value) {
+                try {
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(swift.memory.getObject(value));
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_10AsyncPointV"] = function(promise, value) {
+                try {
+                    const value1 = swift.memory.getObject(value);
+                    swift.memory.release(value);
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(value1);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_14AsyncDirectionO"] = function(promise, value) {
+                try {
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(value);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_10AsyncThemeO"] = function(promise, valueBytes, valueCount) {
+                try {
+                    const string = decodeString(valueBytes, valueCount);
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(string);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_Sq14AsyncDirectionO"] = function(promise, valueIsSome, valueWrappedValue) {
+                try {
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(valueIsSome ? valueWrappedValue : null);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_Sq10AsyncThemeO"] = function(promise, valueIsSome, valueBytes, valueCount) {
+                try {
+                    let optResult;
+                    if (valueIsSome) {
+                        const string = decodeString(valueBytes, valueCount);
+                        optResult = string;
+                    } else {
+                        optResult = null;
+                    }
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(optResult);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_Sq10AsyncPointV"] = function(promise, value) {
+                try {
+                    let optResult;
+                    if (value) {
+                        const struct = structHelpers.AsyncPoint.lift();
+                        optResult = struct;
+                    } else {
+                        optResult = null;
+                    }
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(optResult);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_Sa10AsyncPointV"] = function(promise) {
+                try {
+                    const arrayLen = i32Stack.pop();
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const struct = structHelpers.AsyncPoint.lift();
+                            arrayResult.push(struct);
+                        }
+                        arrayResult.reverse();
+                    }
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(arrayResult);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_Sa14AsyncDirectionO"] = function(promise) {
+                try {
+                    const arrayLen = i32Stack.pop();
+                    let arrayResult;
+                    if (arrayLen === -1) {
+                        arrayResult = taStack.pop();
+                    } else {
+                        arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const caseId = i32Stack.pop();
+                            arrayResult.push(caseId);
+                        }
+                        arrayResult.reverse();
+                    }
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(arrayResult);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_SD10AsyncPointV"] = function(promise) {
+                try {
+                    const dictLen = i32Stack.pop();
+                    const dictResult = {};
+                    for (let i = 0; i < dictLen; i++) {
+                        const struct = structHelpers.AsyncPoint.lift();
+                        const string = strStack.pop();
+                        dictResult[string] = struct;
+                    }
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(dictResult);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_resolve_TestModule_SD14AsyncDirectionO"] = function(promise) {
+                try {
+                    const dictLen = i32Stack.pop();
+                    const dictResult = {};
+                    for (let i = 0; i < dictLen; i++) {
+                        const caseId = i32Stack.pop();
+                        const string = strStack.pop();
+                        dictResult[string] = caseId;
+                    }
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(dictResult);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_reject_TestModule"] = function(promise, valueKind, valuePayload1, valuePayload2) {
+                try {
+                    const jsValue = __bjs_jsValueLift(valueKind, valuePayload1, valuePayload2);
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].reject(jsValue);
+                } catch (error) {
+                    setException(error);
+                }
             }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
@@ -210,6 +517,9 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
+            const AsyncPointHelpers = __bjs_createAsyncPointHelpers();
+            structHelpers.AsyncPoint = AsyncPointHelpers;
+
             const exports = {
                 asyncReturnVoid: function bjs_asyncReturnVoid() {
                     const ret = instance.exports.bjs_asyncReturnVoid();
@@ -255,6 +565,137 @@ export async function createInstantiator(options, swift) {
                     swift.memory.release(ret);
                     return ret1;
                 },
+                asyncRoundTripStruct: function bjs_asyncRoundTripStruct(v) {
+                    structHelpers.AsyncPoint.lower(v);
+                    const ret = instance.exports.bjs_asyncRoundTripStruct();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripStructThrows: function bjs_asyncRoundTripStructThrows(v) {
+                    structHelpers.AsyncPoint.lower(v);
+                    const ret = instance.exports.bjs_asyncRoundTripStructThrows();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                    return ret1;
+                },
+                asyncCombineStructs: function bjs_asyncCombineStructs(a, b) {
+                    structHelpers.AsyncPoint.lower(a);
+                    structHelpers.AsyncPoint.lower(b);
+                    const ret = instance.exports.bjs_asyncCombineStructs();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripEnum: function bjs_asyncRoundTripEnum(v) {
+                    const ret = instance.exports.bjs_asyncRoundTripEnum(v);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripRawEnum: function bjs_asyncRoundTripRawEnum(v) {
+                    const vBytes = textEncoder.encode(v);
+                    const vId = swift.memory.retain(vBytes);
+                    const ret = instance.exports.bjs_asyncRoundTripRawEnum(vId, vBytes.length);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripOptionalEnum: function bjs_asyncRoundTripOptionalEnum(v) {
+                    const isSome = v != null;
+                    const ret = instance.exports.bjs_asyncRoundTripOptionalEnum(+isSome, isSome ? v : 0);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripOptionalRawEnum: function bjs_asyncRoundTripOptionalRawEnum(v) {
+                    const isSome = v != null;
+                    let result, result1;
+                    if (isSome) {
+                        const vBytes = textEncoder.encode(v);
+                        const vId = swift.memory.retain(vBytes);
+                        result = vId;
+                        result1 = vBytes.length;
+                    } else {
+                        result = 0;
+                        result1 = 0;
+                    }
+                    const ret = instance.exports.bjs_asyncRoundTripOptionalRawEnum(+isSome, result, result1);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripOptionalStruct: function bjs_asyncRoundTripOptionalStruct(v) {
+                    const isSome = v != null;
+                    if (isSome) {
+                        structHelpers.AsyncPoint.lower(v);
+                    }
+                    i32Stack.push(+isSome);
+                    const ret = instance.exports.bjs_asyncRoundTripOptionalStruct();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripStructArray: function bjs_asyncRoundTripStructArray(v) {
+                    for (const elem of v) {
+                        structHelpers.AsyncPoint.lower(elem);
+                    }
+                    i32Stack.push(v.length);
+                    const ret = instance.exports.bjs_asyncRoundTripStructArray();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripEnumArray: function bjs_asyncRoundTripEnumArray(v) {
+                    for (const elem of v) {
+                        i32Stack.push((elem | 0));
+                    }
+                    i32Stack.push(v.length);
+                    const ret = instance.exports.bjs_asyncRoundTripEnumArray();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripStructDictionary: function bjs_asyncRoundTripStructDictionary(v) {
+                    const entries = Object.entries(v);
+                    for (const entry of entries) {
+                        const [key, value] = entry;
+                        const bytes = textEncoder.encode(key);
+                        const id = swift.memory.retain(bytes);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
+                        structHelpers.AsyncPoint.lower(value);
+                    }
+                    i32Stack.push(entries.length);
+                    const ret = instance.exports.bjs_asyncRoundTripStructDictionary();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                asyncRoundTripEnumDictionary: function bjs_asyncRoundTripEnumDictionary(v) {
+                    const entries = Object.entries(v);
+                    for (const entry of entries) {
+                        const [key, value] = entry;
+                        const bytes = textEncoder.encode(key);
+                        const id = swift.memory.retain(bytes);
+                        i32Stack.push(bytes.length);
+                        i32Stack.push(id);
+                        i32Stack.push((value | 0));
+                    }
+                    i32Stack.push(entries.length);
+                    const ret = instance.exports.bjs_asyncRoundTripEnumDictionary();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                },
+                AsyncDirection: AsyncDirectionValues,
+                AsyncTheme: AsyncThemeValues,
             };
             _exports = exports;
             return exports;

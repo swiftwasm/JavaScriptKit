@@ -908,6 +908,46 @@
                 }
               }
             }
+          },
+          {
+            "abiName" : "bjs_Calculator_asyncMakePoint",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "asyncMakePoint",
+            "parameters" : [
+              {
+                "label" : "x",
+                "name" : "x",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "label" : "y",
+                "name" : "y",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "PublicPoint"
+              }
+            }
           }
         ],
         "name" : "Calculator",
@@ -12569,6 +12609,330 @@
         }
       },
       {
+        "abiName" : "bjs_asyncRoundTripTheme",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripTheme",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "Theme",
+                "_1" : "String"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "rawValueEnum" : {
+            "_0" : "Theme",
+            "_1" : "String"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripDirection",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripDirection",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "caseEnum" : {
+                "_0" : "Direction"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "caseEnum" : {
+            "_0" : "Direction"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripOptionalTheme",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripOptionalTheme",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "Theme",
+                    "_1" : "String"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "rawValueEnum" : {
+                "_0" : "Theme",
+                "_1" : "String"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripOptionalDirection",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripOptionalDirection",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "caseEnum" : {
+                    "_0" : "Direction"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "caseEnum" : {
+                "_0" : "Direction"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripDirectionArray",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripDirectionArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "caseEnum" : {
+                    "_0" : "Direction"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "caseEnum" : {
+                "_0" : "Direction"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripDirectionDict",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripDirectionDict",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "dictionary" : {
+                "_0" : {
+                  "caseEnum" : {
+                    "_0" : "Direction"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "dictionary" : {
+            "_0" : {
+              "caseEnum" : {
+                "_0" : "Direction"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripThemeArray",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripThemeArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "Theme",
+                    "_1" : "String"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "rawValueEnum" : {
+                "_0" : "Theme",
+                "_1" : "String"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripThemeDict",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripThemeDict",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "dictionary" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "Theme",
+                    "_1" : "String"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "dictionary" : {
+            "_0" : {
+              "rawValueEnum" : {
+                "_0" : "Theme",
+                "_1" : "String"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripFileSize",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripFileSize",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "FileSize",
+                "_1" : "Int64"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "rawValueEnum" : {
+            "_0" : "FileSize",
+            "_1" : "Int64"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripOptionalFileSize",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripOptionalFileSize",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "rawValueEnum" : {
+                    "_0" : "FileSize",
+                    "_1" : "Int64"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "rawValueEnum" : {
+                "_0" : "FileSize",
+                "_1" : "Int64"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_setHttpStatus",
         "effects" : {
           "isAsync" : false,
@@ -14357,6 +14721,241 @@
         "returnType" : {
           "swiftStruct" : {
             "_0" : "PublicPoint"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripPublicPoint",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripPublicPoint",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "point",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "PublicPoint"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "PublicPoint"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripPublicPointThrows",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "asyncRoundTripPublicPointThrows",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "point",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "PublicPoint"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "PublicPoint"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncStructOrThrow",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "asyncStructOrThrow",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "shouldThrow",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "PublicPoint"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncCombinePublicPoints",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncCombinePublicPoints",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "a",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "PublicPoint"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "b",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "PublicPoint"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "PublicPoint"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripContact",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripContact",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "contact",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "Contact"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "Contact"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripPublicPointArray",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripPublicPointArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "points",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "PublicPoint"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "swiftStruct" : {
+                "_0" : "PublicPoint"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripOptionalPublicPoint",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripOptionalPublicPoint",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "point",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "PublicPoint"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "swiftStruct" : {
+                "_0" : "PublicPoint"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripPublicPointDict",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripPublicPointDict",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "points",
+            "type" : {
+              "dictionary" : {
+                "_0" : {
+                  "swiftStruct" : {
+                    "_0" : "PublicPoint"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "dictionary" : {
+            "_0" : {
+              "swiftStruct" : {
+                "_0" : "PublicPoint"
+              }
+            }
           }
         }
       },

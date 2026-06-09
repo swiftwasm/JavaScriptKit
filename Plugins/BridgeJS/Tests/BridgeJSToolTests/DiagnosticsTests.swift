@@ -305,6 +305,56 @@ import Testing
         #expect(skeleton.exported != nil)
     }
 
+    // MARK: - Async return validation
+
+    @Test
+    func asyncReturnOfUnsupportedTypeIsDiagnosed() throws {
+        // An associated-value enum can be neither lowered through the imported-parameter ABI
+        // nor settled via `_bjs_makePromise`, so an async return of one must be diagnosed.
+        let source = """
+            @JS enum Payload {
+                case text(String)
+                case number(Int)
+            }
+            @JS func loadPayload() async -> Payload {
+                .number(1)
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        let skeleton = try swiftAPI.finalize()
+        let exported = try #require(skeleton.exported)
+        let exportSwift = ExportSwift(progress: .silent, moduleName: skeleton.moduleName, skeleton: exported)
+        #expect(throws: BridgeJSCoreError.self) {
+            _ = try exportSwift.finalize()
+        }
+    }
+
+    @Test
+    func asyncReturnOfConvertibleTypeSucceeds() throws {
+        let source = """
+            @JS func loadCount() async -> Int {
+                1
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        let skeleton = try swiftAPI.finalize()
+        let exported = try #require(skeleton.exported)
+        let exportSwift = ExportSwift(progress: .silent, moduleName: skeleton.moduleName, skeleton: exported)
+        #expect(try exportSwift.finalize() != nil)
+    }
+
     @Test
     func omitsNextLineWhenErrorIsOnLastLine() throws {
         let source = """
