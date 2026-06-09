@@ -6967,7 +6967,7 @@ public func _bjs_makeImportedFoo(_ valueBytes: Int32, _ valueLength: Int32) -> I
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
@@ -7002,7 +7002,7 @@ public func _bjs_throwsSwiftError(_ shouldThrow: Int32) -> Void {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
@@ -7027,7 +7027,7 @@ public func _bjs_throwsWithIntResult() -> Int32 {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
@@ -7052,7 +7052,7 @@ public func _bjs_throwsWithStringResult() -> Void {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
@@ -7077,7 +7077,7 @@ public func _bjs_throwsWithBoolResult() -> Int32 {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
@@ -7102,7 +7102,7 @@ public func _bjs_throwsWithFloatResult() -> Float32 {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
@@ -7127,7 +7127,7 @@ public func _bjs_throwsWithDoubleResult() -> Float64 {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
@@ -7152,7 +7152,7 @@ public func _bjs_throwsWithSwiftHeapObjectResult() -> UnsafeMutableRawPointer {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
@@ -7177,7 +7177,7 @@ public func _bjs_throwsWithJSObjectResult() -> Int32 {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
