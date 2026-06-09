@@ -669,7 +669,7 @@ struct IntrinsicJSFragment: Sendable {
         }
 
         let innerFragment =
-            if wrappedType.optionalConvention == .stackABI {
+            if wrappedType.optionalParameterUsesStackABI {
                 try stackLiftFragment(elementType: wrappedType)
             } else {
                 try liftParameter(type: wrappedType, context: bridgeContext)
@@ -686,7 +686,7 @@ struct IntrinsicJSFragment: Sendable {
         kind: JSOptionalKind,
         innerFragment: IntrinsicJSFragment
     ) -> IntrinsicJSFragment {
-        let isStackConvention = wrappedType.optionalConvention == .stackABI
+        let isStackConvention = wrappedType.optionalParameterUsesStackABI
         let absenceLiteral = kind.absenceLiteral
 
         let outerParams: [String]
