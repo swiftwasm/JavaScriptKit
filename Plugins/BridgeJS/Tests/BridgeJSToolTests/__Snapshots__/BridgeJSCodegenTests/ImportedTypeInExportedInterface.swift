@@ -59,7 +59,7 @@ public func _bjs_makeFoo() -> Int32 {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
         } else {
-            let jsError = JSError(message: String(describing: error))
+            let jsError = JSError(message: error.description)
             withExtendedLifetime(jsError.jsObject) {
                 _swift_js_throw(Int32(bitPattern: $0.id))
             }
