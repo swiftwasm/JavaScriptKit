@@ -21,7 +21,7 @@ jobs:
               JAVASCRIPTKIT_DISABLE_TRACING_TRAIT=1
           - os: ubuntu-24.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2404/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a-ubuntu24.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2404/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu24.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasip1"
           - os: ubuntu-24.04
@@ -31,7 +31,7 @@ jobs:
             target: "wasm32-unknown-wasip1"
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasip1-threads"
 
@@ -152,7 +152,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/install-swift
         with:
-          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a/swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a-ubuntu22.04.tar.gz
+          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
       - run: make bootstrap
       - run: ./Utilities/bridge-js-generate.sh
       - name: Check if BridgeJS generated files are up-to-date
@@ -169,7 +169,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/install-swift
         with:
-          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-03-09-a/swift-DEVELOPMENT-SNAPSHOT-2026-03-09-a-ubuntu22.04.tar.gz
+          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
       - uses: swiftwasm/setup-swiftwasm@v2
         id: setup-wasm32-unknown-wasip1
         with: { target: wasm32-unknown-wasip1 }
