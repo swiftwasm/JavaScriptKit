@@ -14,7 +14,9 @@ import JavaScriptKit
 }
 
 @JSFunction func jsRoundTripLightColor(_ value: LightColor) throws(JSException) -> LightColor
-@JSFunction func jsRoundTripImportedPayloadSignal(_ value: ImportedPayloadSignal) throws(JSException) -> ImportedPayloadSignal
+@JSFunction func jsRoundTripImportedPayloadSignal(
+    _ value: ImportedPayloadSignal
+) throws(JSException) -> ImportedPayloadSignal
 @JSFunction func jsRoundTripOptionalImportedPayloadSignal(
     _ value: ImportedPayloadSignal?
 ) throws(JSException) -> ImportedPayloadSignal?
