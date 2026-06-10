@@ -227,6 +227,10 @@ extension Trait where Self == ConditionTrait {
                     fileURLWithPath: "swift",
                     relativeTo: URL(fileURLWithPath: try #require(Self.getSwiftPath()))
                 )
+                var args = args
+                if args.first == "package" {
+                    args.insert(contentsOf: ["--build-system", "native"], at: 1)
+                }
                 try runProcess(swiftExecutable, args, env)
             }
             try body(destination.appending(path: path), runProcess, runSwift)
