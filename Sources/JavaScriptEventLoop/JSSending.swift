@@ -105,7 +105,7 @@ extension JSSending where T == JSObject {
             construct: { $0 },
             deconstruct: { $0 },
             getSourceTid: {
-                #if compiler(>=6.1) && _runtime(_multithreaded)
+                #if _runtime(_multithreaded)
                 return $0.ownerTid
                 #else
                 _ = $0
@@ -258,7 +258,7 @@ extension JSSending {
         file: StaticString = #file,
         line: UInt = #line
     ) async throws -> T {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
+        #if _runtime(_multithreaded)
         let idInDestination = try await withCheckedThrowingContinuation { continuation in
             let context = _JSSendingContext(continuation: continuation)
             let idInSource = self.storage.idInSource
@@ -278,8 +278,6 @@ extension JSSending {
     }
     #endif
 
-    // 6.0 and below can't compile the following without a compiler crash.
-    #if compiler(>=6.1)
     /// Receives multiple `JSSending` instances from a thread in a single operation.
     ///
     /// This method is more efficient than receiving multiple objects individually, as it
@@ -317,7 +315,7 @@ extension JSSending {
         file: StaticString = #file,
         line: UInt = #line
     ) async throws -> (repeat each U) where T == (repeat each U) {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
+        #if _runtime(_multithreaded)
         var sendingObjects: [JavaScriptObjectRef] = []
         var transferringObjects: [JavaScriptObjectRef] = []
         var sourceTid: Int32?
@@ -363,7 +361,6 @@ extension JSSending {
         return try await (repeat (each sendings).receive())
         #endif
     }
-    #endif  // compiler(>=6.1)
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -404,13 +401,11 @@ public struct JSSendingError: Error, CustomStringConvertible {
 ///   - object: The `JSObject` to be received.
 ///   - contextPtr: A pointer to the `_JSSendingContext` instance.
 // swift-format-ignore
-#if compiler(>=6.1)  // @_expose and @_extern are only available in Swift 6.1+
 @_expose(wasm, "swjs_receive_response")
 @_cdecl("swjs_receive_response")
-#endif
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 func _swjs_receive_response(_ object: JavaScriptObjectRef, _ contextPtr: UnsafeRawPointer?) {
-    #if compiler(>=6.1) && _runtime(_multithreaded)
+    #if _runtime(_multithreaded)
     guard let contextPtr = contextPtr else { return }
     let context = Unmanaged<_JSSendingContext>.fromOpaque(contextPtr).takeRetainedValue()
     context.continuation.resume(returning: object)
@@ -424,13 +419,11 @@ func _swjs_receive_response(_ object: JavaScriptObjectRef, _ contextPtr: UnsafeR
 ///   - error: The error to be received.
 ///   - contextPtr: A pointer to the `_JSSendingContext` instance.
 // swift-format-ignore
-#if compiler(>=6.1)  // @_expose and @_extern are only available in Swift 6.1+
 @_expose(wasm, "swjs_receive_error")
 @_cdecl("swjs_receive_error")
-#endif
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 func _swjs_receive_error(_ error: JavaScriptObjectRef, _ contextPtr: UnsafeRawPointer?) {
-    #if compiler(>=6.1) && _runtime(_multithreaded)
+    #if _runtime(_multithreaded)
     guard let contextPtr = contextPtr else { return }
     let context = Unmanaged<_JSSendingContext>.fromOpaque(contextPtr).takeRetainedValue()
     context.continuation.resume(throwing: JSException(JSObject(id: error).jsValue))

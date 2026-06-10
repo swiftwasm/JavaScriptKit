@@ -297,7 +297,6 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
-    #if compiler(>=6.1)
     @Test(.requireSwiftSDK)
     func testingWithCoverage() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
@@ -325,7 +324,6 @@ extension Trait where Self == ConditionTrait {
             }
         }
     }
-    #endif
     #endif  // compiler(>=6.3)
 
     @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasip1-threads"))
@@ -379,7 +377,6 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
-    #if compiler(>=6.1)
     // TODO: Remove triple restriction once swift-testing is shipped in p1-threads SDK
     @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasi"))
     func continuationLeakInTest_SwiftTesting() throws {
@@ -391,8 +388,6 @@ extension Trait where Self == ConditionTrait {
             try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
         }
     }
-    #endif
-
     @Test(.requireSwiftSDK)
     func playwrightOnPageLoad_XCTest() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
@@ -413,7 +408,6 @@ extension Trait where Self == ConditionTrait {
         }
     }
 
-    #if compiler(>=6.1)
     // TODO: Remove triple restriction once swift-testing is shipped in p1-threads SDK
     @Test(.requireSwiftSDK(triple: "wasm32-unknown-wasi"))
     func playwrightOnPageLoad_SwiftTesting() throws {
@@ -434,5 +428,4 @@ extension Trait where Self == ConditionTrait {
             )
         }
     }
-    #endif
 }

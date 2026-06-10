@@ -65,7 +65,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
         return _shared
     }
 
-    #if compiler(>=6.1) && _runtime(_multithreaded)
+    #if _runtime(_multithreaded)
     // In multi-threaded environment, we have an event loop executor per
     // thread (per Web Worker). A job enqueued in one thread should be
     // executed in the same thread under this global executor.
@@ -129,7 +129,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
             _Concurrency._createExecutors(factory: JavaScriptEventLoop.self)
         }
         #else
-        // For Swift 6.1 and below, or Embedded Swift, we need to install
+        // For Embedded Swift, we need to install
         // the global executor by hook API. The ExecutorFactory mechanism
         // does not work in Embedded Swift because ExecutorImpl.swift is
         // excluded from the embedded Concurrency library.
@@ -151,7 +151,7 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     }
 
     internal func unsafeEnqueue(_ job: UnownedJob) {
-        #if canImport(wasi_pthread) && compiler(>=6.1) && _runtime(_multithreaded)
+        #if canImport(wasi_pthread) && _runtime(_multithreaded)
         guard swjs_get_worker_thread_id_cached() == SWJS_MAIN_THREAD_ID else {
             // Notify the main thread to execute the job when a job is
             // enqueued from a Web Worker thread but without an executor preference.

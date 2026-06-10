@@ -17,7 +17,7 @@ import Glibc
 /// The value is stored in a thread-local variable, which is a separate copy for each thread.
 @propertyWrapper
 final class ThreadLocal<Value>: Sendable {
-    #if compiler(>=6.1) && _runtime(_multithreaded)
+    #if _runtime(_multithreaded)
     /// The wrapped value stored in the thread-local storage.
     /// The initial value is `nil` for each thread.
     var wrappedValue: Value? {
