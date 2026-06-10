@@ -16,7 +16,7 @@ jobs:
             toolchain:
               download-url: https://download.swift.org/swift-6.2-release/ubuntu2204/swift-6.2-RELEASE/swift-6.2-RELEASE-ubuntu22.04.tar.gz
             wasi-backend: Node
-            target: "wasm32-unknown-wasi"
+            target: "wasm32-unknown-wasip1"
             env: |
               JAVASCRIPTKIT_DISABLE_TRACING_TRAIT=1
           - os: ubuntu-24.04
@@ -108,7 +108,7 @@ jobs:
       matrix:
         include:
           - os: macos-15
-            xcode: Xcode_16.4
+            xcode: Xcode_26.0.1
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
