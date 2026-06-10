@@ -636,6 +636,27 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         XCTAssertEqual(value, 42)
     }
 
+    func testRemoteMainToWorkerAsyncBodyCanAwaitPromise() async throws {
+        let object = JSObject.global.Object.function!.new()
+        object["value"] = 42
+        let remote = JSRemote(object)
+
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        let task = Task(executorPreference: executor) {
+            try await remote.withJSObject { object in
+                XCTAssertTrue(isMainThread())
+                let value = try await JSPromise.resolve(object["value"]).value
+                XCTAssertTrue(isMainThread())
+                return Int(value.number!)
+            }
+        }
+
+        let value = try await task.value
+        XCTAssertEqual(value, 42)
+    }
+
     func testRemoteWorkerToMainAccess() async throws {
         let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
         defer { executor.terminate() }
@@ -650,6 +671,26 @@ final class WebWorkerTaskExecutorTests: XCTestCase {
         let remote = await task.value
         let result = try await remote.withJSObject { object in
             object["value"].number!
+        }
+        XCTAssertEqual(result, 99)
+    }
+
+    func testRemoteWorkerToMainAsyncBodyCanAwaitPromise() async throws {
+        let executor = try await WebWorkerTaskExecutor(numberOfThreads: 1)
+        defer { executor.terminate() }
+
+        let task = Task(executorPreference: executor) {
+            let object = JSObject.global.Object.function!.new()
+            object["value"] = 99
+            return JSRemote(object)
+        }
+
+        let remote = await task.value
+        let result = try await remote.withJSObject { object in
+            XCTAssertFalse(isMainThread())
+            let value = try await JSPromise.resolve(object["value"]).value
+            XCTAssertFalse(isMainThread())
+            return Int(value.number!)
         }
         XCTAssertEqual(result, 99)
     }
