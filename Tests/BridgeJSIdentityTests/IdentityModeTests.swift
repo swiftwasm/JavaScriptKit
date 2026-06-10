@@ -38,7 +38,9 @@ final class IdentityModeTests: XCTestCase {
         // let FinalizationRegistry fire and call deinit.
         for _ in 0..<100 {
             try gc()
-            try await Task.sleep(for: .milliseconds(0))
+            // Give the JS runtime an actual turn so FinalizationRegistry callbacks
+            // can run before we check the Swift weak reference.
+            try await Task.sleep(for: .milliseconds(1))
             if weakSubject == nil {
                 break
             }
