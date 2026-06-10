@@ -353,7 +353,7 @@ private func makeAsyncClosure(
                 let body: (sending [JSValue]) async throws(JSException) -> JSValue
             }
             let context = Context(resolver: resolver, arguments: arguments, body: body)
-            Task.detached(priority: priority) {
+            Task(priority: priority) {
                 do throws(JSException) {
                     let result = try await context.body(context.arguments)
                     context.resolver(.success(result))
