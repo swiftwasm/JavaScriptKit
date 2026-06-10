@@ -7,7 +7,17 @@ import JavaScriptKit
     case green
 }
 
+@JS enum ImportedPayloadSignal: Equatable {
+    case start(String)
+    case stop(Int)
+    case idle
+}
+
 @JSFunction func jsRoundTripLightColor(_ value: LightColor) throws(JSException) -> LightColor
+@JSFunction func jsRoundTripImportedPayloadSignal(_ value: ImportedPayloadSignal) throws(JSException) -> ImportedPayloadSignal
+@JSFunction func jsRoundTripOptionalImportedPayloadSignal(
+    _ value: ImportedPayloadSignal?
+) throws(JSException) -> ImportedPayloadSignal?
 
 class ImportAPITests: XCTestCase {
     func testRoundTripVoid() throws {
@@ -77,6 +87,29 @@ class ImportAPITests: XCTestCase {
     func testRoundTripCaseEnum() throws {
         for v in [LightColor.red, .yellow, .green] {
             try XCTAssertEqual(jsRoundTripLightColor(v), v)
+        }
+    }
+
+    func testRoundTripAssociatedValueEnum() throws {
+        let values: [ImportedPayloadSignal] = [
+            .start("go"),
+            .stop(42),
+            .idle,
+        ]
+        for value in values {
+            try XCTAssertEqual(jsRoundTripImportedPayloadSignal(value), value)
+        }
+    }
+
+    func testRoundTripOptionalAssociatedValueEnum() throws {
+        let values: [ImportedPayloadSignal?] = [
+            .some(.start("go")),
+            .some(.stop(42)),
+            .some(.idle),
+            nil,
+        ]
+        for value in values {
+            try XCTAssertEqual(jsRoundTripOptionalImportedPayloadSignal(value), value)
         }
     }
 

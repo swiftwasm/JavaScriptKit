@@ -91,6 +91,12 @@ export async function setupOptions(options, context) {
                 "jsRoundTripLightColor": (value) => {
                     return value;
                 },
+                "jsRoundTripImportedPayloadSignal": (value) => {
+                    return value;
+                },
+                "jsRoundTripOptionalImportedPayloadSignal": (value) => {
+                    return value;
+                },
                 "jsEchoJSValue": (v) => {
                     return v;
                 },

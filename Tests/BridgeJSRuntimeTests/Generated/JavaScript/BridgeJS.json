@@ -6552,6 +6552,53 @@
       },
       {
         "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "success"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "failure"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "idle"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "AsyncImportedPayloadResult",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "AsyncImportedPayloadResult",
+        "tsFullPath" : "AsyncImportedPayloadResult"
+      },
+      {
+        "cases" : [
 
         ],
         "emitStyle" : "const",
@@ -7714,6 +7761,53 @@
         ],
         "swiftCallName" : "TSTheme",
         "tsFullPath" : "TSTheme"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "success"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "failure"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "idle"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "AsyncPayloadResult",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "AsyncPayloadResult",
+        "tsFullPath" : "AsyncPayloadResult"
       },
       {
         "cases" : [
@@ -9325,6 +9419,53 @@
         ],
         "swiftCallName" : "LightColor",
         "tsFullPath" : "LightColor"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "start"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "stop"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "idle"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "ImportedPayloadSignal",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "ImportedPayloadSignal",
+        "tsFullPath" : "ImportedPayloadSignal"
       },
       {
         "cases" : [
@@ -12961,6 +13102,66 @@
               "rawValueEnum" : {
                 "_0" : "FileSize",
                 "_1" : "Int64"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripAssociatedValueEnum",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripAssociatedValueEnum",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "associatedValueEnum" : {
+                "_0" : "AsyncPayloadResult"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "associatedValueEnum" : {
+            "_0" : "AsyncPayloadResult"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripOptionalAssociatedValueEnum",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripOptionalAssociatedValueEnum",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "v",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "AsyncPayloadResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "associatedValueEnum" : {
+                "_0" : "AsyncPayloadResult"
               }
             },
             "_1" : "null"
@@ -18425,6 +18626,64 @@
                     "_1" : "String"
                   }
                 }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripAssociatedValueEnum",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "associatedValueEnum" : {
+                        "_0" : "AsyncImportedPayloadResult"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "associatedValueEnum" : {
+                    "_0" : "AsyncImportedPayloadResult"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncRoundTripOptionalAssociatedValueEnum",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "associatedValueEnum" : {
+                            "_0" : "AsyncImportedPayloadResult"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "AsyncImportedPayloadResult"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
               }
             ]
           }
@@ -20387,6 +20646,64 @@
             "returnType" : {
               "caseEnum" : {
                 "_0" : "LightColor"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "jsRoundTripImportedPayloadSignal",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "associatedValueEnum" : {
+                    "_0" : "ImportedPayloadSignal"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "associatedValueEnum" : {
+                "_0" : "ImportedPayloadSignal"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "jsRoundTripOptionalImportedPayloadSignal",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "ImportedPayloadSignal"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "ImportedPayloadSignal"
+                  }
+                },
+                "_1" : "null"
               }
             }
           }

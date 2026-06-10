@@ -1925,6 +1925,67 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y_extern(_ callback: Int32, _ param0: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y_extern(_ callback: Int32, _ param0: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y(_ callback: Int32, _ param0: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (sending AsyncImportedPayloadResult) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let param0CaseId = param0.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y(callbackValue, param0CaseId)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (sending AsyncImportedPayloadResult) -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending AsyncImportedPayloadResult) -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss26AsyncImportedPayloadResultO_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending AsyncImportedPayloadResult) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(AsyncImportedPayloadResult.bridgeJSLiftParameter(param0))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss7JSValueV_y")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss7JSValueV_y_extern(_ callback: Int32, _ param0Kind: Int32, _ param0Payload1: Int32, _ param0Payload2: Float64) -> Void
 #else
@@ -2347,6 +2408,67 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSd
     #if arch(wasm32)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending Double) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     closure(Double.bridgeJSLiftParameter(param0))
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y_extern(callback, param0IsSome, param0CaseId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (sending Optional<AsyncImportedPayloadResult>) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let (param0IsSome, param0CaseId) = param0.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y(callbackValue, param0IsSome, param0CaseId)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (sending Optional<AsyncImportedPayloadResult>) -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending Optional<AsyncImportedPayloadResult>) -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Void {
+    #if arch(wasm32)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending Optional<AsyncImportedPayloadResult>) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(Optional<AsyncImportedPayloadResult>.bridgeJSLiftParameter(param0IsSome, param0CaseId))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -3816,6 +3938,34 @@ public func _bjs_ArraySupportExports_static_multiOptionalArraySecond() -> Void {
     #endif
 }
 
+extension AsyncImportedPayloadResult: _BridgedSwiftAssociatedValueEnum {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> AsyncImportedPayloadResult {
+        switch caseId {
+        case 0:
+            return .success(String.bridgeJSStackPop())
+        case 1:
+            return .failure(Int.bridgeJSStackPop())
+        case 2:
+            return .idle
+        default:
+            fatalError("Unknown AsyncImportedPayloadResult case ID: \(caseId)")
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
+        switch self {
+        case .success(let param0):
+            param0.bridgeJSStackPush()
+            return Int32(0)
+        case .failure(let param0):
+            param0.bridgeJSStackPush()
+            return Int32(1)
+        case .idle:
+            return Int32(2)
+        }
+    }
+}
+
 @_expose(wasm, "bjs_DefaultArgumentExports_static_testStringDefault")
 @_cdecl("bjs_DefaultArgumentExports_static_testStringDefault")
 public func _bjs_DefaultArgumentExports_static_testStringDefault(_ messageBytes: Int32, _ messageLength: Int32) -> Void {
@@ -4125,6 +4275,34 @@ extension TSDirection: _BridgedSwiftCaseEnum {
 }
 
 extension TSTheme: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+}
+
+extension AsyncPayloadResult: _BridgedSwiftAssociatedValueEnum {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> AsyncPayloadResult {
+        switch caseId {
+        case 0:
+            return .success(String.bridgeJSStackPop())
+        case 1:
+            return .failure(Int.bridgeJSStackPop())
+        case 2:
+            return .idle
+        default:
+            fatalError("Unknown AsyncPayloadResult case ID: \(caseId)")
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
+        switch self {
+        case .success(let param0):
+            param0.bridgeJSStackPush()
+            return Int32(0)
+        case .failure(let param0):
+            param0.bridgeJSStackPush()
+            return Int32(1)
+        case .idle:
+            return Int32(2)
+        }
+    }
 }
 
 @_expose(wasm, "bjs_Utils_StringUtils_static_uppercase")
@@ -4866,6 +5044,34 @@ extension LightColor: _BridgedSwiftCaseEnum {
             return 1
         case .green:
             return 2
+        }
+    }
+}
+
+extension ImportedPayloadSignal: _BridgedSwiftAssociatedValueEnum {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> ImportedPayloadSignal {
+        switch caseId {
+        case 0:
+            return .start(String.bridgeJSStackPop())
+        case 1:
+            return .stop(Int.bridgeJSStackPop())
+        case 2:
+            return .idle
+        default:
+            fatalError("Unknown ImportedPayloadSignal case ID: \(caseId)")
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
+        switch self {
+        case .start(let param0):
+            param0.bridgeJSStackPush()
+            return Int32(0)
+        case .stop(let param0):
+            param0.bridgeJSStackPush()
+            return Int32(1)
+        case .idle:
+            return Int32(2)
         }
     }
 }
@@ -7523,6 +7729,32 @@ public func _bjs_asyncRoundTripOptionalFileSize(_ vIsSome: Int32, _ vValue: Int6
     #if arch(wasm32)
     return _bjs_makePromise(resolve: Promise_resolve_Sq8FileSizeO, reject: Promise_reject) {
         return await asyncRoundTripOptionalFileSize(_: Optional<FileSize>.bridgeJSLiftParameter(vIsSome, vValue))
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripAssociatedValueEnum")
+@_cdecl("bjs_asyncRoundTripAssociatedValueEnum")
+public func _bjs_asyncRoundTripAssociatedValueEnum(_ v: Int32) -> Int32 {
+    #if arch(wasm32)
+    let _tmp_v = AsyncPayloadResult.bridgeJSLiftParameter(v)
+    return _bjs_makePromise(resolve: Promise_resolve_18AsyncPayloadResultO, reject: Promise_reject) {
+        return await asyncRoundTripAssociatedValueEnum(_: _tmp_v)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_asyncRoundTripOptionalAssociatedValueEnum")
+@_cdecl("bjs_asyncRoundTripOptionalAssociatedValueEnum")
+public func _bjs_asyncRoundTripOptionalAssociatedValueEnum(_ vIsSome: Int32, _ vCaseId: Int32) -> Int32 {
+    #if arch(wasm32)
+    let _tmp_v = Optional<AsyncPayloadResult>.bridgeJSLiftParameter(vIsSome, vCaseId)
+    return _bjs_makePromise(resolve: Promise_resolve_Sq18AsyncPayloadResultO, reject: Promise_reject) {
+        return await asyncRoundTripOptionalAssociatedValueEnum(_: _tmp_v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -11783,6 +12015,48 @@ func _$Promise_resolve_Sq8FileSizeO(_ promise: JSObject, _ value: Optional<FileS
     if let error = _swift_js_take_exception() { throw error }
 }
 
+@JSFunction func Promise_resolve_18AsyncPayloadResultO(_ promise: JSObject, _ value: AsyncPayloadResult) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_18AsyncPayloadResultO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_18AsyncPayloadResultO_extern(_ promise: Int32, _ value: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_18AsyncPayloadResultO_extern(_ promise: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_18AsyncPayloadResultO(_ promise: Int32, _ value: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_18AsyncPayloadResultO_extern(promise, value)
+}
+
+func _$Promise_resolve_18AsyncPayloadResultO(_ promise: JSObject, _ value: AsyncPayloadResult) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let valueCaseId = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_18AsyncPayloadResultO(promiseValue, valueCaseId)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+@JSFunction func Promise_resolve_Sq18AsyncPayloadResultO(_ promise: JSObject, _ value: Optional<AsyncPayloadResult>) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sq18AsyncPayloadResultO")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq18AsyncPayloadResultO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueCaseId: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq18AsyncPayloadResultO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueCaseId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq18AsyncPayloadResultO(_ promise: Int32, _ valueIsSome: Int32, _ valueCaseId: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sq18AsyncPayloadResultO_extern(promise, valueIsSome, valueCaseId)
+}
+
+func _$Promise_resolve_Sq18AsyncPayloadResultO(_ promise: JSObject, _ value: Optional<AsyncPayloadResult>) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    let (valueIsSome, valueCaseId) = value.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sq18AsyncPayloadResultO(promiseValue, valueIsSome, valueCaseId)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
 @JSFunction func Promise_resolve_11PublicPointV(_ promise: JSObject, _ value: PublicPoint) throws(JSException)
 
 #if arch(wasm32)
@@ -12407,6 +12681,30 @@ fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static_exter
     return bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static_extern(resolveRef, rejectRef, vBytes, vLength)
 }
 
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AsyncImportImports_jsAsyncRoundTripAssociatedValueEnum_static")
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripAssociatedValueEnum_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Int32) -> Void
+#else
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripAssociatedValueEnum_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripAssociatedValueEnum_static(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Int32) -> Void {
+    return bjs_AsyncImportImports_jsAsyncRoundTripAssociatedValueEnum_static_extern(resolveRef, rejectRef, v)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum_static")
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vIsSome: Int32, _ vCaseId: Int32) -> Void
+#else
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vIsSome: Int32, _ vCaseId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum_static(_ resolveRef: Int32, _ rejectRef: Int32, _ vIsSome: Int32, _ vCaseId: Int32) -> Void {
+    return bjs_AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum_static_extern(resolveRef, rejectRef, vIsSome, vCaseId)
+}
+
 func _$AsyncImportImports_jsAsyncRoundTripVoid() async throws(JSException) -> Void {
     try await _bjs_awaitPromise(makeResolveClosure: {
             JSTypedClosure<() -> Void>($0)
@@ -12524,6 +12822,30 @@ func _$AsyncImportImports_jsAsyncRoundTripFeatureFlag(_ v: FeatureFlag) async th
         v.bridgeJSWithLoweredParameter { (vBytes, vLength) in
             bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static(resolveRef, rejectRef, vBytes, vLength)
         }
+    }
+    return resolved
+}
+
+func _$AsyncImportImports_jsAsyncRoundTripAssociatedValueEnum(_ v: AsyncImportedPayloadResult) async throws(JSException) -> AsyncImportedPayloadResult {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(sending AsyncImportedPayloadResult) -> Void>($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>($0)
+        }) { resolveRef, rejectRef in
+        let vCaseId = v.bridgeJSLowerParameter()
+        bjs_AsyncImportImports_jsAsyncRoundTripAssociatedValueEnum_static(resolveRef, rejectRef, vCaseId)
+    }
+    return resolved
+}
+
+func _$AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum(_ v: Optional<AsyncImportedPayloadResult>) async throws(JSException) -> Optional<AsyncImportedPayloadResult> {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(sending Optional<AsyncImportedPayloadResult>) -> Void>($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>($0)
+        }) { resolveRef, rejectRef in
+        let (vIsSome, vCaseId) = v.bridgeJSLowerParameter()
+        bjs_AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum_static(resolveRef, rejectRef, vIsSome, vCaseId)
     }
     return resolved
 }
@@ -14063,6 +14385,48 @@ func _$jsRoundTripLightColor(_ value: LightColor) throws(JSException) -> LightCo
         throw error
     }
     return LightColor.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripImportedPayloadSignal")
+fileprivate func bjs_jsRoundTripImportedPayloadSignal_extern(_ value: Int32) -> Int32
+#else
+fileprivate func bjs_jsRoundTripImportedPayloadSignal_extern(_ value: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsRoundTripImportedPayloadSignal(_ value: Int32) -> Int32 {
+    return bjs_jsRoundTripImportedPayloadSignal_extern(value)
+}
+
+func _$jsRoundTripImportedPayloadSignal(_ value: ImportedPayloadSignal) throws(JSException) -> ImportedPayloadSignal {
+    let valueCaseId = value.bridgeJSLowerParameter()
+    let ret = bjs_jsRoundTripImportedPayloadSignal(valueCaseId)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return ImportedPayloadSignal.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalImportedPayloadSignal")
+fileprivate func bjs_jsRoundTripOptionalImportedPayloadSignal_extern(_ valueIsSome: Int32, _ valueCaseId: Int32) -> Int32
+#else
+fileprivate func bjs_jsRoundTripOptionalImportedPayloadSignal_extern(_ valueIsSome: Int32, _ valueCaseId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsRoundTripOptionalImportedPayloadSignal(_ valueIsSome: Int32, _ valueCaseId: Int32) -> Int32 {
+    return bjs_jsRoundTripOptionalImportedPayloadSignal_extern(valueIsSome, valueCaseId)
+}
+
+func _$jsRoundTripOptionalImportedPayloadSignal(_ value: Optional<ImportedPayloadSignal>) throws(JSException) -> Optional<ImportedPayloadSignal> {
+    let (valueIsSome, valueCaseId) = value.bridgeJSLowerParameter()
+    let ret = bjs_jsRoundTripOptionalImportedPayloadSignal(valueIsSome, valueCaseId)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<ImportedPayloadSignal>.bridgeJSLiftReturn(ret)
 }
 
 #if arch(wasm32)

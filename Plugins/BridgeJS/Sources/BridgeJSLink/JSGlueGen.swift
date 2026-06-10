@@ -1422,27 +1422,19 @@ struct IntrinsicJSFragment: Sendable {
             return try .optionalLiftParameter(wrappedType: wrappedType, kind: kind, context: context)
         case .rawValueEnum(_, .string): return .stringLiftParameter
         case .associatedValueEnum(let fullName):
-            switch context {
-            case .importTS:
-                throw BridgeJSLinkError(
-                    message:
-                        "Associated value enums are not supported to be passed as parameters to imported JS functions: \(fullName)"
-                )
-            case .exportSwift:
-                let base = fullName.components(separatedBy: ".").last ?? fullName
-                return IntrinsicJSFragment(
-                    parameters: ["caseId"],
-                    printCode: { arguments, context in
-                        let (scope, printer) = (context.scope, context.printer)
-                        let caseId = arguments[0]
-                        let resultVar = scope.variable("enumValue")
-                        printer.write(
-                            "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(caseId));"
-                        )
-                        return [resultVar]
-                    }
-                )
-            }
+            let base = fullName.components(separatedBy: ".").last ?? fullName
+            return IntrinsicJSFragment(
+                parameters: ["caseId"],
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
+                    let caseId = arguments[0]
+                    let resultVar = scope.variable("enumValue")
+                    printer.write(
+                        "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(caseId));"
+                    )
+                    return [resultVar]
+                }
+            )
         case .swiftStruct(let fullName):
             switch context {
             case .importTS:
@@ -1502,15 +1494,7 @@ struct IntrinsicJSFragment: Sendable {
             return try .optionalLowerReturn(wrappedType: wrappedType, kind: kind)
         case .rawValueEnum(_, .string): return .stringLowerReturn
         case .associatedValueEnum(let fullName):
-            switch context {
-            case .importTS:
-                throw BridgeJSLinkError(
-                    message:
-                        "Associated value enums are not supported to be returned from imported JS functions: \(fullName)"
-                )
-            case .exportSwift:
-                return associatedValueLowerReturn(fullName: fullName)
-            }
+            return associatedValueLowerReturn(fullName: fullName)
         case .swiftStruct(let fullName):
             switch context {
             case .importTS:
