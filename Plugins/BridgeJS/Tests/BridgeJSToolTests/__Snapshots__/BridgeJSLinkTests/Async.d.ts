@@ -34,6 +34,7 @@ export type Exports = {
     asyncRoundTripJSObject(v: any): Promise<any>;
     asyncRoundTripStruct(v: AsyncPoint): Promise<AsyncPoint>;
     asyncRoundTripStructThrows(v: AsyncPoint): Promise<AsyncPoint>;
+    asyncThrowsZeroArg(): Promise<string>;
     asyncCombineStructs(a: AsyncPoint, b: AsyncPoint): Promise<AsyncPoint>;
     asyncRoundTripEnum(v: AsyncDirectionTag): Promise<AsyncDirectionTag>;
     asyncRoundTripRawEnum(v: AsyncThemeTag): Promise<AsyncThemeTag>;

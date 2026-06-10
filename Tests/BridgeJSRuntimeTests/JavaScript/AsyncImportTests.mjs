@@ -64,6 +64,11 @@ export async function runAsyncWorksTests(exports) {
         (error) => error instanceof Error && error.message === "async struct failure"
     );
 
+    await assert.rejects(
+        () => exports.zeroArgAsyncThrows(),
+        (error) => error instanceof Error && error.message === "ZeroArgAsyncThrowsError"
+    );
+
     const richContact = {
         name: "Alice",
         age: 30,

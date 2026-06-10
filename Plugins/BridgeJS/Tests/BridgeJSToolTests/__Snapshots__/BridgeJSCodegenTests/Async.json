@@ -284,6 +284,23 @@
         }
       },
       {
+        "abiName" : "bjs_asyncThrowsZeroArg",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "asyncThrowsZeroArg",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_asyncCombineStructs",
         "effects" : {
           "isAsync" : true,
