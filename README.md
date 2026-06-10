@@ -5,8 +5,6 @@
 
 Swift framework to interact with JavaScript through WebAssembly.
 
-Minimum supported Swift toolchain: 6.3.
-
 ## Quick Start
 
 Check out the [Hello World](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/tutorials/javascriptkit/hello-world) tutorial for a step-by-step guide to getting started.
@@ -121,6 +119,10 @@ Use the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/)
 ## Examples
 
 Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Examples) for more detailed usage patterns.
+
+## Minimum Supported Swift Version (MSSV)
+
+The minimum supported Swift version is 6.3.
 
 ## Contributing
 
