@@ -14,7 +14,7 @@ jobs:
         entry:
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/swift-6.2.3-release/ubuntu2204/swift-6.2.3-RELEASE/swift-6.2.3-RELEASE-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a-ubuntu22.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasip1"
             env: |
@@ -77,8 +77,6 @@ jobs:
     strategy:
       matrix:
         entry:
-          - image: "swift:6.2.3"
-            swift-syntax-version: "602.0.0"
           - image: "swift:6.3"
             swift-syntax-version: "603.0.0"
     runs-on: ubuntu-latest
@@ -132,7 +130,7 @@ jobs:
   format:
     runs-on: ubuntu-latest
     container:
-      image: swift:6.2.3
+      image: swift:6.3
     steps:
       - uses: actions/checkout@v6
       - run: ./Utilities/format.swift
