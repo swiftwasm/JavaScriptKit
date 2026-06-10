@@ -1,4 +1,4 @@
-#if compiler(>=6.1) && _runtime(_multithreaded)
+#if _runtime(_multithreaded)
 import Synchronization
 import XCTest
 import _CJavaScriptKit  // For swjs_get_worker_thread_id

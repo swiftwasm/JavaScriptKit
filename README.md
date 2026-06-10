@@ -120,6 +120,10 @@ Use the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/)
 
 Check out the [examples](https://github.com/swiftwasm/JavaScriptKit/tree/main/Examples) for more detailed usage patterns.
 
+## Minimum Supported Swift Version (MSSV)
+
+The minimum supported Swift version is 6.3.
+
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to the project.

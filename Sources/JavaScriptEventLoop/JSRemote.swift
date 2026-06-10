@@ -62,7 +62,7 @@ extension JSRemote where T == JSObject {
     ///
     /// - Parameter object: The JavaScript object to reference remotely.
     public init(_ object: JSObject) {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
+        #if _runtime(_multithreaded)
         self.init(sourceObject: object, sourceTid: object.ownerTid)
         #else
         self.init(sourceObject: object, sourceTid: -1)
@@ -92,7 +92,7 @@ extension JSRemote where T == JSObject {
     public func withJSObject<R: Sendable, E: Error>(
         _ body: @Sendable @escaping (JSObject) throws(E) -> R
     ) async throws(E) -> sending R {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
+        #if _runtime(_multithreaded)
         if storage.sourceTid == swjs_get_worker_thread_id_cached() {
             return try body(storage.sourceObject)
         }
@@ -137,13 +137,11 @@ private final class _JSRemoteContext: @unchecked Sendable {
     }
 }
 
-#if compiler(>=6.1)
 @_expose(wasm, "swjs_invoke_remote_jsobject_body")
 @_cdecl("swjs_invoke_remote_jsobject_body")
-#endif
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 func _swjs_invoke_remote_jsobject_body(_ contextPtr: UnsafeRawPointer?) -> Bool {
-    #if compiler(>=6.1) && _runtime(_multithreaded)
+    #if _runtime(_multithreaded)
     guard let contextPtr else { return true }
     let context = Unmanaged<_JSRemoteContext>.fromOpaque(contextPtr).takeRetainedValue()
 

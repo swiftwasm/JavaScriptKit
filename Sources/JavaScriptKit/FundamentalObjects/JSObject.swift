@@ -22,7 +22,7 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     @usableFromInline
     internal var _id: JavaScriptObjectRef
 
-    #if compiler(>=6.1) && _runtime(_multithreaded)
+    #if _runtime(_multithreaded)
     package let ownerTid: Int32
     #endif
 
@@ -35,7 +35,7 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     @_spi(BridgeJS)
     public init(id: JavaScriptObjectRef) {
         self._id = id
-        #if compiler(>=6.1) && _runtime(_multithreaded)
+        #if _runtime(_multithreaded)
         self.ownerTid = swjs_get_worker_thread_id_cached()
         #endif
     }
@@ -61,7 +61,7 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     /// is a programmer error and will result in a runtime assertion failure because JavaScript
     /// object spaces are not shared across threads backed by Web Workers.
     private func assertOnOwnerThread(hint: @autoclosure () -> String) {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
+        #if _runtime(_multithreaded)
         precondition(
             ownerTid == swjs_get_worker_thread_id_cached(),
             "JSObject is being accessed from a thread other than the owner thread: \(hint())"
@@ -71,7 +71,7 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
 
     /// Asserts that the two objects being compared are owned by the same thread.
     private static func assertSameOwnerThread(lhs: JSObject, rhs: JSObject, hint: @autoclosure () -> String) {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
+        #if _runtime(_multithreaded)
         precondition(
             lhs.ownerTid == rhs.ownerTid,
             "JSObject is being accessed from a thread other than the owner thread: \(hint())"
@@ -282,7 +282,7 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     })
 
     deinit {
-        #if compiler(>=6.1) && _runtime(_multithreaded)
+        #if _runtime(_multithreaded)
         if ownerTid != swjs_get_worker_thread_id_cached() {
             // If the object is not owned by the current thread
             swjs_release_remote(ownerTid, id)
