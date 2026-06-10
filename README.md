@@ -5,6 +5,8 @@
 
 Swift framework to interact with JavaScript through WebAssembly.
 
+Minimum supported Swift toolchain: 6.3.
+
 ## Quick Start
 
 Check out the [Hello World](https://swiftpackageindex.com/swiftwasm/JavaScriptKit/tutorials/javascriptkit/hello-world) tutorial for a step-by-step guide to getting started.
