@@ -426,21 +426,45 @@ public class ExportSwift {
         /// A throwing async body needs an explicit closure type, otherwise Swift infers
         /// `throws(any Error)` instead of `throws(JSException)`.
         /// See: https://github.com/swiftlang/swift/issues/76165
-        private func asyncThrowsClosureHead(returnSpelling: String?) -> String {
+        private func asyncThrowsClosureHead(returnSpelling: String?, forcesCapture: Bool) -> String {
             guard effects.isThrows else { return "" }
             let returns = returnSpelling.map { " -> \($0)" } ?? ""
-            return " () async throws(JSException)\(returns) in"
+            let capture = forcesCapture ? "[__bjs_capture] " : ""
+            return " \(capture)() async throws(JSException)\(returns) in"
+        }
+
+        /// A captureless throwing async body closure lowers via `thin_to_thick_function`,
+        /// which miscompiles typed-error calls on wasm32. Forcing a capture that the body
+        /// reads turns the closure into a partial apply with a context, avoiding the
+        /// broken convention. An unread capture list entry is dropped by capture analysis,
+        /// so the body must also read the captured value.
+        /// See: https://github.com/swiftlang/swift/issues/89320
+        private var asyncThrowsBodyForcesCapture: Bool {
+            effects.isThrows && abiParameterSignatures.isEmpty && asyncHoistedBindings.isEmpty
         }
 
         func render(abiName: String) -> DeclSyntax {
             let body: CodeBlockItemListSyntax
             if effects.isAsync, let resolveType = asyncResolveReturnType {
                 let resolveName = "Promise_resolve_\(resolveType.mangleTypeName)"
-                let closureHead = asyncThrowsClosureHead(returnSpelling: resolveType.swiftType)
+                let forcesCapture = asyncThrowsBodyForcesCapture
+                let closureHead = asyncThrowsClosureHead(
+                    returnSpelling: resolveType.swiftType,
+                    forcesCapture: forcesCapture
+                )
+                var hoistedBindings = asyncHoistedBindings
+                var bodyItems = self.body
+                if forcesCapture {
+                    hoistedBindings.append("let __bjs_capture = 0")
+                    if !bodyItems.isEmpty {
+                        bodyItems[0] = bodyItems[0].with(\.leadingTrivia, .newline)
+                    }
+                    bodyItems.insert("_ = __bjs_capture", at: 0)
+                }
                 body = """
-                    \(CodeBlockItemListSyntax(asyncHoistedBindings))
+                    \(CodeBlockItemListSyntax(hoistedBindings))
                     return _bjs_makePromise(resolve: \(raw: resolveName), reject: Promise_reject) {\(raw: closureHead)
-                        \(CodeBlockItemListSyntax(self.body))
+                        \(CodeBlockItemListSyntax(bodyItems))
                     }
                     """
             } else if effects.isThrows {

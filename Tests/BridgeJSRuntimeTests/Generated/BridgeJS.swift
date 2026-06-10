@@ -7189,6 +7189,20 @@ public func _bjs_throwsWithJSObjectResult() -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_zeroArgAsyncThrows")
+@_cdecl("bjs_zeroArgAsyncThrows")
+public func _bjs_zeroArgAsyncThrows() -> Int32 {
+    #if arch(wasm32)
+    let __bjs_capture = 0
+    return _bjs_makePromise(resolve: Promise_resolve_SS, reject: Promise_reject) { [__bjs_capture] () async throws(JSException) -> String in
+        _ = __bjs_capture
+        return try await zeroArgAsyncThrows()
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_asyncRoundTripVoid")
 @_cdecl("bjs_asyncRoundTripVoid")
 public func _bjs_asyncRoundTripVoid() -> Int32 {
@@ -11403,6 +11417,28 @@ func _$Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
     if let error = _swift_js_take_exception() { throw error }
 }
 
+@JSFunction func Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_SS")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_SS(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_SS_extern(promise, valueBytes, valueLength)
+}
+
+func _$Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException) -> Void {
+    let promiseValue = promise.bridgeJSLowerParameter()
+    value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        promise_resolve_BridgeJSRuntimeTests_SS(promiseValue, valueBytes, valueLength)
+    }
+    if let error = _swift_js_take_exception() { throw error }
+}
+
 @JSFunction func Promise_resolve_y(_ promise: JSObject) throws(JSException)
 
 #if arch(wasm32)
@@ -11504,28 +11540,6 @@ func _$Promise_resolve_Sb(_ promise: JSObject, _ value: Bool) throws(JSException
     let promiseValue = promise.bridgeJSLowerParameter()
     let valueValue = value.bridgeJSLowerParameter()
     promise_resolve_BridgeJSRuntimeTests_Sb(promiseValue, valueValue)
-    if let error = _swift_js_take_exception() { throw error }
-}
-
-@JSFunction func Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException)
-
-#if arch(wasm32)
-@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_SS")
-fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
-#else
-fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    fatalError("Only available on WebAssembly")
-}
-#endif
-@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_SS(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return promise_resolve_BridgeJSRuntimeTests_SS_extern(promise, valueBytes, valueLength)
-}
-
-func _$Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
-    value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
-        promise_resolve_BridgeJSRuntimeTests_SS(promiseValue, valueBytes, valueLength)
-    }
     if let error = _swift_js_take_exception() { throw error }
 }
 

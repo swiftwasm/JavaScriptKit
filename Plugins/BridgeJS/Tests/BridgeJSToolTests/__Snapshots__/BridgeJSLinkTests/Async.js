@@ -585,6 +585,18 @@ export async function createInstantiator(options, swift) {
                     }
                     return ret1;
                 },
+                asyncThrowsZeroArg: function bjs_asyncThrowsZeroArg() {
+                    const ret = instance.exports.bjs_asyncThrowsZeroArg();
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                    return ret1;
+                },
                 asyncCombineStructs: function bjs_asyncCombineStructs(a, b) {
                     structHelpers.AsyncPoint.lower(a);
                     structHelpers.AsyncPoint.lower(b);

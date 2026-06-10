@@ -12172,6 +12172,23 @@
         }
       },
       {
+        "abiName" : "bjs_zeroArgAsyncThrows",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "zeroArgAsyncThrows",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_asyncRoundTripVoid",
         "effects" : {
           "isAsync" : true,

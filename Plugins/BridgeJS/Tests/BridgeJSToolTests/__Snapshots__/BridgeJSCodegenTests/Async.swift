@@ -194,6 +194,20 @@ public func _bjs_asyncRoundTripStructThrows() -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_asyncThrowsZeroArg")
+@_cdecl("bjs_asyncThrowsZeroArg")
+public func _bjs_asyncThrowsZeroArg() -> Int32 {
+    #if arch(wasm32)
+    let __bjs_capture = 0
+    return _bjs_makePromise(resolve: Promise_resolve_SS, reject: Promise_reject) { [__bjs_capture] () async throws(JSException) -> String in
+        _ = __bjs_capture
+        return try await asyncThrowsZeroArg()
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_asyncCombineStructs")
 @_cdecl("bjs_asyncCombineStructs")
 public func _bjs_asyncCombineStructs() -> Int32 {

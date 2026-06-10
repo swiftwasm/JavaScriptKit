@@ -96,6 +96,10 @@ struct TestError: Error {
 @JS func throwsWithSwiftHeapObjectResult() throws(JSException) -> Greeter { return Greeter(name: "Test") }
 @JS func throwsWithJSObjectResult() throws(JSException) -> JSObject { return JSObject() }
 
+@JS func zeroArgAsyncThrows() async throws(JSException) -> String {
+    throw JSException(JSError(message: "ZeroArgAsyncThrowsError").jsValue)
+}
+
 @JS func asyncRoundTripVoid() async -> Void { return }
 @JS func asyncRoundTripInt(v: Int) async -> Int { return v }
 @JS func asyncRoundTripFloat(v: Float) async -> Float { return v }

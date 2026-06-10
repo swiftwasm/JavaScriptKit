@@ -31,6 +31,10 @@
     return v
 }
 
+@JS func asyncThrowsZeroArg() async throws(JSException) -> String {
+    return "ok"
+}
+
 @JS func asyncCombineStructs(_ a: AsyncPoint, _ b: AsyncPoint) async -> AsyncPoint {
     return AsyncPoint(x: a.x + b.x, y: a.y + b.y)
 }
