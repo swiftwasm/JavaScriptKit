@@ -57,14 +57,12 @@ extension JavaScriptEventLoop: SchedulingExecutor {
         #endif  // #if compiler(>=6.4) (Embedded)
         #else  // #if hasFeature(Embedded)
         let duration: Duration
-        // Handle clocks we know
         if let _ = clock as? ContinuousClock {
             duration = delay as! ContinuousClock.Duration
         } else if let _ = clock as? SuspendingClock {
             duration = delay as! SuspendingClock.Duration
         } else {
             fatalError("Unsupported clock type; only ContinuousClock and SuspendingClock are supported")
-            return
         }
         let milliseconds = Self.delayInMilliseconds(from: duration)
         self.enqueue(

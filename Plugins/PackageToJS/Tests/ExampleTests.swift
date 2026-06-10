@@ -227,10 +227,6 @@ extension Trait where Self == ConditionTrait {
                     fileURLWithPath: "swift",
                     relativeTo: URL(fileURLWithPath: try #require(Self.getSwiftPath()))
                 )
-                var args = args
-                if args.first == "package" {
-                    args.insert(contentsOf: ["--build-system", "native"], at: 1)
-                }
                 try runProcess(swiftExecutable, args, env)
             }
             try body(destination.appending(path: path), runProcess, runSwift)
@@ -250,11 +246,11 @@ extension Trait where Self == ConditionTrait {
     func basic() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/Basic") { packageDir, _, runSwift in
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "dwarf"], [:])
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "name"], [:])
+            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js"], [:])
+            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "dwarf"], [:])
+            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "name"], [:])
             try runSwift(
-                ["package", "--swift-sdk", swiftSDKID, "-Xswiftc", "-DJAVASCRIPTKIT_WITHOUT_WEAKREFS", "js"],
+                ["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "-Xswiftc", "-DJAVASCRIPTKIT_WITHOUT_WEAKREFS", "js"],
                 [:]
             )
         }
@@ -270,7 +266,7 @@ extension Trait where Self == ConditionTrait {
             try runProcess(which("npm"), ["install"], [:])
             try runProcess(which("npx"), ["playwright", "install", "chromium-headless-shell"], [:])
 
-            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
+            try runSwift(["package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
             try withTemporaryDirectory(body: { tempDir, _ in
                 let scriptContent = """
                     const fs = require('fs');
@@ -282,7 +278,7 @@ extension Trait where Self == ConditionTrait {
                 let scriptPath = tempDir.appending(path: "script.js")
                 try runSwift(
                     [
-                        "package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test",
+                        "package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test",
                         "-Xnode=--require=\(scriptPath.path)",
                     ],
                     [:]
@@ -295,7 +291,7 @@ extension Trait where Self == ConditionTrait {
                 )
             })
             try runSwift(
-                ["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser"],
+                ["package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser"],
                 [:]
             )
         }
@@ -308,7 +304,7 @@ extension Trait where Self == ConditionTrait {
         let swiftPath = try #require(Self.getSwiftPath())
         try withPackage(at: "Examples/Testing") { packageDir, runProcess, runSwift in
             try runSwift(
-                ["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--enable-code-coverage"],
+                ["package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--enable-code-coverage"],
                 [
                     "LLVM_PROFDATA_PATH": URL(fileURLWithPath: swiftPath).appending(path: "llvm-profdata").path
                 ]
@@ -336,7 +332,7 @@ extension Trait where Self == ConditionTrait {
     func multithreading() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/Multithreading") { packageDir, _, runSwift in
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
+            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js"], [:])
         }
     }
 
@@ -344,7 +340,7 @@ extension Trait where Self == ConditionTrait {
     func offscreenCanvas() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/OffscrenCanvas") { packageDir, _, runSwift in
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
+            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js"], [:])
         }
     }
 
@@ -352,7 +348,7 @@ extension Trait where Self == ConditionTrait {
     func actorOnWebWorker() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/ActorOnWebWorker") { packageDir, _, runSwift in
-            try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
+            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js"], [:])
         }
     }
 
@@ -363,7 +359,7 @@ extension Trait where Self == ConditionTrait {
         let swiftSDKID = try #require(Self.getEmbeddedSwiftSDKID())
         try withPackage(at: "Examples/Embedded") { packageDir, _, runSwift in
             try runSwift(
-                ["package", "--swift-sdk", swiftSDKID, "js", "-c", "release"],
+                ["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "-c", "release"],
                 [
                     "JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"
                 ]
@@ -379,7 +375,7 @@ extension Trait where Self == ConditionTrait {
             at: "Plugins/PackageToJS/Fixtures/ContinuationLeakInTest/XCTest",
             assertTerminationStatus: { $0 != 0 }
         ) { packageDir, _, runSwift in
-            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
+            try runSwift(["package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
         }
     }
 
@@ -392,7 +388,7 @@ extension Trait where Self == ConditionTrait {
             at: "Plugins/PackageToJS/Fixtures/ContinuationLeakInTest/SwiftTesting",
             assertTerminationStatus: { $0 != 0 }
         ) { packageDir, _, runSwift in
-            try runSwift(["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
+            try runSwift(["package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"], [:])
         }
     }
     #endif
@@ -409,7 +405,7 @@ extension Trait where Self == ConditionTrait {
 
             try runSwift(
                 ["package", "--disable-sandbox"] + Self.stackSizeLinkerFlags + [
-                    "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser",
+                    "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser",
                     "--playwright-expose", "../expose.js",
                 ],
                 [:]
@@ -431,7 +427,7 @@ extension Trait where Self == ConditionTrait {
 
             try runSwift(
                 [
-                    "package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser",
+                    "package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser",
                     "--playwright-expose", "../expose.js",
                 ],
                 [:]
