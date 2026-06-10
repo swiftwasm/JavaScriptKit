@@ -96,7 +96,8 @@ public final class JSPromise: JSBridgedClass {
                 let body: () async throws(JSException) -> JSValue
             }
             let context = Context(resolver: resolver, body: body)
-            Task {
+            // Detach the task so the JS bridge does not inherit an arbitrary caller executor.
+            Task.detached {
                 do throws(JSException) {
                     let result = try await context.body()
                     context.resolver(.success(result))
