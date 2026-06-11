@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-swift build --package-path ./Plugins/BridgeJS --product BridgeJSTool
+swift build ${SWIFT_PACKAGE_FLAGS:-} --package-path ./Plugins/BridgeJS --product BridgeJSTool
 
 ./Plugins/BridgeJS/.build/debug/BridgeJSTool generate --project ./tsconfig.json --module-name BridgeJSRuntimeTests --target-dir ./Tests/BridgeJSRuntimeTests --output-dir ./Tests/BridgeJSRuntimeTests/Generated
 ./Plugins/BridgeJS/.build/debug/BridgeJSTool generate --project ./tsconfig.json --module-name BridgeJSGlobalTests --target-dir ./Tests/BridgeJSGlobalTests --output-dir ./Tests/BridgeJSGlobalTests/Generated

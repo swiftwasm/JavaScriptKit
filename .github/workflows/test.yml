@@ -15,6 +15,7 @@ jobs:
           - os: ubuntu-24.04
             toolchain:
               download-url: https://download.swift.org/development/ubuntu2404/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu24.04.tar.gz
+            swift-syntax-version: "603.0.2"
             wasi-backend: Node
             target: "wasm32-unknown-wasip1"
             env: |
@@ -22,11 +23,13 @@ jobs:
           - os: ubuntu-24.04
             toolchain:
               download-url: https://download.swift.org/swift-6.3-branch/ubuntu2404/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a-ubuntu24.04.tar.gz
+            swift-syntax-version: "603.0.2"
             wasi-backend: Node
             target: "wasm32-unknown-wasip1"
           - os: ubuntu-22.04
             toolchain:
               download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
+            swift-syntax-version: "603.0.2"
             wasi-backend: Node
             target: "wasm32-unknown-wasip1-threads"
 
@@ -53,17 +56,25 @@ jobs:
         run: |
           echo "SWIFT_SDK_ID=${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}" >> $GITHUB_ENV
           echo "SWIFT_BIN_PATH=$(dirname $(which swiftc))" >> $GITHUB_ENV
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@v1
+        id: swiftsyntax-prebuilts
+        with:
+          swift-syntax-version: ${{ matrix.entry.swift-syntax-version }}
       - run: make bootstrap
       - run: make unittest
         # Skip unit tests with uwasi because its proc_exit throws
         # unhandled promise rejection.
         if: ${{ matrix.entry.wasi-backend != 'MicroWASI' }}
+        env:
+          SWIFT_PACKAGE_FLAGS: ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }}
       - name: Check if SwiftPM resources are stale
         run: |
           make regenerate_swiftpm_resources
           git diff --exit-code Sources/JavaScriptKit/Runtime
-      - run: swift test --package-path ./Plugins/PackageToJS
-      - run: swift test --package-path ./Plugins/BridgeJS
+      - run: swift test ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }} --package-path ./Plugins/PackageToJS
+      - run: swift test ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }} --package-path ./Plugins/BridgeJS
+        env:
+          BRIDGEJS_OVERRIDE_SWIFT_SYNTAX_VERSION: ${{ matrix.entry.swift-syntax-version }}
       - name: Validate BridgeJS TypeScript declarations
         run: npm run check:bridgejs-dts
 
@@ -73,7 +84,7 @@ jobs:
       matrix:
         entry:
           - image: "swift:6.3"
-            swift-syntax-version: "603.0.0"
+            swift-syntax-version: "603.0.2"
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.entry.image }}
@@ -85,12 +96,14 @@ jobs:
           node-version: '20'
       - name: Install TypeScript
         run: npm install
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@v1
+        id: swiftsyntax-prebuilts
+        with:
+          swift-syntax-version: ${{ matrix.entry.swift-syntax-version }}
       - name: Validate BridgeJS TypeScript declarations
         run: npm run check:bridgejs-dts
       - name: Run BridgeJS tests
-        # NOTE: Seems like the prebuilt SwiftSyntax binaries are not compatible with
-        # non-macro dependents, so disable experimental prebuilts for now.
-        run: swift test --disable-experimental-prebuilts --package-path ./Plugins/BridgeJS
+        run: swift test ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }} --package-path ./Plugins/BridgeJS
         env:
           BRIDGEJS_OVERRIDE_SWIFT_SYNTAX_VERSION: ${{ matrix.entry.swift-syntax-version }}
 
@@ -144,8 +157,14 @@ jobs:
       - uses: ./.github/actions/install-swift
         with:
           download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@v1
+        id: swiftsyntax-prebuilts
+        with:
+          swift-syntax-version: "600.0.1"
       - run: make bootstrap
       - run: ./Utilities/bridge-js-generate.sh
+        env:
+          SWIFT_PACKAGE_FLAGS: ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }}
       - name: Check if BridgeJS generated files are up-to-date
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -167,10 +186,17 @@ jobs:
       - uses: swiftwasm/setup-swiftwasm@v2
         id: setup-wasm32-unknown-wasip1-threads
         with: { target: wasm32-unknown-wasip1-threads }
-      - run: ./Utilities/build-examples.sh
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@v1
+        id: swiftsyntax-prebuilts
+        with:
+          swift-syntax-version: "603.0.2"
+      - run: |
+          swift --version
+          ./Utilities/build-examples.sh
         env:
           SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
           SWIFT_SDK_ID_wasm32_unknown_wasip1: ${{ steps.setup-wasm32-unknown-wasip1.outputs.swift-sdk-id }}
+          SWIFT_PACKAGE_FLAGS: ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }}
       - run: ./Utilities/prepare-gh-pages.sh
       - name: Upload static files as artifact
         id: deployment

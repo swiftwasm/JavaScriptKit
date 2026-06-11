@@ -1,3 +1,3 @@
 #!/bin/bash
 set -euxo pipefail
-swift package --build-system native --swift-sdk "${SWIFT_SDK_ID_wasm32_unknown_wasip1:-${SWIFT_SDK_ID:-wasm32-unknown-wasip1}}" js --use-cdn -c "${1:-debug}"
+swift package ${SWIFT_PACKAGE_FLAGS:-} --build-system native --swift-sdk "${SWIFT_SDK_ID_wasm32_unknown_wasip1:-${SWIFT_SDK_ID:-wasm32-unknown-wasip1}}" js --use-cdn -c "${1:-debug}"

@@ -1,4 +1,5 @@
 SWIFT_SDK_ID ?=
+SWIFT_PACKAGE_FLAGS ?=
 ifeq ($(JAVASCRIPTKIT_DISABLE_TRACING_TRAIT),1)
 	TRACING_ARGS :=
 else
@@ -16,7 +17,9 @@ unittest:
 		echo "SWIFT_SDK_ID is not set. Run 'swift sdk list' and pass a matching SDK, e.g. 'make unittest SWIFT_SDK_ID=<id>'."; \
 		exit 2; \
 	}
-	swift package --build-system native --swift-sdk "$(SWIFT_SDK_ID)" \
+	swift package $(SWIFT_PACKAGE_FLAGS) \
+	    --build-system native \
+	    --swift-sdk "$(SWIFT_SDK_ID)" \
 	    $(TRACING_ARGS) \
 	    --disable-sandbox \
 	    js test --prelude ./Tests/prelude.mjs -Xnode --expose-gc
