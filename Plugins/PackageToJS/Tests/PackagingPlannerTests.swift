@@ -42,6 +42,72 @@ import Testing
 
     typealias DebugInfoFormat = PackageToJS.DebugInfoFormat
 
+    @Test func deriveBuildConfigurationForNativeBuildLayout() {
+        let artifact = URL(fileURLWithPath: "/pkg/.build/wasm32-unknown-wasip1/debug/App.wasm")
+        let result = PackageToJS.deriveBuildConfiguration(wasmProductArtifact: artifact, environment: [:])
+
+        #expect(result.configuration == "debug")
+        #expect(result.triple == "wasm32-unknown-wasip1")
+    }
+
+    @Test func deriveBuildConfigurationForSwiftBuildLayout() {
+        let artifact = URL(fileURLWithPath: "/pkg/.build/out/Products/Debug-webassembly-wasm32/AppTests.wasm")
+        let result = PackageToJS.deriveBuildConfiguration(
+            wasmProductArtifact: artifact,
+            environment: [
+                "SWIFT_SDK_ID": "DEVELOPMENT-SNAPSHOT-2026-05-27-a-wasm32-unknown-wasip1"
+            ]
+        )
+
+        #expect(result.configuration == "debug")
+        #expect(result.triple == "wasm32-unknown-wasip1")
+    }
+
+    @Test func selectTestArtifactsForModuleQualifiedFilter() {
+        let artifacts = [
+            URL(fileURLWithPath: "/pkg/.build/out/BridgeJSGlobalTests-test-runner.wasm"),
+            URL(fileURLWithPath: "/pkg/.build/out/BridgeJSRuntimeTests-test-runner.wasm"),
+        ]
+
+        let selected = PackageToJS.selectTestArtifacts(
+            artifacts,
+            filters: ["BridgeJSRuntimeTests.JSTypedArrayTests/testCreateUint8Array"],
+            buildOnly: false
+        )
+
+        #expect(selected == [artifacts[1]])
+    }
+
+    @Test func selectTestArtifactsKeepsAllForUnqualifiedFilter() {
+        let artifacts = [
+            URL(fileURLWithPath: "/pkg/.build/out/BridgeJSGlobalTests-test-runner.wasm"),
+            URL(fileURLWithPath: "/pkg/.build/out/BridgeJSRuntimeTests-test-runner.wasm"),
+        ]
+
+        let selected = PackageToJS.selectTestArtifacts(
+            artifacts,
+            filters: ["testCreateUint8Array"],
+            buildOnly: false
+        )
+
+        #expect(selected == artifacts)
+    }
+
+    @Test func selectTestArtifactsKeepsAllForBuildOnly() {
+        let artifacts = [
+            URL(fileURLWithPath: "/pkg/.build/out/BridgeJSGlobalTests-test-runner.wasm"),
+            URL(fileURLWithPath: "/pkg/.build/out/BridgeJSRuntimeTests-test-runner.wasm"),
+        ]
+
+        let selected = PackageToJS.selectTestArtifacts(
+            artifacts,
+            filters: ["BridgeJSRuntimeTests.JSTypedArrayTests/testCreateUint8Array"],
+            buildOnly: true
+        )
+
+        #expect(selected == artifacts)
+    }
+
     @Test(arguments: [
         (variant: "debug", configuration: "debug", noOptimize: false, debugInfoFormat: DebugInfoFormat.none),
         (variant: "release", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.none),

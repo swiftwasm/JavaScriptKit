@@ -246,25 +246,22 @@ extension Trait where Self == ConditionTrait {
     func basic() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/Basic") { packageDir, _, runSwift in
-            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js"], [:])
+            try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
             try runSwift(
                 [
-                    "package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "--debug-info-format",
-                    "dwarf",
+                    "package", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "dwarf",
                 ],
                 [:]
             )
             try runSwift(
                 [
-                    "package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "--debug-info-format",
-                    "name",
+                    "package", "--swift-sdk", swiftSDKID, "js", "--debug-info-format", "name",
                 ],
                 [:]
             )
             try runSwift(
                 [
-                    "package", "--build-system", "native", "--swift-sdk", swiftSDKID, "-Xswiftc",
-                    "-DJAVASCRIPTKIT_WITHOUT_WEAKREFS", "js",
+                    "package", "--swift-sdk", swiftSDKID, "-Xswiftc", "-DJAVASCRIPTKIT_WITHOUT_WEAKREFS", "js",
                 ],
                 [:]
             )
@@ -282,7 +279,7 @@ extension Trait where Self == ConditionTrait {
             try runProcess(which("npx"), ["playwright", "install", "chromium-headless-shell"], [:])
 
             try runSwift(
-                ["package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"],
+                ["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"],
                 [:]
             )
             try withTemporaryDirectory(body: { tempDir, _ in
@@ -296,8 +293,7 @@ extension Trait where Self == ConditionTrait {
                 let scriptPath = tempDir.appending(path: "script.js")
                 try runSwift(
                     [
-                        "package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js",
-                        "test",
+                        "package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test",
                         "-Xnode=--require=\(scriptPath.path)",
                     ],
                     [:]
@@ -311,8 +307,8 @@ extension Trait where Self == ConditionTrait {
             })
             try runSwift(
                 [
-                    "package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test",
-                    "--environment", "browser",
+                    "package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test", "--environment",
+                    "browser",
                 ],
                 [:]
             )
@@ -327,7 +323,7 @@ extension Trait where Self == ConditionTrait {
         try withPackage(at: "Examples/Testing") { packageDir, runProcess, runSwift in
             try runSwift(
                 [
-                    "package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test",
+                    "package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test",
                     "--enable-code-coverage",
                 ],
                 [
@@ -357,7 +353,7 @@ extension Trait where Self == ConditionTrait {
     func multithreading() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/Multithreading") { packageDir, _, runSwift in
-            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js"], [:])
+            try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
         }
     }
 
@@ -365,7 +361,7 @@ extension Trait where Self == ConditionTrait {
     func offscreenCanvas() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/OffscrenCanvas") { packageDir, _, runSwift in
-            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js"], [:])
+            try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
         }
     }
 
@@ -373,7 +369,7 @@ extension Trait where Self == ConditionTrait {
     func actorOnWebWorker() throws {
         let swiftSDKID = try #require(Self.getSwiftSDKID())
         try withPackage(at: "Examples/ActorOnWebWorker") { packageDir, _, runSwift in
-            try runSwift(["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js"], [:])
+            try runSwift(["package", "--swift-sdk", swiftSDKID, "js"], [:])
         }
     }
 
@@ -384,7 +380,7 @@ extension Trait where Self == ConditionTrait {
         let swiftSDKID = try #require(Self.getEmbeddedSwiftSDKID())
         try withPackage(at: "Examples/Embedded") { packageDir, _, runSwift in
             try runSwift(
-                ["package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "-c", "release"],
+                ["package", "--swift-sdk", swiftSDKID, "js", "-c", "release"],
                 [
                     "JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"
                 ]
@@ -401,7 +397,7 @@ extension Trait where Self == ConditionTrait {
             assertTerminationStatus: { $0 != 0 }
         ) { packageDir, _, runSwift in
             try runSwift(
-                ["package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"],
+                ["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"],
                 [:]
             )
         }
@@ -417,7 +413,7 @@ extension Trait where Self == ConditionTrait {
             assertTerminationStatus: { $0 != 0 }
         ) { packageDir, _, runSwift in
             try runSwift(
-                ["package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"],
+                ["package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test"],
                 [:]
             )
         }
@@ -436,7 +432,7 @@ extension Trait where Self == ConditionTrait {
 
             try runSwift(
                 ["package", "--disable-sandbox"] + Self.stackSizeLinkerFlags + [
-                    "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser",
+                    "--swift-sdk", swiftSDKID, "js", "test", "--environment", "browser",
                     "--playwright-expose", "../expose.js",
                 ],
                 [:]
@@ -458,7 +454,7 @@ extension Trait where Self == ConditionTrait {
 
             try runSwift(
                 [
-                    "package", "--build-system", "native", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test",
+                    "package", "--disable-sandbox", "--swift-sdk", swiftSDKID, "js", "test",
                     "--environment", "browser",
                     "--playwright-expose", "../expose.js",
                 ],

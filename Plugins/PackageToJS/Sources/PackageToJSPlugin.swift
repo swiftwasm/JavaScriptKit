@@ -264,68 +264,66 @@ struct PackageToJSPlugin: CommandPlugin {
         let skeletonCollector = SkeletonCollector(context: context)
         let skeletons = skeletonCollector.collectFromTests()
 
-        // NOTE: Find the product artifact from the default build directory
-        //       because PackageManager.BuildResult doesn't include the
-        //       product artifact for tests.
-        //       This doesn't work when `--scratch-path` is used but
-        //       we don't have a way to guess the correct path. (we can find
-        //       the path by building a dummy executable product but it's
-        //       not worth the overhead)
-        var productArtifact: URL?
-        for fileExtension in ["wasm", "xctest"] {
-            let packageDir = context.package.directoryURL
-            let path = packageDir.appending(path: ".build/debug/\(productName).\(fileExtension)").path
-            if FileManager.default.fileExists(atPath: path) {
-                productArtifact = URL(fileURLWithPath: path)
-                break
-            }
-        }
-        guard let productArtifact = productArtifact else {
-            throw PackageToJSError(
-                "Failed to find '\(productName).wasm' or '\(productName).xctest'"
-            )
-        }
         let outputDir =
             if let outputPath = testOptions.packageOptions.outputPath {
                 URL(fileURLWithPath: outputPath)
             } else {
                 context.pluginWorkDirectoryURL.appending(path: "PackageTests")
             }
-        var make = MiniMake(
-            explain: testOptions.packageOptions.explain,
-            printProgress: self.printProgress
-        )
-        let planner = PackagingPlanner(
-            options: testOptions.packageOptions,
-            context: context,
-            selfPackage: selfPackage,
-            skeletons: skeletons,
-            outputDir: outputDir,
-            wasmProductArtifact: productArtifact,
-            // If the product artifact doesn't have a .wasm extension, add it
-            // to deliver it with the correct MIME type when serving the test
-            // files for browser tests.
-            wasmFilename: productArtifact.lastPathComponent.hasSuffix(".wasm")
-                ? productArtifact.lastPathComponent
-                : productArtifact.lastPathComponent + ".wasm"
-        )
-        let (rootTask, binDir) = try planner.planTestBuild(
-            make: &make
-        )
-        cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
-        print("Packaging tests...")
-        let scope = MiniMake.VariableScope(variables: [:])
-        try make.build(output: rootTask, scope: scope)
-        print("Packaging tests finished")
 
-        if !testOptions.buildOnly {
-            let testRunner = scope.resolve(path: binDir.appending(path: "test.js"))
-            try PackageToJS.runTest(
-                testRunner: testRunner,
-                currentDirectoryURL: context.pluginWorkDirectoryURL,
-                outputDir: outputDir,
-                testOptions: testOptions
+        let productArtifacts = PackageToJS.selectTestArtifacts(
+            try build.findWasmTestArtifacts(for: productName),
+            filters: testOptions.filter,
+            buildOnly: testOptions.buildOnly
+        )
+        let hasMultipleArtifacts = productArtifacts.count > 1
+        let useArtifactOutputDirectories = hasMultipleArtifacts && testOptions.buildOnly
+
+        for (artifactIndex, productArtifact) in productArtifacts.enumerated() {
+            let artifactBaseName = productArtifact.deletingPathExtension().lastPathComponent
+            let artifactOutputDir = useArtifactOutputDirectories && artifactIndex > 0
+                ? outputDir.appending(path: artifactBaseName)
+                : outputDir
+
+            var make = MiniMake(
+                explain: testOptions.packageOptions.explain,
+                printProgress: self.printProgress
             )
+            let planner = PackagingPlanner(
+                options: testOptions.packageOptions,
+                context: context,
+                selfPackage: selfPackage,
+                skeletons: skeletons,
+                outputDir: artifactOutputDir,
+                wasmProductArtifact: productArtifact,
+                // If the product artifact doesn't have a .wasm extension, add it
+                // to deliver it with the correct MIME type when serving the test
+                // files for browser tests.
+                wasmFilename: productArtifact.lastPathComponent.hasSuffix(".wasm")
+                    ? productArtifact.lastPathComponent
+                    : productArtifact.lastPathComponent + ".wasm"
+            )
+            let (rootTask, binDir) = try planner.planTestBuild(make: &make)
+            cleanIfBuildGraphChanged(
+                root: rootTask,
+                make: make,
+                context: context,
+                fingerprintName: useArtifactOutputDirectories ? "minimake-\(artifactBaseName).json" : "minimake.json"
+            )
+            print("Packaging tests...")
+            let scope = MiniMake.VariableScope(variables: [:])
+            try make.build(output: rootTask, scope: scope)
+            print("Packaging tests finished")
+
+            if !testOptions.buildOnly {
+                let testRunner = scope.resolve(path: binDir.appending(path: "test.js"))
+                try PackageToJS.runTest(
+                    testRunner: testRunner,
+                    currentDirectoryURL: context.pluginWorkDirectoryURL,
+                    outputDir: artifactOutputDir,
+                    testOptions: testOptions
+                )
+            }
         }
     }
 
@@ -414,9 +412,10 @@ struct PackageToJSPlugin: CommandPlugin {
     private func cleanIfBuildGraphChanged(
         root: MiniMake.TaskKey,
         make: MiniMake,
-        context: PluginContext
+        context: PluginContext,
+        fingerprintName: String = "minimake.json"
     ) {
-        let buildFingerprint = context.pluginWorkDirectoryURL.appending(path: "minimake.json")
+        let buildFingerprint = context.pluginWorkDirectoryURL.appending(path: fingerprintName)
         let lastBuildFingerprint = try? Data(contentsOf: buildFingerprint)
         let currentBuildFingerprint = try? make.computeFingerprint(root: root)
         if lastBuildFingerprint != currentBuildFingerprint {
@@ -669,6 +668,34 @@ extension PackageManager.BuildResult {
             )
         }
         return executable.url
+    }
+
+    /// Find `.wasm` executable artifacts for a test product.
+    ///
+    /// SwiftPM's native build system historically produced a single umbrella test product at
+    /// `.build/debug/<Package>PackageTests.wasm`, while SwiftBuild reports one executable test runner per test
+    /// target. Prefer reported artifacts, and keep the old path lookup as a compatibility fallback.
+    internal func findWasmTestArtifacts(for product: String) throws -> [URL] {
+        let executables = self.builtArtifacts
+            .filter { $0.kind == .executable && $0.url.pathExtension == "wasm" }
+            .map(\.url)
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+
+        if !executables.isEmpty {
+            return executables
+        }
+
+        for fileExtension in ["wasm", "xctest"] {
+            let path = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+                .appending(path: ".build/debug/\(product).\(fileExtension)")
+            if FileManager.default.fileExists(atPath: path.path) {
+                return [path]
+            }
+        }
+
+        throw PackageToJSError(
+            "Failed to find '\(product).wasm' or '\(product).xctest'"
+        )
     }
 }
 

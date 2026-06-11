@@ -70,14 +70,45 @@ struct PackageToJS {
     }
 
     static func deriveBuildConfiguration(wasmProductArtifact: URL) -> (configuration: String, triple: String) {
+        deriveBuildConfiguration(
+            wasmProductArtifact: wasmProductArtifact,
+            environment: ProcessInfo.processInfo.environment
+        )
+    }
+
+    static func deriveBuildConfiguration(
+        wasmProductArtifact: URL,
+        environment: [String: String]
+    ) -> (configuration: String, triple: String) {
         // e.g. path/to/.build/wasm32-unknown-wasi/debug/Basic.wasm -> ("debug", "wasm32-unknown-wasi")
 
         // First, resolve symlink to get the actual path as SwiftPM 6.0 and earlier returns unresolved
         // symlink path for product artifact.
         let wasmProductArtifact = wasmProductArtifact.resolvingSymlinksInPath()
         let buildConfiguration = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
+
+        if let swiftBuildConfiguration = buildConfiguration.swiftBuildConfigurationName {
+            return (
+                swiftBuildConfiguration.lowercased(),
+                Self.deriveTripleFromSwiftSDKID(environment["SWIFT_SDK_ID"]) ?? "wasm32-unknown-wasip1"
+            )
+        }
+
         let triple = wasmProductArtifact.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent
         return (buildConfiguration, triple)
+    }
+
+    private static func deriveTripleFromSwiftSDKID(_ swiftSDKID: String?) -> String? {
+        guard let swiftSDKID else {
+            return nil
+        }
+
+        for triple in ["wasm32-unknown-wasip1-threads", "wasm32-unknown-wasip1", "wasm32-unknown-wasi"] {
+            if swiftSDKID.contains(triple) {
+                return triple
+            }
+        }
+        return nil
     }
 
     static func runTest(testRunner: URL, currentDirectoryURL: URL, outputDir: URL, testOptions: TestOptions) throws {
@@ -164,6 +195,29 @@ struct PackageToJS {
                 print("Warning: Failed to merge coverage files: \(error)")
             }
         }
+    }
+
+    static func selectTestArtifacts(_ artifacts: [URL], filters: [String], buildOnly: Bool) -> [URL] {
+        guard !buildOnly, artifacts.count > 1, !filters.isEmpty else {
+            return artifacts
+        }
+
+        let selected = artifacts.filter { artifact in
+            let moduleName = testRunnerModuleName(for: artifact)
+            return filters.contains { filter in
+                filter == moduleName || filter.hasPrefix(moduleName + ".") || filter.hasPrefix(moduleName + "/")
+            }
+        }
+        return selected.isEmpty ? artifacts : selected
+    }
+
+    private static func testRunnerModuleName(for artifact: URL) -> String {
+        let baseName = artifact.deletingPathExtension().lastPathComponent
+        let suffix = "-test-runner"
+        guard baseName.hasSuffix(suffix) else {
+            return baseName
+        }
+        return String(baseName.dropLast(suffix.count))
     }
 
     static func runSingleTestingLibrary(
@@ -809,5 +863,15 @@ extension Foundation.Process {
             }
         }
         try body()
+    }
+}
+
+extension String {
+    fileprivate var swiftBuildConfigurationName: String? {
+        let suffix = "-webassembly-wasm32"
+        guard self.hasSuffix(suffix) else {
+            return nil
+        }
+        return String(self.dropLast(suffix.count))
     }
 }
