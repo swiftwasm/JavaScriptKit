@@ -198,6 +198,7 @@ jobs:
         with:
           swift-syntax-version: "603.0.2"
       - run: |
+          set -o pipefail
           swift --version
           echo "SwiftSyntax restore source: ${{ steps.swiftsyntax-prebuilts.outputs.restore-source }}"
           echo "SwiftSyntax cache hit: ${{ steps.swiftsyntax-prebuilts.outputs.cache-hit }}"
@@ -207,10 +208,23 @@ jobs:
           find Examples/ActorOnWebWorker/.build/prebuilts -maxdepth 5 -print 2>/dev/null | sort || true
           find Examples/ActorOnWebWorker/.build -name workspace-state.json -print -exec sed -n '1,240p' {} \; || true
           cd Examples/ActorOnWebWorker
-          swift package --verbose ${SWIFT_PACKAGE_FLAGS} --build-system swiftbuild \
+
+          swift build --verbose ${SWIFT_PACKAGE_FLAGS} --build-system native \
+            --swift-sdk "${SWIFT_SDK_ID_wasm32_unknown_wasip1_threads:-${SWIFT_SDK_ID:-wasm32-unknown-wasip1-threads}}" \
+            --product MyApp -c release \
+            -Xswiftc -static-stdlib \
+            -Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor \
+            -Xlinker --export-if-defined=__main_argc_argv 2>&1 | tee prebuilt-warmup.log
+
+          swift package --verbose ${SWIFT_PACKAGE_FLAGS} --build-system native \
             --swift-sdk "${SWIFT_SDK_ID_wasm32_unknown_wasip1_threads:-${SWIFT_SDK_ID:-wasm32-unknown-wasip1-threads}}" \
             plugin --allow-writing-to-package-directory \
-            js --use-cdn --output ./Bundle -c release
+            js --use-cdn --output ./Bundle -c release 2>&1 | tee plugin-build.log
+
+          if grep -E "Compiling (SwiftSyntax|SwiftBasicFormat|SwiftDiagnostics|SwiftParser|SwiftOperators|SwiftIfConfig|SwiftCompilerPlugin|SwiftSyntaxMacros|SwiftSyntaxMacroExpansion|SwiftCompilerPluginMessageHandling)" prebuilt-warmup.log plugin-build.log; then
+            echo "::error::SwiftSyntax was built from source instead of using prebuilts"
+            exit 1
+          fi
         env:
           SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
           SWIFT_SDK_ID_wasm32_unknown_wasip1: ${{ steps.setup-wasm32-unknown-wasip1.outputs.swift-sdk-id }}
