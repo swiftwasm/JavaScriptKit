@@ -60,6 +60,11 @@ import ArgumentParser
                 swiftToSkeleton.addSourceFile(sourceFile, inputFilePath: inputFile)
             }
             let skeleton = try swiftToSkeleton.finalize()
+            for (file, diagnostic) in swiftToSkeleton.warnings {
+                FileHandle.standardError.write(
+                    Data((diagnostic.formattedDescription(fileName: file, colorize: false) + "\n").utf8)
+                )
+            }
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             let skeletonData = try encoder.encode(skeleton)

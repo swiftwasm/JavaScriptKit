@@ -24,6 +24,9 @@ public final class SwiftToSkeleton {
     private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
     private var usedExternalModules = Set<String>()
 
+    /// Non-fatal diagnostics collected during `finalize()`. These do not fail the build.
+    public private(set) var warnings: [(file: String, diagnostic: DiagnosticError)] = []
+
     public init(
         progress: ProgressReporting,
         moduleName: String,
@@ -87,10 +90,15 @@ public final class SwiftToSkeleton {
             )
             importCollector.walk(sourceFile)
 
-            let importErrorsFatal = importCollector.errors.filter { !$0.message.contains("Unsupported type '") }
-            if !exportCollector.errors.isEmpty || !importErrorsFatal.isEmpty {
+            let exportErrors = exportCollector.errors.filter { $0.severity == .error }
+            let importErrorsFatal = importCollector.errors.filter {
+                $0.severity == .error && !$0.message.contains("Unsupported type '")
+            }
+            let fileWarnings = (exportCollector.errors + importCollector.errors).filter { $0.severity == .warning }
+            warnings.append(contentsOf: fileWarnings.map { (file: inputFilePath, diagnostic: $0) })
+            if !exportErrors.isEmpty || !importErrorsFatal.isEmpty {
                 perSourceErrors.append(
-                    (inputFilePath: inputFilePath, errors: exportCollector.errors + importErrorsFatal)
+                    (inputFilePath: inputFilePath, errors: exportErrors + importErrorsFatal)
                 )
             }
 
@@ -600,6 +608,37 @@ public final class SwiftToSkeleton {
 
 private enum ExportSwiftConstants {
     static let supportedRawTypes = SwiftEnumRawType.supportedTypeNames
+}
+
+/// Warns about Swift closures handed to JavaScript with an `async throws(JSException)` signature.
+/// Captureless closure values lose their thrown error at runtime due to a Swift compiler bug.
+private func asyncThrowsClosureWarning(node: some SyntaxProtocol) -> DiagnosticError {
+    DiagnosticError(
+        node: node,
+        message:
+            "async throwing closures passed to JavaScript may lose thrown errors due to a Swift compiler bug "
+            + "(swiftlang/swift#89320) unless the closure value captures state",
+        hint:
+            "Pass a closure that captures state, or see the BridgeJS closure documentation for details",
+        severity: .warning
+    )
+}
+
+extension BridgeType {
+    fileprivate var containsAsyncThrowsClosure: Bool {
+        switch self {
+        case .closure(let signature, _):
+            return signature.isAsync && signature.isThrows
+        case .nullable(let wrapped, _):
+            return wrapped.containsAsyncThrowsClosure
+        case .array(let element):
+            return element.containsAsyncThrowsClosure
+        case .dictionary(let value):
+            return value.containsAsyncThrowsClosure
+        default:
+            return false
+        }
+    }
 }
 
 extension AttributeSyntax {
@@ -1194,6 +1233,9 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
             guard let type = resolvedType else { return nil }
             returnType = type
+            if returnType.containsAsyncThrowsClosure {
+                errors.append(asyncThrowsClosureWarning(node: returnClause.type))
+            }
         } else {
             returnType = .void
         }
@@ -2852,6 +2894,11 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             }
             guard let bridgeType = withLookupErrors({ parent.lookupType(for: type, errors: &$0) }) else {
                 return nil
+            }
+            if case .closure(let signature, useJSTypedClosure: true) = bridgeType,
+                signature.isAsync, signature.isThrows
+            {
+                errors.append(asyncThrowsClosureWarning(node: type))
             }
             let nameToken = param.secondName ?? param.firstName
             let name = SwiftToSkeleton.normalizeIdentifier(nameToken.text)

@@ -137,14 +137,21 @@ import SwiftSyntax
 import class Foundation.ProcessInfo
 
 public struct DiagnosticError: Error {
+    public enum Severity: String, Sendable {
+        case error
+        case warning
+    }
+
     public let node: Syntax
     public let message: String
     public let hint: String?
+    public let severity: Severity
 
-    public init(node: some SyntaxProtocol, message: String, hint: String? = nil) {
+    public init(node: some SyntaxProtocol, message: String, hint: String? = nil, severity: Severity = .error) {
         self.node = Syntax(node)
         self.message = message
         self.hint = hint
+        self.severity = severity
     }
 
     /// Formats the diagnostic error as a string.
@@ -166,12 +173,14 @@ public struct DiagnosticError: Error {
 
         let lineNumberWidth = max(3, String(lines.count).count)
 
+        let severityLabel = severity.rawValue
+        let severityColor = severity == .warning ? ANSI.boldYellow : ANSI.boldRed
         let header: String = {
             guard colorize else {
-                return "\(displayFileName):\(startLocation.line):\(startLocation.column): error: \(message)"
+                return "\(displayFileName):\(startLocation.line):\(startLocation.column): \(severityLabel): \(message)"
             }
             return
-                "\(displayFileName):\(startLocation.line):\(startLocation.column): \(ANSI.boldRed)error: \(ANSI.boldDefault)\(message)\(ANSI.reset)"
+                "\(displayFileName):\(startLocation.line):\(startLocation.column): \(severityColor)\(severityLabel): \(ANSI.boldDefault)\(message)\(ANSI.reset)"
         }()
 
         let highlightStartColumn = min(max(1, startLocation.column), mainLine.utf8.count + 1)
@@ -227,8 +236,8 @@ public struct DiagnosticError: Error {
         let pointerSpacing = max(0, highlightStartColumn - 1)
         let pointerMessage: String = {
             let pointer = String(repeating: " ", count: pointerSpacing) + "`- "
-            guard colorize else { return pointer + "error: \(message)" }
-            return pointer + "\(ANSI.boldRed)error: \(ANSI.boldDefault)\(message)\(ANSI.reset)"
+            guard colorize else { return pointer + "\(severityLabel): \(message)" }
+            return pointer + "\(severityColor)\(severityLabel): \(ANSI.boldDefault)\(message)\(ANSI.reset)"
         }()
         descriptionParts.append(
             Self.formatSourceLine(
@@ -304,6 +313,7 @@ public struct BridgeJSCoreDiagnosticError: Swift.Error, CustomStringConvertible 
 private enum ANSI {
     static let reset = "\u{001B}[0;0m"
     static let boldRed = "\u{001B}[1;31m"
+    static let boldYellow = "\u{001B}[1;33m"
     static let boldDefault = "\u{001B}[1;39m"
     static let cyan = "\u{001B}[0;36m"
     static let underline = "\u{001B}[4;39m"

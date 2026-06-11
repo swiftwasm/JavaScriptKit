@@ -239,7 +239,7 @@ Notes:
 - The same `JavaScriptEventLoop.installGlobalExecutor()` requirement applies as for async functions; there is no special handling for closures.
 - **Cancellation is a non-goal.** There is no propagation between a Swift `Task` and a JavaScript `Promise` in either direction; cancelling one side does not cancel the other.
 
-> Warning: When an async throwing closure handed to JavaScript throws, the error is currently lost instead of rejecting the `Promise` with it, due to a Swift compiler bug on `wasm32` ([swiftlang/swift#89320](https://github.com/swiftlang/swift/issues/89320), fix in progress in [swiftlang/swift#89715](https://github.com/swiftlang/swift/pull/89715)). Closures that capture state are unaffected, as are throwing JavaScript callbacks passed into Swift.
+> Warning: When an async throwing closure handed to JavaScript throws, the error is currently lost instead of rejecting the `Promise` with it, due to a Swift compiler bug on `wasm32` ([swiftlang/swift#89320](https://github.com/swiftlang/swift/issues/89320), fix in progress in [swiftlang/swift#89715](https://github.com/swiftlang/swift/pull/89715)). Closures that capture state are unaffected, as are throwing JavaScript callbacks passed into Swift. BridgeJS emits a build-time warning for this signature.
 
 ## Supported Features
 

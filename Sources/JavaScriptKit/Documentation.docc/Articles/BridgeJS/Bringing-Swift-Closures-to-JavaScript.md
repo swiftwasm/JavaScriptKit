@@ -78,7 +78,7 @@ const count = await fetchCount("/items"); // Promise<number>
 
 **Cancellation is a non-goal.** There is no propagation between a Swift `Task` and a JavaScript `Promise` in either direction.
 
-> Note: The reject path of async throwing typed closures is affected by a Swift compiler bug ([swiftlang/swift#89320](https://github.com/swiftlang/swift/issues/89320)). See <doc:Exporting-Swift-Closure> for details.
+> Note: The reject path of async throwing typed closures is affected by a Swift compiler bug ([swiftlang/swift#89320](https://github.com/swiftlang/swift/issues/89320)); BridgeJS emits a build-time warning for this signature. See <doc:Exporting-Swift-Closure> for details.
 
 ## Lifetime and release()
 
