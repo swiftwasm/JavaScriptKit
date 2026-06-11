@@ -610,37 +610,6 @@ private enum ExportSwiftConstants {
     static let supportedRawTypes = SwiftEnumRawType.supportedTypeNames
 }
 
-/// Warns about Swift closures handed to JavaScript with an `async throws(JSException)` signature.
-/// Captureless closure values lose their thrown error at runtime due to a Swift compiler bug.
-private func asyncThrowsClosureWarning(node: some SyntaxProtocol) -> DiagnosticError {
-    DiagnosticError(
-        node: node,
-        message:
-            "async throwing closures passed to JavaScript may lose thrown errors due to a Swift compiler bug "
-            + "(swiftlang/swift#89320) unless the closure value captures state",
-        hint:
-            "Pass a closure that captures state, or see the BridgeJS closure documentation for details",
-        severity: .warning
-    )
-}
-
-extension BridgeType {
-    fileprivate var containsAsyncThrowsClosure: Bool {
-        switch self {
-        case .closure(let signature, _):
-            return signature.isAsync && signature.isThrows
-        case .nullable(let wrapped, _):
-            return wrapped.containsAsyncThrowsClosure
-        case .array(let element):
-            return element.containsAsyncThrowsClosure
-        case .dictionary(let value):
-            return value.containsAsyncThrowsClosure
-        default:
-            return false
-        }
-    }
-}
-
 extension AttributeSyntax {
     /// The attribute name as text when it is a simple identifier (e.g. "JS", "JSFunction").
     /// Prefer this over `attributeName.trimmedDescription` for name checks to avoid unnecessary string work.
@@ -1233,9 +1202,6 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
             guard let type = resolvedType else { return nil }
             returnType = type
-            if returnType.containsAsyncThrowsClosure {
-                errors.append(asyncThrowsClosureWarning(node: returnClause.type))
-            }
         } else {
             returnType = .void
         }
@@ -2894,11 +2860,6 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             }
             guard let bridgeType = withLookupErrors({ parent.lookupType(for: type, errors: &$0) }) else {
                 return nil
-            }
-            if case .closure(let signature, useJSTypedClosure: true) = bridgeType,
-                signature.isAsync, signature.isThrows
-            {
-                errors.append(asyncThrowsClosureWarning(node: type))
             }
             let nameToken = param.secondName ?? param.firstName
             let name = SwiftToSkeleton.normalizeIdentifier(nameToken.text)

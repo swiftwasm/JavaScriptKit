@@ -45,9 +45,6 @@ export async function runJsClosureAsyncTests(exports) {
     assert.equal(await parsed, "parsed:42");
     assert.equal(await parser("-7"), "parsed:-7");
 
-    // Blocked by swiftlang/swift#89320 (wasm32 typed-throws async miscompile for captureless closures); re-enable once swiftlang/swift#89715 lands.
-    const ASYNC_THROWS_CLOSURE_REJECT_BLOCKED = true;
-    if (!ASYNC_THROWS_CLOSURE_REJECT_BLOCKED) {
     let directionBReject = null;
     try {
         await parser("not-a-number");
@@ -57,7 +54,6 @@ export async function runJsClosureAsyncTests(exports) {
     }
     assert.notEqual(directionBReject, null);
     assert.equal(directionBReject.message, "AsyncParseError: not-a-number");
-    }
 
     assert.equal(await parser("100"), "parsed:100");
 
@@ -72,7 +68,6 @@ export async function runJsClosureAsyncTests(exports) {
     assert.equal(await recorded, undefined);
     assert.equal(exports.lastRecordedValue(), "logged-value");
 
-    if (!ASYNC_THROWS_CLOSURE_REJECT_BLOCKED) {
     let voidReject = null;
     try {
         await recorder("boom");
@@ -82,7 +77,6 @@ export async function runJsClosureAsyncTests(exports) {
     }
     assert.notEqual(voidReject, null);
     assert.equal(voidReject.message, "AsyncRecorderError");
-    }
 
     const payloadLoader = exports.makeAsyncPayloadLoader();
     const payloadPromise = payloadLoader(true);
