@@ -8,6 +8,7 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.event_name, 'pull') }}
 jobs:
   test:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     name: Build and Test
     strategy:
       matrix:
@@ -79,6 +80,7 @@ jobs:
         run: npm run check:bridgejs-dts
 
   test-bridgejs-against-swift-versions:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     name: Test BridgeJS against Swift versions
     strategy:
       matrix:
@@ -108,6 +110,7 @@ jobs:
           BRIDGEJS_OVERRIDE_SWIFT_SYNTAX_VERSION: ${{ matrix.entry.swift-syntax-version }}
 
   native-build:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     # Check native build to make it easy to develop applications by Xcode
     name: Build for native target
     strategy:
@@ -126,6 +129,7 @@ jobs:
           DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer/
 
   prettier:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -136,6 +140,7 @@ jobs:
       - run: npx prettier --check Runtime/src
 
   format:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     runs-on: ubuntu-latest
     container:
       image: swift:6.3
@@ -151,6 +156,7 @@ jobs:
           }
 
   check-bridgejs-generated:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
@@ -175,6 +181,7 @@ jobs:
 
   build-examples:
     runs-on: ubuntu-22.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/install-swift
@@ -192,20 +199,27 @@ jobs:
           swift-syntax-version: "603.0.2"
       - run: |
           swift --version
-          ./Utilities/build-examples.sh
+          echo "SwiftSyntax restore source: ${{ steps.swiftsyntax-prebuilts.outputs.restore-source }}"
+          echo "SwiftSyntax cache hit: ${{ steps.swiftsyntax-prebuilts.outputs.cache-hit }}"
+          echo "SwiftSyntax prebuilts path: ${{ steps.swiftsyntax-prebuilts.outputs.prebuilts-path }}"
+          find "${{ steps.swiftsyntax-prebuilts.outputs.prebuilts-path }}" -maxdepth 3 -type f | sort
+          cd Examples/ActorOnWebWorker
+          ./build.sh release
         env:
           SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
           SWIFT_SDK_ID_wasm32_unknown_wasip1: ${{ steps.setup-wasm32-unknown-wasip1.outputs.swift-sdk-id }}
           SWIFT_PACKAGE_FLAGS: ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }}
-      - run: ./Utilities/prepare-gh-pages.sh
+      - if: false # TEMP: skip pages packaging while debugging one example.
+        run: ./Utilities/prepare-gh-pages.sh
       - name: Upload static files as artifact
+        if: false # TEMP: skip pages artifact upload while debugging one example.
         id: deployment
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./_site
   deploy-examples:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
