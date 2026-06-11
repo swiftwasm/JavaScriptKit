@@ -13,38 +13,66 @@
 /// }
 /// ```
 public struct JSException: Error, Equatable, CustomStringConvertible {
-    /// The value thrown from JavaScript.
-    /// This can be any JavaScript value (error object, string, number, etc.).
-    public var thrownValue: JSValue {
-        return _thrownValue
+    /// Boxes the exception payload in a class so `JSException` stays within the direct
+    /// typed-error convention on wasm32.
+    private final class Storage {
+        /// The actual JavaScript value that was thrown.
+        let thrownValue: JSValue
+
+        /// A description of the exception.
+        let description: String
+
+        /// The stack trace of the exception.
+        let stack: String?
+
+        init(thrownValue: JSValue, description: String, stack: String?) {
+            self.thrownValue = thrownValue
+            self.description = description
+            self.stack = stack
+        }
     }
 
-    /// The actual JavaScript value that was thrown.
+    /// The boxed payload of the exception.
     ///
     /// Marked as `nonisolated(unsafe)` to satisfy `Sendable` requirement
     /// from `Error` protocol.
-    private nonisolated(unsafe) let _thrownValue: JSValue
+    private nonisolated(unsafe) let storage: Storage
+
+    /// The value thrown from JavaScript.
+    /// This can be any JavaScript value (error object, string, number, etc.).
+    public var thrownValue: JSValue {
+        return storage.thrownValue
+    }
 
     /// A description of the exception.
-    public let description: String
+    public var description: String {
+        return storage.description
+    }
 
     /// The stack trace of the exception.
-    public let stack: String?
+    public var stack: String? {
+        return storage.stack
+    }
 
     /// Initializes a new JSException instance with a value thrown from JavaScript.
     ///
     /// Only available within the package. This must be called on the thread where the exception object created.
+    /// The stringified representation is captured on the object owner thread to bring useful info
+    /// to the catching thread even if they are different threads.
     @usableFromInline
     package init(_ thrownValue: JSValue) {
-        self._thrownValue = thrownValue
-        // Capture the stringified representation on the object owner thread
-        // to bring useful info to the catching thread even if they are different threads.
         if let errorObject = thrownValue.object, let stack = errorObject.stack.string {
-            self.description = "JSException(\(stack))"
-            self.stack = stack
+            self.storage = Storage(
+                thrownValue: thrownValue,
+                description: "JSException(\(stack))",
+                stack: stack
+            )
         } else {
-            self.description = "JSException(\(thrownValue))"
-            self.stack = nil
+            self.storage = Storage(
+                thrownValue: thrownValue,
+                description: "JSException(\(thrownValue))",
+                stack: nil
+            )
         }
     }
 
@@ -54,5 +82,11 @@ public struct JSException: Error, Equatable, CustomStringConvertible {
     ///   - message: The message to throw.
     public init(message: String) {
         self.init(JSError(message: message).jsValue)
+    }
+
+    public static func == (lhs: JSException, rhs: JSException) -> Bool {
+        return lhs.storage.thrownValue == rhs.storage.thrownValue
+            && lhs.storage.description == rhs.storage.description
+            && lhs.storage.stack == rhs.storage.stack
     }
 }

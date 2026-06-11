@@ -38,6 +38,47 @@ let log = JSTypedClosure<(String) -> Void> { print($0) }
 defer { log.release() }
 ```
 
+## Throwing typed closures
+
+A ``JSTypedClosure`` signature can be `throws(JSException)`. Exceptions propagate across the boundary: a Swift closure that throws surfaces as a thrown JS error (caught with `try/catch` in JavaScript), and a throwing JS callback surfaces back into Swift as a `JSException`.
+
+```swift
+import JavaScriptKit
+
+let parse = JSTypedClosure<(String) throws(JSException) -> Int> { text in
+    guard let value = Int(text) else {
+        throw JSException(JSError(message: "Not a number: \(text)").jsValue)
+    }
+    return value
+}
+defer { parse.release() }
+```
+
+Only `throws(JSException)` is supported. Plain `throws` is rejected at build time with a diagnostic, consistent with the rest of BridgeJS (see <doc:Exporting-Swift-Function>).
+
+## Async typed closures
+
+A ``JSTypedClosure`` signature can be `async`. JavaScript receives a function that returns a `Promise`, so the TypeScript shape is `(args) => Promise<R>`. Supported return types mirror `async` functions: `ConvertibleToJSValue` types, `@JS struct`, raw-value / case-only enums, `Void`, and their `Optional` / `Array` / `Dictionary` compositions. Unsupported async return types (associated-value enums, protocols, namespace enums) are diagnosed at build time.
+
+```swift
+import JavaScriptKit
+
+let fetchCount = JSTypedClosure<(String) async -> Int> { endpoint in
+    try? await Task.sleep(nanoseconds: 10_000_000)
+    return endpoint.count
+}
+defer { fetchCount.release() }
+```
+
+```javascript
+const count = await fetchCount("/items"); // Promise<number>
+```
+
+> Important: Async closures require the JavaScript event loop executor, exactly like `async` functions. Call `JavaScriptEventLoop.installGlobalExecutor()` once during startup before invoking them. There is no special handling for closures.
+
+**Cancellation is a non-goal.** There is no propagation between a Swift `Task` and a JavaScript `Promise` in either direction.
+
+
 ## Lifetime and release()
 
 A ``JSTypedClosure`` keeps the Swift closure alive and exposes a JavaScript function that calls into it. To avoid leaks and use-after-free:

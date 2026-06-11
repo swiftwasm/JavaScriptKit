@@ -201,6 +201,9 @@ import BridgeJSUtilities
             let skeleton = try withSpan("SwiftToSkeleton.finalize") {
                 return try swiftToSkeleton.finalize()
             }
+            for (file, diagnostic) in swiftToSkeleton.warnings {
+                printStderr(diagnostic.formattedDescription(fileName: file))
+            }
 
             var exporter: ExportSwift?
             if let skeleton = skeleton.exported {

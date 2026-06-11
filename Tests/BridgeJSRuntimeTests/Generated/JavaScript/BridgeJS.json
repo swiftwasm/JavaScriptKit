@@ -11605,6 +11605,374 @@
     "exposeToGlobal" : false,
     "functions" : [
       {
+        "abiName" : "bjs_awaitAsyncCallback",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "awaitAsyncCallback",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "fetch",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : true,
+                  "isThrows" : true,
+                  "mangleName" : "20BridgeJSRuntimeTestsYaKSS_SS",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "string" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "string" : {
+
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeAsyncParser",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeAsyncParser",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : true,
+              "mangleName" : "20BridgeJSRuntimeTestsYaKSS_SS",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "string" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "string" : {
+
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeAsyncEcho",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeAsyncEcho",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : false,
+              "mangleName" : "20BridgeJSRuntimeTestsYaSS_SS",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "string" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "string" : {
+
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeAsyncRecorder",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeAsyncRecorder",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : true,
+              "mangleName" : "20BridgeJSRuntimeTestsYaKSS_y",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "string" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "void" : {
+
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_lastRecordedValue",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "lastRecordedValue",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeAsyncPayloadLoader",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeAsyncPayloadLoader",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : true,
+              "mangleName" : "20BridgeJSRuntimeTestsYaKSb_18AsyncPayloadResultO",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "bool" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "associatedValueEnum" : {
+                  "_0" : "AsyncPayloadResult"
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_awaitPayloadCallback",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "awaitPayloadCallback",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "load",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : true,
+                  "isThrows" : true,
+                  "mangleName" : "20BridgeJSRuntimeTestsYaKSb_18AsyncPayloadResultO",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "bool" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "associatedValueEnum" : {
+                      "_0" : "AsyncPayloadResult"
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeAsyncPointMaker",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeAsyncPointMaker",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : false,
+              "mangleName" : "20BridgeJSRuntimeTestsYaSd_9DataPointV",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "double" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "swiftStruct" : {
+                  "_0" : "DataPoint"
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeThrowingParser",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeThrowingParser",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : true,
+              "mangleName" : "20BridgeJSRuntimeTestsKSS_Si",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "string" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_runValidator",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "runValidator",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "validate",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : true,
+                  "mangleName" : "20BridgeJSRuntimeTestsKSS_Sb",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "string" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "bool" : {
+
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "bool" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripVoid",
         "effects" : {
           "isAsync" : false,
@@ -18719,6 +19087,45 @@
             "methods" : [
 
             ],
+            "name" : "ClosureAsyncImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "runJsClosureAsyncTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
             "name" : "ClosureSupportImports",
             "setters" : [
 
@@ -19511,6 +19918,45 @@
                   "isThrows" : true
                 },
                 "name" : "runJsClosureSupportTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "ClosureThrowsImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "runJsClosureThrowsTests",
                 "parameters" : [
 
                 ],

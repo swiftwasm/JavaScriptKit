@@ -894,7 +894,7 @@ public struct BridgeJSLink {
     ) throws -> [String] {
         let printer = CodeFragmentPrinter()
         let builder = ExportedThunkBuilder(
-            effects: Effects(isAsync: false, isThrows: true),
+            effects: Effects(isAsync: signature.isAsync, isThrows: signature.isAsync ? signature.isThrows : true),
             hasDirectAccessToSwiftClass: false,
             intrinsicRegistry: intrinsicRegistry
         )
@@ -3743,7 +3743,9 @@ extension BridgeType {
             let paramTypes = signature.parameters.enumerated().map { index, param in
                 "arg\(index): \(param.tsType)"
             }.joined(separator: ", ")
-            return "(\(paramTypes)) => \(signature.returnType.tsType)"
+            let returnTS =
+                signature.isAsync ? "Promise<\(signature.returnType.tsType)>" : signature.returnType.tsType
+            return "(\(paramTypes)) => \(returnTS)"
         case .array(let elementType):
             let inner = elementType.tsType
             if inner.contains("|") || inner.contains("=>") {

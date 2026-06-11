@@ -24,6 +24,18 @@ class JSClosureAsyncTests: XCTestCase {
         XCTAssertEqual(result, 42.0)
     }
 
+    func testAsyncClosureReject() async throws {
+        let closure = JSClosure.async { (_) async throws(JSException) -> JSValue in
+            throw JSException(message: "AsyncClosureRejected")
+        }.jsValue
+        let result = await JSPromise(from: closure.function!())!.result
+        guard case .failure(let rejectedValue) = result else {
+            XCTFail("Expected the async closure promise to reject, got \(result)")
+            return
+        }
+        XCTAssertEqual(rejectedValue.object?.message.string, "AsyncClosureRejected")
+    }
+
     func testAsyncClosureWithPriority() async throws {
         let priority = UnsafeSendableBox<TaskPriority?>(nil)
         let closure = JSClosure.async(priority: .high) { _ in

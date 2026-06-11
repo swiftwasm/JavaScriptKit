@@ -1,4 +1,109 @@
 {
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_runValidator",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "runValidator",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "cb",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : true,
+                  "mangleName" : "10TestModuleKSS_Sb",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "string" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "bool" : {
+
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_loadEach",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "loadEach",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "fetch",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : true,
+                  "isThrows" : true,
+                  "mangleName" : "10TestModuleYaKSS_SS",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "string" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "string" : {
+
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
   "imported" : {
     "children" : [
       {
