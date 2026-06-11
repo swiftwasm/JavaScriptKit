@@ -203,6 +203,9 @@ jobs:
           echo "SwiftSyntax cache hit: ${{ steps.swiftsyntax-prebuilts.outputs.cache-hit }}"
           echo "SwiftSyntax prebuilts path: ${{ steps.swiftsyntax-prebuilts.outputs.prebuilts-path }}"
           find "${{ steps.swiftsyntax-prebuilts.outputs.prebuilts-path }}" -maxdepth 3 -type f | sort
+          swift package --verbose ${SWIFT_PACKAGE_FLAGS} --package-path Examples/ActorOnWebWorker resolve
+          find Examples/ActorOnWebWorker/.build/prebuilts -maxdepth 5 -print 2>/dev/null | sort || true
+          find Examples/ActorOnWebWorker/.build -name workspace-state.json -print -exec sed -n '1,240p' {} \; || true
           cd Examples/ActorOnWebWorker
           ./build.sh release
         env:
