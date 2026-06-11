@@ -96,14 +96,14 @@ jobs:
           node-version: '20'
       - name: Install TypeScript
         run: npm install
-      - uses: swiftwasm/setup-swift-syntax-prebuilts@v1
-        id: swiftsyntax-prebuilts
-        with:
-          swift-syntax-version: ${{ matrix.entry.swift-syntax-version }}
       - name: Validate BridgeJS TypeScript declarations
         run: npm run check:bridgejs-dts
       - name: Run BridgeJS tests
-        run: swift test ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }} --package-path ./Plugins/BridgeJS
+        # NOTE: This job runs in the swift Docker image, whose compiler tag is
+        # swift-6.3.2-RELEASE. No matching release asset is currently published
+        # for the setup action, so using it falls back to a local SwiftSyntax
+        # prebuild and makes the job slower than building normally.
+        run: swift test --disable-experimental-prebuilts --package-path ./Plugins/BridgeJS
         env:
           BRIDGEJS_OVERRIDE_SWIFT_SYNTAX_VERSION: ${{ matrix.entry.swift-syntax-version }}
 
