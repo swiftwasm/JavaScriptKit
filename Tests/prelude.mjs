@@ -6,6 +6,8 @@ import {
 import { ImportedFoo } from './BridgeJSRuntimeTests/JavaScript/Types.mjs';
 import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
 import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/JavaScript/ClosureSupportTests.mjs';
+import { getImports as getClosureThrowsImports } from './BridgeJSRuntimeTests/JavaScript/ClosureThrowsTests.mjs';
+import { getImports as getClosureAsyncImports } from './BridgeJSRuntimeTests/JavaScript/ClosureAsyncTests.mjs';
 import { getImports as getSwiftClassSupportImports } from './BridgeJSRuntimeTests/JavaScript/SwiftClassSupportTests.mjs';
 import { getImports as getOptionalSupportImports } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
 import { getImports as getArraySupportImports, ArrayElementObject } from './BridgeJSRuntimeTests/JavaScript/ArraySupportTests.mjs';
@@ -160,6 +162,8 @@ export async function setupOptions(options, context) {
                     runJsOptionalSupportTests(exports);
                 },
                 ClosureSupportImports: getClosureSupportImports(importsContext),
+                ClosureThrowsImports: getClosureThrowsImports(importsContext),
+                ClosureAsyncImports: getClosureAsyncImports(importsContext),
                 SwiftClassSupportImports: getSwiftClassSupportImports(importsContext),
                 OptionalSupportImports: getOptionalSupportImports(importsContext),
                 ArraySupportImports: getArraySupportImports(importsContext),

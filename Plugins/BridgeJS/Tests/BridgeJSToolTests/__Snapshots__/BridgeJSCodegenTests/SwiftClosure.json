@@ -1331,6 +1331,233 @@
         }
       },
       {
+        "abiName" : "bjs_makeThrowingParser",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeThrowingParser",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : true,
+              "mangleName" : "10TestModuleKSS_Si",
+              "moduleName" : "TestModule",
+              "parameters" : [
+                {
+                  "string" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_validateWith",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "validateWith",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "validate",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : true,
+                  "mangleName" : "10TestModuleKSS_Sb",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "string" : {
+
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "bool" : {
+
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeFetcher",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeFetcher",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : true,
+              "mangleName" : "10TestModuleYaKSS_SS",
+              "moduleName" : "TestModule",
+              "parameters" : [
+                {
+                  "string" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "string" : {
+
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeAsyncEcho",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeAsyncEcho",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : false,
+              "mangleName" : "10TestModuleYaSS_SS",
+              "moduleName" : "TestModule",
+              "parameters" : [
+                {
+                  "string" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "string" : {
+
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeAnimalLoader",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeAnimalLoader",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : false,
+              "mangleName" : "10TestModuleYaSS_6AnimalV",
+              "moduleName" : "TestModule",
+              "parameters" : [
+                {
+                  "string" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "swiftStruct" : {
+                  "_0" : "Animal"
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeResultLoader",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeResultLoader",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : true,
+              "mangleName" : "10TestModuleYaKSb_9APIResultO",
+              "moduleName" : "TestModule",
+              "parameters" : [
+                {
+                  "bool" : {
+
+                  }
+                }
+              ],
+              "returnType" : {
+                "associatedValueEnum" : {
+                  "_0" : "APIResult"
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundtripDirection",
         "effects" : {
           "isAsync" : false,

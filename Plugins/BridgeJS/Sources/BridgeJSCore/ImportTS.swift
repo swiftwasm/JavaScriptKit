@@ -272,9 +272,7 @@ public struct ImportTS {
                 }
             }
 
-            // Add exception check for ImportTS context (skipped for async, where
-            // errors are funneled through the JS-side reject path)
-            if !effects.isAsync && context == .importTS {
+            if !effects.isAsync && (context == .importTS || effects.isThrows) {
                 body.write("if let error = _swift_js_take_exception() { throw error }")
             }
         }
@@ -323,18 +321,19 @@ public struct ImportTS {
             let innerBody = body
             body = CodeFragmentPrinter()
 
+            let tryKeyword = effects.isThrows ? "try" : "try!"
             let rejectFactory = "makeRejectClosure: { JSTypedClosure<(sending JSValue) -> Void>($0) }"
             if returnType == .void {
                 let resolveFactory = "makeResolveClosure: { JSTypedClosure<() -> Void>($0) }"
                 body.write(
-                    "try await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
+                    "\(tryKeyword) await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
                 )
             } else {
                 let resolveSwiftType = returnType.closureSwiftType
                 let resolveFactory =
                     "makeResolveClosure: { JSTypedClosure<(sending \(resolveSwiftType)) -> Void>($0) }"
                 body.write(
-                    "let resolved = try await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
+                    "let resolved = \(tryKeyword) await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
                 )
             }
             body.indent {

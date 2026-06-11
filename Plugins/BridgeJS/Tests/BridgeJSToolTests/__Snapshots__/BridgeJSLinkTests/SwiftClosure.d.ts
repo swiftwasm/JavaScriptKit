@@ -84,6 +84,12 @@ export type Exports = {
     roundtripOptionalDouble(doubleClosure: (arg0: number | null) => number | null): (arg0: number | null) => number | null;
     roundtripPerson(personClosure: (arg0: Person) => Person): (arg0: Person) => Person;
     roundtripOptionalPerson(personClosure: (arg0: Person | null) => Person | null): (arg0: Person | null) => Person | null;
+    makeThrowingParser(): (arg0: string) => number;
+    validateWith(validate: (arg0: string) => boolean): void;
+    makeFetcher(): (arg0: string) => Promise<string>;
+    makeAsyncEcho(): (arg0: string) => Promise<string>;
+    makeAnimalLoader(): (arg0: string) => Promise<Animal>;
+    makeResultLoader(): (arg0: boolean) => Promise<APIResultTag>;
     roundtripDirection(callback: (arg0: DirectionTag) => DirectionTag): (arg0: DirectionTag) => DirectionTag;
     roundtripTheme(callback: (arg0: ThemeTag) => ThemeTag): (arg0: ThemeTag) => ThemeTag;
     roundtripHttpStatus(callback: (arg0: HttpStatusTag) => HttpStatusTag): (arg0: HttpStatusTag) => HttpStatusTag;

@@ -191,7 +191,40 @@ public final class SwiftToSkeleton {
             }
 
             let isAsync = functionType.effectSpecifiers?.asyncSpecifier != nil
-            let isThrows = functionType.effectSpecifiers?.throwsClause != nil
+
+            if isAsync, !returnType.isAsyncResolvable {
+                errors.append(
+                    DiagnosticError(
+                        node: functionType,
+                        message:
+                            "Returning '\(returnType.swiftType)' from an async closure is not yet supported",
+                        hint:
+                            "Return a type lowerable through the async resolve ABI "
+                            + "(String/Int/Bool/Double/Float/raw-value or case-only enum/@JS struct/JSObject/Optional/Array/Dictionary), "
+                            + "or make the closure non-async."
+                    )
+                )
+                return nil
+            }
+
+            var isThrows = false
+            if let throwsClause = functionType.effectSpecifiers?.throwsClause {
+                guard let thrownType = throwsClause.type,
+                    thrownType.trimmedDescription == "JSException"
+                else {
+                    errors.append(
+                        DiagnosticError(
+                            node: throwsClause,
+                            message:
+                                "Only JSException is supported for thrown type of Swift closures, "
+                                + "got \(throwsClause.type?.trimmedDescription ?? "unspecified")",
+                            hint: "Annotate the closure as `throws(JSException)`"
+                        )
+                    )
+                    return nil
+                }
+                isThrows = true
+            }
 
             return .closure(
                 ClosureSignature(
@@ -1027,22 +1060,6 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             let resolvedType = withLookupErrors { self.parent.lookupType(for: param.type, errors: &$0) }
             guard let type = resolvedType else {
                 continue  // Skip unsupported types
-            }
-            if case .closure(let signature, _) = type {
-                if signature.isAsync {
-                    diagnose(
-                        node: param.type,
-                        message: "Async is not supported for Swift closures yet."
-                    )
-                    continue
-                }
-                if signature.isThrows {
-                    diagnose(
-                        node: param.type,
-                        message: "Throws is not supported for Swift closures yet."
-                    )
-                    continue
-                }
             }
             if case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)

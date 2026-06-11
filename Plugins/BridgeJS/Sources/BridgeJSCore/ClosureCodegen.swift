@@ -16,7 +16,7 @@ public struct ClosureCodegen {
         let closureParams = signature.parameters.map { "\(sendingPrefix)\($0.closureSwiftType)" }.joined(
             separator: ", "
         )
-        let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
+        let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws(JSException)" : "")
         let swiftReturnType = signature.returnType.closureSwiftType
         return "(\(closureParams))\(swiftEffects) -> \(swiftReturnType)"
     }
@@ -73,7 +73,17 @@ public struct ClosureCodegen {
             helperEnumDeclPrinter.indent {
                 helperEnumDeclPrinter.write("let callback = JSObject.bridgeJSLiftParameter(callbackId)")
                 let parameters: String
-                if signature.parameters.isEmpty {
+                if signature.isThrows || signature.isAsync {
+                    let sendingPrefix = signature.sendingParameters ? "sending " : ""
+                    let typedParams =
+                        signature.parameters.enumerated().map { index, paramType in
+                            "param\(index): \(sendingPrefix)\(paramType.closureSwiftType)"
+                        }.joined(separator: ", ")
+                    let returnType = signature.returnType.closureSwiftType
+                    let effects =
+                        (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws(JSException)" : "")
+                    parameters = " (\(typedParams))\(effects) -> \(returnType)"
+                } else if signature.parameters.isEmpty {
                     parameters = ""
                 } else if signature.parameters.count == 1 {
                     parameters = " param0"
@@ -146,9 +156,17 @@ public struct ClosureCodegen {
             liftedParams.append("\(paramType.swiftType).bridgeJSLiftParameter(\(argNames.joined(separator: ", ")))")
         }
 
-        let closureCallExpr = ExprSyntax("closure(\(raw: liftedParams.joined(separator: ", ")))")
+        let tryPrefix = signature.isThrows ? "try " : ""
+        let closureCallExpr = ExprSyntax("\(raw: tryPrefix)closure(\(raw: liftedParams.joined(separator: ", ")))")
+        let asyncTryPrefix = (signature.isThrows ? "try " : "") + "await "
+        let asyncClosureCallExpr = ExprSyntax(
+            "\(raw: asyncTryPrefix)closure(\(raw: liftedParams.joined(separator: ", ")))"
+        )
 
-        let abiReturnWasmType = try signature.returnType.loweringReturnInfo().returnType
+        let abiReturnWasmType =
+            signature.isAsync
+            ? try BridgeType.jsObject(nil).loweringReturnInfo().returnType
+            : try signature.returnType.loweringReturnInfo().returnType
 
         // Build signature using SwiftSignatureBuilder
         let funcSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
@@ -156,12 +174,7 @@ public struct ClosureCodegen {
             returnType: abiReturnWasmType
         )
 
-        // Build function declaration using helper
-        let funcDecl = SwiftCodePattern.buildExposedFunctionDecl(
-            abiName: abiName,
-            signature: funcSignature
-        ) { printer in
-            printer.write("let closure = Unmanaged<\(boxType)>.fromOpaque(boxPtr).takeUnretainedValue().closure")
+        let emitCallAndLower: (CodeFragmentPrinter) -> Void = { printer in
             if signature.returnType == .void {
                 printer.write(closureCallExpr.description)
             } else {
@@ -186,6 +199,79 @@ public struct ClosureCodegen {
                 default:
                     printer.write("return result.bridgeJSLowerReturn()")
                 }
+            }
+        }
+
+        let emitAsyncCallAndLower: (CodeFragmentPrinter) -> Void = { printer in
+            printer.write("let closure = Unmanaged<\(boxType)>.fromOpaque(boxPtr).takeUnretainedValue().closure")
+            let resolveType = signature.returnType
+            let resolveName = "Promise_resolve_\(resolveType.mangleTypeName)"
+            let rejectName = "Promise_reject"
+            let closureHead: String
+            if signature.isThrows {
+                let returnSpelling = resolveType == .void ? "" : " -> \(resolveType.closureSwiftType)"
+                closureHead = " () async throws(JSException)\(returnSpelling) in"
+            } else {
+                closureHead = ""
+            }
+            printer.write("return _bjs_makePromise(resolve: \(resolveName), reject: \(rejectName)) {\(closureHead)")
+            printer.indent {
+                if resolveType == .void {
+                    printer.write(asyncClosureCallExpr.description)
+                } else {
+                    printer.write("return \(asyncClosureCallExpr)")
+                }
+            }
+            printer.write("}")
+        }
+
+        let catchPlaceholderStmt = abiReturnWasmType?.swiftReturnPlaceholderStmt
+
+        // Build function declaration using helper
+        let funcDecl = SwiftCodePattern.buildExposedFunctionDecl(
+            abiName: abiName,
+            signature: funcSignature
+        ) { printer in
+            if signature.isAsync {
+                emitAsyncCallAndLower(printer)
+            } else if signature.isThrows {
+                printer.write(
+                    "let closure = Unmanaged<\(boxType)>.fromOpaque(boxPtr).takeUnretainedValue().closure"
+                )
+                printer.write("do {")
+                printer.indent {
+                    emitCallAndLower(printer)
+                }
+                printer.write("} catch let error {")
+                printer.indent {
+                    printer.write("if let error = error.thrownValue.object {")
+                    printer.indent {
+                        printer.write("withExtendedLifetime(error) {")
+                        printer.indent {
+                            printer.write("_swift_js_throw(Int32(bitPattern: $0.id))")
+                        }
+                        printer.write("}")
+                    }
+                    printer.write("} else {")
+                    printer.indent {
+                        printer.write("let jsError = JSError(message: error.description)")
+                        printer.write("withExtendedLifetime(jsError.jsObject) {")
+                        printer.indent {
+                            printer.write("_swift_js_throw(Int32(bitPattern: $0.id))")
+                        }
+                        printer.write("}")
+                    }
+                    printer.write("}")
+                    if let catchPlaceholderStmt {
+                        printer.write(catchPlaceholderStmt)
+                    }
+                }
+                printer.write("}")
+            } else {
+                printer.write(
+                    "let closure = Unmanaged<\(boxType)>.fromOpaque(boxPtr).takeUnretainedValue().closure"
+                )
+                emitCallAndLower(printer)
             }
         }
 

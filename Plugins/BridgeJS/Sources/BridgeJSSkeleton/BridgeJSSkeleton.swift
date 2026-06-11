@@ -157,7 +157,8 @@ public struct ClosureSignature: Codable, Equatable, Hashable, Sendable {
             ? "y"
             : parameters.map { $0.mangleTypeName }.joined()
         let sendingPart = sendingParameters ? "s" : ""
-        let signaturePart = "\(sendingPart)\(paramPart)_\(returnType.mangleTypeName)"
+        let effects = (isAsync ? "Ya" : "") + (isThrows ? "K" : "")
+        let signaturePart = "\(sendingPart)\(effects)\(paramPart)_\(returnType.mangleTypeName)"
         self.mangleName = "\(moduleName.count)\(moduleName)\(signaturePart)"
     }
 }
@@ -1049,7 +1050,30 @@ public struct ExportedSkeleton: Codable {
         for enumDef in enums {
             for method in enumDef.staticMethods { consider(method.returnType, method.effects) }
         }
+        for returnType in asyncClosureResolveReturnTypes {
+            consider(returnType, Effects(isAsync: true, isThrows: false))
+        }
         return result
+    }
+
+    private var asyncClosureResolveReturnTypes: [BridgeType] {
+        var collector = AsyncClosureReturnTypeCollector()
+        var walker = BridgeSkeletonWalker(visitor: collector)
+        walker.walk(self)
+        return walker.visitor.returnTypes
+    }
+}
+
+private struct AsyncClosureReturnTypeCollector: BridgeSkeletonVisitor {
+    private(set) var returnTypes: [BridgeType] = []
+
+    mutating func visitClosure(
+        _ signature: ClosureSignature,
+        useJSTypedClosure: Bool,
+        accessLevel: BridgeJSAccessLevel
+    ) {
+        guard signature.isAsync else { return }
+        returnTypes.append(signature.returnType)
     }
 }
 
@@ -1424,11 +1448,18 @@ public struct ClosureSignatureCollectorVisitor: BridgeSkeletonVisitor {
         accessLevel: BridgeJSAccessLevel
     ) {
         recordSignature(signature, accessLevel: accessLevel)
+
+        if signature.isAsync {
+            recordInjectedSignatures(
+                forReturnType: signature.returnType,
+                accessLevel: accessLevel
+            )
+        }
     }
 
     /// Insert `signature` at `accessLevel`, or upgrade the existing level to
     /// the more permissive of the two. Centralizing the merge here keeps
-    /// `visitClosure` and `recordInjectedSignature` in lockstep — if the
+    /// `visitClosure` and `recordInjectedSignatures` in lockstep - if the
     /// merge policy ever needs to change (e.g. adding a diagnostic for
     /// conflicting levels), there's only one place to update.
     private mutating func recordSignature(
@@ -1444,55 +1475,47 @@ public struct ClosureSignatureCollectorVisitor: BridgeSkeletonVisitor {
     public mutating func visitImportedFunction(_ function: ImportedFunctionSkeleton) {
         guard function.effects.isAsync else { return }
 
-        // When async imports exist, inject closure signatures for the typed resolve
-        // and reject callbacks used by _bjs_awaitPromise.
-        // - Reject always uses (sending JSValue) -> Void
-        // - Resolve uses a typed closure matching the return type (or () -> Void for void)
-        // All async callback closures use `sending` parameters so values can be
-        // transferred through the checked continuation without Sendable constraints.
+        recordInjectedSignatures(
+            forReturnType: function.returnType,
+            accessLevel: function.accessLevel
+        )
+    }
 
+    private mutating func recordInjectedSignatures(
+        forReturnType returnType: BridgeType,
+        accessLevel: BridgeJSAccessLevel
+    ) {
         // Reject callback
-        recordInjectedSignature(
+        recordSignature(
             ClosureSignature(
                 parameters: [.jsValue],
                 returnType: .void,
                 moduleName: moduleName,
                 sendingParameters: true
             ),
-            for: function
+            accessLevel: accessLevel
         )
         // Resolve callback (typed per return type)
-        if function.returnType == .void {
-            recordInjectedSignature(
+        if returnType == .void {
+            recordSignature(
                 ClosureSignature(
                     parameters: [],
                     returnType: .void,
                     moduleName: moduleName
                 ),
-                for: function
+                accessLevel: accessLevel
             )
         } else {
-            recordInjectedSignature(
+            recordSignature(
                 ClosureSignature(
-                    parameters: [function.returnType],
+                    parameters: [returnType],
                     returnType: .void,
                     moduleName: moduleName,
                     sendingParameters: true
                 ),
-                for: function
+                accessLevel: accessLevel
             )
         }
-    }
-
-    /// Inject a closure signature derived from an async import (e.g. Promise
-    /// resolve/reject callbacks). The injected signature inherits the access
-    /// level of the originating function so its synthesized init matches the
-    /// visibility of the async API surface.
-    private mutating func recordInjectedSignature(
-        _ signature: ClosureSignature,
-        for function: ImportedFunctionSkeleton
-    ) {
-        recordSignature(signature, accessLevel: function.accessLevel)
     }
 }
 
@@ -1678,7 +1701,8 @@ extension BridgeType {
                 signature.parameters.isEmpty
                 ? "y"
                 : signature.parameters.map { $0.mangleTypeName }.joined()
-            return "K\(params)_\(signature.returnType.mangleTypeName)\(useJSTypedClosure ? "J" : "")"
+            let effects = (signature.isAsync ? "Ya" : "") + (signature.isThrows ? "K" : "")
+            return "K\(effects)\(params)_\(signature.returnType.mangleTypeName)\(useJSTypedClosure ? "J" : "")"
         case .array(let elementType):
             // Array mangling: "Sa" prefix followed by element type
             return "Sa\(elementType.mangleTypeName)"

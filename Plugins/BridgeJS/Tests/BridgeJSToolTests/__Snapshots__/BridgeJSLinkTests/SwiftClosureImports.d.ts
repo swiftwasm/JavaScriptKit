@@ -5,6 +5,8 @@
 // `swift package bridge-js`.
 
 export type Exports = {
+    runValidator(cb: (arg0: string) => boolean): void;
+    loadEach(fetch: (arg0: string) => Promise<string>): void;
 }
 export type Imports = {
     applyInt(value: number, transform: (arg0: number) => number): number;

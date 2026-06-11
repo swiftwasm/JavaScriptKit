@@ -38,6 +38,17 @@ import JavaScriptKit
 @JS func roundtripPerson(_ personClosure: (Person) -> Person) -> (Person) -> Person
 @JS func roundtripOptionalPerson(_ personClosure: (Person?) -> Person?) -> (Person?) -> Person?
 
+@JS func makeThrowingParser() -> JSTypedClosure<(String) throws(JSException) -> Int>
+@JS func validateWith(_ validate: (String) throws(JSException) -> Bool)
+
+@JS func makeFetcher() -> JSTypedClosure<(String) async throws(JSException) -> String>
+
+@JS func makeAsyncEcho() -> JSTypedClosure<(String) async -> String>
+
+@JS func makeAnimalLoader() -> JSTypedClosure<(String) async -> Animal>
+
+@JS func makeResultLoader() -> JSTypedClosure<(Bool) async throws(JSException) -> APIResult>
+
 @JS func roundtripDirection(_ callback: (Direction) -> Direction) -> (Direction) -> Direction
 @JS func roundtripTheme(_ callback: (Theme) -> Theme) -> (Theme) -> Theme
 @JS func roundtripHttpStatus(_ callback: (HttpStatus) -> HttpStatus) -> (HttpStatus) -> HttpStatus
