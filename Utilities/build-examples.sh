@@ -6,12 +6,14 @@ EXCLUDED_EXAMPLES=()
 
 for example in Examples/*; do
     skip_example=false
-    for excluded in "${EXCLUDED_EXAMPLES[@]}"; do
-        if [[ "$example" == *"$excluded"* ]]; then
-            skip_example=true
-            break
-        fi
-    done
+    if ((${#EXCLUDED_EXAMPLES[@]})); then
+        for excluded in "${EXCLUDED_EXAMPLES[@]}"; do
+            if [[ "$example" == *"$excluded"* ]]; then
+                skip_example=true
+                break
+            fi
+        done
+    fi
     if [ "$skip_example" = true ]; then
         echo "Skipping $example"
         continue

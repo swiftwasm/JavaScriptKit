@@ -14,7 +14,7 @@ jobs:
         entry:
           - os: ubuntu-24.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2404/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a-ubuntu24.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2404/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu24.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasip1"
             env: |
@@ -26,7 +26,7 @@ jobs:
             target: "wasm32-unknown-wasip1"
           - os: ubuntu-22.04
             toolchain:
-              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a-ubuntu22.04.tar.gz
+              download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasip1-threads"
 
@@ -143,7 +143,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/install-swift
         with:
-          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a/swift-DEVELOPMENT-SNAPSHOT-2025-09-14-a-ubuntu22.04.tar.gz
+          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
       - run: make bootstrap
       - run: ./Utilities/bridge-js-generate.sh
       - name: Check if BridgeJS generated files are up-to-date
@@ -160,16 +160,14 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/install-swift
         with:
-          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-03-09-a/swift-DEVELOPMENT-SNAPSHOT-2026-03-09-a-ubuntu22.04.tar.gz
+          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
       - uses: swiftwasm/setup-swiftwasm@v2
         id: setup-wasm32-unknown-wasip1
         with: { target: wasm32-unknown-wasip1 }
       - uses: swiftwasm/setup-swiftwasm@v2
         id: setup-wasm32-unknown-wasip1-threads
         with: { target: wasm32-unknown-wasip1-threads }
-      - run: |
-          swift --version
-          ./Utilities/build-examples.sh
+      - run: ./Utilities/build-examples.sh
         env:
           SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
           SWIFT_SDK_ID_wasm32_unknown_wasip1: ${{ steps.setup-wasm32-unknown-wasip1.outputs.swift-sdk-id }}
