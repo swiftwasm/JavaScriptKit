@@ -56,7 +56,7 @@ jobs:
         run: |
           echo "SWIFT_SDK_ID=${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}" >> $GITHUB_ENV
           echo "SWIFT_BIN_PATH=$(dirname $(which swiftc))" >> $GITHUB_ENV
-      - uses: swiftwasm/setup-swift-syntax-prebuilts@v1
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@yt/support-swiftpm-triple-build-dir
         id: swiftsyntax-prebuilts
         with:
           swift-syntax-version: ${{ matrix.entry.swift-syntax-version }}
@@ -157,7 +157,7 @@ jobs:
       - uses: ./.github/actions/install-swift
         with:
           download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
-      - uses: swiftwasm/setup-swift-syntax-prebuilts@v1
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@yt/support-swiftpm-triple-build-dir
         id: swiftsyntax-prebuilts
         with:
           swift-syntax-version: "600.0.1"
@@ -186,7 +186,7 @@ jobs:
       - uses: swiftwasm/setup-swiftwasm@v2
         id: setup-wasm32-unknown-wasip1-threads
         with: { target: wasm32-unknown-wasip1-threads }
-      - uses: swiftwasm/setup-swift-syntax-prebuilts@v1
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@yt/support-swiftpm-triple-build-dir
         id: swiftsyntax-prebuilts
         with:
           swift-syntax-version: "603.0.2"
