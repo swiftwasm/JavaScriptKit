@@ -309,15 +309,14 @@ import Testing
 
     @Test
     func asyncReturnOfUnsupportedTypeIsDiagnosed() throws {
-        // An associated-value enum can be neither lowered through the imported-parameter ABI
-        // nor settled via `_bjs_makePromise`, so an async return of one must be diagnosed.
+        // Protocol existentials still can't be lowered through the imported-parameter ABI, so
+        // an async return of one must still be diagnosed.
         let source = """
-            @JS enum Payload {
-                case text(String)
-                case number(Int)
+            @JS protocol PayloadDelegate {
+                func notify()
             }
-            @JS func loadPayload() async -> Payload {
-                .number(1)
+            @JS func loadPayload() async -> PayloadDelegate {
+                fatalError()
             }
             """
         let swiftAPI = SwiftToSkeleton(

@@ -1,0 +1,194 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "start"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "stop"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "idle"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "PayloadSignal",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "PayloadSignal",
+        "tsFullPath" : "PayloadSignal"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "send",
+                "parameters" : [
+                  {
+                    "name" : "signal",
+                    "type" : {
+                      "associatedValueEnum" : {
+                        "_0" : "PayloadSignal"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "current",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "associatedValueEnum" : {
+                    "_0" : "PayloadSignal"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "roundTripOptional",
+                "parameters" : [
+                  {
+                    "name" : "signal",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "associatedValueEnum" : {
+                            "_0" : "PayloadSignal"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "associatedValueEnum" : {
+                        "_0" : "PayloadSignal"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "name" : "PayloadSignalControls",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "roundTrip",
+                "parameters" : [
+                  {
+                    "name" : "signal",
+                    "type" : {
+                      "associatedValueEnum" : {
+                        "_0" : "PayloadSignal"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "associatedValueEnum" : {
+                    "_0" : "PayloadSignal"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

@@ -1611,10 +1611,10 @@ extension BridgeType {
     /// Whether a value of this type can be passed to a generated `Promise_resolve_<mangled>`
     /// settlement helper, i.e. lowered through the imported-parameter ABI. Every `async`
     /// exported return settles through `_bjs_makePromise`; the few types that cannot be lowered
-    /// (associated-value enums, protocols, namespace enums, and their compositions) are diagnosed.
+    /// (protocols, namespace enums, and their compositions) are diagnosed.
     public var isAsyncResolvable: Bool {
         switch self {
-        case .associatedValueEnum, .swiftProtocol, .namespaceEnum:
+        case .swiftProtocol, .namespaceEnum:
             return false
         case .nullable(let wrapped, _):
             return wrapped.isAsyncResolvable

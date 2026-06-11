@@ -1,6 +1,12 @@
 import Testing
 import JavaScriptKit
 
+@JS enum AsyncImportedPayloadResult: Equatable {
+    case success(String)
+    case failure(Int)
+    case idle
+}
+
 @JSClass struct AsyncImportImports {
     @JSFunction static func jsAsyncRoundTripVoid() async throws(JSException)
     @JSFunction static func jsAsyncRoundTripNumber(_ v: Double) async throws(JSException) -> Double
@@ -12,6 +18,12 @@ import JavaScriptKit
     @JSFunction static func jsAsyncRoundTripIntArray(_ values: [Double]) async throws(JSException) -> [Double]
     @JSFunction static func jsAsyncRoundTripStringArray(_ values: [String]) async throws(JSException) -> [String]
     @JSFunction static func jsAsyncRoundTripFeatureFlag(_ v: FeatureFlag) async throws(JSException) -> FeatureFlag
+    @JSFunction static func jsAsyncRoundTripAssociatedValueEnum(
+        _ v: AsyncImportedPayloadResult
+    ) async throws(JSException) -> AsyncImportedPayloadResult
+    @JSFunction static func jsAsyncRoundTripOptionalAssociatedValueEnum(
+        _ v: AsyncImportedPayloadResult?
+    ) async throws(JSException) -> AsyncImportedPayloadResult?
 }
 
 @Suite struct AsyncImportTests {
@@ -67,6 +79,29 @@ import JavaScriptKit
     @Test(arguments: [FeatureFlag.foo, .bar])
     func asyncRoundTripFeatureFlag(v: FeatureFlag) async throws {
         try #expect(await AsyncImportImports.jsAsyncRoundTripFeatureFlag(v) == v)
+    }
+
+    @Test func asyncRoundTripAssociatedValueEnum() async throws {
+        let values: [AsyncImportedPayloadResult] = [
+            .success("ok"),
+            .failure(7),
+            .idle,
+        ]
+        for value in values {
+            try #expect(await AsyncImportImports.jsAsyncRoundTripAssociatedValueEnum(value) == value)
+        }
+    }
+
+    @Test func asyncRoundTripOptionalAssociatedValueEnum() async throws {
+        let values: [AsyncImportedPayloadResult?] = [
+            .some(.success("ok")),
+            .some(.failure(7)),
+            .some(.idle),
+            nil,
+        ]
+        for value in values {
+            try #expect(await AsyncImportImports.jsAsyncRoundTripOptionalAssociatedValueEnum(value) == value)
+        }
     }
 
     // MARK: - Structured return type

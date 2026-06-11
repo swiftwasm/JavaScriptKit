@@ -1,0 +1,129 @@
+{
+  "exported" : {
+    "classes" : [
+
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "success"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "failure"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "idle"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "AsyncPayloadResult",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "AsyncPayloadResult",
+        "tsFullPath" : "AsyncPayloadResult"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_asyncRoundTripAssociatedValueEnum",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripAssociatedValueEnum",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "associatedValueEnum" : {
+                "_0" : "AsyncPayloadResult"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "associatedValueEnum" : {
+            "_0" : "AsyncPayloadResult"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_asyncRoundTripOptionalAssociatedValueEnum",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "asyncRoundTripOptionalAssociatedValueEnum",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "associatedValueEnum" : {
+                    "_0" : "AsyncPayloadResult"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "associatedValueEnum" : {
+                "_0" : "AsyncPayloadResult"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

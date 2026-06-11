@@ -1,7 +1,7 @@
 // @ts-check
 
 import assert from 'node:assert';
-import { ThemeValues, DirectionValues, FileSizeValues } from '../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
+import { ThemeValues, DirectionValues, FileSizeValues, AsyncPayloadResultValues } from '../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 
 /**
  * @returns {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Imports["AsyncImportImports"]}
@@ -36,6 +36,12 @@ export function getImports(importsContext) {
             return Promise.resolve(v);
         },
         jsAsyncRoundTripFeatureFlag: (v) => {
+            return Promise.resolve(v);
+        },
+        jsAsyncRoundTripAssociatedValueEnum: (v) => {
+            return Promise.resolve(v);
+        },
+        jsAsyncRoundTripOptionalAssociatedValueEnum: (v) => {
             return Promise.resolve(v);
         },
     };
@@ -124,4 +130,15 @@ export async function runAsyncWorksTests(exports) {
     assert.equal(await exports.asyncRoundTripFileSize(FileSizeValues.Large), FileSizeValues.Large);
     assert.equal(await exports.asyncRoundTripOptionalFileSize(FileSizeValues.Tiny), FileSizeValues.Tiny);
     assert.equal(await exports.asyncRoundTripOptionalFileSize(null), null);
+
+    const asyncPayloadSuccess = { tag: AsyncPayloadResultValues.Tag.Success, param0: "ok" };
+    const asyncPayloadFailure = { tag: AsyncPayloadResultValues.Tag.Failure, param0: 7 };
+    const asyncPayloadIdle = { tag: AsyncPayloadResultValues.Tag.Idle };
+    assert.deepEqual(await exports.asyncRoundTripAssociatedValueEnum(asyncPayloadSuccess), asyncPayloadSuccess);
+    assert.deepEqual(await exports.asyncRoundTripAssociatedValueEnum(asyncPayloadFailure), asyncPayloadFailure);
+    assert.deepEqual(await exports.asyncRoundTripAssociatedValueEnum(asyncPayloadIdle), asyncPayloadIdle);
+    assert.deepEqual(await exports.asyncRoundTripOptionalAssociatedValueEnum(asyncPayloadSuccess), asyncPayloadSuccess);
+    assert.deepEqual(await exports.asyncRoundTripOptionalAssociatedValueEnum(asyncPayloadFailure), asyncPayloadFailure);
+    assert.deepEqual(await exports.asyncRoundTripOptionalAssociatedValueEnum(asyncPayloadIdle), asyncPayloadIdle);
+    assert.equal(await exports.asyncRoundTripOptionalAssociatedValueEnum(null), null);
 }

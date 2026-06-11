@@ -334,6 +334,16 @@ extension StaticCalculator {
 
 @JS func asyncRoundTripOptionalFileSize(_ v: FileSize?) async -> FileSize? { v }
 
+@JS enum AsyncPayloadResult: Equatable {
+    case success(String)
+    case failure(Int)
+    case idle
+}
+
+@JS func asyncRoundTripAssociatedValueEnum(_ v: AsyncPayloadResult) async -> AsyncPayloadResult { v }
+
+@JS func asyncRoundTripOptionalAssociatedValueEnum(_ v: AsyncPayloadResult?) async -> AsyncPayloadResult? { v }
+
 @JS func setHttpStatus(_ status: HttpStatus) -> HttpStatus {
     return status
 }
