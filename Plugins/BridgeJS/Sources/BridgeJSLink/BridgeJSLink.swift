@@ -107,6 +107,7 @@ public struct BridgeJSLink {
             /// Represents a Swift heap object like a class instance or an actor instance.
             class SwiftHeapObject {
                 static __wrap(pointer, deinit, prototype, identityCache) {
+                    pointer = pointer >>> 0;
                     const makeFresh = (identityMap) => {
                         const obj = Object.create(prototype);
                         const state = { pointer, deinit, hasReleased: false, identityMap };
@@ -428,7 +429,7 @@ public struct BridgeJSLink {
                         "\(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).release(sourceId);"
                     )
                     printer.write(
-                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, bytesPtr);"
+                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, bytesPtr >>> 0);"
                     )
                     printer.write("bytes.set(source);")
                 }
@@ -443,7 +444,7 @@ public struct BridgeJSLink {
                 printer.write("bjs[\"swift_js_init_memory_with_result\"] = function(ptr, len) {")
                 printer.indent {
                     printer.write(
-                        "const target = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr, len);"
+                        "const target = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr >>> 0, len >>> 0);"
                     )
                     printer.write("target.set(\(JSGlueVariableScope.reservedStorageToReturnBytes));")
                     printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = undefined;")
@@ -789,7 +790,7 @@ public struct BridgeJSLink {
                                 helperPrinter.write("if (state.unregistered) {")
                                 helperPrinter.indent {
                                     helperPrinter.write(
-                                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, state.file);"
+                                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, state.file >>> 0);"
                                     )
                                     helperPrinter.write("let length = 0;")
                                     helperPrinter.write("while (bytes[length] !== 0) { length += 1; }")

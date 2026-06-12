@@ -84,14 +84,14 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
                 swift.memory.release(sourceId);
-                const bytes = new Uint8Array(memory.buffer, bytesPtr);
+                const bytes = new Uint8Array(memory.buffer, bytesPtr >>> 0);
                 bytes.set(source);
             }
             bjs["swift_js_make_js_string"] = function(ptr, len) {
                 return swift.memory.retain(decodeString(ptr, len));
             }
             bjs["swift_js_init_memory_with_result"] = function(ptr, len) {
-                const target = new Uint8Array(memory.buffer, ptr, len);
+                const target = new Uint8Array(memory.buffer, ptr >>> 0, len >>> 0);
                 target.set(tmpRetBytes);
                 tmpRetBytes = undefined;
             }
