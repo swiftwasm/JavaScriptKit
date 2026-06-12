@@ -60,14 +60,16 @@ export const decodeArray = (
     memory: DataView,
     objectSpace: JSObjectSpace,
 ) => {
+    const basePtr = ptr >>> 0;
+    const count = length >>> 0;
     // fast path for empty array
-    if (length === 0) {
+    if (count === 0) {
         return [];
     }
 
     let result = [];
-    for (let index = 0; index < length; index++) {
-        const base = ptr + 16 * index;
+    for (let index = 0; index < count; index++) {
+        const base = basePtr + 16 * index;
         const kind = memory.getUint32(base, true);
         const payload1 = memory.getUint32(base + 4, true);
         const payload2 = memory.getFloat64(base + 8, true);
@@ -97,7 +99,7 @@ export const write = (
         memory,
         objectSpace,
     );
-    memory.setUint32(kind_ptr, kind, true);
+    memory.setUint32(kind_ptr >>> 0, kind, true);
 };
 
 export const writeAndReturnKindBits = (
@@ -109,23 +111,25 @@ export const writeAndReturnKindBits = (
     objectSpace: JSObjectSpace,
 ): JavaScriptValueKindAndFlags => {
     const exceptionBit = (is_exception ? 1 : 0) << 31;
+    const payload1Offset = payload1_ptr >>> 0;
+    const payload2Offset = payload2_ptr >>> 0;
     if (value === null) {
         return exceptionBit | Kind.Null;
     }
 
     const writeRef = (kind: Kind) => {
-        memory.setUint32(payload1_ptr, objectSpace.retain(value), true);
+        memory.setUint32(payload1Offset, objectSpace.retain(value), true);
         return exceptionBit | kind;
     };
 
     const type = typeof value;
     switch (type) {
         case "boolean": {
-            memory.setUint32(payload1_ptr, value ? 1 : 0, true);
+            memory.setUint32(payload1Offset, value ? 1 : 0, true);
             return exceptionBit | Kind.Boolean;
         }
         case "number": {
-            memory.setFloat64(payload2_ptr, value, true);
+            memory.setFloat64(payload2Offset, value, true);
             return exceptionBit | Kind.Number;
         }
         case "string": {
@@ -157,9 +161,11 @@ export function decodeObjectRefs(
     length: number,
     memory: DataView,
 ): ref[] {
-    const result: ref[] = new Array(length);
-    for (let i = 0; i < length; i++) {
-        result[i] = memory.getUint32(ptr + 4 * i, true);
+    const basePtr = ptr >>> 0;
+    const count = length >>> 0;
+    const result: ref[] = new Array(count);
+    for (let i = 0; i < count; i++) {
+        result[i] = memory.getUint32(basePtr + 4 * i, true);
     }
     return result;
 }

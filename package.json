@@ -14,6 +14,7 @@
     "build:ts": "cd Runtime; rollup -c",
     "prepublishOnly": "npm run build",
     "format": "prettier --write Runtime/src",
+    "test:runtime": "vitest run Runtime/test",
     "check:bridgejs-dts": "tsc --project Plugins/BridgeJS/Tests/BridgeJSToolTests/__Snapshots__/BridgeJSLinkTests/tsconfig.json"
   },
   "keywords": [

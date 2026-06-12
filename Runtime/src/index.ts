@@ -450,31 +450,39 @@ export class SwiftRuntime {
                 const memory = this.memory;
                 const bytes = this.textEncoder.encode(memory.getObject(ref));
                 const bytes_ptr = memory.retain(bytes);
-                this.getDataView().setUint32(bytes_ptr_result, bytes_ptr, true);
+                this.getDataView().setUint32(
+                    bytes_ptr_result >>> 0,
+                    bytes_ptr,
+                    true,
+                );
                 return bytes.length;
             },
             swjs_decode_string:
                 // NOTE: TextDecoder can't decode typed arrays backed by SharedArrayBuffer
                 this.options.sharedMemory == true
                     ? (bytes_ptr: pointer, length: number) => {
+                          const bytesOffset = bytes_ptr >>> 0;
+                          const byteLength = length >>> 0;
                           const bytes = this.getUint8Array().slice(
-                              bytes_ptr,
-                              bytes_ptr + length,
+                              bytesOffset,
+                              bytesOffset + byteLength,
                           );
                           const string = this.textDecoder.decode(bytes);
                           return this.memory.retain(string);
                       }
                     : (bytes_ptr: pointer, length: number) => {
+                          const bytesOffset = bytes_ptr >>> 0;
+                          const byteLength = length >>> 0;
                           const bytes = this.getUint8Array().subarray(
-                              bytes_ptr,
-                              bytes_ptr + length,
+                              bytesOffset,
+                              bytesOffset + byteLength,
                           );
                           const string = this.textDecoder.decode(bytes);
                           return this.memory.retain(string);
                       },
             swjs_load_string: (ref: ref, buffer: pointer) => {
                 const bytes = this.memory.getObject(ref);
-                this.getUint8Array().set(bytes, buffer);
+                this.getUint8Array().set(bytes, buffer >>> 0);
             },
 
             swjs_call_function: (
@@ -741,8 +749,8 @@ export class SwiftRuntime {
                 }
                 const array = new ArrayType(
                     this.wasmMemory!.buffer,
-                    elementsPtr,
-                    length,
+                    elementsPtr >>> 0,
+                    length >>> 0,
                 );
                 // Call `.slice()` to copy the memory
                 return this.memory.retain(array.slice());
@@ -756,7 +764,7 @@ export class SwiftRuntime {
                 const memory = this.memory;
                 const typedArray = memory.getObject(ref);
                 const bytes = new Uint8Array(typedArray.buffer);
-                this.getUint8Array().set(bytes, buffer);
+                this.getUint8Array().set(bytes, buffer >>> 0);
             },
 
             swjs_release: (ref: ref) => {
