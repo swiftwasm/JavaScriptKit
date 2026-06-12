@@ -31,6 +31,12 @@ export function getImports(importsContext) {
         jsRoundTripCoordinate: (value) => {
             return { ...value };
         },
+        jsRoundTripUserId: (value) => {
+            return value;
+        },
+        jsRoundTripOptionalUserId: (value) => {
+            return value ?? null;
+        },
     };
 }
 
@@ -45,19 +51,15 @@ export function runAliasWorks(exports) {
     runMultipleAliases(exports);
     runArrays(exports);
     runThrows(exports);
-    runNonCopyable(exports);
+    runJSValueAlias(exports);
+    runScalarAlias(exports);
     runClosureWithAliasParameter(exports);
     runOptionalInArray(exports);
     runClassPropertyAndInitWithAlias(exports);
     runAssociatedValueEnumPayload(exports);
     runStructToStructAlias(exports);
     runStructToEnumAlias(exports);
-    runClassToStructAlias(exports);
     runEnumToClassAlias(exports);
-}
-
-export async function runAliasAsyncWorks(exports) {
-    await runAsyncReturningAlias(exports);
 }
 
 /**
@@ -194,15 +196,28 @@ function runThrows(exports) {
 /**
  * @param {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports
  */
-function runNonCopyable(exports) {
-    const seed = exports.makeToken(7);
-    assert.equal(seed.read(), 7);
+function runJSValueAlias(exports) {
+    assert.equal(exports.roundTripBoxed(42), 42);
+    assert.equal(exports.roundTripBoxed("hello"), "hello");
+    assert.deepStrictEqual(exports.roundTripBoxed({ a: 1 }), { a: 1 });
 
-    const next = exports.incrementToken(seed);
-    assert.equal(next.read(), 8);
+    assert.equal(exports.roundTripOptionalBoxed(null), null);
+    assert.equal(exports.roundTripOptionalBoxed("present"), "present");
+}
 
-    next.release();
-    seed.release();
+/**
+ * @param {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports
+ */
+function runScalarAlias(exports) {
+    assert.equal(exports.roundTripUserId(42), 42);
+    assert.equal(exports.roundTripUserId(-1), -1);
+
+    assert.equal(exports.roundTripOptionalUserId(null), null);
+    assert.equal(exports.roundTripOptionalUserId(0), 0);
+    assert.equal(exports.roundTripOptionalUserId(7), 7);
+
+    assert.deepStrictEqual(exports.roundTripUserIdArray([]), []);
+    assert.deepStrictEqual(exports.roundTripUserIdArray([1, 2, 3]), [1, 2, 3]);
 }
 
 /**
@@ -322,17 +337,6 @@ function runStructToEnumAlias(exports) {
 /**
  * @param {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports
  */
-function runClassToStructAlias(exports) {
-    const made = exports.makeSession("hello");
-    assert.deepStrictEqual(made, { token: "hello" });
-
-    const echoed = exports.roundTripSession({ token: "world" });
-    assert.deepStrictEqual(echoed, { token: "world" });
-}
-
-/**
- * @param {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports
- */
 function runEnumToClassAlias(exports) {
     const seed = exports.PriorityReference.medium();
     assert.equal(seed.describe(), "medium");
@@ -344,14 +348,4 @@ function runEnumToClassAlias(exports) {
 
     seed.release();
     echoed.release();
-}
-
-/**
- * @param {import('../../../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports
- */
-async function runAsyncReturningAlias(exports) {
-    const result = await exports.asyncMakePolygon("async");
-    assert.equal(result.vertexCount(), 2);
-    assert.equal(result.summary(), "async(2)");
-    result.release();
 }

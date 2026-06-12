@@ -651,9 +651,6 @@ struct IntrinsicJSFragment: Sendable {
         kind: JSOptionalKind,
         context bridgeContext: BridgeContext = .importTS
     ) throws -> IntrinsicJSFragment {
-        if case .alias(_, let underlying) = wrappedType {
-            return try optionalLiftParameter(wrappedType: underlying, kind: kind, context: bridgeContext)
-        }
         if wrappedType.isSingleParamScalar {
             let coerce = wrappedType.liftCoerce
             return IntrinsicJSFragment(
@@ -742,9 +739,6 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
-        if case .alias(_, let underlying) = wrappedType {
-            return try optionalLowerParameter(wrappedType: underlying, kind: kind)
-        }
         if wrappedType.isSingleParamScalar {
             let wasmType = wrappedType.wasmParams[0].type
             let coerce = wrappedType.lowerCoerce
@@ -973,9 +967,6 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) -> IntrinsicJSFragment {
-        if case .alias(_, let underlying) = wrappedType {
-            return optionalLiftReturn(wrappedType: underlying, kind: kind)
-        }
         if let scalarKind = wrappedType.optionalScalarKind {
             return optionalLiftReturnFromStorage(storage: scalarKind.storageName)
         }
@@ -1073,9 +1064,6 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     static func optionalLowerReturn(wrappedType: BridgeType, kind: JSOptionalKind) throws -> IntrinsicJSFragment {
-        if case .alias(_, let underlying) = wrappedType {
-            return try optionalLowerReturn(wrappedType: underlying, kind: kind)
-        }
         switch wrappedType {
         case .void, .nullable, .namespaceEnum, .closure:
             throw BridgeJSLinkError(message: "Unsupported optional wrapped type for protocol export: \(wrappedType)")
@@ -1200,9 +1188,7 @@ struct IntrinsicJSFragment: Sendable {
     // MARK: - Protocol Support
 
     static func protocolPropertyOptionalToSideChannel(wrappedType: BridgeType) throws -> IntrinsicJSFragment {
-        if case .alias(_, let underlying) = wrappedType {
-            return try protocolPropertyOptionalToSideChannel(wrappedType: underlying)
-        }
+        let wrappedType = wrappedType.unaliased
         if let scalarKind = wrappedType.optionalScalarKind {
             let storage = scalarKind.storageName
             return IntrinsicJSFragment(
@@ -1299,7 +1285,7 @@ struct IntrinsicJSFragment: Sendable {
 
     /// Returns a fragment that lowers a JS value to Wasm core values for parameters
     static func lowerParameter(type: BridgeType) throws -> IntrinsicJSFragment {
-        switch type {
+        switch type.unaliased {
         case .bool, .integer, .float, .double, .unsafePointer, .caseEnum:
             return .identity
         case .rawValueEnum(_, let rawType) where rawType != .string:
@@ -1338,8 +1324,6 @@ struct IntrinsicJSFragment: Sendable {
             return try arrayLower(elementType: elementType)
         case .dictionary(let valueType):
             return try dictionaryLower(valueType: valueType)
-        case .alias(_, let underlying):
-            return try lowerParameter(type: underlying)
         default:
             throw BridgeJSLinkError(message: "Unhandled type in lowerParameter: \(type)")
         }
@@ -1347,7 +1331,7 @@ struct IntrinsicJSFragment: Sendable {
 
     /// Returns a fragment that lifts a Wasm core value to a JS value for return values
     static func liftReturn(type: BridgeType) throws -> IntrinsicJSFragment {
-        switch type {
+        switch type.unaliased {
         case .bool, .rawValueEnum(_, .bool):
             return .boolLiftReturn
         case .integer(let t) where !t.is64Bit && !t.isSigned:
@@ -1397,8 +1381,6 @@ struct IntrinsicJSFragment: Sendable {
             return try arrayLift(elementType: elementType)
         case .dictionary(let valueType):
             return try dictionaryLift(valueType: valueType)
-        case .alias(_, let underlying):
-            return try liftReturn(type: underlying)
         default:
             throw BridgeJSLinkError(message: "Unhandled type in liftReturn: \(type)")
         }
@@ -1408,7 +1390,7 @@ struct IntrinsicJSFragment: Sendable {
 
     /// Returns a fragment that lifts Wasm core values to JS values for parameters
     static func liftParameter(type: BridgeType, context: BridgeContext = .importTS) throws -> IntrinsicJSFragment {
-        switch type {
+        switch type.unaliased {
         case .bool, .rawValueEnum(_, .bool):
             return .boolLiftParameter
         case .integer(let t) where !t.is64Bit && !t.isSigned:
@@ -1489,8 +1471,6 @@ struct IntrinsicJSFragment: Sendable {
             return try arrayLift(elementType: elementType)
         case .dictionary(let valueType):
             return try dictionaryLift(valueType: valueType)
-        case .alias(_, let underlying):
-            return try liftParameter(type: underlying, context: context)
         default:
             throw BridgeJSLinkError(message: "Unhandled type in liftParameter: \(type)")
         }
@@ -1498,7 +1478,7 @@ struct IntrinsicJSFragment: Sendable {
 
     /// Returns a fragment that lowers a JS value to Wasm core values for return values
     static func lowerReturn(type: BridgeType, context: BridgeContext = .importTS) throws -> IntrinsicJSFragment {
-        switch type {
+        switch type.unaliased {
         case .bool, .rawValueEnum(_, .bool):
             return .boolLowerReturn
         case .integer, .float, .double, .unsafePointer, .caseEnum:
@@ -1545,8 +1525,6 @@ struct IntrinsicJSFragment: Sendable {
             return try arrayLower(elementType: elementType)
         case .dictionary(let valueType):
             return try dictionaryLower(valueType: valueType)
-        case .alias(_, let underlying):
-            return try lowerReturn(type: underlying, context: context)
         default:
             throw BridgeJSLinkError(message: "Unhandled type in lowerReturn: \(type)")
         }
@@ -1782,6 +1760,7 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     private static func associatedValuePushPayload(type: BridgeType) throws -> IntrinsicJSFragment {
+        let type = type.unaliased
         switch type {
         case .nullable(let wrappedType, let kind):
             return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
@@ -1791,6 +1770,7 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     private static func associatedValuePopPayload(type: BridgeType) throws -> IntrinsicJSFragment {
+        let type = type.unaliased
         switch type {
         case .nullable(let wrappedType, let kind):
             return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
@@ -1964,9 +1944,6 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     private static func stackLiftFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
-        if case .alias(_, let underlying) = elementType {
-            return try stackLiftFragment(elementType: underlying)
-        }
         if case .nullable(let wrappedType, let kind) = elementType {
             return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
         }
@@ -2094,9 +2071,6 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     private static func stackLowerFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
-        if case .alias(_, let underlying) = elementType {
-            return try stackLowerFragment(elementType: underlying)
-        }
         if case .nullable(let wrappedType, let kind) = elementType {
             return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
         }
@@ -2221,9 +2195,6 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
-        if case .alias(_, let underlying) = wrappedType {
-            return try optionalElementRaiseFragment(wrappedType: underlying, kind: kind)
-        }
         if case .associatedValueEnum(let fullName) = wrappedType {
             let base = fullName.components(separatedBy: ".").last ?? fullName
             let absenceLiteral = kind.absenceLiteral
@@ -2290,9 +2261,6 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
-        if case .alias(_, let underlying) = wrappedType {
-            return try optionalElementLowerFragment(wrappedType: underlying, kind: kind)
-        }
         if case .associatedValueEnum(let fullName) = wrappedType {
             let base = fullName.components(separatedBy: ".").last ?? fullName
             return IntrinsicJSFragment(
@@ -2499,6 +2467,7 @@ struct IntrinsicJSFragment: Sendable {
         fieldName: String,
         allStructs: [ExportedStruct]
     ) throws -> IntrinsicJSFragment {
+        let type = type.unaliased
         switch type {
         case .jsValue:
             preconditionFailure("Struct field of JSValue is not supported yet")
@@ -2560,7 +2529,8 @@ struct IntrinsicJSFragment: Sendable {
         field: ExportedProperty,
         allStructs: [ExportedStruct]
     ) throws -> IntrinsicJSFragment {
-        switch field.type {
+        let fieldType = field.type.unaliased
+        switch fieldType {
         case .jsValue:
             preconditionFailure("Struct field of JSValue is not supported yet")
         case .nullable(let wrappedType, let kind):
@@ -2611,7 +2581,7 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         default:
-            return try stackLiftFragment(elementType: field.type)
+            return try stackLiftFragment(elementType: fieldType)
         }
     }
 }
@@ -2715,8 +2685,8 @@ private extension BridgeType {
             return .stackABI
         case .nullable(let wrapped, _):
             return wrapped.optionalConvention
-        case .alias(_, let underlying):
-            return underlying.optionalConvention
+        case .alias:
+            preconditionFailure()
         }
     }
 
@@ -2748,8 +2718,6 @@ private extension BridgeType {
             return .i32(-1)
         case .nullable(let wrapped, _):
             return wrapped.nilSentinel
-        case .alias(_, let underlying):
-            return underlying.nilSentinel
         default:
             return .none
         }
@@ -2815,8 +2783,8 @@ private extension BridgeType {
             return []
         case .nullable(let wrapped, _):
             return wrapped.wasmParams
-        case .alias(_, let underlying):
-            return underlying.wasmParams
+        case .alias:
+            preconditionFailure()
         }
     }
 

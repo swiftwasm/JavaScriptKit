@@ -552,10 +552,7 @@ public final class SwiftToSkeleton {
         swiftCallName: String,
         errors: inout [DiagnosticError]
     ) -> BridgeType? {
-        if let targetDecl = typeDeclResolver.resolve(aliasTarget),
-            let targetJSAttribute = targetDecl.attributes.firstJSAttribute,
-            extractAliasTarget(from: targetJSAttribute) != nil
-        {
+        func diagnoseChainedAlias() -> BridgeType? {
             errors.append(
                 DiagnosticError(
                     node: aliasTarget,
@@ -565,7 +562,17 @@ public final class SwiftToSkeleton {
             )
             return nil
         }
+        if let targetDecl = typeDeclResolver.resolve(aliasTarget),
+            let targetJSAttribute = targetDecl.attributes.firstJSAttribute,
+            extractAliasTarget(from: targetJSAttribute) != nil
+        {
+            return diagnoseChainedAlias()
+        }
         guard let targetType = lookupType(for: aliasTarget, errors: &errors) else { return nil }
+        if case .alias = targetType {
+            // Alias declared in another module.
+            return diagnoseChainedAlias()
+        }
         if case .swiftProtocol = targetType {
             errors.append(
                 DiagnosticError(
@@ -1745,6 +1752,15 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             case .alias(_, let underlying) = aliasBridgeType
         else {
             errors.append(contentsOf: lookupErrors)
+            return
+        }
+        guard underlying.aliasConformanceProtocols != nil else {
+            errors.append(
+                DiagnosticError(
+                    node: aliasTarget,
+                    message: "Representation \(underlying.swiftType) is not supported"
+                )
+            )
             return
         }
         exportedAliases.append(

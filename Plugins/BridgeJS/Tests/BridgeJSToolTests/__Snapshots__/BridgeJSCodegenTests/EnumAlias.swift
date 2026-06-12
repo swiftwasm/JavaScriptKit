@@ -2,8 +2,8 @@
 @_cdecl("bjs_roundtripColor")
 public func _bjs_roundtripColor(_ color: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = roundtripColor(_: Color.bridgeFromJS(ColorBox.bridgeJSLiftParameter(color)))
-    return ret.bridgeToJS().bridgeJSLowerReturn()
+    let ret = roundtripColor(_: Color.bridgeJSLiftParameter(color))
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -50,3 +50,5 @@ fileprivate func _bjs_ColorBox_wrap_extern(_ pointer: UnsafeMutableRawPointer) -
 @inline(never) fileprivate func _bjs_ColorBox_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_ColorBox_wrap_extern(pointer)
 }
+
+extension Color: _BridgedSwiftAlias, _BridgedSwiftStackType {}

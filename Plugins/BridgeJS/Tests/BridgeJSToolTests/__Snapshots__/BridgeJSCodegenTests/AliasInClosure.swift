@@ -28,7 +28,7 @@ private enum _BJS_Closure_10TestModuleAl7Polygon_Si {
         return { [callback] param0 in
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
-            let param0Pointer = param0.bridgeToJS().bridgeJSLowerParameter()
+            let param0Pointer = param0.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleAl7Polygon_Si(callbackValue, param0Pointer)
             return Int.bridgeJSLiftReturn(ret)
             #else
@@ -54,7 +54,7 @@ extension JSTypedClosure where Signature == (Polygon) -> Int {
 public func _invoke_swift_closure_TestModule_10TestModuleAl7Polygon_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Polygon) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Polygon.bridgeFromJS(PolygonReference.bridgeJSLiftParameter(param0)))
+    let result = closure(Polygon.bridgeJSLiftParameter(param0))
     return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -92,7 +92,7 @@ private enum _BJS_Closure_10TestModuley_Al7Polygon {
             #if arch(wasm32)
             let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuley_Al7Polygon(callbackValue)
-            return Polygon.bridgeFromJS(PolygonReference.bridgeJSLiftReturn(ret))
+            return Polygon.bridgeJSLiftReturn(ret)
             #else
             fatalError("Only available on WebAssembly")
             #endif
@@ -117,7 +117,7 @@ public func _invoke_swift_closure_TestModule_10TestModuley_Al7Polygon(_ boxPtr: 
     #if arch(wasm32)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<() -> Polygon>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     let result = closure()
-    return result.bridgeToJS().bridgeJSLowerReturn()
+    return result.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -186,3 +186,5 @@ fileprivate func _bjs_PolygonReference_wrap_extern(_ pointer: UnsafeMutableRawPo
 @inline(never) fileprivate func _bjs_PolygonReference_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_PolygonReference_wrap_extern(pointer)
 }
+
+extension Polygon: _BridgedSwiftAlias, _BridgedSwiftStackType {}

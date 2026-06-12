@@ -116,44 +116,8 @@ import JavaScriptKit
     return polygon.vertices.map { Polygon(vertices: [$0], label: polygon.label) }
 }
 
-@JS(as: TokenReference.self) struct Token: ~Copyable {
-    let value: Int
-
-    consuming func bridgeToJS() -> TokenReference {
-        return TokenReference(value: value)
-    }
-
-    static func bridgeFromJS(_ value: consuming TokenReference) -> Token {
-        return Token(value: value.value)
-    }
-}
-
-@JS final class TokenReference {
-    let value: Int
-
-    @JS init(value: Int) {
-        self.value = value
-    }
-
-    @JS func read() -> Int {
-        return value
-    }
-}
-
-@JS func incrementToken(_ token: borrowing Token) -> Token {
-    return Token(value: token.value + 1)
-}
-
-@JS func makeToken(_ value: Int) -> Token {
-    return Token(value: value)
-}
-
 @JS func makePolygonInspector() -> (Polygon) -> Int {
     return { polygon in polygon.vertices.count }
-}
-
-@JS func asyncMakePolygon(_ label: String) async -> Polygon {
-    return Polygon(vertices: [9, 9], label: label)
 }
 
 @JS func roundTripOptionalPolygonArray(_ polygons: [Polygon?]) -> [Polygon?] {
@@ -294,38 +258,6 @@ import JavaScriptKit
     return Alert(level: level)
 }
 
-@JS(as: SessionState.self) class Session {
-    var token: String
-
-    init(token: String) {
-        self.token = token
-    }
-
-    consuming func bridgeToJS() -> SessionState {
-        return SessionState(token: token)
-    }
-
-    static func bridgeFromJS(_ value: consuming SessionState) -> Session {
-        return Session(token: value.token)
-    }
-}
-
-@JS struct SessionState {
-    var token: String
-
-    @JS init(token: String) {
-        self.token = token
-    }
-}
-
-@JS func roundTripSession(_ session: Session) -> Session {
-    return session
-}
-
-@JS func makeSession(_ token: String) -> Session {
-    return Session(token: token)
-}
-
 @JS enum Shape {
     case polygon(Polygon)
     case empty
@@ -341,6 +273,30 @@ import JavaScriptKit
 
 @JS func makeShapeEmpty() -> Shape {
     return .empty
+}
+
+@JS(as: Int.self) struct UserId {
+    var rawValue: Int
+
+    consuming func bridgeToJS() -> Int {
+        return rawValue
+    }
+
+    static func bridgeFromJS(_ value: consuming Int) -> UserId {
+        return UserId(rawValue: value)
+    }
+}
+
+@JS func roundTripUserId(_ id: UserId) -> UserId {
+    return id
+}
+
+@JS func roundTripOptionalUserId(_ id: UserId?) -> UserId? {
+    return id
+}
+
+@JS func roundTripUserIdArray(_ ids: [UserId]) -> [UserId] {
+    return ids
 }
 
 // MARK: - Imports
@@ -391,6 +347,26 @@ import JavaScriptKit
     }
 }
 
+@JS(as: JSValue.self) struct Boxed {
+    var value: JSValue
+
+    consuming func bridgeToJS() -> JSValue {
+        return value
+    }
+
+    static func bridgeFromJS(_ value: consuming JSValue) -> Boxed {
+        return Boxed(value: value)
+    }
+}
+
+@JS func roundTripBoxed(_ boxed: Boxed) -> Boxed {
+    return boxed
+}
+
+@JS func roundTripOptionalBoxed(_ boxed: Boxed?) -> Boxed? {
+    return boxed
+}
+
 @JSClass struct AliasImports {
     @JSFunction static func jsRoundTripTagged(_ value: Tagged) throws(JSException) -> Tagged
     @JSFunction static func jsRoundTripOptionalTagged(_ value: Tagged?) throws(JSException) -> Tagged?
@@ -398,4 +374,6 @@ import JavaScriptKit
     @JSFunction static func jsRoundTripAliasedTags(_ values: [AliasedTag?]) throws(JSException) -> [AliasedTag?]
     @JSFunction static func jsRoundTripPolygon(_ value: Polygon) throws(JSException) -> Polygon
     @JSFunction static func jsRoundTripCoordinate(_ value: Coordinate) throws(JSException) -> Coordinate
+    @JSFunction static func jsRoundTripUserId(_ value: UserId) throws(JSException) -> UserId
+    @JSFunction static func jsRoundTripOptionalUserId(_ value: UserId?) throws(JSException) -> UserId?
 }

@@ -100,6 +100,15 @@ public class ExportSwift {
                 }
             }
         }
+
+        withSpan("Render Aliases") { [self] in
+            let aliasCodegen = AliasCodegen()
+            for alias in skeleton.aliases {
+                if let aliasExtension = aliasCodegen.renderAliasConformance(alias) {
+                    decls.append(aliasExtension)
+                }
+            }
+        }
         return withSpan("Format Export Glue") {
             return decls.map { $0.description }.joined(separator: "\n\n")
         }
@@ -227,15 +236,15 @@ public class ExportSwift {
                 } else {
                     optionalSwiftType = "JSUndefinedOr"
                 }
-                typeNameForIntrinsic = "\(optionalSwiftType)<\(wrappedType.unaliased.swiftType)>"
-                let liftCall =
-                    "\(typeNameForIntrinsic).bridgeJSLiftParameter(\(argumentsToLift.joined(separator: ", ")))"
-                liftingExpr = "\(raw: param.type.liftAliases(expression: liftCall))"
+                typeNameForIntrinsic = "\(optionalSwiftType)<\(wrappedType.swiftType)>"
+                liftingExpr = ExprSyntax(
+                    "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                )
             default:
-                typeNameForIntrinsic = param.type.unaliased.swiftType
-                let liftCall =
-                    "\(typeNameForIntrinsic).bridgeJSLiftParameter(\(argumentsToLift.joined(separator: ", ")))"
-                liftingExpr = "\(raw: param.type.liftAliases(expression: liftCall))"
+                typeNameForIntrinsic = param.type.swiftType
+                liftingExpr = ExprSyntax(
+                    "\(raw: typeNameForIntrinsic).bridgeJSLiftParameter(\(raw: argumentsToLift.joined(separator: ", ")))"
+                )
             }
 
             liftedParameterExprs.append(liftingExpr)
@@ -280,8 +289,7 @@ public class ExportSwift {
             }
 
             if effects.isAsync, returnType != .void {
-                let lowered = returnType.lowerAliases(expression: callExpr.description)
-                return CodeBlockItemSyntax(item: .init(StmtSyntax("return \(raw: lowered)")))
+                return CodeBlockItemSyntax(item: .init(StmtSyntax("return \(raw: callExpr)")))
             }
 
             if returnType == .void {
@@ -394,18 +402,17 @@ public class ExportSwift {
                 return
             }
 
-            let returnAccessor = returnType.lowerAliases(expression: "ret")
             switch returnType {
             case .closure(_, useJSTypedClosure: false):
                 append("return JSTypedClosure(ret).bridgeJSLowerReturn()")
             case .array, .nullable(.array, _):
                 let stackCodegen = StackCodegen()
-                for stmt in stackCodegen.lowerStatements(for: returnType, accessor: returnAccessor, varPrefix: "ret") {
+                for stmt in stackCodegen.lowerStatements(for: returnType, accessor: "ret", varPrefix: "ret") {
                     append(stmt)
                 }
             case .dictionary(.swiftProtocol):
                 let stackCodegen = StackCodegen()
-                for stmt in stackCodegen.lowerStatements(for: returnType, accessor: returnAccessor, varPrefix: "ret") {
+                for stmt in stackCodegen.lowerStatements(for: returnType, accessor: "ret", varPrefix: "ret") {
                     append(stmt)
                 }
             case .swiftProtocol:
@@ -421,7 +428,7 @@ public class ExportSwift {
                     """
                 )
             default:
-                append("return \(raw: returnAccessor).bridgeJSLowerReturn()")
+                append("return ret.bridgeJSLowerReturn()")
             }
         }
 
@@ -880,7 +887,7 @@ struct StackCodegen {
         case .string, .integer, .bool, .float, .double,
             .jsObject(nil), .jsValue, .swiftStruct, .swiftHeapObject, .unsafePointer,
             .swiftProtocol, .caseEnum, .associatedValueEnum, .rawValueEnum, .array, .dictionary, .alias:
-            return "\(raw: type.liftAliases(expression: "\(type.unaliased.swiftType).bridgeJSStackPop()"))"
+            return "\(raw: type.swiftType).bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: className)(unsafelyWrapping: JSObject.bridgeJSStackPop())"
         case .nullable(let wrappedType, let kind):
@@ -898,9 +905,7 @@ struct StackCodegen {
         case .string, .integer, .bool, .float, .double, .jsObject(nil), .jsValue,
             .swiftStruct, .swiftHeapObject, .caseEnum, .associatedValueEnum, .rawValueEnum,
             .array, .dictionary, .alias:
-            let popCall = "\(typeName)<\(wrappedType.unaliased.swiftType)>.bridgeJSStackPop()"
-            let nullableType = BridgeType.nullable(wrappedType, kind)
-            return "\(raw: nullableType.liftAliases(expression: popCall))"
+            return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: typeName)<JSObject>.bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
         case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol:
@@ -1208,10 +1213,9 @@ struct EnumCodegen {
     ) {
         for (index, associatedValue) in associatedValues.enumerated() {
             let paramName = associatedValue.label ?? "param\(index)"
-            let accessor = associatedValue.type.lowerAliases(expression: paramName)
             let statements = stackCodegen.lowerStatements(
                 for: associatedValue.type,
-                accessor: accessor,
+                accessor: paramName,
                 varPrefix: paramName
             )
             for statement in statements {
@@ -1344,10 +1348,9 @@ struct StructCodegen {
         let instanceProps = structDef.properties.filter { !$0.isStatic }
 
         for property in instanceProps {
-            let accessor = property.type.lowerAliases(expression: "self.\(property.name)")
             let statements = stackCodegen.lowerStatements(
                 for: property.type,
-                accessor: accessor,
+                accessor: "self.\(property.name)",
                 varPrefix: property.name
             )
             for statement in statements {
@@ -1356,6 +1359,18 @@ struct StructCodegen {
         }
 
         return printer.lines
+    }
+}
+
+// MARK: - AliasCodegen
+
+struct AliasCodegen {
+    func renderAliasConformance(_ alias: ExportedAlias) -> DeclSyntax? {
+        guard let protocols = alias.underlying.aliasConformanceProtocols else {
+            return nil
+        }
+        let conformances = (["_BridgedSwiftAlias"] + protocols).joined(separator: ", ")
+        return "extension \(raw: alias.swiftCallName): \(raw: conformances) {}"
     }
 }
 
@@ -1570,61 +1585,20 @@ extension UnsafePointerType {
 }
 
 extension BridgeType {
-    var unaliased: BridgeType {
+    var aliasConformanceProtocols: [String]? {
         switch self {
-        case .alias(_, let underlying): return underlying.unaliased
-        case .nullable(let wrapped, let kind): return .nullable(wrapped.unaliased, kind)
-        case .array(let element): return .array(element.unaliased)
-        case .dictionary(let value): return .dictionary(value.unaliased)
-        case .bool, .integer, .float, .double, .string, .jsValue, .jsObject,
-            .swiftHeapObject, .unsafePointer, .swiftProtocol, .void,
-            .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct,
-            .namespaceEnum, .closure:
-            return self
-        }
-    }
-
-    /// If this type contains an alias, convert the expression with a type of the alias to the underlying type.
-    func liftAliases(expression: String) -> String {
-        switch self {
-        case .alias(let name, _):
-            return "\(name).bridgeFromJS(\(expression))"
-        case .nullable(let wrapped, _):
-            let lifted = wrapped.liftAliases(expression: "$0")
-            return lifted == "$0" ? expression : "\(expression).map { \(lifted) }"
-        case .array(let element):
-            let lifted = element.liftAliases(expression: "$0")
-            return lifted == "$0" ? expression : "\(expression).map { \(lifted) }"
-        case .dictionary(let value):
-            let lifted = value.liftAliases(expression: "$0")
-            return lifted == "$0" ? expression : "\(expression).mapValues { \(lifted) }"
-        case .bool, .integer, .float, .double, .string, .jsValue, .jsObject,
-            .swiftHeapObject, .unsafePointer, .swiftProtocol, .void,
-            .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct,
-            .namespaceEnum, .closure:
-            return expression
-        }
-    }
-
-    /// Opposite of `liftAliases`: if this type contains an alias, convert the expression with a type of the underlying to the alias type.
-    func lowerAliases(expression: String) -> String {
-        switch self {
-        case .alias:
-            return "\(expression).bridgeToJS()"
-        case .nullable(let wrapped, _):
-            let lowered = wrapped.lowerAliases(expression: "$0")
-            return lowered == "$0" ? expression : "\(expression).map { \(lowered) }"
-        case .array(let element):
-            let lowered = element.lowerAliases(expression: "$0")
-            return lowered == "$0" ? expression : "\(expression).map { \(lowered) }"
-        case .dictionary(let value):
-            let lowered = value.lowerAliases(expression: "$0")
-            return lowered == "$0" ? expression : "\(expression).mapValues { \(lowered) }"
-        case .bool, .integer, .float, .double, .string, .jsValue, .jsObject,
-            .swiftHeapObject, .unsafePointer, .swiftProtocol, .void,
-            .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct,
-            .namespaceEnum, .closure:
-            return expression
+        case .swiftHeapObject, .jsObject, .integer, .float, .double, .bool, .string, .jsValue:
+            return ["_BridgedSwiftStackType"]
+        case .swiftStruct:
+            return ["_BridgedSwiftStruct"]
+        case .caseEnum:
+            return ["_BridgedSwiftCaseEnum"]
+        case .associatedValueEnum:
+            return ["_BridgedSwiftAssociatedValueEnum"]
+        case .rawValueEnum, .void, .unsafePointer, .namespaceEnum,
+            .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias:
+            // Not supported yet.
+            return nil
         }
     }
 

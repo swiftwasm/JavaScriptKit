@@ -5,7 +5,7 @@ import {
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 import { ImportedFoo } from './BridgeJSRuntimeTests/JavaScript/Types.mjs';
 import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
-import { runAliasWorks, runAliasAsyncWorks, getImports as getAliasImports, Surface } from './BridgeJSRuntimeTests/JavaScript/AliasTests.mjs';
+import { runAliasWorks, getImports as getAliasImports, Surface } from './BridgeJSRuntimeTests/JavaScript/AliasTests.mjs';
 import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/JavaScript/ClosureSupportTests.mjs';
 import { getImports as getClosureThrowsImports } from './BridgeJSRuntimeTests/JavaScript/ClosureThrowsTests.mjs';
 import { getImports as getClosureAsyncImports } from './BridgeJSRuntimeTests/JavaScript/ClosureAsyncTests.mjs';
@@ -141,14 +141,6 @@ export async function setupOptions(options, context) {
                         throw new Error("No exports!?");
                     }
                     await runAsyncWorksTests(exports);
-                    return;
-                },
-                runAliasAsyncWorks: async () => {
-                    const exports = importsContext.getExports();
-                    if (!exports) {
-                        throw new Error("No exports!?");
-                    }
-                    await runAliasAsyncWorks(exports);
                     return;
                 },
                 AsyncImportImports: getAsyncImportImports(importsContext),

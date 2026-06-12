@@ -217,6 +217,294 @@ extension Optional: _BridgedAsOptional {
     public init(optional: Wrapped?) { self = optional }
 }
 
+// MARK: - _BridgedSwiftAlias
+
+/// Types that are bridged using a separate JavaScript representation (`@JS(as:)`).
+public protocol _BridgedSwiftAlias {
+    associatedtype JSRepresentation
+    consuming func bridgeToJS() -> JSRepresentation
+    static func bridgeFromJS(_ value: consuming JSRepresentation) -> Self
+}
+
+extension _BridgedSwiftAlias where JSRepresentation: _BridgedSwiftHeapObject {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> UnsafeMutableRawPointer {
+        bridgeToJS().bridgeJSLowerParameter()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer) -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSLiftReturn(pointer))
+    }
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ pointer: UnsafeMutableRawPointer) -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSLiftParameter(pointer))
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> UnsafeMutableRawPointer {
+        bridgeToJS().bridgeJSLowerReturn()
+    }
+    // MARK: Stack ABI
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSStackPop())
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        bridgeToJS().bridgeJSStackPush()
+    }
+}
+
+extension _BridgedAsOptional where Wrapped: _BridgedSwiftAlias, Wrapped.JSRepresentation: _BridgedSwiftHeapObject {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (
+        isSome: Int32, pointer: UnsafeMutableRawPointer
+    ) {
+        asOptional.map { $0.bridgeToJS() }.bridgeJSLowerParameter()
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ pointer: UnsafeMutableRawPointer) -> Self {
+        Self(optional: Optional<Wrapped.JSRepresentation>.bridgeJSLiftReturn(pointer).map { Wrapped.bridgeFromJS($0) })
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(
+        _ isSome: Int32,
+        _ pointer: UnsafeMutableRawPointer
+    ) -> Self {
+        Self(
+            optional: Optional<Wrapped.JSRepresentation>.bridgeJSLiftParameter(isSome, pointer)
+                .map { Wrapped.bridgeFromJS($0) }
+        )
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
+        Self(
+            optional: Optional<Wrapped.JSRepresentation>.bridgeJSLiftReturnFromSideChannel()
+                .map { Wrapped.bridgeFromJS($0) }
+        )
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        asOptional.map { $0.bridgeToJS() }.bridgeJSLowerReturn()
+    }
+}
+
+extension _BridgedSwiftAlias where JSRepresentation: _JSBridgedClass {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        bridgeToJS().bridgeJSLowerParameter()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ id: Int32) -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSLiftReturn(id))
+    }
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ id: Int32) -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSLiftParameter(id))
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
+        bridgeToJS().bridgeJSLowerReturn()
+    }
+    // MARK: Stack ABI
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSStackPop())
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        bridgeToJS().bridgeJSStackPush()
+    }
+}
+
+extension _BridgedSwiftAlias where JSRepresentation: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> JSRepresentation.WasmCoreType {
+        bridgeToJS().bridgeJSLowerParameter()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: JSRepresentation.WasmCoreType) -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSLiftReturn(value))
+    }
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ value: JSRepresentation.WasmCoreType) -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSLiftParameter(value))
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> JSRepresentation.WasmCoreType {
+        bridgeToJS().bridgeJSLowerReturn()
+    }
+}
+
+extension _BridgedSwiftAlias
+where
+    JSRepresentation: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType, JSRepresentation: _BridgedSwiftStackType,
+    JSRepresentation.StackLiftResult == JSRepresentation
+{
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSStackPop())
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        bridgeToJS().bridgeJSStackPush()
+    }
+}
+
+extension _BridgedAsOptional
+where Wrapped: _BridgedSwiftAlias, Wrapped.JSRepresentation: _BridgedSwiftOptionalScalarBridge {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (
+        isSome: Int32, value: Wrapped.JSRepresentation.WasmCoreType
+    ) {
+        asOptional.map { $0.bridgeToJS() }.bridgeJSLowerParameter()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(
+        _ isSome: Int32,
+        _ value: Wrapped.JSRepresentation.WasmCoreType
+    ) -> Self {
+        Self(
+            optional: Optional<Wrapped.JSRepresentation>.bridgeJSLiftParameter(isSome, value)
+                .map { Wrapped.bridgeFromJS($0) }
+        )
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        asOptional.map { $0.bridgeToJS() }.bridgeJSLowerReturn()
+    }
+}
+
+extension _BridgedAsOptional
+where Wrapped: _BridgedSwiftAlias, Wrapped.JSRepresentation: _BridgedSwiftOptionalScalarSideChannelBridge {
+    @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
+        Self(
+            optional: Optional<Wrapped.JSRepresentation>.bridgeJSLiftReturnFromSideChannel()
+                .map { Wrapped.bridgeFromJS($0) }
+        )
+    }
+}
+
+extension _BridgedSwiftAlias where JSRepresentation: _BridgedSwiftStruct {
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSStackPop())
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        bridgeToJS().bridgeJSStackPush()
+    }
+
+    public init(unsafelyCopying jsObject: JSObject) {
+        self = Self.bridgeFromJS(JSRepresentation(unsafelyCopying: jsObject))
+    }
+    public func toJSObject() -> JSObject {
+        return self.bridgeToJS().toJSObject()
+    }
+}
+
+extension _BridgedSwiftAlias where JSRepresentation: _BridgedSwiftCaseEnum {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
+        bridgeToJS().bridgeJSLowerParameter()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ value: Int32) -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSLiftReturn(value))
+    }
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSLiftParameter(value))
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 {
+        bridgeToJS().bridgeJSLowerReturn()
+    }
+}
+
+extension _BridgedSwiftAlias where JSRepresentation: _BridgedSwiftAssociatedValueEnum {
+    @_spi(BridgeJS) public static func bridgeJSStackPopPayload(_ caseId: Int32) -> Self {
+        bridgeFromJS(JSRepresentation.bridgeJSStackPopPayload(caseId))
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPushPayload() -> Int32 {
+        bridgeToJS().bridgeJSStackPushPayload()
+    }
+}
+
+extension _BridgedSwiftAlias where JSRepresentation == String {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T {
+        bridgeToJS().bridgeJSWithLoweredParameter(body)
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ bytesCount: Int32) -> Self {
+        bridgeFromJS(String.bridgeJSLiftReturn(bytesCount))
+    }
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ bytes: Int32, _ count: Int32) -> Self {
+        bridgeFromJS(String.bridgeJSLiftParameter(bytes, count))
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        bridgeToJS().bridgeJSLowerReturn()
+    }
+    // MARK: Stack ABI
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        bridgeFromJS(String.bridgeJSStackPop())
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        bridgeToJS().bridgeJSStackPush()
+    }
+}
+
+extension _BridgedAsOptional where Wrapped: _BridgedSwiftAlias, Wrapped.JSRepresentation == String {
+    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(
+        _ body: (Int32, Int32, Int32) -> T
+    ) -> T {
+        asOptional.map { $0.bridgeToJS() }.bridgeJSWithLoweredParameter(body)
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(
+        _ isSome: Int32,
+        _ bytes: Int32,
+        _ count: Int32
+    ) -> Self {
+        Self(optional: Optional<String>.bridgeJSLiftParameter(isSome, bytes, count).map { Wrapped.bridgeFromJS($0) })
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturnFromSideChannel() -> Self {
+        Self(optional: Optional<String>.bridgeJSLiftReturnFromSideChannel().map { Wrapped.bridgeFromJS($0) })
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        asOptional.map { $0.bridgeToJS() }.bridgeJSLowerReturn()
+    }
+}
+
+extension _BridgedSwiftAlias where JSRepresentation == JSValue {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (kind: Int32, payload1: Int32, payload2: Double) {
+        bridgeToJS().bridgeJSLowerParameter()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> Self {
+        bridgeFromJS(JSValue.bridgeJSLiftReturn())
+    }
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(
+        _ kind: Int32,
+        _ payload1: Int32,
+        _ payload2: Double
+    ) -> Self {
+        bridgeFromJS(JSValue.bridgeJSLiftParameter(kind, payload1, payload2))
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        bridgeToJS().bridgeJSLowerReturn()
+    }
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        bridgeFromJS(JSValue.bridgeJSStackPop())
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        bridgeToJS().bridgeJSStackPush()
+    }
+}
+
+extension _BridgedAsOptional where Wrapped: _BridgedSwiftAlias, Wrapped.JSRepresentation == JSValue {
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (
+        isSome: Int32, kind: Int32, payload1: Int32, payload2: Double
+    ) {
+        asOptional.map { $0.bridgeToJS() }.bridgeJSLowerParameter()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(
+        _ isSome: Int32,
+        _ kind: Int32,
+        _ payload1: Int32,
+        _ payload2: Double
+    ) -> Self {
+        Self(
+            optional: Optional<JSValue>.bridgeJSLiftParameter(isSome, kind, payload1, payload2)
+                .map { Wrapped.bridgeFromJS($0) }
+        )
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        asOptional.map { $0.bridgeToJS() }.bridgeJSLowerReturn()
+    }
+}
+
 extension Bool: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType, _BridgedSwiftStackType {
     // MARK: ImportTS
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {

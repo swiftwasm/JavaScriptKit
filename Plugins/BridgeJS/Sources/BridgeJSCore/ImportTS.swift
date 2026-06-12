@@ -172,8 +172,7 @@ public struct ImportTS {
             if loweringInfo.useBorrowing {
                 let returnVariableName = "ret\(borrowedArguments.count)"
                 let assign = needsReturnVariable ? "let \(returnVariableName) = " : ""
-                let loweredAlias = param.type.lowerAliases(expression: param.name)
-                body.write("\(assign)\(loweredAlias).bridgeJSWithLoweredParameter { \(pattern) in")
+                body.write("\(assign)\(param.name).bridgeJSWithLoweredParameter { \(pattern) in")
                 body.indent()
                 borrowedArguments.append(
                     BorrowedArgument(
@@ -204,8 +203,7 @@ public struct ImportTS {
                         "(\(raw: param.name) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()"
                     )
                 } else {
-                    let loweredAlias = param.type.lowerAliases(expression: param.name)
-                    initializerExpr = ExprSyntax("\(raw: loweredAlias).bridgeJSLowerParameter()")
+                    initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
                 }
 
                 if loweringInfo.loweredParameters.isEmpty {
@@ -296,21 +294,18 @@ public struct ImportTS {
 
             if returnType.usesSideChannelForOptionalReturn() {
                 // Side channel returns: extern function returns Void, value is retrieved via side channel
-                let liftCall = "\(returnType.unaliased.swiftType).bridgeJSLiftReturnFromSideChannel()"
-                body.write("return \(returnType.liftAliases(expression: liftCall))")
+                body.write("return \(returnType.swiftType).bridgeJSLiftReturnFromSideChannel()")
             } else {
                 let liftExpr: String
                 switch returnType {
                 case .closure(let signature, _):
                     liftExpr = "_BJS_Closure_\(signature.mangleName).bridgeJSLift(ret)"
                 default:
-                    let liftCall: String
                     if liftingInfo.valueToLift != nil {
-                        liftCall = "\(returnType.unaliased.swiftType).bridgeJSLiftReturn(ret)"
+                        liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn(ret)"
                     } else {
-                        liftCall = "\(returnType.unaliased.swiftType).bridgeJSLiftReturn()"
+                        liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn()"
                     }
-                    liftExpr = returnType.liftAliases(expression: liftCall)
                 }
                 body.write("return \(liftExpr)")
             }
@@ -908,7 +903,7 @@ extension BridgeType {
     }
 
     func loweringParameterInfo(context: BridgeContext = .importTS) throws -> LoweringParameterInfo {
-        switch self {
+        switch self.unaliased {
         case .bool: return .bool
         case .integer(let t): return LoweringParameterInfo(loweredParameters: [("value", t.wasmCoreType)])
         case .float: return .float
@@ -962,8 +957,8 @@ extension BridgeType {
             return LoweringParameterInfo(loweredParameters: params, useBorrowing: wrappedInfo.useBorrowing)
         case .array, .dictionary:
             return LoweringParameterInfo(loweredParameters: [])
-        case .alias(_, let underlying):
-            return try underlying.loweringParameterInfo(context: context)
+        case .alias:
+            preconditionFailure()
         }
     }
 
@@ -983,7 +978,7 @@ extension BridgeType {
     func liftingReturnInfo(
         context: BridgeContext = .importTS
     ) throws -> LiftingReturnInfo {
-        switch self {
+        switch self.unaliased {
         case .bool: return .bool
         case .integer(let t): return LiftingReturnInfo(valueToLift: t.wasmCoreType)
         case .float: return .float
@@ -1026,7 +1021,7 @@ extension BridgeType {
         case .nullable(let wrappedType, _):
             // jsObject and `@JS struct` use the stack ABI for optionals — the thunk returns
             // void and the value (plus isSome discriminator) flows through the stacks.
-            if case .jsObject = wrappedType.unaliased {
+            if case .jsObject = wrappedType {
                 return LiftingReturnInfo(valueToLift: nil)
             }
             if case .swiftStruct = wrappedType, context == .importTS {
@@ -1036,8 +1031,8 @@ extension BridgeType {
             return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
         case .array, .dictionary:
             return LiftingReturnInfo(valueToLift: nil)
-        case .alias(_, let underlying):
-            return try underlying.liftingReturnInfo(context: context)
+        case .alias:
+            preconditionFailure()
         }
     }
 }

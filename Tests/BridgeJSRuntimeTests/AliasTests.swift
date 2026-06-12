@@ -10,10 +10,6 @@ final class AliasTests: XCTestCase {
         runAliasWorks()
     }
 
-    func testAliasAsyncEndToEnd() async throws {
-        try await runAliasAsyncWorks()
-    }
-
     // MARK: - Imports
 
     func testRoundTripTagged() throws {
@@ -68,5 +64,16 @@ final class AliasTests: XCTestCase {
         let echoed = try AliasImports.jsRoundTripCoordinate(coordinate)
         XCTAssertEqual(echoed.latitude, 12.5)
         XCTAssertEqual(echoed.longitude, -34.25)
+    }
+
+    func testRoundTripUserIdImport() throws {
+        let echoed = try AliasImports.jsRoundTripUserId(UserId(rawValue: 42))
+        XCTAssertEqual(echoed.rawValue, 42)
+    }
+
+    func testRoundTripOptionalUserIdImport() throws {
+        XCTAssertNil(try AliasImports.jsRoundTripOptionalUserId(nil))
+        XCTAssertEqual(try AliasImports.jsRoundTripOptionalUserId(UserId(rawValue: 0))?.rawValue, 0)
+        XCTAssertEqual(try AliasImports.jsRoundTripOptionalUserId(UserId(rawValue: 7))?.rawValue, 7)
     }
 }

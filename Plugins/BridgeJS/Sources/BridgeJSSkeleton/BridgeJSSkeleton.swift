@@ -1008,7 +1008,7 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
     }
 }
 
-public struct ExportedAlias: Codable {
+public struct ExportedAlias: Codable, Equatable, Sendable {
     public let swiftCallName: String
     public let underlying: BridgeType
 
@@ -1623,6 +1623,20 @@ extension BridgeType {
             self = .unsafePointer(.init(kind: .opaquePointer))
         default:
             return nil
+        }
+    }
+
+    public var unaliased: BridgeType {
+        switch self {
+        case .alias(_, let underlying): return underlying.unaliased
+        case .nullable(let wrapped, let kind): return .nullable(wrapped.unaliased, kind)
+        case .array(let element): return .array(element.unaliased)
+        case .dictionary(let value): return .dictionary(value.unaliased)
+        case .bool, .integer, .float, .double, .string, .jsValue, .jsObject,
+            .swiftHeapObject, .unsafePointer, .swiftProtocol, .void,
+            .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct,
+            .namespaceEnum, .closure:
+            return self
         }
     }
 
