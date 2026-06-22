@@ -936,14 +936,19 @@ public struct BridgeJSLink {
 
         for skeleton in exportedSkeletons {
             for proto in skeleton.protocols {
+                printer.write(lines: renderJSDoc(documentation: proto.documentation, parameters: []))
                 printer.write("export interface \(proto.name) {")
                 printer.indent {
                     for method in proto.methods {
+                        printer.write(
+                            lines: renderJSDoc(documentation: method.documentation, parameters: method.parameters)
+                        )
                         printer.write(
                             "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                         )
                     }
                     for property in proto.properties {
+                        printer.write(lines: renderJSDoc(documentation: property.documentation, parameters: []))
                         let propertySignature =
                             property.isReadonly
                             ? "readonly \(property.name): \(resolveTypeScriptType(property.type));"
@@ -978,11 +983,18 @@ public struct BridgeJSLink {
                     printer.indent {
                         for function in enumDefinition.staticMethods {
                             printer.write(
+                                lines: renderJSDoc(
+                                    documentation: function.documentation,
+                                    parameters: function.parameters
+                                )
+                            )
+                            printer.write(
                                 "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
                             )
                         }
                         for property in enumDefinition.staticProperties {
                             let readonly = property.isReadonly ? "readonly " : ""
+                            printer.write(lines: renderJSDoc(documentation: property.documentation, parameters: []))
                             printer.write("\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
                         }
                     }
@@ -999,6 +1011,9 @@ public struct BridgeJSLink {
             exportedSkeletons: exportedSkeletons,
             renderTSSignatureCallback: { parameters, returnType, effects in
                 self.renderTSSignature(parameters: parameters, returnType: returnType, effects: effects)
+            },
+            renderDocCallback: { documentation, parameters in
+                self.renderJSDoc(documentation: documentation, parameters: parameters)
             }
         )
         printer.write(lines: namespaceDeclarationsLines)
@@ -1014,8 +1029,16 @@ public struct BridgeJSLink {
             renderClassEntry: { klass in
                 data.namespacedClassDtsExportEntries[klass.name] ?? []
             },
-            renderFunctionSignature: { function in
-                "\(function.name)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+            renderFunctionEntry: { function in
+                self.renderJSDoc(documentation: function.documentation, parameters: function.parameters)
+                    + [
+                        "\(function.name)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+                    ]
+            },
+            renderPropertyEntry: { property in
+                let readonly = property.isReadonly ? "readonly " : ""
+                return self.renderJSDoc(documentation: property.documentation, parameters: [])
+                    + ["\(readonly)\(property.name): \(property.type.tsType);"]
             }
         )
         printer.write("export type Exports = {")
@@ -1574,12 +1597,6 @@ public struct BridgeJSLink {
             .replacingOccurrences(of: "\"", with: "\\\"")
     }
 
-    /// Helper method to append JSDoc comments for parameters with default values
-    private func appendJSDocIfNeeded(for parameters: [Parameter], to lines: inout [String]) {
-        let jsDocLines = DefaultValueUtils.formatJSDoc(for: parameters)
-        lines.append(contentsOf: jsDocLines)
-    }
-
     func renderExportedStruct(
         _ structDefinition: ExportedStruct
     ) throws -> (js: [String], dtsType: [String], dtsExportEntry: [String]) {
@@ -1589,15 +1606,24 @@ public struct BridgeJSLink {
         let staticProperties = structDefinition.properties.filter { $0.isStatic }
 
         let dtsTypePrinter = CodeFragmentPrinter()
+        for line in renderJSDoc(documentation: structDefinition.documentation, parameters: []) {
+            dtsTypePrinter.write(line)
+        }
         dtsTypePrinter.write("export interface \(structName) {")
         let instanceProps = structDefinition.properties.filter { !$0.isStatic }
         dtsTypePrinter.indent {
             for property in instanceProps {
                 let tsType = resolveTypeScriptType(property.type)
+                for line in renderJSDoc(documentation: property.documentation, parameters: []) {
+                    dtsTypePrinter.write(line)
+                }
                 dtsTypePrinter.write("\(property.name): \(tsType);")
             }
             for method in structDefinition.methods where !method.effects.isStatic {
-                let jsDocLines = DefaultValueUtils.formatJSDoc(for: method.parameters)
+                let jsDocLines = renderJSDoc(
+                    documentation: method.documentation,
+                    parameters: method.parameters
+                )
                 dtsTypePrinter.write(lines: jsDocLines)
                 let signature = renderTSSignature(
                     parameters: method.parameters,
@@ -1659,7 +1685,10 @@ public struct BridgeJSLink {
         dtsExportEntryPrinter.write("\(structName): {")
         dtsExportEntryPrinter.indent {
             if let constructor = structDefinition.constructor {
-                let jsDocLines = DefaultValueUtils.formatJSDoc(for: constructor.parameters)
+                let jsDocLines = renderJSDoc(
+                    documentation: constructor.documentation,
+                    parameters: constructor.parameters
+                )
                 dtsExportEntryPrinter.write(lines: jsDocLines)
                 dtsExportEntryPrinter.write(
                     "init\(renderTSSignature(parameters: constructor.parameters, returnType: .swiftStruct(structDefinition.swiftCallName), effects: constructor.effects));"
@@ -1667,10 +1696,16 @@ public struct BridgeJSLink {
             }
             for property in staticProperties {
                 let readonly = property.isReadonly ? "readonly " : ""
+                for line in renderJSDoc(documentation: property.documentation, parameters: []) {
+                    dtsExportEntryPrinter.write(line)
+                }
                 dtsExportEntryPrinter.write("\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
             }
             for method in staticMethods {
-                let jsDocLines = DefaultValueUtils.formatJSDoc(for: method.parameters)
+                let jsDocLines = renderJSDoc(
+                    documentation: method.documentation,
+                    parameters: method.parameters
+                )
                 dtsExportEntryPrinter.write(lines: jsDocLines)
                 dtsExportEntryPrinter.write(
                     "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
@@ -1769,6 +1804,10 @@ public struct BridgeJSLink {
     private func generateDeclarations(enumDefinition: ExportedEnum) -> [String] {
         let printer = CodeFragmentPrinter()
         let enumValuesName = enumDefinition.valuesName
+
+        for line in renderJSDoc(documentation: enumDefinition.documentation, parameters: []) {
+            printer.write(line)
+        }
 
         switch enumDefinition.emitStyle {
         case .tsEnum:
@@ -1883,7 +1922,7 @@ extension BridgeJSLink {
         )
         var dtsLines: [String] = []
 
-        appendJSDocIfNeeded(for: function.parameters, to: &dtsLines)
+        dtsLines.append(contentsOf: renderJSDoc(documentation: function.documentation, parameters: function.parameters))
 
         dtsLines.append(
             "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
@@ -1935,7 +1974,7 @@ extension BridgeJSLink {
 
         var dtsLines: [String] = []
 
-        appendJSDocIfNeeded(for: function.parameters, to: &dtsLines)
+        dtsLines.append(contentsOf: renderJSDoc(documentation: function.documentation, parameters: function.parameters))
 
         dtsLines.append(
             "static \(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
@@ -1966,7 +2005,7 @@ extension BridgeJSLink {
 
         var dtsLines: [String] = []
 
-        appendJSDocIfNeeded(for: function.parameters, to: &dtsLines)
+        dtsLines.append(contentsOf: renderJSDoc(documentation: function.documentation, parameters: function.parameters))
 
         dtsLines.append(
             "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
@@ -2082,6 +2121,9 @@ extension BridgeJSLink {
         let dtsTypePrinter = CodeFragmentPrinter()
         let dtsExportEntryPrinter = CodeFragmentPrinter()
 
+        for line in renderJSDoc(documentation: klass.documentation, parameters: []) {
+            dtsTypePrinter.write(line)
+        }
         dtsTypePrinter.write("export interface \(klass.name) extends SwiftHeapObject {")
         dtsExportEntryPrinter.write("\(klass.name): {")
         jsPrinter.write("class \(klass.name) extends SwiftHeapObject {")
@@ -2134,7 +2176,10 @@ extension BridgeJSLink {
             }
 
             dtsExportEntryPrinter.indent {
-                let jsDocLines = DefaultValueUtils.formatJSDoc(for: constructor.parameters)
+                let jsDocLines = renderJSDoc(
+                    documentation: constructor.documentation,
+                    parameters: constructor.parameters
+                )
                 for line in jsDocLines {
                     dtsExportEntryPrinter.write(line)
                 }
@@ -2167,6 +2212,12 @@ extension BridgeJSLink {
                 }
 
                 dtsExportEntryPrinter.indent {
+                    for line in renderJSDoc(
+                        documentation: method.documentation,
+                        parameters: method.parameters
+                    ) {
+                        dtsExportEntryPrinter.write(line)
+                    }
                     dtsExportEntryPrinter.write(
                         "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                     )
@@ -2194,6 +2245,12 @@ extension BridgeJSLink {
                 }
 
                 dtsTypePrinter.indent {
+                    for line in renderJSDoc(
+                        documentation: method.documentation,
+                        parameters: method.parameters
+                    ) {
+                        dtsTypePrinter.write(line)
+                    }
                     dtsTypePrinter.write(
                         "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                     )
@@ -2281,6 +2338,9 @@ extension BridgeJSLink {
         // Add instance property to TypeScript interface definition
         let readonly = property.isReadonly ? "readonly " : ""
         dtsPrinter.indent {
+            for line in renderJSDoc(documentation: property.documentation, parameters: []) {
+                dtsPrinter.write(line)
+            }
             dtsPrinter.write("\(readonly)\(property.name): \(property.type.tsType);")
         }
     }
@@ -2708,6 +2768,7 @@ extension BridgeJSLink {
             var functionDtsLines: [(name: String, lines: [String])] = []
             var classDtsLines: [(name: String, lines: [String])] = []
             var enumDtsLines: [(name: String, line: String)] = []
+            var staticPropertyDtsLines: [(name: String, lines: [String])] = []
             var propertyJsLines: [String] = []
         }
 
@@ -2791,7 +2852,8 @@ extension BridgeJSLink {
         fileprivate func buildHierarchicalExportsType(
             exportedSkeletons: [ExportedSkeleton],
             renderClassEntry: (ExportedClass) -> [String],
-            renderFunctionSignature: (ExportedFunction) -> String
+            renderFunctionEntry: (ExportedFunction) -> [String],
+            renderPropertyEntry: (ExportedProperty) -> [String]
         ) -> [String] {
             let printer = CodeFragmentPrinter()
             let rootNode = NamespaceNode(name: "")
@@ -2802,7 +2864,8 @@ extension BridgeJSLink {
                 populateTypeScriptExportLines(
                     node: node,
                     renderClassEntry: renderClassEntry,
-                    renderFunctionSignature: renderFunctionSignature
+                    renderFunctionEntry: renderFunctionEntry,
+                    renderPropertyEntry: renderPropertyEntry
                 )
             }
 
@@ -2814,16 +2877,20 @@ extension BridgeJSLink {
         private func populateTypeScriptExportLines(
             node: NamespaceNode,
             renderClassEntry: (ExportedClass) -> [String],
-            renderFunctionSignature: (ExportedFunction) -> String
+            renderFunctionEntry: (ExportedFunction) -> [String],
+            renderPropertyEntry: (ExportedProperty) -> [String]
         ) {
             for function in node.content.functions {
-                let signature = renderFunctionSignature(function)
-                node.content.functionDtsLines.append((function.name, [signature]))
+                node.content.functionDtsLines.append((function.name, renderFunctionEntry(function)))
             }
 
             for klass in node.content.classes {
                 let entry = renderClassEntry(klass)
                 node.content.classDtsLines.append((klass.name, entry))
+            }
+
+            for property in node.content.staticProperties {
+                node.content.staticPropertyDtsLines.append((property.name, renderPropertyEntry(property)))
             }
 
             for enumDef in node.content.enums {
@@ -2834,7 +2901,8 @@ extension BridgeJSLink {
                 populateTypeScriptExportLines(
                     node: childNode,
                     renderClassEntry: renderClassEntry,
-                    renderFunctionSignature: renderFunctionSignature
+                    renderFunctionEntry: renderFunctionEntry,
+                    renderPropertyEntry: renderPropertyEntry
                 )
             }
         }
@@ -2962,9 +3030,8 @@ extension BridgeJSLink {
                         printer.write(line)
                     }
 
-                    for property in childNode.content.staticProperties.sorted(by: { $0.name < $1.name }) {
-                        let readonly = property.isReadonly ? "readonly " : ""
-                        printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                    for (_, lines) in childNode.content.staticPropertyDtsLines.sorted(by: { $0.name < $1.name }) {
+                        printer.write(lines: lines)
                     }
 
                     for (_, lines) in childNode.content.functionDtsLines.sorted(by: { $0.name < $1.name }) {
@@ -3030,7 +3097,8 @@ extension BridgeJSLink {
         /// - Returns: Array of TypeScript declaration lines defining the global namespace structure
         func namespaceDeclarations(
             exportedSkeletons: [ExportedSkeleton],
-            renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String
+            renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String,
+            renderDocCallback: @escaping (String?, [Parameter]) -> [String]
         ) -> [String] {
             let printer = CodeFragmentPrinter()
 
@@ -3052,7 +3120,8 @@ extension BridgeJSLink {
                         printer: printer,
                         exposeToGlobal: true,
                         exportedSkeletons: exportedSkeletons,
-                        renderTSSignatureCallback: renderTSSignatureCallback
+                        renderTSSignatureCallback: renderTSSignatureCallback,
+                        renderDocCallback: renderDocCallback
                     )
                     printer.unindent()
                     printer.write("}")
@@ -3071,7 +3140,8 @@ extension BridgeJSLink {
                         printer: printer,
                         exposeToGlobal: false,
                         exportedSkeletons: exportedSkeletons,
-                        renderTSSignatureCallback: renderTSSignatureCallback
+                        renderTSSignatureCallback: renderTSSignatureCallback,
+                        renderDocCallback: renderDocCallback
                     )
                 }
             }
@@ -3085,7 +3155,8 @@ extension BridgeJSLink {
             printer: CodeFragmentPrinter,
             exposeToGlobal: Bool,
             exportedSkeletons: [ExportedSkeleton],
-            renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String
+            renderTSSignatureCallback: @escaping ([Parameter], BridgeType, Effects) -> String,
+            renderDocCallback: @escaping (String?, [Parameter]) -> [String]
         ) {
             func hasContent(node: NamespaceNode) -> Bool {
                 // Enums and structs are always included
@@ -3129,6 +3200,7 @@ extension BridgeJSLink {
                     if exposeToGlobal {
                         let sortedClasses = childNode.content.classes.sorted { $0.name < $1.name }
                         for klass in sortedClasses {
+                            printer.write(lines: renderDocCallback(klass.documentation, []))
                             printer.write("class \(klass.name) {")
                             printer.indent {
                                 if let constructor = klass.constructor {
@@ -3138,6 +3210,9 @@ extension BridgeJSLink {
                                     }
                                     let constructorSignature =
                                         "constructor(\(paramSignatures.joined(separator: ", ")));"
+                                    printer.write(
+                                        lines: renderDocCallback(constructor.documentation, constructor.parameters)
+                                    )
                                     printer.write(constructorSignature)
                                 }
 
@@ -3146,6 +3221,7 @@ extension BridgeJSLink {
                                     let staticKeyword = method.effects.isStatic ? "static " : ""
                                     let methodSignature =
                                         "\(staticKeyword)\(method.name)\(renderTSSignatureCallback(method.parameters, method.returnType, method.effects));"
+                                    printer.write(lines: renderDocCallback(method.documentation, method.parameters))
                                     printer.write(methodSignature)
                                 }
 
@@ -3153,6 +3229,7 @@ extension BridgeJSLink {
                                 for property in sortedProperties {
                                     let staticKeyword = property.isStatic ? "static " : ""
                                     let readonly = property.isReadonly ? "readonly " : ""
+                                    printer.write(lines: renderDocCallback(property.documentation, []))
                                     printer.write(
                                         "\(staticKeyword)\(readonly)\(property.name): \(property.type.tsType);"
                                     )
@@ -3167,6 +3244,7 @@ extension BridgeJSLink {
                     // Generate enum definitions within declare global namespace
                     let sortedEnums = childNode.content.enums.sorted { $0.name < $1.name }
                     for enumDefinition in sortedEnums {
+                        printer.write(lines: renderDocCallback(enumDefinition.documentation, []))
                         let style: EnumEmitStyle = enumDefinition.emitStyle
                         let enumValuesName = enumDefinition.valuesName
                         switch enumDefinition.enumType {
@@ -3275,6 +3353,7 @@ extension BridgeJSLink {
                     let sortedStructs = childNode.content.structs.sorted { $0.name < $1.name }
                     for structDef in sortedStructs {
                         let instanceProps = structDef.properties.filter { !$0.isStatic }
+                        printer.write(lines: renderDocCallback(structDef.documentation, []))
                         printer.write("export interface \(structDef.name) {")
                         printer.indent {
                             for property in instanceProps {
@@ -3282,6 +3361,7 @@ extension BridgeJSLink {
                                     property.type,
                                     exportedSkeletons: exportedSkeletons
                                 )
+                                printer.write(lines: renderDocCallback(property.documentation, []))
                                 printer.write("\(property.name): \(tsType);")
                             }
                         }
@@ -3294,11 +3374,13 @@ extension BridgeJSLink {
                         for function in sortedFunctions {
                             let signature =
                                 "function \(function.name)\(renderTSSignatureCallback(function.parameters, function.returnType, function.effects));"
+                            printer.write(lines: renderDocCallback(function.documentation, function.parameters))
                             printer.write(signature)
                         }
                         let sortedProperties = childNode.content.staticProperties.sorted { $0.name < $1.name }
                         for property in sortedProperties {
                             let readonly = property.isReadonly ? "var " : "let "
+                            printer.write(lines: renderDocCallback(property.documentation, []))
                             printer.write("\(readonly)\(property.name): \(property.type.tsType);")
                         }
                     }
@@ -3309,7 +3391,8 @@ extension BridgeJSLink {
                         printer: printer,
                         exposeToGlobal: exposeToGlobal,
                         exportedSkeletons: exportedSkeletons,
-                        renderTSSignatureCallback: renderTSSignatureCallback
+                        renderTSSignatureCallback: renderTSSignatureCallback,
+                        renderDocCallback: renderDocCallback
                     )
 
                     printer.unindent()
@@ -3668,24 +3751,6 @@ enum DefaultValueUtils {
             .replacingOccurrences(of: "\"", with: "\\\"")
     }
 
-    /// Generates JSDoc comment lines for parameters with default values
-    static func formatJSDoc(for parameters: [Parameter]) -> [String] {
-        let paramsWithDefaults = parameters.filter { $0.hasDefault }
-        guard !paramsWithDefaults.isEmpty else {
-            return []
-        }
-
-        var jsDocLines: [String] = ["/**"]
-        for param in paramsWithDefaults {
-            if let defaultValue = param.defaultValue {
-                let defaultDoc = format(defaultValue, as: .typescript)
-                jsDocLines.append(" * @param \(param.name) - Optional parameter (default: \(defaultDoc))")
-            }
-        }
-        jsDocLines.append(" */")
-        return jsDocLines
-    }
-
     /// Generates a JavaScript parameter list with default values
     static func formatParameterList(_ parameters: [Parameter]) -> String {
         return parameters.map { param in
@@ -3695,6 +3760,144 @@ enum DefaultValueUtils {
             }
             return param.name
         }.joined(separator: ", ")
+    }
+}
+
+extension BridgeJSLink {
+    /// Renders the JSDoc block for an exported declaration, mapping the Swift DocC
+    /// comment to `@param`/`@returns`/`@throws` and merging any default-value notes.
+    /// Returns an empty array when there is nothing to document.
+    fileprivate func renderJSDoc(documentation: String?, parameters: [Parameter]) -> [String] {
+        let parsed = documentation.map(DocCComment.init(parsing:)) ?? DocCComment()
+
+        var tagLines: [String] = []
+        for parameter in parameters {
+            let docText = parsed.parameter(named: parameter.name)
+            let defaultValue = parameter.defaultValue.map { DefaultValueUtils.format($0, as: .typescript) }
+            switch (docText, defaultValue) {
+            case let (.some(text), .some(value)):
+                tagLines.append("@param \(parameter.name) \(text) (default: \(value))")
+            case let (.some(text), .none):
+                tagLines.append("@param \(parameter.name) \(text)")
+            case let (.none, .some(value)):
+                tagLines.append("@param \(parameter.name) - Optional parameter (default: \(value))")
+            case (.none, .none):
+                continue
+            }
+        }
+        if let returns = parsed.returns {
+            tagLines.append(returns.isEmpty ? "@returns" : "@returns \(returns)")
+        }
+        if let thrown = parsed.throws {
+            tagLines.append(thrown.isEmpty ? "@throws" : "@throws \(thrown)")
+        }
+
+        guard !parsed.description.isEmpty || !tagLines.isEmpty else { return [] }
+
+        // `*/` in the doc text would prematurely close the JSDoc block comment.
+        func escape(_ text: String) -> String { text.replacingOccurrences(of: "*/", with: "*\\/") }
+
+        var lines: [String] = ["/**"]
+        lines.append(contentsOf: parsed.description.map { $0.isEmpty ? " *" : " * \(escape($0))" })
+        lines.append(contentsOf: tagLines.map { " * \(escape($0))" })
+        lines.append(" */")
+        return lines
+    }
+}
+
+/// A parsed Swift DocC comment: a description block plus its `- Parameters:`,
+/// `- Returns:`, and `- Throws:` field items.
+private struct DocCComment {
+    var description: [String] = []
+    var parameters: [(name: String, text: String)] = []
+    var returns: String?
+    var `throws`: String?
+
+    init() {}
+
+    init(parsing text: String) {
+        enum Target { case description, parameter(Int), returns, `throws`, none }
+        var target: Target = .description
+
+        func append(continuation line: String) {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            switch target {
+            case .description: description.append(line)
+            case .parameter(let index) where !trimmed.isEmpty: parameters[index].text += " \(trimmed)"
+            case .returns where !trimmed.isEmpty: returns = [returns, trimmed].compactMap { $0 }.joined(separator: " ")
+            case .throws where !trimmed.isEmpty:
+                `throws` = [`throws`, trimmed].compactMap { $0 }.joined(separator: " ")
+            default: return
+            }
+        }
+
+        func addParameter(_ name: String, _ desc: String) {
+            parameters.append((name: name, text: desc))
+            target = .parameter(parameters.count - 1)
+        }
+
+        func isInParameterList(_ target: Target) -> Bool {
+            switch target {
+            case .none, .parameter: return true
+            default: return false
+            }
+        }
+
+        for rawLine in text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init) {
+            let trimmed = rawLine.trimmingCharacters(in: .whitespaces)
+            if trimmed == "- Parameters:" {
+                target = .none
+            } else if let (name, desc) = Self.listItem(trimmed, keyword: "Parameter") {
+                addParameter(name, desc)
+            } else if let desc = Self.field(trimmed, keyword: "Returns") {
+                returns = desc
+                target = .returns
+            } else if let desc = Self.field(trimmed, keyword: "Throws") {
+                `throws` = desc
+                target = .throws
+            } else if isInParameterList(target), let (name, desc) = Self.bareItem(trimmed) {
+                addParameter(name, desc)
+            } else {
+                append(continuation: rawLine)
+            }
+        }
+
+        while description.first?.trimmingCharacters(in: .whitespaces).isEmpty == true { description.removeFirst() }
+        while description.last?.trimmingCharacters(in: .whitespaces).isEmpty == true { description.removeLast() }
+    }
+
+    func parameter(named name: String) -> String? {
+        parameters.first { $0.name == name }?.text
+    }
+
+    /// Matches `- Keyword name: description`.
+    private static func listItem(_ line: String, keyword: String) -> (String, String)? {
+        guard line.hasPrefix("- \(keyword) ") else { return nil }
+        return splitNameAndDescription(String(line.dropFirst("- \(keyword) ".count)))
+    }
+
+    /// Matches `- name: description` (a sub-item of a `- Parameters:` block).
+    private static func bareItem(_ line: String) -> (String, String)? {
+        guard line.hasPrefix("- ") else { return nil }
+        guard let (name, desc) = splitNameAndDescription(String(line.dropFirst(2))), !name.contains(" ") else {
+            return nil
+        }
+        return (name, desc)
+    }
+
+    /// Matches `- Keyword: description`, returning the (possibly empty) description.
+    private static func field(_ line: String, keyword: String) -> String? {
+        if line.hasPrefix("- \(keyword): ") {
+            return String(line.dropFirst("- \(keyword): ".count)).trimmingCharacters(in: .whitespaces)
+        }
+        return line == "- \(keyword):" ? "" : nil
+    }
+
+    private static func splitNameAndDescription(_ rest: String) -> (String, String)? {
+        guard let colon = rest.firstIndex(of: ":") else { return nil }
+        let name = String(rest[..<colon]).trimmingCharacters(in: .whitespaces)
+        let desc = String(rest[rest.index(after: colon)...]).trimmingCharacters(in: .whitespaces)
+        return name.isEmpty ? nil : (name, desc)
     }
 }
 

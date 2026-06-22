@@ -21,9 +21,11 @@
             }
           ]
         },
+        "documentation" : "A greeter living in a namespace.",
         "methods" : [
           {
             "abiName" : "bjs___Swift_Foundation_Greeter_greet",
+            "documentation" : "Produces a greeting for the configured name.\n- Returns: The greeting message.",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,
@@ -262,6 +264,7 @@
       },
       {
         "abiName" : "bjs_MyModule_Utils_namespacedFunction",
+        "documentation" : "A namespaced free function.\n- Returns: A fixed namespaced string.",
         "effects" : {
           "isAsync" : false,
           "isStatic" : false,

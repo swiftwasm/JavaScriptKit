@@ -16,6 +16,7 @@
         "methods" : [
           {
             "abiName" : "bjs_PlayBridgeJS_updateDetailed",
+            "documentation" : "Structured entry point used by the playground so JS doesn't need to parse diagnostics.",
             "effects" : {
               "isAsync" : false,
               "isStatic" : false,

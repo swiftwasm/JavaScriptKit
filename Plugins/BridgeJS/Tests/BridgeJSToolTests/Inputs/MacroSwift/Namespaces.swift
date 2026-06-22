@@ -1,7 +1,10 @@
 @JS func plainFunction() -> String { "plain" }
 
+/// A namespaced free function.
+/// - Returns: A fixed namespaced string.
 @JS(namespace: "MyModule.Utils") func namespacedFunction() -> String { "namespaced" }
 
+/// A greeter living in a namespace.
 @JS(namespace: "__Swift.Foundation") class Greeter {
     var name: String
 
@@ -9,6 +12,8 @@
         self.name = name
     }
 
+    /// Produces a greeting for the configured name.
+    /// - Returns: The greeting message.
     @JS func greet() -> String {
         return "Hello, " + self.name + "!"
     }
