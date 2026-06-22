@@ -35,7 +35,7 @@ jobs:
       JAVASCRIPTKIT_WASI_BACKEND: ${{ matrix.entry.wasi-backend }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Export matrix env
         if: ${{ matrix.entry.env != '' && matrix.entry.env != null }}
         run: |
@@ -79,7 +79,7 @@ jobs:
     container:
       image: ${{ matrix.entry.image }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -105,7 +105,7 @@ jobs:
             xcode: Xcode_26.0.1
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: swift build --product BridgeJSTool
         env:
           DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer/
@@ -116,7 +116,7 @@ jobs:
   prettier:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
@@ -128,7 +128,7 @@ jobs:
     container:
       image: swift:6.3
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: ./Utilities/format.swift
       - name: Check for formatting changes
         run: |
@@ -141,7 +141,7 @@ jobs:
   check-bridgejs-generated:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/install-swift
         with:
           download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
@@ -158,7 +158,7 @@ jobs:
   build-examples:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/install-swift
         with:
           download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
