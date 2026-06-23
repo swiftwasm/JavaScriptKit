@@ -8,6 +8,7 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.event_name, 'pull') }}
 jobs:
   test:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     name: Build and Test
     strategy:
       matrix:
@@ -15,6 +16,7 @@ jobs:
           - os: ubuntu-24.04
             toolchain:
               download-url: https://download.swift.org/development/ubuntu2404/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu24.04.tar.gz
+            swift-syntax-version: "603.0.2"
             wasi-backend: Node
             target: "wasm32-unknown-wasip1"
             env: |
@@ -22,11 +24,13 @@ jobs:
           - os: ubuntu-24.04
             toolchain:
               download-url: https://download.swift.org/swift-6.3-branch/ubuntu2404/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a-ubuntu24.04.tar.gz
+            swift-syntax-version: "603.0.2"
             wasi-backend: Node
             target: "wasm32-unknown-wasip1"
           - os: ubuntu-22.04
             toolchain:
               download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
+            swift-syntax-version: "603.0.2"
             wasi-backend: Node
             target: "wasm32-unknown-wasip1-threads"
 
@@ -53,28 +57,37 @@ jobs:
         run: |
           echo "SWIFT_SDK_ID=${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}" >> $GITHUB_ENV
           echo "SWIFT_BIN_PATH=$(dirname $(which swiftc))" >> $GITHUB_ENV
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@yt/support-swiftpm-triple-build-dir
+        id: swiftsyntax-prebuilts
+        with:
+          swift-syntax-version: ${{ matrix.entry.swift-syntax-version }}
       - run: make bootstrap
       - run: npm run test:runtime
       - run: make unittest
         # Skip unit tests with uwasi because its proc_exit throws
         # unhandled promise rejection.
         if: ${{ matrix.entry.wasi-backend != 'MicroWASI' }}
+        env:
+          SWIFT_PACKAGE_FLAGS: ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }}
       - name: Check if SwiftPM resources are stale
         run: |
           make regenerate_swiftpm_resources
           git diff --exit-code Sources/JavaScriptKit/Runtime
-      - run: swift test --package-path ./Plugins/PackageToJS
-      - run: swift test --package-path ./Plugins/BridgeJS
+      - run: swift test ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }} --package-path ./Plugins/PackageToJS
+      - run: swift test ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }} --package-path ./Plugins/BridgeJS
+        env:
+          BRIDGEJS_OVERRIDE_SWIFT_SYNTAX_VERSION: ${{ matrix.entry.swift-syntax-version }}
       - name: Validate BridgeJS TypeScript declarations
         run: npm run check:bridgejs-dts
 
   test-bridgejs-against-swift-versions:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     name: Test BridgeJS against Swift versions
     strategy:
       matrix:
         entry:
           - image: "swift:6.3"
-            swift-syntax-version: "603.0.0"
+            swift-syntax-version: "603.0.2"
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.entry.image }}
@@ -89,13 +102,16 @@ jobs:
       - name: Validate BridgeJS TypeScript declarations
         run: npm run check:bridgejs-dts
       - name: Run BridgeJS tests
-        # NOTE: Seems like the prebuilt SwiftSyntax binaries are not compatible with
-        # non-macro dependents, so disable experimental prebuilts for now.
+        # NOTE: This job runs in the swift Docker image, whose compiler tag is
+        # swift-6.3.2-RELEASE. No matching release asset is currently published
+        # for the setup action, so using it falls back to a local SwiftSyntax
+        # prebuild and makes the job slower than building normally.
         run: swift test --disable-experimental-prebuilts --package-path ./Plugins/BridgeJS
         env:
           BRIDGEJS_OVERRIDE_SWIFT_SYNTAX_VERSION: ${{ matrix.entry.swift-syntax-version }}
 
   native-build:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     # Check native build to make it easy to develop applications by Xcode
     name: Build for native target
     strategy:
@@ -114,6 +130,7 @@ jobs:
           DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer/
 
   prettier:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -124,6 +141,7 @@ jobs:
       - run: npx prettier --check Runtime/src
 
   format:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     runs-on: ubuntu-latest
     container:
       image: swift:6.3
@@ -139,14 +157,21 @@ jobs:
           }
 
   check-bridgejs-generated:
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/install-swift
         with:
           download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@yt/support-swiftpm-triple-build-dir
+        id: swiftsyntax-prebuilts
+        with:
+          swift-syntax-version: "600.0.1"
       - run: make bootstrap
       - run: ./Utilities/bridge-js-generate.sh
+        env:
+          SWIFT_PACKAGE_FLAGS: ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }}
       - name: Check if BridgeJS generated files are up-to-date
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -156,7 +181,8 @@ jobs:
           }
 
   build-examples:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/install-swift
@@ -168,19 +194,109 @@ jobs:
       - uses: swiftwasm/setup-swiftwasm@v2
         id: setup-wasm32-unknown-wasip1-threads
         with: { target: wasm32-unknown-wasip1-threads }
-      - run: ./Utilities/build-examples.sh
+      - uses: swiftwasm/setup-swift-syntax-prebuilts@yt/support-swiftpm-triple-build-dir
+        id: swiftsyntax-prebuilts
+        with:
+          swift-syntax-version: "603.0.2"
+      - run: |
+          set -o pipefail
+          swift --version
+          echo "SwiftSyntax restore source: ${{ steps.swiftsyntax-prebuilts.outputs.restore-source }}"
+          echo "SwiftSyntax cache hit: ${{ steps.swiftsyntax-prebuilts.outputs.cache-hit }}"
+          echo "SwiftSyntax prebuilts path: ${{ steps.swiftsyntax-prebuilts.outputs.prebuilts-path }}"
+          find "${{ steps.swiftsyntax-prebuilts.outputs.prebuilts-path }}" -maxdepth 3 -type f | sort
+
+          runtime_view="$RUNNER_TEMP/JavaScriptKitRuntimeOnly"
+          rm -rf "$runtime_view"
+          cp -R "$GITHUB_WORKSPACE" "$runtime_view"
+          rm -rf "$runtime_view/.git"
+
+          cat > "$runtime_view/Package.swift" <<'EOF'
+          // swift-tools-version:6.2
+
+          import CompilerPluginSupport
+          import PackageDescription
+
+          let package = Package(
+              name: "JavaScriptKit",
+              platforms: [
+                  .macOS(.v13),
+                  .iOS(.v13),
+                  .tvOS(.v13),
+                  .watchOS(.v6),
+                  .macCatalyst(.v13),
+              ],
+              products: [
+                  .library(name: "JavaScriptKit", targets: ["JavaScriptKit"]),
+                  .library(name: "JavaScriptEventLoop", targets: ["JavaScriptEventLoop"]),
+                  .plugin(name: "PackageToJS", targets: ["PackageToJS"]),
+              ],
+              dependencies: [
+                  .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"604.0.0")
+              ],
+              targets: [
+                  .target(
+                      name: "JavaScriptKit",
+                      dependencies: ["_CJavaScriptKit", "BridgeJSMacros"],
+                      exclude: ["Runtime"],
+                      swiftSettings: [
+                          .enableExperimentalFeature("Extern"),
+                      ]
+                  ),
+                  .target(name: "_CJavaScriptKit"),
+                  .macro(
+                      name: "BridgeJSMacros",
+                      dependencies: [
+                          .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                          .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+                      ]
+                  ),
+                  .target(
+                      name: "JavaScriptEventLoop",
+                      dependencies: ["JavaScriptKit", "_CJavaScriptEventLoop"]
+                  ),
+                  .target(name: "_CJavaScriptEventLoop"),
+                  .plugin(
+                      name: "PackageToJS",
+                      capability: .command(
+                          intent: .custom(verb: "js", description: "Convert a Swift package to a JavaScript package")
+                      ),
+                      path: "Plugins/PackageToJS/Sources"
+                  ),
+              ]
+          )
+          EOF
+
+          swift package --verbose ${SWIFT_PACKAGE_FLAGS} --package-path "$runtime_view/Examples/ActorOnWebWorker" resolve
+          find "$runtime_view/Examples/ActorOnWebWorker/.build/prebuilts" -maxdepth 5 -print 2>/dev/null | sort || true
+          find "$runtime_view/Examples/ActorOnWebWorker/.build" -name workspace-state.json -print -exec sed -n '1,240p' {} \; || true
+
+          cd "$runtime_view/Examples/ActorOnWebWorker"
+
+          swift package --verbose ${SWIFT_PACKAGE_FLAGS} --build-system native \
+            --swift-sdk "${SWIFT_SDK_ID_wasm32_unknown_wasip1_threads:-${SWIFT_SDK_ID:-wasm32-unknown-wasip1-threads}}" \
+            plugin --allow-writing-to-package-directory \
+            js --use-cdn --output ./Bundle -c release 2>&1 | tee plugin-build.log
+
+          if grep -E "Compiling (SwiftSyntax|SwiftBasicFormat|SwiftDiagnostics|SwiftParser|SwiftOperators|SwiftIfConfig|SwiftCompilerPlugin|SwiftSyntaxMacros|SwiftSyntaxMacroExpansion|SwiftCompilerPluginMessageHandling)|SwiftSyntax-tool\.build|SwiftCompilerPlugin-tool\.build|SwiftSyntaxMacros-tool\.build" plugin-build.log; then
+            echo "::error::SwiftSyntax was built from source instead of using prebuilts"
+            exit 1
+          fi
         env:
           SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
           SWIFT_SDK_ID_wasm32_unknown_wasip1: ${{ steps.setup-wasm32-unknown-wasip1.outputs.swift-sdk-id }}
-      - run: ./Utilities/prepare-gh-pages.sh
+          SWIFT_PACKAGE_FLAGS: ${{ steps.swiftsyntax-prebuilts.outputs.swift-flags }}
+      - if: false # TEMP: skip pages packaging while debugging one example.
+        run: ./Utilities/prepare-gh-pages.sh
       - name: Upload static files as artifact
+        if: false # TEMP: skip pages artifact upload while debugging one example.
         id: deployment
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./_site
   deploy-examples:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: false # TEMP: narrow CI while debugging SwiftSyntax prebuilt consumption.
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
