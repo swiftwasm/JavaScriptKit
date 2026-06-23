@@ -34,7 +34,8 @@ declare global {
             class Greeter {
                 constructor(name: string);
                 greet(): string;
-                makeDefault(): Greeter;
+                static makeDefault(): Greeter;
+                static readonly defaultGreeting: string;
                 release(): void;
             }
             class UUID {

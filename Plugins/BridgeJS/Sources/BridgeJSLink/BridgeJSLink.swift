@@ -3143,17 +3143,19 @@ extension BridgeJSLink {
 
                                 let sortedMethods = klass.methods.sorted { $0.name < $1.name }
                                 for method in sortedMethods {
+                                    let staticKeyword = method.effects.isStatic ? "static " : ""
                                     let methodSignature =
-                                        "\(method.name)\(renderTSSignatureCallback(method.parameters, method.returnType, method.effects));"
+                                        "\(staticKeyword)\(method.name)\(renderTSSignatureCallback(method.parameters, method.returnType, method.effects));"
                                     printer.write(methodSignature)
                                 }
 
-                                let sortedProperties = klass.properties.filter { !$0.isStatic }.sorted {
-                                    $0.name < $1.name
-                                }
+                                let sortedProperties = klass.properties.sorted { $0.name < $1.name }
                                 for property in sortedProperties {
+                                    let staticKeyword = property.isStatic ? "static " : ""
                                     let readonly = property.isReadonly ? "readonly " : ""
-                                    printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                                    printer.write(
+                                        "\(staticKeyword)\(readonly)\(property.name): \(property.type.tsType);"
+                                    )
                                 }
 
                                 printer.write("release(): void;")
