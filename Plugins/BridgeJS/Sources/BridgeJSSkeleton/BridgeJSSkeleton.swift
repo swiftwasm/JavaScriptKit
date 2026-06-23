@@ -673,6 +673,7 @@ public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedTy
     public var constructor: ExportedConstructor?
     public var methods: [ExportedFunction]
     public let namespace: [String]?
+    public var documentation: String?
 
     public init(
         name: String,
@@ -681,7 +682,8 @@ public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedTy
         properties: [ExportedProperty] = [],
         constructor: ExportedConstructor? = nil,
         methods: [ExportedFunction] = [],
-        namespace: [String]?
+        namespace: [String]?,
+        documentation: String? = nil
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
@@ -690,6 +692,7 @@ public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedTy
         self.constructor = constructor
         self.methods = methods
         self.namespace = namespace
+        self.documentation = documentation
     }
 }
 
@@ -759,6 +762,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable, NamespacedExportedType
     public let emitStyle: EnumEmitStyle
     public var staticMethods: [ExportedFunction]
     public var staticProperties: [ExportedProperty] = []
+    public var documentation: String?
     public var enumType: EnumType {
         if cases.isEmpty {
             return .namespace
@@ -787,7 +791,8 @@ public struct ExportedEnum: Codable, Equatable, Sendable, NamespacedExportedType
         namespace: [String]?,
         emitStyle: EnumEmitStyle,
         staticMethods: [ExportedFunction] = [],
-        staticProperties: [ExportedProperty] = []
+        staticProperties: [ExportedProperty] = [],
+        documentation: String? = nil
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
@@ -799,6 +804,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable, NamespacedExportedType
         self.emitStyle = emitStyle
         self.staticMethods = staticMethods
         self.staticProperties = staticProperties
+        self.documentation = documentation
     }
 }
 
@@ -815,15 +821,18 @@ public struct ExportedProtocolProperty: Codable, Equatable, Sendable {
     public let name: String
     public let type: BridgeType
     public let isReadonly: Bool
+    public var documentation: String?
 
     public init(
         name: String,
         type: BridgeType,
-        isReadonly: Bool
+        isReadonly: Bool,
+        documentation: String? = nil
     ) {
         self.name = name
         self.type = type
         self.isReadonly = isReadonly
+        self.documentation = documentation
     }
 }
 
@@ -832,17 +841,20 @@ public struct ExportedProtocol: Codable, Equatable {
     public let methods: [ExportedFunction]
     public let properties: [ExportedProtocolProperty]
     public let namespace: [String]?
+    public var documentation: String?
 
     public init(
         name: String,
         methods: [ExportedFunction],
         properties: [ExportedProtocolProperty] = [],
-        namespace: [String]? = nil
+        namespace: [String]? = nil,
+        documentation: String? = nil
     ) {
         self.name = name
         self.methods = methods
         self.properties = properties
         self.namespace = namespace
+        self.documentation = documentation
     }
 }
 
@@ -854,6 +866,7 @@ public struct ExportedFunction: Codable, Equatable, Sendable {
     public var effects: Effects
     public var namespace: [String]?
     public var staticContext: StaticContext?
+    public var documentation: String?
 
     public init(
         name: String,
@@ -862,7 +875,8 @@ public struct ExportedFunction: Codable, Equatable, Sendable {
         returnType: BridgeType,
         effects: Effects,
         namespace: [String]? = nil,
-        staticContext: StaticContext? = nil
+        staticContext: StaticContext? = nil,
+        documentation: String? = nil
     ) {
         self.name = name
         self.abiName = abiName
@@ -871,6 +885,7 @@ public struct ExportedFunction: Codable, Equatable, Sendable {
         self.effects = effects
         self.namespace = namespace
         self.staticContext = staticContext
+        self.documentation = documentation
     }
 }
 
@@ -883,6 +898,7 @@ public struct ExportedClass: Codable, NamespacedExportedType {
     public var properties: [ExportedProperty]
     public var namespace: [String]?
     public var identityMode: Bool?  // nil = use config default, true/false = override
+    public var documentation: String?
 
     public init(
         name: String,
@@ -892,7 +908,8 @@ public struct ExportedClass: Codable, NamespacedExportedType {
         methods: [ExportedFunction],
         properties: [ExportedProperty] = [],
         namespace: [String]? = nil,
-        identityMode: Bool? = nil
+        identityMode: Bool? = nil,
+        documentation: String? = nil
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
@@ -902,6 +919,7 @@ public struct ExportedClass: Codable, NamespacedExportedType {
         self.properties = properties
         self.namespace = namespace
         self.identityMode = identityMode
+        self.documentation = documentation
     }
 }
 
@@ -910,12 +928,20 @@ public struct ExportedConstructor: Codable, Equatable, Sendable {
     public var parameters: [Parameter]
     public var effects: Effects
     public var namespace: [String]?
+    public var documentation: String?
 
-    public init(abiName: String, parameters: [Parameter], effects: Effects, namespace: [String]? = nil) {
+    public init(
+        abiName: String,
+        parameters: [Parameter],
+        effects: Effects,
+        namespace: [String]? = nil,
+        documentation: String? = nil
+    ) {
         self.abiName = abiName
         self.parameters = parameters
         self.effects = effects
         self.namespace = namespace
+        self.documentation = documentation
     }
 }
 
@@ -926,6 +952,7 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
     public var isStatic: Bool
     public var namespace: [String]?
     public var staticContext: StaticContext?
+    public var documentation: String?
 
     public init(
         name: String,
@@ -933,7 +960,8 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
         isReadonly: Bool = false,
         isStatic: Bool = false,
         namespace: [String]? = nil,
-        staticContext: StaticContext? = nil
+        staticContext: StaticContext? = nil,
+        documentation: String? = nil
     ) {
         self.name = name
         self.type = type
@@ -941,6 +969,7 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
         self.isStatic = isStatic
         self.namespace = namespace
         self.staticContext = staticContext
+        self.documentation = documentation
     }
 
     public func callName(prefix: String? = nil) -> String {

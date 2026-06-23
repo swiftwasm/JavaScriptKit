@@ -1,0 +1,436 @@
+{
+  "exported" : {
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Greeter_init",
+          "documentation" : "Create a greeter.\n- Parameter name: The name to greet.",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "documentation" : "A greeter that keeps the target name.",
+        "methods" : [
+          {
+            "abiName" : "bjs_Greeter_greet",
+            "documentation" : "Returns a greeting for the configured name.\n- Returns: The greeting message.",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "greet",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Greeter",
+        "properties" : [
+          {
+            "documentation" : "The configured name.",
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Greeter"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "red"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "green"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "blue"
+          }
+        ],
+        "documentation" : "A primary color channel.",
+        "emitStyle" : "const",
+        "name" : "Color",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_Color_static_canonical",
+            "documentation" : "Returns the canonical name for a channel label.\n- Parameter label: The raw label.\n- Returns: The canonical channel name.",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "canonical",
+            "parameters" : [
+              {
+                "label" : "label",
+                "name" : "label",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "enumName" : {
+                "_0" : "Color"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+          {
+            "documentation" : "The default channel.",
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "fallback",
+            "staticContext" : {
+              "enumName" : {
+                "_0" : "Color"
+              }
+            },
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Color",
+        "tsFullPath" : "Color"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_greet",
+        "documentation" : "Returns a greeting for a user.\n- Parameters:\n  - name: The user's name.\n  - greeting: The greeting word to use.\n- Returns: The composed greeting message.",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "greet",
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "defaultValue" : {
+              "string" : {
+                "_0" : "Hello"
+              }
+            },
+            "label" : "greeting",
+            "name" : "greeting",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_add",
+        "documentation" : "Adds two numbers together.\n- Parameter a: The first addend.\n- Parameter b: The second addend.\n- Returns: The sum of the inputs.",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "add",
+        "parameters" : [
+          {
+            "label" : "a",
+            "name" : "a",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "b",
+            "name" : "b",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_trimmed",
+        "documentation" : "Has blank doc lines around the summary; boundaries should be trimmed.",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "trimmed",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_hello",
+        "documentation" : "Says hello to the world.\n\nDemonstrates that block doc comments are supported too.",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "hello",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_parseInt",
+        "documentation" : "Parses an integer from text.\n- Parameter text: The text to parse.\n- Returns: The parsed integer.\n- Throws: A `JSException` when the text is not a valid integer.",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "parseInt",
+        "parameters" : [
+          {
+            "label" : "text",
+            "name" : "text",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_MathUtils_double",
+        "documentation" : "Doubles a value, in a namespace.\n- Parameter value: The value to double.\n- Returns: Twice the input.",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "double",
+        "namespace" : [
+          "MathUtils"
+        ],
+        "parameters" : [
+          {
+            "label" : "value",
+            "name" : "value",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_terminator",
+        "documentation" : "Returns the JSDoc terminator *\/ embedded mid-sentence.",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "terminator",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+      {
+        "documentation" : "Receives lifecycle callbacks.",
+        "methods" : [
+          {
+            "abiName" : "bjs_Listener_onEvent",
+            "documentation" : "Called when an event fires.\n- Parameter id: The event identifier.",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "onEvent",
+            "parameters" : [
+              {
+                "label" : "id",
+                "name" : "id",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Listener",
+        "properties" : [
+          {
+            "documentation" : "The listener's display name.",
+            "isReadonly" : true,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "structs" : [
+      {
+        "documentation" : "A 2D point in space.",
+        "methods" : [
+
+        ],
+        "name" : "Point",
+        "properties" : [
+          {
+            "documentation" : "The horizontal position.",
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "documentation" : "The vertical position.",
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "y",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Point"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

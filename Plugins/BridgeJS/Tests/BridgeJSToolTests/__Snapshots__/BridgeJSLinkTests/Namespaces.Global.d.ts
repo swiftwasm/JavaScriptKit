@@ -17,6 +17,10 @@ declare global {
     }
     namespace MyModule {
         namespace Utils {
+            /**
+             * A namespaced free function.
+             * @returns A fixed namespaced string.
+             */
             function namespacedFunction(): string;
         }
     }
@@ -31,8 +35,15 @@ declare global {
     }
     namespace __Swift {
         namespace Foundation {
+            /**
+             * A greeter living in a namespace.
+             */
             class Greeter {
                 constructor(name: string);
+                /**
+                 * Produces a greeting for the configured name.
+                 * @returns The greeting message.
+                 */
                 greet(): string;
                 static makeDefault(): Greeter;
                 static readonly defaultGreeting: string;
@@ -53,7 +64,14 @@ export interface SwiftHeapObject {
     /// Note: Calling this method will release the heap object and it will no longer be accessible.
     release(): void;
 }
+/**
+ * A greeter living in a namespace.
+ */
 export interface Greeter extends SwiftHeapObject {
+    /**
+     * Produces a greeting for the configured name.
+     * @returns The greeting message.
+     */
     greet(): string;
 }
 export interface Converter extends SwiftHeapObject {
@@ -75,6 +93,10 @@ export type Exports = {
     },
     MyModule: {
         Utils: {
+            /**
+             * A namespaced free function.
+             * @returns A fixed namespaced string.
+             */
             namespacedFunction(): string;
         },
     },

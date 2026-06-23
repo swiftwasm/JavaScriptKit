@@ -1266,8 +1266,54 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             returnType: returnType,
             effects: effects,
             namespace: finalNamespace,
-            staticContext: staticContext
+            staticContext: staticContext,
+            documentation: extractDocumentation(from: node)
         )
+    }
+
+    /// Returns the doc comment (`///` or `/** */`) attached to a declaration, with
+    /// markers stripped and DocC field lists (`- Parameters:`, `- Returns:`) preserved.
+    private func extractDocumentation(from node: some SyntaxProtocol) -> String? {
+        var run: [String] = []
+        for piece in node.leadingTrivia {
+            switch piece {
+            case .docLineComment(let text):
+                var line = Substring(text)
+                if line.hasPrefix("///") { line = line.dropFirst(3) }
+                if line.first == " " { line = line.dropFirst() }
+                if line.last == "\r" { line = line.dropLast() }
+                run.append(String(line))
+            case .docBlockComment(let text):
+                run.append(contentsOf: stripBlockComment(text))
+            case .newlines(let count), .carriageReturns(let count), .carriageReturnLineFeeds(let count):
+                if count >= 2 { run.removeAll() }
+            case .lineComment, .blockComment:
+                run.removeAll()
+            default:
+                continue
+            }
+        }
+        // Trim boundary blank lines so line (`///`) and block (`/** */`) comments
+        // produce a consistent skeleton value.
+        while run.first?.trimmingCharacters(in: .whitespaces).isEmpty == true { run.removeFirst() }
+        while run.last?.trimmingCharacters(in: .whitespaces).isEmpty == true { run.removeLast() }
+        return run.isEmpty ? nil : run.joined(separator: "\n")
+    }
+
+    private func stripBlockComment(_ text: String) -> [String] {
+        var body = Substring(text)
+        if body.hasPrefix("/**") { body = body.dropFirst(3) }
+        if body.hasSuffix("*/") { body = body.dropLast(2) }
+        return body.split(separator: "\n", omittingEmptySubsequences: false).map { raw -> String in
+            var line = raw[...]
+            if line.last == "\r" { line = line.dropLast() }
+            while let first = line.first, first == " " || first == "\t" { line = line.dropFirst() }
+            if line.first == "*" {
+                line = line.dropFirst()
+                if line.first == " " { line = line.dropFirst() }
+            }
+            return String(line)
+        }
     }
 
     private func collectEffects(signature: FunctionSignatureSyntax, isStatic: Bool = false) -> Effects? {
@@ -1360,7 +1406,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             let constructor = ExportedConstructor(
                 abiName: "bjs_\(classAbiName)_init",
                 parameters: parameters,
-                effects: effects
+                effects: effects,
+                documentation: extractDocumentation(from: node)
             )
             exportedClassByName[classKey]?.constructor = constructor
 
@@ -1383,7 +1430,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             let constructor = ExportedConstructor(
                 abiName: "bjs_\(structAbiName)_init",
                 parameters: parameters,
-                effects: effects
+                effects: effects,
+                documentation: extractDocumentation(from: node)
             )
             exportedStructByName[structKey]?.constructor = constructor
 
@@ -1490,7 +1538,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 isReadonly: isReadonly,
                 isStatic: isStatic,
                 namespace: finalNamespace,
-                staticContext: staticContext
+                staticContext: staticContext,
+                documentation: extractDocumentation(from: node)
             )
 
             if case .enumBody(_, let key) = state {
@@ -1537,7 +1586,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             methods: [],
             properties: [],
             namespace: effectiveNamespace,
-            identityMode: classIdentityMode
+            identityMode: classIdentityMode,
+            documentation: extractDocumentation(from: node)
         )
         let uniqueKey = makeKey(name: name, namespace: effectiveNamespace)
 
@@ -1657,7 +1707,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             namespace: effectiveNamespace,
             emitStyle: emitStyle,
             staticMethods: [],
-            staticProperties: []
+            staticProperties: [],
+            documentation: extractDocumentation(from: node)
         )
 
         let enumUniqueKey = makeKey(name: name, namespace: effectiveNamespace)
@@ -1774,7 +1825,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             name: name,
             methods: [],
             properties: [],
-            namespace: effectiveNamespace
+            namespace: effectiveNamespace,
+            documentation: extractDocumentation(from: node)
         )
 
         stateStack.push(state: .protocolBody(name: name, key: protocolUniqueKey))
@@ -1798,7 +1850,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             name: name,
             methods: methods,
             properties: exportedProtocolByName[protocolUniqueKey]?.properties ?? [],
-            namespace: effectiveNamespace
+            namespace: effectiveNamespace,
+            documentation: extractDocumentation(from: node)
         )
 
         exportedProtocolByName[protocolUniqueKey] = exportedProtocol
@@ -1874,7 +1927,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                         isReadonly: true,
                         isStatic: false,
                         namespace: effectiveNamespace,
-                        staticContext: nil
+                        staticContext: nil,
+                        documentation: extractDocumentation(from: varDecl)
                     )
                     properties.append(property)
                 }
@@ -1888,7 +1942,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             explicitAccessControl: explicitAccessControl,
             properties: properties,
             methods: [],
-            namespace: effectiveNamespace
+            namespace: effectiveNamespace,
+            documentation: extractDocumentation(from: node)
         )
 
         exportedStructByName[structUniqueKey] = exportedStruct
@@ -1981,7 +2036,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             returnType: returnType,
             effects: effects,
             namespace: namespace,
-            staticContext: nil
+            staticContext: nil,
+            documentation: extractDocumentation(from: node)
         )
     }
 
@@ -2022,7 +2078,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             let exportedProperty = ExportedProtocolProperty(
                 name: propertyName,
                 type: propertyType,
-                isReadonly: isReadonly
+                isReadonly: isReadonly,
+                documentation: extractDocumentation(from: node)
             )
 
             if var currentProtocol = exportedProtocolByName[protocolKey] {
@@ -2033,7 +2090,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                     name: currentProtocol.name,
                     methods: currentProtocol.methods,
                     properties: properties,
-                    namespace: currentProtocol.namespace
+                    namespace: currentProtocol.namespace,
+                    documentation: currentProtocol.documentation
                 )
                 exportedProtocolByName[protocolKey] = currentProtocol
             }
