@@ -155,7 +155,44 @@ jobs:
             exit 1
           }
 
+  # Pull requests: compile every example in parallel just to catch breakage.
+  # One job per example avoids rebuilding JavaScriptKit + swift-syntax 6x in series,
+  # which collapses the wall-clock time from ~1h to that of the slowest single example.
   build-examples:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - ActorOnWebWorker
+          - Basic
+          - Embedded
+          - Multithreading
+          - OffscrenCanvas
+          - PlayBridgeJS
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/install-swift
+        with:
+          download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a/swift-DEVELOPMENT-SNAPSHOT-2026-05-27-a-ubuntu22.04.tar.gz
+      - uses: swiftwasm/setup-swiftwasm@v2
+        id: setup-wasm32-unknown-wasip1
+        with: { target: wasm32-unknown-wasip1 }
+      - uses: swiftwasm/setup-swiftwasm@v2
+        id: setup-wasm32-unknown-wasip1-threads
+        with: { target: wasm32-unknown-wasip1-threads }
+      # build.sh resolves the package relative to the working directory, so run it
+      # from the example directory (mirroring Utilities/build-examples.sh's `cd`).
+      - run: ./build.sh release
+        working-directory: Examples/${{ matrix.example }}
+        env:
+          SWIFT_SDK_ID_wasm32_unknown_wasip1_threads: ${{ steps.setup-wasm32-unknown-wasip1-threads.outputs.swift-sdk-id }}
+          SWIFT_SDK_ID_wasm32_unknown_wasip1: ${{ steps.setup-wasm32-unknown-wasip1.outputs.swift-sdk-id }}
+
+  # main: build all examples in release and publish them to GitHub Pages.
+  build-examples-deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -184,7 +221,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    needs: build-examples
+    needs: build-examples-deploy
     permissions:
       pages: write
       id-token: write
