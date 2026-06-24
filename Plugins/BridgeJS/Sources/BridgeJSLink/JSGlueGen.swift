@@ -2685,8 +2685,8 @@ private extension BridgeType {
             return .stackABI
         case .nullable(let wrapped, _):
             return wrapped.optionalConvention
-        case .alias:
-            preconditionFailure()
+        case .alias(_, let underlying):
+            return underlying.optionalConvention
         }
     }
 
@@ -2783,8 +2783,8 @@ private extension BridgeType {
             return []
         case .nullable(let wrapped, _):
             return wrapped.wasmParams
-        case .alias:
-            preconditionFailure()
+        case .alias(_, let underlying):
+            return underlying.wasmParams
         }
     }
 

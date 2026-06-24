@@ -958,7 +958,7 @@ extension BridgeType {
         case .array, .dictionary:
             return LoweringParameterInfo(loweredParameters: [])
         case .alias:
-            preconditionFailure()
+            preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching loweringParameterInfo")
         }
     }
 
@@ -1032,7 +1032,7 @@ extension BridgeType {
         case .array, .dictionary:
             return LiftingReturnInfo(valueToLift: nil)
         case .alias:
-            preconditionFailure()
+            preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching liftingReturnInfo")
         }
     }
 }

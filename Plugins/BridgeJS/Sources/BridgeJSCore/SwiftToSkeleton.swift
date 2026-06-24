@@ -1635,7 +1635,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
 
         if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
-            recordAlias(node: node, aliasTarget: aliasTarget)
+            recordAlias(node: node, jsAttribute: jsAttribute, aliasTarget: aliasTarget)
             return .skipChildren
         }
 
@@ -1739,9 +1739,20 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
     private func recordAlias(
         node: some SyntaxProtocol & NamedDeclSyntax,
+        jsAttribute: AttributeSyntax,
         aliasTarget: TypeSyntax
     ) {
         let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: node, itemName: node.name.text)
+        if extractNamespace(from: jsAttribute) != nil {
+            errors.append(
+                DiagnosticError(
+                    node: node,
+                    message: "`namespace` is not supported on `@JS(as:)` types",
+                    hint: "Remove the `namespace:` argument; an alias adopts its target's representation"
+                )
+            )
+            return
+        }
         var lookupErrors: [DiagnosticError] = []
         guard
             let aliasBridgeType = parent.aliasType(
@@ -1774,7 +1785,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
 
         if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
-            recordAlias(node: node, aliasTarget: aliasTarget)
+            recordAlias(node: node, jsAttribute: jsAttribute, aliasTarget: aliasTarget)
             return .skipChildren
         }
 
@@ -1962,7 +1973,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
 
         if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
-            recordAlias(node: node, aliasTarget: aliasTarget)
+            recordAlias(node: node, jsAttribute: jsAttribute, aliasTarget: aliasTarget)
             return .skipChildren
         }
 

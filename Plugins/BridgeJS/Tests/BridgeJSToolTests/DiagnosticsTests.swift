@@ -427,6 +427,27 @@ import Testing
     }
 
     @Test
+    func jsAsWithNamespaceDiagnostic() throws {
+        let source = """
+            @JS final class Box { @JS init() {} }
+            @JS(as: Box.self, namespace: "Foo") struct Wrapped {
+                consuming func bridgeToJS() -> Box { fatalError() }
+                static func bridgeFromJS(_ value: consuming Box) -> Wrapped { fatalError() }
+            }
+            """
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        #expect(throws: BridgeJSCoreDiagnosticError.self) {
+            _ = try swiftAPI.finalize()
+        }
+    }
+
+    @Test
     func omitsNextLineWhenErrorIsOnLastLine() throws {
         let source = """
             preamble

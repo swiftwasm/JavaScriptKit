@@ -1770,6 +1770,8 @@ extension BridgeType {
             // Dictionary mangling: "SD" prefix followed by value type (key is always String)
             return "SD\(valueType.mangleTypeName)"
         case .alias(let name, _):
+            // `name` is the namespace-qualified swiftCallName (unique), so the underlying
+            // representation isn't mangled in - aliases bridge via their JS type's ABI.
             return "Al\(name.count)\(name)"
         }
     }
