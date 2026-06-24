@@ -903,7 +903,7 @@ extension BridgeType {
     }
 
     func loweringParameterInfo(context: BridgeContext = .importTS) throws -> LoweringParameterInfo {
-        switch self {
+        switch self.unaliased {
         case .bool: return .bool
         case .integer(let t): return LoweringParameterInfo(loweredParameters: [("value", t.wasmCoreType)])
         case .float: return .float
@@ -957,6 +957,8 @@ extension BridgeType {
             return LoweringParameterInfo(loweredParameters: params, useBorrowing: wrappedInfo.useBorrowing)
         case .array, .dictionary:
             return LoweringParameterInfo(loweredParameters: [])
+        case .alias:
+            preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching loweringParameterInfo")
         }
     }
 
@@ -976,7 +978,7 @@ extension BridgeType {
     func liftingReturnInfo(
         context: BridgeContext = .importTS
     ) throws -> LiftingReturnInfo {
-        switch self {
+        switch self.unaliased {
         case .bool: return .bool
         case .integer(let t): return LiftingReturnInfo(valueToLift: t.wasmCoreType)
         case .float: return .float
@@ -1029,6 +1031,8 @@ extension BridgeType {
             return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
         case .array, .dictionary:
             return LiftingReturnInfo(valueToLift: nil)
+        case .alias:
+            preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching liftingReturnInfo")
         }
     }
 }

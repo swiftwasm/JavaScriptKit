@@ -1,0 +1,145 @@
+{
+  "exported" : {
+    "aliases" : [
+      {
+        "swiftCallName" : "Polygon",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "PolygonReference"
+          }
+        }
+      }
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_PolygonReference_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "sides",
+              "name" : "sides",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "PolygonReference",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "PolygonReference"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_makePolygonFactory",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makePolygonFactory",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : false,
+              "mangleName" : "10TestModuley_Al7Polygon",
+              "moduleName" : "TestModule",
+              "parameters" : [
+
+              ],
+              "returnType" : {
+                "alias" : {
+                  "name" : "Polygon",
+                  "underlying" : {
+                    "swiftHeapObject" : {
+                      "_0" : "PolygonReference"
+                    }
+                  }
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : false
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makePolygonInspector",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makePolygonInspector",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : false,
+              "mangleName" : "10TestModuleAl7Polygon_Si",
+              "moduleName" : "TestModule",
+              "parameters" : [
+                {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                }
+              ],
+              "returnType" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : false
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

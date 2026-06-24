@@ -5,6 +5,7 @@ import {
 } from '../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.js';
 import { ImportedFoo } from './BridgeJSRuntimeTests/JavaScript/Types.mjs';
 import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
+import { runAliasWorks, getImports as getAliasImports, Surface } from './BridgeJSRuntimeTests/JavaScript/AliasTests.mjs';
 import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/JavaScript/ClosureSupportTests.mjs';
 import { getImports as getClosureThrowsImports } from './BridgeJSRuntimeTests/JavaScript/ClosureThrowsTests.mjs';
 import { getImports as getClosureAsyncImports } from './BridgeJSRuntimeTests/JavaScript/ClosureAsyncTests.mjs';
@@ -107,6 +108,7 @@ export async function setupOptions(options, context) {
                 },
                 ArrayElementObject,
                 JSClassWithArrayMembers,
+                Surface,
                 JsGreeter: class {
                     /**
                      * @param {string} name
@@ -173,6 +175,7 @@ export async function setupOptions(options, context) {
                 IntegerTypesSupportImports: getIntegerTypesSupportImports(importsContext),
                 JSTypedArrayImports: getJSTypedArrayImports(importsContext),
                 IdentityModeTestImports: getIdentityModeTestImports(importsContext),
+                AliasImports: getAliasImports(importsContext),
             };
         },
         addToCoreImports(importObject, importsContext) {
@@ -195,6 +198,13 @@ export async function setupOptions(options, context) {
                     throw new Error("No exports!?");
                 }
                 return BridgeJSRuntimeTests_runJsStructWorks(exports);
+            }
+            bridgeJSRuntimeTests["runAliasWorks"] = () => {
+                const exports = getExports();
+                if (!exports) {
+                    throw new Error("No exports!?");
+                }
+                runAliasWorks(exports);
             }
             const bridgeJSGlobalTests = importObject["BridgeJSGlobalTests"] || {};
             bridgeJSGlobalTests["runJsWorksGlobal"] = () => {

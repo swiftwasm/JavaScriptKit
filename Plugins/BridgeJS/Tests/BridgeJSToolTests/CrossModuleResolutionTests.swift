@@ -457,6 +457,36 @@ import Testing
         }
     }
 
+    @Test
+    func crossModuleChainedJSAsDiagnostic() throws {
+        let core = try buildDependencySkeleton(
+            moduleName: "Core",
+            source: """
+                @JS(as: Box.self) public struct Wrapped {
+                    public consuming func bridgeToJS() -> Box { fatalError() }
+                    public static func bridgeFromJS(_ value: consuming Box) -> Wrapped { fatalError() }
+                }
+                @JS public final class Box { @JS public init() {} }
+                """
+        )
+        do {
+            _ = try resolveApp(
+                source: """
+                    import Core
+                    @JS(as: Wrapped.self) public struct Doubly {
+                        public consuming func bridgeToJS() -> Wrapped { fatalError() }
+                        public static func bridgeFromJS(_ value: consuming Wrapped) -> Doubly { fatalError() }
+                    }
+                    """,
+                dependencies: [(moduleName: "Core", skeleton: core)]
+            )
+            Issue.record("Expected chained-alias diagnostic for cross-module `@JS(as:)` target")
+        } catch let error as BridgeJSCoreDiagnosticError {
+            let combinedMessages = error.diagnostics.map(\.diagnostic.message).joined(separator: "\n")
+            #expect(combinedMessages.contains("not another `@JS(as:)` type"))
+        }
+    }
+
     // MARK: - Utillites
 
     private func resolveApp(

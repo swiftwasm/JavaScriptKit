@@ -1,0 +1,719 @@
+{
+  "exported" : {
+    "aliases" : [
+      {
+        "swiftCallName" : "Polygon",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "PolygonReference"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Tag",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "TagReference"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Tagged",
+        "underlying" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "swiftCallName" : "Canvas",
+        "underlying" : {
+          "jsObject" : {
+            "_0" : "Surface"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "AliasedTag",
+        "underlying" : {
+          "associatedValueEnum" : {
+            "_0" : "InnerTag"
+          }
+        }
+      },
+      {
+        "swiftCallName" : "UserId",
+        "underlying" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      }
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_PolygonReference_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "underlying",
+              "name" : "underlying",
+              "type" : {
+                "alias" : {
+                  "name" : "Polygon",
+                  "underlying" : {
+                    "swiftHeapObject" : {
+                      "_0" : "PolygonReference"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_PolygonReference_snapshot",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "snapshot",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PolygonReference_merge",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "merge",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "other",
+                "type" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_PolygonReference_static_origin",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "origin",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "PolygonReference"
+              }
+            }
+          }
+        ],
+        "name" : "PolygonReference",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "PolygonReference"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_TagReference_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "underlying",
+              "name" : "underlying",
+              "type" : {
+                "alias" : {
+                  "name" : "Tag",
+                  "underlying" : {
+                    "swiftHeapObject" : {
+                      "_0" : "TagReference"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "TagReference",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "TagReference"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "payload"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "empty"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "InnerTag",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "InnerTag",
+        "tsFullPath" : "InnerTag"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_roundtripPolygon",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripPolygon",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygon",
+            "type" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Polygon",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "PolygonReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_optionalPolygon",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "optionalPolygon",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygon",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_polygonArray",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "polygonArray",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygons",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "alias" : {
+                    "name" : "Polygon",
+                    "underlying" : {
+                      "swiftHeapObject" : {
+                        "_0" : "PolygonReference"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_validatePolygon",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "validatePolygon",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "polygon",
+            "type" : {
+              "alias" : {
+                "name" : "Polygon",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "PolygonReference"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Polygon",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "PolygonReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeTag",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeTag",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Tag",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "TagReference"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_roundtripTags",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripTags",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "xs",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "nullable" : {
+                    "_0" : {
+                      "alias" : {
+                        "name" : "AliasedTag",
+                        "underlying" : {
+                          "associatedValueEnum" : {
+                            "_0" : "InnerTag"
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "nullable" : {
+                "_0" : {
+                  "alias" : {
+                    "name" : "AliasedTag",
+                    "underlying" : {
+                      "associatedValueEnum" : {
+                        "_0" : "InnerTag"
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_describeUser",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "describeUser",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "owner",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "HasOptionalUserId"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftProtocol" : {
+            "_0" : "HasOptionalUserId"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "HasOptionalUserId",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "name" : "userId",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "alias" : {
+                    "name" : "UserId",
+                    "underlying" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "structs" : [
+
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "acceptTagged",
+            "parameters" : [
+              {
+                "name" : "tagged",
+                "type" : {
+                  "alias" : {
+                    "name" : "Tagged",
+                    "underlying" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "acceptOptionalTagged",
+            "parameters" : [
+              {
+                "name" : "tagged",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "alias" : {
+                        "name" : "Tagged",
+                        "underlying" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "roundtripTagged",
+            "parameters" : [
+              {
+                "name" : "tagged",
+                "type" : {
+                  "alias" : {
+                    "name" : "Tagged",
+                    "underlying" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "alias" : {
+                "name" : "Tagged",
+                "underlying" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "produceOptionalCanvas",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "alias" : {
+                    "name" : "Canvas",
+                    "underlying" : {
+                      "jsObject" : {
+                        "_0" : "Surface"
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+
+              ]
+            },
+            "getters" : [
+              {
+                "accessLevel" : "internal",
+                "name" : "label",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "methods" : [
+
+            ],
+            "name" : "Surface",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

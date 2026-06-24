@@ -22,6 +22,7 @@ Configure your package and build for JavaScript as described in <doc:Setting-up-
 - <doc:Exporting-Swift-Closure>
 - <doc:Exporting-Swift-Protocols>
 - <doc:Exporting-Swift-Optional>
+- <doc:Exporting-Swift-Custom-Representation>
 - <doc:Exporting-Swift-Default-Parameters>
 - <doc:Exporting-Swift-Static-Functions>
 - <doc:Exporting-Swift-Static-Properties>

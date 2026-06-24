@@ -153,7 +153,9 @@ public struct ClosureCodegen {
             let argNames = liftInfo.parameters.map { (argName, _) in
                 liftInfo.parameters.count > 1 ? "\(paramName)\(argName.capitalizedFirstLetter)" : paramName
             }
-            liftedParams.append("\(paramType.swiftType).bridgeJSLiftParameter(\(argNames.joined(separator: ", ")))")
+            liftedParams.append(
+                "\(paramType.swiftType).bridgeJSLiftParameter(\(argNames.joined(separator: ", ")))"
+            )
         }
 
         let tryPrefix = signature.isThrows ? "try " : ""

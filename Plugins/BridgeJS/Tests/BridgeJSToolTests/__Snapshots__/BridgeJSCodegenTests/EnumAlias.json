@@ -1,0 +1,96 @@
+{
+  "exported" : {
+    "aliases" : [
+      {
+        "swiftCallName" : "Color",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "ColorBox"
+          }
+        }
+      }
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_ColorBox_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "ColorBox",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "ColorBox"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_roundtripColor",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundtripColor",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "color",
+            "type" : {
+              "alias" : {
+                "name" : "Color",
+                "underlying" : {
+                  "swiftHeapObject" : {
+                    "_0" : "ColorBox"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "alias" : {
+            "name" : "Color",
+            "underlying" : {
+              "swiftHeapObject" : {
+                "_0" : "ColorBox"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

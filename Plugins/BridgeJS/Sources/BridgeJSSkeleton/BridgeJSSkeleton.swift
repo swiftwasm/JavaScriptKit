@@ -274,6 +274,7 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case swiftProtocol(String)
     case swiftStruct(String)
     indirect case closure(ClosureSignature, useJSTypedClosure: Bool)
+    indirect case alias(name: String, underlying: BridgeType)
 }
 
 public enum WasmCoreType: String, Codable, Sendable {
@@ -1007,12 +1008,23 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
     }
 }
 
+public struct ExportedAlias: Codable, Equatable, Sendable {
+    public let swiftCallName: String
+    public let underlying: BridgeType
+
+    public init(swiftCallName: String, underlying: BridgeType) {
+        self.swiftCallName = swiftCallName
+        self.underlying = underlying
+    }
+}
+
 public struct ExportedSkeleton: Codable {
     public var functions: [ExportedFunction]
     public var classes: [ExportedClass]
     public var enums: [ExportedEnum]
     public var structs: [ExportedStruct]
     public var protocols: [ExportedProtocol]
+    public var aliases: [ExportedAlias]
     /// Whether to expose exported APIs to the global namespace.
     ///
     /// When `true`, exported functions, classes, and namespaces are available
@@ -1032,6 +1044,7 @@ public struct ExportedSkeleton: Codable {
         enums: [ExportedEnum],
         structs: [ExportedStruct] = [],
         protocols: [ExportedProtocol] = [],
+        aliases: [ExportedAlias] = [],
         exposeToGlobal: Bool,
         identityMode: String? = nil
     ) {
@@ -1040,6 +1053,7 @@ public struct ExportedSkeleton: Codable {
         self.enums = enums
         self.structs = structs
         self.protocols = protocols
+        self.aliases = aliases
         self.exposeToGlobal = exposeToGlobal
         self.identityMode = identityMode
     }
@@ -1050,12 +1064,13 @@ public struct ExportedSkeleton: Codable {
         self.enums.append(contentsOf: other.enums)
         self.structs.append(contentsOf: other.structs)
         self.protocols.append(contentsOf: other.protocols)
+        self.aliases.append(contentsOf: other.aliases)
         assert(self.exposeToGlobal == other.exposeToGlobal)
         assert(self.identityMode == other.identityMode)
     }
 
     public var isEmpty: Bool {
-        functions.isEmpty && classes.isEmpty && enums.isEmpty && structs.isEmpty && protocols.isEmpty
+        functions.isEmpty && classes.isEmpty && enums.isEmpty && structs.isEmpty && protocols.isEmpty && aliases.isEmpty
     }
 
     /// Distinct `async` return types needing a `Promise_resolve_<mangled>` helper, deduplicated
@@ -1611,6 +1626,20 @@ extension BridgeType {
         }
     }
 
+    public var unaliased: BridgeType {
+        switch self {
+        case .alias(_, let underlying): return underlying.unaliased
+        case .nullable(let wrapped, let kind): return .nullable(wrapped.unaliased, kind)
+        case .array(let element): return .array(element.unaliased)
+        case .dictionary(let value): return .dictionary(value.unaliased)
+        case .bool, .integer, .float, .double, .string, .jsValue, .jsObject,
+            .swiftHeapObject, .unsafePointer, .swiftProtocol, .void,
+            .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct,
+            .namespaceEnum, .closure:
+            return self
+        }
+    }
+
     public var abiReturnType: WasmCoreType? {
         switch self {
         case .void: return nil
@@ -1651,6 +1680,8 @@ extension BridgeType {
         case .dictionary:
             // Dictionaries use stack-based return with entry count (no direct WASM return type)
             return nil
+        case .alias(_, let underlying):
+            return underlying.abiReturnType
         }
     }
 
@@ -1738,6 +1769,10 @@ extension BridgeType {
         case .dictionary(let valueType):
             // Dictionary mangling: "SD" prefix followed by value type (key is always String)
             return "SD\(valueType.mangleTypeName)"
+        case .alias(let name, _):
+            // `name` is the namespace-qualified swiftCallName (unique), so the underlying
+            // representation isn't mangled in - aliases bridge via their JS type's ABI.
+            return "Al\(name.count)\(name)"
         }
     }
 
@@ -1749,8 +1784,11 @@ extension BridgeType {
         guard case .nullable(let wrappedType, _) = self else {
             return false
         }
+        return wrappedType.requiresSideChannelForOptionalReturnIfWrapped
+    }
 
-        switch wrappedType {
+    private var requiresSideChannelForOptionalReturnIfWrapped: Bool {
+        switch self {
         case .string, .integer, .float, .double, .swiftProtocol:
             return true
         case .rawValueEnum(_, let rawType):
@@ -1764,6 +1802,8 @@ extension BridgeType {
             }
         case .bool, .caseEnum, .swiftHeapObject, .associatedValueEnum, .jsObject:
             return false
+        case .alias(_, let underlying):
+            return underlying.requiresSideChannelForOptionalReturnIfWrapped
         default:
             return false
         }
