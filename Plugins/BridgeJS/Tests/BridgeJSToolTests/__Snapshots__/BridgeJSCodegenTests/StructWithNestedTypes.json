@@ -1,0 +1,337 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "circle"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "square"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Kind",
+        "namespace" : [
+          "Shape"
+        ],
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Shape.Kind",
+        "tsFullPath" : "Shape.Kind"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "button"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "slider"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Variant",
+        "namespace" : [
+          "Widget"
+        ],
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Widget.Variant",
+        "tsFullPath" : "Widget.Variant"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "leading"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "trailing"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Alignment",
+        "namespace" : [
+          "Widget",
+          "Layout"
+        ],
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Widget.Layout.Alignment",
+        "tsFullPath" : "Widget.Layout.Alignment"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Shape_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "label",
+              "name" : "label",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Shape",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Shape"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Widget_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Widget",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Widget"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Layout",
+        "namespace" : [
+          "Widget"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "padding",
+            "namespace" : [
+              "Widget"
+            ],
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Widget.Layout"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Widget_Bounds_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "width",
+              "name" : "width",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            },
+            {
+              "label" : "height",
+              "name" : "height",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Widget_Bounds_static_zero",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "zero",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Widget.Bounds"
+              }
+            },
+            "staticContext" : {
+              "structName" : {
+                "_0" : "Widget_Bounds"
+              }
+            }
+          }
+        ],
+        "name" : "Bounds",
+        "namespace" : [
+          "Widget"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "width",
+            "namespace" : [
+              "Widget"
+            ],
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "height",
+            "namespace" : [
+              "Widget"
+            ],
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "dimensions",
+            "staticContext" : {
+              "structName" : {
+                "_0" : "Widget_Bounds"
+              }
+            },
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Widget.Bounds"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

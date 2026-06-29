@@ -16,10 +16,10 @@ export interface PrivateClass extends SwiftHeapObject {
 }
 export type Exports = {
     PrivateAPI: {
+        privateFunction(): string;
         PrivateClass: {
             new(): PrivateClass;
-        }
-        privateFunction(): string;
+        },
     },
 }
 export type Imports = {

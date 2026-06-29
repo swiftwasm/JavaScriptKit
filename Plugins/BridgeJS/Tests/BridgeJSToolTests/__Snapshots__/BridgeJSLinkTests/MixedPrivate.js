@@ -295,13 +295,13 @@ export async function createInstantiator(options, swift) {
             }
             const exports = {
                 PrivateAPI: {
-                    PrivateClass,
                     privateFunction: function bjs_PrivateAPI_privateFunction() {
                         instance.exports.bjs_PrivateAPI_privateFunction();
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
                     },
+                    PrivateClass,
                 },
             };
             _exports = exports;

@@ -348,8 +348,8 @@ export async function createInstantiator(options, swift) {
             }
             const exports = {
                 CachedModel,
-                UncachedModel,
                 ExplicitlyUncachedModel,
+                UncachedModel,
             };
             _exports = exports;
             return exports;

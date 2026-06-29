@@ -19,13 +19,13 @@ export interface Widget extends SwiftHeapObject {
     name: string;
 }
 export type Exports = {
-    Widget: {
-        new(name: string): Widget;
-    }
     processRenderable(item: Renderable, transform: (arg0: Renderable) => string): string;
     makeRenderableFactory(defaultName: string): () => Renderable;
     roundtripRenderable(callback: (arg0: Renderable) => Renderable): (arg0: Renderable) => Renderable;
     processOptionalRenderable(callback: (arg0: Renderable | null) => string): string;
+    Widget: {
+        new(name: string): Widget;
+    },
 }
 export type Imports = {
 }

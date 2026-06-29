@@ -23,16 +23,16 @@ export interface PublicGreeter extends SwiftHeapObject {
 export interface PackageGreeter extends SwiftHeapObject {
 }
 export type Exports = {
+    takeGreeter(greeter: Greeter): void;
     Greeter: {
         new(name: string): Greeter;
         greetAnonymously(): string;
         readonly defaultGreeting: string;
-    }
-    PublicGreeter: {
-    }
+    },
     PackageGreeter: {
-    }
-    takeGreeter(greeter: Greeter): void;
+    },
+    PublicGreeter: {
+    },
 }
 export type Imports = {
     jsRoundTripGreeter(greeter: Greeter): Greeter;

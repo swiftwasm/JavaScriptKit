@@ -153,8 +153,6 @@ export interface SwiftHeapObject {
 export interface User extends SwiftHeapObject {
 }
 export type Exports = {
-    User: {
-    }
     handle(result: APIResultTag): void;
     getResult(): APIResultTag;
     roundtripAPIResult(result: APIResultTag): APIResultTag;
@@ -183,6 +181,8 @@ export type Exports = {
     OptionalAllTypesResult: OptionalAllTypesResultObject
     API: {
         NetworkingResult: NetworkingResultObject
+    },
+    User: {
     },
     Utilities: {
         Result: ResultObject

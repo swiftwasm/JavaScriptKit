@@ -389,13 +389,13 @@ export async function createInstantiator(options, swift) {
                 },
                 Networking: {
                     API: {
-                        HTTPServer,
                         Method: MethodValues,
+                        HTTPServer,
                     },
                     APIV2: {
                         Internal: {
-                            TestServer,
                             SupportedMethod: SupportedMethodValues,
+                            TestServer,
                         },
                     },
                 },

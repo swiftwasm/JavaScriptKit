@@ -75,21 +75,21 @@ export type Exports = {
     Formatting: {
         Converter: {
             new(): Converter;
-        }
+        },
     },
     Networking: {
         API: {
+            Method: MethodObject
             HTTPServer: {
                 new(): HTTPServer;
-            }
-            Method: MethodObject
+            },
         },
         APIV2: {
             Internal: {
+                SupportedMethod: SupportedMethodObject
                 TestServer: {
                     new(): TestServer;
-                }
-                SupportedMethod: SupportedMethodObject
+                },
             },
         },
     },
@@ -105,7 +105,7 @@ export type Exports = {
     Utils: {
         Converter: {
             new(): Converter;
-        }
+        },
     },
 }
 export type Imports = {

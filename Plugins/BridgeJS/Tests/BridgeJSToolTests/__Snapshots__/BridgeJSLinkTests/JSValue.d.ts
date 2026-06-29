@@ -19,13 +19,13 @@ export interface JSValueHolder extends SwiftHeapObject {
     optionalValue: any | null;
 }
 export type Exports = {
-    JSValueHolder: {
-        new(value: any, optionalValue: any | null): JSValueHolder;
-    }
     roundTripJSValue(value: any): any;
     roundTripOptionalJSValue(value: any | null): any | null;
     roundTripJSValueArray(values: any[]): any[];
     roundTripOptionalJSValueArray(values: any[] | null): any[] | null;
+    JSValueHolder: {
+        new(value: any, optionalValue: any | null): JSValueHolder;
+    },
 }
 export type Imports = {
     jsEchoJSValue(value: any): any;

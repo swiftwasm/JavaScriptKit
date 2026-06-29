@@ -18,14 +18,14 @@ export interface SwiftHeapObject {
 export interface Box extends SwiftHeapObject {
 }
 export type Exports = {
-    Box: {
-    }
     mirrorDictionary(values: Record<string, number>): Record<string, number>;
     optionalDictionary(values: Record<string, string> | null): Record<string, string> | null;
     nestedDictionary(values: Record<string, number[]>): Record<string, number[]>;
     boxDictionary(boxes: Record<string, Box>): Record<string, Box>;
     optionalBoxDictionary(boxes: Record<string, Box | null>): Record<string, Box | null>;
     roundtripCounters(counters: Counters): Counters;
+    Box: {
+    },
 }
 export type Imports = {
     importMirrorDictionary(values: Record<string, number>): Record<string, number>;

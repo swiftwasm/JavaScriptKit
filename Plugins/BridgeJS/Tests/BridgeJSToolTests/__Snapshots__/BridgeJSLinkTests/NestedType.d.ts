@@ -30,10 +30,10 @@ export interface Player extends SwiftHeapObject {
     getTag(): string;
 }
 export type Exports = {
-    User: {
-    }
     Player: {
-    }
+    },
+    User: {
+    },
 }
 export type Imports = {
 }

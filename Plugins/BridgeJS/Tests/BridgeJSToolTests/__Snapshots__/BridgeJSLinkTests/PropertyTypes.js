@@ -406,7 +406,6 @@ export async function createInstantiator(options, swift) {
                 }
             }
             const exports = {
-                PropertyHolder,
                 createPropertyHolder: function bjs_createPropertyHolder(intValue, floatValue, doubleValue, boolValue, stringValue, jsObject) {
                     const stringValueBytes = textEncoder.encode(stringValue);
                     const stringValueId = swift.memory.retain(stringValueBytes);
@@ -419,6 +418,7 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return ret;
                 },
+                PropertyHolder,
             };
             _exports = exports;
             return exports;

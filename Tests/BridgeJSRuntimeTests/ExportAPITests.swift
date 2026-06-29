@@ -1359,6 +1359,27 @@ enum GraphOperations {
     @JS static func roundtripMetadata(_ m: Metadata) -> Metadata { m }
 }
 
+@JS class NestedTypeHost {
+    @JS enum Variant: String {
+        case primary
+        case secondary
+    }
+
+    @JS struct Label {
+        var text: String
+
+        @JS init(text: String) {
+            self.text = text
+        }
+    }
+
+    @JS init() {}
+
+    @JS func describe() -> String {
+        "host"
+    }
+}
+
 class ExportAPITests: XCTestCase {
     func testAll() {
         var hasDeinitGreeter = false

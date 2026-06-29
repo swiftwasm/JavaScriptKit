@@ -25,7 +25,7 @@ export type Exports = {
     roundTripPointerFields(value: PointerFields): PointerFields;
     PointerFields: {
         init(raw: number, mutRaw: number, opaque: number, ptr: number, mutPtr: number): PointerFields;
-    }
+    },
 }
 export type Imports = {
 }

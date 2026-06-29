@@ -360,7 +360,6 @@ export async function createInstantiator(options, swift) {
             structHelpers.Counters = CountersHelpers;
 
             const exports = {
-                Box,
                 mirrorDictionary: function bjs_mirrorDictionary(values) {
                     const entries = Object.entries(values);
                     for (const entry of entries) {
@@ -513,6 +512,7 @@ export async function createInstantiator(options, swift) {
                     const structValue = structHelpers.Counters.lift();
                     return structValue;
                 },
+                Box,
             };
             _exports = exports;
             return exports;

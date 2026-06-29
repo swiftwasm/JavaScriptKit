@@ -31,11 +31,11 @@ export interface PropertyHolder extends SwiftHeapObject {
     observedProperty: number;
 }
 export type Exports = {
-    PropertyHolder: {
-        new(intValue: number, floatValue: number, doubleValue: number, boolValue: boolean, stringValue: string, jsObject: any): PropertyHolder;
-    }
     createPropertyHolder(intValue: number, floatValue: number, doubleValue: number, boolValue: boolean, stringValue: string, jsObject: any): PropertyHolder;
     testPropertyHolder(holder: PropertyHolder): string;
+    PropertyHolder: {
+        new(intValue: number, floatValue: number, doubleValue: number, boolValue: boolean, stringValue: string, jsObject: any): PropertyHolder;
+    },
 }
 export type Imports = {
 }

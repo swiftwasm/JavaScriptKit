@@ -41,15 +41,15 @@ export interface MathUtils extends SwiftHeapObject {
     multiply(x: number, y: number): number;
 }
 export type Exports = {
+    Calculator: CalculatorObject
+    APIResult: APIResultObject
     MathUtils: {
         new(): MathUtils;
         subtract(a: number, b: number): number;
         add(a: number, b: number): number;
         divide(a: number, b: number): number;
         readonly pi: number;
-    }
-    Calculator: CalculatorObject
-    APIResult: APIResultObject
+    },
     Utils: {
         String: {
             uppercase(text: string): string;

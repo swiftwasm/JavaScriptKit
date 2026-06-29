@@ -363,7 +363,6 @@ export async function createInstantiator(options, swift) {
                 }
             }
             const exports = {
-                PolygonReference,
                 makePolygonFactory: function bjs_makePolygonFactory() {
                     const ret = instance.exports.bjs_makePolygonFactory();
                     return swift.memory.getObject(ret);
@@ -372,6 +371,7 @@ export async function createInstantiator(options, swift) {
                     const ret = instance.exports.bjs_makePolygonInspector();
                     return swift.memory.getObject(ret);
                 },
+                PolygonReference,
             };
             _exports = exports;
             return exports;

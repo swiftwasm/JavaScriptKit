@@ -36,7 +36,7 @@ export type Exports = {
     Collections: {
         Container: {
             new(): Container;
-        }
+        },
     },
     MyModule: {
         Utils: {
@@ -51,7 +51,7 @@ export type Exports = {
         Converters: {
             Converter: {
                 new(): Converter;
-            }
+            },
         },
     },
     __Swift: {
@@ -60,9 +60,9 @@ export type Exports = {
                 new(name: string): Greeter;
                 makeDefault(): Greeter;
                 readonly defaultGreeting: string;
-            }
+            },
             UUID: {
-            }
+            },
         },
     },
 }

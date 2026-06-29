@@ -64,12 +64,6 @@ export interface Person extends SwiftHeapObject {
 export interface TestProcessor extends SwiftHeapObject {
 }
 export type Exports = {
-    Person: {
-        new(name: string): Person;
-    }
-    TestProcessor: {
-        new(transform: (arg0: string) => string): TestProcessor;
-    }
     roundtripAnimal(animalClosure: (arg0: Animal) => Animal): (arg0: Animal) => Animal;
     roundtripOptionalAnimal(animalClosure: (arg0: Animal | null) => Animal | null): (arg0: Animal | null) => Animal | null;
     roundtripString(stringClosure: (arg0: string) => string): (arg0: string) => string;
@@ -105,7 +99,13 @@ export type Exports = {
     APIResult: APIResultObject
     Animal: {
         init(type: string): Animal;
-    }
+    },
+    Person: {
+        new(name: string): Person;
+    },
+    TestProcessor: {
+        new(transform: (arg0: string) => string): TestProcessor;
+    },
 }
 export type Imports = {
 }

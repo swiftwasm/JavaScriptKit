@@ -793,9 +793,6 @@ export async function createInstantiator(options, swift) {
             enumHelpers.Result = ResultHelpers;
 
             const exports = {
-                Helper,
-                MyViewController,
-                DelegateManager,
                 processDelegates: function bjs_processDelegates(delegates) {
                     for (const elem of delegates) {
                         const objId = swift.memory.retain(elem);
@@ -847,6 +844,9 @@ export async function createInstantiator(options, swift) {
                 ExampleEnum: ExampleEnumValues,
                 Result: ResultValues,
                 Priority: PriorityValues,
+                DelegateManager,
+                Helper,
+                MyViewController,
             };
             _exports = exports;
             return exports;

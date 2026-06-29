@@ -367,7 +367,6 @@ export async function createInstantiator(options, swift) {
                 globalThis.PropertyNamespace.Nested = {};
             }
             const exports = {
-                PropertyClass,
                 PropertyEnum: {
                     ...PropertyEnumValues,
                     get enumProperty() {
@@ -397,6 +396,7 @@ export async function createInstantiator(options, swift) {
                         instance.exports.bjs_PropertyEnum_static_computedEnum_set(valueId, valueBytes.length);
                     }
                 },
+                PropertyClass,
                 PropertyNamespace: {
                     get namespaceProperty() {
                         instance.exports.bjs_PropertyNamespace_static_namespaceProperty_get();

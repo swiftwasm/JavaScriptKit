@@ -37,13 +37,6 @@ export interface Surface {
     readonly label: string;
 }
 export type Exports = {
-    PolygonReference: {
-        new(underlying: PolygonReference): PolygonReference;
-        origin(): PolygonReference;
-    }
-    TagReference: {
-        new(underlying: TagReference): TagReference;
-    }
     roundtripPolygon(polygon: PolygonReference): PolygonReference;
     optionalPolygon(polygon: PolygonReference | null): PolygonReference | null;
     polygonArray(polygons: PolygonReference[]): PolygonReference[];
@@ -52,6 +45,13 @@ export type Exports = {
     roundtripTags(xs: (InnerTagTag | null)[]): (InnerTagTag | null)[];
     describeUser(owner: HasOptionalUserId): HasOptionalUserId;
     InnerTag: InnerTagObject
+    PolygonReference: {
+        new(underlying: PolygonReference): PolygonReference;
+        origin(): PolygonReference;
+    },
+    TagReference: {
+        new(underlying: TagReference): TagReference;
+    },
 }
 export type Imports = {
     acceptTagged(tagged: string): void;

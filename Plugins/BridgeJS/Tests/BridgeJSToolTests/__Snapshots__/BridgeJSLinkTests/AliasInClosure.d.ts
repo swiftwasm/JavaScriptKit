@@ -14,11 +14,11 @@ export interface SwiftHeapObject {
 export interface PolygonReference extends SwiftHeapObject {
 }
 export type Exports = {
-    PolygonReference: {
-        new(sides: number): PolygonReference;
-    }
     makePolygonFactory(): () => PolygonReference;
     makePolygonInspector(): (arg0: PolygonReference) => number;
+    PolygonReference: {
+        new(sides: number): PolygonReference;
+    },
 }
 export type Imports = {
 }

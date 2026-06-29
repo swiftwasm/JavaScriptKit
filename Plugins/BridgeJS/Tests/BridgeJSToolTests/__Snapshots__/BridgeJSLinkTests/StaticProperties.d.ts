@@ -26,6 +26,7 @@ export interface SwiftHeapObject {
 export interface PropertyClass extends SwiftHeapObject {
 }
 export type Exports = {
+    PropertyEnum: PropertyEnumObject
     PropertyClass: {
         new(): PropertyClass;
         readonly staticConstant: string;
@@ -35,8 +36,7 @@ export type Exports = {
         computedProperty: string;
         readonly readOnlyComputed: number;
         optionalProperty: string | null;
-    }
-    PropertyEnum: PropertyEnumObject
+    },
     PropertyNamespace: {
         readonly namespaceConstant: string;
         namespaceProperty: string;

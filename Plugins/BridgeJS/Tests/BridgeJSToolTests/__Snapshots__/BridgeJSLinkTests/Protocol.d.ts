@@ -96,21 +96,21 @@ export interface DelegateManager extends SwiftHeapObject {
     delegatesByName: Record<string, MyViewControllerDelegate>;
 }
 export type Exports = {
-    Helper: {
-        new(value: number): Helper;
-    }
-    MyViewController: {
-        new(delegate: MyViewControllerDelegate): MyViewController;
-    }
-    DelegateManager: {
-        new(delegates: MyViewControllerDelegate[]): DelegateManager;
-    }
     processDelegates(delegates: MyViewControllerDelegate[]): MyViewControllerDelegate[];
     processDelegatesByName(delegates: Record<string, MyViewControllerDelegate>): Record<string, MyViewControllerDelegate>;
     Direction: DirectionObject
     ExampleEnum: ExampleEnumObject
     Result: ResultObject
     Priority: PriorityObject
+    DelegateManager: {
+        new(delegates: MyViewControllerDelegate[]): DelegateManager;
+    },
+    Helper: {
+        new(value: number): Helper;
+    },
+    MyViewController: {
+        new(delegate: MyViewControllerDelegate): MyViewController;
+    },
 }
 export type Imports = {
 }

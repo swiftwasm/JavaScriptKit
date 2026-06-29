@@ -1422,8 +1422,6 @@ export async function createInstantiator(options, swift) {
             enumHelpers.APIResult = APIResultHelpers;
 
             const exports = {
-                Person,
-                TestProcessor,
                 roundtripAnimal: function bjs_roundtripAnimal(animalClosure) {
                     const callbackId = swift.memory.retain(animalClosure);
                     const ret = instance.exports.bjs_roundtripAnimal(callbackId);
@@ -1576,6 +1574,8 @@ export async function createInstantiator(options, swift) {
                         return structValue;
                     },
                 },
+                Person,
+                TestProcessor,
             };
             _exports = exports;
             return exports;

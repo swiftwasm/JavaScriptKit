@@ -14,10 +14,10 @@ export interface SwiftHeapObject {
 export interface ColorBox extends SwiftHeapObject {
 }
 export type Exports = {
+    roundtripColor(color: ColorBox): ColorBox;
     ColorBox: {
         new(name: string): ColorBox;
-    }
-    roundtripColor(color: ColorBox): ColorBox;
+    },
 }
 export type Imports = {
 }

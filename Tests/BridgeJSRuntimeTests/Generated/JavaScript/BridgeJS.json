@@ -4707,6 +4707,43 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_NestedTypeHost_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_NestedTypeHost_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "NestedTypeHost",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "NestedTypeHost"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_OptionalHolder_init",
           "effects" : {
             "isAsync" : false,
@@ -9996,6 +10033,36 @@
         ],
         "swiftCallName" : "NestedStructGroupB",
         "tsFullPath" : "NestedStructGroupB"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "primary"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "secondary"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Variant",
+        "namespace" : [
+          "NestedTypeHost"
+        ],
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "NestedTypeHost.Variant",
+        "tsFullPath" : "NestedTypeHost.Variant"
       },
       {
         "cases" : [
@@ -18036,6 +18103,50 @@
           }
         ],
         "swiftCallName" : "NestedStructGroupB.Metadata"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_NestedTypeHost_Label_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "text",
+              "name" : "text",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Label",
+        "namespace" : [
+          "NestedTypeHost"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "text",
+            "namespace" : [
+              "NestedTypeHost"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "NestedTypeHost.Label"
       },
       {
         "methods" : [

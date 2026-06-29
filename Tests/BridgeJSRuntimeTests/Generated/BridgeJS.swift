@@ -5797,6 +5797,9 @@ public func _bjs_NestedStructGroupB_static_roundtripMetadata() -> Void {
     #endif
 }
 
+extension NestedTypeHost.Variant: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+}
+
 extension LightColor: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return bridgeJSRawValue
@@ -6571,6 +6574,63 @@ fileprivate func _bjs_struct_lift_NestedStructGroupB_Metadata_extern() -> Int32 
 #endif
 @inline(never) fileprivate func _bjs_struct_lift_NestedStructGroupB_Metadata() -> Int32 {
     return _bjs_struct_lift_NestedStructGroupB_Metadata_extern()
+}
+
+extension NestedTypeHost.Label: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> NestedTypeHost.Label {
+        let text = String.bridgeJSStackPop()
+        return NestedTypeHost.Label(text: text)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.text.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_NestedTypeHost_Label(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_NestedTypeHost_Label()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_NestedTypeHost_Label")
+fileprivate func _bjs_struct_lower_NestedTypeHost_Label_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_NestedTypeHost_Label_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_NestedTypeHost_Label(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_NestedTypeHost_Label_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_NestedTypeHost_Label")
+fileprivate func _bjs_struct_lift_NestedTypeHost_Label_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_NestedTypeHost_Label_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_NestedTypeHost_Label() -> Int32 {
+    return _bjs_struct_lift_NestedTypeHost_Label_extern()
+}
+
+@_expose(wasm, "bjs_NestedTypeHost_Label_init")
+@_cdecl("bjs_NestedTypeHost_Label_init")
+public func _bjs_NestedTypeHost_Label_init(_ textBytes: Int32, _ textLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = NestedTypeHost.Label(text: String.bridgeJSLiftParameter(textBytes, textLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension Point: _BridgedSwiftStruct {
@@ -12880,6 +12940,59 @@ fileprivate func _bjs_TextProcessor_wrap_extern(_ pointer: UnsafeMutableRawPoint
 #endif
 @inline(never) fileprivate func _bjs_TextProcessor_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_TextProcessor_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_NestedTypeHost_init")
+@_cdecl("bjs_NestedTypeHost_init")
+public func _bjs_NestedTypeHost_init() -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = NestedTypeHost()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NestedTypeHost_describe")
+@_cdecl("bjs_NestedTypeHost_describe")
+public func _bjs_NestedTypeHost_describe(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = NestedTypeHost.bridgeJSLiftParameter(_self).describe()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NestedTypeHost_deinit")
+@_cdecl("bjs_NestedTypeHost_deinit")
+public func _bjs_NestedTypeHost_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<NestedTypeHost>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension NestedTypeHost: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_NestedTypeHost_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_NestedTypeHost_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NestedTypeHost_wrap")
+fileprivate func _bjs_NestedTypeHost_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_NestedTypeHost_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_NestedTypeHost_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_NestedTypeHost_wrap_extern(pointer)
 }
 
 @_expose(wasm, "bjs_OptionalHolder_init")

@@ -39,11 +39,6 @@ declare global {
     }
     namespace Networking {
         namespace API {
-            class HTTPServer {
-                constructor();
-                call(method: Networking.API.MethodTag): void;
-                release(): void;
-            }
             const MethodValues: {
                 readonly Get: 0;
                 readonly Post: 1;
@@ -51,19 +46,24 @@ declare global {
                 readonly Delete: 3;
             };
             type MethodTag = typeof MethodValues[keyof typeof MethodValues];
+            class HTTPServer {
+                constructor();
+                call(method: Networking.API.MethodTag): void;
+                release(): void;
+            }
         }
         namespace APIV2 {
             namespace Internal {
-                class TestServer {
-                    constructor();
-                    call(method: Networking.APIV2.Internal.SupportedMethodTag): void;
-                    release(): void;
-                }
                 const SupportedMethodValues: {
                     readonly Get: 0;
                     readonly Post: 1;
                 };
                 type SupportedMethodTag = typeof SupportedMethodValues[keyof typeof SupportedMethodValues];
+                class TestServer {
+                    constructor();
+                    call(method: Networking.APIV2.Internal.SupportedMethodTag): void;
+                    release(): void;
+                }
             }
         }
     }
@@ -114,21 +114,21 @@ export type Exports = {
     Formatting: {
         Converter: {
             new(): Converter;
-        }
+        },
     },
     Networking: {
         API: {
+            Method: MethodObject
             HTTPServer: {
                 new(): HTTPServer;
-            }
-            Method: MethodObject
+            },
         },
         APIV2: {
             Internal: {
+                SupportedMethod: SupportedMethodObject
                 TestServer: {
                     new(): TestServer;
-                }
-                SupportedMethod: SupportedMethodObject
+                },
             },
         },
     },
@@ -144,7 +144,7 @@ export type Exports = {
     Utils: {
         Converter: {
             new(): Converter;
-        }
+        },
     },
 }
 export type Imports = {

@@ -41,11 +41,6 @@ export interface MultiArrayContainer extends SwiftHeapObject {
     readonly strings: string[];
 }
 export type Exports = {
-    Item: {
-    }
-    MultiArrayContainer: {
-        new(nums: number[], strs: string[]): MultiArrayContainer;
-    }
     processIntArray(values: number[]): number[];
     processStringArray(values: string[]): string[];
     processDoubleArray(values: number[]): number[];
@@ -76,6 +71,11 @@ export type Exports = {
     multiOptionalArrayParams(a: number[] | null, b: string[] | null): number;
     Direction: DirectionObject
     Status: StatusObject
+    Item: {
+    },
+    MultiArrayContainer: {
+        new(nums: number[], strs: string[]): MultiArrayContainer;
+    },
 }
 export type Imports = {
     checkArray(a: any): void;

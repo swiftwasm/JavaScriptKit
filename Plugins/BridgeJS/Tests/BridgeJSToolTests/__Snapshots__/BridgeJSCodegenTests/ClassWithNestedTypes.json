@@ -1,0 +1,218 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Account_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Account_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Account",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "role",
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "Account.Role",
+                "_1" : "String"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "defaultRole",
+            "staticContext" : {
+              "className" : {
+                "_0" : "Account"
+              }
+            },
+            "type" : {
+              "rawValueEnum" : {
+                "_0" : "Account.Role",
+                "_1" : "String"
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Account"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "admin"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "guest"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Role",
+        "namespace" : [
+          "Account"
+        ],
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Account.Role",
+        "tsFullPath" : "Account.Role"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Account_Credentials_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "token",
+              "name" : "token",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Account_Credentials_static_empty",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "empty",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Account.Credentials"
+              }
+            },
+            "staticContext" : {
+              "structName" : {
+                "_0" : "Account_Credentials"
+              }
+            }
+          }
+        ],
+        "name" : "Credentials",
+        "namespace" : [
+          "Account"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "token",
+            "namespace" : [
+              "Account"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "maxLength",
+            "staticContext" : {
+              "structName" : {
+                "_0" : "Account_Credentials"
+              }
+            },
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Account.Credentials"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}
