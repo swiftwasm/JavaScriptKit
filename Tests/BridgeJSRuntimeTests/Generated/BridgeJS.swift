@@ -6633,6 +6633,28 @@ public func _bjs_NestedTypeHost_Label_init(_ textBytes: Int32, _ textLength: Int
     #endif
 }
 
+@_expose(wasm, "bjs_NestedTypeHost_Label_static_maxLength_get")
+@_cdecl("bjs_NestedTypeHost_Label_static_maxLength_get")
+public func _bjs_NestedTypeHost_Label_static_maxLength_get() -> Int32 {
+    #if arch(wasm32)
+    let ret = NestedTypeHost.Label.maxLength
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NestedTypeHost_Label_static_untitled")
+@_cdecl("bjs_NestedTypeHost_Label_static_untitled")
+public func _bjs_NestedTypeHost_Label_static_untitled() -> Void {
+    #if arch(wasm32)
+    let ret = NestedTypeHost.Label.untitled()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 extension Point: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Point {
         let y = Int.bridgeJSStackPop()

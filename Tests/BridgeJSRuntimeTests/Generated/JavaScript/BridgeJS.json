@@ -18125,7 +18125,28 @@
           ]
         },
         "methods" : [
+          {
+            "abiName" : "bjs_NestedTypeHost_Label_static_untitled",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "untitled",
+            "parameters" : [
 
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "NestedTypeHost.Label"
+              }
+            },
+            "staticContext" : {
+              "structName" : {
+                "_0" : "NestedTypeHost_Label"
+              }
+            }
+          }
         ],
         "name" : "Label",
         "namespace" : [
@@ -18142,6 +18163,24 @@
             "type" : {
               "string" : {
 
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "maxLength",
+            "staticContext" : {
+              "structName" : {
+                "_0" : "NestedTypeHost_Label"
+              }
+            },
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }

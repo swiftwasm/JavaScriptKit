@@ -1371,6 +1371,12 @@ enum GraphOperations {
         @JS init(text: String) {
             self.text = text
         }
+
+        @JS static var maxLength: Int { 64 }
+
+        @JS static func untitled() -> Label {
+            Label(text: "untitled")
+        }
     }
 
     @JS init() {}

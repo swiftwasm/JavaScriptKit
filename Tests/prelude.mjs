@@ -689,6 +689,8 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.NestedTypeHost.Variant.Secondary, "secondary");
     const hostLabel = exports.NestedTypeHost.Label.init("Save");
     assert.equal(hostLabel.text, "Save");
+    assert.equal(exports.NestedTypeHost.Label.maxLength, 64);
+    assert.equal(exports.NestedTypeHost.Label.untitled().text, "untitled");
     nestedHost.release();
 
     const s1 = { tag: exports.APIResult.Tag.Success, param0: "Cześć 🙋‍♂️" };
