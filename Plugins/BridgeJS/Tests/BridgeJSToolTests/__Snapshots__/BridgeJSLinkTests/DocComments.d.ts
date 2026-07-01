@@ -77,13 +77,6 @@ export interface Greeter extends SwiftHeapObject {
     name: string;
 }
 export type Exports = {
-    Greeter: {
-        /**
-         * Create a greeter.
-         * @param name The name to greet.
-         */
-        new(name: string): Greeter;
-    }
     /**
      * Returns a greeting for a user.
      * @param name The user's name.
@@ -120,6 +113,13 @@ export type Exports = {
      */
     terminator(): string;
     Color: ColorObject
+    Greeter: {
+        /**
+         * Create a greeter.
+         * @param name The name to greet.
+         */
+        new(name: string): Greeter;
+    },
     MathUtils: {
         /**
          * Doubles a value, in a namespace.

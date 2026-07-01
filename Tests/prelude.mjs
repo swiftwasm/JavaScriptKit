@@ -683,6 +683,16 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     testServer.call(exports.Networking.APIV2.Internal.SupportedMethod.Post);
     testServer.release();
 
+    const nestedHost = new exports.NestedTypeHost();
+    assert.equal(nestedHost.describe(), "host");
+    assert.equal(exports.NestedTypeHost.Variant.Primary, "primary");
+    assert.equal(exports.NestedTypeHost.Variant.Secondary, "secondary");
+    const hostLabel = exports.NestedTypeHost.Label.init("Save");
+    assert.equal(hostLabel.text, "Save");
+    assert.equal(exports.NestedTypeHost.Label.maxLength, 64);
+    assert.equal(exports.NestedTypeHost.Label.untitled().text, "untitled");
+    nestedHost.release();
+
     const s1 = { tag: exports.APIResult.Tag.Success, param0: "Cześć 🙋‍♂️" };
     const f1 = { tag: exports.APIResult.Tag.Failure, param0: 42 };
     const i1 = { tag: APIResultValues.Tag.Info };

@@ -355,7 +355,6 @@ export async function createInstantiator(options, swift) {
             enumHelpers.APIResult = APIResultHelpers;
 
             const exports = {
-                MathUtils,
                 Calculator: {
                     ...CalculatorValues,
                     square: function(value) {
@@ -382,6 +381,7 @@ export async function createInstantiator(options, swift) {
                         return ret;
                     }
                 },
+                MathUtils,
                 Utils: {
                     String: {
                         uppercase: function bjs_Utils_String_static_uppercase(text) {

@@ -4,19 +4,18 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export {};
+export type RoleObject = typeof Account.RoleValues;
 
-declare global {
-    namespace GlobalAPI {
-        function globalFunction(): string;
-        class GlobalClass {
-            constructor();
-            greet(): string;
-            release(): void;
-        }
+export namespace Account {
+    const RoleValues: {
+        readonly Admin: "admin";
+        readonly Guest: "guest";
+    };
+    type RoleTag = typeof RoleValues[keyof typeof RoleValues];
+    export interface Credentials {
+        token: string;
     }
 }
-
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
     /// Release the heap object.
@@ -24,23 +23,20 @@ export interface SwiftHeapObject {
     /// Note: Calling this method will release the heap object and it will no longer be accessible.
     release(): void;
 }
-export interface GlobalClass extends SwiftHeapObject {
-    greet(): string;
-}
-export interface PrivateClass extends SwiftHeapObject {
-    greet(): string;
+export interface Account extends SwiftHeapObject {
+    describe(): string;
+    name: string;
+    readonly role: Account.RoleTag;
 }
 export type Exports = {
-    GlobalAPI: {
-        globalFunction(): string;
-        GlobalClass: {
-            new(): GlobalClass;
-        },
-    },
-    PrivateAPI: {
-        privateFunction(): string;
-        PrivateClass: {
-            new(): PrivateClass;
+    Account: {
+        new(name: string): Account;
+        readonly defaultRole: Account.RoleTag;
+        Role: RoleObject
+        Credentials: {
+            init(token: string): Account.Credentials;
+            readonly maxLength: number;
+            empty(): Account.Credentials;
         },
     },
 }

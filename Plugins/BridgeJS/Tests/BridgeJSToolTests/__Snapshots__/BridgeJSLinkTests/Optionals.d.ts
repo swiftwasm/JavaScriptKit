@@ -42,12 +42,6 @@ export interface WithOptionalJSClass {
     childOrNull: WithOptionalJSClass | null;
 }
 export type Exports = {
-    Greeter: {
-        new(name: string | null): Greeter;
-    }
-    OptionalPropertyHolder: {
-        new(): OptionalPropertyHolder;
-    }
     roundTripOptionalClass(value: Greeter | null): Greeter | null;
     testOptionalPropertyRoundtrip(holder: OptionalPropertyHolder | null): OptionalPropertyHolder | null;
     roundTripExportedOptionalJSObject(value: any | null): any | null;
@@ -71,6 +65,12 @@ export type Exports = {
     roundTripAlias(age: number | null): number | null;
     roundTripOptionalAlias(name: string | null): string | null;
     testMixedOptionals(firstName: string | null, lastName: string | null, age: number | null, active: boolean): string | null;
+    Greeter: {
+        new(name: string | null): Greeter;
+    },
+    OptionalPropertyHolder: {
+        new(): OptionalPropertyHolder;
+    },
 }
 export type Imports = {
     WithOptionalJSClass: {

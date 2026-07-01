@@ -46,22 +46,6 @@ export interface ConstructorDefaults extends SwiftHeapObject {
     tag: string | null;
 }
 export type Exports = {
-    DefaultGreeter: {
-        new(name: string): DefaultGreeter;
-    }
-    EmptyGreeter: {
-        new(): EmptyGreeter;
-    }
-    ConstructorDefaults: {
-        /**
-         * @param name - Optional parameter (default: "Default")
-         * @param count - Optional parameter (default: 42)
-         * @param enabled - Optional parameter (default: true)
-         * @param status - Optional parameter (default: Status.Active)
-         * @param tag - Optional parameter (default: null)
-         */
-        new(name?: string, count?: number, enabled?: boolean, status?: StatusTag, tag?: string | null): ConstructorDefaults;
-    }
     /**
      * @param message - Optional parameter (default: "Hello World")
      */
@@ -143,6 +127,22 @@ export type Exports = {
      */
     testMixedWithArrayDefault(name?: string, values?: number[], enabled?: boolean): string;
     Status: StatusObject
+    ConstructorDefaults: {
+        /**
+         * @param name - Optional parameter (default: "Default")
+         * @param count - Optional parameter (default: 42)
+         * @param enabled - Optional parameter (default: true)
+         * @param status - Optional parameter (default: Status.Active)
+         * @param tag - Optional parameter (default: null)
+         */
+        new(name?: string, count?: number, enabled?: boolean, status?: StatusTag, tag?: string | null): ConstructorDefaults;
+    },
+    DefaultGreeter: {
+        new(name: string): DefaultGreeter;
+    },
+    EmptyGreeter: {
+        new(): EmptyGreeter;
+    },
     MathOperations: {
         /**
          * @param baseValue - Optional parameter (default: 0.0)
@@ -152,7 +152,7 @@ export type Exports = {
          * @param b - Optional parameter (default: 5.0)
          */
         subtract(a: number, b?: number): number;
-    }
+    },
 }
 export type Imports = {
 }

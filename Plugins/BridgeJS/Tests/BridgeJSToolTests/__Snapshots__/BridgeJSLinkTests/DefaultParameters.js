@@ -456,9 +456,6 @@ export async function createInstantiator(options, swift) {
             structHelpers.MathOperations = MathOperationsHelpers;
 
             const exports = {
-                DefaultGreeter,
-                EmptyGreeter,
-                ConstructorDefaults,
                 testStringDefault: function bjs_testStringDefault(message = "Hello World") {
                     const messageBytes = textEncoder.encode(message);
                     const messageId = swift.memory.retain(messageBytes);
@@ -675,6 +672,9 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 Status: StatusValues,
+                ConstructorDefaults,
+                DefaultGreeter,
+                EmptyGreeter,
                 MathOperations: {
                     init: function(baseValue = 0.0) {
                         instance.exports.bjs_MathOperations_init(baseValue);

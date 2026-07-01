@@ -600,7 +600,6 @@ export async function createInstantiator(options, swift) {
             structHelpers.Vector2D = Vector2DHelpers;
 
             const exports = {
-                Greeter,
                 roundtrip: function bjs_roundtrip(session) {
                     structHelpers.Person.lower(session);
                     instance.exports.bjs_roundtrip();
@@ -614,26 +613,6 @@ export async function createInstantiator(options, swift) {
                     return structValue;
                 },
                 Precision: PrecisionValues,
-                DataPoint: {
-                    init: function(x, y, label, optCount, optFlag) {
-                        const labelBytes = textEncoder.encode(label);
-                        const labelId = swift.memory.retain(labelBytes);
-                        const isSome = optCount != null;
-                        const isSome1 = optFlag != null;
-                        instance.exports.bjs_DataPoint_init(x, y, labelId, labelBytes.length, +isSome, isSome ? optCount : 0, +isSome1, isSome1 ? optFlag ? 1 : 0 : 0);
-                        const structValue = structHelpers.DataPoint.lift();
-                        return structValue;
-                    },
-                    get dimensions() {
-                        const ret = instance.exports.bjs_DataPoint_static_dimensions_get();
-                        return ret;
-                    },
-                    origin: function() {
-                        instance.exports.bjs_DataPoint_static_origin();
-                        const structValue = structHelpers.DataPoint.lift();
-                        return structValue;
-                    },
-                },
                 ConfigStruct: {
                     get maxRetries() {
                         const ret = instance.exports.bjs_ConfigStruct_static_maxRetries_get();
@@ -668,6 +647,27 @@ export async function createInstantiator(options, swift) {
                         return ret;
                     },
                 },
+                DataPoint: {
+                    init: function(x, y, label, optCount, optFlag) {
+                        const labelBytes = textEncoder.encode(label);
+                        const labelId = swift.memory.retain(labelBytes);
+                        const isSome = optCount != null;
+                        const isSome1 = optFlag != null;
+                        instance.exports.bjs_DataPoint_init(x, y, labelId, labelBytes.length, +isSome, isSome ? optCount : 0, +isSome1, isSome1 ? optFlag ? 1 : 0 : 0);
+                        const structValue = structHelpers.DataPoint.lift();
+                        return structValue;
+                    },
+                    get dimensions() {
+                        const ret = instance.exports.bjs_DataPoint_static_dimensions_get();
+                        return ret;
+                    },
+                    origin: function() {
+                        instance.exports.bjs_DataPoint_static_origin();
+                        const structValue = structHelpers.DataPoint.lift();
+                        return structValue;
+                    },
+                },
+                Greeter,
             };
             _exports = exports;
             return exports;

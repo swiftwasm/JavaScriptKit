@@ -685,8 +685,6 @@ export async function createInstantiator(options, swift) {
                 }
             }
             const exports = {
-                Greeter,
-                OptionalPropertyHolder,
                 roundTripOptionalClass: function bjs_roundTripOptionalClass(value) {
                     const isSome = value != null;
                     let result;
@@ -972,6 +970,8 @@ export async function createInstantiator(options, swift) {
                     tmpRetString = undefined;
                     return optResult;
                 },
+                Greeter,
+                OptionalPropertyHolder,
             };
             _exports = exports;
             return exports;

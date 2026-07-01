@@ -23,13 +23,13 @@ export interface ExplicitlyUncachedModel extends SwiftHeapObject {
 export type Exports = {
     CachedModel: {
         new(name: string): CachedModel;
-    }
-    UncachedModel: {
-        new(value: number): UncachedModel;
-    }
+    },
     ExplicitlyUncachedModel: {
         new(count: number): ExplicitlyUncachedModel;
-    }
+    },
+    UncachedModel: {
+        new(value: number): UncachedModel;
+    },
 }
 export type Imports = {
 }

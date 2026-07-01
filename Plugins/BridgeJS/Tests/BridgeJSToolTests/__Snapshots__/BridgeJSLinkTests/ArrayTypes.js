@@ -493,8 +493,6 @@ export async function createInstantiator(options, swift) {
             structHelpers.Point = PointHelpers;
 
             const exports = {
-                Item,
-                MultiArrayContainer,
                 processIntArray: function bjs_processIntArray(values) {
                     for (const elem of values) {
                         i32Stack.push((elem | 0));
@@ -1201,6 +1199,8 @@ export async function createInstantiator(options, swift) {
                 },
                 Direction: DirectionValues,
                 Status: StatusValues,
+                Item,
+                MultiArrayContainer,
             };
             _exports = exports;
             return exports;

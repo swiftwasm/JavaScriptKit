@@ -16,10 +16,10 @@ export interface GlobalClass extends SwiftHeapObject {
 }
 export type Exports = {
     GlobalAPI: {
+        globalFunction(): string;
         GlobalClass: {
             new(): GlobalClass;
-        }
-        globalFunction(): string;
+        },
     },
 }
 export type Imports = {

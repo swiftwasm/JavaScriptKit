@@ -4,17 +4,21 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export const CalculatorValues = {
-    Scientific: 0,
-    Basic: 1,
+export const KindValues = {
+    Circle: "circle",
+    Square: "square",
 };
 
-export const APIResultValues = {
-    Tag: {
-        Success: 0,
-        Failure: 1,
-    },
+export const VariantValues = {
+    Button: "button",
+    Slider: "slider",
 };
+
+export const AlignmentValues = {
+    Leading: "leading",
+    Trailing: "trailing",
+};
+
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
@@ -42,37 +46,48 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createAPIResultValuesHelpers = () => ({
+    const __bjs_createShapeHelpers = () => ({
         lower: (value) => {
-            const enumTag = value.tag;
-            switch (enumTag) {
-                case APIResultValues.Tag.Success: {
-                    const bytes = textEncoder.encode(value.param0);
-                    const id = swift.memory.retain(bytes);
-                    i32Stack.push(bytes.length);
-                    i32Stack.push(id);
-                    return APIResultValues.Tag.Success;
-                }
-                case APIResultValues.Tag.Failure: {
-                    i32Stack.push((value.param0 | 0));
-                    return APIResultValues.Tag.Failure;
-                }
-                default: throw new Error("Unknown APIResultValues tag: " + String(enumTag));
-            }
+            const bytes = textEncoder.encode(value.label);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
         },
-        lift: (tag) => {
-            tag = tag | 0;
-            switch (tag) {
-                case APIResultValues.Tag.Success: {
-                    const string = strStack.pop();
-                    return { tag: APIResultValues.Tag.Success, param0: string };
-                }
-                case APIResultValues.Tag.Failure: {
-                    const int = i32Stack.pop();
-                    return { tag: APIResultValues.Tag.Failure, param0: int };
-                }
-                default: throw new Error("Unknown APIResultValues tag returned from Swift: " + String(tag));
-            }
+        lift: () => {
+            const string = strStack.pop();
+            return { label: string };
+        }
+    });
+    const __bjs_createWidgetHelpers = () => ({
+        lower: (value) => {
+            const bytes = textEncoder.encode(value.name);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+        },
+        lift: () => {
+            const string = strStack.pop();
+            return { name: string };
+        }
+    });
+    const __bjs_createWidget_LayoutHelpers = () => ({
+        lower: (value) => {
+            i32Stack.push((value.padding | 0));
+        },
+        lift: () => {
+            const int = i32Stack.pop();
+            return { padding: int };
+        }
+    });
+    const __bjs_createWidget_BoundsHelpers = () => ({
+        lower: (value) => {
+            i32Stack.push((value.width | 0));
+            i32Stack.push((value.height | 0));
+        },
+        lift: () => {
+            const int = i32Stack.pop();
+            const int1 = i32Stack.pop();
+            return { width: int1, height: int };
         }
     });
 
@@ -149,6 +164,34 @@ export async function createInstantiator(options, swift) {
                 const byteLen = count * Ctor.BYTES_PER_ELEMENT;
                 const copy = memory.buffer.slice(ptr, ptr + byteLen);
                 taStack.push(Array.from(new Ctor(copy)));
+            }
+            bjs["swift_js_struct_lower_Shape"] = function(objectId) {
+                structHelpers.Shape.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Shape"] = function() {
+                const value = structHelpers.Shape.lift();
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Widget"] = function(objectId) {
+                structHelpers.Widget.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Widget"] = function() {
+                const value = structHelpers.Widget.lift();
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Widget_Layout"] = function(objectId) {
+                structHelpers.Widget_Layout.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Widget_Layout"] = function() {
+                const value = structHelpers.Widget_Layout.lift();
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Widget_Bounds"] = function(objectId) {
+                structHelpers.Widget_Bounds.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Widget_Bounds"] = function() {
+                const value = structHelpers.Widget_Bounds.lift();
+                return swift.memory.retain(value);
             }
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
@@ -247,14 +290,6 @@ export async function createInstantiator(options, swift) {
                 return pointer || 0;
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
-            // Wrapper functions for module: TestModule
-            if (!importObject["TestModule"]) {
-                importObject["TestModule"] = {};
-            }
-            importObject["TestModule"]["bjs_MathUtils_wrap"] = function(pointer) {
-                const obj = _exports['MathUtils'].__construct(pointer);
-                return swift.memory.retain(obj);
-            };
         },
         setInstance: (i) => {
             instance = i;
@@ -269,140 +304,60 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const swiftHeapObjectFinalizationRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
-                if (state.hasReleased) {
-                    return;
-                }
-                state.hasReleased = true;
-                state.identityMap?.delete(state.pointer);
-                state.deinit(state.pointer);
-            });
+            const ShapeHelpers = __bjs_createShapeHelpers();
+            structHelpers.Shape = ShapeHelpers;
 
-            /// Represents a Swift heap object like a class instance or an actor instance.
-            class SwiftHeapObject {
-                static __wrap(pointer, deinit, prototype, identityCache) {
-                    pointer = pointer >>> 0;
-                    const makeFresh = (identityMap) => {
-                        const obj = Object.create(prototype);
-                        const state = { pointer, deinit, hasReleased: false, identityMap };
-                        obj.pointer = pointer;
-                        obj.__swiftHeapObjectState = state;
-                        swiftHeapObjectFinalizationRegistry.register(obj, state, state);
-                        if (identityMap) {
-                            identityMap.set(pointer, new WeakRef(obj));
-                        }
-                        return obj;
-                    };
+            const WidgetHelpers = __bjs_createWidgetHelpers();
+            structHelpers.Widget = WidgetHelpers;
 
-                    if (!identityCache) {
-                        return makeFresh(null);
-                    }
+            const Widget_LayoutHelpers = __bjs_createWidget_LayoutHelpers();
+            structHelpers.Widget_Layout = Widget_LayoutHelpers;
 
-                    const cached = identityCache.get(pointer)?.deref();
-                    if (cached && !cached.__swiftHeapObjectState.hasReleased) {
-                        deinit(pointer);
-                        return cached;
-                    }
-                    if (identityCache.has(pointer)) {
-                        identityCache.delete(pointer);
-                    }
+            const Widget_BoundsHelpers = __bjs_createWidget_BoundsHelpers();
+            structHelpers.Widget_Bounds = Widget_BoundsHelpers;
 
-                    return makeFresh(identityCache);
-                }
-
-                release() {
-                    const state = this.__swiftHeapObjectState;
-                    if (state.hasReleased) {
-                        return;
-                    }
-                    state.hasReleased = true;
-                    swiftHeapObjectFinalizationRegistry.unregister(state);
-                    state.identityMap?.delete(state.pointer);
-                    state.deinit(state.pointer);
-                }
-            }
-            class MathUtils extends SwiftHeapObject {
-                static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_MathUtils_deinit, MathUtils.prototype, null);
-                }
-
-                constructor() {
-                    const ret = instance.exports.bjs_MathUtils_init();
-                    return MathUtils.__construct(ret);
-                }
-                static subtract(a, b) {
-                    const ret = instance.exports.bjs_MathUtils_static_subtract(a, b);
-                    return ret;
-                }
-                static add(a, b) {
-                    const ret = instance.exports.bjs_MathUtils_static_add(a, b);
-                    return ret;
-                }
-                multiply(x, y) {
-                    const ret = instance.exports.bjs_MathUtils_multiply(this.pointer, x, y);
-                    return ret;
-                }
-                static divide(a, b) {
-                    const ret = instance.exports.bjs_MathUtils_static_divide(a, b);
-                    return ret;
-                }
-                static get pi() {
-                    const ret = instance.exports.bjs_MathUtils_static_pi_get();
-                    return ret;
-                }
-            }
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers();
-            enumHelpers.APIResult = APIResultHelpers;
-
-            if (typeof globalThis.Utils === 'undefined') {
-                globalThis.Utils = {};
-            }
-            if (typeof globalThis.Utils.String === 'undefined') {
-                globalThis.Utils.String = {};
-            }
             const exports = {
-                Calculator: {
-                    ...CalculatorValues,
-                    square: function(value) {
-                        const ret = instance.exports.bjs_Calculator_static_square(value);
-                        return ret;
+                Shape: {
+                    init: function(label) {
+                        const labelBytes = textEncoder.encode(label);
+                        const labelId = swift.memory.retain(labelBytes);
+                        instance.exports.bjs_Shape_init(labelId, labelBytes.length);
+                        const structValue = structHelpers.Shape.lift();
+                        return structValue;
                     },
-                    cube: function(value) {
-                        const ret = instance.exports.bjs_Calculator_static_cube(value);
-                        return ret;
+                    Kind: KindValues,
+                },
+                Widget: {
+                    init: function(name) {
+                        const nameBytes = textEncoder.encode(name);
+                        const nameId = swift.memory.retain(nameBytes);
+                        instance.exports.bjs_Widget_init(nameId, nameBytes.length);
+                        const structValue = structHelpers.Widget.lift();
+                        return structValue;
                     },
-                    get version() {
-                        instance.exports.bjs_Calculator_static_version_get();
-                        const ret = tmpRetString;
-                        tmpRetString = undefined;
-                        return ret;
-                    }
-                },
-                APIResult: {
-                    ...APIResultValues,
-                    roundtrip: function(value) {
-                        const valueCaseId = enumHelpers.APIResult.lower(value);
-                        instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
-                        const ret = enumHelpers.APIResult.lift(i32Stack.pop());
-                        return ret;
-                    }
-                },
-                MathUtils,
-                Utils: {
-                    String: {
-                        uppercase: function bjs_Utils_String_static_uppercase(text) {
-                            const textBytes = textEncoder.encode(text);
-                            const textId = swift.memory.retain(textBytes);
-                            instance.exports.bjs_Utils_String_static_uppercase(textId, textBytes.length);
-                            const ret = tmpRetString;
-                            tmpRetString = undefined;
+                    Variant: VariantValues,
+                    Bounds: {
+                        init: function(width, height) {
+                            instance.exports.bjs_Widget_Bounds_init(width, height);
+                            const structValue = structHelpers.Widget_Bounds.lift();
+                            return structValue;
+                        },
+                        get dimensions() {
+                            const ret = instance.exports.bjs_Widget_Bounds_static_dimensions_get();
                             return ret;
                         },
+                        zero: function() {
+                            instance.exports.bjs_Widget_Bounds_static_zero();
+                            const structValue = structHelpers.Widget_Bounds.lift();
+                            return structValue;
+                        },
+                    },
+                    Layout: {
+                        Alignment: AlignmentValues,
                     },
                 },
             };
             _exports = exports;
-            globalThis.Utils.String.uppercase = exports.Utils.String.uppercase;
             return exports;
         },
     }

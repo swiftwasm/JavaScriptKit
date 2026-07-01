@@ -1061,7 +1061,6 @@ export async function createInstantiator(options, swift) {
             enumHelpers.OptionalAllTypesResult = OptionalAllTypesResultHelpers;
 
             const exports = {
-                User,
                 handle: function bjs_handle(result) {
                     const resultCaseId = enumHelpers.APIResult.lower(result);
                     instance.exports.bjs_handle(resultCaseId);
@@ -1255,6 +1254,7 @@ export async function createInstantiator(options, swift) {
                 API: {
                     NetworkingResult: NetworkingResultValues,
                 },
+                User,
                 Utilities: {
                     Result: ResultValues,
                 },

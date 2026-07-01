@@ -560,7 +560,7 @@ public class ExportSwift {
         func callName(for property: ExportedProperty) -> String {
             switch self {
             case .enumStatic(let enumDef):
-                return property.callName(prefix: enumDef.swiftCallName)
+                return "\(enumDef.swiftCallName).\(property.name)"
             case .classStatic(let klass):
                 // property.callName() would use staticContext (the ABI name) as prefix;
                 // use swiftCallName directly so the emitted expression is valid Swift.
@@ -568,7 +568,7 @@ public class ExportSwift {
             case .classInstance:
                 return property.callName()
             case .structStatic(let structDef):
-                return property.callName(prefix: structDef.swiftCallName)
+                return "\(structDef.swiftCallName).\(property.name)"
             }
         }
     }

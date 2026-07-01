@@ -351,12 +351,8 @@ export async function createInstantiator(options, swift) {
             structHelpers.Player_Stats = Player_StatsHelpers;
 
             const exports = {
-                User,
                 Player,
-                Player: {
-                },
-                User: {
-                },
+                User,
             };
             _exports = exports;
             return exports;

@@ -322,22 +322,22 @@ export async function createInstantiator(options, swift) {
             }
             const exports = {
                 GlobalAPI: {
-                    GlobalClass,
                     globalFunction: function bjs_GlobalAPI_globalFunction() {
                         instance.exports.bjs_GlobalAPI_globalFunction();
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
                     },
+                    GlobalClass,
                 },
                 PrivateAPI: {
-                    PrivateClass,
                     privateFunction: function bjs_PrivateAPI_privateFunction() {
                         instance.exports.bjs_PrivateAPI_privateFunction();
                         const ret = tmpRetString;
                         tmpRetString = undefined;
                         return ret;
                     },
+                    PrivateClass,
                 },
             };
             _exports = exports;

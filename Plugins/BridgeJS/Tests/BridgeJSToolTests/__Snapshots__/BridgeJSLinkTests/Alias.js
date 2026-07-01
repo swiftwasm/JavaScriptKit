@@ -421,8 +421,6 @@ export async function createInstantiator(options, swift) {
             enumHelpers.InnerTag = InnerTagHelpers;
 
             const exports = {
-                PolygonReference,
-                TagReference,
                 roundtripPolygon: function bjs_roundtripPolygon(polygon) {
                     const ret = instance.exports.bjs_roundtripPolygon(polygon.pointer);
                     return PolygonReference.__construct(ret);
@@ -517,6 +515,8 @@ export async function createInstantiator(options, swift) {
                     return ret1;
                 },
                 InnerTag: InnerTagValues,
+                PolygonReference,
+                TagReference,
             };
             _exports = exports;
             return exports;

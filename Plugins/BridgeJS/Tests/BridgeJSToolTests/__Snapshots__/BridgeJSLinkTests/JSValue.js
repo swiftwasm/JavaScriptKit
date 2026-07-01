@@ -527,7 +527,6 @@ export async function createInstantiator(options, swift) {
                 }
             }
             const exports = {
-                JSValueHolder,
                 roundTripJSValue: function bjs_roundTripJSValue(value) {
                     const [valueKind, valuePayload1, valuePayload2] = __bjs_jsValueLower(value);
                     instance.exports.bjs_roundTripJSValue(valueKind, valuePayload1, valuePayload2);
@@ -627,6 +626,7 @@ export async function createInstantiator(options, swift) {
                     }
                     return optResult;
                 },
+                JSValueHolder,
             };
             _exports = exports;
             return exports;

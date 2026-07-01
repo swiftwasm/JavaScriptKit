@@ -351,7 +351,6 @@ export async function createInstantiator(options, swift) {
             structHelpers.Point = PointHelpers;
 
             const exports = {
-                Greeter,
                 greet: function bjs_greet(name, greeting = "Hello") {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
@@ -407,6 +406,7 @@ export async function createInstantiator(options, swift) {
                         return ret;
                     }
                 },
+                Greeter,
                 MathUtils: {
                     double: function bjs_MathUtils_double(value) {
                         const ret = instance.exports.bjs_MathUtils_double(value);

@@ -290,11 +290,11 @@ export async function createInstantiator(options, swift) {
                 }
             }
             const exports = {
-                ColorBox,
                 roundtripColor: function bjs_roundtripColor(color) {
                     const ret = instance.exports.bjs_roundtripColor(color.pointer);
                     return ColorBox.__construct(ret);
                 },
+                ColorBox,
             };
             _exports = exports;
             return exports;

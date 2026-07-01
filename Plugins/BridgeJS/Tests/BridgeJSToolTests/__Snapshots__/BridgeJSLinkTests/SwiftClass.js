@@ -374,12 +374,12 @@ export async function createInstantiator(options, swift) {
 
             }
             const exports = {
-                Greeter,
-                PublicGreeter,
-                PackageGreeter,
                 takeGreeter: function bjs_takeGreeter(greeter) {
                     instance.exports.bjs_takeGreeter(greeter.pointer);
                 },
+                Greeter,
+                PackageGreeter,
+                PublicGreeter,
             };
             _exports = exports;
             return exports;

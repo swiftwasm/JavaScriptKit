@@ -63,24 +63,24 @@ export interface Greeter extends SwiftHeapObject {
     name: string;
 }
 export type Exports = {
-    Greeter: {
-        new(name: string): Greeter;
-    }
     roundtrip(session: Person): Person;
     roundtripContainer(container: Container): Container;
     Precision: PrecisionObject
-    DataPoint: {
-        init(x: number, y: number, label: string, optCount: number | null, optFlag: boolean | null): DataPoint;
-        readonly dimensions: number;
-        origin(): DataPoint;
-    }
     ConfigStruct: {
         readonly maxRetries: number;
         defaultConfig: string;
         timeout: number;
         readonly computedSetting: string;
         update(timeout: number): number;
-    }
+    },
+    DataPoint: {
+        init(x: number, y: number, label: string, optCount: number | null, optFlag: boolean | null): DataPoint;
+        readonly dimensions: number;
+        origin(): DataPoint;
+    },
+    Greeter: {
+        new(name: string): Greeter;
+    },
 }
 export type Imports = {
 }
