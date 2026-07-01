@@ -62,7 +62,7 @@ public func _bjs_Account_Credentials_init(_ tokenBytes: Int32, _ tokenLength: In
 @_cdecl("bjs_Account_Credentials_static_maxLength_get")
 public func _bjs_Account_Credentials_static_maxLength_get() -> Int32 {
     #if arch(wasm32)
-    let ret = Account_Credentials.maxLength
+    let ret = Account.Credentials.maxLength
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

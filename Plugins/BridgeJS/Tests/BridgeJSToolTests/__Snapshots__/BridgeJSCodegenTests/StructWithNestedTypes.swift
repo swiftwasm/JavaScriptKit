@@ -230,7 +230,7 @@ public func _bjs_Widget_Bounds_init(_ width: Int32, _ height: Int32) -> Void {
 @_cdecl("bjs_Widget_Bounds_static_dimensions_get")
 public func _bjs_Widget_Bounds_static_dimensions_get() -> Int32 {
     #if arch(wasm32)
-    let ret = Widget_Bounds.dimensions
+    let ret = Widget.Bounds.dimensions
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
