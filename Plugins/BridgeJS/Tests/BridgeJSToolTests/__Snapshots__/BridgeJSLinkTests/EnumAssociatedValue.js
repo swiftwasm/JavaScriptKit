@@ -676,9 +676,8 @@ export async function createInstantiator(options, swift) {
                     if (isSome) {
                         const caseId = enumHelpers.APIResult.lower(value.param0);
                         i32Stack.push(caseId);
-                    } else {
-                        i32Stack.push(-1);
                     }
+                    i32Stack.push(isSome);
                     return OptionalAllTypesResultValues.Tag.OptNestedEnum;
                 }
                 case OptionalAllTypesResultValues.Tag.OptArray: {
@@ -738,12 +737,13 @@ export async function createInstantiator(options, swift) {
                     return { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                    const caseId = i32Stack.pop();
+                    const isSome = i32Stack.pop();
                     let optValue;
-                    if (caseId === -1) {
+                    if (isSome === 0) {
                         optValue = null;
                     } else {
-                        optValue = enumHelpers.APIResult.lift(caseId);
+                        const enumValue = enumHelpers.APIResult.lift(i32Stack.pop());
+                        optValue = enumValue;
                     }
                     return { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: optValue };
                 }

@@ -2195,35 +2195,6 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
-        if case .associatedValueEnum(let fullName) = wrappedType {
-            let base = fullName.components(separatedBy: ".").last ?? fullName
-            let absenceLiteral = kind.absenceLiteral
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let caseIdVar = scope.variable("caseId")
-                    let resultVar = scope.variable("optValue")
-
-                    printer.write("const \(caseIdVar) = \(scope.popI32());")
-                    printer.write("let \(resultVar);")
-                    printer.write("if (\(caseIdVar) === -1) {")
-                    printer.indent {
-                        printer.write("\(resultVar) = \(absenceLiteral);")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write(
-                            "\(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(caseIdVar));"
-                        )
-                    }
-                    printer.write("}")
-
-                    return [resultVar]
-                }
-            )
-        }
-
         let absenceLiteral = kind.absenceLiteral
         return IntrinsicJSFragment(
             parameters: [],
@@ -2261,36 +2232,6 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
-        if case .associatedValueEnum(let fullName) = wrappedType {
-            let base = fullName.components(separatedBy: ".").last ?? fullName
-            return IntrinsicJSFragment(
-                parameters: ["value"],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let value = arguments[0]
-                    let isSomeVar = scope.variable("isSome")
-                    let presenceExpr = kind.presenceCheck(value: value)
-
-                    printer.write("const \(isSomeVar) = \(presenceExpr) ? 1 : 0;")
-                    printer.write("if (\(isSomeVar)) {")
-                    printer.indent {
-                        let caseIdVar = scope.variable("caseId")
-                        printer.write(
-                            "const \(caseIdVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
-                        )
-                        scope.emitPushI32Parameter(caseIdVar, printer: printer)
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        scope.emitPushI32Parameter("-1", printer: printer)
-                    }
-                    printer.write("}")
-
-                    return []
-                }
-            )
-        }
-
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
