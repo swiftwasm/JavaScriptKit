@@ -1100,23 +1100,6 @@ extension _BridgedSwiftAssociatedValueEnum {
         _swift_js_push_i32(bridgeJSStackPushPayload())
     }
 
-    public static func bridgeJSStackPopAsOptional() -> Self? {
-        let discriminator = _swift_js_pop_i32()
-        if discriminator == -1 {
-            return nil
-        }
-        return bridgeJSStackPopPayload(discriminator)
-    }
-
-    public static func bridgeJSStackPushAsOptional(_ value: consuming Self?) {
-        switch consume value {
-        case .none:
-            _swift_js_push_i32(-1)
-        case .some(let value):
-            _swift_js_push_i32(value.bridgeJSStackPushPayload())
-        }
-    }
-
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ caseId: Int32) -> Self {
         return bridgeJSStackPopPayload(caseId)
     }
@@ -2378,7 +2361,12 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftAssociatedValueEnum {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
-        Wrapped.bridgeJSStackPushAsOptional(asOptional)
+        switch asOptional {
+        case .none:
+            _swift_js_push_i32(-1)
+        case .some(let value):
+            _swift_js_push_i32(value.bridgeJSStackPushPayload())
+        }
     }
 }
 

@@ -482,9 +482,8 @@ export async function createInstantiator(options, swift) {
                         if (isSome) {
                             const caseId = enumHelpers.InnerTag.lower(elem);
                             i32Stack.push(caseId);
-                        } else {
-                            i32Stack.push(-1);
                         }
+                        i32Stack.push(isSome);
                     }
                     i32Stack.push(xs.length);
                     instance.exports.bjs_roundtripTags();
@@ -495,12 +494,13 @@ export async function createInstantiator(options, swift) {
                     } else {
                         arrayResult = [];
                         for (let i = 0; i < arrayLen; i++) {
-                            const caseId1 = i32Stack.pop();
+                            const isSome1 = i32Stack.pop();
                             let optValue;
-                            if (caseId1 === -1) {
+                            if (isSome1 === 0) {
                                 optValue = null;
                             } else {
-                                optValue = enumHelpers.InnerTag.lift(caseId1);
+                                const enumValue = enumHelpers.InnerTag.lift(i32Stack.pop());
+                                optValue = enumValue;
                             }
                             arrayResult.push(optValue);
                         }
