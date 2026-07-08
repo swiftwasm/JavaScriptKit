@@ -205,12 +205,14 @@ import BridgeJSUtilities
                 printStderr(diagnostic.formattedDescription(fileName: file))
             }
 
+            let importedSkeleton = skeleton.imported
             var exporter: ExportSwift?
             if let skeleton = skeleton.exported {
                 exporter = ExportSwift(
                     progress: progress,
                     moduleName: moduleName,
-                    skeleton: skeleton
+                    skeleton: skeleton,
+                    imported: importedSkeleton
                 )
             }
             var importer: ImportTS?

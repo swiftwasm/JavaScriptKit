@@ -98,7 +98,7 @@ graph LR
 | `Dictionary<K, V>` | `Record<K, V>` | - | [#495](https://github.com/swiftwasm/JavaScriptKit/issues/495) |
 | `Set<T>` | `Set<T>` | - | [#397](https://github.com/swiftwasm/JavaScriptKit/issues/397) |
 | `Foundation.URL` | `string` | - | [#496](https://github.com/swiftwasm/JavaScriptKit/issues/496) |
-| Generics | - | - | [#398](https://github.com/swiftwasm/JavaScriptKit/issues/398) |
+| Generic function or method (`T`, `[T]`, `T?`, `[String: T]`) | `<T>(value: T, type: BridgeType<T>)` | Depends on `T` | ✅ |
 
 ### Import-specific (TypeScript -> Swift)
 

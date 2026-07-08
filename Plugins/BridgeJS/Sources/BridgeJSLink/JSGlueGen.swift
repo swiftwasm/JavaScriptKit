@@ -35,6 +35,8 @@ final class JSGlueVariableScope {
     static let reservedSwiftClosureRegistry = "swiftClosureRegistry"
     static let reservedMakeSwiftClosure = "makeClosure"
     static let reservedTaStack = "taStack"
+    static let reservedCodecs = "__bjs_codecs"
+    static let reservedCodecsById = "__bjs_codecsById"
 
     private let intrinsicRegistry: JSIntrinsicRegistry
 
@@ -65,6 +67,8 @@ final class JSGlueVariableScope {
         reservedSwiftClosureRegistry,
         reservedMakeSwiftClosure,
         reservedTaStack,
+        reservedCodecs,
+        reservedCodecsById,
     ]
 
     init(intrinsicRegistry: JSIntrinsicRegistry) {
@@ -135,6 +139,193 @@ extension JSGlueVariableScope {
     }
     func popPointer() -> String {
         return "\(JSGlueVariableScope.reservedPointerStack).pop()"
+    }
+}
+
+enum GenericJSCodegen {
+    static func genericCodecLowerStatement(type: BridgeType, codec: String, value: String) -> String? {
+        switch type {
+        case .generic: return "\(codec).lower(\(value));"
+        case .array(.generic): return "__bjs_lowerArrayGeneric(\(value), \(codec));"
+        case .nullable(.generic, _): return "__bjs_lowerOptionalGeneric(\(value), \(codec));"
+        case .dictionary(.generic): return "__bjs_lowerDictGeneric(\(value), \(codec));"
+        default: return nil
+        }
+    }
+
+    static func genericCodecLiftExpression(type: BridgeType, codec: String) -> String? {
+        switch type {
+        case .generic: return "\(codec).lift()"
+        case .array(.generic): return "__bjs_liftArrayGeneric(\(codec))"
+        case .nullable(.generic, _): return "__bjs_liftOptionalGeneric(\(codec))"
+        case .dictionary(.generic): return "__bjs_liftDictGeneric(\(codec))"
+        default: return nil
+        }
+    }
+
+    struct GenericMethodNaming {
+        let tokenNames: [String: String]
+        let codecNames: [String: String]
+        let typeIdNames: [String: String]
+
+        func tokenName(_ genericName: String) -> String {
+            guard let name = tokenNames[genericName] else {
+                preconditionFailure("No token name registered for generic '\(genericName)'")
+            }
+            return name
+        }
+
+        func codecVariable(_ genericName: String) -> String {
+            guard let name = codecNames[genericName] else {
+                preconditionFailure("No codec variable registered for generic '\(genericName)'")
+            }
+            return name
+        }
+
+        func typeIdVariable(_ genericName: String) -> String {
+            guard let name = typeIdNames[genericName] else {
+                preconditionFailure("No type-id variable registered for generic '\(genericName)'")
+            }
+            return name
+        }
+
+        func genericName(of param: Parameter) -> String {
+            guard let name = param.type.referencedGenericName else {
+                preconditionFailure("Generic value parameter '\(param.name)' has no referenced generic name")
+            }
+            return name
+        }
+    }
+
+    static func makeGenericMethodNaming(
+        scope: JSGlueVariableScope,
+        parameters: [Parameter],
+        genericNames: [String]
+    ) -> GenericMethodNaming {
+        for parameter in parameters {
+            _ = scope.variable(parameter.name)
+        }
+        let tokenNames = Dictionary(uniqueKeysWithValues: genericNames.map { ($0, scope.variable("type\($0)")) })
+        let codecNames = Dictionary(uniqueKeysWithValues: genericNames.map { ($0, scope.variable("codec\($0)")) })
+        let typeIdNames = Dictionary(
+            uniqueKeysWithValues: genericNames.map { ($0, scope.variable("\($0.lowercased())TypeId")) }
+        )
+        return GenericMethodNaming(
+            tokenNames: tokenNames,
+            codecNames: codecNames,
+            typeIdNames: typeIdNames
+        )
+    }
+
+    static func emitGenericExportCallBody(
+        into printer: CodeFragmentPrinter,
+        abiName: String,
+        naming: GenericMethodNaming,
+        genericNames: [String],
+        selfStatements: [String],
+        selfForwardings: [String],
+        concreteStatements: [String],
+        concreteForwardings: [String],
+        genericValueParameters: [Parameter],
+        returnType: BridgeType
+    ) {
+        for genericName in genericNames {
+            printer.write(
+                "const \(naming.typeIdVariable(genericName)) = __bjs_resolveGenericType(\(naming.tokenName(genericName)));"
+            )
+            printer.write(
+                "const \(naming.codecVariable(genericName)) = \(JSGlueVariableScope.reservedCodecsById)[\(naming.typeIdVariable(genericName))];"
+            )
+        }
+        printer.write(lines: selfStatements)
+        printer.write(lines: concreteStatements)
+        for parameter in genericValueParameters {
+            if let statement = genericCodecLowerStatement(
+                type: parameter.type,
+                codec: naming.codecVariable(naming.genericName(of: parameter)),
+                value: parameter.name
+            ) {
+                printer.write(statement)
+            }
+        }
+        let callArguments = selfForwardings + concreteForwardings + genericNames.map { naming.typeIdVariable($0) }
+        printer.write("instance.exports.\(abiName)(\(callArguments.joined(separator: ", ")));")
+        if let returnGenericName = returnType.referencedGenericName,
+            let liftExpression = genericCodecLiftExpression(
+                type: returnType,
+                codec: naming.codecVariable(returnGenericName)
+            )
+        {
+            printer.write("return \(liftExpression);")
+        }
+    }
+
+    static func runtimeHelperDeclarations() -> [String] {
+        let i32 = JSGlueVariableScope.reservedI32Stack
+        let codecs = JSGlueVariableScope.reservedCodecs
+        let codecsById = JSGlueVariableScope.reservedCodecsById
+        return [
+            "function __bjs_resolveGenericType(token) {",
+            "    const codec = \(codecs)[token];",
+            "    if (!codec) {",
+            "        throw new Error(\"BridgeJS: no generic codec registered for type '\" + token + \"'\");",
+            "    }",
+            "    let id = \(codecsById).indexOf(codec);",
+            "    if (id === -1) {",
+            "        id = \(codecsById).push(codec) - 1;",
+            "    }",
+            "    return id;",
+            "}",
+            "function __bjs_lowerArrayGeneric(value, codec) {",
+            "    for (let i = 0; i < value.length; i++) {",
+            "        codec.lower(value[i]);",
+            "    }",
+            "    \(i32).push(value.length);",
+            "}",
+            "function __bjs_liftArrayGeneric(codec) {",
+            "    const count = \(i32).pop();",
+            "    if (count === -1) {",
+            "        return \(JSGlueVariableScope.reservedTaStack).pop();",
+            "    }",
+            "    const result = new Array(count);",
+            "    for (let i = count - 1; i >= 0; i--) {",
+            "        result[i] = codec.lift();",
+            "    }",
+            "    return result;",
+            "}",
+            "function __bjs_lowerOptionalGeneric(value, codec) {",
+            "    if (value === null || value === undefined) {",
+            "        \(i32).push(0);",
+            "    } else {",
+            "        codec.lower(value);",
+            "        \(i32).push(1);",
+            "    }",
+            "}",
+            "function __bjs_liftOptionalGeneric(codec) {",
+            "    if (\(i32).pop() === 0) {",
+            "        return null;",
+            "    }",
+            "    return codec.lift();",
+            "}",
+            "function __bjs_lowerDictGeneric(value, codec) {",
+            "    const keys = Object.keys(value);",
+            "    for (let i = 0; i < keys.length; i++) {",
+            "        \(codecs)[\"String\"].lower(keys[i]);",
+            "        codec.lower(value[keys[i]]);",
+            "    }",
+            "    \(i32).push(keys.length);",
+            "}",
+            "function __bjs_liftDictGeneric(codec) {",
+            "    const count = \(i32).pop();",
+            "    const result = {};",
+            "    for (let i = 0; i < count; i++) {",
+            "        const value = codec.lift();",
+            "        const key = \(codecs)[\"String\"].lift();",
+            "        result[key] = value;",
+            "    }",
+            "    return result;",
+            "}",
+        ]
     }
 }
 
@@ -1943,7 +2134,7 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
-    private static func stackLiftFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
+    static func stackLiftFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
         if case .nullable(let wrappedType, let kind) = elementType {
             return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
         }
@@ -2070,7 +2261,7 @@ struct IntrinsicJSFragment: Sendable {
         }
     }
 
-    private static func stackLowerFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
+    static func stackLowerFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
         if case .nullable(let wrappedType, let kind) = elementType {
             return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
         }
@@ -2361,6 +2552,44 @@ struct IntrinsicJSFragment: Sendable {
 
             // Attach instance methods to the struct instance
             for method in structDef.methods where !method.effects.isStatic {
+                if method.isGeneric {
+                    let genericNames = method.genericParameterNames
+                    let methodScope = liftScope.makeChildScope()
+                    let naming = GenericJSCodegen.makeGenericMethodNaming(
+                        scope: methodScope,
+                        parameters: method.parameters,
+                        genericNames: genericNames
+                    )
+                    let tokenName = naming.tokenName
+                    let genericParamList = (method.parameters.map { $0.name } + genericNames.map { tokenName($0) })
+                        .joined(separator: ", ")
+                    printer.write("\(instanceVar).\(method.name) = function(\(genericParamList)) {")
+                    let concretePrinter = CodeFragmentPrinter()
+                    var concreteForwardings: [String] = []
+                    for param in method.concreteParameters {
+                        let fragment = try IntrinsicJSFragment.lowerParameter(type: param.type)
+                        let lowered = try fragment.printCode([param.name], context.with(\.printer, concretePrinter))
+                        concreteForwardings.append(contentsOf: lowered)
+                    }
+                    printer.indent {
+                        GenericJSCodegen.emitGenericExportCallBody(
+                            into: printer,
+                            abiName: method.abiName,
+                            naming: naming,
+                            genericNames: genericNames,
+                            selfStatements: [
+                                "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName).lower(this);"
+                            ],
+                            selfForwardings: [],
+                            concreteStatements: concretePrinter.lines,
+                            concreteForwardings: concreteForwardings,
+                            genericValueParameters: method.genericValueParameters,
+                            returnType: method.returnType
+                        )
+                    }
+                    printer.write("}.bind(\(instanceVar));")
+                    continue
+                }
                 let paramList = DefaultValueUtils.formatParameterList(method.parameters)
                 printer.write(
                     "\(instanceVar).\(method.name) = function(\(paramList)) {"
@@ -2622,7 +2851,7 @@ private extension BridgeType {
             return .inlineFlag
         case .closure:
             return .inlineFlag
-        case .swiftStruct, .array, .dictionary, .void, .namespaceEnum:
+        case .swiftStruct, .array, .dictionary, .void, .namespaceEnum, .generic:
             return .stackABI
         case .nullable(let wrapped, _):
             return wrapped.optionalConvention
@@ -2720,7 +2949,7 @@ private extension BridgeType {
             return [("caseId", .i32)]
         case .closure:
             return [("funcRef", .i32)]
-        case .void, .namespaceEnum, .swiftStruct, .array, .dictionary:
+        case .void, .namespaceEnum, .swiftStruct, .array, .dictionary, .generic:
             return []
         case .nullable(let wrapped, _):
             return wrapped.wasmParams
