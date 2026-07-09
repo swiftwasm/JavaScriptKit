@@ -8,6 +8,8 @@
 #endif
 #include <stdbool.h>
 #include <stdint.h>
+#include <ptrcheck.h>
+#include <lifetimebound.h>
 
 /// `JavaScriptObjectRef` represents JavaScript object reference that is referenced by Swift side.
 /// This value is an address of `SwiftRuntimeHeap`.
@@ -291,12 +293,21 @@ IMPORT_JS_FUNCTION(swjs_create_oneshot_function, JavaScriptObjectRef, (const Jav
 /// This is used to provide an efficient way to create `TypedArray`.
 ///
 /// @param constructor The `TypedArray` constructor.
-/// @param elements_ptr The elements pointer to initialize. They are assumed to be the same size of `constructor` elements size.
-/// @param length The length of `elements_ptr`
+/// @param elements_ptr The elements to copy into the new typed array. May be NULL
+///                     when `length` is 0 (Swift's `Array.baseAddress` is NULL for
+///                     empty arrays). The pointee bytes are copied; the pointer
+///                     does not escape the call.
+/// @param length The number of elements at `elements_ptr`.
+/// @param element_size The size in bytes of each element. Should match the byte
+///                     width of `constructor`'s element type
+///                     (`constructor.BYTES_PER_ELEMENT`). The JS side ignores this
+///                     value; it exists so clang's bounds-safety analyzer can
+///                     express the buffer size as `length * element_size`.
 /// @returns A reference to the constructed typed array
 IMPORT_JS_FUNCTION(swjs_create_typed_array, JavaScriptObjectRef, (const JavaScriptObjectRef constructor,
-                                                                  const void * _Nullable elements_ptr,
-                                                                  const int length))
+                                                                  const void * _Nullable __sized_by_or_null(length * element_size) __noescape elements_ptr,
+                                                                  const int length,
+                                                                  const int element_size))
 
 /// Copies the byte contents of a typed array into a Swift side memory buffer.
 ///
