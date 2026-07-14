@@ -41,11 +41,52 @@ If you used `from: .global`, do not pass the function in `getImports()`; the run
 
 Bound functions are `throws(JSException)`. Call them with `try` or `try?`; they throw when the JavaScript implementation throws.
 
+## Generic functions
+
+A `@JSFunction` can be generic over a type parameter constrained to `BridgedSwiftGenericBridgeable`. The concrete type chosen at the call site then crosses the bridge:
+
+```swift
+@JSFunction func parse<T: BridgedSwiftGenericBridgeable>(_ json: String) throws(JSException) -> T
+
+let user: User = try parse(jsonString)
+```
+
+`T` must be a bridgeable type: a supported primitive (`Bool`, any fixed-width integer such as `Int`/`UInt`/`Int8`…`UInt64`, `Float`, `Double`, `String`, or `JSValue`), or a `@JS` struct, `final @JS class`, or `@JS enum`. You do not write any conformance yourself; marking a type `@JS` makes it usable as `T` (see <doc:Supported-Types>). Generics are not supported for `async` functions or `where` clauses (see <doc:Unsupported-Features>).
+
+A generic type parameter may be used in more than one parameter, an imported function may declare more than one distinct generic parameter, and a generic result type may be used on a function that takes no generic parameters (the JavaScript implementation produces the value):
+
+```swift
+@JSFunction func pickFirst<T: BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) throws(JSException) -> T
+
+@JSFunction func makeValue<T: BridgedSwiftGenericBridgeable>() throws(JSException) -> T
+
+@JSFunction func combine<T: BridgedSwiftGenericBridgeable, U: BridgedSwiftGenericBridgeable>(_ a: T, _ b: U) throws(JSException) -> U
+```
+
+The generic parameter may also be wrapped as `[T]`, `T?`, or `[String: T]` in parameters and the result:
+
+```swift
+@JSFunction func roundTrip<T: BridgedSwiftGenericBridgeable>(_ values: [T]) throws(JSException) -> [T]
+
+@JSFunction func lookup<T: BridgedSwiftGenericBridgeable>(_ values: [String: T]) throws(JSException) -> T?
+```
+
+### Generic methods on imported classes
+
+An imported `@JSClass` type can also have generic methods, both instance and static. The same constraint applies. The Swift to JavaScript bridge resolves the concrete type through an internal type id, and the JavaScript implementation is called with only the method's declared arguments:
+
+```swift
+@JSClass struct Store {
+    @JSFunction func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+    @JSFunction static func box<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+}
+```
+
 ## Supported features
 
 | Feature | Status |
 |:--|:--|
 | Primitive parameter/result types (e.g. `Double`, `Bool`) | ✅ |
 | `String` parameter/result type | ✅ |
+| Generic parameter/result types (constrained to `BridgedSwiftGenericBridgeable`) | ✅ |
 | Async function | ❌ |
-| Generics | ❌ |

@@ -6,6 +6,7 @@ import {
 import { ImportedFoo } from './BridgeJSRuntimeTests/JavaScript/Types.mjs';
 import { runJsOptionalSupportTests } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
 import { runAliasWorks, getImports as getAliasImports, Surface } from './BridgeJSRuntimeTests/JavaScript/AliasTests.mjs';
+import { runExportGenericTests } from './BridgeJSRuntimeTests/JavaScript/ExportGenericTests.mjs';
 import { getImports as getClosureSupportImports } from './BridgeJSRuntimeTests/JavaScript/ClosureSupportTests.mjs';
 import { getImports as getClosureThrowsImports } from './BridgeJSRuntimeTests/JavaScript/ClosureThrowsTests.mjs';
 import { getImports as getClosureAsyncImports } from './BridgeJSRuntimeTests/JavaScript/ClosureAsyncTests.mjs';
@@ -155,6 +156,23 @@ export async function setupOptions(options, context) {
                     return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
                 },
                 jsRoundTripOptionalPoint: (point) => point,
+                jsGenericRoundTrip: (v) => v,
+                jsGenericRoundTripClass: (v) => v,
+                jsGenericParsePoint: (json) => JSON.parse(json),
+                jsImportPickFirst: (a, b) => a,
+                jsImportMakeInt: () => 123,
+                jsImportCombineSecond: (a, b) => b,
+                jsGenericArrayRoundTrip: (v) => v,
+                jsGenericOptionalRoundTrip: (v) => v,
+                jsGenericDictRoundTrip: (v) => v,
+                ImportGenericConsumer: class {
+                    identity(value) {
+                        return value;
+                    }
+                    static box(value) {
+                        return value;
+                    }
+                },
                 roundTripArrayMembers: (value) => {
                     return value;
                 },
@@ -205,6 +223,13 @@ export async function setupOptions(options, context) {
                     throw new Error("No exports!?");
                 }
                 runAliasWorks(exports);
+            }
+            bridgeJSRuntimeTests["runExportGenericTests"] = () => {
+                const exports = getExports();
+                if (!exports) {
+                    throw new Error("No exports!?");
+                }
+                return runExportGenericTests(exports);
             }
             const bridgeJSGlobalTests = importObject["BridgeJSGlobalTests"] || {};
             bridgeJSGlobalTests["runJsWorksGlobal"] = () => {

@@ -7,6 +7,79 @@ import BridgeJSUtilities
 import BridgeJSSkeleton
 #endif
 
+/// Outcome of attempting to resolve a type as a reference to a generic parameter.
+enum GenericParameterResolution {
+    case resolved(BridgeType)
+    /// A non-nil message is a hard diagnostic; `nil` means the type isn't generic
+    /// and the caller should fall back to normal type resolution.
+    case rejected(String?)
+}
+
+func resolveGenericTypeReference(
+    for type: TypeSyntax,
+    genericParameterNames: [String]
+) -> GenericParameterResolution {
+    if let identifier = type.as(IdentifierTypeSyntax.self),
+        identifier.genericArgumentClause == nil,
+        genericParameterNames.contains(identifier.name.text)
+    {
+        return .resolved(.generic(identifier.name.text))
+    }
+    if let wrapped = wrappedGenericBridgeType(for: type, genericParameterNames: genericParameterNames) {
+        return .resolved(wrapped)
+    }
+    if !genericParameterNames.isEmpty,
+        let wrapped = wrappedGenericParameter(in: type, genericParameterNames: genericParameterNames)
+    {
+        return .rejected(
+            "Generic parameter '\(wrapped)' may only be used as a bare type; wrapping it beyond 'T?', '[T]' and '[String: T]' is not supported."
+        )
+    }
+    return .rejected(nil)
+}
+
+private func wrappedGenericParameter(
+    in type: TypeSyntax,
+    genericParameterNames: [String]
+) -> String? {
+    for token in type.tokens(viewMode: .sourceAccurate) {
+        if case .identifier(let text) = token.tokenKind, genericParameterNames.contains(text) {
+            return text
+        }
+    }
+    return nil
+}
+
+private func wrappedGenericBridgeType(
+    for type: TypeSyntax,
+    genericParameterNames: [String]
+) -> BridgeType? {
+    func bareGenericName(_ inner: TypeSyntax) -> String? {
+        guard let identifier = inner.as(IdentifierTypeSyntax.self),
+            identifier.genericArgumentClause == nil,
+            genericParameterNames.contains(identifier.name.text)
+        else {
+            return nil
+        }
+        return identifier.name.text
+    }
+    if let arrayType = type.as(ArrayTypeSyntax.self), let name = bareGenericName(arrayType.element) {
+        return .array(.generic(name))
+    }
+    if let optionalType = type.as(OptionalTypeSyntax.self), let name = bareGenericName(optionalType.wrappedType) {
+        return .nullable(.generic(name), .null)
+    }
+    if let dictType = type.as(DictionaryTypeSyntax.self),
+        let keyIdentifier = dictType.key.as(IdentifierTypeSyntax.self),
+        keyIdentifier.genericArgumentClause == nil,
+        keyIdentifier.name.text == "String",
+        let name = bareGenericName(dictType.value)
+    {
+        return .dictionary(.generic(name))
+    }
+    return nil
+}
+
 /// Builds BridgeJS skeletons from Swift source files using SwiftSyntax walk for API collection.
 ///
 /// This is a shared entry point for producing:
@@ -672,6 +745,11 @@ public final class SwiftToSkeleton {
         return String(name.dropFirst().dropLast())
     }
 
+    fileprivate static func isBridgeableGenericConstraint(_ constraint: String?) -> Bool {
+        constraint == "BridgedSwiftGenericBridgeable"
+            || constraint == "JavaScriptKit.BridgedSwiftGenericBridgeable"
+    }
+
 }
 
 private enum ExportSwiftConstants {
@@ -1128,20 +1206,40 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     }
 
     /// Shared parameter parsing logic used by functions, initializers, and protocol methods
+    private func lookupTypeWithGenerics(
+        for type: TypeSyntax,
+        genericParameterNames: [String],
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        switch resolveGenericTypeReference(for: type, genericParameterNames: genericParameterNames) {
+        case .resolved(let bridgeType):
+            return bridgeType
+        case .rejected(let message):
+            if let message {
+                errors.append(DiagnosticError(node: Syntax(type), message: message))
+                return nil
+            }
+            return parent.lookupType(for: type, errors: &errors)
+        }
+    }
+
     private func parseParameters(
         from parameterClause: FunctionParameterClauseSyntax,
-        allowDefaults: Bool = true
+        allowDefaults: Bool = true,
+        genericParameterNames: [String] = []
     ) -> [Parameter] {
         var parameters: [Parameter] = []
 
         for param in parameterClause.parameters {
-            let resolvedType = withLookupErrors { self.parent.lookupType(for: param.type, errors: &$0) }
+            let resolvedType = withLookupErrors {
+                self.lookupTypeWithGenerics(
+                    for: param.type,
+                    genericParameterNames: genericParameterNames,
+                    errors: &$0
+                )
+            }
             guard let type = resolvedType else {
                 continue  // Skip unsupported types
-            }
-            if case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
-                diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
-                continue
             }
             if case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
@@ -1231,6 +1329,43 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return nil
         }
 
+        var genericParameterNames: [String] = []
+        if let genericClause = node.genericParameterClause {
+            for genericParam in genericClause.parameters {
+                let constraint = genericParam.inheritedType?.trimmedDescription
+                guard SwiftToSkeleton.isBridgeableGenericConstraint(constraint) else {
+                    diagnose(
+                        node: node,
+                        message:
+                            "Generic parameter '\(genericParam.name.text)' must be constrained to 'BridgedSwiftGenericBridgeable' to be used with @JS."
+                    )
+                    return nil
+                }
+                genericParameterNames.append(genericParam.name.text)
+            }
+            if node.genericWhereClause != nil {
+                diagnose(
+                    node: node,
+                    message: "'where' clauses are not supported on generic @JS functions."
+                )
+                return nil
+            }
+            if node.signature.effectSpecifiers?.asyncSpecifier != nil {
+                diagnose(
+                    node: node,
+                    message: "Generic @JS functions cannot be 'async' yet."
+                )
+                return nil
+            }
+            if node.signature.effectSpecifiers?.throwsClause != nil {
+                diagnose(
+                    node: node,
+                    message: "Generic @JS functions cannot be 'throws' yet."
+                )
+                return nil
+            }
+        }
+
         let name = node.name.text
 
         let attributeNamespace = extractNamespace(from: jsAttribute)
@@ -1260,10 +1395,20 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             )
         }
 
-        let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
+        let parameters = parseParameters(
+            from: node.signature.parameterClause,
+            allowDefaults: true,
+            genericParameterNames: genericParameterNames
+        )
         let returnType: BridgeType
         if let returnClause = node.signature.returnClause {
-            let resolvedType = withLookupErrors { self.parent.lookupType(for: returnClause.type, errors: &$0) }
+            let resolvedType = withLookupErrors {
+                self.lookupTypeWithGenerics(
+                    for: returnClause.type,
+                    genericParameterNames: genericParameterNames,
+                    errors: &$0
+                )
+            }
 
             if let type = resolvedType, case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
                 diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
@@ -1274,6 +1419,34 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             returnType = type
         } else {
             returnType = .void
+        }
+
+        if !genericParameterNames.isEmpty {
+            for genericName in genericParameterNames {
+                if !parameters.contains(where: { $0.type.referencedGenericName == genericName }) {
+                    diagnose(
+                        node: node,
+                        message:
+                            "The generic parameter '\(genericName)' must be used in at least one parameter of a generic @JS function."
+                    )
+                    return nil
+                }
+            }
+            switch returnType {
+            case .void:
+                break
+            default:
+                guard let returnName = returnType.referencedGenericName,
+                    genericParameterNames.contains(returnName)
+                else {
+                    diagnose(
+                        node: node,
+                        message:
+                            "A generic @JS function must return the generic type (optionally wrapped in '[T]', 'T?' or '[String: T]') or Void."
+                    )
+                    return nil
+                }
+            }
         }
 
         let abiName: String
@@ -1337,7 +1510,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             effects: effects,
             namespace: finalNamespace,
             staticContext: staticContext,
-            documentation: extractDocumentation(from: node)
+            documentation: extractDocumentation(from: node),
+            genericParameters: genericParameterNames.isEmpty ? nil : genericParameterNames
         )
     }
 
@@ -1653,6 +1827,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             message: "Class visibility must be at least internal"
         )
         let classIdentityMode = extractIdentityMode(from: jsAttribute)
+        let isFinal = node.modifiers.contains { $0.name.tokenKind == .keyword(.final) } ? true : nil
         let exportedClass = ExportedClass(
             name: name,
             swiftCallName: swiftCallName,
@@ -1662,7 +1837,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             properties: [],
             namespace: effectiveNamespace,
             identityMode: classIdentityMode,
-            documentation: extractDocumentation(from: node)
+            documentation: extractDocumentation(from: node),
+            isFinal: isFinal
         )
         let uniqueKey = makeKey(name: name, namespace: effectiveNamespace)
 
@@ -2914,21 +3090,84 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
 
+        var genericParameterNames: [String] = []
+        if let genericClause = node.genericParameterClause {
+            for genericParam in genericClause.parameters {
+                let paramName = genericParam.name.text
+                let constraintText = genericParam.inheritedType?.trimmedDescription
+                guard SwiftToSkeleton.isBridgeableGenericConstraint(constraintText) else {
+                    errors.append(
+                        DiagnosticError(
+                            node: Syntax(genericParam),
+                            message:
+                                "Generic parameter '\(paramName)' must be constrained to 'BridgedSwiftGenericBridgeable' to be used with @JSFunction."
+                        )
+                    )
+                    return nil
+                }
+                genericParameterNames.append(paramName)
+            }
+        }
+        if node.genericWhereClause != nil {
+            errors.append(
+                DiagnosticError(
+                    node: node,
+                    message: "'where' clauses are not supported on @JSFunction declarations."
+                )
+            )
+            return nil
+        }
+
         let baseName = SwiftToSkeleton.normalizeIdentifier(node.name.text)
         let jsName = AttributeChecker.extractJSName(from: jsFunction)
         let from = AttributeChecker.extractJSImportFrom(from: jsFunction)
         let name = baseName
 
-        let parameters = parseParameters(from: node.signature.parameterClause)
+        let parameters = parseParameters(
+            from: node.signature.parameterClause,
+            genericParameterNames: genericParameterNames
+        )
         let returnType: BridgeType
         if let returnTypeSyntax = node.signature.returnClause?.type {
-            guard let resolved = withLookupErrors({ parent.lookupType(for: returnTypeSyntax, errors: &$0) }) else {
+            guard
+                let resolved = lookupTypeWithGenerics(
+                    for: returnTypeSyntax,
+                    genericParameterNames: genericParameterNames
+                )
+            else {
                 return nil
             }
             returnType = resolved
         } else {
             returnType = .void
         }
+
+        if !genericParameterNames.isEmpty {
+            if effects.isAsync {
+                errors.append(
+                    DiagnosticError(
+                        node: node,
+                        message: "Generic @JSFunction declarations cannot be 'async' yet."
+                    )
+                )
+                return nil
+            }
+            for genericName in genericParameterNames {
+                let usedInParameter = parameters.contains { $0.type.referencedGenericName == genericName }
+                let usedInReturn = returnType.referencedGenericName == genericName
+                if !usedInParameter && !usedInReturn {
+                    errors.append(
+                        DiagnosticError(
+                            node: node,
+                            message:
+                                "The generic parameter '\(genericName)' must be used in a parameter or return type of a generic @JSFunction declaration."
+                        )
+                    )
+                    return nil
+                }
+            }
+        }
+
         let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
         return ImportedFunctionSkeleton(
             name: name,
@@ -2938,7 +3177,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             returnType: returnType,
             effects: effects,
             documentation: nil,
-            accessLevel: accessLevel
+            accessLevel: accessLevel,
+            genericParameters: genericParameterNames.isEmpty ? nil : genericParameterNames
         )
     }
 
@@ -3014,7 +3254,26 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     // MARK: - Type and Parameter Parsing
 
-    private func parseParameters(from clause: FunctionParameterClauseSyntax) -> [Parameter] {
+    private func lookupTypeWithGenerics(
+        for type: TypeSyntax,
+        genericParameterNames: [String]
+    ) -> BridgeType? {
+        switch resolveGenericTypeReference(for: type, genericParameterNames: genericParameterNames) {
+        case .resolved(let bridgeType):
+            return bridgeType
+        case .rejected(let message):
+            if let message {
+                errors.append(DiagnosticError(node: Syntax(type), message: message))
+                return nil
+            }
+            return withLookupErrors { parent.lookupType(for: type, errors: &$0) }
+        }
+    }
+
+    private func parseParameters(
+        from clause: FunctionParameterClauseSyntax,
+        genericParameterNames: [String] = []
+    ) -> [Parameter] {
         clause.parameters.compactMap { param in
             let type = param.type
             if type.is(MissingTypeSyntax.self) {
@@ -3026,7 +3285,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 )
                 return nil
             }
-            guard let bridgeType = withLookupErrors({ parent.lookupType(for: type, errors: &$0) }) else {
+            guard let bridgeType = lookupTypeWithGenerics(for: type, genericParameterNames: genericParameterNames)
+            else {
                 return nil
             }
             let nameToken = param.secondName ?? param.firstName

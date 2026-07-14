@@ -204,6 +204,26 @@ extension _BridgedSwiftStackType {
     }
 }
 
+public protocol BridgedSwiftGenericBridgeable: _BridgedSwiftStackType
+where StackLiftResult == Self {
+    @_spi(BridgeJS) static var bridgeJSTypeID: Int32 { get }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_resolve_type_id")
+private func _swift_js_resolve_type_id_extern(_ namePtr: UnsafePointer<UInt8>?, _ length: Int32) -> Int32
+#else
+private func _swift_js_resolve_type_id_extern(_ namePtr: UnsafePointer<UInt8>?, _ length: Int32) -> Int32 {
+    _onlyAvailableOnWasm()
+}
+#endif
+
+@_spi(BridgeJS) @inline(never) public func _swift_js_resolve_type_id(_ name: StaticString) -> Int32 {
+    name.withUTF8Buffer { buffer in
+        _swift_js_resolve_type_id_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+
 /// Types that bridge with the same (isSome, value) ABI as Optional.
 /// Used by JSUndefinedOr so all bridge methods delegate to Optional<Wrapped>.
 public protocol _BridgedAsOptional {
@@ -808,6 +828,49 @@ extension String: _BridgedSwiftStackType {
     }
 }
 
+extension Bool: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Bool")
+}
+extension Int: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int")
+}
+extension Float: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Float")
+}
+extension Double: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Double")
+}
+extension String: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("String")
+}
+extension UInt: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt")
+}
+extension Int8: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int8")
+}
+extension UInt8: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt8")
+}
+extension Int16: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int16")
+}
+extension UInt16: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt16")
+}
+extension Int32: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int32")
+}
+extension UInt32: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt32")
+}
+extension Int64: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int64")
+}
+extension UInt64: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt64")
+}
+
 extension JSObject: _BridgedSwiftStackType {
     // JSObject is a non-final class, so we must explicitly specify the associated type
     // rather than relying on the default `Self` (which Swift requires for covariant returns).
@@ -912,6 +975,10 @@ extension JSValue: _BridgedSwiftStackType {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
         bridgeJSStackPush()
     }
+}
+
+extension JSValue: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("JSValue")
 }
 
 /// A protocol that Swift heap objects exposed to JavaScript via `@JS class` must conform to.

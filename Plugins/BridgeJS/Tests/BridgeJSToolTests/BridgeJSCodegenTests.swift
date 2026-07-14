@@ -28,7 +28,8 @@ import Testing
             let exportSwift = ExportSwift(
                 progress: .silent,
                 moduleName: skeleton.moduleName,
-                skeleton: exported
+                skeleton: exported,
+                imported: skeleton.imported
             )
             if let s = try exportSwift.finalize() {
                 swiftParts.append(s)

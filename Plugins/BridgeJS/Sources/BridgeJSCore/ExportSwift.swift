@@ -24,11 +24,21 @@ public class ExportSwift {
     private var skeleton: ExportedSkeleton
     private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
 
-    public init(progress: ProgressReporting, moduleName: String, skeleton: ExportedSkeleton) {
+    private let hasGenericExports: Bool
+    private let hasGenerics: Bool
+
+    public init(
+        progress: ProgressReporting,
+        moduleName: String,
+        skeleton: ExportedSkeleton,
+        imported: ImportedModuleSkeleton? = nil
+    ) {
         self.progress = progress
         self.moduleName = moduleName
         self.exposeToGlobal = skeleton.exposeToGlobal
         self.skeleton = skeleton
+        self.hasGenericExports = skeleton.hasGenericDeclarations
+        self.hasGenerics = hasGenericExports || (imported?.hasGenericDeclarations ?? false)
     }
 
     /// Finalizes the export process and generates the bridge code
@@ -46,6 +56,7 @@ public class ExportSwift {
 
     func renderSwiftGlue() throws -> String? {
         var decls: [DeclSyntax] = []
+        let genericExportCodegen = GenericExportCodegen()
 
         try withSpan("Render Protocols") { [self] in
             let protocolCodegen = ProtocolCodegen()
@@ -59,6 +70,14 @@ public class ExportSwift {
             for enumDef in skeleton.enums {
                 if let enumHelpers = enumCodegen.renderEnumHelpers(enumDef) {
                     decls.append(enumHelpers)
+                }
+                if hasGenerics, enumDef.enumType != .namespace {
+                    decls.append(
+                        contentsOf: genericExportCodegen.renderConformance(
+                            typeName: enumDef.swiftCallName,
+                            abiName: enumDef.abiName
+                        )
+                    )
                 }
 
                 for staticMethod in enumDef.staticMethods {
@@ -80,11 +99,24 @@ public class ExportSwift {
             let structCodegen = StructCodegen()
             for structDef in skeleton.structs {
                 decls.append(contentsOf: structCodegen.renderStructHelpers(structDef))
+                if hasGenerics {
+                    decls.append(
+                        contentsOf: genericExportCodegen.renderConformance(
+                            typeName: structDef.swiftCallName,
+                            abiName: structDef.abiName
+                        )
+                    )
+                }
                 decls.append(contentsOf: try renderSingleExportedStruct(struct: structDef))
             }
 
             for function in skeleton.functions {
                 decls.append(try renderSingleExportedFunction(function: function))
+            }
+            if hasGenericExports {
+                decls.append(
+                    contentsOf: genericExportCodegen.renderTypeRegistry(skeleton: skeleton)
+                )
             }
             for klass in skeleton.classes {
                 decls.append(contentsOf: try renderSingleExportedClass(klass: klass))
@@ -639,6 +671,15 @@ public class ExportSwift {
     }
 
     func renderSingleExportedFunction(function: ExportedFunction) throws -> DeclSyntax {
+        if function.isGeneric {
+            if function.effects.isStatic, let staticContext = function.staticContext {
+                return try GenericExportCodegen().renderExportedFunction(
+                    function,
+                    selfKind: .staticMember(staticContextBaseName(staticContext))
+                )
+            }
+            return try GenericExportCodegen().renderExportedFunction(function)
+        }
         let builder = try ExportedThunkBuilder(effects: function.effects, returnType: function.returnType)
         for param in function.parameters {
             try builder.liftParameter(param: param)
@@ -682,6 +723,13 @@ public class ExportSwift {
         ownerTypeName: String,
         instanceSelfType: BridgeType
     ) throws -> DeclSyntax {
+        if method.isGeneric {
+            let selfKind: GenericExportCodegen.SelfKind =
+                method.effects.isStatic
+                ? .staticMember(ownerTypeName)
+                : .instance(instanceSelfType)
+            return try GenericExportCodegen().renderExportedFunction(method, selfKind: selfKind)
+        }
         let builder = try ExportedThunkBuilder(effects: method.effects, returnType: method.returnType)
         if !method.effects.isStatic {
             try builder.liftParameter(param: Parameter(label: nil, name: "_self", type: instanceSelfType))
@@ -826,6 +874,15 @@ public class ExportSwift {
         // Generate ConvertibleToJSValue extension
         decls.append(contentsOf: renderConvertibleToJSValueExtension(klass: klass))
 
+        if hasGenerics, klass.isFinal == true {
+            decls.append(
+                contentsOf: GenericExportCodegen().renderConformance(
+                    typeName: klass.swiftCallName,
+                    abiName: klass.abiName
+                )
+            )
+        }
+
         return decls
     }
 
@@ -875,6 +932,257 @@ public class ExportSwift {
     }
 }
 
+// MARK: - GenericExportCodegen
+
+/// Renders Swift glue for generic `@JS` exported functions.
+struct GenericExportCodegen {
+    enum SelfKind {
+        case free
+        case instance(BridgeType)
+        case staticMember(String)
+    }
+
+    func renderConformance(typeName: String, abiName: String) -> [DeclSyntax] {
+        let printer = CodeFragmentPrinter()
+        printer.write("extension \(typeName): BridgedSwiftGenericBridgeable {")
+        printer.indent {
+            printer.write(
+                "@_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id(\"\(abiName)\")"
+            )
+        }
+        printer.write("}")
+        return ["\(raw: printer.lines.joined(separator: "\n"))"]
+    }
+
+    func renderTypeRegistry(skeleton: ExportedSkeleton) -> [DeclSyntax] {
+        let printer = CodeFragmentPrinter()
+        printer.write("#if !hasFeature(Embedded)")
+        printer.write(
+            "private let _bridgeJSExportTypeRegistry: [Int32: any BridgedSwiftGenericBridgeable.Type] = {"
+        )
+        printer.indent {
+            printer.write("var registry: [Int32: any BridgedSwiftGenericBridgeable.Type] = [:]")
+            printer.write("func register<T: BridgedSwiftGenericBridgeable>(_ type: T.Type) {")
+            printer.indent {
+                printer.write("registry[T.bridgeJSTypeID] = type")
+            }
+            printer.write("}")
+            for primitive in BridgeType.genericBridgeablePrimitives {
+                printer.write("register(\(primitive.token).self)")
+            }
+            for structDef in skeleton.structs {
+                printer.write("register(\(structDef.swiftCallName).self)")
+            }
+            for klass in skeleton.classes where klass.isFinal == true {
+                printer.write("register(\(klass.swiftCallName).self)")
+            }
+            for enumDef in skeleton.enums where enumDef.enumType != .namespace {
+                printer.write("register(\(enumDef.swiftCallName).self)")
+            }
+            printer.write("return registry")
+        }
+        printer.write("}()")
+        printer.write("#endif")
+        return ["\(raw: printer.lines.joined(separator: "\n"))"]
+    }
+
+    func renderExportedFunction(
+        _ function: ExportedFunction,
+        selfKind: SelfKind = .free
+    ) throws -> DeclSyntax {
+        let genericNames = function.genericParameterNames
+        let count = genericNames.count
+
+        let genericValueParameters = function.genericValueParameters
+        let concreteParameters = function.concreteParameters
+        guard !genericValueParameters.isEmpty else {
+            throw BridgeJSCoreError(
+                "Generic @JS exports must use a generic parameter in at least one parameter"
+            )
+        }
+        let returnPushStatement: String?
+        if case .void = function.returnType {
+            returnPushStatement = nil
+        } else if let statement = function.returnType.genericStackPushStatement(value: "ret") {
+            returnPushStatement = statement
+        } else {
+            throw BridgeJSCoreError("Generic @JS exports must return the generic type or Void in this version")
+        }
+
+        let selfParameter: Parameter?
+        switch selfKind {
+        case .instance(let instanceSelfType):
+            selfParameter = Parameter(label: nil, name: "_self", type: instanceSelfType)
+        case .free, .staticMember:
+            selfParameter = nil
+        }
+
+        let builder = try ExportSwift.ExportedThunkBuilder(
+            effects: Effects(isAsync: false, isThrows: false, isStatic: false),
+            returnType: .void
+        )
+        if let selfParameter {
+            try builder.liftParameter(param: selfParameter)
+        }
+        for concreteParameter in concreteParameters {
+            try builder.liftParameter(param: concreteParameter)
+        }
+        let concreteABIParameters = builder.abiParameterSignatures
+        let concreteLiftedExprs = builder.liftedParameterExprs
+        let concreteABINames = concreteABIParameters.map { $0.name }
+
+        func genericIndex(_ genericName: String) -> Int { genericNames.firstIndex(of: genericName)! }
+        func metatypeName(_ genericName: String) -> String { "_generic\(genericIndex(genericName))Type" }
+        func typeIdName(_ genericName: String) -> String {
+            ABINameGenerator.genericTypeIdParameterName(index: genericIndex(genericName))
+        }
+
+        func argument(label: String?, expression: String) -> String {
+            if let label, label != "_" {
+                return "\(label): \(expression)"
+            }
+            return expression
+        }
+
+        let abiName = function.abiName
+
+        let thunkSignature = SwiftSignatureBuilder.buildABIFunctionSignature(
+            abiParameters: concreteABIParameters + genericNames.map { (name: typeIdName($0), type: .i32) },
+            returnType: nil
+        )
+
+        var valueStackBindings: [(name: String, expr: String)] = []
+        var wasmArgBindings: [(name: String, expr: String)] = []
+        var bindingNameByParameter: [String: String] = [:]
+        let allConcreteParameters = (selfParameter.map { [$0] } ?? []) + concreteParameters
+        for (concreteParameter, liftedExpr) in zip(allConcreteParameters, concreteLiftedExprs) {
+            if concreteParameter.type.isStackUsingParameter {
+                let bindingName = "_tmp_\(concreteParameter.name)"
+                valueStackBindings.append((bindingName, liftedExpr.description))
+                bindingNameByParameter[concreteParameter.name] = bindingName
+            } else {
+                let bindingName = "_val_\(concreteParameter.name)"
+                wasmArgBindings.append((bindingName, liftedExpr.description))
+                bindingNameByParameter[concreteParameter.name] = bindingName
+            }
+        }
+
+        var userCallArguments: [String] = []
+        for param in function.parameters {
+            if param.type.usesGenericParameter {
+                userCallArguments.append(argument(label: param.label, expression: param.name))
+            } else {
+                let bindingName = bindingNameByParameter[param.name] ?? param.name
+                userCallArguments.append(argument(label: param.label, expression: bindingName))
+            }
+        }
+
+        let printer = CodeFragmentPrinter()
+        printer.write("#if hasFeature(Embedded)")
+        printer.write(SwiftCodePattern.buildExposeAttributes(abiName: abiName))
+        printer.write("public func _\(abiName)\(thunkSignature) {")
+        printer.indent {
+            printer.write(
+                "fatalError(\"Generic @JS exported functions are not supported in Embedded Swift\")"
+            )
+        }
+        printer.write("}")
+        printer.write("#else")
+        let entryDecl = SwiftCodePattern.buildExposedFunctionDecl(
+            abiName: abiName,
+            signature: thunkSignature
+        ) { printer in
+            for genericName in genericNames {
+                printer.write(
+                    "guard let \(metatypeName(genericName)) = _bridgeJSExportTypeRegistry[\(typeIdName(genericName))] else {"
+                )
+                printer.indent {
+                    printer.write(
+                        "fatalError(\"BridgeJS: unknown generic type id \\(\(typeIdName(genericName)))\")"
+                    )
+                }
+                printer.write("}")
+            }
+            let open1Arguments = genericNames.map { metatypeName($0) } + concreteABINames
+            printer.write("_\(abiName)_open1(\(open1Arguments.joined(separator: ", ")))")
+        }
+        printer.write(multilineString: entryDecl.description)
+
+        for k in 1...count {
+            let openName = "_\(abiName)_open\(k)"
+            let openedName = genericNames[k - 1]
+            let alreadyOpened = Array(genericNames[0..<(k - 1)])
+            let remaining = Array(genericNames[k..<count])
+
+            let genericClauseNames = [openedName] + alreadyOpened
+            let genericClause =
+                "<\(genericClauseNames.map { "\($0): BridgedSwiftGenericBridgeable" }.joined(separator: ", "))>"
+
+            var params: [String] = []
+            params.append("_ \(metatypeName(openedName)): \(openedName).Type")
+            for openedAlready in alreadyOpened {
+                params.append("as\(openedAlready) \(metatypeName(openedAlready)): \(openedAlready).Type")
+            }
+            for remainingName in remaining {
+                params.append("_ \(metatypeName(remainingName)): any BridgedSwiftGenericBridgeable.Type")
+            }
+            for abiParam in concreteABIParameters {
+                params.append("_ \(abiParam.name): \(abiParam.type.swiftType)")
+            }
+            let openSignature = "\(genericClause)(\(params.joined(separator: ", ")))"
+
+            printer.write("private func \(openName)\(openSignature) {")
+            printer.indent {
+                if k < count {
+                    let nextOpenedName = genericNames[k]
+                    var callArguments: [String] = []
+                    callArguments.append(metatypeName(nextOpenedName))
+                    for threadedName in genericNames[0..<k] {
+                        callArguments.append("as\(threadedName): \(threadedName).self")
+                    }
+                    for remainingName in genericNames[(k + 1)..<count] {
+                        callArguments.append(metatypeName(remainingName))
+                    }
+                    callArguments.append(contentsOf: concreteABINames)
+                    printer.write("_\(abiName)_open\(k + 1)(\(callArguments.joined(separator: ", ")))")
+                } else {
+                    for genericValueParameter in genericValueParameters.reversed() {
+                        let popExpr = genericValueParameter.type.genericStackPopExpression ?? ""
+                        printer.write("let \(genericValueParameter.name) = \(popExpr)")
+                    }
+                    for binding in valueStackBindings.reversed() {
+                        printer.write("let \(binding.name) = \(binding.expr)")
+                    }
+                    for binding in wasmArgBindings {
+                        printer.write("let \(binding.name) = \(binding.expr)")
+                    }
+                    let callee: String
+                    switch selfKind {
+                    case .free:
+                        callee = function.name
+                    case .instance:
+                        let selfBinding = bindingNameByParameter["_self"]!
+                        callee = "\(selfBinding).\(function.name)"
+                    case .staticMember(let ownerTypeName):
+                        callee = "\(ownerTypeName).\(function.name)"
+                    }
+                    if let returnPushStatement {
+                        printer.write(
+                            "let ret = \(callee)(\(userCallArguments.joined(separator: ", ")))"
+                        )
+                        printer.write(returnPushStatement)
+                    } else {
+                        printer.write("\(callee)(\(userCallArguments.joined(separator: ", ")))")
+                    }
+                }
+            }
+            printer.write("}")
+        }
+        printer.write("#endif")
+        return "\(raw: printer.lines.joined(separator: "\n"))"
+    }
+}
+
 // MARK: - StackCodegen
 
 /// Helper for stack-based lifting and lowering operations.
@@ -896,6 +1204,8 @@ struct StackCodegen {
             return "JSObject.bridgeJSStackPop()"
         case .void, .namespaceEnum:
             return "()"
+        case .generic:
+            fatalError("Generic parameters are handled by the generic export thunk, not concrete-type codegen")
         }
     }
 
@@ -908,7 +1218,7 @@ struct StackCodegen {
             return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: typeName)<JSObject>.bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
-        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol:
+        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol, .generic:
             fatalError("Invalid nullable wrapped type: \(wrappedType)")
         }
     }
@@ -941,6 +1251,8 @@ struct StackCodegen {
             return lowerArrayStatements(elementType: elementType, accessor: accessor, varPrefix: varPrefix)
         case .dictionary(let valueType):
             return lowerDictionaryStatements(valueType: valueType, accessor: accessor, varPrefix: varPrefix)
+        case .generic:
+            fatalError("Generic parameters are handled by the generic export thunk, not concrete-type codegen")
         }
     }
 
@@ -1596,9 +1908,29 @@ extension BridgeType {
         case .associatedValueEnum:
             return ["_BridgedSwiftAssociatedValueEnum"]
         case .rawValueEnum, .void, .unsafePointer, .namespaceEnum,
-            .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias:
+            .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias, .generic:
             // Not supported yet.
             return nil
+        }
+    }
+
+    /// Wrapped generic values bridge through the same `Array`/`Optional`/`Dictionary`
+    /// conditional conformances that concrete types use.
+    var genericStackPopExpression: String? {
+        switch self {
+        case .generic(let name): return "\(name).bridgeJSStackPop()"
+        case .array(.generic(let name)): return "Array<\(name)>.bridgeJSStackPop()"
+        case .nullable(.generic(let name), _): return "Optional<\(name)>.bridgeJSStackPop()"
+        case .dictionary(.generic(let name)): return "Dictionary<String, \(name)>.bridgeJSStackPop()"
+        default: return nil
+        }
+    }
+
+    func genericStackPushStatement(value: String) -> String? {
+        switch self {
+        case .generic, .array(.generic), .nullable(.generic, _), .dictionary(.generic):
+            return "\(value).bridgeJSStackPush()"
+        default: return nil
         }
     }
 
@@ -1631,6 +1963,7 @@ extension BridgeType {
             let closureType = "(\(paramTypes))\(effectsStr) -> \(signature.returnType.swiftType)"
             return useJSTypedClosure ? "JSTypedClosure<\(closureType)>" : closureType
         case .alias(let name, _): return name
+        case .generic(let name): return name
         }
     }
 
@@ -1717,6 +2050,10 @@ extension BridgeType {
             return LiftingIntrinsicInfo(parameters: [])
         case .alias(_, let underlying):
             return try underlying.liftParameterInfo()
+        case .generic:
+            throw BridgeJSCoreError(
+                "Generic parameters are handled by the generic export thunk, not concrete-type codegen"
+            )
         }
     }
 
@@ -1770,6 +2107,10 @@ extension BridgeType {
             return .array
         case .alias(_, let underlying):
             return try underlying.loweringReturnInfo()
+        case .generic:
+            throw BridgeJSCoreError(
+                "Generic parameters are handled by the generic export thunk, not concrete-type codegen"
+            )
         }
     }
 }

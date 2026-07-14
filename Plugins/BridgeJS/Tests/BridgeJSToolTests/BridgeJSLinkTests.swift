@@ -126,6 +126,74 @@ import Testing
         try snapshot(bridgeJSLink: bridgeJSLink, name: "MixedModules")
     }
 
+    private func linkedJS(forFixture input: String) throws -> String {
+        let url = Self.inputsDirectory.appendingPathComponent(input)
+        let name = url.deletingPathExtension().lastPathComponent
+        let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
+        let importSwift = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).swift")
+        let importResult = try importSwift.finalize()
+        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let unifiedData = try encoder.encode(importResult)
+        try bridgeJSLink.addSkeletonFile(data: unifiedData)
+        return try bridgeJSLink.link().0
+    }
+
+    @Test
+    func genericResolverIsGatedToGenericModules() throws {
+        let genericJS = try linkedJS(forFixture: "GenericImports.swift")
+        #expect(genericJS.contains("swift_js_resolve_type_id"))
+        #expect(genericJS.contains("__bjs_codecs"))
+
+        let nonGenericJS = try linkedJS(forFixture: "SwiftStructImports.swift")
+        #expect(!nonGenericJS.contains("swift_js_resolve_type_id"))
+        #expect(!nonGenericJS.contains("__bjs_codecs"))
+    }
+
+    @Test
+    func duplicateGenericTokenAcrossModulesFailsLinking() throws {
+        func makeSkeleton(moduleName: String, source: String) throws -> BridgeJSSkeleton {
+            let swiftAPI = SwiftToSkeleton(
+                progress: .silent,
+                moduleName: moduleName,
+                exposeToGlobal: false,
+                externalModuleIndex: .empty
+            )
+            swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "\(moduleName).swift")
+            return try swiftAPI.finalize()
+        }
+        let structSource = """
+            @JS public struct Point {
+                public var x: Int
+                @JS public init(x: Int) { self.x = x }
+            }
+            """
+        let first = try makeSkeleton(
+            moduleName: "FirstModule",
+            source: structSource + """
+
+                @JS public func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
+                """
+        )
+        let second = try makeSkeleton(moduleName: "SecondModule", source: structSource)
+        let bridgeJSLink = BridgeJSLink(skeletons: [first, second], sharedMemory: false)
+        #expect {
+            _ = try bridgeJSLink.link()
+        } throws: { error in
+            guard let linkError = error as? BridgeJSLinkError else { return false }
+            return linkError.message.contains("Generic bridge token 'Point'")
+                && linkError.message.contains("FirstModule")
+                && linkError.message.contains("SecondModule")
+        }
+    }
+
     @Test
     func perClassIdentityModeFromAnnotation() throws {
         let url = Self.inputsDirectory.appendingPathComponent("IdentityModeClass.swift")

@@ -1,0 +1,557 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_GenericImportBox_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "isFinal" : true,
+        "methods" : [
+          {
+            "abiName" : "bjs_GenericImportBox_get",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "get",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "GenericImportBox",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "value",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "GenericImportBox"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "red"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "green"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "GenericColor",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "GenericColor",
+        "tsFullPath" : "GenericColor"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "light"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "dark"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "GenericMode",
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "GenericMode",
+        "tsFullPath" : "GenericMode"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "label" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "number"
+          },
+          {
+            "associatedValues" : [
+              {
+                "label" : "value",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "text"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "GenericTagged",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "GenericTagged",
+        "tsFullPath" : "GenericTagged"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "GenericPoint",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "y",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "GenericPoint"
+      }
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "genericRoundTrip",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "genericParse",
+            "parameters" : [
+              {
+                "name" : "json",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T",
+              "U"
+            ],
+            "name" : "importGenericCombine",
+            "parameters" : [
+              {
+                "name" : "a",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              },
+              {
+                "name" : "b",
+                "type" : {
+                  "generic" : {
+                    "_0" : "U"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "U"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T",
+              "t"
+            ],
+            "name" : "importGenericCaseDistinct",
+            "parameters" : [
+              {
+                "name" : "a",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              },
+              {
+                "name" : "b",
+                "type" : {
+                  "generic" : {
+                    "_0" : "t"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "importGenericArray",
+            "parameters" : [
+              {
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "importGenericOptional",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "importGenericDictionary",
+            "parameters" : [
+              {
+                "name" : "values",
+                "type" : {
+                  "dictionary" : {
+                    "_0" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "dictionary" : {
+                "_0" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "genericParameters" : [
+                  "T"
+                ],
+                "name" : "accept",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "genericParameters" : [
+                  "T"
+                ],
+                "name" : "identity",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "name" : "GenericConsumer",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "genericParameters" : [
+                  "T"
+                ],
+                "name" : "box",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

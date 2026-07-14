@@ -32,6 +32,14 @@ So even if you cache the property name (e.g. with `CachedJSStrings`), you are st
 
 BridgeJS avoids this by generating **separate** access paths per property or method. Each generated getter/setter or function call has a stable shape at the engine level, so the IC can stay monomorphic or polymorphic and the fast path is used.
 
+## Generic imports
+
+An imported generic `@JSFunction` (`func parse<T: BridgedSwiftGenericBridgeable>(...)`) lets one piece of glue serve many concrete types. The generic value crosses using the type's own stack ABI, and a runtime type ID (interned once via `swift_js_resolve_type_id`) selects the matching JS codec, so the type-agnostic glue can lower and lift the right representation without a specialized path per call site. Because this path avoids existentials entirely, it also works under Embedded Swift; the Embedded example (`Examples/Embedded`) exercises a generic import, including a `@JS struct` round-trip.
+
+## Generic exports
+
+An exported generic `@JS` function reuses the same stack ABI and codec table, with the dispatch reversed. The WebAssembly entry point is a concrete `@_expose` thunk that takes the runtime type ID as a trailing `Int32`. It looks the ID up in a codegen-emitted registry of `BridgedSwiftGenericBridgeable` types, reifies `T` through an opened existential, and runs an unspecialized helper that pops the argument from the stack, calls your function, and pushes the result. The JavaScript wrapper resolves the `BridgeType<T>` token to the same interned ID and uses the matching codec to lower the argument and lift the return. Because this depends on existential types, generic exports are excluded under Embedded Swift.
+
 ## What to read next
 
 - ABI and binary interface details will be documented in this section as they stabilize.
