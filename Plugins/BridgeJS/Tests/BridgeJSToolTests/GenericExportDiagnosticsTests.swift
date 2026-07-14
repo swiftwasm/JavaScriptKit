@@ -14,7 +14,7 @@ import Testing
             source: """
                 @JS public func identity<T>(_ value: T) -> T { value }
                 """,
-            contains: "Generic parameter 'T' must be constrained to '_BridgedSwiftGenericBridgeable'"
+            contains: "Generic parameter 'T' must be constrained to 'BridgedSwiftGenericBridgeable'"
         )
     }
 
@@ -22,7 +22,7 @@ import Testing
     func genericWhereClauseUnsupported() {
         expectDiagnostic(
             source: """
-                @JS public func identity<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T where T: Sendable { value }
+                @JS public func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T where T: Sendable { value }
                 """,
             contains: "'where' clauses are not supported"
         )
@@ -32,7 +32,7 @@ import Testing
     func asyncGenericExportUnsupported() {
         expectDiagnostic(
             source: """
-                @JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) async -> T { v }
+                @JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: T) async -> T { v }
                 """,
             contains: "Generic @JS functions cannot be 'async' yet."
         )
@@ -42,17 +42,17 @@ import Testing
     func throwsGenericExportUnsupported() {
         expectDiagnostic(
             source: """
-                @JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> T { v }
+                @JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> T { v }
                 """,
             contains: "Generic @JS functions cannot be 'throws' yet."
         )
     }
 
     @Test(arguments: [
-        ("[[T]]", "@JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: [[T]]) {}"),
-        ("[T?]", "@JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: [T?]) {}"),
-        ("T??", "@JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: T??) {}"),
-        ("[Int: T]", "@JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: [Int: T]) {}"),
+        ("[[T]]", "@JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: [[T]]) {}"),
+        ("[T?]", "@JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: [T?]) {}"),
+        ("T??", "@JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: T??) {}"),
+        ("[Int: T]", "@JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: [Int: T]) {}"),
     ])
     func unsupportedGenericWrapperFormsInParameter(label: String, source: String) {
         expectDiagnostic(
@@ -62,10 +62,10 @@ import Testing
     }
 
     @Test(arguments: [
-        ("[[T]]", "@JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) -> [[T]] { [[v]] }"),
-        ("[T?]", "@JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) -> [T?] { [v] }"),
-        ("T??", "@JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) -> T?? { v }"),
-        ("[Int: T]", "@JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) -> [Int: T] { [0: v] }"),
+        ("[[T]]", "@JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: T) -> [[T]] { [[v]] }"),
+        ("[T?]", "@JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: T) -> [T?] { [v] }"),
+        ("T??", "@JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: T) -> T?? { v }"),
+        ("[Int: T]", "@JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: T) -> [Int: T] { [0: v] }"),
     ])
     func unsupportedGenericWrapperFormsInReturn(label: String, source: String) {
         expectDiagnostic(
@@ -78,7 +78,7 @@ import Testing
     func fullyUnusedGenericParameterRejected() {
         expectDiagnostic(
             source: """
-                @JS public func combine<T: _BridgedSwiftGenericBridgeable, U: _BridgedSwiftGenericBridgeable>(_ a: T) -> T { a }
+                @JS public func combine<T: BridgedSwiftGenericBridgeable, U: BridgedSwiftGenericBridgeable>(_ a: T) -> T { a }
                 """,
             contains: "must be used in at least one parameter"
         )
@@ -88,7 +88,7 @@ import Testing
     func genericParameterMustBeUsedAsParameter() {
         expectDiagnostic(
             source: """
-                @JS public func f<T: _BridgedSwiftGenericBridgeable>() -> T { fatalError() }
+                @JS public func f<T: BridgedSwiftGenericBridgeable>() -> T { fatalError() }
                 """,
             contains: "must be used in at least one parameter"
         )
@@ -98,7 +98,7 @@ import Testing
     func genericConcreteReturnUnsupported() {
         expectDiagnostic(
             source: """
-                @JS public func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) -> String { "" }
+                @JS public func f<T: BridgedSwiftGenericBridgeable>(_ v: T) -> String { "" }
                 """,
             contains: "must return the generic type"
         )
@@ -110,7 +110,7 @@ import Testing
             source: """
                 @JS class Box {
                     @JS init() {}
-                    @JS func wrap<T: _BridgedSwiftGenericBridgeable>(_ v: T) async -> T { v }
+                    @JS func wrap<T: BridgedSwiftGenericBridgeable>(_ v: T) async -> T { v }
                 }
                 """,
             contains: "Generic @JS functions cannot be 'async' yet."
@@ -123,7 +123,7 @@ import Testing
             source: """
                 @JS class Box {
                     @JS init() {}
-                    @JS func wrap<T: _BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> T { v }
+                    @JS func wrap<T: BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> T { v }
                 }
                 """,
             contains: "Generic @JS functions cannot be 'throws' yet."
@@ -136,7 +136,7 @@ import Testing
             source: """
                 @JS class Box {
                     @JS init() {}
-                    @JS func wrap<T: _BridgedSwiftGenericBridgeable>(_ v: T) -> T where T: Sendable { v }
+                    @JS func wrap<T: BridgedSwiftGenericBridgeable>(_ v: T) -> T where T: Sendable { v }
                 }
                 """,
             contains: "'where' clauses are not supported on generic @JS functions."
@@ -153,7 +153,7 @@ import Testing
                 }
                 """,
             contains:
-                "Generic parameter 'T' must be constrained to '_BridgedSwiftGenericBridgeable' to be used with @JS."
+                "Generic parameter 'T' must be constrained to 'BridgedSwiftGenericBridgeable' to be used with @JS."
         )
     }
 
@@ -163,7 +163,7 @@ import Testing
             source: """
                 @JS class Box {
                     @JS init() {}
-                    @JS func count<T: _BridgedSwiftGenericBridgeable>(_ v: T) -> Int { 0 }
+                    @JS func count<T: BridgedSwiftGenericBridgeable>(_ v: T) -> Int { 0 }
                 }
                 """,
             contains: "must return the generic type"
@@ -176,7 +176,7 @@ import Testing
             source: """
                 @JS enum E {
                     case a
-                    @JS func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) -> T { v }
+                    @JS func f<T: BridgedSwiftGenericBridgeable>(_ v: T) -> T { v }
                 }
                 """,
             contains: "Only static functions are supported in enums"

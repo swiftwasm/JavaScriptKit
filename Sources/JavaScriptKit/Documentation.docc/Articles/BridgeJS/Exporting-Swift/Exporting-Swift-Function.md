@@ -138,12 +138,12 @@ export type Exports = {
 
 ### Generic functions
 
-A `@JS` function can be generic over a type parameter constrained to `_BridgedSwiftGenericBridgeable`. The concrete type chosen at the call site crosses the bridge:
+A `@JS` function can be generic over a type parameter constrained to `BridgedSwiftGenericBridgeable`. The concrete type chosen at the call site crosses the bridge:
 
 ```swift
 import JavaScriptKit
 
-@JS public func identity<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T {
+@JS public func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T {
     return value
 }
 ```
@@ -172,7 +172,7 @@ export type Exports = {
 A single `T` may be used in more than one parameter, and a function may declare multiple distinct generic parameters. Each distinct generic parameter takes its own `BridgeType` token, appended after the regular arguments in declaration order:
 
 ```swift
-@JS public func combine<T: _BridgedSwiftGenericBridgeable, U: _BridgedSwiftGenericBridgeable>(_ a: T, _ b: U) -> T {
+@JS public func combine<T: BridgedSwiftGenericBridgeable, U: BridgedSwiftGenericBridgeable>(_ a: T, _ b: U) -> T {
     a
 }
 ```
@@ -186,7 +186,7 @@ export type Exports = {
 The generic parameter may also be wrapped as `[T]`, `T?`, or `[String: T]` in parameters and the result:
 
 ```swift
-@JS public func firstOrNil<T: _BridgedSwiftGenericBridgeable>(_ values: [T]) -> T? {
+@JS public func firstOrNil<T: BridgedSwiftGenericBridgeable>(_ values: [T]) -> T? {
     values.first
 }
 ```
@@ -201,7 +201,7 @@ import JavaScriptKit
 @JS public class Box {
     @JS public init() {}
 
-    @JS public func wrap<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T {
+    @JS public func wrap<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T {
         return value
     }
 }
@@ -239,6 +239,6 @@ export type Exports = {
 | Throwing JS exception: `func x() throws(JSException)` | ✅ |
 | Throwing any exception: `func x() throws` | ❌ |
 | Async methods: `func x() async` | ✅ |
-| Generic parameter/result types (constrained to `_BridgedSwiftGenericBridgeable`) | ✅ |
+| Generic parameter/result types (constrained to `BridgedSwiftGenericBridgeable`) | ✅ |
 | Opaque types: `func x() -> some P`, `func y(_: some P)` | ❌ |
 | Default parameter values: `func x(_ foo: String = "")` | ✅ (See <doc:Exporting-Swift-Default-Parameters>) |

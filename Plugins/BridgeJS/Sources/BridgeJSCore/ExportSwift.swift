@@ -944,7 +944,7 @@ struct GenericExportCodegen {
 
     func renderConformance(typeName: String, abiName: String) -> [DeclSyntax] {
         let printer = CodeFragmentPrinter()
-        printer.write("extension \(typeName): _BridgedSwiftGenericBridgeable {")
+        printer.write("extension \(typeName): BridgedSwiftGenericBridgeable {")
         printer.indent {
             printer.write(
                 "@_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id(\"\(abiName)\")"
@@ -958,11 +958,11 @@ struct GenericExportCodegen {
         let printer = CodeFragmentPrinter()
         printer.write("#if !hasFeature(Embedded)")
         printer.write(
-            "private let _bridgeJSExportTypeRegistry: [Int32: any _BridgedSwiftGenericBridgeable.Type] = {"
+            "private let _bridgeJSExportTypeRegistry: [Int32: any BridgedSwiftGenericBridgeable.Type] = {"
         )
         printer.indent {
-            printer.write("var registry: [Int32: any _BridgedSwiftGenericBridgeable.Type] = [:]")
-            printer.write("func register<T: _BridgedSwiftGenericBridgeable>(_ type: T.Type) {")
+            printer.write("var registry: [Int32: any BridgedSwiftGenericBridgeable.Type] = [:]")
+            printer.write("func register<T: BridgedSwiftGenericBridgeable>(_ type: T.Type) {")
             printer.indent {
                 printer.write("registry[T.bridgeJSTypeID] = type")
             }
@@ -1116,7 +1116,7 @@ struct GenericExportCodegen {
 
             let genericClauseNames = [openedName] + alreadyOpened
             let genericClause =
-                "<\(genericClauseNames.map { "\($0): _BridgedSwiftGenericBridgeable" }.joined(separator: ", "))>"
+                "<\(genericClauseNames.map { "\($0): BridgedSwiftGenericBridgeable" }.joined(separator: ", "))>"
 
             var params: [String] = []
             params.append("_ \(metatypeName(openedName)): \(openedName).Type")
@@ -1124,7 +1124,7 @@ struct GenericExportCodegen {
                 params.append("as\(openedAlready) \(metatypeName(openedAlready)): \(openedAlready).Type")
             }
             for remainingName in remaining {
-                params.append("_ \(metatypeName(remainingName)): any _BridgedSwiftGenericBridgeable.Type")
+                params.append("_ \(metatypeName(remainingName)): any BridgedSwiftGenericBridgeable.Type")
             }
             for abiParam in concreteABIParameters {
                 params.append("_ \(abiParam.name): \(abiParam.type.swiftType)")

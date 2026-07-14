@@ -397,7 +397,7 @@ public struct ImportTS {
             let genericClause =
                 genericParameters.isEmpty
                 ? ""
-                : "<" + genericParameters.map { "\($0): _BridgedSwiftGenericBridgeable" }.joined(separator: ", ")
+                : "<" + genericParameters.map { "\($0): BridgedSwiftGenericBridgeable" }.joined(separator: ", ")
                     + ">"
             printer.write("func \(name.backtickIfNeeded())\(genericClause)\(signature) {")
             printer.indent {

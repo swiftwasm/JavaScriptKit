@@ -37,7 +37,7 @@ Types defined in a separate Swift package cannot yet be referenced from `@JS` de
 
 ## Generics
 
-Generic functions are supported in both directions, through a type parameter constrained to `_BridgedSwiftGenericBridgeable`: an imported `@JSFunction` (see <doc:Importing-JS-Function>) and an exported `@JS` function (see <doc:Exporting-Swift-Function>). Generics also work on methods of an exported `@JS` class or struct (both instance and static), on static methods of an exported `@JS` enum or namespace enum, and on imported `@JSClass` methods. A function may declare one or more distinct generic parameters, such as `combine<T, U>(_ a: T, _ b: U) -> T`. The following forms are not supported and produce build-time diagnostics:
+Generic functions are supported in both directions, through a type parameter constrained to `BridgedSwiftGenericBridgeable`: an imported `@JSFunction` (see <doc:Importing-JS-Function>) and an exported `@JS` function (see <doc:Exporting-Swift-Function>). Generics also work on methods of an exported `@JS` class or struct (both instance and static), on static methods of an exported `@JS` enum or namespace enum, and on imported `@JSClass` methods. A function may declare one or more distinct generic parameters, such as `combine<T, U>(_ a: T, _ b: U) -> T`. The following forms are not supported and produce build-time diagnostics:
 
 - `async` generic functions.
 - `where` clauses on a generic declaration.

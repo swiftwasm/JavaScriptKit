@@ -204,7 +204,7 @@ extension _BridgedSwiftStackType {
     }
 }
 
-public protocol _BridgedSwiftGenericBridgeable: _BridgedSwiftStackType
+public protocol BridgedSwiftGenericBridgeable: _BridgedSwiftStackType
 where StackLiftResult == Self {
     @_spi(BridgeJS) static var bridgeJSTypeID: Int32 { get }
 }
@@ -828,46 +828,46 @@ extension String: _BridgedSwiftStackType {
     }
 }
 
-extension Bool: _BridgedSwiftGenericBridgeable {
+extension Bool: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Bool")
 }
-extension Int: _BridgedSwiftGenericBridgeable {
+extension Int: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int")
 }
-extension Float: _BridgedSwiftGenericBridgeable {
+extension Float: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Float")
 }
-extension Double: _BridgedSwiftGenericBridgeable {
+extension Double: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Double")
 }
-extension String: _BridgedSwiftGenericBridgeable {
+extension String: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("String")
 }
-extension UInt: _BridgedSwiftGenericBridgeable {
+extension UInt: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt")
 }
-extension Int8: _BridgedSwiftGenericBridgeable {
+extension Int8: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int8")
 }
-extension UInt8: _BridgedSwiftGenericBridgeable {
+extension UInt8: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt8")
 }
-extension Int16: _BridgedSwiftGenericBridgeable {
+extension Int16: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int16")
 }
-extension UInt16: _BridgedSwiftGenericBridgeable {
+extension UInt16: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt16")
 }
-extension Int32: _BridgedSwiftGenericBridgeable {
+extension Int32: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int32")
 }
-extension UInt32: _BridgedSwiftGenericBridgeable {
+extension UInt32: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt32")
 }
-extension Int64: _BridgedSwiftGenericBridgeable {
+extension Int64: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("Int64")
 }
-extension UInt64: _BridgedSwiftGenericBridgeable {
+extension UInt64: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("UInt64")
 }
 
@@ -977,7 +977,7 @@ extension JSValue: _BridgedSwiftStackType {
     }
 }
 
-extension JSValue: _BridgedSwiftGenericBridgeable {
+extension JSValue: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeID: Int32 = _swift_js_resolve_type_id("JSValue")
 }
 

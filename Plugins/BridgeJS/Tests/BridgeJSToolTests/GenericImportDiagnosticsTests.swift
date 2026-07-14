@@ -14,7 +14,7 @@ import Testing
             source: """
                 @JSFunction func identity<T>(_ value: T) throws(JSException) -> T
                 """,
-            contains: "Generic parameter 'T' must be constrained to '_BridgedSwiftGenericBridgeable'"
+            contains: "Generic parameter 'T' must be constrained to 'BridgedSwiftGenericBridgeable'"
         )
     }
 
@@ -22,7 +22,7 @@ import Testing
     func genericWhereClauseUnsupported() {
         expectDiagnostic(
             source: """
-                @JSFunction func identity<T: _BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T where T: Sendable
+                @JSFunction func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T where T: Sendable
                 """,
             contains: "'where' clauses are not supported on @JSFunction"
         )
@@ -32,7 +32,7 @@ import Testing
     func asyncGenericImportUnsupported() {
         expectDiagnostic(
             source: """
-                @JSFunction func identityAsync<T: _BridgedSwiftGenericBridgeable>(_ value: T) async throws(JSException) -> T
+                @JSFunction func identityAsync<T: BridgedSwiftGenericBridgeable>(_ value: T) async throws(JSException) -> T
                 """,
             contains: "Generic @JSFunction declarations cannot be 'async' yet."
         )
@@ -43,7 +43,7 @@ import Testing
         let skeleton = try makeSkeleton(
             """
             @JSClass struct Box {
-                @JSFunction func member<T: _BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+                @JSFunction func member<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
             }
             """,
             moduleName: "App"
@@ -56,10 +56,10 @@ import Testing
     }
 
     @Test(arguments: [
-        ("[[T]]", "@JSFunction func f<T: _BridgedSwiftGenericBridgeable>(_ v: [[T]]) throws(JSException)"),
-        ("[T?]", "@JSFunction func f<T: _BridgedSwiftGenericBridgeable>(_ v: [T?]) throws(JSException)"),
-        ("T??", "@JSFunction func f<T: _BridgedSwiftGenericBridgeable>(_ v: T??) throws(JSException)"),
-        ("[Int: T]", "@JSFunction func f<T: _BridgedSwiftGenericBridgeable>(_ v: [Int: T]) throws(JSException)"),
+        ("[[T]]", "@JSFunction func f<T: BridgedSwiftGenericBridgeable>(_ v: [[T]]) throws(JSException)"),
+        ("[T?]", "@JSFunction func f<T: BridgedSwiftGenericBridgeable>(_ v: [T?]) throws(JSException)"),
+        ("T??", "@JSFunction func f<T: BridgedSwiftGenericBridgeable>(_ v: T??) throws(JSException)"),
+        ("[Int: T]", "@JSFunction func f<T: BridgedSwiftGenericBridgeable>(_ v: [Int: T]) throws(JSException)"),
     ])
     func unsupportedGenericWrapperFormsInParameter(label: String, source: String) {
         expectDiagnostic(
@@ -69,10 +69,10 @@ import Testing
     }
 
     @Test(arguments: [
-        ("[[T]]", "@JSFunction func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> [[T]]"),
-        ("[T?]", "@JSFunction func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> [T?]"),
-        ("T??", "@JSFunction func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> T??"),
-        ("[Int: T]", "@JSFunction func f<T: _BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> [Int: T]"),
+        ("[[T]]", "@JSFunction func f<T: BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> [[T]]"),
+        ("[T?]", "@JSFunction func f<T: BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> [T?]"),
+        ("T??", "@JSFunction func f<T: BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> T??"),
+        ("[Int: T]", "@JSFunction func f<T: BridgedSwiftGenericBridgeable>(_ v: T) throws(JSException) -> [Int: T]"),
     ])
     func unsupportedGenericWrapperFormsInReturn(label: String, source: String) {
         expectDiagnostic(
@@ -86,7 +86,7 @@ import Testing
         expectDiagnostic(
             source: """
                 @JSClass struct Box {
-                    @JSFunction func member<T: _BridgedSwiftGenericBridgeable>(_ value: T) async throws(JSException) -> T
+                    @JSFunction func member<T: BridgedSwiftGenericBridgeable>(_ value: T) async throws(JSException) -> T
                 }
                 """,
             contains: "Generic @JSFunction declarations cannot be 'async' yet."
@@ -102,7 +102,7 @@ import Testing
                 }
                 """,
             contains:
-                "Generic parameter 'T' must be constrained to '_BridgedSwiftGenericBridgeable' to be used with @JSFunction."
+                "Generic parameter 'T' must be constrained to 'BridgedSwiftGenericBridgeable' to be used with @JSFunction."
         )
     }
 
@@ -110,7 +110,7 @@ import Testing
     func genericImportedFunctionUnusedTypeParamIsRejected() {
         expectDiagnostic(
             source: """
-                @JSFunction func unused<T: _BridgedSwiftGenericBridgeable>() throws(JSException) -> Int
+                @JSFunction func unused<T: BridgedSwiftGenericBridgeable>() throws(JSException) -> Int
                 """,
             contains:
                 "The generic parameter 'T' must be used in a parameter or return type of a generic @JSFunction declaration."
@@ -122,7 +122,7 @@ import Testing
         expectDiagnostic(
             source: """
                 @JSClass struct Box {
-                    @JSFunction func member<T: _BridgedSwiftGenericBridgeable>() throws(JSException) -> Int
+                    @JSFunction func member<T: BridgedSwiftGenericBridgeable>() throws(JSException) -> Int
                 }
                 """,
             contains:
@@ -134,7 +134,7 @@ import Testing
     func genericImportedReturnOnlyTypeParamIsAllowed() throws {
         let skeleton = try makeSkeleton(
             """
-            @JSFunction func make<T: _BridgedSwiftGenericBridgeable>() throws(JSException) -> T
+            @JSFunction func make<T: BridgedSwiftGenericBridgeable>() throws(JSException) -> T
             """,
             moduleName: "App"
         )

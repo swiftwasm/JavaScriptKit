@@ -34,11 +34,11 @@ BridgeJS avoids this by generating **separate** access paths per property or met
 
 ## Generic imports
 
-An imported generic `@JSFunction` (`func parse<T: _BridgedSwiftGenericBridgeable>(...)`) lets one piece of glue serve many concrete types. The generic value crosses using the type's own stack ABI, and a runtime type ID (interned once via `swift_js_resolve_type_id`) selects the matching JS codec, so the type-agnostic glue can lower and lift the right representation without a specialized path per call site.
+An imported generic `@JSFunction` (`func parse<T: BridgedSwiftGenericBridgeable>(...)`) lets one piece of glue serve many concrete types. The generic value crosses using the type's own stack ABI, and a runtime type ID (interned once via `swift_js_resolve_type_id`) selects the matching JS codec, so the type-agnostic glue can lower and lift the right representation without a specialized path per call site.
 
 ## Generic exports
 
-An exported generic `@JS` function reuses the same stack ABI and codec table, with the dispatch reversed. The WebAssembly entry point is a concrete `@_expose` thunk that takes the runtime type ID as a trailing `Int32`. It looks the ID up in a codegen-emitted registry of `_BridgedSwiftGenericBridgeable` types, reifies `T` through an opened existential, and runs an unspecialized helper that pops the argument from the stack, calls your function, and pushes the result. The JavaScript wrapper resolves the `BridgeType<T>` token to the same interned ID and uses the matching codec to lower the argument and lift the return. Because this depends on existential types, generic exports are excluded under Embedded Swift.
+An exported generic `@JS` function reuses the same stack ABI and codec table, with the dispatch reversed. The WebAssembly entry point is a concrete `@_expose` thunk that takes the runtime type ID as a trailing `Int32`. It looks the ID up in a codegen-emitted registry of `BridgedSwiftGenericBridgeable` types, reifies `T` through an opened existential, and runs an unspecialized helper that pops the argument from the stack, calls your function, and pushes the result. The JavaScript wrapper resolves the `BridgeType<T>` token to the same interned ID and uses the matching codec to lower the argument and lift the return. Because this depends on existential types, generic exports are excluded under Embedded Swift.
 
 ## What to read next
 

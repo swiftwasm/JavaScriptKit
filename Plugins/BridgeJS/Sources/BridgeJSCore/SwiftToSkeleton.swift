@@ -746,8 +746,8 @@ public final class SwiftToSkeleton {
     }
 
     fileprivate static func isBridgeableGenericConstraint(_ constraint: String?) -> Bool {
-        constraint == "_BridgedSwiftGenericBridgeable"
-            || constraint == "JavaScriptKit._BridgedSwiftGenericBridgeable"
+        constraint == "BridgedSwiftGenericBridgeable"
+            || constraint == "JavaScriptKit.BridgedSwiftGenericBridgeable"
     }
 
 }
@@ -1337,7 +1337,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                     diagnose(
                         node: node,
                         message:
-                            "Generic parameter '\(genericParam.name.text)' must be constrained to '_BridgedSwiftGenericBridgeable' to be used with @JS."
+                            "Generic parameter '\(genericParam.name.text)' must be constrained to 'BridgedSwiftGenericBridgeable' to be used with @JS."
                     )
                     return nil
                 }
@@ -3100,7 +3100,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                         DiagnosticError(
                             node: Syntax(genericParam),
                             message:
-                                "Generic parameter '\(paramName)' must be constrained to '_BridgedSwiftGenericBridgeable' to be used with @JSFunction."
+                                "Generic parameter '\(paramName)' must be constrained to 'BridgedSwiftGenericBridgeable' to be used with @JSFunction."
                         )
                     )
                     return nil

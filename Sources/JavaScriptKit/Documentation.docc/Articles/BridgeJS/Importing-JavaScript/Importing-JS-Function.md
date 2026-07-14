@@ -43,10 +43,10 @@ Bound functions are `throws(JSException)`. Call them with `try` or `try?`; they 
 
 ## Generic functions
 
-A `@JSFunction` can be generic over a type parameter constrained to `_BridgedSwiftGenericBridgeable`. The concrete type chosen at the call site then crosses the bridge:
+A `@JSFunction` can be generic over a type parameter constrained to `BridgedSwiftGenericBridgeable`. The concrete type chosen at the call site then crosses the bridge:
 
 ```swift
-@JSFunction func parse<T: _BridgedSwiftGenericBridgeable>(_ json: String) throws(JSException) -> T
+@JSFunction func parse<T: BridgedSwiftGenericBridgeable>(_ json: String) throws(JSException) -> T
 
 let user: User = try parse(jsonString)
 ```
@@ -56,19 +56,19 @@ let user: User = try parse(jsonString)
 A generic type parameter may be used in more than one parameter, an imported function may declare more than one distinct generic parameter, and a generic result type may be used on a function that takes no generic parameters (the JavaScript implementation produces the value):
 
 ```swift
-@JSFunction func pickFirst<T: _BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) throws(JSException) -> T
+@JSFunction func pickFirst<T: BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) throws(JSException) -> T
 
-@JSFunction func makeValue<T: _BridgedSwiftGenericBridgeable>() throws(JSException) -> T
+@JSFunction func makeValue<T: BridgedSwiftGenericBridgeable>() throws(JSException) -> T
 
-@JSFunction func combine<T: _BridgedSwiftGenericBridgeable, U: _BridgedSwiftGenericBridgeable>(_ a: T, _ b: U) throws(JSException) -> U
+@JSFunction func combine<T: BridgedSwiftGenericBridgeable, U: BridgedSwiftGenericBridgeable>(_ a: T, _ b: U) throws(JSException) -> U
 ```
 
 The generic parameter may also be wrapped as `[T]`, `T?`, or `[String: T]` in parameters and the result:
 
 ```swift
-@JSFunction func roundTrip<T: _BridgedSwiftGenericBridgeable>(_ values: [T]) throws(JSException) -> [T]
+@JSFunction func roundTrip<T: BridgedSwiftGenericBridgeable>(_ values: [T]) throws(JSException) -> [T]
 
-@JSFunction func lookup<T: _BridgedSwiftGenericBridgeable>(_ values: [String: T]) throws(JSException) -> T?
+@JSFunction func lookup<T: BridgedSwiftGenericBridgeable>(_ values: [String: T]) throws(JSException) -> T?
 ```
 
 ### Generic methods on imported classes
@@ -77,8 +77,8 @@ An imported `@JSClass` type can also have generic methods, both instance and sta
 
 ```swift
 @JSClass struct Store {
-    @JSFunction func identity<T: _BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
-    @JSFunction static func box<T: _BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+    @JSFunction func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+    @JSFunction static func box<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
 }
 ```
 
@@ -88,5 +88,5 @@ An imported `@JSClass` type can also have generic methods, both instance and sta
 |:--|:--|
 | Primitive parameter/result types (e.g. `Double`, `Bool`) | ✅ |
 | `String` parameter/result type | ✅ |
-| Generic parameter/result types (constrained to `_BridgedSwiftGenericBridgeable`) | ✅ |
+| Generic parameter/result types (constrained to `BridgedSwiftGenericBridgeable`) | ✅ |
 | Async function | ❌ |

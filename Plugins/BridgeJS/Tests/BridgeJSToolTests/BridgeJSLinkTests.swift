@@ -179,7 +179,7 @@ import Testing
             moduleName: "FirstModule",
             source: structSource + """
 
-                @JS public func identity<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
+                @JS public func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
                 """
         )
         let second = try makeSkeleton(moduleName: "SecondModule", source: structSource)

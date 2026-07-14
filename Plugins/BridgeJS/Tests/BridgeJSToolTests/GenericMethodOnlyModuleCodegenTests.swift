@@ -7,7 +7,7 @@ import Testing
             """
             @JS final class OnlyBox {
                 @JS init() {}
-                @JS func wrap<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
+                @JS func wrap<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
             }
             """
         ).js
@@ -21,7 +21,7 @@ import Testing
             """
             @JS final class OnlyBox {
                 @JS init() {}
-                @JS func wrap<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
+                @JS func wrap<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
             }
             """,
             "OnlyBox"
@@ -30,7 +30,7 @@ import Testing
             """
             @JS struct OnlyPair {
                 @JS init() {}
-                @JS func first<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
+                @JS func first<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
             }
             """,
             "OnlyPair"
@@ -39,7 +39,7 @@ import Testing
             """
             @JS enum OnlyFactory {
                 case primary
-                @JS static func one<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
+                @JS static func one<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T { value }
             }
             """,
             "OnlyFactory"
@@ -48,7 +48,7 @@ import Testing
     func exportMethodOnlyEmitsSwiftRuntimeInfrastructure(source: String, typeName: String) throws {
         let swift = try renderExportGlue(source)
         #expect(swift.contains("_bridgeJSExportTypeRegistry"))
-        #expect(swift.contains("extension \(typeName): _BridgedSwiftGenericBridgeable {"))
+        #expect(swift.contains("extension \(typeName): BridgedSwiftGenericBridgeable {"))
         #expect(swift.contains("register(\(typeName).self)"))
     }
 
@@ -57,7 +57,7 @@ import Testing
         let js = try linkSource(
             """
             @JSClass struct OnlyConsumer {
-                @JSFunction func identity<T: _BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+                @JSFunction func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
             }
             """
         ).js

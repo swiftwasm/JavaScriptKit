@@ -21,19 +21,19 @@ import JavaScriptKit
     }
 }
 
-@JS public func exportGenericIdentity<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T {
+@JS public func exportGenericIdentity<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T {
     value
 }
 
-@JS public func exportGenericEcho<T: _BridgedSwiftGenericBridgeable>(_ value: T, tag: Int) -> T {
+@JS public func exportGenericEcho<T: BridgedSwiftGenericBridgeable>(_ value: T, tag: Int) -> T {
     value
 }
 
-@JS public func exportGenericPickFirst<T: _BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) -> T {
+@JS public func exportGenericPickFirst<T: BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) -> T {
     a
 }
 
-@JS public func exportGenericPickSecond<T: _BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) -> T {
+@JS public func exportGenericPickSecond<T: BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) -> T {
     b
 }
 
@@ -53,22 +53,22 @@ import JavaScriptKit
     return -1
 }
 
-@JS public func exportGenericArrayIdentity<T: _BridgedSwiftGenericBridgeable>(_ values: [T]) -> [T] {
+@JS public func exportGenericArrayIdentity<T: BridgedSwiftGenericBridgeable>(_ values: [T]) -> [T] {
     values
 }
 
-@JS public func exportGenericOptionalIdentity<T: _BridgedSwiftGenericBridgeable>(_ value: T?) -> T? {
+@JS public func exportGenericOptionalIdentity<T: BridgedSwiftGenericBridgeable>(_ value: T?) -> T? {
     value
 }
 
-@JS public func exportGenericDictIdentity<T: _BridgedSwiftGenericBridgeable>(_ values: [String: T]) -> [String: T] {
+@JS public func exportGenericDictIdentity<T: BridgedSwiftGenericBridgeable>(_ values: [String: T]) -> [String: T] {
     values
 }
 
 nonisolated(unsafe) var _lastWrappedPoint = ExportGenericPoint(x: 0, y: 0)
 nonisolated(unsafe) var _lastTag = 0
 
-@JS public func exportGenericWrapPointAndTag<T: _BridgedSwiftGenericBridgeable>(
+@JS public func exportGenericWrapPointAndTag<T: BridgedSwiftGenericBridgeable>(
     _ p: ExportGenericPoint,
     tag: Int,
     _ value: T
@@ -80,71 +80,71 @@ nonisolated(unsafe) var _lastTag = 0
 
 @JS
 public func exportGenericCombineFirst<
-    T: _BridgedSwiftGenericBridgeable,
-    U: _BridgedSwiftGenericBridgeable
+    T: BridgedSwiftGenericBridgeable,
+    U: BridgedSwiftGenericBridgeable
 >(_ a: T, _ b: U) -> T {
     a
 }
 
 @JS
 public func exportGenericCombineSecond<
-    T: _BridgedSwiftGenericBridgeable,
-    U: _BridgedSwiftGenericBridgeable
+    T: BridgedSwiftGenericBridgeable,
+    U: BridgedSwiftGenericBridgeable
 >(_ a: T, _ b: U) -> U {
     b
 }
 
 @JS
 public func exportGenericCombineTripleLast<
-    T: _BridgedSwiftGenericBridgeable,
-    U: _BridgedSwiftGenericBridgeable,
-    V: _BridgedSwiftGenericBridgeable
+    T: BridgedSwiftGenericBridgeable,
+    U: BridgedSwiftGenericBridgeable,
+    V: BridgedSwiftGenericBridgeable
 >(_ a: T, _ b: U, _ c: V) -> V {
     c
 }
 
 @JS public final class ExportGenericMethodBox {
     @JS public init() {}
-    @JS public func echo<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T {
+    @JS public func echo<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T {
         value
     }
     @JS
     public func combine<
-        T: _BridgedSwiftGenericBridgeable,
-        U: _BridgedSwiftGenericBridgeable
+        T: BridgedSwiftGenericBridgeable,
+        U: BridgedSwiftGenericBridgeable
     >(_ a: T, _ b: U) -> U {
         b
     }
-    @JS public static func wrapArray<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> [T] {
+    @JS public static func wrapArray<T: BridgedSwiftGenericBridgeable>(_ value: T) -> [T] {
         [value]
     }
 }
 
 @JS public struct ExportGenericMethodPair {
     @JS public init() {}
-    @JS public func first<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T {
+    @JS public func first<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T {
         value
     }
-    @JS public func maybe<T: _BridgedSwiftGenericBridgeable>(_ value: T, present: Bool) -> T? {
+    @JS public func maybe<T: BridgedSwiftGenericBridgeable>(_ value: T, present: Bool) -> T? {
         present ? value : nil
     }
-    @JS public func dict<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> [String: T] {
+    @JS public func dict<T: BridgedSwiftGenericBridgeable>(_ value: T) -> [String: T] {
         ["value": value]
     }
-    @JS public static func wrap<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> [T] {
+    @JS public static func wrap<T: BridgedSwiftGenericBridgeable>(_ value: T) -> [T] {
         [value]
     }
 }
 
 @JS public enum ExportGenericMethodFactory {
     case primary
-    @JS public static func one<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T {
+    @JS public static func one<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T {
         value
     }
 }
 
 @JS public enum ExportGenericMethodNamespace {
-    @JS public static func make<T: _BridgedSwiftGenericBridgeable>(_ value: T) -> T {
+    @JS public static func make<T: BridgedSwiftGenericBridgeable>(_ value: T) -> T {
         value
     }
 }

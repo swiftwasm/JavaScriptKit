@@ -33,7 +33,7 @@ See <doc:Exporting-Swift-Array> for usage details.
 
 ## Generic type parameters
 
-A generic type parameter constrained to `_BridgedSwiftGenericBridgeable` is supported as a parameter or result type in both directions: an imported `@JSFunction` (see <doc:Importing-JS-Function>) and an exported `@JS` function (see <doc:Exporting-Swift-Function>). The types that satisfy that constraint are:
+A generic type parameter constrained to `BridgedSwiftGenericBridgeable` is supported as a parameter or result type in both directions: an imported `@JSFunction` (see <doc:Importing-JS-Function>) and an exported `@JS` function (see <doc:Exporting-Swift-Function>). The types that satisfy that constraint are:
 
 - `Bool`, `Float`, `Double`, `String`, and `JSValue`
 - every fixed-width integer: `Int`, `UInt`, `Int8`/`Int16`/`Int32`/`Int64`, and `UInt8`/`UInt16`/`UInt32`/`UInt64`

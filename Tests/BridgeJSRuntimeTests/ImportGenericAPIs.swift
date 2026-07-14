@@ -44,25 +44,25 @@ import JavaScriptKit
     }
 }
 
-@JSFunction func jsGenericRoundTrip<T: _BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
-@JSFunction func jsGenericRoundTripClass<T: _BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
-@JSFunction func jsGenericParsePoint<T: _BridgedSwiftGenericBridgeable>(_ json: String) throws(JSException) -> T
-@JSFunction func jsImportPickFirst<T: _BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) throws(JSException) -> T
-@JSFunction func jsImportMakeInt<T: _BridgedSwiftGenericBridgeable>() throws(JSException) -> T
-@JSFunction func jsImportCombineSecond<T: _BridgedSwiftGenericBridgeable, U: _BridgedSwiftGenericBridgeable>(
+@JSFunction func jsGenericRoundTrip<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+@JSFunction func jsGenericRoundTripClass<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+@JSFunction func jsGenericParsePoint<T: BridgedSwiftGenericBridgeable>(_ json: String) throws(JSException) -> T
+@JSFunction func jsImportPickFirst<T: BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) throws(JSException) -> T
+@JSFunction func jsImportMakeInt<T: BridgedSwiftGenericBridgeable>() throws(JSException) -> T
+@JSFunction func jsImportCombineSecond<T: BridgedSwiftGenericBridgeable, U: BridgedSwiftGenericBridgeable>(
     _ a: T,
     _ b: U
 ) throws(JSException) -> U
-@JSFunction func jsGenericArrayRoundTrip<T: _BridgedSwiftGenericBridgeable>(_ values: [T]) throws(JSException) -> [T]
-@JSFunction func jsGenericOptionalRoundTrip<T: _BridgedSwiftGenericBridgeable>(_ value: T?) throws(JSException) -> T?
-@JSFunction func jsGenericDictRoundTrip<T: _BridgedSwiftGenericBridgeable>(
+@JSFunction func jsGenericArrayRoundTrip<T: BridgedSwiftGenericBridgeable>(_ values: [T]) throws(JSException) -> [T]
+@JSFunction func jsGenericOptionalRoundTrip<T: BridgedSwiftGenericBridgeable>(_ value: T?) throws(JSException) -> T?
+@JSFunction func jsGenericDictRoundTrip<T: BridgedSwiftGenericBridgeable>(
     _ values: [String: T]
 ) throws(JSException) -> [String: T]
 
 @JSClass struct ImportGenericConsumer {
     @JSFunction init() throws(JSException)
-    @JSFunction func identity<T: _BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
-    @JSFunction static func box<T: _BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+    @JSFunction func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+    @JSFunction static func box<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
 }
 
 class ImportGenericAPITests: XCTestCase {
