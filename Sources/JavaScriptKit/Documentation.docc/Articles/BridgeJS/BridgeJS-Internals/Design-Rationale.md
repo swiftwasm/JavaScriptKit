@@ -34,7 +34,7 @@ BridgeJS avoids this by generating **separate** access paths per property or met
 
 ## Generic imports
 
-An imported generic `@JSFunction` (`func parse<T: BridgedSwiftGenericBridgeable>(...)`) lets one piece of glue serve many concrete types. The generic value crosses using the type's own stack ABI, and a runtime type ID (interned once via `swift_js_resolve_type_id`) selects the matching JS codec, so the type-agnostic glue can lower and lift the right representation without a specialized path per call site.
+An imported generic `@JSFunction` (`func parse<T: BridgedSwiftGenericBridgeable>(...)`) lets one piece of glue serve many concrete types. The generic value crosses using the type's own stack ABI, and a runtime type ID (interned once via `swift_js_resolve_type_id`) selects the matching JS codec, so the type-agnostic glue can lower and lift the right representation without a specialized path per call site. Because this path avoids existentials entirely, it also works under Embedded Swift; the Embedded example (`Examples/Embedded`) exercises a generic import, including a `@JS struct` round-trip.
 
 ## Generic exports
 

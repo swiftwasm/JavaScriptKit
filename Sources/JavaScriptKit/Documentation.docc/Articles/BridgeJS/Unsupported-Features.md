@@ -49,4 +49,4 @@ The generic parameter may be used bare (`T`) or wrapped in `[T]`, `T?`, or `[Str
 
 The generic argument must be a primitive or a type defined in the same module as the generic function. Using a `@JS` type from another module as the generic argument is not supported yet: at an imported `@JSFunction` call site this surfaces as a Swift conformance error, and an exported `@JS` function traps at runtime when passed such a type's token.
 
-Exported generic functions additionally require runtime existential support, so they are not available under Embedded Swift. Imported generics remain available there.
+Exported generic functions additionally require runtime existential support, so they are not available under Embedded Swift. Imported generics remain available there and are exercised by the Embedded example (`Examples/Embedded`).

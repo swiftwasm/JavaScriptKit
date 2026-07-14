@@ -8,7 +8,14 @@
 <body>
   <script type="module">
     import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
-    init();
+    init({
+      getImports() {
+        return {
+          // Implements the generic `echoValue` imported by main.swift.
+          echoValue: (value) => value,
+        };
+      },
+    });
   </script>
 </body>
 
