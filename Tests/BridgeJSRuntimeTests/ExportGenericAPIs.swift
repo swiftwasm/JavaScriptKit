@@ -1,4 +1,4 @@
-import XCTest
+import Testing
 import JavaScriptKit
 
 @JS public struct ExportGenericPoint {
@@ -157,8 +157,8 @@ public func exportGenericCombineTripleLast<
 @_extern(c)
 func runExportGenericTests() -> Void
 
-final class ExportGenericAPITests: XCTestCase {
-    func testExportGenerics() throws {
+@Suite struct ExportGenericAPITests {
+    @Test func exportGenerics() {
         runExportGenericTests()
     }
 }
