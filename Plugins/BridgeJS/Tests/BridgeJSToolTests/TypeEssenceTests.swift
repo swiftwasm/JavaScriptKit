@@ -46,7 +46,6 @@ import Testing
         Golden(.caseEnum("Direction"), swift: "Direction", ts: "DirectionTag", mangle: "9DirectionO"),
         Golden(.rawValueEnum("Mode", .string), swift: "Mode", ts: "ModeTag", mangle: "4ModeO"),
         Golden(.associatedValueEnum("Result"), swift: "Result", ts: "ResultTag", mangle: "6ResultO"),
-        Golden(.namespaceEnum("Utils"), swift: "Utils", ts: "Utils", mangle: "5UtilsO"),
         Golden(.swiftProtocol("Drawable"), swift: "AnyDrawable", ts: "Drawable", mangle: "8DrawableP"),
         Golden(.swiftHeapObject("Greeter"), swift: "Greeter", ts: "Greeter", mangle: "7GreeterC"),
         Golden(.jsObject(nil), swift: "JSObject", ts: "any", mangle: "8JSObjectC"),
@@ -87,7 +86,7 @@ import Testing
         let expected: Set<Substring> = [
             "integer", "float", "double", "string", "bool", "jsObject", "jsValue",
             "swiftHeapObject", "void", "unsafePointer", "nullable", "array", "dictionary",
-            "caseEnum", "rawValueEnum", "associatedValueEnum", "namespaceEnum",
+            "caseEnum", "rawValueEnum", "associatedValueEnum",
             "swiftProtocol", "swiftStruct", "alias",
         ]
         #expect(expected.subtracting(seen).isEmpty, "missing goldens: \(expected.subtracting(seen).sorted())")

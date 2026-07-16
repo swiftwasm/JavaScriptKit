@@ -17,10 +17,10 @@
 //   - **combinators** (optional/array/dictionary/closure) - built from other types; every facet
 //     folds over the children.
 //
-// Two cases are deliberately *not* value types: `namespace` (an empty enum used only for
-// namespacing - it never crosses the boundary) and `alias` (a transparent `@JS(as:)` newtype
-// that is a named view of another type). Keeping them out of `nominal` is the point - lumping
-// non-values in with value types was the smell.
+// `alias` is deliberately kept out of `nominal`: it is a transparent `@JS(as:)` newtype - a
+// named view of another type, carrying no ABI of its own - not a value nominal in its own
+// right. (Namespace enums, which are not values at all, are rejected at the parser and are not
+// a `BridgeType` case: you can never have a value of one.)
 //
 // So the general rules switch on a handful of structural classes, not 20 type cases, and
 // `essence(of:)` is the single place that maps a `BridgeType` to its essence.
@@ -38,11 +38,6 @@ public enum TypeEssence {
     case void
 
     // -- not a value --
-
-    /// An empty enum used purely as a namespace (`enum Utils {}`). It has *no* value ABI - you
-    /// can never have a value of it crossing the boundary (the ABI rules reject it) - so it is
-    /// deliberately not a `nominal`. It exists only as a name a declaration path can refer to.
-    case namespace(String)
 
     /// A transparent newtype: `@JS(as: T) struct Name`. It is a value, but a *view* of another
     /// value type - its own Swift name, but its underlying type's wire representation. Kept
@@ -133,8 +128,6 @@ extension BridgeType {
             return .nominal(NominalEssence(name: name, kind: .rawValueEnum(raw)))
         case .associatedValueEnum(let name):
             return .nominal(NominalEssence(name: name, kind: .associatedValueEnum))
-        case .namespaceEnum(let name):
-            return .namespace(name)
         case .swiftProtocol(let name):
             return .nominal(NominalEssence(name: name, kind: .protocolType))
         case .swiftHeapObject(let name):
@@ -167,8 +160,6 @@ extension BridgeType {
             return "y"
         case .nominal(let n):
             return "\(n.name.count)\(n.name)\(n.kind.mangleSuffix)"
-        case .namespace(let name):
-            return "\(name.count)\(name)O"
         case .optional(let wrapped, let kind):
             return "\(kind == .null ? "Sq" : "Su")\(wrapped.mangleTypeName)"
         case .array(let element):
@@ -202,8 +193,6 @@ extension BridgeType {
             case .protocolType: return "Any\(n.name)"
             default: return n.name
             }
-        case .namespace(let name):
-            return name
         case .optional(let wrapped, let kind):
             return kind == .null
                 ? "Optional<\(wrapped.swiftType)>" : "JSUndefinedOr<\(wrapped.swiftType)>"
@@ -256,8 +245,6 @@ extension BridgeType {
             case .structType, .protocolType, .heapObject:
                 return n.name
             }
-        case .namespace(let name):
-            return name
         case .optional(let wrapped, let kind):
             return "\(wrapped.tsType) | \(kind.absenceLiteral)"
         case .array(let element):

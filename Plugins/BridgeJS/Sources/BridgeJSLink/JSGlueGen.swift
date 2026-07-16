@@ -1065,7 +1065,7 @@ struct IntrinsicJSFragment: Sendable {
 
     static func optionalLowerReturn(wrappedType: BridgeType, kind: JSOptionalKind) throws -> IntrinsicJSFragment {
         switch wrappedType {
-        case .void, .nullable, .namespaceEnum, .closure:
+        case .void, .nullable, .closure:
             throw BridgeJSLinkError(message: "Unsupported optional wrapped type for protocol export: \(wrappedType)")
         default: break
         }
@@ -1318,8 +1318,6 @@ struct IntrinsicJSFragment: Sendable {
                     return [callbackIdVar]
                 }
             )
-        case .namespaceEnum(let string):
-            throw BridgeJSLinkError(message: "Namespace enums are not supported to be passed as parameters: \(string)")
         case .array(let elementType):
             return try arrayLower(elementType: elementType)
         case .dictionary(let valueType):
@@ -1372,10 +1370,6 @@ struct IntrinsicJSFragment: Sendable {
                     let funcRef = arguments[0]
                     return ["\(JSGlueVariableScope.reservedSwift).memory.getObject(\(funcRef))"]
                 }
-            )
-        case .namespaceEnum(let string):
-            throw BridgeJSLinkError(
-                message: "Namespace enums are not supported to be returned from functions: \(string)"
             )
         case .array(let elementType):
             return try arrayLift(elementType: elementType)
@@ -1462,11 +1456,6 @@ struct IntrinsicJSFragment: Sendable {
                     return ["\(JSGlueVariableScope.reservedSwift).memory.getObject(\(funcRef))"]
                 }
             )
-        case .namespaceEnum(let string):
-            throw BridgeJSLinkError(
-                message:
-                    "Namespace enums are not supported to be passed as parameters to imported JS functions: \(string)"
-            )
         case .array(let elementType):
             return try arrayLift(elementType: elementType)
         case .dictionary(let valueType):
@@ -1516,10 +1505,6 @@ struct IntrinsicJSFragment: Sendable {
                     printer.write("}")
                     return ["\(JSGlueVariableScope.reservedSwift).memory.retain(\(value))"]
                 }
-            )
-        case .namespaceEnum(let string):
-            throw BridgeJSLinkError(
-                message: "Namespace enums are not supported to be returned from imported JS functions: \(string)"
             )
         case .array(let elementType):
             return try arrayLower(elementType: elementType)
@@ -2045,7 +2030,7 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
-        case .void, .swiftProtocol, .namespaceEnum, .closure:
+        case .void, .swiftProtocol, .closure:
             // These types should not appear as struct fields - return error fragment
             return IntrinsicJSFragment(
                 parameters: ["value"],
@@ -2106,7 +2091,7 @@ struct IntrinsicJSFragment: Sendable {
                     return [varName]
                 }
             )
-        case .void, .swiftProtocol, .namespaceEnum, .closure:
+        case .void, .swiftProtocol, .closure:
             // These types should not appear as struct fields
             return IntrinsicJSFragment(
                 parameters: [],
@@ -2216,7 +2201,7 @@ private extension BridgeType {
             return .inlineFlag
         case .closure:
             return .inlineFlag
-        case .swiftStruct, .array, .dictionary, .void, .namespaceEnum:
+        case .swiftStruct, .array, .dictionary, .void:
             return .stackABI
         case .nullable(let wrapped, _):
             return wrapped.optionalConvention

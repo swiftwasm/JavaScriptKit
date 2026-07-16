@@ -270,7 +270,6 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case caseEnum(String)
     case rawValueEnum(String, SwiftEnumRawType)
     case associatedValueEnum(String)
-    case namespaceEnum(String)
     case swiftProtocol(String)
     case swiftStruct(String)
     indirect case closure(ClosureSignature, useJSTypedClosure: Bool)
@@ -1635,7 +1634,7 @@ extension BridgeType {
         case .bool, .integer, .float, .double, .string, .jsValue, .jsObject,
             .swiftHeapObject, .unsafePointer, .swiftProtocol, .void,
             .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct,
-            .namespaceEnum, .closure:
+            .closure:
             return self
         }
     }
@@ -1662,8 +1661,6 @@ extension BridgeType {
         case .rawValueEnum(_, let rawType):
             return rawType.wasmCoreType
         case .associatedValueEnum:
-            return nil
-        case .namespaceEnum:
             return nil
         case .swiftProtocol:
             // Protocols pass JSObject IDs as Int32
@@ -1697,7 +1694,7 @@ extension BridgeType {
     /// (protocols, namespace enums, and their compositions) are diagnosed.
     public var isAsyncResolvable: Bool {
         switch self {
-        case .swiftProtocol, .namespaceEnum:
+        case .swiftProtocol:
             return false
         case .nullable(let wrapped, _):
             return wrapped.isAsyncResolvable

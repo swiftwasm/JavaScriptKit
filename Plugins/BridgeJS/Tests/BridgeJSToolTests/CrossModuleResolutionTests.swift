@@ -282,7 +282,7 @@ import Testing
     }
 
     @Test
-    func resolvesExternalNamespaceEnum() throws {
+    func rejectsExternalNamespaceEnumAsValueType() throws {
         let core = try buildDependencySkeleton(
             moduleName: "Core",
             source: """
@@ -291,15 +291,25 @@ import Testing
                 }
                 """
         )
-        let app = try resolveApp(
-            source: """
-                import Core
-                @JS public func dummy(_ u: Utils?) -> Utils? { u }
-                """,
-            dependencies: [(moduleName: "Core", skeleton: core)]
-        )
-        let function = try #require(app.exported?.functions.first(where: { $0.name == "dummy" }))
-        #expect(function.returnType == .nullable(.namespaceEnum("Utils"), .null))
+        // A namespace enum is not a value type - you can never have a value of it, so using it
+        // in a value position (even as `Utils?`) is rejected at resolution rather than
+        // represented as a never-valid bridged type.
+        do {
+            _ = try resolveApp(
+                source: """
+                    import Core
+                    @JS public func dummy(_ u: Utils?) -> Utils? { u }
+                    """,
+                dependencies: [(moduleName: "Core", skeleton: core)]
+            )
+            Issue.record("Expected a diagnostic for using a namespace enum as a value type")
+        } catch let error as BridgeJSCoreDiagnosticError {
+            // Cross-module resolution reports the generic "unsupported type" (the namespace is
+            // simply not registered as a resolvable value type). Same-module use gets the more
+            // specific "namespace, not a value type" message from the parser.
+            let combined = error.diagnostics.map(\.diagnostic.message).joined(separator: "\n")
+            #expect(combined.contains("Utils"))
+        }
     }
 
     // MARK: - Structural positions

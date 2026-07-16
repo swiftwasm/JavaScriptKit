@@ -46,7 +46,6 @@ import Testing
         .swiftStruct("Point"),
         .caseEnum("Direction"),
         .associatedValueEnum("Result"),
-        .namespaceEnum("Utils"),
         .rawValueEnum("Mode", .string),
         .rawValueEnum("Mode", .bool),
         .rawValueEnum("Mode", .float),
@@ -234,8 +233,6 @@ import Testing
     /// Types with no ABI in a given cell must say so, rather than answering with something
     /// plausible. Preserved from the tables this description replaced.
     @Test func typesWithoutAnABISaySo() {
-        #expect(throws: (any Error).self) { try BridgeABI.shape(of: .namespaceEnum("Utils"), cell: .exportParameter) }
-        #expect(throws: (any Error).self) { try BridgeABI.shape(of: .namespaceEnum("Utils"), cell: .exportReturn) }
         #expect(throws: (any Error).self) {
             try BridgeABI.shape(of: .swiftProtocol("D"), cell: .importParameter, context: .importTS)
         }
@@ -243,16 +240,6 @@ import Testing
         #expect(throws: Never.self) {
             try BridgeABI.shape(of: .swiftProtocol("D"), cell: .importParameter, context: .exportSwift)
         }
-    }
-
-    /// A quirk worth pinning: an optional return never consults its payload's flat shape, so
-    /// `.nullable(.namespaceEnum)` is accepted where a bare `.namespaceEnum` return throws.
-    /// Inherited from the old table. Documented here so that if it is ever tightened, it is
-    /// a deliberate change with a failing test, not a silent one.
-    @Test func optionalReturnDoesNotValidateItsPayload() throws {
-        #expect(throws: (any Error).self) { try BridgeABI.shape(of: .namespaceEnum("Utils"), cell: .exportReturn) }
-        let optional = try BridgeABI.shape(of: .nullable(.namespaceEnum("Utils"), .null), cell: .exportReturn)
-        #expect(optional.returnValue == nil)
     }
 
     /// `payloadSlots` is `wasmParams`' new home. It differs from the `.exportParameter`
@@ -265,9 +252,6 @@ import Testing
         // Stack-borne payloads have no flat slots, which is how callers detect them.
         #expect(BridgeABI.payloadSlots(of: .array(.string)).isEmpty)
         #expect(BridgeABI.payloadSlots(of: .swiftStruct("Point")).isEmpty)
-        // No ABI at all, but answers with an arity rather than throwing -- callers reach
-        // this from non-throwing contexts and only want the count.
-        #expect(BridgeABI.payloadSlots(of: .namespaceEnum("Utils")).isEmpty)
     }
 
     // MARK: - Aliases
@@ -311,7 +295,7 @@ import Testing
         let expected: Set<String> = [
             "integer", "float", "double", "string", "bool", "jsObject", "jsValue",
             "swiftHeapObject", "void", "unsafePointer", "nullable", "array", "dictionary",
-            "caseEnum", "rawValueEnum", "associatedValueEnum", "namespaceEnum",
+            "caseEnum", "rawValueEnum", "associatedValueEnum",
             "swiftProtocol", "swiftStruct", "closure",
         ]
         #expect(

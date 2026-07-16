@@ -416,7 +416,19 @@ public final class SwiftToSkeleton {
                         member.decl.is(EnumCaseDeclSyntax.self)
                     }
                     if !hasAnyCases {
-                        return .namespaceEnum(swiftCallName)
+                        // An empty enum is a namespace, not a value type - you can never have a
+                        // value of it. Referencing it in a value position is an error, caught
+                        // here rather than represented as a (never-valid) bridged type.
+                        errors.append(
+                            DiagnosticError(
+                                node: type,
+                                message:
+                                    "'\(swiftCallName)' is a namespace, not a value type, and cannot be used here.",
+                                hint:
+                                    "Namespace enums (empty `@JS` enums) only group static members; they have no values."
+                            )
+                        )
+                        return nil
                     }
                     let hasAssociatedValues =
                         enumDecl.memberBlock.members.contains { member in

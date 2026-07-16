@@ -193,7 +193,7 @@ extension StackOp {
             let v = compile(value, as: operation)
             return [lowering ? .lowerDict(key: key, value: v) : .liftDict(key: key, value: v)]
 
-        case .void, .namespaceEnum:
+        case .void:
             return []
         case .alias(_, let underlying):
             return compile(underlying, as: operation)

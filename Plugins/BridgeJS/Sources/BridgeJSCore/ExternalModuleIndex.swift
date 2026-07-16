@@ -56,7 +56,9 @@ public struct ExternalModuleIndex {
                 case .associatedValue:
                     bridgeType = .associatedValueEnum(enumDef.swiftCallName)
                 case .namespace:
-                    bridgeType = .namespaceEnum(enumDef.swiftCallName)
+                    // A namespace enum has no value type, so there is nothing to resolve a
+                    // cross-module value reference to. Its nested types register their own paths.
+                    continue
                 }
                 register(dotPath: enumDef.swiftCallName, bridgeType: bridgeType)
             }

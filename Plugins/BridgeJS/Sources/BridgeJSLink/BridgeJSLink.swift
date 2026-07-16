@@ -1524,21 +1524,15 @@ public struct BridgeJSLink {
     fileprivate static func resolveTypeScriptType(_ type: BridgeType, exportedSkeletons: [ExportedSkeleton]) -> String {
         switch type {
         case .caseEnum(let name), .rawValueEnum(let name, _),
-            .associatedValueEnum(let name), .namespaceEnum(let name):
-            // Look up the enum to get its tsFullPath
+            .associatedValueEnum(let name):
+            // Look up the enum to get its tsFullPath (with the full namespace).
             for skeleton in exportedSkeletons {
                 for enumDef in skeleton.enums {
                     if enumDef.name == name || enumDef.swiftCallName == name {
-                        // Use the stored tsFullPath which has the full namespace
-                        switch type {
-                        case .namespaceEnum:
+                        if enumDef.emitStyle == .tsEnum {
                             return enumDef.tsFullPath
-                        default:
-                            if enumDef.emitStyle == .tsEnum {
-                                return enumDef.tsFullPath
-                            }
-                            return "\(enumDef.tsFullPath)Tag"
                         }
+                        return "\(enumDef.tsFullPath)Tag"
                     }
                 }
             }

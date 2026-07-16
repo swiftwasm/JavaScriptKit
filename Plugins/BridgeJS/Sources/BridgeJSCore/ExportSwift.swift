@@ -894,7 +894,7 @@ struct StackCodegen {
             return liftNullableExpression(wrappedType: wrappedType, kind: kind)
         case .closure:
             return "JSObject.bridgeJSStackPop()"
-        case .void, .namespaceEnum:
+        case .void:
             return "()"
         }
     }
@@ -908,7 +908,7 @@ struct StackCodegen {
             return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: typeName)<JSObject>.bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
-        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol:
+        case .nullable, .void, .closure, .unsafePointer, .swiftProtocol:
             fatalError("Invalid nullable wrapped type: \(wrappedType)")
         }
     }
@@ -935,7 +935,7 @@ struct StackCodegen {
             return [
                 "_swift_js_push_i32((\(raw: accessor) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
             ]
-        case .void, .namespaceEnum:
+        case .void:
             return []
         case .array(let elementType):
             return lowerArrayStatements(elementType: elementType, accessor: accessor, varPrefix: varPrefix)
@@ -952,7 +952,7 @@ struct StackCodegen {
         switch elementType {
         case .swiftProtocol:
             return lowerProtocolArrayStatements(accessor: accessor, varPrefix: varPrefix)
-        case .void, .namespaceEnum:
+        case .void:
             fatalError("Invalid array element type: \(elementType)")
         default:
             return ["\(raw: accessor).bridgeJSStackPush()"]
@@ -990,7 +990,7 @@ struct StackCodegen {
                 accessor: accessor,
                 varPrefix: varPrefix
             )
-        case .void, .namespaceEnum:
+        case .void:
             fatalError("Invalid dictionary value type: \(valueType)")
         default:
             return ["\(raw: accessor).bridgeJSStackPush()"]
@@ -1566,7 +1566,7 @@ extension BridgeType {
             return ["_BridgedSwiftCaseEnum"]
         case .associatedValueEnum:
             return ["_BridgedSwiftAssociatedValueEnum"]
-        case .rawValueEnum, .void, .unsafePointer, .namespaceEnum,
+        case .rawValueEnum, .void, .unsafePointer,
             .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias:
             // Not supported yet.
             return nil

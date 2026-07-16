@@ -265,8 +265,6 @@ public enum BridgeABI {
             return ABIShape(flat: [ABISlot("caseId", .i32)])
         case .swiftStruct(let name):
             return ABIShape()
-        case .namespaceEnum:
-            throw BridgeABIError("Namespace enums are not supported to pass as parameters")
         case .closure:
             return ABIShape(flat: [ABISlot("callbackId", .i32)])
         case .array(let element):
@@ -323,8 +321,6 @@ public enum BridgeABI {
         case .swiftStruct(let name):
             // Structs use stack-based return (no direct Wasm return type).
             return ABIShape()
-        case .namespaceEnum:
-            throw BridgeABIError("Namespace enums are not supported to pass as parameters")
         case .closure:
             // Closures pass a callback id as i32.
             return ret(ABISlot("value", .i32))
@@ -389,8 +385,6 @@ public enum BridgeABI {
             case .exportSwift:
                 return ABIShape()
             }
-        case .namespaceEnum:
-            throw BridgeABIError("Namespace enums cannot be used as parameters")
         case .nullable(.swiftStruct(let name), _) where context == .importTS:
             // Optional `@JS struct`s bridge through the stack (isSome discriminator + fields),
             // like optional arrays/dictionaries, rather than the non-optional object-id ABI.
@@ -457,8 +451,6 @@ public enum BridgeABI {
             case .exportSwift:
                 return ABIShape()
             }
-        case .namespaceEnum:
-            throw BridgeABIError("Namespace enums cannot be used as return values")
         case .nullable(let wrappedType, _):
             // jsObject and `@JS struct` use the stack ABI for optionals -- the thunk returns
             // void and the value (plus isSome discriminator) flows through the stacks.
@@ -487,20 +479,14 @@ public enum BridgeABI {
     /// where the `isSome` flag is the optional's own, not the payload's.
     ///
     /// Non-throwing on purpose: callers only want arity here, and reach this from
-    /// non-throwing contexts. `.namespaceEnum` has no ABI at all, and answers with no
-    /// slots rather than an error -- matching what the JS side did before this description
-    /// existed.
+    /// non-throwing contexts.
     public static func payloadSlots(of type: BridgeType) -> [ABISlot] {
         switch type {
         case .nullable(let wrappedType, _):
             return payloadSlots(of: wrappedType)
         case .alias(_, let underlying):
             return payloadSlots(of: underlying)
-        case .namespaceEnum:
-            return []
         default:
-            // `.namespaceEnum` above is the only case `exportParameterShape` rejects, so
-            // this cannot silently swallow a real error.
             return ((try? exportParameterShape(of: type)) ?? ABIShape()).flat
         }
     }
