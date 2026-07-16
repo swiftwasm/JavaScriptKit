@@ -1807,130 +1807,21 @@ struct IntrinsicJSFragment: Sendable {
 
     // MARK: - Array Helpers
 
-    /// Lowers an array from JS to Swift by iterating elements and pushing to stacks
     static func arrayLower(elementType: BridgeType) throws -> IntrinsicJSFragment {
-        return IntrinsicJSFragment(
-            parameters: ["arr"],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let arr = arguments[0]
-
-                let elemVar = scope.variable("elem")
-                printer.write("for (const \(elemVar) of \(arr)) {")
-                try printer.indent {
-                    let elementFragment = try stackLowerFragment(elementType: elementType)
-                    let _ = try elementFragment.printCode(
-                        [elemVar],
-                        context
-                    )
-                }
-                printer.write("}")
-                scope.emitPushI32Parameter("\(arr).length", printer: printer)
-                return []
-            }
-        )
+        // Delegates to the stack machine so top-level and nested arrays share one code path.
+        try stackLowerFragment(elementType: .array(elementType))
     }
 
-    /// Lowers a dictionary from JS to Swift by iterating entries and pushing to stacks
     static func dictionaryLower(valueType: BridgeType) throws -> IntrinsicJSFragment {
-        return IntrinsicJSFragment(
-            parameters: ["dict"],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let dict = arguments[0]
-
-                let entriesVar = scope.variable("entries")
-                let entryVar = scope.variable("entry")
-                printer.write("const \(entriesVar) = Object.entries(\(dict));")
-                printer.write("for (const \(entryVar) of \(entriesVar)) {")
-                try printer.indent {
-                    let keyVar = scope.variable("key")
-                    let valueVar = scope.variable("value")
-                    printer.write("const [\(keyVar), \(valueVar)] = \(entryVar);")
-
-                    let keyFragment = try stackLowerFragment(elementType: .string)
-                    let _ = try keyFragment.printCode(
-                        [keyVar],
-                        context
-                    )
-
-                    let valueFragment = try stackLowerFragment(elementType: valueType)
-                    let _ = try valueFragment.printCode(
-                        [valueVar],
-                        context
-                    )
-                }
-                printer.write("}")
-                scope.emitPushI32Parameter("\(entriesVar).length", printer: printer)
-                return []
-            }
-        )
+        try stackLowerFragment(elementType: .dictionary(valueType))
     }
 
-    /// Lifts an array from Swift to JS by popping elements from stacks
     static func arrayLift(elementType: BridgeType) throws -> IntrinsicJSFragment {
-        return IntrinsicJSFragment(
-            parameters: [],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let resultVar = scope.variable("arrayResult")
-                let lenVar = scope.variable("arrayLen")
-
-                printer.write("const \(lenVar) = \(scope.popI32());")
-                printer.write("let \(resultVar);")
-                printer.write("if (\(lenVar) === -1) {")
-                printer.indent {
-                    // Bulk path: Swift pushed a typed array onto the typed-array stack
-                    printer.write("\(resultVar) = \(JSGlueVariableScope.reservedTaStack).pop();")
-                }
-                printer.write("} else {")
-                try printer.indent {
-                    // Element-by-element path (original behavior)
-                    let iVar = scope.variable("i")
-                    printer.write("\(resultVar) = [];")
-                    printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
-                    try printer.indent {
-                        let elementFragment = try stackLiftFragment(elementType: elementType)
-                        let elementResults = try elementFragment.printCode([], context)
-                        if let elementExpr = elementResults.first {
-                            printer.write("\(resultVar).push(\(elementExpr));")
-                        }
-                    }
-                    printer.write("}")
-                    printer.write("\(resultVar).reverse();")
-                }
-                printer.write("}")
-                return [resultVar]
-            }
-        )
+        try stackLiftFragment(elementType: .array(elementType))
     }
 
-    /// Lifts a dictionary from Swift to JS by popping key/value pairs from stacks
     static func dictionaryLift(valueType: BridgeType) throws -> IntrinsicJSFragment {
-        return IntrinsicJSFragment(
-            parameters: [],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let resultVar = scope.variable("dictResult")
-                let lenVar = scope.variable("dictLen")
-                let iVar = scope.variable("i")
-
-                printer.write("const \(lenVar) = \(scope.popI32());")
-                printer.write("const \(resultVar) = {};")
-                printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
-                try printer.indent {
-                    let valueFragment = try stackLiftFragment(elementType: valueType)
-                    let valueResults = try valueFragment.printCode([], context)
-                    let keyFragment = try stackLiftFragment(elementType: .string)
-                    let keyResults = try keyFragment.printCode([], context)
-                    if let keyExpr = keyResults.first, let valueExpr = valueResults.first {
-                        printer.write("\(resultVar)[\(keyExpr)] = \(valueExpr);")
-                    }
-                }
-                printer.write("}")
-                return [resultVar]
-            }
-        )
+        try stackLiftFragment(elementType: .dictionary(valueType))
     }
 
     /// Lifts a value Swift pushed onto the stacks.

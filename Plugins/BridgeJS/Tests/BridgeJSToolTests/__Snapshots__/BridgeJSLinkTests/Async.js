@@ -342,17 +342,12 @@ export async function createInstantiator(options, swift) {
             bjs["promise_resolve_TestModule_Sa10AsyncPointV"] = function(promise) {
                 try {
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const struct = structHelpers.AsyncPoint.lift();
-                            arrayResult.push(struct);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const struct = structHelpers.AsyncPoint.lift();
+                        arrayResult.push(struct);
                     }
+                    arrayResult.reverse();
                     swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(arrayResult);
                 } catch (error) {
                     setException(error);
@@ -361,17 +356,12 @@ export async function createInstantiator(options, swift) {
             bjs["promise_resolve_TestModule_Sa14AsyncDirectionO"] = function(promise) {
                 try {
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const caseId = i32Stack.pop();
-                            arrayResult.push(caseId);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const caseId = i32Stack.pop();
+                        arrayResult.push(caseId);
                     }
+                    arrayResult.reverse();
                     swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(arrayResult);
                 } catch (error) {
                     setException(error);

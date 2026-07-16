@@ -446,18 +446,13 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(polygons.length);
                     instance.exports.bjs_polygonArray();
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const ptr = ptrStack.pop();
-                            const obj = PolygonReference.__construct(ptr);
-                            arrayResult.push(obj);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const ptr = ptrStack.pop();
+                        const obj = PolygonReference.__construct(ptr);
+                        arrayResult.push(obj);
                     }
+                    arrayResult.reverse();
                     return arrayResult;
                 },
                 validatePolygon: function bjs_validatePolygon(polygon) {
@@ -488,24 +483,19 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(xs.length);
                     instance.exports.bjs_roundtripTags();
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const isSome1 = i32Stack.pop();
-                            let optValue;
-                            if (isSome1 === 0) {
-                                optValue = null;
-                            } else {
-                                const enumValue = enumHelpers.InnerTag.lift(i32Stack.pop());
-                                optValue = enumValue;
-                            }
-                            arrayResult.push(optValue);
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const isSome1 = i32Stack.pop();
+                        let optValue;
+                        if (isSome1 === 0) {
+                            optValue = null;
+                        } else {
+                            const enumValue = enumHelpers.InnerTag.lift(i32Stack.pop());
+                            optValue = enumValue;
                         }
-                        arrayResult.reverse();
+                        arrayResult.push(optValue);
                     }
+                    arrayResult.reverse();
                     return arrayResult;
                 },
                 describeUser: function bjs_describeUser(owner) {

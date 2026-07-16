@@ -85,6 +85,7 @@ final class JSStackMachine {
         case .liftEnum(let fullName): stepLiftEnum(fullName)
         case .lowerArray(let element): try stepLowerArray(element)
         case .liftArray(let element): try stepLiftArray(element)
+        case .liftMaybeBulkArray(let element): try stepLiftMaybeBulkArray(element)
         case .lowerDict(let key, let value): try stepLowerDict(key: key, value: value)
         case .liftDict(let key, let value): try stepLiftDict(key: key, value: value)
         case .lowerOptional(let absence, let payload): try stepLowerOptional(absence, payload)
@@ -221,10 +222,22 @@ final class JSStackMachine {
         scope.emitPushI32Parameter("\(value).length", printer: printer)
     }
 
+    /// Counted lift (every element type the runtime never bulks): pop the count, then that many
+    /// elements. Elements come back in reverse push order, so the result is reversed. No
+    /// discriminator - these arrays can never take the typed-array path.
     private func stepLiftArray(_ element: [StackOp]) throws {
-        // The array union: `count == -1` means Swift took the bulk path and pushed one typed
-        // array onto `taStack` instead of N elements. The two arms read different channels and
-        // only the element arm reverses -- which is why arrays are their own op, not `.counted`.
+        let resultVar = scope.variable("arrayResult")
+        let lenVar = scope.variable("arrayLen")
+        printer.write("const \(lenVar) = \(scope.popI32());")
+        printer.write("const \(resultVar) = [];")
+        try emitCountedLoop(into: resultVar, count: lenVar, element: element)
+        push(resultVar)
+    }
+
+    /// Lift where the element might be bulk-transferred: pop the count; `-1` means Swift pushed
+    /// a single typed array onto `taStack`, otherwise it is a counted element sequence. The
+    /// runtime chose which, so this handles both.
+    private func stepLiftMaybeBulkArray(_ element: [StackOp]) throws {
         let resultVar = scope.variable("arrayResult")
         let lenVar = scope.variable("arrayLen")
         printer.write("const \(lenVar) = \(scope.popI32());")
@@ -235,18 +248,23 @@ final class JSStackMachine {
         }
         printer.write("} else {")
         try printer.indent {
-            let iVar = scope.variable("i")
             printer.write("\(resultVar) = [];")
-            printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
-            try printer.indent {
-                try run(element)
-                printer.write("\(resultVar).push(\(pop()));")
-            }
-            printer.write("}")
-            printer.write("\(resultVar).reverse();")
+            try emitCountedLoop(into: resultVar, count: lenVar, element: element)
         }
         printer.write("}")
         push(resultVar)
+    }
+
+    /// The shared "pop `count` elements into `resultVar`, then reverse" loop.
+    private func emitCountedLoop(into resultVar: String, count lenVar: String, element: [StackOp]) throws {
+        let iVar = scope.variable("i")
+        printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
+        try printer.indent {
+            try run(element)
+            printer.write("\(resultVar).push(\(pop()));")
+        }
+        printer.write("}")
+        printer.write("\(resultVar).reverse();")
     }
 
     // MARK: - Dictionaries

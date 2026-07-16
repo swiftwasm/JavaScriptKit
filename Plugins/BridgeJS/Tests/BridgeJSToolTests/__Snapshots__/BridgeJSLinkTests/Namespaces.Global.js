@@ -357,18 +357,13 @@ export async function createInstantiator(options, swift) {
                 getItems() {
                     instance.exports.bjs_Collections_Container_getItems(this.pointer);
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const ptr = ptrStack.pop();
-                            const obj = Greeter.__construct(ptr);
-                            arrayResult.push(obj);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const ptr = ptrStack.pop();
+                        const obj = Greeter.__construct(ptr);
+                        arrayResult.push(obj);
                     }
+                    arrayResult.reverse();
                     return arrayResult;
                 }
                 addItem(item) {

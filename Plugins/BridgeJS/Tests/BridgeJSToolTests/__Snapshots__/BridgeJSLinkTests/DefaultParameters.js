@@ -586,17 +586,12 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(names.length);
                     instance.exports.bjs_testStringArrayDefault();
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const string = strStack.pop();
-                            arrayResult.push(string);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const string = strStack.pop();
+                        arrayResult.push(string);
                     }
+                    arrayResult.reverse();
                     return arrayResult;
                 },
                 testDoubleArrayDefault: function bjs_testDoubleArrayDefault(values = [1.5, 2.5, 3.5]) {
@@ -626,17 +621,12 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(flags.length);
                     instance.exports.bjs_testBoolArrayDefault();
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const bool = i32Stack.pop() !== 0;
-                            arrayResult.push(bool);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const bool = i32Stack.pop() !== 0;
+                        arrayResult.push(bool);
                     }
+                    arrayResult.reverse();
                     return arrayResult;
                 },
                 testEmptyArrayDefault: function bjs_testEmptyArrayDefault(items = []) {

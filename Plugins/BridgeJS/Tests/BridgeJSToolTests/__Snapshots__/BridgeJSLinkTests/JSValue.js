@@ -317,20 +317,15 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_jsEchoJSValueArray"] = function bjs_jsEchoJSValueArray() {
                 try {
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const jsValuePayload2 = f64Stack.pop();
-                            const jsValuePayload1 = i32Stack.pop();
-                            const jsValueKind = i32Stack.pop();
-                            const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
-                            arrayResult.push(jsValue);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const jsValuePayload2 = f64Stack.pop();
+                        const jsValuePayload1 = i32Stack.pop();
+                        const jsValueKind = i32Stack.pop();
+                        const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                        arrayResult.push(jsValue);
                     }
+                    arrayResult.reverse();
                     let ret = imports.jsEchoJSValueArray(arrayResult);
                     for (const elem of ret) {
                         const [elemKind, elemPayload1, elemPayload2] = __bjs_jsValueLower(elem);
@@ -573,20 +568,15 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(values.length);
                     instance.exports.bjs_roundTripJSValueArray();
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const jsValuePayload2 = f64Stack.pop();
-                            const jsValuePayload1 = i32Stack.pop();
-                            const jsValueKind = i32Stack.pop();
-                            const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
-                            arrayResult.push(jsValue);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const jsValuePayload2 = f64Stack.pop();
+                        const jsValuePayload1 = i32Stack.pop();
+                        const jsValueKind = i32Stack.pop();
+                        const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                        arrayResult.push(jsValue);
                     }
+                    arrayResult.reverse();
                     return arrayResult;
                 },
                 roundTripOptionalJSValueArray: function bjs_roundTripOptionalJSValueArray(values) {
@@ -606,20 +596,15 @@ export async function createInstantiator(options, swift) {
                     let optResult;
                     if (isSome1) {
                         const arrayLen = i32Stack.pop();
-                        let arrayResult;
-                        if (arrayLen === -1) {
-                            arrayResult = taStack.pop();
-                        } else {
-                            arrayResult = [];
-                            for (let i = 0; i < arrayLen; i++) {
-                                const jsValuePayload2 = f64Stack.pop();
-                                const jsValuePayload1 = i32Stack.pop();
-                                const jsValueKind = i32Stack.pop();
-                                const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
-                                arrayResult.push(jsValue);
-                            }
-                            arrayResult.reverse();
+                        const arrayResult = [];
+                        for (let i = 0; i < arrayLen; i++) {
+                            const jsValuePayload2 = f64Stack.pop();
+                            const jsValuePayload1 = i32Stack.pop();
+                            const jsValueKind = i32Stack.pop();
+                            const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                            arrayResult.push(jsValue);
                         }
+                        arrayResult.reverse();
                         optResult = arrayResult;
                     } else {
                         optResult = null;

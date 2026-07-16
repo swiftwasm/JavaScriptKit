@@ -1140,7 +1140,11 @@ extension _BridgedNumericArray {
                 UnsafeRawPointer(base),
                 Int32(buffer.count)
             )
-            // -1 discriminator tells JS arrayLift to pop from the typed-array stack
+            // -1 discriminator tells JS arrayLift to pop from the typed-array stack. The signal
+            // is emitted at runtime, by the concrete element type, precisely so the JS codegen
+            // does not have to replicate which element types are bulk-eligible - a rule that is
+            // not statically visible for `@JS(as:)` aliases, whose array bridges through the
+            // counted path even though the alias resolves to a numeric representation.
             _swift_js_push_i32(-1)
         }
     }

@@ -296,19 +296,14 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(foos.length);
                     instance.exports.bjs_processFooArray();
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const objId1 = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId1);
-                            swift.memory.release(objId1);
-                            arrayResult.push(obj);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const objId1 = i32Stack.pop();
+                        const obj = swift.memory.getObject(objId1);
+                        swift.memory.release(objId1);
+                        arrayResult.push(obj);
                     }
+                    arrayResult.reverse();
                     return arrayResult;
                 },
                 processOptionalFooArray: function bjs_processOptionalFooArray(foos) {
@@ -323,26 +318,21 @@ export async function createInstantiator(options, swift) {
                     i32Stack.push(foos.length);
                     instance.exports.bjs_processOptionalFooArray();
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const isSome1 = i32Stack.pop();
-                            let optValue;
-                            if (isSome1 === 0) {
-                                optValue = null;
-                            } else {
-                                const objId1 = i32Stack.pop();
-                                const obj = swift.memory.getObject(objId1);
-                                swift.memory.release(objId1);
-                                optValue = obj;
-                            }
-                            arrayResult.push(optValue);
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const isSome1 = i32Stack.pop();
+                        let optValue;
+                        if (isSome1 === 0) {
+                            optValue = null;
+                        } else {
+                            const objId1 = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId1);
+                            swift.memory.release(objId1);
+                            optValue = obj;
                         }
-                        arrayResult.reverse();
+                        arrayResult.push(optValue);
                     }
+                    arrayResult.reverse();
                     return arrayResult;
                 },
                 roundtripFooContainer: function bjs_roundtripFooContainer(container) {

@@ -44,6 +44,34 @@ import Testing
         #expect(program(.array(.bool), .lower) == [.lowerArray(element: [.push(.i32, coerce: .boolToI32)])])
     }
 
+    /// A numeric-looking element keeps the runtime bulk/counted discriminator on lift; every
+    /// other element is a plain counted sequence with no discriminator. The predicate is a
+    /// "might bulk", kept deliberately loose so the runtime stays the single authority (see
+    /// `isPossiblyBulkNumericElement`).
+    @Test func numericLookingArraysKeepDiscriminatorEverythingElseCounted() {
+        #expect(
+            program(.array(.integer(.int)), .lift) == [
+                .liftMaybeBulkArray(element: [.pop(.i32, coerce: .none, hint: "int")])
+            ]
+        )
+        #expect(
+            program(.array(.double), .lift) == [.liftMaybeBulkArray(element: [.pop(.f64, coerce: .none, hint: "f64")])]
+        )
+        #expect(
+            program(.array(.integer(.uint8)), .lift) == [
+                .liftMaybeBulkArray(element: [.pop(.i32, coerce: .zeroExtendU32, hint: "int")])
+            ]
+        )
+        // Not numeric-looking: 64-bit integers (no typed-array form), Bool, String, structs.
+        #expect(
+            program(.array(.integer(.int64)), .lift) == [.liftArray(element: [.pop(.i64, coerce: .none, hint: "int")])]
+        )
+        #expect(program(.array(.bool), .lift) == [.liftArray(element: [.pop(.i32, coerce: .i32ToBool, hint: "bool")])])
+        #expect(program(.array(.string), .lift) == [.liftArray(element: [.liftString])])
+        // Lowering is always counted, even for numeric elements (a JS array isn't a typed array).
+        #expect(program(.array(.integer(.int)), .lower) == [.lowerArray(element: [.push(.i32, coerce: .truncToI32)])])
+    }
+
     @Test func nestedArrayComposes() throws {
         #expect(
             program(.array(.array(.string)), .lift)

@@ -231,17 +231,12 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_logStrings"] = function bjs_logStrings() {
                 try {
                     const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const string = strStack.pop();
-                            arrayResult.push(string);
-                        }
-                        arrayResult.reverse();
+                    const arrayResult = [];
+                    for (let i = 0; i < arrayLen; i++) {
+                        const string = strStack.pop();
+                        arrayResult.push(string);
                     }
+                    arrayResult.reverse();
                     imports.logStrings(arrayResult);
                 } catch (error) {
                     setException(error);

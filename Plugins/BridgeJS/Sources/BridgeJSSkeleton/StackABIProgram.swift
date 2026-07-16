@@ -80,11 +80,20 @@ public indirect enum StackOp: Equatable, Sendable {
     /// hand-written fragments' error rather than emitting something plausible-but-wrong.
     case unsupported(reason: String)
 
-    /// Lower an array: pop the JS array, run `element` per item, then push the count.
-    /// (The `-1` typed-array bulk path is Swift->JS only, so it appears only in `liftArray`.)
+    /// Lower an array: pop the JS array, run `element` per item, then push the count. JS->Swift
+    /// always uses the counted form (a JS array can't be handed over as a typed array cheaply).
     case lowerArray(element: Program)
-    /// Lift an array: pop the count (or `-1` for the typed-array bulk path), run `element`.
+    /// Lift a counted array: pop the count, then run `element` that many times. Used for every
+    /// element type that the runtime never bulk-transfers, i.e. everything non-numeric. No
+    /// discriminator is emitted, because these arrays can never take the typed-array path.
     case liftArray(element: Program)
+    /// Lift an array whose element *might* be bulk-transferred as a typed array: pop the count;
+    /// `-1` means Swift pushed one typed array onto `taStack`, anything else is a counted
+    /// element sequence. Emitted only for numeric-looking elements (see
+    /// `isPossiblyBulkNumericElement`), which is where the runtime's typed-array fast path can
+    /// actually apply. The runtime emits the discriminator, so the codegen does not have to
+    /// know whether a given numeric-looking element (e.g. a `@JS(as: Int)` alias) really bulks.
+    case liftMaybeBulkArray(element: Program)
 
     case lowerDict(key: Program, value: Program)
     case liftDict(key: Program, value: Program)
@@ -170,8 +179,14 @@ extension StackOp {
                     : .liftOptional(absence: kind, payload: payload)
             ]
         case .array(let element):
-            let e = compile(element, as: operation)
-            return [lowering ? .lowerArray(element: e) : .liftArray(element: e)]
+            if lowering {
+                return [.lowerArray(element: compile(element, as: .lower))]
+            }
+            // On lift, keep the runtime bulk/counted discriminator only where the typed-array
+            // fast path can apply (numeric-looking elements). Every other element type is
+            // counted with no discriminator, which is the common case.
+            let e = compile(element, as: .lift)
+            return [isPossiblyBulkNumericElement(element) ? .liftMaybeBulkArray(element: e) : .liftArray(element: e)]
         case .dictionary(let value):
             // Keys are always strings.
             let key: Program = [lowering ? .lowerString : .liftString]
@@ -182,6 +197,25 @@ extension StackOp {
             return []
         case .alias(_, let underlying):
             return compile(underlying, as: operation)
+        }
+    }
+
+    /// Whether an array of `type` *might* be bulk-transferred Swift->JS as a typed array, and so
+    /// needs the runtime bulk/counted discriminator kept on the lift.
+    ///
+    /// This is deliberately a "might", not a "does". The runtime's actual bulk-eligibility is
+    /// `_BridgedNumericArray` conformance (bare non-64-bit integers, `Float`, `Double`), but a
+    /// `@JS(as: Int)` alias unaliases to `.integer` here while its array bridges through the
+    /// *counted* path - so the codegen cannot statically tell the two apart. Keeping the
+    /// discriminator for every numeric-looking element is correct either way (the `-1` branch
+    /// handles bulk, the else-branch handles counted), and lets the runtime remain the single
+    /// authority on which arrays actually bulk. Everything not numeric-looking never bulks, so
+    /// it skips the discriminator entirely.
+    static func isPossiblyBulkNumericElement(_ type: BridgeType) -> Bool {
+        switch type {
+        case .integer(let t): return !t.is64Bit
+        case .float, .double: return true
+        default: return false
         }
     }
 
