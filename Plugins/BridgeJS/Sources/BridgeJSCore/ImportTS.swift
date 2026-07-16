@@ -879,161 +879,32 @@ enum SwiftCodePattern {
 }
 
 extension BridgeType {
+    /// The Wasm parameters a Swift->JS call passes for this type.
+    ///
+    /// Projection of `BridgeABI.shape(of:cell:context:)` at `.importParameter`. The layout
+    /// itself lives in `BridgeJSABI.swift`; this only adapts it to the shape callers expect.
     struct LoweringParameterInfo {
         let loweredParameters: [(name: String, type: WasmCoreType)]
         /// If true, the parameter should be lowered by using `bridgeJSWithLoweredParameter`
         /// that takes a closure to handle the borrowed parameter.
         var useBorrowing: Bool = false
-
-        static let bool = LoweringParameterInfo(loweredParameters: [("value", .i32)])
-        static let int = LoweringParameterInfo(loweredParameters: [("value", .i32)])
-        static let float = LoweringParameterInfo(loweredParameters: [("value", .f32)])
-        static let double = LoweringParameterInfo(loweredParameters: [("value", .f64)])
-        static let string = LoweringParameterInfo(
-            loweredParameters: [("bytes", .i32), ("length", .i32)],
-            useBorrowing: true
-        )
-        static let jsObject = LoweringParameterInfo(loweredParameters: [("value", .i32)])
-        static let jsValue = LoweringParameterInfo(loweredParameters: [
-            ("kind", .i32),
-            ("payload1", .i32),
-            ("payload2", .f64),
-        ])
-        static let void = LoweringParameterInfo(loweredParameters: [])
     }
 
     func loweringParameterInfo(context: BridgeContext = .importTS) throws -> LoweringParameterInfo {
-        switch self.unaliased {
-        case .bool: return .bool
-        case .integer(let t): return LoweringParameterInfo(loweredParameters: [("value", t.wasmCoreType)])
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        case .jsObject: return .jsObject
-        case .jsValue: return .jsValue
-        case .void: return .void
-        case .closure:
-            // Swift closure is passed to JS as a JS function reference.
-            return LoweringParameterInfo(loweredParameters: [("funcRef", .i32)])
-        case .unsafePointer:
-            return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
-        case .swiftHeapObject:
-            return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
-        case .swiftProtocol:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
-            case .exportSwift:
-                return LoweringParameterInfo(loweredParameters: [("objectId", .i32)])
-            }
-        case .caseEnum:
-            return LoweringParameterInfo(loweredParameters: [("value", .i32)])
-        case .rawValueEnum(_, let rawType):
-            if rawType == .string {
-                return .string
-            }
-            let wasmType = rawType.wasmCoreType ?? .i32
-            return LoweringParameterInfo(loweredParameters: [("value", wasmType)])
-        case .associatedValueEnum:
-            return LoweringParameterInfo(loweredParameters: [("caseId", .i32)])
-        case .swiftStruct:
-            switch context {
-            case .importTS:
-                // Swift structs are bridged as JS objects (object IDs) in imported signatures.
-                return LoweringParameterInfo(loweredParameters: [("objectId", .i32)])
-            case .exportSwift:
-                return LoweringParameterInfo(loweredParameters: [])
-            }
-        case .namespaceEnum:
-            throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
-        case .nullable(.swiftStruct, _) where context == .importTS:
-            // Optional `@JS struct`s bridge through the stack (isSome discriminator + fields),
-            // like optional arrays/dictionaries, rather than the non-optional object-id ABI.
-            return LoweringParameterInfo(loweredParameters: [("isSome", .i32)])
-        case .nullable(let wrappedType, _):
-            let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
-            var params = [("isSome", WasmCoreType.i32)]
-            params.append(contentsOf: wrappedInfo.loweredParameters)
-            return LoweringParameterInfo(loweredParameters: params, useBorrowing: wrappedInfo.useBorrowing)
-        case .array, .dictionary:
-            return LoweringParameterInfo(loweredParameters: [])
-        case .alias:
-            preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching loweringParameterInfo")
-        }
+        let shape = try BridgeABI.shape(of: self, cell: .importParameter, context: context)
+        return LoweringParameterInfo(loweredParameters: shape.wasmParameters, useBorrowing: shape.useBorrowing)
     }
 
+    /// The single Wasm value a JS->Swift return carries for this type, or nil when the value
+    /// travels over the stack / a side channel instead.
+    ///
+    /// Projection of `BridgeABI.shape(of:cell:context:)` at `.importReturn`.
     struct LiftingReturnInfo {
         let valueToLift: WasmCoreType?
-
-        static let bool = LiftingReturnInfo(valueToLift: .i32)
-        static let int = LiftingReturnInfo(valueToLift: .i32)
-        static let float = LiftingReturnInfo(valueToLift: .f32)
-        static let double = LiftingReturnInfo(valueToLift: .f64)
-        static let string = LiftingReturnInfo(valueToLift: .i32)
-        static let jsObject = LiftingReturnInfo(valueToLift: .i32)
-        static let jsValue = LiftingReturnInfo(valueToLift: nil)
-        static let void = LiftingReturnInfo(valueToLift: nil)
     }
 
-    func liftingReturnInfo(
-        context: BridgeContext = .importTS
-    ) throws -> LiftingReturnInfo {
-        switch self.unaliased {
-        case .bool: return .bool
-        case .integer(let t): return LiftingReturnInfo(valueToLift: t.wasmCoreType)
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        case .jsObject: return .jsObject
-        case .jsValue: return .jsValue
-        case .void: return .void
-        case .closure:
-            // JS returns a callback ID for closures, which Swift lifts to a typed closure.
-            return LiftingReturnInfo(valueToLift: .i32)
-        case .unsafePointer:
-            return LiftingReturnInfo(valueToLift: .pointer)
-        case .swiftHeapObject:
-            return LiftingReturnInfo(valueToLift: .pointer)
-        case .swiftProtocol:
-            switch context {
-            case .importTS:
-                throw BridgeJSCoreError("swiftProtocol is not supported in imported signatures")
-            case .exportSwift:
-                return LiftingReturnInfo(valueToLift: .i32)
-            }
-        case .caseEnum:
-            return LiftingReturnInfo(valueToLift: .i32)
-        case .rawValueEnum(_, let rawType):
-            let wasmType = rawType.wasmCoreType ?? .i32
-            return LiftingReturnInfo(valueToLift: wasmType)
-        case .associatedValueEnum:
-            return LiftingReturnInfo(valueToLift: .i32)
-        case .swiftStruct:
-            switch context {
-            case .importTS:
-                // Swift structs are bridged as JS objects (object IDs) in imported signatures.
-                return LiftingReturnInfo(valueToLift: .i32)
-            case .exportSwift:
-                return LiftingReturnInfo(valueToLift: nil)
-            }
-        case .namespaceEnum:
-            throw BridgeJSCoreError("Namespace enums cannot be used as return values")
-        case .nullable(let wrappedType, _):
-            // jsObject and `@JS struct` use the stack ABI for optionals — the thunk returns
-            // void and the value (plus isSome discriminator) flows through the stacks.
-            if case .jsObject = wrappedType {
-                return LiftingReturnInfo(valueToLift: nil)
-            }
-            if case .swiftStruct = wrappedType, context == .importTS {
-                return LiftingReturnInfo(valueToLift: nil)
-            }
-            let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
-            return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
-        case .array, .dictionary:
-            return LiftingReturnInfo(valueToLift: nil)
-        case .alias:
-            preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching liftingReturnInfo")
-        }
+    func liftingReturnInfo(context: BridgeContext = .importTS) throws -> LiftingReturnInfo {
+        LiftingReturnInfo(valueToLift: try BridgeABI.shape(of: self, cell: .importReturn, context: context).returnValue)
     }
 }
 

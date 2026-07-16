@@ -346,9 +346,9 @@ struct IntrinsicJSFragment: Sendable {
     // MARK: - JSValue Fragments
 
     private static let jsValueLowerHelperName = "__bjs_jsValueLower"
-    private static let jsValueLiftHelperName = "__bjs_jsValueLift"
+    static let jsValueLiftHelperName = "__bjs_jsValueLift"
 
-    private static func registerJSValueHelpers(scope: JSGlueVariableScope) {
+    static func registerJSValueHelpers(scope: JSGlueVariableScope) {
         scope.registerIntrinsic("jsValueHelpers") { helperPrinter in
             helperPrinter.write("function \(jsValueLowerHelperName)(value) {")
             helperPrinter.indent {
@@ -1760,23 +1760,13 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     private static func associatedValuePushPayload(type: BridgeType) throws -> IntrinsicJSFragment {
-        let type = type.unaliased
-        switch type {
-        case .nullable(let wrappedType, let kind):
-            return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
-        default:
-            return try stackLowerFragment(elementType: type)
-        }
+        // Optionals used to need a special case here; `stackLowerFragment` now covers them,
+        // because the VM reads the optional encoding out of the ABI description.
+        try stackLowerFragment(elementType: type.unaliased)
     }
 
     private static func associatedValuePopPayload(type: BridgeType) throws -> IntrinsicJSFragment {
-        let type = type.unaliased
-        switch type {
-        case .nullable(let wrappedType, let kind):
-            return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
-        default:
-            return try stackLiftFragment(elementType: type)
-        }
+        try stackLiftFragment(elementType: type.unaliased)
     }
 
     private static func swiftStructLower(structBase: String) -> IntrinsicJSFragment {
@@ -1943,315 +1933,32 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
+    /// Lifts a value Swift pushed onto the stacks.
+    ///
+    /// The layout is compiled straight from the `BridgeType` into a `StackOp` program and
+    /// interpreted by the JS stack machine. `BridgeType` is the description (wasm-bindgen's
+    /// `Descriptor`); there is no intermediate tree.
     private static func stackLiftFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
-        if case .nullable(let wrappedType, let kind) = elementType {
-            return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
-        }
-        if elementType.isSingleParamScalar {
-            let wasmType = elementType.wasmParams[0].type
-            let coerce = elementType.liftCoerce
-            let varHint = elementType.varHint
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { _, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let popExpr = popExpression(for: wasmType, scope: scope)
-                    let varName = scope.variable(varHint)
-                    if let transform = coerce {
-                        let inlined = transform.replacingOccurrences(of: "$0", with: popExpr)
-                        printer.write("const \(varName) = \(inlined);")
-                    } else {
-                        printer.write("const \(varName) = \(popExpr);")
-                    }
-                    return [varName]
-                }
-            )
-        }
-        switch elementType {
-        case .jsValue:
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { _, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let payload2Var = scope.variable("jsValuePayload2")
-                    let payload1Var = scope.variable("jsValuePayload1")
-                    let kindVar = scope.variable("jsValueKind")
-                    printer.write("const \(payload2Var) = \(scope.popF64());")
-                    printer.write("const \(payload1Var) = \(scope.popI32());")
-                    printer.write("const \(kindVar) = \(scope.popI32());")
-                    let resultVar = scope.variable("jsValue")
-                    registerJSValueHelpers(scope: scope)
-                    printer.write(
-                        "const \(resultVar) = \(jsValueLiftHelperName)(\(kindVar), \(payload1Var), \(payload2Var));"
-                    )
-                    return [resultVar]
-                }
-            )
-        case .string:
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let strVar = scope.variable("string")
-                    printer.write("const \(strVar) = \(scope.popString());")
-                    return [strVar]
-                }
-            )
-        case .rawValueEnum(_, .string):
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let varName = scope.variable("rawValue")
-                    printer.write("const \(varName) = \(scope.popString());")
-                    return [varName]
-                }
-            )
-        case .swiftStruct(let fullName):
-            let structBase = fullName.replacingOccurrences(of: ".", with: "_")
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let resultVar = scope.variable("struct")
-                    printer.write(
-                        "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).lift();"
-                    )
-                    return [resultVar]
-                }
-            )
-        case .associatedValueEnum(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let resultVar = scope.variable("enumValue")
-                    printer.write(
-                        "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(scope.popI32()));"
-                    )
-                    return [resultVar]
-                }
-            )
-        case .swiftHeapObject(let className):
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let ptrVar = scope.variable("ptr")
-                    let objVar = scope.variable("obj")
-                    let classRef = context.classReference(forQualifiedName: className)
-                    printer.write("const \(ptrVar) = \(scope.popPointer());")
-                    printer.write("const \(objVar) = \(classRef).__construct(\(ptrVar));")
-                    return [objVar]
-                }
-            )
-        case .jsObject, .swiftProtocol:
-            return IntrinsicJSFragment(
-                parameters: [],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let idVar = scope.variable("objId")
-                    let objVar = scope.variable("obj")
-                    printer.write("const \(idVar) = \(scope.popI32());")
-                    printer.write(
-                        "const \(objVar) = \(JSGlueVariableScope.reservedSwift).memory.getObject(\(idVar));"
-                    )
-                    printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(\(idVar));")
-                    return [objVar]
-                }
-            )
-        case .array(let innerElementType):
-            return try arrayLift(elementType: innerElementType)
-        case .dictionary(let valueType):
-            return try dictionaryLift(valueType: valueType)
-        default:
-            throw BridgeJSLinkError(message: "Unsupported array element type: \(elementType)")
-        }
-    }
-
-    private static func stackLowerFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
-        if case .nullable(let wrappedType, let kind) = elementType {
-            return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
-        }
-        if elementType.isSingleParamScalar {
-            let wasmType = elementType.wasmParams[0].type
-            let stackCoerce = elementType.stackLowerCoerce
-            return IntrinsicJSFragment(
-                parameters: ["value"],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let value = arguments[0]
-                    let pushExpr: String
-                    if let coerce = stackCoerce {
-                        pushExpr = coerce.replacingOccurrences(of: "$0", with: value)
-                    } else {
-                        pushExpr = value
-                    }
-                    emitPush(for: wasmType, value: pushExpr, scope: scope, printer: printer)
-                    return []
-                }
-            )
-        }
-        switch elementType {
-        case .jsValue:
-            return IntrinsicJSFragment(
-                parameters: ["value"],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    registerJSValueHelpers(scope: scope)
-                    let lowered = try jsValueLower.printCode([arguments[0]], context)
-                    let kindVar = lowered[0]
-                    let payload1Var = lowered[1]
-                    let payload2Var = lowered[2]
-                    scope.emitPushI32Parameter(kindVar, printer: printer)
-                    scope.emitPushI32Parameter(payload1Var, printer: printer)
-                    scope.emitPushF64Parameter(payload2Var, printer: printer)
-                    return []
-                }
-            )
-        case .string, .rawValueEnum(_, .string):
-            return IntrinsicJSFragment(
-                parameters: ["value"],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let value = arguments[0]
-                    let bytesVar = scope.variable("bytes")
-                    let idVar = scope.variable("id")
-                    printer.write(
-                        "const \(bytesVar) = \(JSGlueVariableScope.reservedTextEncoder).encode(\(value));"
-                    )
-                    printer.write(
-                        "const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(bytesVar));"
-                    )
-                    scope.emitPushI32Parameter("\(bytesVar).length", printer: printer)
-                    scope.emitPushI32Parameter(idVar, printer: printer)
-                    return []
-                }
-            )
-        case .swiftStruct(let fullName):
-            let structBase = fullName.replacingOccurrences(of: ".", with: "_")
-            return IntrinsicJSFragment(
-                parameters: ["value"],
-                printCode: { arguments, context in
-                    let printer = context.printer
-                    let value = arguments[0]
-                    printer.write(
-                        "\(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
-                    )
-                    return []
-                }
-            )
-
-        case .associatedValueEnum(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
-            return IntrinsicJSFragment(
-                parameters: ["value"],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let value = arguments[0]
-                    let caseIdVar = scope.variable("caseId")
-                    printer.write(
-                        "const \(caseIdVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lower(\(value));"
-                    )
-                    scope.emitPushI32Parameter(caseIdVar, printer: printer)
-                    return []
-                }
-            )
-        case .swiftHeapObject:
-            return IntrinsicJSFragment(
-                parameters: ["value"],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let value = arguments[0]
-                    scope.emitPushPointerParameter("\(value).pointer", printer: printer)
-                    return []
-                }
-            )
-        case .jsObject, .swiftProtocol:
-            return IntrinsicJSFragment(
-                parameters: ["value"],
-                printCode: { arguments, context in
-                    let (scope, printer) = (context.scope, context.printer)
-                    let value = arguments[0]
-                    let idVar = scope.variable("objId")
-                    printer.write(
-                        "const \(idVar) = \(JSGlueVariableScope.reservedSwift).memory.retain(\(value));"
-                    )
-                    scope.emitPushI32Parameter(idVar, printer: printer)
-                    return []
-                }
-            )
-        case .array(let innerElementType):
-            return try arrayLower(elementType: innerElementType)
-        case .dictionary(let valueType):
-            return try dictionaryLower(valueType: valueType)
-        default:
-            throw BridgeJSLinkError(message: "Unsupported array element type for lowering: \(elementType)")
-        }
-    }
-
-    private static func optionalElementRaiseFragment(
-        wrappedType: BridgeType,
-        kind: JSOptionalKind
-    ) throws -> IntrinsicJSFragment {
-        let absenceLiteral = kind.absenceLiteral
+        // Swift produced the value, so its wire format is the swiftToJS one. That distinction
+        // is real: a Swift->JS String is one already-decoded strStack slot, where a JS->Swift
+        // String is two i32 slots -- so lower and lift are compiled as separate programs.
+        let program = StackOp.compile(elementType, as: .lift)
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let isSomeVar = scope.variable("isSome")
-                let resultVar = scope.variable("optValue")
-
-                printer.write("const \(isSomeVar) = \(scope.popI32());")
-                printer.write("let \(resultVar);")
-                printer.write("if (\(isSomeVar) === 0) {")
-                printer.indent {
-                    printer.write("\(resultVar) = \(absenceLiteral);")
-                }
-                printer.write("} else {")
-                try printer.indent {
-                    let innerFragment = try stackLiftFragment(elementType: wrappedType)
-                    let innerResults = try innerFragment.printCode([], context)
-                    if let innerResult = innerResults.first {
-                        printer.write("\(resultVar) = \(innerResult);")
-                    } else {
-                        printer.write("\(resultVar) = undefined;")
-                    }
-                }
-                printer.write("}")
-
-                return [resultVar]
+            printCode: { _, context in
+                guard let result = try JSStackMachine.lift(program, context) else { return [] }
+                return [result]
             }
         )
     }
 
-    /// Lower an optional element to the stack using the **conditional** protocol:
-    /// push isSome flag, then conditionally push the payload (no placeholders for nil).
-    private static func optionalElementLowerFragment(
-        wrappedType: BridgeType,
-        kind: JSOptionalKind
-    ) throws -> IntrinsicJSFragment {
+    /// Lowers a value onto the stacks for Swift to pop.
+    private static func stackLowerFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
+        let program = StackOp.compile(elementType, as: .lower)
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let value = arguments[0]
-                let isSomeVar = scope.variable("isSome")
-
-                let presenceExpr = kind.presenceCheck(value: value)
-                printer.write("const \(isSomeVar) = \(presenceExpr) ? 1 : 0;")
-                printer.write("if (\(isSomeVar)) {")
-                try printer.indent {
-                    let innerFragment = try stackLowerFragment(elementType: wrappedType)
-                    let _ = try innerFragment.printCode(
-                        [value],
-                        context
-                    )
-                }
-                printer.write("}")
-                scope.emitPushI32Parameter(isSomeVar, printer: printer)
-
+                try JSStackMachine.lower(program, arguments[0], context)
                 return []
             }
         )
@@ -2435,8 +2142,6 @@ struct IntrinsicJSFragment: Sendable {
                     return [idVar]
                 }
             )
-        case .nullable(let wrappedType, let kind):
-            return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
         case .swiftStruct(let nestedName):
             return IntrinsicJSFragment(
                 parameters: ["value"],
@@ -2474,8 +2179,6 @@ struct IntrinsicJSFragment: Sendable {
         switch fieldType {
         case .jsValue:
             preconditionFailure("Struct field of JSValue is not supported yet")
-        case .nullable(let wrappedType, let kind):
-            return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
         case .swiftStruct(let nestedName):
             return IntrinsicJSFragment(
                 parameters: [],
@@ -2679,53 +2382,14 @@ private extension BridgeType {
         }
     }
 
+    /// The Wasm slots this type's payload occupies.
+    ///
+    /// Projection of `BridgeABI.payloadSlots(of:)`. Only the `type`s are read by callers
+    /// here (for arity and placeholder zeros), never the names -- which is why the naming
+    /// differences between ABI cells are harmless at this call site.
     var wasmParams: [(name: String, type: WasmCoreType)] {
-        switch self {
-        case .bool:
-            return [("value", .i32)]
-        case .integer(let t):
-            return [("value", t.wasmCoreType)]
-        case .float:
-            return [("value", .f32)]
-        case .double:
-            return [("value", .f64)]
-        case .string:
-            return [("bytes", .i32), ("length", .i32)]
-        case .jsObject:
-            return [("value", .i32)]
-        case .jsValue:
-            return [("kind", .i32), ("payload1", .i32), ("payload2", .f64)]
-        case .swiftHeapObject:
-            return [("pointer", .pointer)]
-        case .unsafePointer:
-            return [("pointer", .pointer)]
-        case .swiftProtocol:
-            return [("value", .i32)]
-        case .caseEnum:
-            return [("value", .i32)]
-        case .rawValueEnum(_, let rawType):
-            switch rawType {
-            case .string:
-                return [("bytes", .i32), ("length", .i32)]
-            case .float:
-                return [("value", .f32)]
-            case .double:
-                return [("value", .f64)]
-            case .bool:
-                return [("value", .i32)]
-            case .integer(let integerType):
-                return [("value", integerType.wasmCoreType)]
-            }
-        case .associatedValueEnum:
-            return [("caseId", .i32)]
-        case .closure:
-            return [("funcRef", .i32)]
-        case .void, .namespaceEnum, .swiftStruct, .array, .dictionary:
-            return []
-        case .nullable(let wrapped, _):
-            return wrapped.wasmParams
-        case .alias(_, let underlying):
-            return underlying.wasmParams
+        BridgeABI.payloadSlots(of: self).compactMap { slot in
+            slot.wasmCoreType.map { (slot.name, $0) }
         }
     }
 

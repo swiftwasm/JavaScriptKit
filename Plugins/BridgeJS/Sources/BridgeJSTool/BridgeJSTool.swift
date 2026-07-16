@@ -277,6 +277,27 @@ import BridgeJSUtilities
             if skeleton.exported != nil || skeleton.imported != nil {
                 progress.print("Generated BridgeJS code")
             }
+        case "emit-intrinsics":
+            // Regenerates the Swift half of the stack ABI from the description in
+            // `BridgeJSABI.swift`. Unlike `generate`, this doesn't read any user source --
+            // its only input is the description itself, so it takes just an output path.
+            // Wired into `./Utilities/bridge-js-generate.sh`, which CI checks is up to date.
+            let parser = ArgumentParser(
+                singleDashOptions: [:],
+                doubleDashOptions: [
+                    "output": OptionRule(
+                        help: "The path of the Swift file to write the generated intrinsics to",
+                        required: true
+                    )
+                ]
+            )
+            let parsedArguments = try parser.parse(arguments: Array(arguments.dropFirst()))
+            let outputPath = URL(fileURLWithPath: parsedArguments.doubleDashOptions["output"]!)
+            try FileManager.default.createDirectory(
+                at: outputPath.deletingLastPathComponent(),
+                withIntermediateDirectories: true
+            )
+            try writeIfChanged(try SwiftRuntimeABIEmitter().render(), to: outputPath)
         case "export", "import":
             throw BridgeJSToolError(
                 """

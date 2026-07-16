@@ -1662,139 +1662,28 @@ extension BridgeType {
         }
     }
 
+    /// The Wasm parameters a JS->Swift thunk receives for this type.
+    ///
+    /// Projection of `BridgeABI.shape(of:cell:)` at `.exportParameter`. The layout itself
+    /// lives in `BridgeJSABI.swift`; this only adapts it to the shape callers expect.
     struct LiftingIntrinsicInfo: Sendable {
         let parameters: [(name: String, type: WasmCoreType)]
-
-        static let bool = LiftingIntrinsicInfo(parameters: [("value", .i32)])
-        static let int = LiftingIntrinsicInfo(parameters: [("value", .i32)])
-        static let float = LiftingIntrinsicInfo(parameters: [("value", .f32)])
-        static let double = LiftingIntrinsicInfo(parameters: [("value", .f64)])
-        static let string = LiftingIntrinsicInfo(parameters: [("bytes", .i32), ("length", .i32)])
-        static let jsObject = LiftingIntrinsicInfo(parameters: [("value", .i32)])
-        static let jsValue = LiftingIntrinsicInfo(parameters: [("kind", .i32), ("payload1", .i32), ("payload2", .f64)])
-        static let swiftHeapObject = LiftingIntrinsicInfo(parameters: [("value", .pointer)])
-        static let unsafePointer = LiftingIntrinsicInfo(parameters: [("pointer", .pointer)])
-        static let void = LiftingIntrinsicInfo(parameters: [])
-        static let caseEnum = LiftingIntrinsicInfo(parameters: [("value", .i32)])
-        static let associatedValueEnum = LiftingIntrinsicInfo(parameters: [
-            ("caseId", .i32)
-        ])
     }
 
     func liftParameterInfo() throws -> LiftingIntrinsicInfo {
-        switch self {
-        case .bool: return .bool
-        case .integer(let t): return LiftingIntrinsicInfo(parameters: [("value", t.wasmCoreType)])
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        case .jsObject: return .jsObject
-        case .jsValue: return .jsValue
-        case .swiftHeapObject: return .swiftHeapObject
-        case .unsafePointer: return .unsafePointer
-        case .swiftProtocol: return .jsObject
-        case .void: return .void
-        case .nullable(let wrappedType, _):
-            let wrappedInfo = try wrappedType.liftParameterInfo()
-            if wrappedInfo.parameters.isEmpty {
-                return LiftingIntrinsicInfo(parameters: [])
-            }
-            var optionalParams: [(name: String, type: WasmCoreType)] = [("isSome", .i32)]
-            optionalParams.append(contentsOf: wrappedInfo.parameters)
-            return LiftingIntrinsicInfo(parameters: optionalParams)
-        case .caseEnum: return .caseEnum
-        case .rawValueEnum(_, let rawType):
-            return rawType.liftingIntrinsicInfo
-        case .associatedValueEnum:
-            return .associatedValueEnum
-        case .swiftStruct:
-            return LiftingIntrinsicInfo(parameters: [])
-        case .namespaceEnum:
-            throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
-        case .closure:
-            return LiftingIntrinsicInfo(parameters: [("callbackId", .i32)])
-        case .array, .dictionary:
-            return LiftingIntrinsicInfo(parameters: [])
-        case .alias(_, let underlying):
-            return try underlying.liftParameterInfo()
-        }
+        LiftingIntrinsicInfo(parameters: try BridgeABI.shape(of: self, cell: .exportParameter).wasmParameters)
     }
 
+    /// The single Wasm value a Swift->JS thunk returns for this type, or nil when the value
+    /// travels over the stack / a side channel instead.
+    ///
+    /// Projection of `BridgeABI.shape(of:cell:)` at `.exportReturn`.
     struct LoweringIntrinsicInfo: Sendable {
         let returnType: WasmCoreType?
-
-        static let bool = LoweringIntrinsicInfo(returnType: .i32)
-        static let int = LoweringIntrinsicInfo(returnType: .i32)
-        static let float = LoweringIntrinsicInfo(returnType: .f32)
-        static let double = LoweringIntrinsicInfo(returnType: .f64)
-        static let string = LoweringIntrinsicInfo(returnType: nil)
-        static let jsObject = LoweringIntrinsicInfo(returnType: .i32)
-        static let jsValue = LoweringIntrinsicInfo(returnType: nil)
-        static let swiftHeapObject = LoweringIntrinsicInfo(returnType: .pointer)
-        static let unsafePointer = LoweringIntrinsicInfo(returnType: .pointer)
-        static let void = LoweringIntrinsicInfo(returnType: nil)
-        static let caseEnum = LoweringIntrinsicInfo(returnType: .i32)
-        static let rawValueEnum = LoweringIntrinsicInfo(returnType: .i32)
-        static let associatedValueEnum = LoweringIntrinsicInfo(returnType: nil)
-        static let swiftStruct = LoweringIntrinsicInfo(returnType: nil)
-        static let optional = LoweringIntrinsicInfo(returnType: nil)
-        static let array = LoweringIntrinsicInfo(returnType: nil)
     }
 
     func loweringReturnInfo() throws -> LoweringIntrinsicInfo {
-        switch self {
-        case .bool: return .bool
-        case .integer(let t): return LoweringIntrinsicInfo(returnType: t.wasmCoreType)
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        case .jsObject: return .jsObject
-        case .jsValue: return .jsValue
-        case .swiftHeapObject: return .swiftHeapObject
-        case .unsafePointer: return .unsafePointer
-        case .swiftProtocol: return .jsObject
-        case .void: return .void
-        case .nullable: return .optional
-        case .caseEnum: return .caseEnum
-        case .rawValueEnum(_, let rawType):
-            return rawType.loweringIntrinsicInfo
-        case .associatedValueEnum:
-            return .associatedValueEnum
-        case .swiftStruct:
-            return .swiftStruct
-        case .namespaceEnum:
-            throw BridgeJSCoreError("Namespace enums are not supported to pass as parameters")
-        case .closure:
-            return .jsObject
-        case .array, .dictionary:
-            return .array
-        case .alias(_, let underlying):
-            return try underlying.loweringReturnInfo()
-        }
-    }
-}
-
-extension SwiftEnumRawType {
-    var liftingIntrinsicInfo: BridgeType.LiftingIntrinsicInfo {
-        switch self {
-        case .bool: return .bool
-        case .integer(let integerType):
-            return .init(parameters: [("value", integerType.wasmCoreType)])
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        }
-    }
-
-    var loweringIntrinsicInfo: BridgeType.LoweringIntrinsicInfo {
-        switch self {
-        case .bool: return .bool
-        case .integer(let integerType):
-            return .init(returnType: integerType.wasmCoreType)
-        case .float: return .float
-        case .double: return .double
-        case .string: return .string
-        }
+        LoweringIntrinsicInfo(returnType: try BridgeABI.shape(of: self, cell: .exportReturn).returnValue)
     }
 }
 
