@@ -20,12 +20,20 @@ public struct ExternalModuleIndex {
 
     private let byModuleAndPath: [String: [String: ExternalType]]
     private let byPath: [String: [ExternalType]]
+    /// Dot-paths that name a *namespace* (empty `@JS enum`) rather than a value type, mapped to
+    /// the modules that declare them. Kept separately from value types precisely so that using
+    /// one in a value position can be diagnosed as "X is a namespace" rather than reported as an
+    /// unknown type - the declaration identity is retained even though there is no value ABI.
+    private let namespacesByPath: [String: Set<String>]
+    private let namespacesByModule: [String: Set<String>]
 
     public var moduleNames: Set<String> { Set(byModuleAndPath.keys) }
 
     public init(dependencies: [(moduleName: String, skeleton: BridgeJSSkeleton)]) {
         var entriesByModule: [String: [String: ExternalType]] = [:]
         var entriesByDotPath: [String: [ExternalType]] = [:]
+        var namespacesByPath: [String: Set<String>] = [:]
+        var namespacesByModule: [String: Set<String>] = [:]
 
         for (moduleName, skeleton) in dependencies {
             guard let exported = skeleton.exported else { continue }
@@ -56,8 +64,11 @@ public struct ExternalModuleIndex {
                 case .associatedValue:
                     bridgeType = .associatedValueEnum(enumDef.swiftCallName)
                 case .namespace:
-                    // A namespace enum has no value type, so there is nothing to resolve a
-                    // cross-module value reference to. Its nested types register their own paths.
+                    // A namespace has no value type, so it registers no resolvable value. But we
+                    // keep its identity, so a value-position use gets a helpful "X is a
+                    // namespace" diagnostic instead of a generic "unknown type".
+                    namespacesByPath[enumDef.swiftCallName, default: []].insert(moduleName)
+                    namespacesByModule[moduleName, default: []].insert(enumDef.swiftCallName)
                     continue
                 }
                 register(dotPath: enumDef.swiftCallName, bridgeType: bridgeType)
@@ -77,6 +88,8 @@ public struct ExternalModuleIndex {
 
         self.byModuleAndPath = entriesByModule
         self.byPath = entriesByDotPath
+        self.namespacesByPath = namespacesByPath
+        self.namespacesByModule = namespacesByModule
     }
 
     public var isEmpty: Bool { byModuleAndPath.isEmpty }
@@ -97,5 +110,13 @@ public struct ExternalModuleIndex {
         guard let moduleEntries = byModuleAndPath[moduleName] else { return nil }
         guard let externalType = moduleEntries[dotPath] else { return nil }
         return .unique(externalType)
+    }
+
+    /// Whether `dotPath` names a known external namespace (in `module` if given, else any).
+    public func isNamespace(dotPath: String, module moduleName: String?) -> Bool {
+        if let moduleName {
+            return namespacesByModule[moduleName]?.contains(dotPath) ?? false
+        }
+        return namespacesByPath[dotPath] != nil
     }
 }

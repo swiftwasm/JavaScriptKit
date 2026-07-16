@@ -249,9 +249,12 @@ public final class SwiftToSkeleton {
         // T?
         if let optionalType = type.as(OptionalTypeSyntax.self) {
             let wrappedType = optionalType.wrappedType
-            if let baseType = lookupType(for: wrappedType, errors: &errors) {
-                return .nullable(baseType, .null)
+            guard let baseType = lookupType(for: wrappedType, errors: &errors) else {
+                // The wrapped type is invalid and has already been diagnosed; propagate the
+                // failure rather than adding a second, generic error for the whole `T?`.
+                return nil
             }
+            return .nullable(baseType, .null)
         }
         // JSUndefinedOr<T>
         if let identifierType = type.as(IdentifierTypeSyntax.self),
@@ -488,8 +491,14 @@ public final class SwiftToSkeleton {
             return .swiftHeapObject(swiftCallName)
         }
 
+        let errorCountBeforeExternal = errors.count
         if let externalType = resolveExternal(for: type, errors: &errors) {
             return externalType
+        }
+        // If external resolution already produced a specific diagnostic (ambiguous, or a
+        // namespace used as a value), don't pile a generic "unsupported type" on top of it.
+        if errors.count > errorCountBeforeExternal {
+            return nil
         }
 
         errors.append(
@@ -526,7 +535,21 @@ public final class SwiftToSkeleton {
             lookupResult = externalModuleIndex.lookup(dotPath: dotPath)
         }
 
-        guard let lookupResult else { return nil }
+        guard let lookupResult else {
+            // Not a value type. If it names a known external namespace, diagnose it as such
+            // rather than letting the caller fall through to a generic "unknown type" - the same
+            // helpful message a same-module namespace gets.
+            if externalModuleIndex.isNamespace(dotPath: dotPath, module: scopedModule) {
+                errors.append(
+                    DiagnosticError(
+                        node: type,
+                        message: "'\(dotPath)' is a namespace, not a value type, and cannot be used here.",
+                        hint: "Namespace enums (empty `@JS` enums) only group static members; they have no values."
+                    )
+                )
+            }
+            return nil
+        }
         switch lookupResult {
         case .unique(let externalType):
             usedExternalModules.insert(externalType.moduleName)

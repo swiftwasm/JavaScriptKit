@@ -304,11 +304,12 @@ import Testing
             )
             Issue.record("Expected a diagnostic for using a namespace enum as a value type")
         } catch let error as BridgeJSCoreDiagnosticError {
-            // Cross-module resolution reports the generic "unsupported type" (the namespace is
-            // simply not registered as a resolvable value type). Same-module use gets the more
-            // specific "namespace, not a value type" message from the parser.
+            // The namespace's identity is retained across modules, so the diagnostic names it
+            // specifically ("is a namespace, not a value type") rather than a generic unknown
+            // type -- and only once, not doubled with a fallback.
             let combined = error.diagnostics.map(\.diagnostic.message).joined(separator: "\n")
-            #expect(combined.contains("Utils"))
+            #expect(combined.contains("'Utils' is a namespace, not a value type"))
+            #expect(!combined.contains("Unsupported type"))
         }
     }
 
