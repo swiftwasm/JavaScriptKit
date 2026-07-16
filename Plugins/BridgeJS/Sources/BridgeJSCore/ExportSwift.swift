@@ -1555,35 +1555,6 @@ struct ProtocolCodegen {
     }
 }
 
-extension WasmCoreType {
-    var swiftType: String {
-        switch self {
-        case .i32: return "Int32"
-        case .i64: return "Int64"
-        case .f32: return "Float32"
-        case .f64: return "Float64"
-        case .pointer: return "UnsafeMutableRawPointer"
-        }
-    }
-}
-
-extension UnsafePointerType {
-    var swiftType: String {
-        switch kind {
-        case .unsafePointer:
-            return "UnsafePointer<\(pointee ?? "Never")>"
-        case .unsafeMutablePointer:
-            return "UnsafeMutablePointer<\(pointee ?? "Never")>"
-        case .unsafeRawPointer:
-            return "UnsafeRawPointer"
-        case .unsafeMutableRawPointer:
-            return "UnsafeMutableRawPointer"
-        case .opaquePointer:
-            return "OpaquePointer"
-        }
-    }
-}
-
 extension BridgeType {
     var aliasConformanceProtocols: [String]? {
         switch self {
@@ -1599,38 +1570,6 @@ extension BridgeType {
             .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias:
             // Not supported yet.
             return nil
-        }
-    }
-
-    var swiftType: String {
-        switch self {
-        case .bool: return "Bool"
-        case .integer(let t): return t.swiftTypeName
-        case .float: return "Float"
-        case .double: return "Double"
-        case .string: return "String"
-        case .jsValue: return "JSValue"
-        case .jsObject(nil): return "JSObject"
-        case .jsObject(let name?): return name
-        case .swiftHeapObject(let name): return name
-        case .unsafePointer(let ptr): return ptr.swiftType
-        case .swiftProtocol(let name): return "Any\(name)"
-        case .void: return "Void"
-        case .nullable(let wrappedType, let kind):
-            return kind == .null ? "Optional<\(wrappedType.swiftType)>" : "JSUndefinedOr<\(wrappedType.swiftType)>"
-        case .array(let elementType): return "[\(elementType.swiftType)]"
-        case .dictionary(let valueType): return "[String: \(valueType.swiftType)]"
-        case .caseEnum(let name): return name
-        case .rawValueEnum(let name, _): return name
-        case .associatedValueEnum(let name): return name
-        case .swiftStruct(let name): return name
-        case .namespaceEnum(let name): return name
-        case .closure(let signature, let useJSTypedClosure):
-            let paramTypes = signature.parameters.map { $0.swiftType }.joined(separator: ", ")
-            let effectsStr = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
-            let closureType = "(\(paramTypes))\(effectsStr) -> \(signature.returnType.swiftType)"
-            return useJSTypedClosure ? "JSTypedClosure<\(closureType)>" : closureType
-        case .alias(let name, _): return name
         }
     }
 
