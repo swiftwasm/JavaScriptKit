@@ -74,6 +74,10 @@ extension Vector2D {
     @JS func scaled(by factor: Double) -> Vector2D {
         return Vector2D(dx: dx * factor, dy: dy * factor)
     }
+
+    @JS func describe() -> String {
+        return "Vector2D(\(dx), \(dy))"
+    }
 }
 
 extension DataPoint {

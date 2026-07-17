@@ -67,8 +67,8 @@ export async function createInstantiator(options, swift) {
             }.bind(instance1);
             instance1.multiply = function(a, b) {
                 structHelpers.MathOperations.lower(this);
-                const ret = instance.exports.bjs_MathOperations_multiply(a, b);
-                return ret;
+                const ret1 = instance.exports.bjs_MathOperations_multiply(a, b);
+                return ret1;
             }.bind(instance1);
             return instance1;
         }

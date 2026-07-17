@@ -48,6 +48,7 @@ export interface Vector2D {
     dy: number;
     magnitude(): number;
     scaled(factor: number): Vector2D;
+    describe(): string;
 }
 export type PrecisionObject = typeof PrecisionValues;
 
