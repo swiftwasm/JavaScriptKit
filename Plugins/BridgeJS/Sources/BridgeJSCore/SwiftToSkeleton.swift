@@ -422,15 +422,7 @@ public final class SwiftToSkeleton {
                         // An empty enum is a namespace, not a value type - you can never have a
                         // value of it. Referencing it in a value position is an error, caught
                         // here rather than represented as a (never-valid) bridged type.
-                        errors.append(
-                            DiagnosticError(
-                                node: type,
-                                message:
-                                    "'\(swiftCallName)' is a namespace, not a value type, and cannot be used here.",
-                                hint:
-                                    "Namespace enums (empty `@JS` enums) only group static members; they have no values."
-                            )
-                        )
+                        errors.append(.namespaceUsedAsValue(swiftCallName, node: type))
                         return nil
                     }
                     let hasAssociatedValues =
@@ -540,13 +532,7 @@ public final class SwiftToSkeleton {
             // rather than letting the caller fall through to a generic "unknown type" - the same
             // helpful message a same-module namespace gets.
             if externalModuleIndex.isNamespace(dotPath: dotPath, module: scopedModule) {
-                errors.append(
-                    DiagnosticError(
-                        node: type,
-                        message: "'\(dotPath)' is a namespace, not a value type, and cannot be used here.",
-                        hint: "Namespace enums (empty `@JS` enums) only group static members; they have no values."
-                    )
-                )
+                errors.append(.namespaceUsedAsValue(dotPath, node: type))
             }
             return nil
         }

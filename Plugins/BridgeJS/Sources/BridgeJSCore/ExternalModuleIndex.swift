@@ -25,7 +25,6 @@ public struct ExternalModuleIndex {
     /// one in a value position can be diagnosed as "X is a namespace" rather than reported as an
     /// unknown type - the declaration identity is retained even though there is no value ABI.
     private let namespacesByPath: [String: Set<String>]
-    private let namespacesByModule: [String: Set<String>]
 
     public var moduleNames: Set<String> { Set(byModuleAndPath.keys) }
 
@@ -33,7 +32,6 @@ public struct ExternalModuleIndex {
         var entriesByModule: [String: [String: ExternalType]] = [:]
         var entriesByDotPath: [String: [ExternalType]] = [:]
         var namespacesByPath: [String: Set<String>] = [:]
-        var namespacesByModule: [String: Set<String>] = [:]
 
         for (moduleName, skeleton) in dependencies {
             guard let exported = skeleton.exported else { continue }
@@ -68,7 +66,6 @@ public struct ExternalModuleIndex {
                     // keep its identity, so a value-position use gets a helpful "X is a
                     // namespace" diagnostic instead of a generic "unknown type".
                     namespacesByPath[enumDef.swiftCallName, default: []].insert(moduleName)
-                    namespacesByModule[moduleName, default: []].insert(enumDef.swiftCallName)
                     continue
                 }
                 register(dotPath: enumDef.swiftCallName, bridgeType: bridgeType)
@@ -89,7 +86,6 @@ public struct ExternalModuleIndex {
         self.byModuleAndPath = entriesByModule
         self.byPath = entriesByDotPath
         self.namespacesByPath = namespacesByPath
-        self.namespacesByModule = namespacesByModule
     }
 
     public var isEmpty: Bool { byModuleAndPath.isEmpty }
@@ -114,9 +110,10 @@ public struct ExternalModuleIndex {
 
     /// Whether `dotPath` names a known external namespace (in `module` if given, else any).
     public func isNamespace(dotPath: String, module moduleName: String?) -> Bool {
+        guard let modules = namespacesByPath[dotPath] else { return false }
         if let moduleName {
-            return namespacesByModule[moduleName]?.contains(dotPath) ?? false
+            return modules.contains(moduleName)
         }
-        return namespacesByPath[dotPath] != nil
+        return true
     }
 }

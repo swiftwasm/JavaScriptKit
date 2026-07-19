@@ -98,7 +98,7 @@ public struct SwiftRuntimeABIEmitter {
 
     private func renderScalar(_ type: BridgeType, into printer: CodeFragmentPrinter) throws {
         let slot = try Self.singleSlot(of: type)
-        let conv = try Self.conversion(for: type, slot: slot)
+        let conv = try Self.conversion(for: type)
         let swiftType = try Self.swiftTypeName(of: type)
         let wasmType = try Self.wasmSwiftTypeName(of: slot)
         let channel = slot.channel.rawValue
@@ -174,7 +174,7 @@ public struct SwiftRuntimeABIEmitter {
     /// - narrower than the slot: widen going down, `truncatingIfNeeded` coming back up
     /// - unsigned at the slot's width: reinterpret via `bitPattern` (the slot is signed)
     /// - unsigned word-sized: reinterpret through the fixed-width unsigned peer first
-    static func conversion(for type: BridgeType, slot: ABISlot) throws -> Conversion {
+    static func conversion(for type: BridgeType) throws -> Conversion {
         switch type {
         case .bool:
             return Conversion(lower: "self ? 1 : 0", lift: "value == 1")
@@ -231,16 +231,13 @@ public struct SwiftRuntimeABIEmitter {
         }
     }
 
-    /// The Swift spelling of a slot's Wasm core type.
+    /// The Swift spelling of a slot's Wasm core type. The spelling itself is
+    /// `WasmCoreType.swiftType` -- the same one the thunk emitters use -- so the generated
+    /// intrinsics cannot drift from the thunk signatures.
     static func wasmSwiftTypeName(of slot: ABISlot) throws -> String {
-        switch slot.channel {
-        case .i32: return "Int32"
-        case .i64: return "Int64"
-        case .f32: return "Float32"
-        case .f64: return "Float64"
-        case .pointer: return "UnsafeMutableRawPointer"
-        case .string, .typedArray:
+        guard let wasmCoreType = slot.wasmCoreType else {
             throw BridgeJSCoreError("\(slot.channel) is not a Wasm core channel")
         }
+        return wasmCoreType.swiftType
     }
 }

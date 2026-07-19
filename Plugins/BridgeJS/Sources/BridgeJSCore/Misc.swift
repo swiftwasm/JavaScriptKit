@@ -154,6 +154,16 @@ public struct DiagnosticError: Error {
         self.severity = severity
     }
 
+    /// The "namespace used in a value position" diagnostic. Shared so the same-module and
+    /// cross-module lookups say exactly the same thing.
+    public static func namespaceUsedAsValue(_ name: String, node: some SyntaxProtocol) -> DiagnosticError {
+        DiagnosticError(
+            node: node,
+            message: "'\(name)' is a namespace, not a value type, and cannot be used here.",
+            hint: "Namespace enums (empty `@JS` enums) only group static members; they have no values."
+        )
+    }
+
     /// Formats the diagnostic error as a string.
     ///
     /// - Parameters:

@@ -104,8 +104,6 @@ public enum ABICoercion: String, Codable, Equatable, Hashable, Sendable {
     case zeroExtendU32
     /// Round to f32 precision: `Math.fround(value)`
     case fround
-    /// Reinterpret as unsigned 64-bit: `BigInt.asUintN(64, value)`
-    case asUintN64
 }
 
 /// One slot: a single value on one channel.

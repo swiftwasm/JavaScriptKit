@@ -18,8 +18,11 @@ import BridgeJSUtilities
 /// this interpreter is always a straight forward pass - it never reasons about LIFO order,
 /// because the compiler already reversed the lift program.
 ///
-/// The Swift runtime intrinsics are interpreted from the *same* programs by
-/// `SwiftStackABIInterpreter`, so the two sides of the boundary run one description.
+/// The Swift half of the boundary is not an interpreter: the scalar conformances are
+/// generated from the same ABI description by `SwiftRuntimeABIEmitter` (see its header for
+/// what is and isn't generated), and the container codecs are the generic
+/// `_BridgedSwiftStackType` defaults in `BridgeJSIntrinsics.swift`, composed at runtime by
+/// protocol dispatch.
 final class JSStackMachine {
     private let context: IntrinsicJSFragment.PrintCodeContext
     private var scope: JSGlueVariableScope { context.scope }
@@ -354,7 +357,6 @@ final class JSStackMachine {
         case .truncToI32: return "(\(value) | 0)"
         case .zeroExtendU32: return "\(value) >>> 0"
         case .fround: return "Math.fround(\(value))"
-        case .asUintN64: return "BigInt.asUintN(64, \(value))"
         }
     }
 

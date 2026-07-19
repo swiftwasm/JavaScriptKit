@@ -1221,33 +1221,6 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
-    // MARK: - JS Glue Descriptor Helpers
-
-    private static func popExpression(for wasmType: WasmCoreType, scope: JSGlueVariableScope) -> String {
-        switch wasmType {
-        case .i32: return scope.popI32()
-        case .i64: return scope.popI64()
-        case .f32: return scope.popF32()
-        case .f64: return scope.popF64()
-        case .pointer: return scope.popPointer()
-        }
-    }
-
-    private static func emitPush(
-        for wasmType: WasmCoreType,
-        value: String,
-        scope: JSGlueVariableScope,
-        printer: CodeFragmentPrinter
-    ) {
-        switch wasmType {
-        case .i32: scope.emitPushI32Parameter(value, printer: printer)
-        case .i64: scope.emitPushI64Parameter(value, printer: printer)
-        case .f32: scope.emitPushF32Parameter(value, printer: printer)
-        case .f64: scope.emitPushF64Parameter(value, printer: printer)
-        case .pointer: scope.emitPushPointerParameter(value, printer: printer)
-        }
-    }
-
     /// Lower an optional value to the stack using the **conditional** protocol:
     /// push isSome flag, then conditionally push the payload (no placeholders for nil).
     private static func stackOptionalLower(
@@ -2308,19 +2281,6 @@ private extension BridgeType {
         switch self {
         case .bool, .rawValueEnum(_, .bool): return "$0 ? 1 : 0"
         default: return nil
-        }
-    }
-
-    var varHint: String {
-        switch self {
-        case .bool: return "bool"
-        case .integer: return "int"
-        case .float: return "f32"
-        case .double: return "f64"
-        case .unsafePointer: return "pointer"
-        case .caseEnum: return "caseId"
-        case .rawValueEnum: return "rawValue"
-        default: return "value"
         }
     }
 }
