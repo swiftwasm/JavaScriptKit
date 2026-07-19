@@ -25,9 +25,9 @@ import Testing
 
     // MARK: - Corpus
 
-    /// Types that may appear anywhere. `.alias` is excluded here and covered separately,
-    /// because the import-side tables `preconditionFailure` on it by contract (they require
-    /// callers to pre-`unaliased`), and a `preconditionFailure` cannot be caught.
+    /// Types that may appear anywhere. `.alias` is excluded here and covered separately:
+    /// the alias transparency tests below compare every leaf against its aliased form in
+    /// every cell, which is stronger than a corpus entry for one particular alias.
     static let leafTypes: [BridgeType] = [
         .bool,
         .integer(.int), .integer(.uint),
@@ -256,18 +256,49 @@ import Testing
 
     // MARK: - Aliases
 
-    /// `.alias` is transparent on the export side (the tables recurse through it) and must
-    /// be pre-resolved on the import side. Both halves of that contract are asserted here.
-    @Test("aliases are transparent to the export-side description", arguments: leafTypes)
+    /// `.alias` is sugar to the ABI description: every cell sees through it to the
+    /// underlying type, and callers never pre-desugar (see `BridgeType.unaliased`).
+    /// Asserted by comparing each shape against the same type with the alias stripped --
+    /// in every cell, in both contexts, and behind one level of each container. The
+    /// container pairs exercise the nested matches (optional-of-struct,
+    /// optional-of-jsObject) that must desugar their wrapped type before matching.
+    @Test("aliases are transparent to the description", arguments: leafTypes)
     func aliasIsTransparent(underlying: BridgeType) throws {
         let aliased = BridgeType.alias(name: "MyAlias", underlying: underlying)
-        let direct = Outcome { Self.slots(try BridgeABI.shape(of: underlying, cell: .exportParameter)) }
-        let viaAlias = Outcome { Self.slots(try BridgeABI.shape(of: aliased, cell: .exportParameter)) }
-        #expect(direct == viaAlias, "alias should be transparent for \(underlying)")
+        let pairs: [(direct: BridgeType, sugared: BridgeType)] = [
+            (underlying, aliased),
+            (.nullable(underlying, .null), .nullable(aliased, .null)),
+            (.nullable(underlying, .undefined), .nullable(aliased, .undefined)),
+            (.array(underlying), .array(aliased)),
+            (.dictionary(underlying), .dictionary(aliased)),
+        ]
+        for cell in ABICell.allCases {
+            for context in [BridgeContext.importTS, .exportSwift] {
+                for (direct, sugared) in pairs {
+                    let directShape = Outcome { try BridgeABI.shape(of: direct, cell: cell, context: context) }
+                    let viaAlias = Outcome { try BridgeABI.shape(of: sugared, cell: cell, context: context) }
+                    #expect(
+                        directShape == viaAlias,
+                        "alias should be transparent for \(direct) in \(cell)/\(context)"
+                    )
+                }
+            }
+        }
+    }
 
-        let directRet = Outcome { try BridgeABI.shape(of: underlying, cell: .exportReturn).returnValue }
-        let viaAliasRet = Outcome { try BridgeABI.shape(of: aliased, cell: .exportReturn).returnValue }
-        #expect(directRet == viaAliasRet, "alias should be transparent for \(underlying) (return)")
+    /// The same transparency for the stack side of the description: payload slots and the
+    /// compiled `StackOp` programs -- including the array element position, whose
+    /// bulk/counted discriminator decision must see through an aliased element.
+    @Test("aliases are transparent to payload slots and stack programs", arguments: leafTypes)
+    func aliasIsTransparentOnTheStack(underlying: BridgeType) {
+        let aliased = BridgeType.alias(name: "MyAlias", underlying: underlying)
+        #expect(BridgeABI.payloadSlots(of: aliased) == BridgeABI.payloadSlots(of: underlying))
+        for operation in [StackOp.Operation.lower, .lift] {
+            #expect(StackOp.compile(aliased, as: operation) == StackOp.compile(underlying, as: operation))
+            #expect(
+                StackOp.compile(.array(aliased), as: operation) == StackOp.compile(.array(underlying), as: operation)
+            )
+        }
     }
 
     // MARK: - Stack programs

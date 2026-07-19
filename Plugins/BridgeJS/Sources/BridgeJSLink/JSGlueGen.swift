@@ -1747,11 +1747,11 @@ struct IntrinsicJSFragment: Sendable {
     private static func associatedValuePushPayload(type: BridgeType) throws -> IntrinsicJSFragment {
         // Optionals used to need a special case here; `stackLowerFragment` now covers them,
         // because the VM reads the optional encoding out of the ABI description.
-        try stackLowerFragment(elementType: type.unaliased)
+        try stackLowerFragment(elementType: type)
     }
 
     private static func associatedValuePopPayload(type: BridgeType) throws -> IntrinsicJSFragment {
-        try stackLiftFragment(elementType: type.unaliased)
+        try stackLiftFragment(elementType: type)
     }
 
     private static func swiftStructLower(structBase: String) -> IntrinsicJSFragment {

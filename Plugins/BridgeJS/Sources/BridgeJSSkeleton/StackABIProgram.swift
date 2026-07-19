@@ -205,16 +205,17 @@ extension StackOp {
     ///
     /// This is deliberately a "might", not a "does". The runtime's actual bulk-eligibility is
     /// `_BridgedNumericArray` conformance (bare non-64-bit integers, `Float`, `Double`), but a
-    /// `@JS(as: Int)` alias unaliases to `.integer` here while its array bridges through the
-    /// *counted* path - so the codegen cannot statically tell the two apart. Keeping the
-    /// discriminator for every numeric-looking element is correct either way (the `-1` branch
-    /// handles bulk, the else-branch handles counted), and lets the runtime remain the single
-    /// authority on which arrays actually bulk. Everything not numeric-looking never bulks, so
-    /// it skips the discriminator entirely.
+    /// `@JS(as: Int)` alias looks numeric here while its array bridges through the *counted*
+    /// path - so the codegen cannot statically tell the two apart. Keeping the discriminator
+    /// for every numeric-looking element is correct either way (the `-1` branch handles bulk,
+    /// the else-branch handles counted), and lets the runtime remain the single authority on
+    /// which arrays actually bulk. Everything not numeric-looking never bulks, so it skips the
+    /// discriminator entirely.
     static func isPossiblyBulkNumericElement(_ type: BridgeType) -> Bool {
         switch type {
         case .integer(let t): return !t.is64Bit
         case .float, .double: return true
+        case .alias(_, let underlying): return isPossiblyBulkNumericElement(underlying)
         default: return false
         }
     }

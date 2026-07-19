@@ -197,14 +197,19 @@ public struct BridgeABIError: Error, CustomStringConvertible {
 ///
 /// - `ExportSwift.swift` / `ImportTS.swift` project `shape(of:cell:context:)` into Wasm thunk
 ///   signatures.
-/// - `JSGlueGen.swift` interprets `term(of:direction:context:)` to emit push/pop sequences.
-/// - The Swift runtime intrinsics in `Sources/JavaScriptKit/Generated/BridgeJSIntrinsics+ABI.swift`
-///   are generated from the same terms, so the two sides of the boundary cannot drift apart.
+/// - `JSGlueGen.swift` compiles types into `StackOp` programs (`StackOp.compile`) and
+///   interprets them with `JSStackMachine` to emit push/pop sequences.
+/// - The scalar runtime conformances in `Sources/JavaScriptKit/Generated/BridgeJSIntrinsics+ABI.swift`
+///   are generated from the same description (`SwiftRuntimeABIEmitter`), so the two sides of
+///   the boundary cannot drift apart on the slot layouts.
 public enum BridgeABI {
 
     // MARK: Flat shape (Wasm params / return)
 
     /// The Wasm-level shape of `type` in one cell of the ABI matrix.
+    ///
+    /// `.alias` is sugar to this layer: every cell sees through it to the underlying type
+    /// (see `BridgeType.unaliased`), so callers pass types as spelled and never pre-desugar.
     ///
     /// - Parameters:
     ///   - context: Modulates the *representation* of some types independently of direction.
@@ -261,15 +266,15 @@ public enum BridgeABI {
             return ABIShape(flat: [ABISlot("value", .i32)])
         case .rawValueEnum(_, let rawType):
             return try exportParameterShape(of: rawType.bridgeType)
-        case .associatedValueEnum(let name):
+        case .associatedValueEnum:
             return ABIShape(flat: [ABISlot("caseId", .i32)])
-        case .swiftStruct(let name):
+        case .swiftStruct:
             return ABIShape()
         case .closure:
             return ABIShape(flat: [ABISlot("callbackId", .i32)])
-        case .array(let element):
+        case .array:
             return ABIShape()
-        case .dictionary(let value):
+        case .dictionary:
             return ABIShape()
         case .alias(_, let underlying):
             return try exportParameterShape(of: underlying)
@@ -305,28 +310,25 @@ public enum BridgeABI {
             return ret(ABISlot("value", .i32))
         case .void:
             return ABIShape()
-        case .nullable(let wrappedType, _):
+        case .nullable:
             // Every optional return travels over the stack, so the wrapped type's *flat*
-            // shape is never consulted here. That is not just an optimization: it is why
-            // `.nullable(.namespaceEnum)` is accepted where a bare `.namespaceEnum` return
-            // throws. Preserved deliberately -- recursing into `exportReturnShape` would
-            // start rejecting a type the old table allowed.
+            // shape is never consulted here.
             return ABIShape()
         case .caseEnum:
             return ret(ABISlot("value", .i32))
         case .rawValueEnum(_, let rawType):
             return try exportReturnShape(of: rawType.bridgeType)
-        case .associatedValueEnum(let name):
+        case .associatedValueEnum:
             return ABIShape()
-        case .swiftStruct(let name):
+        case .swiftStruct:
             // Structs use stack-based return (no direct Wasm return type).
             return ABIShape()
         case .closure:
             // Closures pass a callback id as i32.
             return ret(ABISlot("value", .i32))
-        case .array(let element):
+        case .array:
             return ABIShape()
-        case .dictionary(let value):
+        case .dictionary:
             return ABIShape()
         case .alias(_, let underlying):
             return try exportReturnShape(of: underlying)
@@ -336,7 +338,7 @@ public enum BridgeABI {
     // MARK: importParameter -- Swift -> JS, Wasm params
 
     private static func importParameterShape(of type: BridgeType, context: BridgeContext) throws -> ABIShape {
-        switch type.unaliased {
+        switch type {
         case .bool:
             return ABIShape(flat: [ABISlot("value", .i32)])
         case .integer(let t):
@@ -377,7 +379,7 @@ public enum BridgeABI {
             return ABIShape(flat: [ABISlot("value", wasm: rawType.wasmCoreType ?? .i32)])
         case .associatedValueEnum:
             return ABIShape(flat: [ABISlot("caseId", .i32)])
-        case .swiftStruct(let name):
+        case .swiftStruct:
             switch context {
             case .importTS:
                 // Swift structs are bridged as JS objects (object ids) in imported signatures.
@@ -385,19 +387,21 @@ public enum BridgeABI {
             case .exportSwift:
                 return ABIShape()
             }
-        case .nullable(.swiftStruct(let name), _) where context == .importTS:
+        case .nullable(let wrappedType, _):
             // Optional `@JS struct`s bridge through the stack (isSome discriminator + fields),
             // like optional arrays/dictionaries, rather than the non-optional object-id ABI.
-            return ABIShape(flat: [ABISlot("isSome", .i32)])
-        case .nullable(let wrappedType, _):
+            // Matched on the canonical wrapped type, so an alias of a struct takes the same path.
+            if case .swiftStruct = wrappedType.unaliased, context == .importTS {
+                return ABIShape(flat: [ABISlot("isSome", .i32)])
+            }
             let wrapped = try importParameterShape(of: wrappedType, context: context)
             return ABIShape(flat: [ABISlot("isSome", .i32)] + wrapped.flat, useBorrowing: wrapped.useBorrowing)
-        case .array(let element):
+        case .array:
             return ABIShape()
-        case .dictionary(let value):
+        case .dictionary:
             return ABIShape()
-        case .alias:
-            preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching importParameterShape")
+        case .alias(_, let underlying):
+            return try importParameterShape(of: underlying, context: context)
         }
     }
 
@@ -405,7 +409,7 @@ public enum BridgeABI {
 
     private static func importReturnShape(of type: BridgeType, context: BridgeContext) throws -> ABIShape {
         func ret(_ slot: ABISlot) -> ABIShape { ABIShape(flat: [slot]) }
-        switch type.unaliased {
+        switch type {
         case .bool:
             return ret(ABISlot("value", .i32))
         case .integer(let t):
@@ -443,7 +447,7 @@ public enum BridgeABI {
             return ret(ABISlot("value", wasm: rawType.wasmCoreType ?? .i32))
         case .associatedValueEnum:
             return ret(ABISlot("caseId", .i32))
-        case .swiftStruct(let name):
+        case .swiftStruct:
             switch context {
             case .importTS:
                 // Swift structs are bridged as JS objects (object ids) in imported signatures.
@@ -454,20 +458,23 @@ public enum BridgeABI {
         case .nullable(let wrappedType, _):
             // jsObject and `@JS struct` use the stack ABI for optionals -- the thunk returns
             // void and the value (plus isSome discriminator) flows through the stacks.
-            if case .jsObject = wrappedType {
+            // Matched on the canonical wrapped type, so aliases of either take the same path.
+            switch wrappedType.unaliased {
+            case .jsObject:
                 return ABIShape()
-            }
-            if case .swiftStruct(let name) = wrappedType, context == .importTS {
+            case .swiftStruct where context == .importTS:
                 return ABIShape()
+            default:
+                break
             }
             let wrapped = try importReturnShape(of: wrappedType, context: context)
             return ABIShape(flat: wrapped.flat)
-        case .array(let element):
+        case .array:
             return ABIShape()
-        case .dictionary(let value):
+        case .dictionary:
             return ABIShape()
-        case .alias:
-            preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching importReturnShape")
+        case .alias(_, let underlying):
+            return try importReturnShape(of: underlying, context: context)
         }
     }
 

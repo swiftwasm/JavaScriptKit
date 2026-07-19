@@ -1625,6 +1625,24 @@ extension BridgeType {
         }
     }
 
+    /// The canonical type: `self` with `.alias` sugar stripped through its value structure
+    /// (optionals, arrays, dictionaries). The analog of the Swift compiler's
+    /// `getCanonicalType()`. (`.closure` is a leaf here: it crosses the boundary as an opaque
+    /// function reference, and its signature types are desugared where its thunks are emitted.)
+    ///
+    /// `.alias` (`@JS(as:)`) is sugar for the wire but a newtype for the runtime: its
+    /// *identity* (the alias name) drives the Swift-side spelling and conversions
+    /// (`swiftType`, `mangleTypeName`, the generated `_BridgedSwiftAlias` conformance), while
+    /// its *wire representation* is entirely the underlying type's. Accordingly:
+    ///
+    /// - Surface facets and the Swift emitters preserve the alias; they never desugar.
+    /// - Semantic queries see through it themselves, via a `case .alias` arm that delegates
+    ///   to the underlying type (`BridgeABI.shape`, `StackOp.compile`, `abiReturnType`, ...),
+    ///   so callers pass types as spelled and never pre-desugar.
+    /// - Use `unaliased` where a whole subtree must be alias-free before *structural
+    ///   matching*: nested patterns inside a semantic query, and the JS glue fragment layer's
+    ///   entry points -- the glue never needs the alias's identity, so it canonicalizes once
+    ///   at entry and matches freely below.
     public var unaliased: BridgeType {
         switch self {
         case .alias(_, let underlying): return underlying.unaliased
