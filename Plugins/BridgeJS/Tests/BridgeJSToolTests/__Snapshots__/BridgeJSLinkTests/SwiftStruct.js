@@ -237,9 +237,16 @@ export async function createInstantiator(options, swift) {
             }.bind(instance1);
             instance1.scaled = function(factor) {
                 structHelpers.Vector2D.lower(this);
-                const ret = instance.exports.bjs_Vector2D_scaled(factor);
+                const ret1 = instance.exports.bjs_Vector2D_scaled(factor);
                 const structValue = structHelpers.Vector2D.lift();
                 return structValue;
+            }.bind(instance1);
+            instance1.describe = function() {
+                structHelpers.Vector2D.lower(this);
+                const ret2 = instance.exports.bjs_Vector2D_describe();
+                const ret3 = tmpRetString;
+                tmpRetString = undefined;
+                return ret3;
             }.bind(instance1);
             return instance1;
         }

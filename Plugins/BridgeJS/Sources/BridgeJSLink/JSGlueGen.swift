@@ -2381,14 +2381,10 @@ struct IntrinsicJSFragment: Sendable {
                     if method.returnType == .void {
                         printer.write("\(callExpr);")
                     } else {
-                        printer.write("const ret = \(callExpr);")
-                    }
-
-                    // Lift return value if needed
-                    if method.returnType != .void {
                         let liftFragment = try IntrinsicJSFragment.liftReturn(type: method.returnType)
-                        let liftArgs = liftFragment.parameters.isEmpty ? [] : ["ret"]
-                        let lifted = try liftFragment.printCode(liftArgs, context)
+                        let returnVariable = context.scope.variable("ret")
+                        printer.write("const \(returnVariable) = \(callExpr);")
+                        let lifted = try liftFragment.printCode([returnVariable], context)
                         if let liftedValue = lifted.first {
                             printer.write("return \(liftedValue);")
                         }

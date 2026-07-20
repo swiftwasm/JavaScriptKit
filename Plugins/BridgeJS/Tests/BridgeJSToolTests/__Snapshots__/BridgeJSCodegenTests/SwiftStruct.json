@@ -686,6 +686,23 @@
                 "_0" : "Vector2D"
               }
             }
+          },
+          {
+            "abiName" : "bjs_Vector2D_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
           }
         ],
         "name" : "Vector2D",
