@@ -75,7 +75,19 @@ struct PackageToJS {
         // First, resolve symlink to get the actual path as SwiftPM 6.0 and earlier returns unresolved
         // symlink path for product artifact.
         let wasmProductArtifact = wasmProductArtifact.resolvingSymlinksInPath()
-        let buildConfiguration = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
+        let parentDirName = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
+
+        // SwiftBuild lays artifacts out as
+        //   .build/out/Products/<Config>-webassembly-wasm32/<name>.wasm
+        // which doesn't encode the triple in the path. Recognize that layout and map it to
+        // the WebAssembly triple JavaScriptKit builds for.
+        if parentDirName.hasSuffix("-webassembly-wasm32") {
+            let buildConfiguration = parentDirName.split(separator: "-").first.map { $0.lowercased() } ?? "debug"
+            return (buildConfiguration, "wasm32-unknown-wasip1")
+        }
+
+        // Native layout: .build/<triple>/<config>/<name>.wasm
+        let buildConfiguration = parentDirName
         let triple = wasmProductArtifact.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent
         return (buildConfiguration, triple)
     }
@@ -645,9 +657,66 @@ struct PackagingPlanner {
         return (packageInputs, outputDirTask, intermediatesDirTask, packageJsonTask)
     }
 
+    /// Plan the shared npm install for a directory that hosts several per-runner test
+    /// bundles as subdirectories. Node resolves `node_modules` by walking up the directory
+    /// tree, so a single install here serves every runner underneath, avoiding one install
+    /// per test target.
+    func planSharedNodeModules(make: inout MiniMake) throws -> MiniMake.TaskKey {
+        let outputDirTask = make.addTask(
+            inputFiles: [selfPath],
+            output: outputDir,
+            attributes: [.silent]
+        ) {
+            try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
+        }
+        let intermediatesDirTask = make.addTask(
+            inputFiles: [selfPath],
+            output: intermediatesDir,
+            attributes: [.silent]
+        ) {
+            try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
+        }
+        let packageJsonTask = planCopyTemplateFile(
+            make: &make,
+            file: "Plugins/PackageToJS/Templates/package.json",
+            output: "package.json",
+            outputDirTask: outputDirTask,
+            inputFiles: [],
+            inputTasks: []
+        )
+        return planNpmInstall(
+            make: &make,
+            intermediatesDirTask: intermediatesDirTask,
+            packageJsonTask: packageJsonTask
+        )
+    }
+
+    private func planNpmInstall(
+        make: inout MiniMake,
+        intermediatesDirTask: MiniMake.TaskKey,
+        packageJsonTask: MiniMake.TaskKey
+    ) -> MiniMake.TaskKey {
+        make.addTask(
+            inputFiles: [
+                selfPath,
+                outputDir.appending(path: "package.json"),
+            ],
+            inputTasks: [intermediatesDirTask, packageJsonTask],
+            output: intermediatesDir.appending(path: "npm-install.stamp")
+        ) {
+            try system.npmInstall(packageDir: $1.resolve(path: outputDir).path)
+            try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: Data())
+        }
+    }
+
     /// Construct the test build plan and return the root task key
+    ///
+    /// - Parameter installNodeModules: whether to install the test harness's npm
+    ///   dependencies into this bundle's directory. Pass `false` when several runners share
+    ///   a single `node_modules` planned once via `planSharedNodeModules`.
     func planTestBuild(
-        make: inout MiniMake
+        make: inout MiniMake,
+        installNodeModules: Bool = true
     ) throws -> (rootTask: MiniMake.TaskKey, binDir: BuildPath) {
         var (allTasks, outputDirTask, intermediatesDirTask, packageJsonTask) = try planBuildInternal(
             make: &make,
@@ -655,20 +724,17 @@ struct PackagingPlanner {
             debugInfoFormat: .dwarf
         )
 
-        // Install npm dependencies used in the test harness
-        allTasks.append(
-            make.addTask(
-                inputFiles: [
-                    selfPath,
-                    outputDir.appending(path: "package.json"),
-                ],
-                inputTasks: [intermediatesDirTask, packageJsonTask],
-                output: intermediatesDir.appending(path: "npm-install.stamp")
-            ) {
-                try system.npmInstall(packageDir: $1.resolve(path: outputDir).path)
-                try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: Data())
-            }
-        )
+        // Install npm dependencies used in the test harness, unless a shared node_modules is
+        // provided in a parent directory (see planSharedNodeModules).
+        if installNodeModules {
+            allTasks.append(
+                planNpmInstall(
+                    make: &make,
+                    intermediatesDirTask: intermediatesDirTask,
+                    packageJsonTask: packageJsonTask
+                )
+            )
+        }
 
         let binDir = outputDir.appending(path: "bin")
         let binDirTask = make.addTask(
