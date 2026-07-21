@@ -588,30 +588,8 @@ struct PackagingPlanner {
         }
         packageInputs.append(wasm)
 
-        // NOTE: The imports are parsed from the product artifact instead of the final .wasm
-        // file because wasm-opt removes unreferenced imports, and the presence of an import
-        // decides how the JavaScript glue code is generated.
         let wasmImportsPath = self.wasmImportsPath
-        let wasmImportsTask = make.addTask(
-            inputFiles: [selfPath, wasmProductArtifact],
-            inputTasks: [intermediatesDirTask],
-            output: wasmImportsPath
-        ) {
-            let metadata = try parseImports(
-                moduleBytes: try Data(contentsOf: URL(fileURLWithPath: $1.resolve(path: wasmProductArtifact).path))
-            )
-            let jsonEncoder = JSONEncoder()
-            jsonEncoder.outputFormatting = .prettyPrinted
-            let jsonData = try jsonEncoder.encode(metadata)
-            let outputPath = $1.resolve(path: $0.output)
-            // Every task consuming the imports depends on this file, so leave it untouched
-            // when the imports are unchanged. Rewriting it would give it a newer timestamp
-            // and re-run them (including `npm install`) for unrelated Swift source changes.
-            if let lastImports = try? Data(contentsOf: outputPath), lastImports == jsonData {
-                return
-            }
-            try system.writeFile(atPath: outputPath.path, content: jsonData)
-        }
+        let wasmImportsTask = planWasmImports(make: &make, intermediatesDirTask: intermediatesDirTask)
 
         packageInputs.append(wasmImportsTask)
 
@@ -758,9 +736,99 @@ struct PackagingPlanner {
         )
     }
 
+    /// Plan the shared npm install for a directory that hosts several per-runner test
+    /// bundles as subdirectories. Node resolves `node_modules` by walking up the directory
+    /// tree, so a single install here serves every runner underneath, avoiding one install
+    /// per test target.
+    func planSharedNodeModules(make: inout MiniMake) throws -> MiniMake.TaskKey {
+        let outputDirTask = make.addTask(
+            inputFiles: [selfPath],
+            output: outputDir,
+            attributes: [.silent]
+        ) {
+            try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
+        }
+        let intermediatesDirTask = make.addTask(
+            inputFiles: [selfPath],
+            output: intermediatesDir,
+            attributes: [.silent]
+        ) {
+            try system.createDirectory(atPath: $1.resolve(path: $0.output).path)
+        }
+        let wasmImportsTask = planWasmImports(make: &make, intermediatesDirTask: intermediatesDirTask)
+        let packageJsonTask = planCopyTemplateFile(
+            make: &make,
+            file: "Plugins/PackageToJS/Templates/package.json",
+            output: "package.json",
+            outputDirTask: outputDirTask,
+            wasmImportsTask: wasmImportsTask,
+            inputFiles: [],
+            inputTasks: []
+        )
+        return planNpmInstall(
+            make: &make,
+            intermediatesDirTask: intermediatesDirTask,
+            packageJsonTask: packageJsonTask
+        )
+    }
+
+    /// Plan the task parsing the imports of the product .wasm file
+    ///
+    /// NOTE: The imports are parsed from the product artifact instead of the final .wasm
+    /// file because wasm-opt removes unreferenced imports, and the presence of an import
+    /// decides how the JavaScript glue code is generated.
+    private func planWasmImports(
+        make: inout MiniMake,
+        intermediatesDirTask: MiniMake.TaskKey
+    ) -> MiniMake.TaskKey {
+        make.addTask(
+            inputFiles: [selfPath, wasmProductArtifact],
+            inputTasks: [intermediatesDirTask],
+            output: wasmImportsPath
+        ) {
+            let metadata = try parseImports(
+                moduleBytes: try Data(contentsOf: URL(fileURLWithPath: $1.resolve(path: wasmProductArtifact).path))
+            )
+            let jsonEncoder = JSONEncoder()
+            jsonEncoder.outputFormatting = .prettyPrinted
+            let jsonData = try jsonEncoder.encode(metadata)
+            let outputPath = $1.resolve(path: $0.output)
+            // Every task consuming the imports depends on this file, so leave it untouched
+            // when the imports are unchanged. Rewriting it would give it a newer timestamp
+            // and re-run them (including `npm install`) for unrelated Swift source changes.
+            if let lastImports = try? Data(contentsOf: outputPath), lastImports == jsonData {
+                return
+            }
+            try system.writeFile(atPath: outputPath.path, content: jsonData)
+        }
+    }
+
+    private func planNpmInstall(
+        make: inout MiniMake,
+        intermediatesDirTask: MiniMake.TaskKey,
+        packageJsonTask: MiniMake.TaskKey
+    ) -> MiniMake.TaskKey {
+        make.addTask(
+            inputFiles: [
+                selfPath,
+                outputDir.appending(path: "package.json"),
+            ],
+            inputTasks: [intermediatesDirTask, packageJsonTask],
+            output: intermediatesDir.appending(path: "npm-install.stamp")
+        ) {
+            try system.npmInstall(packageDir: $1.resolve(path: outputDir).path)
+            try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: Data())
+        }
+    }
+
     /// Construct the test build plan and return the root task key
+    ///
+    /// - Parameter installNodeModules: whether to install the test harness's npm
+    ///   dependencies into this bundle's directory. Pass `false` when several runners share
+    ///   a single `node_modules` planned once via `planSharedNodeModules`.
     func planTestBuild(
-        make: inout MiniMake
+        make: inout MiniMake,
+        installNodeModules: Bool = true
     ) throws -> (rootTask: MiniMake.TaskKey, binDir: BuildPath) {
         var (allTasks, outputDirTask, intermediatesDirTask, packageJsonTask, wasmImportsTask) = try planBuildInternal(
             make: &make,
@@ -768,20 +836,17 @@ struct PackagingPlanner {
             debugInfoFormat: .dwarf
         )
 
-        // Install npm dependencies used in the test harness
-        allTasks.append(
-            make.addTask(
-                inputFiles: [
-                    selfPath,
-                    outputDir.appending(path: "package.json"),
-                ],
-                inputTasks: [intermediatesDirTask, packageJsonTask],
-                output: intermediatesDir.appending(path: "npm-install.stamp")
-            ) {
-                try system.npmInstall(packageDir: $1.resolve(path: outputDir).path)
-                try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: Data())
-            }
-        )
+        // Install npm dependencies used in the test harness, unless a shared node_modules is
+        // provided in a parent directory (see planSharedNodeModules).
+        if installNodeModules {
+            allTasks.append(
+                planNpmInstall(
+                    make: &make,
+                    intermediatesDirTask: intermediatesDirTask,
+                    packageJsonTask: packageJsonTask
+                )
+            )
+        }
 
         let binDir = outputDir.appending(path: "bin")
         let binDirTask = make.addTask(
