@@ -82,7 +82,7 @@ let package = Package(
 
         .testTarget(
             name: "JavaScriptKitTests",
-            dependencies: ["JavaScriptKit"],
+            dependencies: ["JavaScriptKit", "JavaScriptEventLoopTestSupport"],
             swiftSettings: [
                 .enableExperimentalFeature("Extern"),
                 .define("Tracing", .when(traits: ["Tracing"])),
@@ -191,7 +191,7 @@ let package = Package(
         ),
         .testTarget(
             name: "BridgeJSRuntimeTests",
-            dependencies: ["JavaScriptKit", "JavaScriptEventLoop"],
+            dependencies: ["JavaScriptKit", "JavaScriptEventLoop", "JavaScriptEventLoopTestSupport"],
             exclude: [
                 "bridge-js.config.json",
                 "bridge-js.d.ts",
@@ -219,7 +219,7 @@ let package = Package(
         ),
         .testTarget(
             name: "BridgeJSIdentityTests",
-            dependencies: ["JavaScriptKit", "JavaScriptEventLoop"],
+            dependencies: ["JavaScriptKit", "JavaScriptEventLoop", "JavaScriptEventLoopTestSupport"],
             exclude: [
                 "bridge-js.config.json",
                 "Generated/JavaScript",
