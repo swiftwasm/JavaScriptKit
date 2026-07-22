@@ -1,3 +1,4 @@
+import Foundation
 import SwiftParser
 import SwiftSyntax
 import Testing
@@ -6,6 +7,69 @@ import Testing
 @testable import BridgeJSSkeleton
 
 @Suite struct DiagnosticsTests {
+    private func moduleDiagnostics(source: String) -> BridgeJSCoreDiagnosticError? {
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
+        do {
+            _ = try swiftAPI.finalize()
+            return nil
+        } catch let error as BridgeJSCoreDiagnosticError {
+            return error
+        } catch {
+            Issue.record("Unexpected error: \(error)")
+            return nil
+        }
+    }
+
+    @Test
+    func missingJavaScriptModuleProducesDiagnostic() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(from: .module("/missing.js")) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("JavaScript module file was not found at '/missing.js'"))
+        #expect(diagnostics.description.contains("test.swift:2:27:"))
+    }
+
+    @Test
+    func javaScriptModulePathMustStartAtTargetRoot() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(from: .module("missing.js")) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("JavaScript module paths must start with '/'"))
+        #expect(diagnostics.description.contains("test.swift:2:27:"))
+    }
+
+    @Test
+    func missingJavaScriptModuleWithTraversalProducesDiagnosticAtPath() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(from: .module("/../missing.js")) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("JavaScript module file was not found at '/../missing.js'"))
+        #expect(diagnostics.description.contains("test.swift:2:27:"))
+    }
+
+    @Test
+    func javaScriptModulePathMustBeStringLiteral() throws {
+        let source = """
+            let modulePath = "/module.js"
+            @JSFunction(from: .module(modulePath)) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("JavaScript module path must be a string literal."))
+        #expect(diagnostics.description.contains("test.swift:2:27:"))
+    }
+
     /// Returns the first parameter's type node from a function in the source (the first `@JS func`-like decl), for pinpointing diagnostics.
     private func firstParameterTypeNode(source: String) -> TypeSyntax? {
         let tree = Parser.parse(source: source)

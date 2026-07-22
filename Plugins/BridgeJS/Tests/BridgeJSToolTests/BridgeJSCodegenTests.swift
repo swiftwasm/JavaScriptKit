@@ -4,6 +4,7 @@ import SwiftParser
 import Testing
 
 @testable import BridgeJSCore
+@testable import BridgeJSLink
 @testable import BridgeJSSkeleton
 
 @Suite struct BridgeJSCodegenTests {
@@ -12,6 +13,65 @@ import Testing
     ).appendingPathComponent("MacroSwift")
     static let multifileInputsDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
         .appendingPathComponent("Inputs").appendingPathComponent("MacroSwift").appendingPathComponent("Multifile")
+
+    @Test
+    func legacyImportedModuleSkeletonDecodesWithoutModules() throws {
+        let decoded = try JSONDecoder().decode(
+            ImportedModuleSkeleton.self,
+            from: Data(#"{"children":[]}"#.utf8)
+        )
+        #expect(decoded.children.isEmpty)
+        #expect(decoded.modules == nil)
+    }
+
+    @Test
+    func changingOnlyJavaScriptModuleContentsUpdatesGeneratedArtifacts() throws {
+        let modulePath = "/Modules/math.mjs"
+        let swiftSource = """
+            @JSFunction(from: .module("/Modules/math.mjs"))
+            func add(_ lhs: Int, _ rhs: Int) throws(JSException) -> Int
+
+            @JSGetter(jsName: "version", from: .module("/Modules/math.mjs"))
+            var moduleVersion: String
+            """
+
+        func generate(source: String) throws -> (BridgeJSSkeleton, String, BridgeJSLinkOutput) {
+            var moduleLoadCount = 0
+            let generator = SwiftToSkeleton(
+                progress: .silent,
+                moduleName: "TestModule",
+                exposeToGlobal: false,
+                externalModuleIndex: .empty,
+                javaScriptModuleSource: {
+                    moduleLoadCount += 1
+                    return $0 == modulePath ? source : nil
+                }
+            )
+            generator.addSourceFile(Parser.parse(source: swiftSource), inputFilePath: "Imports.swift")
+            let skeleton = try generator.finalize()
+            let imported = try #require(skeleton.imported)
+            let generatedThunks = try ImportTS(
+                progress: .silent,
+                moduleName: skeleton.moduleName,
+                skeleton: imported
+            ).finalize()
+            let swiftThunks = try #require(generatedThunks)
+            let linked = try BridgeJSLink(skeletons: [skeleton]).link()
+            #expect(moduleLoadCount == 1)
+            return (skeleton, swiftThunks, linked)
+        }
+
+        let firstSource = "export const version = 'one'; export function add(a, b) { return a + b; }"
+        let secondSource = "export const version = 'two'; export function add(a, b) { return a + b; }"
+        let first = try generate(source: firstSource)
+        let second = try generate(source: secondSource)
+
+        #expect(first.1 == second.1)
+        #expect(first.0.imported?.moduleContentFingerprint != second.0.imported?.moduleContentFingerprint)
+        #expect(first.2.modules.map(\.relativePath) == second.2.modules.map(\.relativePath))
+        #expect(first.2.modules.map(\.source) == [firstSource])
+        #expect(second.2.modules.map(\.source) == [secondSource])
+    }
 
     private func snapshotCodegen(
         skeleton: BridgeJSSkeleton,
@@ -77,11 +137,25 @@ import Testing
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let name = url.deletingPathExtension().lastPathComponent
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
+        let moduleSources =
+            input == "JSImportModule.swift"
+            ? [
+                "/Modules/JSImportModule.mjs": try String(
+                    contentsOf: Self.inputsDirectory.appending(path: "Modules/JSImportModule.mjs"),
+                    encoding: .utf8
+                ),
+                "/Modules/ModuleCounter.mjs": try String(
+                    contentsOf: Self.inputsDirectory.appending(path: "Modules/ModuleCounter.mjs"),
+                    encoding: .utf8
+                ),
+            ]
+            : [:]
         let swiftAPI = SwiftToSkeleton(
             progress: .silent,
             moduleName: "TestModule",
             exposeToGlobal: false,
-            externalModuleIndex: .empty
+            externalModuleIndex: .empty,
+            javaScriptModuleSource: { moduleSources[$0] }
         )
         swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
         let skeleton = try swiftAPI.finalize()

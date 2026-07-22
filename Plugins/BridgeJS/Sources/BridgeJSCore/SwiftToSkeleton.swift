@@ -23,6 +23,8 @@ public final class SwiftToSkeleton {
 
     private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
     private var usedExternalModules = Set<String>()
+    private let javaScriptModuleSource: (String) throws -> String?
+    private var importedJSModules: [String: ImportedJSModule] = [:]
 
     /// Non-fatal diagnostics collected during `finalize()`. These do not fail the build.
     public private(set) var warnings: [(file: String, diagnostic: DiagnosticError)] = []
@@ -32,12 +34,14 @@ public final class SwiftToSkeleton {
         moduleName: String,
         exposeToGlobal: Bool,
         externalModuleIndex: ExternalModuleIndex,
-        identityMode: String? = nil
+        identityMode: String? = nil,
+        javaScriptModuleSource: @escaping (String) throws -> String? = { _ in nil }
     ) {
         self.progress = progress
         self.moduleName = moduleName
         self.exposeToGlobal = exposeToGlobal
         self.identityMode = identityMode
+        self.javaScriptModuleSource = javaScriptModuleSource
         self.typeDeclResolver = TypeDeclResolver()
         self.externalModuleIndex = externalModuleIndex
 
@@ -90,6 +94,38 @@ public final class SwiftToSkeleton {
             )
             importCollector.walk(sourceFile)
 
+            let importOrigins =
+                importCollector.importedFunctions.compactMap(\.from)
+                + importCollector.importedTypes.compactMap(\.from)
+                + importCollector.importedGlobalGetters.compactMap(\.from)
+            let modulePaths = Set(importOrigins.compactMap(\.modulePath))
+            for path in modulePaths.sorted() {
+                if importedJSModules[path] != nil {
+                    continue
+                }
+                let pathNode = importCollector.importedModulePathNodes[path] ?? Syntax(sourceFile)
+                guard path.hasPrefix("/") else {
+                    importCollector.errors.append(
+                        DiagnosticError(
+                            node: pathNode,
+                            message: "JavaScript module paths must start with '/' to indicate the Swift target root: "
+                                + "'\(path)'."
+                        )
+                    )
+                    continue
+                }
+                guard let source = try javaScriptModuleSource(path) else {
+                    importCollector.errors.append(
+                        DiagnosticError(
+                            node: pathNode,
+                            message: "JavaScript module file was not found at '\(path)'."
+                        )
+                    )
+                    continue
+                }
+                importedJSModules[path] = ImportedJSModule(path: path, source: source)
+            }
+
             let exportErrors = exportCollector.errors.filter { $0.severity == .error }
             let importErrorsFatal = importCollector.errors.filter {
                 $0.severity == .error && !$0.message.contains("Unsupported type '")
@@ -128,7 +164,11 @@ public final class SwiftToSkeleton {
             throw BridgeJSCoreDiagnosticError(diagnostics: diagnostics)
         }
         let importedSkeleton: ImportedModuleSkeleton? = {
-            let module = ImportedModuleSkeleton(children: importedFiles)
+            let modules = importedJSModules.values.sorted { $0.path < $1.path }
+            let module = ImportedModuleSkeleton(
+                children: importedFiles,
+                modules: modules.isEmpty ? nil : modules
+            )
             if module.children.allSatisfy({ $0.functions.isEmpty && $0.types.isEmpty && $0.globalGetters.isEmpty }) {
                 return nil
             }
@@ -2413,6 +2453,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     var importedFunctions: [ImportedFunctionSkeleton] = []
     var importedTypes: [ImportedTypeSkeleton] = []
     var importedGlobalGetters: [ImportedGetterSkeleton] = []
+    var importedModulePathNodes: [String: Syntax] = [:]
     var errors: [DiagnosticError] = []
 
     private let inputFilePath: String
@@ -2507,22 +2548,41 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             }
             return nil
         }
+    }
 
-        /// Extracts the `from` argument value from an attribute, if present.
-        static func extractJSImportFrom(from attribute: AttributeSyntax) -> JSImportFrom? {
-            guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else {
-                return nil
-            }
-            for argument in arguments {
-                guard argument.label?.text == "from" else { continue }
-
-                // Accept `.global`, `JSImportFrom.global`, etc.
-                let description = argument.expression.trimmedDescription
-                let caseName = description.split(separator: ".").last.map(String.init) ?? description
-                return JSImportFrom(rawValue: caseName)
-            }
+    private func extractJSImportFrom(from attribute: AttributeSyntax) -> JSImportFrom? {
+        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self),
+            let argument = arguments.first(where: { $0.label?.text == "from" })
+        else {
             return nil
         }
+
+        if let call = argument.expression.as(FunctionCallExprSyntax.self),
+            call.calledExpression.trimmedDescription.split(separator: ".").last == "module"
+        {
+            guard call.arguments.count == 1,
+                let pathExpression = call.arguments.first?.expression,
+                let literal = pathExpression.as(StringLiteralExprSyntax.self),
+                let path = literal.representedLiteralValue
+            else {
+                errors.append(
+                    DiagnosticError(
+                        node: call.arguments.first?.expression ?? argument.expression,
+                        message: "JavaScript module path must be a string literal."
+                    )
+                )
+                return nil
+            }
+            if importedModulePathNodes[path] == nil {
+                importedModulePathNodes[path] = Syntax(literal)
+            }
+            return .module(path)
+        }
+
+        // Accept `.global`, `JSImportFrom.global`, etc.
+        let description = argument.expression.trimmedDescription
+        let caseName = description.split(separator: ".").last.map(String.init) ?? description
+        return caseName == "global" ? .global : nil
     }
 
     // MARK: - Validation Helpers
@@ -2705,7 +2765,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         if AttributeChecker.hasJSClassAttribute(node.attributes) {
             let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
             let jsName = attribute.flatMap(AttributeChecker.extractJSName)
-            let from = attribute.flatMap(AttributeChecker.extractJSImportFrom)
+            let from = attribute.flatMap { extractJSImportFrom(from: $0) }
             let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
             enterJSClass(node.name.text, jsName: jsName, from: from, accessLevel: accessLevel)
         }
@@ -2722,7 +2782,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         if AttributeChecker.hasJSClassAttribute(node.attributes) {
             let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
             let jsName = attribute.flatMap(AttributeChecker.extractJSName)
-            let from = attribute.flatMap(AttributeChecker.extractJSImportFrom)
+            let from = attribute.flatMap { extractJSImportFrom(from: $0) }
             let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
             enterJSClass(node.name.text, jsName: jsName, from: from, accessLevel: accessLevel)
         }
@@ -2916,7 +2976,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
         let baseName = SwiftToSkeleton.normalizeIdentifier(node.name.text)
         let jsName = AttributeChecker.extractJSName(from: jsFunction)
-        let from = AttributeChecker.extractJSImportFrom(from: jsFunction)
+        let from = extractJSImportFrom(from: jsFunction)
         let name = baseName
 
         let parameters = parseParameters(from: node.signature.parameterClause)
@@ -2969,7 +3029,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
         let propertyName = SwiftToSkeleton.normalizeIdentifier(identifier.identifier.text)
         let jsName = AttributeChecker.extractJSName(from: jsGetter)
-        let from = AttributeChecker.extractJSImportFrom(from: jsGetter)
+        let from = extractJSImportFrom(from: jsGetter)
         let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
         return ImportedGetterSkeleton(
             name: propertyName,
