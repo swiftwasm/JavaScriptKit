@@ -17,6 +17,20 @@ import JavaScriptKit
 
 To bind a function that lives on the JavaScript global object (e.g. `parseInt`, `setTimeout`), add `from: .global`. Use `jsName` when the Swift name differs from the JavaScript name - see the ``JSFunction(jsName:from:)`` API reference for options.
 
+To ship the function with the Swift target, put it in a `.js` or `.mjs` ECMAScript module and use a target-relative path:
+
+```javascript
+// JavaScript/math.js
+export function add(a, b) { return a + b; }
+```
+
+```swift
+@JSFunction(from: .module("JavaScript/math.js"))
+func add(_ a: Double, _ b: Double) throws(JSException) -> Double
+```
+
+BridgeJS copies explicitly referenced modules into the generated PackageToJS package. Multiple declarations may reference the same file; it is embedded and imported only once. `jsName` selects a differently named export, otherwise BridgeJS uses the normalized Swift name.
+
 ### 2. Provide the implementation at initialization
 
 Return the corresponding function(s) in the object passed to `getImports()` when initializing the WebAssembly module.
@@ -35,7 +49,7 @@ const { exports } = await init({
 });
 ```
 
-If you used `from: .global`, do not pass the function in `getImports()`; the runtime resolves it from `globalThis`.
+If you used `from: .global` or `.module`, do not pass the function in `getImports()`. Module-only bindings do not require `getImports()` at all.
 
 ### 3. Handle errors
 

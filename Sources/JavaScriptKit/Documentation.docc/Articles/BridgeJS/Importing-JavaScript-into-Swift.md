@@ -25,10 +25,11 @@ Add the BridgeJS plugin and enable the Extern feature as described in <doc:Setti
 
 Create Swift declarations that mirror the JavaScript API you want to call.
 
-You can bring JavaScript into Swift in two ways:
+You can bring JavaScript into Swift in three ways:
 
 - **Inject at initialization**: Declare in Swift and supply the implementation in `getImports()` (e.g. a `today()` function).
 - **Import from `globalThis`**: For APIs on the JavaScript global object (e.g. `console`, `document`), use `@JSGetter(from: .global)` so they are read from `globalThis` and you don't pass them in `getImports()`.
+- **Ship an ECMAScript module**: Use `from: .module("target/relative/path.js")` on a top-level function/getter or `@JSClass`. BridgeJS copies the referenced file into the generated package, so it is not supplied through `getImports()`.
 
 ```swift
 import JavaScriptKit

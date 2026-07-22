@@ -281,6 +281,13 @@ protocol PackagingSystem {
 }
 
 extension PackagingSystem {
+    func recreateDirectory(atPath: String) throws {
+        if FileManager.default.fileExists(atPath: atPath) {
+            try FileManager.default.removeItem(atPath: atPath)
+        }
+        try createDirectory(atPath: atPath)
+    }
+
     func createDirectory(atPath: String) throws {
         guard !FileManager.default.fileExists(atPath: atPath) else { return }
         try FileManager.default.createDirectory(
@@ -597,21 +604,40 @@ struct PackagingPlanner {
         if skeletons.count > 0 {
             let bridgeJs = outputDir.appending(path: "bridge-js.js")
             let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
+            let bridgeModules = outputDir.appending(path: "bridge-js-modules")
+            let linkBridgeJS: (MiniMake.VariableScope) throws -> BridgeJSLinkOutput = { scope in
+                var link = BridgeJSLink(
+                    sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
+                )
+                for skeletonPath in skeletons {
+                    let url = URL(fileURLWithPath: scope.resolve(path: skeletonPath).path)
+                    try link.addSkeletonFile(data: Data(contentsOf: url))
+                }
+                return try link.link()
+            }
             packageInputs.append(
                 make.addTask(inputFiles: skeletons + [selfPath], output: bridgeJs) { _, scope in
-                    var link = BridgeJSLink(
-                        sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
+                    let output = try linkBridgeJS(scope)
+                    try system.writeFile(
+                        atPath: scope.resolve(path: bridgeJs).path,
+                        content: Data(output.outputJs.utf8)
                     )
-
-                    // Decode skeleton format
-                    for skeletonPath in skeletons {
-                        let data = try Data(contentsOf: URL(fileURLWithPath: scope.resolve(path: skeletonPath).path))
-                        try link.addSkeletonFile(data: data)
+                    try system.writeFile(
+                        atPath: scope.resolve(path: bridgeDts).path,
+                        content: Data(output.outputDts.utf8)
+                    )
+                }
+            )
+            packageInputs.append(
+                make.addTask(inputFiles: skeletons + [selfPath], output: bridgeModules) { _, scope in
+                    let output = try linkBridgeJS(scope)
+                    let modulesDirectory = scope.resolve(path: bridgeModules)
+                    try system.recreateDirectory(atPath: modulesDirectory.path)
+                    for module in output.modules {
+                        let destination = scope.resolve(path: outputDir.appending(path: module.relativePath))
+                        try system.createDirectory(atPath: destination.deletingLastPathComponent().path)
+                        try system.writeFile(atPath: destination.path, content: Data(module.source.utf8))
                     }
-
-                    let (outputJs, outputDts) = try link.link()
-                    try system.writeFile(atPath: scope.resolve(path: bridgeJs).path, content: Data(outputJs.utf8))
-                    try system.writeFile(atPath: scope.resolve(path: bridgeDts).path, content: Data(outputDts.utf8))
                 }
             )
         }

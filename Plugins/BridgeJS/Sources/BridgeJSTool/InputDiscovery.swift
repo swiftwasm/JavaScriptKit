@@ -1,0 +1,1 @@
+../BridgeJSPluginUtilities/InputDiscovery.swift

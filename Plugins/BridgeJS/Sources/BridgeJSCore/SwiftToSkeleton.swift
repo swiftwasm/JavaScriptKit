@@ -23,6 +23,8 @@ public final class SwiftToSkeleton {
 
     private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
     private var usedExternalModules = Set<String>()
+    private let javaScriptModuleSource: (String) throws -> String?
+    private var importedJSModules: [String: ImportedJSModule] = [:]
 
     /// Non-fatal diagnostics collected during `finalize()`. These do not fail the build.
     public private(set) var warnings: [(file: String, diagnostic: DiagnosticError)] = []
@@ -32,12 +34,14 @@ public final class SwiftToSkeleton {
         moduleName: String,
         exposeToGlobal: Bool,
         externalModuleIndex: ExternalModuleIndex,
-        identityMode: String? = nil
+        identityMode: String? = nil,
+        javaScriptModuleSource: @escaping (String) throws -> String? = { _ in nil }
     ) {
         self.progress = progress
         self.moduleName = moduleName
         self.exposeToGlobal = exposeToGlobal
         self.identityMode = identityMode
+        self.javaScriptModuleSource = javaScriptModuleSource
         self.typeDeclResolver = TypeDeclResolver()
         self.externalModuleIndex = externalModuleIndex
 
@@ -90,6 +94,27 @@ public final class SwiftToSkeleton {
             )
             importCollector.walk(sourceFile)
 
+            let importOrigins =
+                importCollector.importedFunctions.compactMap(\.from)
+                + importCollector.importedTypes.compactMap(\.from)
+                + importCollector.importedGlobalGetters.compactMap(\.from)
+            let modulePaths = Set(importOrigins.compactMap(\.modulePath))
+            for path in modulePaths.sorted() {
+                if importedJSModules[path] != nil {
+                    continue
+                }
+                guard let source = try javaScriptModuleSource(path) else {
+                    importCollector.errors.append(
+                        DiagnosticError(
+                            node: sourceFile,
+                            message: "JavaScript module file was not found at '\(path)'."
+                        )
+                    )
+                    continue
+                }
+                importedJSModules[path] = ImportedJSModule(path: path, source: source)
+            }
+
             let exportErrors = exportCollector.errors.filter { $0.severity == .error }
             let importErrorsFatal = importCollector.errors.filter {
                 $0.severity == .error && !$0.message.contains("Unsupported type '")
@@ -128,7 +153,11 @@ public final class SwiftToSkeleton {
             throw BridgeJSCoreDiagnosticError(diagnostics: diagnostics)
         }
         let importedSkeleton: ImportedModuleSkeleton? = {
-            let module = ImportedModuleSkeleton(children: importedFiles)
+            let modules = importedJSModules.values.sorted { $0.path < $1.path }
+            let module = ImportedModuleSkeleton(
+                children: importedFiles,
+                modules: modules.isEmpty ? nil : modules
+            )
             if module.children.allSatisfy({ $0.functions.isEmpty && $0.types.isEmpty && $0.globalGetters.isEmpty }) {
                 return nil
             }
@@ -2516,10 +2545,19 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             for argument in arguments {
                 guard argument.label?.text == "from" else { continue }
 
+                if let call = argument.expression.as(FunctionCallExprSyntax.self),
+                    call.calledExpression.trimmedDescription.split(separator: ".").last == "module",
+                    call.arguments.count == 1,
+                    let literal = call.arguments.first?.expression.as(StringLiteralExprSyntax.self),
+                    let path = literal.representedLiteralValue
+                {
+                    return .module(path)
+                }
+
                 // Accept `.global`, `JSImportFrom.global`, etc.
                 let description = argument.expression.trimmedDescription
                 let caseName = description.split(separator: ".").last.map(String.init) ?? description
-                return JSImportFrom(rawValue: caseName)
+                return caseName == "global" ? .global : nil
             }
             return nil
         }

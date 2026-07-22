@@ -24,6 +24,28 @@ import JavaScriptKit
 
 If the class is on `globalThis`, add `from: .global` to `@JSClass` and omit the type from `getImports()` in the next step.
 
+For a class shipped as an ECMAScript module, put the origin on `@JSClass`:
+
+```javascript
+// JavaScript/greeter.js
+export class Greeter {
+    constructor(name) { this.name = name; }
+    static named(name) { return new Greeter(name); }
+    greet() { return `Hello, ${this.name}!`; }
+}
+```
+
+```swift
+@JSClass(from: .module("JavaScript/greeter.js"))
+struct Greeter {
+    @JSFunction init(_ name: String) throws(JSException)
+    @JSFunction static func named(_ name: String) throws(JSException) -> Greeter
+    @JSFunction func greet() throws(JSException) -> String
+}
+```
+
+The module's named class export is the root for construction and static methods. Instance methods, getters, and setters operate on the wrapped object and must not specify their own `from:` argument. Use `jsName` on `@JSClass` to select a differently named class export. JavaScript inheritance may be implemented normally in the module; the Swift declaration describes the API visible on the exported class and its instances.
+
 ### 2. Wire the JavaScript side
 
 **If you chose injection:** Implement the class in JavaScript and pass it in `getImports()`.
@@ -47,7 +69,7 @@ const { exports } = await init({
 });
 ```
 
-**If you chose global:** Do not pass the class in `getImports()`; the runtime will resolve it from `globalThis`.
+**If you chose global or module-backed lookup:** Do not pass the class in `getImports()`; the runtime resolves it from `globalThis` or the copied module.
 
 ## Macro options
 

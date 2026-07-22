@@ -57,6 +57,7 @@ let package = Package(
             dependencies: [
                 "BridgeJSCore",
                 "BridgeJSLink",
+                "BridgeJSBuildPlugin",
                 "TS2Swift",
                 .product(name: "SwiftParser", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),

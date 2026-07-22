@@ -103,7 +103,7 @@ import ArgumentParser
         }
     }
 
-    static func linkSkeletons(skeletonFiles: [String]) throws -> (outputJs: String, outputDts: String) {
+    static func linkSkeletons(skeletonFiles: [String]) throws -> BridgeJSLinkOutput {
         var skeletons: [BridgeJSSkeleton] = []
         for skeletonFile in skeletonFiles.sorted() {
             let skeletonData = try readData(from: skeletonFile)
@@ -122,8 +122,7 @@ import ArgumentParser
         var skeletonFiles: [String]
 
         func run() throws {
-            let (outputJs, _) = try linkSkeletons(skeletonFiles: skeletonFiles)
-            print(outputJs)
+            print(try linkSkeletons(skeletonFiles: skeletonFiles).outputJs)
         }
     }
 
@@ -136,8 +135,7 @@ import ArgumentParser
         var skeletonFiles: [String]
 
         func run() throws {
-            let (_, outputDts) = try linkSkeletons(skeletonFiles: skeletonFiles)
-            print(outputDts)
+            print(try linkSkeletons(skeletonFiles: skeletonFiles).outputDts)
         }
     }
 }

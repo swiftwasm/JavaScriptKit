@@ -16,6 +16,7 @@ public struct BridgeJSLink {
     let enableLifetimeTracking: Bool = false
     private let namespaceBuilder = NamespaceBuilder()
     private let intrinsicRegistry = JSIntrinsicRegistry()
+    private let importedModuleRegistry = ImportedJSModuleRegistry()
 
     public init(
         skeletons: [BridgeJSSkeleton] = [],
@@ -1077,6 +1078,11 @@ public struct BridgeJSLink {
         let printer = CodeFragmentPrinter(header: header)
         printer.nextLine()
 
+        printer.write(lines: importedModuleRegistry.importLines)
+        if !importedModuleRegistry.importLines.isEmpty {
+            printer.nextLine()
+        }
+
         printer.write(lines: data.topLevelTypeLines)
 
         let exportedSkeletons = skeletons.compactMap(\.exported)
@@ -1220,8 +1226,9 @@ public struct BridgeJSLink {
         return printer.lines.joined(separator: "\n")
     }
 
-    public func link() throws -> (outputJs: String, outputDts: String) {
+    public func link() throws -> BridgeJSLinkOutput {
         intrinsicRegistry.reset()
+        try importedModuleRegistry.configure(skeletons: skeletons)
         intrinsicRegistry.classNamespaces = skeletons.reduce(into: [:]) { result, unified in
             guard let skeleton = unified.exported else { return }
             for klass in skeleton.classes {
@@ -1233,7 +1240,11 @@ public struct BridgeJSLink {
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
         let outputDts = generateTypeScript(data: data)
-        return (outputJs, outputDts)
+        return BridgeJSLinkOutput(
+            outputJs: outputJs,
+            outputDts: outputDts,
+            modules: importedModuleRegistry.artifacts
+        )
     }
 
     private func enumHelperAssignments() -> CodeFragmentPrinter {
@@ -1586,7 +1597,7 @@ public struct BridgeJSLink {
         return "\"\(Self.escapeForJavaScriptStringLiteral(name))\""
     }
 
-    fileprivate static func escapeForJavaScriptStringLiteral(_ string: String) -> String {
+    static func escapeForJavaScriptStringLiteral(_ string: String) -> String {
         string
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
@@ -3460,7 +3471,10 @@ extension BridgeJSLink {
             try thunkBuilder.liftParameter(param: param)
         }
         let jsName = function.jsName ?? function.name
-        let importRootExpr = function.from == .global ? "globalThis" : "imports"
+        let importRootExpr = try importedModuleRegistry.namespaceExpression(
+            swiftModuleName: importObjectBuilder.moduleName,
+            from: function.from
+        )
 
         try thunkBuilder.call(name: jsName, fromObjectExpr: importRootExpr)
         let funcLines = thunkBuilder.renderFunction(name: function.abiName(context: nil))
@@ -3484,7 +3498,10 @@ extension BridgeJSLink {
             intrinsicRegistry: intrinsicRegistry
         )
         let jsName = getter.jsName ?? getter.name
-        let importRootExpr = getter.from == .global ? "globalThis" : "imports"
+        let importRootExpr = try importedModuleRegistry.namespaceExpression(
+            swiftModuleName: importObjectBuilder.moduleName,
+            from: getter.from
+        )
         try thunkBuilder.getImportProperty(
             name: jsName,
             fromObjectExpr: importRootExpr,
@@ -3539,7 +3556,11 @@ extension BridgeJSLink {
         }
         for method in type.staticMethods {
             let abiName = method.abiName(context: type, operation: "static")
-            let (js, dts) = try renderImportedStaticMethod(context: type, method: method)
+            let (js, dts) = try renderImportedStaticMethod(
+                swiftModuleName: importObjectBuilder.moduleName,
+                context: type,
+                method: method
+            )
             importObjectBuilder.assignToImportObject(name: abiName, function: js)
             importObjectBuilder.appendDts(dts)
         }
@@ -3583,7 +3604,10 @@ extension BridgeJSLink {
         for param in constructor.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let importRootExpr = type.from == .global ? "globalThis" : "imports"
+        let importRootExpr = try importedModuleRegistry.namespaceExpression(
+            swiftModuleName: importObjectBuilder.moduleName,
+            from: type.from
+        )
         try thunkBuilder.callConstructor(
             jsName: type.jsName ?? type.name,
             swiftTypeName: type.name,
@@ -3627,6 +3651,7 @@ extension BridgeJSLink {
     }
 
     func renderImportedStaticMethod(
+        swiftModuleName: String,
         context: ImportedTypeSkeleton,
         method: ImportedFunctionSkeleton
     ) throws -> (js: [String], dts: [String]) {
@@ -3638,7 +3663,10 @@ extension BridgeJSLink {
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let importRootExpr = context.from == .global ? "globalThis" : "imports"
+        let importRootExpr = try importedModuleRegistry.namespaceExpression(
+            swiftModuleName: swiftModuleName,
+            from: context.from
+        )
         let constructorExpr = ImportedThunkBuilder.propertyAccessExpr(
             objectExpr: importRootExpr,
             propertyName: context.jsName ?? context.name

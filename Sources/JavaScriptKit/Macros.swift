@@ -9,8 +9,11 @@ public enum JSEnumStyle: String {
 /// Controls where BridgeJS reads imported JS values from.
 ///
 /// - `global`: Read from `globalThis`.
-public enum JSImportFrom: String {
+/// - `module`: Read a named export from a target-relative ECMAScript module file.
+public enum JSImportFrom {
     case global
+    /// Read from an ECMAScript module file located relative to the Swift target directory.
+    case module(String)
 }
 
 /// A macro that exposes Swift functions, classes, and methods to JavaScript.
@@ -141,6 +144,7 @@ public macro JS(
 ///
 /// - Parameter from: Selects where the property is read from.
 ///   Use `.global` to read from `globalThis` (e.g. `console`, `document`).
+///   Use `.module("path/to/module.js")` to read a named export from a file relative to the Swift target.
 @attached(accessor)
 public macro JSGetter(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSGetterMacro")
@@ -180,6 +184,7 @@ public macro JSSetter(jsName: String? = nil, from: JSImportFrom? = nil) =
 ///   If not provided, the Swift function name is used.
 /// - Parameter from: Selects where the function is looked up from.
 ///   Use `.global` to call a function on `globalThis` (e.g. `setTimeout`).
+///   Use `.module("path/to/module.js")` to call a named export from a file relative to the Swift target.
 @attached(body)
 public macro JSFunction(jsName: String? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSFunctionMacro")
@@ -204,6 +209,7 @@ public macro JSFunction(jsName: String? = nil, from: JSImportFrom? = nil) =
 ///
 /// - Parameter from: Selects where the constructor is looked up from.
 ///   Use `.global` to construct globals like `WebSocket` via `globalThis`.
+///   Use `.module("path/to/module.js")` to construct a named class export from a file relative to the Swift target.
 @attached(member, names: named(jsObject), named(init(unsafelyWrapping:)))
 @attached(extension, conformances: _JSBridgedClass)
 public macro JSClass(jsName: String? = nil, from: JSImportFrom? = nil) =
