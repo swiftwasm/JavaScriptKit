@@ -198,6 +198,7 @@ let package = Package(
                 "bridge-js.global.d.ts",
                 "Generated/JavaScript",
                 "JavaScript",
+                "Modules",
             ],
             swiftSettings: [
                 .enableExperimentalFeature("Extern")

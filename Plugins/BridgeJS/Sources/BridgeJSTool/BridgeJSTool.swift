@@ -160,6 +160,10 @@ import BridgeJSUtilities
             var inputFiles = withSpan("Collecting Swift files") {
                 return inputSwiftFiles(targetDirectory: targetDirectory, positionalArguments: positionalArguments)
             }
+            let javaScriptModuleFilesByPath = try makeJavaScriptModuleFileLookup(
+                targetDirectory: targetDirectory,
+                positionalArguments: positionalArguments
+            )
 
             // BridgeJS.Macros.swift contains imported declarations (@JSFunction, @JSClass, etc.) that need
             // to be processed by SwiftToSkeleton to populate the imported skeleton. The command plugin
@@ -176,7 +180,17 @@ import BridgeJSUtilities
                 moduleName: moduleName,
                 exposeToGlobal: config.exposeToGlobal,
                 externalModuleIndex: externalModuleIndex,
-                identityMode: config.identityMode
+                identityMode: config.identityMode,
+                javaScriptModuleSource: { path in
+                    guard let fileURL = javaScriptModuleFilesByPath[path] else {
+                        return nil
+                    }
+                    do {
+                        return try String(contentsOf: fileURL, encoding: .utf8)
+                    } catch {
+                        throw BridgeJSToolError("Failed to read JavaScript module '\(path)': \(error)")
+                    }
+                }
             )
             for inputFile in inputFiles.sorted() {
                 try withSpan("Parsing \(inputFile)") {
@@ -236,7 +250,10 @@ import BridgeJSUtilities
 
             // Combine and write unified Swift output
             let outputSwiftURL = outputDirectory.appending(path: "BridgeJS.swift")
-            let combinedSwift = [closureSupport, exportResult, importResult].compactMap { $0 }
+            let moduleFingerprint = skeleton.imported?.moduleContentFingerprint.map {
+                "// BridgeJS JavaScript module fingerprint: \($0)"
+            }
+            let combinedSwift = [moduleFingerprint, closureSupport, exportResult, importResult].compactMap { $0 }
             let outputSwift = combineGeneratedSwift(
                 combinedSwift,
                 importingExternalModules: skeleton.usedExternalModules
@@ -396,7 +413,32 @@ private func inputSwiftFiles(targetDirectory: URL, positionalArguments: [String]
     if positionalArguments.isEmpty {
         return recursivelyCollectSwiftFiles(from: targetDirectory).map(\.path)
     }
-    return positionalArguments
+    return positionalArguments.filter { URL(fileURLWithPath: $0).pathExtension == "swift" }
+}
+
+private func makeJavaScriptModuleFileLookup(
+    targetDirectory: URL,
+    positionalArguments: [String]
+) throws -> [String: URL] {
+    let files =
+        positionalArguments.isEmpty
+        ? discoverJavaScriptModuleFiles(in: targetDirectory)
+        : positionalArguments.map { URL(fileURLWithPath: $0) }.filter(isJavaScriptModuleFile)
+
+    let targetPath = targetDirectory.standardizedFileURL.path
+    let targetPrefix = targetPath.hasSuffix("/") ? targetPath : targetPath + "/"
+    var modules: [String: URL] = [:]
+
+    for file in files {
+        let fileURL = file.standardizedFileURL
+        guard fileURL.path.hasPrefix(targetPrefix) else {
+            throw BridgeJSToolError("JavaScript module is outside the target directory: \(fileURL.path)")
+        }
+        let relativePath = String(fileURL.path.dropFirst(targetPrefix.count))
+        modules[relativePath] = fileURL
+    }
+
+    return modules
 }
 
 extension Profiling {

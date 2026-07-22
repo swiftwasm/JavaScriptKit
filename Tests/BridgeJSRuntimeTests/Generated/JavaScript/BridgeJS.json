@@ -23983,6 +23983,188 @@
       },
       {
         "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : "Modules\/JSImportModule.mjs",
+            "name" : "moduleAdd",
+            "parameters" : [
+              {
+                "name" : "lhs",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "rhs",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : "Modules\/JSImportModule.mjs",
+            "jsName" : "renamedFunction",
+            "name" : "moduleRenamed",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "accessLevel" : "internal",
+            "from" : "Modules\/JSImportModule.mjs",
+            "jsName" : "version",
+            "name" : "moduleVersion",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "value",
+                  "type" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "from" : "Modules\/JSImportModule.mjs",
+            "getters" : [
+              {
+                "accessLevel" : "internal",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "jsName" : "ModuleCounter",
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "increment",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "ImportedModuleCounter",
+            "setters" : [
+              {
+                "accessLevel" : "internal",
+                "functionName" : "value_set",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "create",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "ImportedModuleCounter"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
 
         ],
         "types" : [
@@ -24863,6 +25045,12 @@
             ]
           }
         ]
+      }
+    ],
+    "modules" : [
+      {
+        "path" : "Modules\/JSImportModule.mjs",
+        "source" : "export function moduleAdd(lhs, rhs) {\n    return lhs + rhs;\n}\n\nexport function renamedFunction() {\n    return \"loaded from a module\";\n}\n\nexport const version = \"module-v1\";\n\nexport class ModuleCounter {\n    constructor(value) {\n        this.value = value;\n    }\n\n    static create(value) {\n        return new ModuleCounter(value);\n    }\n\n    increment() {\n        return ++this.value;\n    }\n\n    setValue(value) {\n        this.value = value;\n    }\n}\n"
       }
     ]
   },

@@ -14,13 +14,13 @@ import Testing
         function: String = #function,
         sourceLocation: Testing.SourceLocation = #_sourceLocation
     ) throws {
-        let (outputJs, outputDts) = try bridgeJSLink.link()
+        let output = try bridgeJSLink.link()
         try assertSnapshot(
             name: name,
             filePath: filePath,
             function: function,
             sourceLocation: sourceLocation,
-            input: outputJs.data(using: .utf8)!,
+            input: output.outputJs.data(using: .utf8)!,
             fileExtension: "js"
         )
         try assertSnapshot(
@@ -28,9 +28,22 @@ import Testing
             filePath: filePath,
             function: function,
             sourceLocation: sourceLocation,
-            input: outputDts.data(using: .utf8)!,
+            input: output.outputDts.data(using: .utf8)!,
             fileExtension: "d.ts"
         )
+        if !output.modules.isEmpty {
+            let moduleDump = output.modules.map { module in
+                "// \(module.relativePath)\n\(module.source)"
+            }.joined(separator: "\n")
+            try assertSnapshot(
+                name: name,
+                filePath: filePath,
+                function: function,
+                sourceLocation: sourceLocation,
+                input: Data(moduleDump.utf8),
+                fileExtension: "modules.js"
+            )
+        }
     }
 
     static let inputsDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent(
@@ -49,11 +62,19 @@ import Testing
         let name = url.deletingPathExtension().lastPathComponent
 
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
+        let moduleSource =
+            input == "JSImportModule.swift"
+            ? try String(
+                contentsOf: Self.inputsDirectory.appending(path: "Modules/JSImportModule.mjs"),
+                encoding: .utf8
+            )
+            : nil
         let importSwift = SwiftToSkeleton(
             progress: .silent,
             moduleName: "TestModule",
             exposeToGlobal: false,
-            externalModuleIndex: .empty
+            externalModuleIndex: .empty,
+            javaScriptModuleSource: { $0 == "Modules/JSImportModule.mjs" ? moduleSource : nil }
         )
         importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).swift")
         let importResult = try importSwift.finalize()
