@@ -1101,7 +1101,7 @@ public struct ExportedSkeleton: Codable {
     }
 
     private var asyncClosureResolveReturnTypes: [BridgeType] {
-        var collector = AsyncClosureReturnTypeCollector()
+        let collector = AsyncClosureReturnTypeCollector()
         var walker = BridgeSkeletonWalker(visitor: collector)
         walker.walk(self)
         return walker.visitor.returnTypes
