@@ -5,6 +5,7 @@
 // `swift package bridge-js`.
 
 import * as __bjs_imported_module_0 from "./bridge-js-modules/TestModule/Modules/JSImportModule.mjs";
+import * as __bjs_imported_module_1 from "./bridge-js-modules/TestModule/Modules/ModuleCounter.mjs";
 
 export async function createInstantiator(options, swift) {
     let instance;
@@ -233,15 +234,15 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_ImportedModuleCounter_init"] = function bjs_ImportedModuleCounter_init(value) {
+            TestModule["bjs_ModuleCounter_init"] = function bjs_ModuleCounter_init(value) {
                 try {
-                    return swift.memory.retain(new __bjs_imported_module_0.ModuleCounter(value));
+                    return swift.memory.retain(new __bjs_imported_module_1.ModuleCounter(value));
                 } catch (error) {
                     setException(error);
                     return 0
                 }
             }
-            TestModule["bjs_ImportedModuleCounter_value_get"] = function bjs_ImportedModuleCounter_value_get(self) {
+            TestModule["bjs_ModuleCounter_value_get"] = function bjs_ModuleCounter_value_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).value;
                     return ret;
@@ -250,23 +251,23 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            TestModule["bjs_ImportedModuleCounter_value_set"] = function bjs_ImportedModuleCounter_value_set(self, newValue) {
+            TestModule["bjs_ModuleCounter_value_set"] = function bjs_ModuleCounter_value_set(self, newValue) {
                 try {
                     swift.memory.getObject(self).value = newValue;
                 } catch (error) {
                     setException(error);
                 }
             }
-            TestModule["bjs_ImportedModuleCounter_create_static"] = function bjs_ImportedModuleCounter_create_static(value) {
+            TestModule["bjs_ModuleCounter_create_static"] = function bjs_ModuleCounter_create_static(value) {
                 try {
-                    let ret = __bjs_imported_module_0.ModuleCounter.create(value);
+                    let ret = __bjs_imported_module_1.ModuleCounter.create(value);
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);
                     return 0
                 }
             }
-            TestModule["bjs_ImportedModuleCounter_increment"] = function bjs_ImportedModuleCounter_increment(self) {
+            TestModule["bjs_ModuleCounter_increment"] = function bjs_ModuleCounter_increment(self) {
                 try {
                     let ret = swift.memory.getObject(self).increment();
                     return ret;

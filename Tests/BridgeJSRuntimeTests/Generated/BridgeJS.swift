@@ -8,7 +8,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-// BridgeJS JavaScript module fingerprint: 2acd02db34648b2a
+// BridgeJS JavaScript module fingerprint: 76f49b4593a4f170
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si")
@@ -16983,104 +16983,104 @@ func _$moduleRenamed() throws(JSException) -> String {
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportedModuleCounter_init")
-fileprivate func bjs_ImportedModuleCounter_init_extern(_ value: Int32) -> Int32
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ModuleCounter_init")
+fileprivate func bjs_ModuleCounter_init_extern(_ value: Int32) -> Int32
 #else
-fileprivate func bjs_ImportedModuleCounter_init_extern(_ value: Int32) -> Int32 {
+fileprivate func bjs_ModuleCounter_init_extern(_ value: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_ImportedModuleCounter_init(_ value: Int32) -> Int32 {
-    return bjs_ImportedModuleCounter_init_extern(value)
+@inline(never) fileprivate func bjs_ModuleCounter_init(_ value: Int32) -> Int32 {
+    return bjs_ModuleCounter_init_extern(value)
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportedModuleCounter_create_static")
-fileprivate func bjs_ImportedModuleCounter_create_static_extern(_ value: Int32) -> Int32
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ModuleCounter_create_static")
+fileprivate func bjs_ModuleCounter_create_static_extern(_ value: Int32) -> Int32
 #else
-fileprivate func bjs_ImportedModuleCounter_create_static_extern(_ value: Int32) -> Int32 {
+fileprivate func bjs_ModuleCounter_create_static_extern(_ value: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_ImportedModuleCounter_create_static(_ value: Int32) -> Int32 {
-    return bjs_ImportedModuleCounter_create_static_extern(value)
+@inline(never) fileprivate func bjs_ModuleCounter_create_static(_ value: Int32) -> Int32 {
+    return bjs_ModuleCounter_create_static_extern(value)
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportedModuleCounter_value_get")
-fileprivate func bjs_ImportedModuleCounter_value_get_extern(_ self: Int32) -> Int32
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ModuleCounter_value_get")
+fileprivate func bjs_ModuleCounter_value_get_extern(_ self: Int32) -> Int32
 #else
-fileprivate func bjs_ImportedModuleCounter_value_get_extern(_ self: Int32) -> Int32 {
+fileprivate func bjs_ModuleCounter_value_get_extern(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_ImportedModuleCounter_value_get(_ self: Int32) -> Int32 {
-    return bjs_ImportedModuleCounter_value_get_extern(self)
+@inline(never) fileprivate func bjs_ModuleCounter_value_get(_ self: Int32) -> Int32 {
+    return bjs_ModuleCounter_value_get_extern(self)
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportedModuleCounter_value_set")
-fileprivate func bjs_ImportedModuleCounter_value_set_extern(_ self: Int32, _ newValue: Int32) -> Void
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ModuleCounter_value_set")
+fileprivate func bjs_ModuleCounter_value_set_extern(_ self: Int32, _ newValue: Int32) -> Void
 #else
-fileprivate func bjs_ImportedModuleCounter_value_set_extern(_ self: Int32, _ newValue: Int32) -> Void {
+fileprivate func bjs_ModuleCounter_value_set_extern(_ self: Int32, _ newValue: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_ImportedModuleCounter_value_set(_ self: Int32, _ newValue: Int32) -> Void {
-    return bjs_ImportedModuleCounter_value_set_extern(self, newValue)
+@inline(never) fileprivate func bjs_ModuleCounter_value_set(_ self: Int32, _ newValue: Int32) -> Void {
+    return bjs_ModuleCounter_value_set_extern(self, newValue)
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportedModuleCounter_increment")
-fileprivate func bjs_ImportedModuleCounter_increment_extern(_ self: Int32) -> Int32
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ModuleCounter_increment")
+fileprivate func bjs_ModuleCounter_increment_extern(_ self: Int32) -> Int32
 #else
-fileprivate func bjs_ImportedModuleCounter_increment_extern(_ self: Int32) -> Int32 {
+fileprivate func bjs_ModuleCounter_increment_extern(_ self: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_ImportedModuleCounter_increment(_ self: Int32) -> Int32 {
-    return bjs_ImportedModuleCounter_increment_extern(self)
+@inline(never) fileprivate func bjs_ModuleCounter_increment(_ self: Int32) -> Int32 {
+    return bjs_ModuleCounter_increment_extern(self)
 }
 
-func _$ImportedModuleCounter_init(_ value: Int) throws(JSException) -> JSObject {
+func _$ModuleCounter_init(_ value: Int) throws(JSException) -> JSObject {
     let valueValue = value.bridgeJSLowerParameter()
-    let ret = bjs_ImportedModuleCounter_init(valueValue)
+    let ret = bjs_ModuleCounter_init(valueValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
     return JSObject.bridgeJSLiftReturn(ret)
 }
 
-func _$ImportedModuleCounter_create(_ value: Int) throws(JSException) -> ImportedModuleCounter {
+func _$ModuleCounter_create(_ value: Int) throws(JSException) -> ModuleCounter {
     let valueValue = value.bridgeJSLowerParameter()
-    let ret = bjs_ImportedModuleCounter_create_static(valueValue)
+    let ret = bjs_ModuleCounter_create_static(valueValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return ImportedModuleCounter.bridgeJSLiftReturn(ret)
+    return ModuleCounter.bridgeJSLiftReturn(ret)
 }
 
-func _$ImportedModuleCounter_value_get(_ self: JSObject) throws(JSException) -> Int {
+func _$ModuleCounter_value_get(_ self: JSObject) throws(JSException) -> Int {
     let selfValue = self.bridgeJSLowerParameter()
-    let ret = bjs_ImportedModuleCounter_value_get(selfValue)
+    let ret = bjs_ModuleCounter_value_get(selfValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
     return Int.bridgeJSLiftReturn(ret)
 }
 
-func _$ImportedModuleCounter_value_set(_ self: JSObject, _ newValue: Int) throws(JSException) -> Void {
+func _$ModuleCounter_value_set(_ self: JSObject, _ newValue: Int) throws(JSException) -> Void {
     let selfValue = self.bridgeJSLowerParameter()
     let newValueValue = newValue.bridgeJSLowerParameter()
-    bjs_ImportedModuleCounter_value_set(selfValue, newValueValue)
+    bjs_ModuleCounter_value_set(selfValue, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
 }
 
-func _$ImportedModuleCounter_increment(_ self: JSObject) throws(JSException) -> Int {
+func _$ModuleCounter_increment(_ self: JSObject) throws(JSException) -> Int {
     let selfValue = self.bridgeJSLowerParameter()
-    let ret = bjs_ImportedModuleCounter_increment(selfValue)
+    let ret = bjs_ModuleCounter_increment(selfValue)
     if let error = _swift_js_take_exception() {
         throw error
     }

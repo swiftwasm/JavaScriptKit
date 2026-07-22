@@ -137,20 +137,25 @@ import Testing
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let name = url.deletingPathExtension().lastPathComponent
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let moduleSource =
+        let moduleSources =
             input == "JSImportModule.swift"
-            ? try String(
-                contentsOf: Self.inputsDirectory.appending(path: "Modules/JSImportModule.mjs"),
-                encoding: .utf8
-            )
-
-            : nil
+            ? [
+                "/Modules/JSImportModule.mjs": try String(
+                    contentsOf: Self.inputsDirectory.appending(path: "Modules/JSImportModule.mjs"),
+                    encoding: .utf8
+                ),
+                "/Modules/ModuleCounter.mjs": try String(
+                    contentsOf: Self.inputsDirectory.appending(path: "Modules/ModuleCounter.mjs"),
+                    encoding: .utf8
+                ),
+            ]
+            : [:]
         let swiftAPI = SwiftToSkeleton(
             progress: .silent,
             moduleName: "TestModule",
             exposeToGlobal: false,
             externalModuleIndex: .empty,
-            javaScriptModuleSource: { $0 == "/Modules/JSImportModule.mjs" ? moduleSource : nil }
+            javaScriptModuleSource: { moduleSources[$0] }
         )
         swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
         let skeleton = try swiftAPI.finalize()

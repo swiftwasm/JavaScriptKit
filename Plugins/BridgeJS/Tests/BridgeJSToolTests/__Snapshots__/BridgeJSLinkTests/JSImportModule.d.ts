@@ -4,7 +4,7 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-export interface ImportedModuleCounter {
+export interface ModuleCounter {
     increment(): number;
     value: number;
 }
