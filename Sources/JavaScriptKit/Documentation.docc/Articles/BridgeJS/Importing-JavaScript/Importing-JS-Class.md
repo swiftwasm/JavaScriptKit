@@ -36,7 +36,7 @@ export class Greeter {
 ```
 
 ```swift
-@JSClass(from: .module("JavaScript/greeter.js"))
+@JSClass(from: .module("/JavaScript/greeter.js"))
 struct Greeter {
     @JSFunction init(_ name: String) throws(JSException)
     @JSFunction static func named(_ name: String) throws(JSException) -> Greeter
@@ -44,7 +44,7 @@ struct Greeter {
 }
 ```
 
-The module's named class export is the root for construction and static methods. Instance methods, getters, and setters operate on the wrapped object and must not specify their own `from:` argument. Use `jsName` on `@JSClass` to select a differently named class export. JavaScript inheritance may be implemented normally in the module; the Swift declaration describes the API visible on the exported class and its instances.
+The path's leading `/` denotes the Swift target root, not the filesystem root. The module's named class export is the root for construction and static methods. Instance methods, getters, and setters operate on the wrapped object and must not specify their own `from:` argument. Use `jsName` on `@JSClass` to select a differently named class export. JavaScript inheritance may be implemented normally in the module; the Swift declaration describes the API visible on the exported class and its instances.
 
 ### 2. Wire the JavaScript side
 

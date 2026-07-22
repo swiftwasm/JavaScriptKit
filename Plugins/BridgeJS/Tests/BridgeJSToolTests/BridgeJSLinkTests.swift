@@ -56,6 +56,20 @@ import Testing
         return inputs.filter { $0.hasSuffix(`extension`) }
     }
 
+    @Test
+    func rejectsNonRootedJavaScriptModulePath() {
+        let skeleton = BridgeJSSkeleton(
+            moduleName: "TestModule",
+            imported: ImportedModuleSkeleton(
+                children: [],
+                modules: [ImportedJSModule(path: "Modules/module.js", source: "")]
+            )
+        )
+        #expect(throws: BridgeJSLinkError.self) {
+            try BridgeJSLink(skeletons: [skeleton]).link()
+        }
+    }
+
     @Test(arguments: collectInputs(extension: ".swift"))
     func snapshot(input: String) throws {
         let url = Self.inputsDirectory.appendingPathComponent(input)
@@ -74,7 +88,7 @@ import Testing
             moduleName: "TestModule",
             exposeToGlobal: false,
             externalModuleIndex: .empty,
-            javaScriptModuleSource: { $0 == "Modules/JSImportModule.mjs" ? moduleSource : nil }
+            javaScriptModuleSource: { $0 == "/Modules/JSImportModule.mjs" ? moduleSource : nil }
         )
         importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).swift")
         let importResult = try importSwift.finalize()

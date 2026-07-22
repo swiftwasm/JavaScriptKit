@@ -23990,7 +23990,7 @@
               "isStatic" : false,
               "isThrows" : true
             },
-            "from" : "Modules\/JSImportModule.mjs",
+            "from" : "\/Modules\/JSImportModule.mjs",
             "name" : "moduleAdd",
             "parameters" : [
               {
@@ -24032,7 +24032,7 @@
               "isStatic" : false,
               "isThrows" : true
             },
-            "from" : "Modules\/JSImportModule.mjs",
+            "from" : "\/Modules\/JSImportModule.mjs",
             "jsName" : "renamedFunction",
             "name" : "moduleRenamed",
             "parameters" : [
@@ -24048,7 +24048,7 @@
         "globalGetters" : [
           {
             "accessLevel" : "internal",
-            "from" : "Modules\/JSImportModule.mjs",
+            "from" : "\/Modules\/JSImportModule.mjs",
             "jsName" : "version",
             "name" : "moduleVersion",
             "type" : {
@@ -24077,7 +24077,7 @@
                 }
               ]
             },
-            "from" : "Modules\/JSImportModule.mjs",
+            "from" : "\/Modules\/JSImportModule.mjs",
             "getters" : [
               {
                 "accessLevel" : "internal",
@@ -25049,7 +25049,7 @@
     ],
     "modules" : [
       {
-        "path" : "Modules\/JSImportModule.mjs",
+        "path" : "\/Modules\/JSImportModule.mjs",
         "source" : "export function moduleAdd(lhs, rhs) {\n    return lhs + rhs;\n}\n\nexport function renamedFunction() {\n    return \"loaded from a module\";\n}\n\nexport const version = \"module-v1\";\n\nexport class ModuleCounter {\n    constructor(value) {\n        this.value = value;\n    }\n\n    static create(value) {\n        return new ModuleCounter(value);\n    }\n\n    increment() {\n        return ++this.value;\n    }\n\n    setValue(value) {\n        this.value = value;\n    }\n}\n"
       }
     ]

@@ -17,7 +17,7 @@ import JavaScriptKit
 
 To bind a function that lives on the JavaScript global object (e.g. `parseInt`, `setTimeout`), add `from: .global`. Use `jsName` when the Swift name differs from the JavaScript name - see the ``JSFunction(jsName:from:)`` API reference for options.
 
-To ship the function with the Swift target, put it in a `.js` or `.mjs` ECMAScript module and use a target-relative path:
+To ship the function with the Swift target, put it in a `.js` or `.mjs` ECMAScript module and use a target-rooted path:
 
 ```javascript
 // JavaScript/math.js
@@ -25,11 +25,11 @@ export function add(a, b) { return a + b; }
 ```
 
 ```swift
-@JSFunction(from: .module("JavaScript/math.js"))
+@JSFunction(from: .module("/JavaScript/math.js"))
 func add(_ a: Double, _ b: Double) throws(JSException) -> Double
 ```
 
-BridgeJS copies explicitly referenced modules into the generated PackageToJS package. Multiple declarations may reference the same file; it is embedded and imported only once. `jsName` selects a differently named export, otherwise BridgeJS uses the normalized Swift name.
+The leading `/` denotes the Swift target root, not the filesystem root. BridgeJS copies explicitly referenced modules into the generated PackageToJS package. Multiple declarations may reference the same file; it is embedded and imported only once. `jsName` selects a differently named export, otherwise BridgeJS uses the normalized Swift name.
 
 ### 2. Provide the implementation at initialization
 

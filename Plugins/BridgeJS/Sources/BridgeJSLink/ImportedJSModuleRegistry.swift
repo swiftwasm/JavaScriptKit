@@ -18,6 +18,11 @@ final class ImportedJSModuleRegistry {
         var sources: [Key: String] = [:]
         for skeleton in skeletons {
             for module in skeleton.imported?.modules ?? [] {
+                guard module.path.hasPrefix("/") else {
+                    throw BridgeJSLinkError(
+                        message: "JavaScript module path must start with '/': \(module.path)"
+                    )
+                }
                 let key = Key(swiftModuleName: skeleton.moduleName, path: module.path)
                 if let existing = sources[key], existing != module.source {
                     throw BridgeJSLinkError(
@@ -31,7 +36,7 @@ final class ImportedJSModuleRegistry {
         for (index, entry) in sources.sorted(by: {
             ($0.key.swiftModuleName, $0.key.path) < ($1.key.swiftModuleName, $1.key.path)
         }).enumerated() {
-            let relativePath = "bridge-js-modules/\(entry.key.swiftModuleName)/\(entry.key.path)"
+            let relativePath = "bridge-js-modules/\(entry.key.swiftModuleName)\(entry.key.path)"
             aliases[entry.key] = "__bjs_imported_module_\(index)"
             artifacts.append(.init(relativePath: relativePath, source: entry.value))
         }
