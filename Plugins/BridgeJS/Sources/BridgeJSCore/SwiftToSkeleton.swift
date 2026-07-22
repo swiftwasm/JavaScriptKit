@@ -103,6 +103,16 @@ public final class SwiftToSkeleton {
                 if importedJSModules[path] != nil {
                     continue
                 }
+                guard path.hasPrefix("/") else {
+                    importCollector.errors.append(
+                        DiagnosticError(
+                            node: sourceFile,
+                            message: "JavaScript module paths must start with '/' to indicate the Swift target root: "
+                                + "'\(path)'."
+                        )
+                    )
+                    continue
+                }
                 guard let source = try javaScriptModuleSource(path) else {
                     importCollector.errors.append(
                         DiagnosticError(

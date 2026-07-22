@@ -1,16 +1,16 @@
 import JavaScriptKit
 import XCTest
 
-@JSFunction(from: .module("Modules/JSImportModule.mjs"))
+@JSFunction(from: .module("/Modules/JSImportModule.mjs"))
 func moduleAdd(_ lhs: Int, _ rhs: Int) throws(JSException) -> Int
 
-@JSFunction(jsName: "renamedFunction", from: .module("Modules/JSImportModule.mjs"))
+@JSFunction(jsName: "renamedFunction", from: .module("/Modules/JSImportModule.mjs"))
 func moduleRenamed() throws(JSException) -> String
 
-@JSGetter(jsName: "version", from: .module("Modules/JSImportModule.mjs"))
+@JSGetter(jsName: "version", from: .module("/Modules/JSImportModule.mjs"))
 var moduleVersion: String
 
-@JSClass(jsName: "ModuleCounter", from: .module("Modules/JSImportModule.mjs"))
+@JSClass(jsName: "ModuleCounter", from: .module("/Modules/JSImportModule.mjs"))
 struct ImportedModuleCounter {
     @JSFunction init(_ value: Int) throws(JSException)
     @JSFunction static func create(_ value: Int) throws(JSException) -> ImportedModuleCounter

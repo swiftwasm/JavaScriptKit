@@ -8,7 +8,7 @@ BridgeJS generates glue code per Swift target (module). Some patterns that are v
 
 ## File-backed JavaScript modules
 
-Files referenced by `JSImportFrom.module` must be nonempty, target-relative `.js` or `.mjs` paths and must remain within that Swift target. Only explicitly referenced files are copied. BridgeJS does not discover or rewrite an imported module's dependency graph, so referenced files should currently be self-contained.
+Files referenced by `JSImportFrom.module` must be nonempty `.js` or `.mjs` paths beginning with `/`. This leading slash denotes the Swift target root, not the filesystem root. Files must remain within that Swift target. Only explicitly referenced files are copied. BridgeJS does not discover or rewrite an imported module's dependency graph, so referenced files should currently be self-contained.
 
 Generated packages use static ECMAScript module imports. This works with the existing PackageToJS browser and Node ESM entry points. CommonJS and classic non-module script output are not generated or translated.
 

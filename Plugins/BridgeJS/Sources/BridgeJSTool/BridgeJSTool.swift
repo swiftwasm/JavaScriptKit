@@ -434,8 +434,8 @@ private func makeJavaScriptModuleFileLookup(
         guard fileURL.path.hasPrefix(targetPrefix) else {
             throw BridgeJSToolError("JavaScript module is outside the target directory: \(fileURL.path)")
         }
-        let relativePath = String(fileURL.path.dropFirst(targetPrefix.count))
-        modules[relativePath] = fileURL
+        let targetRootedPath = "/\(fileURL.path.dropFirst(targetPrefix.count))"
+        modules[targetRootedPath] = fileURL
     }
 
     return modules

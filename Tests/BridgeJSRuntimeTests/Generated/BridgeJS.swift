@@ -8,7 +8,7 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-// BridgeJS JavaScript module fingerprint: 89f1e5b74a064b7d
+// BridgeJS JavaScript module fingerprint: 2acd02db34648b2a
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si")

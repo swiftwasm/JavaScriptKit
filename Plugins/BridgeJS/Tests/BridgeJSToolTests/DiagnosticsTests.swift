@@ -28,9 +28,16 @@ import Testing
 
     @Test
     func missingJavaScriptModuleProducesDiagnostic() throws {
+        let source = "@JSFunction(from: .module(\"/missing.js\")) func imported() throws(JSException)"
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("JavaScript module file was not found at '/missing.js'"))
+    }
+
+    @Test
+    func javaScriptModulePathMustStartAtTargetRoot() throws {
         let source = "@JSFunction(from: .module(\"missing.js\")) func imported() throws(JSException)"
         let diagnostics = try #require(moduleDiagnostics(source: source))
-        #expect(diagnostics.description.contains("JavaScript module file was not found at 'missing.js'"))
+        #expect(diagnostics.description.contains("JavaScript module paths must start with '/'"))
     }
 
     /// Returns the first parameter's type node from a function in the source (the first `@JS func`-like decl), for pinpointing diagnostics.

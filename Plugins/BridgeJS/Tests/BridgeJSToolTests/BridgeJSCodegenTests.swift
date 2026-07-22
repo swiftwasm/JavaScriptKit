@@ -26,12 +26,12 @@ import Testing
 
     @Test
     func changingOnlyJavaScriptModuleContentsUpdatesGeneratedArtifacts() throws {
-        let modulePath = "Modules/math.mjs"
+        let modulePath = "/Modules/math.mjs"
         let swiftSource = """
-            @JSFunction(from: .module("Modules/math.mjs"))
+            @JSFunction(from: .module("/Modules/math.mjs"))
             func add(_ lhs: Int, _ rhs: Int) throws(JSException) -> Int
 
-            @JSGetter(jsName: "version", from: .module("Modules/math.mjs"))
+            @JSGetter(jsName: "version", from: .module("/Modules/math.mjs"))
             var moduleVersion: String
             """
 
@@ -150,7 +150,7 @@ import Testing
             moduleName: "TestModule",
             exposeToGlobal: false,
             externalModuleIndex: .empty,
-            javaScriptModuleSource: { $0 == "Modules/JSImportModule.mjs" ? moduleSource : nil }
+            javaScriptModuleSource: { $0 == "/Modules/JSImportModule.mjs" ? moduleSource : nil }
         )
         swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
         let skeleton = try swiftAPI.finalize()

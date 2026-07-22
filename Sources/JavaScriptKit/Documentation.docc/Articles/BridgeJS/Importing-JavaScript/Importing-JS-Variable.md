@@ -17,7 +17,7 @@ import JavaScriptKit
 
 To bind a variable that is not on `globalThis`, omit `from: .global` and supply the value in `getImports()` in the next step. Use `jsName` when the Swift name differs from the JavaScript property name - see the ``JSGetter(jsName:from:)`` API reference.
 
-A top-level getter can also read a named export from a target-relative module:
+A top-level getter can also read a named export from a target-rooted module:
 
 ```javascript
 // JavaScript/config.js
@@ -25,11 +25,11 @@ export const environment = "production";
 ```
 
 ```swift
-@JSGetter(jsName: "environment", from: .module("JavaScript/config.js"))
+@JSGetter(jsName: "environment", from: .module("/JavaScript/config.js"))
 var currentEnvironment: String
 ```
 
-Module exports are read-only through this API. Top-level `@JSSetter` remains unsupported.
+The path's leading `/` denotes the Swift target root, not the filesystem root. Module exports are read-only through this API. Top-level `@JSSetter` remains unsupported.
 
 ### 2. Add a setter for writable variables (optional)
 
