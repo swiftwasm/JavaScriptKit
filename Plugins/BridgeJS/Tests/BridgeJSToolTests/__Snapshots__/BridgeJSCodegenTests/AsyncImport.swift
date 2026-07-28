@@ -27,8 +27,8 @@ private enum _BJS_Closure_10TestModules7JSValueV_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0Kind, param0Payload1, param0Payload2) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModules7JSValueV_y(callbackValue, param0Kind, param0Payload1, param0Payload2)
             #else
             fatalError("Only available on WebAssembly")
@@ -88,8 +88,8 @@ private enum _BJS_Closure_10TestModules8JSObjectC_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModules8JSObjectC_y(callbackValue, param0Value)
             #else
             fatalError("Only available on WebAssembly")
@@ -149,8 +149,8 @@ private enum _BJS_Closure_10TestModulesSS_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 invoke_js_callback_TestModule_10TestModulesSS_y(callbackValue, param0Bytes, param0Length)
             }
             #else
@@ -211,8 +211,8 @@ private enum _BJS_Closure_10TestModulesSb_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModulesSb_y(callbackValue, param0Value)
             #else
             fatalError("Only available on WebAssembly")
@@ -272,8 +272,8 @@ private enum _BJS_Closure_10TestModulesSd_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModulesSd_y(callbackValue, param0Value)
             #else
             fatalError("Only available on WebAssembly")
@@ -333,8 +333,8 @@ private enum _BJS_Closure_10TestModulesSi_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModulesSi_y(callbackValue, param0Value)
             #else
             fatalError("Only available on WebAssembly")

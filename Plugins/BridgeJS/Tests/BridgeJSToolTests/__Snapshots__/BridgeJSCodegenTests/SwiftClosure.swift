@@ -27,8 +27,8 @@ private enum _BJS_Closure_10TestModule10HttpStatusO_10HttpStatusO {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModule10HttpStatusO_10HttpStatusO(callbackValue, param0Value)
             return HttpStatus.bridgeJSLiftReturn(ret)
             #else
@@ -90,8 +90,8 @@ private enum _BJS_Closure_10TestModule5ThemeO_5ThemeO {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 let ret = invoke_js_callback_TestModule_10TestModule5ThemeO_5ThemeO(callbackValue, param0Bytes, param0Length)
                 return ret
             }
@@ -156,8 +156,8 @@ private enum _BJS_Closure_10TestModule6AnimalV_6AnimalV {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let _ = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModule6AnimalV_6AnimalV(callbackValue)
             return Animal.bridgeJSLiftReturn()
             #else
@@ -219,8 +219,8 @@ private enum _BJS_Closure_10TestModule6PersonC_6PersonC {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Pointer = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModule6PersonC_6PersonC(callbackValue, param0Pointer)
             return Person.bridgeJSLiftReturn(ret)
             #else
@@ -282,8 +282,8 @@ private enum _BJS_Closure_10TestModule9APIResultO_9APIResultO {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0CaseId = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModule9APIResultO_9APIResultO(callbackValue, param0CaseId)
             return APIResult.bridgeJSLiftReturn(ret)
             #else
@@ -345,8 +345,8 @@ private enum _BJS_Closure_10TestModule9DirectionO_9DirectionO {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModule9DirectionO_9DirectionO(callbackValue, param0Value)
             return Direction.bridgeJSLiftReturn(ret)
             #else
@@ -408,8 +408,8 @@ private enum _BJS_Closure_10TestModuleKSS_Sb {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] (param0: String) throws(JSException) -> Bool in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 let ret = invoke_js_callback_TestModule_10TestModuleKSS_Sb(callbackValue, param0Bytes, param0Length)
                 return ret
             }
@@ -491,8 +491,8 @@ private enum _BJS_Closure_10TestModuleKSS_Si {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] (param0: String) throws(JSException) -> Int in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 let ret = invoke_js_callback_TestModule_10TestModuleKSS_Si(callbackValue, param0Bytes, param0Length)
                 return ret
             }
@@ -574,8 +574,8 @@ private enum _BJS_Closure_10TestModuleSS_SS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 let ret = invoke_js_callback_TestModule_10TestModuleSS_SS(callbackValue, param0Bytes, param0Length)
                 return ret
             }
@@ -640,8 +640,8 @@ private enum _BJS_Closure_10TestModuleSb_Sb {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSb_Sb(callbackValue, param0Value)
             return Bool.bridgeJSLiftReturn(ret)
             #else
@@ -703,8 +703,8 @@ private enum _BJS_Closure_10TestModuleSd_Sd {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSd_Sd(callbackValue, param0Value)
             return Double.bridgeJSLiftReturn(ret)
             #else
@@ -766,8 +766,8 @@ private enum _BJS_Closure_10TestModuleSf_Sf {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSf_Sf(callbackValue, param0Value)
             return Float.bridgeJSLiftReturn(ret)
             #else
@@ -829,8 +829,8 @@ private enum _BJS_Closure_10TestModuleSi_Si {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSi_Si(callbackValue, param0Value)
             return Int.bridgeJSLiftReturn(ret)
             #else
@@ -892,8 +892,8 @@ private enum _BJS_Closure_10TestModuleSq10HttpStatusO_Sq10HttpStatusO {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0IsSome, param0Value) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO(callbackValue, param0IsSome, param0Value)
             return Optional<HttpStatus>.bridgeJSLiftReturnFromSideChannel()
             #else
@@ -955,8 +955,8 @@ private enum _BJS_Closure_10TestModuleSq5ThemeO_Sq5ThemeO {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 invoke_js_callback_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(callbackValue, param0IsSome, param0Bytes, param0Length)
             }
             return Optional<Theme>.bridgeJSLiftReturnFromSideChannel()
@@ -1019,8 +1019,8 @@ private enum _BJS_Closure_10TestModuleSq6AnimalV_Sq6AnimalV {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0IsSome = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV(callbackValue, param0IsSome)
             return Optional<Animal>.bridgeJSLiftReturn()
             #else
@@ -1082,8 +1082,8 @@ private enum _BJS_Closure_10TestModuleSq6PersonC_Sq6PersonC {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0IsSome, param0Pointer) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSq6PersonC_Sq6PersonC(callbackValue, param0IsSome, param0Pointer)
             return Optional<Person>.bridgeJSLiftReturn(ret)
             #else
@@ -1145,8 +1145,8 @@ private enum _BJS_Closure_10TestModuleSq9APIResultO_Sq9APIResultO {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0IsSome, param0CaseId) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(callbackValue, param0IsSome, param0CaseId)
             return Optional<APIResult>.bridgeJSLiftReturn(ret)
             #else
@@ -1208,8 +1208,8 @@ private enum _BJS_Closure_10TestModuleSq9DirectionO_Sq9DirectionO {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0IsSome, param0Value) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO(callbackValue, param0IsSome, param0Value)
             return Optional<Direction>.bridgeJSLiftReturn(ret)
             #else
@@ -1271,8 +1271,8 @@ private enum _BJS_Closure_10TestModuleSqSS_SqSS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 invoke_js_callback_TestModule_10TestModuleSqSS_SqSS(callbackValue, param0IsSome, param0Bytes, param0Length)
             }
             return Optional<String>.bridgeJSLiftReturnFromSideChannel()
@@ -1335,8 +1335,8 @@ private enum _BJS_Closure_10TestModuleSqSb_SqSb {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0IsSome, param0Value) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSqSb_SqSb(callbackValue, param0IsSome, param0Value)
             return Optional<Bool>.bridgeJSLiftReturn(ret)
             #else
@@ -1398,8 +1398,8 @@ private enum _BJS_Closure_10TestModuleSqSd_SqSd {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0IsSome, param0Value) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModuleSqSd_SqSd(callbackValue, param0IsSome, param0Value)
             return Optional<Double>.bridgeJSLiftReturnFromSideChannel()
             #else
@@ -1461,8 +1461,8 @@ private enum _BJS_Closure_10TestModuleSqSf_SqSf {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0IsSome, param0Value) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModuleSqSf_SqSf(callbackValue, param0IsSome, param0Value)
             return Optional<Float>.bridgeJSLiftReturnFromSideChannel()
             #else
@@ -1524,8 +1524,8 @@ private enum _BJS_Closure_10TestModuleSqSi_SqSi {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0IsSome, param0Value) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModuleSqSi_SqSi(callbackValue, param0IsSome, param0Value)
             return Optional<Int>.bridgeJSLiftReturnFromSideChannel()
             #else
@@ -1592,8 +1592,8 @@ private enum _BJS_Closure_10TestModuleYaKSS_SS {
                 }, makeRejectClosure: {
                     JSTypedClosure<(sending JSValue) -> Void>($0)
                 }) { resolveRef, rejectRef in
-                let callbackValue = callback.bridgeJSLowerParameter()
                 param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                    let callbackValue = callback.bridgeJSLowerParameter()
                     invoke_js_callback_TestModule_10TestModuleYaKSS_SS(resolveRef, rejectRef, callbackValue, param0Bytes, param0Length)
                 }
             }
@@ -1663,8 +1663,8 @@ private enum _BJS_Closure_10TestModuleYaKSb_9APIResultO {
                 }, makeRejectClosure: {
                     JSTypedClosure<(sending JSValue) -> Void>($0)
                 }) { resolveRef, rejectRef in
-                let callbackValue = callback.bridgeJSLowerParameter()
                 let param0Value = param0.bridgeJSLowerParameter()
+                let callbackValue = callback.bridgeJSLowerParameter()
                 invoke_js_callback_TestModule_10TestModuleYaKSb_9APIResultO(resolveRef, rejectRef, callbackValue, param0Value)
             }
             return resolved
@@ -1733,8 +1733,8 @@ private enum _BJS_Closure_10TestModuleYaSS_6AnimalV {
                 }, makeRejectClosure: {
                     JSTypedClosure<(sending JSValue) -> Void>($0)
                 }) { resolveRef, rejectRef in
-                let callbackValue = callback.bridgeJSLowerParameter()
                 param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                    let callbackValue = callback.bridgeJSLowerParameter()
                     invoke_js_callback_TestModule_10TestModuleYaSS_6AnimalV(resolveRef, rejectRef, callbackValue, param0Bytes, param0Length)
                 }
             }
@@ -1804,8 +1804,8 @@ private enum _BJS_Closure_10TestModuleYaSS_SS {
                 }, makeRejectClosure: {
                     JSTypedClosure<(sending JSValue) -> Void>($0)
                 }) { resolveRef, rejectRef in
-                let callbackValue = callback.bridgeJSLowerParameter()
                 param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                    let callbackValue = callback.bridgeJSLowerParameter()
                     invoke_js_callback_TestModule_10TestModuleYaSS_SS(resolveRef, rejectRef, callbackValue, param0Bytes, param0Length)
                 }
             }
@@ -1870,8 +1870,8 @@ private enum _BJS_Closure_10TestModules6AnimalV_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let _ = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModules6AnimalV_y(callbackValue)
             #else
             fatalError("Only available on WebAssembly")
@@ -1931,8 +1931,8 @@ private enum _BJS_Closure_10TestModules7JSValueV_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0Kind, param0Payload1, param0Payload2) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModules7JSValueV_y(callbackValue, param0Kind, param0Payload1, param0Payload2)
             #else
             fatalError("Only available on WebAssembly")
@@ -1992,8 +1992,8 @@ private enum _BJS_Closure_10TestModules9APIResultO_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0CaseId = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModules9APIResultO_y(callbackValue, param0CaseId)
             #else
             fatalError("Only available on WebAssembly")
@@ -2053,8 +2053,8 @@ private enum _BJS_Closure_10TestModulesSS_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 invoke_js_callback_TestModule_10TestModulesSS_y(callbackValue, param0Bytes, param0Length)
             }
             #else
@@ -2652,8 +2652,8 @@ fileprivate func promise_reject_TestModule_extern(_ promise: Int32, _ valueKind:
 }
 
 func _$Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let (valueKind, valuePayload1, valuePayload2) = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_reject_TestModule(promiseValue, valueKind, valuePayload1, valuePayload2)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -2673,8 +2673,8 @@ fileprivate func promise_resolve_TestModule_SS_extern(_ promise: Int32, _ valueB
 }
 
 func _$Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        let promiseValue = promise.bridgeJSLowerParameter()
         promise_resolve_TestModule_SS(promiseValue, valueBytes, valueLength)
     }
     if let error = _swift_js_take_exception() { throw error }
@@ -2695,8 +2695,8 @@ fileprivate func promise_resolve_TestModule_6AnimalV_extern(_ promise: Int32, _ 
 }
 
 func _$Promise_resolve_6AnimalV(_ promise: JSObject, _ value: Animal) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueObjectId = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_6AnimalV(promiseValue, valueObjectId)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -2716,8 +2716,8 @@ fileprivate func promise_resolve_TestModule_9APIResultO_extern(_ promise: Int32,
 }
 
 func _$Promise_resolve_9APIResultO(_ promise: JSObject, _ value: APIResult) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueCaseId = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_9APIResultO(promiseValue, valueCaseId)
     if let error = _swift_js_take_exception() { throw error }
 }

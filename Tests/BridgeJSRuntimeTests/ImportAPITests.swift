@@ -21,6 +21,16 @@ import JavaScriptKit
     _ value: ImportedPayloadSignal?
 ) throws(JSException) -> ImportedPayloadSignal?
 
+// Parameters that push onto the shared stacks must arrive in declaration order.
+@JSFunction func jsJoinOptionalArrayThenArray(_ a: [Int]?, _ b: [Int]) throws(JSException) -> String
+@JSFunction func jsJoinOptionalStructThenArray(_ a: Point?, _ b: [Int]) throws(JSException) -> String
+@JSFunction func jsJoinEnumThenArray(_ a: ImportedPayloadSignal, _ b: [Int]) throws(JSException) -> String
+@JSFunction func jsJoinStringThenStackParams(
+    _ s: String,
+    _ a: [Int]?,
+    _ b: [Int]
+) throws(JSException) -> String
+
 class ImportAPITests: XCTestCase {
     func testRoundTripVoid() throws {
         try jsRoundTripVoid()
@@ -183,5 +193,22 @@ class ImportAPITests: XCTestCase {
 
         let dashed = try StaticBox.with_dashes()
         XCTAssertEqual(try dashed.value(), 7)
+    }
+
+    func testStackLoweredParameterOrder() throws {
+        XCTAssertEqual(try jsJoinOptionalArrayThenArray([1, 2], [7, 8, 9]), "[1,2]|[7,8,9]")
+        XCTAssertEqual(try jsJoinOptionalArrayThenArray(nil, [7, 8, 9]), "null|[7,8,9]")
+        XCTAssertEqual(
+            try jsJoinOptionalStructThenArray(Point(x: 1, y: 2), [7, 8, 9]),
+            #"{"x":1,"y":2}|[7,8,9]"#
+        )
+        XCTAssertEqual(
+            try jsJoinEnumThenArray(.stop(5), [7, 8, 9]),
+            #"{"tag":1,"param0":5}|[7,8,9]"#
+        )
+        XCTAssertEqual(
+            try jsJoinStringThenStackParams("s", [1, 2], [7, 8, 9]),
+            #""s"|[1,2]|[7,8,9]"#
+        )
     }
 }

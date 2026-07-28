@@ -264,8 +264,8 @@ fileprivate func bjs_TS2Swift_convert_extern(_ self: Int32, _ tsBytes: Int32, _ 
 }
 
 func _$TS2Swift_convert(_ self: JSObject, _ ts: String) throws(JSException) -> String {
-    let selfValue = self.bridgeJSLowerParameter()
     let ret0 = ts.bridgeJSWithLoweredParameter { (tsBytes, tsLength) in
+        let selfValue = self.bridgeJSLowerParameter()
         let ret = bjs_TS2Swift_convert(selfValue, tsBytes, tsLength)
         return ret
     }

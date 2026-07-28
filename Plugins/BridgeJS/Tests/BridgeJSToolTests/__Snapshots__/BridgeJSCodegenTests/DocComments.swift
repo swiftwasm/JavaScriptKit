@@ -2,8 +2,8 @@ struct AnyListener: Listener, _BridgedSwiftProtocolWrapper {
     let jsObject: JSObject
 
     func onEvent(id: Int) -> Void {
-        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let idValue = id.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         _extern_onEvent(jsObjectValue, idValue)
     }
 

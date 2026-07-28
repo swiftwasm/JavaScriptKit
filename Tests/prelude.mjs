@@ -46,6 +46,8 @@ export async function setupOptions(options, context) {
         }
     }
 
+    const joinStackParams = (...args) => args.map((v) => JSON.stringify(v)).join("|");
+
     return {
         ...options,
         getImports: (importsContext) => {
@@ -155,6 +157,10 @@ export async function setupOptions(options, context) {
                     return { x: (point.x | 0) + (dx | 0), y: (point.y | 0) + (dy | 0) };
                 },
                 jsRoundTripOptionalPoint: (point) => point,
+                jsJoinOptionalArrayThenArray: joinStackParams,
+                jsJoinOptionalStructThenArray: joinStackParams,
+                jsJoinEnumThenArray: joinStackParams,
+                jsJoinStringThenStackParams: joinStackParams,
                 roundTripArrayMembers: (value) => {
                     return value;
                 },

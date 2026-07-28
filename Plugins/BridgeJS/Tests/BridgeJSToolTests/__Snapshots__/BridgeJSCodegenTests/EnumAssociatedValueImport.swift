@@ -84,8 +84,8 @@ func _$PayloadSignalControls_roundTrip(_ signal: PayloadSignal) throws(JSExcepti
 }
 
 func _$PayloadSignalControls_send(_ self: JSObject, _ signal: PayloadSignal) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let signalCaseId = signal.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_PayloadSignalControls_send(selfValue, signalCaseId)
     if let error = _swift_js_take_exception() {
         throw error
@@ -102,8 +102,8 @@ func _$PayloadSignalControls_current(_ self: JSObject) throws(JSException) -> Pa
 }
 
 func _$PayloadSignalControls_roundTripOptional(_ self: JSObject, _ signal: Optional<PayloadSignal>) throws(JSException) -> Optional<PayloadSignal> {
-    let selfValue = self.bridgeJSLowerParameter()
     let (signalIsSome, signalCaseId) = signal.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     let ret = bjs_PayloadSignalControls_roundTripOptional(selfValue, signalIsSome, signalCaseId)
     if let error = _swift_js_take_exception() {
         throw error

@@ -21,8 +21,8 @@ fileprivate func bjs_check_extern(_ a: Float64, _ b: Int32) -> Void {
 }
 
 func _$check(_ a: Double, _ b: Bool) throws(JSException) -> Void {
-    let aValue = a.bridgeJSLowerParameter()
     let bValue = b.bridgeJSLowerParameter()
+    let aValue = a.bridgeJSLowerParameter()
     bjs_check(aValue, bValue)
     if let error = _swift_js_take_exception() {
         throw error

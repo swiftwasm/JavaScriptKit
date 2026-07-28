@@ -121,8 +121,8 @@ func _$Greeter_age_get(_ self: JSObject) throws(JSException) -> Double {
 }
 
 func _$Greeter_name_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+        let selfValue = self.bridgeJSLowerParameter()
         bjs_Greeter_name_set(selfValue, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -140,8 +140,8 @@ func _$Greeter_greet(_ self: JSObject) throws(JSException) -> String {
 }
 
 func _$Greeter_changeName(_ self: JSObject, _ name: String) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
+        let selfValue = self.bridgeJSLowerParameter()
         bjs_Greeter_changeName(selfValue, nameBytes, nameLength)
     }
     if let error = _swift_js_take_exception() {
@@ -174,9 +174,9 @@ fileprivate func bjs_Animatable_getAnimations_extern(_ self: Int32, _ options: I
 }
 
 func _$Animatable_animate(_ self: JSObject, _ keyframes: JSObject, _ options: JSObject) throws(JSException) -> JSObject {
-    let selfValue = self.bridgeJSLowerParameter()
-    let keyframesValue = keyframes.bridgeJSLowerParameter()
     let optionsValue = options.bridgeJSLowerParameter()
+    let keyframesValue = keyframes.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     let ret = bjs_Animatable_animate(selfValue, keyframesValue, optionsValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -185,8 +185,8 @@ func _$Animatable_animate(_ self: JSObject, _ keyframes: JSObject, _ options: JS
 }
 
 func _$Animatable_getAnimations(_ self: JSObject, _ options: JSObject) throws(JSException) -> JSObject {
-    let selfValue = self.bridgeJSLowerParameter()
     let optionsValue = options.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     let ret = bjs_Animatable_getAnimations(selfValue, optionsValue)
     if let error = _swift_js_take_exception() {
         throw error

@@ -27,8 +27,8 @@ private enum _BJS_Closure_10TestModule13JSPublicEventC_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModule13JSPublicEventC_y(callbackValue, param0Value)
             #else
             fatalError("Only available on WebAssembly")
@@ -88,8 +88,8 @@ private enum _BJS_Closure_10TestModule14JSPackageEventC_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModule14JSPackageEventC_y(callbackValue, param0Value)
             #else
             fatalError("Only available on WebAssembly")
@@ -149,8 +149,8 @@ private enum _BJS_Closure_10TestModule15JSInternalEventC_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModule15JSInternalEventC_y(callbackValue, param0Value)
             #else
             fatalError("Only available on WebAssembly")
@@ -206,8 +206,8 @@ fileprivate func bjs_JSPublicTarget_addInternalListener_extern(_ self: Int32, _ 
 }
 
 func _$JSPublicTarget_addPublicListener(_ self: JSObject, _ handler: JSTypedClosure<(JSPublicEvent) -> Void>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let handlerFuncRef = handler.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_JSPublicTarget_addPublicListener(selfValue, handlerFuncRef)
     if let error = _swift_js_take_exception() {
         throw error
@@ -215,8 +215,8 @@ func _$JSPublicTarget_addPublicListener(_ self: JSObject, _ handler: JSTypedClos
 }
 
 func _$JSPublicTarget_addInternalListener(_ self: JSObject, _ handler: JSTypedClosure<(JSPublicEvent) -> Void>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let handlerFuncRef = handler.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_JSPublicTarget_addInternalListener(selfValue, handlerFuncRef)
     if let error = _swift_js_take_exception() {
         throw error
@@ -236,8 +236,8 @@ fileprivate func bjs_JSPackageTarget_addPackageListener_extern(_ self: Int32, _ 
 }
 
 func _$JSPackageTarget_addPackageListener(_ self: JSObject, _ handler: JSTypedClosure<(JSPackageEvent) -> Void>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let handlerFuncRef = handler.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_JSPackageTarget_addPackageListener(selfValue, handlerFuncRef)
     if let error = _swift_js_take_exception() {
         throw error
@@ -257,8 +257,8 @@ fileprivate func bjs_JSInternalTarget_addInternalListener_extern(_ self: Int32, 
 }
 
 func _$JSInternalTarget_addInternalListener(_ self: JSObject, _ handler: JSTypedClosure<(JSInternalEvent) -> Void>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let handlerFuncRef = handler.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_JSInternalTarget_addInternalListener(selfValue, handlerFuncRef)
     if let error = _swift_js_take_exception() {
         throw error

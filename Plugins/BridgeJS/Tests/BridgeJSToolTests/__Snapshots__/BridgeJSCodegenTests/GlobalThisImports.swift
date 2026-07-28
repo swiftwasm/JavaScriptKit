@@ -55,8 +55,8 @@ fileprivate func bjs_JSConsole_log_extern(_ self: Int32, _ messageBytes: Int32, 
 }
 
 func _$JSConsole_log(_ self: JSObject, _ message: String) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     message.bridgeJSWithLoweredParameter { (messageBytes, messageLength) in
+        let selfValue = self.bridgeJSLowerParameter()
         bjs_JSConsole_log(selfValue, messageBytes, messageLength)
     }
     if let error = _swift_js_take_exception() {

@@ -27,8 +27,8 @@ private enum _BJS_Closure_10TestModule10RenderableP_10RenderableP {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0ObjectId = (param0 as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModule10RenderableP_10RenderableP(callbackValue, param0ObjectId)
             return AnyRenderable.bridgeJSLiftReturn(ret)
             #else
@@ -90,8 +90,8 @@ private enum _BJS_Closure_10TestModule10RenderableP_SS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0ObjectId = (param0 as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModule10RenderableP_SS(callbackValue, param0ObjectId)
             return String.bridgeJSLiftReturn(ret)
             #else
@@ -153,13 +153,13 @@ private enum _BJS_Closure_10TestModuleSq10RenderableP_SS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0IsSome, param0ObjectId): (Int32, Int32)
             if let param0 {
                 (param0IsSome, param0ObjectId) = (1, (param0 as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
             } else {
                 (param0IsSome, param0ObjectId) = (0, 0)
             }
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSq10RenderableP_SS(callbackValue, param0IsSome, param0ObjectId)
             return String.bridgeJSLiftReturn(ret)
             #else

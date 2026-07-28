@@ -59,9 +59,9 @@ fileprivate func bjs_translate_extern(_ point: Int32, _ dx: Int32, _ dy: Int32) 
 }
 
 func _$translate(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException) -> Point {
-    let pointObjectId = point.bridgeJSLowerParameter()
-    let dxValue = dx.bridgeJSLowerParameter()
     let dyValue = dy.bridgeJSLowerParameter()
+    let dxValue = dx.bridgeJSLowerParameter()
+    let pointObjectId = point.bridgeJSLowerParameter()
     let ret = bjs_translate(pointObjectId, dxValue, dyValue)
     if let error = _swift_js_take_exception() {
         throw error

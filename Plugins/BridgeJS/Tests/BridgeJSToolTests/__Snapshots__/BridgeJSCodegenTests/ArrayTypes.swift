@@ -534,8 +534,8 @@ fileprivate func bjs_checkArrayWithLength_extern(_ a: Int32, _ b: Float64) -> Vo
 }
 
 func _$checkArrayWithLength(_ a: JSObject, _ b: Double) throws(JSException) -> Void {
-    let aValue = a.bridgeJSLowerParameter()
     let bValue = b.bridgeJSLowerParameter()
+    let aValue = a.bridgeJSLowerParameter()
     bjs_checkArrayWithLength(aValue, bValue)
     if let error = _swift_js_take_exception() {
         throw error

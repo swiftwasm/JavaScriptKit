@@ -350,8 +350,8 @@ fileprivate func promise_reject_TestModule_extern(_ promise: Int32, _ valueKind:
 }
 
 func _$Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let (valueKind, valuePayload1, valuePayload2) = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_reject_TestModule(promiseValue, valueKind, valuePayload1, valuePayload2)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -391,8 +391,8 @@ fileprivate func promise_resolve_TestModule_Si_extern(_ promise: Int32, _ value:
 }
 
 func _$Promise_resolve_Si(_ promise: JSObject, _ value: Int) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueValue = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_Si(promiseValue, valueValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -412,8 +412,8 @@ fileprivate func promise_resolve_TestModule_SS_extern(_ promise: Int32, _ valueB
 }
 
 func _$Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        let promiseValue = promise.bridgeJSLowerParameter()
         promise_resolve_TestModule_SS(promiseValue, valueBytes, valueLength)
     }
     if let error = _swift_js_take_exception() { throw error }
@@ -434,8 +434,8 @@ fileprivate func promise_resolve_TestModule_Sb_extern(_ promise: Int32, _ value:
 }
 
 func _$Promise_resolve_Sb(_ promise: JSObject, _ value: Bool) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueValue = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_Sb(promiseValue, valueValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -455,8 +455,8 @@ fileprivate func promise_resolve_TestModule_Sf_extern(_ promise: Int32, _ value:
 }
 
 func _$Promise_resolve_Sf(_ promise: JSObject, _ value: Float) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueValue = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_Sf(promiseValue, valueValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -476,8 +476,8 @@ fileprivate func promise_resolve_TestModule_Sd_extern(_ promise: Int32, _ value:
 }
 
 func _$Promise_resolve_Sd(_ promise: JSObject, _ value: Double) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueValue = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_Sd(promiseValue, valueValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -497,8 +497,8 @@ fileprivate func promise_resolve_TestModule_8JSObjectC_extern(_ promise: Int32, 
 }
 
 func _$Promise_resolve_8JSObjectC(_ promise: JSObject, _ value: JSObject) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueValue = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_8JSObjectC(promiseValue, valueValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -518,8 +518,8 @@ fileprivate func promise_resolve_TestModule_10AsyncPointV_extern(_ promise: Int3
 }
 
 func _$Promise_resolve_10AsyncPointV(_ promise: JSObject, _ value: AsyncPoint) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueObjectId = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_10AsyncPointV(promiseValue, valueObjectId)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -539,8 +539,8 @@ fileprivate func promise_resolve_TestModule_14AsyncDirectionO_extern(_ promise: 
 }
 
 func _$Promise_resolve_14AsyncDirectionO(_ promise: JSObject, _ value: AsyncDirection) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueValue = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_14AsyncDirectionO(promiseValue, valueValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -560,8 +560,8 @@ fileprivate func promise_resolve_TestModule_10AsyncThemeO_extern(_ promise: Int3
 }
 
 func _$Promise_resolve_10AsyncThemeO(_ promise: JSObject, _ value: AsyncTheme) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        let promiseValue = promise.bridgeJSLowerParameter()
         promise_resolve_TestModule_10AsyncThemeO(promiseValue, valueBytes, valueLength)
     }
     if let error = _swift_js_take_exception() { throw error }
@@ -582,8 +582,8 @@ fileprivate func promise_resolve_TestModule_Sq14AsyncDirectionO_extern(_ promise
 }
 
 func _$Promise_resolve_Sq14AsyncDirectionO(_ promise: JSObject, _ value: Optional<AsyncDirection>) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_Sq14AsyncDirectionO(promiseValue, valueIsSome, valueValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -603,8 +603,8 @@ fileprivate func promise_resolve_TestModule_Sq10AsyncThemeO_extern(_ promise: In
 }
 
 func _$Promise_resolve_Sq10AsyncThemeO(_ promise: JSObject, _ value: Optional<AsyncTheme>) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     value.bridgeJSWithLoweredParameter { (valueIsSome, valueBytes, valueLength) in
+        let promiseValue = promise.bridgeJSLowerParameter()
         promise_resolve_TestModule_Sq10AsyncThemeO(promiseValue, valueIsSome, valueBytes, valueLength)
     }
     if let error = _swift_js_take_exception() { throw error }
@@ -625,8 +625,8 @@ fileprivate func promise_resolve_TestModule_Sq10AsyncPointV_extern(_ promise: In
 }
 
 func _$Promise_resolve_Sq10AsyncPointV(_ promise: JSObject, _ value: Optional<AsyncPoint>) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueIsSome = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_Sq10AsyncPointV(promiseValue, valueIsSome)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -646,8 +646,8 @@ fileprivate func promise_resolve_TestModule_Sa10AsyncPointV_extern(_ promise: In
 }
 
 func _$Promise_resolve_Sa10AsyncPointV(_ promise: JSObject, _ value: [AsyncPoint]) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let _ = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_Sa10AsyncPointV(promiseValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -667,8 +667,8 @@ fileprivate func promise_resolve_TestModule_Sa14AsyncDirectionO_extern(_ promise
 }
 
 func _$Promise_resolve_Sa14AsyncDirectionO(_ promise: JSObject, _ value: [AsyncDirection]) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let _ = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_Sa14AsyncDirectionO(promiseValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -688,8 +688,8 @@ fileprivate func promise_resolve_TestModule_SD10AsyncPointV_extern(_ promise: In
 }
 
 func _$Promise_resolve_SD10AsyncPointV(_ promise: JSObject, _ value: [String: AsyncPoint]) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let _ = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_SD10AsyncPointV(promiseValue)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -709,8 +709,8 @@ fileprivate func promise_resolve_TestModule_SD14AsyncDirectionO_extern(_ promise
 }
 
 func _$Promise_resolve_SD14AsyncDirectionO(_ promise: JSObject, _ value: [String: AsyncDirection]) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let _ = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_SD14AsyncDirectionO(promiseValue)
     if let error = _swift_js_take_exception() { throw error }
 }
