@@ -79,8 +79,8 @@ func _$SignalControls_roundTrip(_ signal: Signal) throws(JSException) -> Signal 
 }
 
 func _$SignalControls_send(_ self: JSObject, _ signal: Signal) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let signalValue = signal.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_SignalControls_send(selfValue, signalValue)
     if let error = _swift_js_take_exception() {
         throw error

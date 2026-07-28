@@ -107,7 +107,7 @@ public struct ImportTS {
         let abiReturnType: WasmCoreType?
         // Track destructured variable names for multiple lowered parameters
         var destructuredVarNames: [String] = []
-        // Stack-lowered parameters should be evaluated in reverse order to match LIFO stacks
+        // Parameters are lowered in reverse order to match the LIFO stacks they push onto
         var stackLoweringStmts: [String] = []
         // Values to extend lifetime during call
         var valuesToExtendLifetimeDuringCall: [String] = []
@@ -206,12 +206,8 @@ public struct ImportTS {
                     initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
                 }
 
-                if loweringInfo.loweredParameters.isEmpty {
-                    stackLoweringStmts.insert("let _ = \(initializerExpr)", at: 0)
-                    return
-                }
-
-                body.write("let \(pattern) = \(initializerExpr)")
+                let binding = loweringInfo.loweredParameters.isEmpty ? "_" : pattern
+                stackLoweringStmts.insert("let \(binding) = \(initializerExpr)", at: 0)
             }
             destructuredVarNames.append(contentsOf: destructuredNames)
 

@@ -873,8 +873,8 @@ func _$WithOptionalJSClass_childOrNull_get(_ self: JSObject) throws(JSException)
 }
 
 func _$WithOptionalJSClass_stringOrNull_set(_ self: JSObject, _ newValue: Optional<String>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+        let selfValue = self.bridgeJSLowerParameter()
         bjs_WithOptionalJSClass_stringOrNull_set(selfValue, newValueIsSome, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -883,8 +883,8 @@ func _$WithOptionalJSClass_stringOrNull_set(_ self: JSObject, _ newValue: Option
 }
 
 func _$WithOptionalJSClass_stringOrUndefined_set(_ self: JSObject, _ newValue: JSUndefinedOr<String>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+        let selfValue = self.bridgeJSLowerParameter()
         bjs_WithOptionalJSClass_stringOrUndefined_set(selfValue, newValueIsSome, newValueBytes, newValueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -893,8 +893,8 @@ func _$WithOptionalJSClass_stringOrUndefined_set(_ self: JSObject, _ newValue: J
 }
 
 func _$WithOptionalJSClass_doubleOrNull_set(_ self: JSObject, _ newValue: Optional<Double>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_doubleOrNull_set(selfValue, newValueIsSome, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -902,8 +902,8 @@ func _$WithOptionalJSClass_doubleOrNull_set(_ self: JSObject, _ newValue: Option
 }
 
 func _$WithOptionalJSClass_doubleOrUndefined_set(_ self: JSObject, _ newValue: JSUndefinedOr<Double>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_doubleOrUndefined_set(selfValue, newValueIsSome, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -911,8 +911,8 @@ func _$WithOptionalJSClass_doubleOrUndefined_set(_ self: JSObject, _ newValue: J
 }
 
 func _$WithOptionalJSClass_boolOrNull_set(_ self: JSObject, _ newValue: Optional<Bool>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_boolOrNull_set(selfValue, newValueIsSome, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -920,8 +920,8 @@ func _$WithOptionalJSClass_boolOrNull_set(_ self: JSObject, _ newValue: Optional
 }
 
 func _$WithOptionalJSClass_boolOrUndefined_set(_ self: JSObject, _ newValue: JSUndefinedOr<Bool>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_boolOrUndefined_set(selfValue, newValueIsSome, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -929,8 +929,8 @@ func _$WithOptionalJSClass_boolOrUndefined_set(_ self: JSObject, _ newValue: JSU
 }
 
 func _$WithOptionalJSClass_intOrNull_set(_ self: JSObject, _ newValue: Optional<Int>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_intOrNull_set(selfValue, newValueIsSome, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -938,8 +938,8 @@ func _$WithOptionalJSClass_intOrNull_set(_ self: JSObject, _ newValue: Optional<
 }
 
 func _$WithOptionalJSClass_intOrUndefined_set(_ self: JSObject, _ newValue: JSUndefinedOr<Int>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_intOrUndefined_set(selfValue, newValueIsSome, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -947,8 +947,8 @@ func _$WithOptionalJSClass_intOrUndefined_set(_ self: JSObject, _ newValue: JSUn
 }
 
 func _$WithOptionalJSClass_childOrNull_set(_ self: JSObject, _ newValue: Optional<WithOptionalJSClass>) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_childOrNull_set(selfValue, newValueIsSome, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -956,8 +956,8 @@ func _$WithOptionalJSClass_childOrNull_set(_ self: JSObject, _ newValue: Optiona
 }
 
 func _$WithOptionalJSClass_roundTripStringOrNull(_ self: JSObject, _ value: Optional<String>) throws(JSException) -> Optional<String> {
-    let selfValue = self.bridgeJSLowerParameter()
     value.bridgeJSWithLoweredParameter { (valueIsSome, valueBytes, valueLength) in
+        let selfValue = self.bridgeJSLowerParameter()
         bjs_WithOptionalJSClass_roundTripStringOrNull(selfValue, valueIsSome, valueBytes, valueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -967,8 +967,8 @@ func _$WithOptionalJSClass_roundTripStringOrNull(_ self: JSObject, _ value: Opti
 }
 
 func _$WithOptionalJSClass_roundTripStringOrUndefined(_ self: JSObject, _ value: JSUndefinedOr<String>) throws(JSException) -> JSUndefinedOr<String> {
-    let selfValue = self.bridgeJSLowerParameter()
     value.bridgeJSWithLoweredParameter { (valueIsSome, valueBytes, valueLength) in
+        let selfValue = self.bridgeJSLowerParameter()
         bjs_WithOptionalJSClass_roundTripStringOrUndefined(selfValue, valueIsSome, valueBytes, valueLength)
     }
     if let error = _swift_js_take_exception() {
@@ -978,8 +978,8 @@ func _$WithOptionalJSClass_roundTripStringOrUndefined(_ self: JSObject, _ value:
 }
 
 func _$WithOptionalJSClass_roundTripDoubleOrNull(_ self: JSObject, _ value: Optional<Double>) throws(JSException) -> Optional<Double> {
-    let selfValue = self.bridgeJSLowerParameter()
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_roundTripDoubleOrNull(selfValue, valueIsSome, valueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -988,8 +988,8 @@ func _$WithOptionalJSClass_roundTripDoubleOrNull(_ self: JSObject, _ value: Opti
 }
 
 func _$WithOptionalJSClass_roundTripDoubleOrUndefined(_ self: JSObject, _ value: JSUndefinedOr<Double>) throws(JSException) -> JSUndefinedOr<Double> {
-    let selfValue = self.bridgeJSLowerParameter()
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_roundTripDoubleOrUndefined(selfValue, valueIsSome, valueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -998,8 +998,8 @@ func _$WithOptionalJSClass_roundTripDoubleOrUndefined(_ self: JSObject, _ value:
 }
 
 func _$WithOptionalJSClass_roundTripBoolOrNull(_ self: JSObject, _ value: Optional<Bool>) throws(JSException) -> Optional<Bool> {
-    let selfValue = self.bridgeJSLowerParameter()
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     let ret = bjs_WithOptionalJSClass_roundTripBoolOrNull(selfValue, valueIsSome, valueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -1008,8 +1008,8 @@ func _$WithOptionalJSClass_roundTripBoolOrNull(_ self: JSObject, _ value: Option
 }
 
 func _$WithOptionalJSClass_roundTripBoolOrUndefined(_ self: JSObject, _ value: JSUndefinedOr<Bool>) throws(JSException) -> JSUndefinedOr<Bool> {
-    let selfValue = self.bridgeJSLowerParameter()
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     let ret = bjs_WithOptionalJSClass_roundTripBoolOrUndefined(selfValue, valueIsSome, valueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -1018,8 +1018,8 @@ func _$WithOptionalJSClass_roundTripBoolOrUndefined(_ self: JSObject, _ value: J
 }
 
 func _$WithOptionalJSClass_roundTripIntOrNull(_ self: JSObject, _ value: Optional<Int>) throws(JSException) -> Optional<Int> {
-    let selfValue = self.bridgeJSLowerParameter()
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_roundTripIntOrNull(selfValue, valueIsSome, valueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -1028,8 +1028,8 @@ func _$WithOptionalJSClass_roundTripIntOrNull(_ self: JSObject, _ value: Optiona
 }
 
 func _$WithOptionalJSClass_roundTripIntOrUndefined(_ self: JSObject, _ value: JSUndefinedOr<Int>) throws(JSException) -> JSUndefinedOr<Int> {
-    let selfValue = self.bridgeJSLowerParameter()
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_roundTripIntOrUndefined(selfValue, valueIsSome, valueValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -1038,8 +1038,8 @@ func _$WithOptionalJSClass_roundTripIntOrUndefined(_ self: JSObject, _ value: JS
 }
 
 func _$WithOptionalJSClass_roundTripChildOrNull(_ self: JSObject, _ value: Optional<WithOptionalJSClass>) throws(JSException) -> Optional<WithOptionalJSClass> {
-    let selfValue = self.bridgeJSLowerParameter()
     let (valueIsSome, valueValue) = value.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_WithOptionalJSClass_roundTripChildOrNull(selfValue, valueIsSome, valueValue)
     if let error = _swift_js_take_exception() {
         throw error

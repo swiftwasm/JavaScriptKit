@@ -247,6 +247,85 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
+            TestModule["bjs_optionalArrayThenArray"] = function bjs_optionalArrayThenArray(a) {
+                try {
+                    let optResult;
+                    if (a) {
+                        const arrayLen = i32Stack.pop();
+                        let arrayResult;
+                        if (arrayLen === -1) {
+                            arrayResult = taStack.pop();
+                        } else {
+                            arrayResult = [];
+                            for (let i = 0; i < arrayLen; i++) {
+                                const int = i32Stack.pop();
+                                arrayResult.push(int);
+                            }
+                            arrayResult.reverse();
+                        }
+                        optResult = arrayResult;
+                    } else {
+                        optResult = null;
+                    }
+                    const arrayLen1 = i32Stack.pop();
+                    let arrayResult1;
+                    if (arrayLen1 === -1) {
+                        arrayResult1 = taStack.pop();
+                    } else {
+                        arrayResult1 = [];
+                        for (let i1 = 0; i1 < arrayLen1; i1++) {
+                            const int1 = i32Stack.pop();
+                            arrayResult1.push(int1);
+                        }
+                        arrayResult1.reverse();
+                    }
+                    let ret = imports.optionalArrayThenArray(optResult, arrayResult1);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_borrowedStringAroundStackParams"] = function bjs_borrowedStringAroundStackParams(sBytes, sCount, a) {
+                try {
+                    const string = decodeString(sBytes, sCount);
+                    let optResult;
+                    if (a) {
+                        const arrayLen = i32Stack.pop();
+                        let arrayResult;
+                        if (arrayLen === -1) {
+                            arrayResult = taStack.pop();
+                        } else {
+                            arrayResult = [];
+                            for (let i = 0; i < arrayLen; i++) {
+                                const int = i32Stack.pop();
+                                arrayResult.push(int);
+                            }
+                            arrayResult.reverse();
+                        }
+                        optResult = arrayResult;
+                    } else {
+                        optResult = null;
+                    }
+                    const arrayLen1 = i32Stack.pop();
+                    let arrayResult1;
+                    if (arrayLen1 === -1) {
+                        arrayResult1 = taStack.pop();
+                    } else {
+                        arrayResult1 = [];
+                        for (let i1 = 0; i1 < arrayLen1; i1++) {
+                            const int1 = i32Stack.pop();
+                            arrayResult1.push(int1);
+                        }
+                        arrayResult1.reverse();
+                    }
+                    let ret = imports.borrowedStringAroundStackParams(string, optResult, arrayResult1);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
         },
         setInstance: (i) => {
             instance = i;

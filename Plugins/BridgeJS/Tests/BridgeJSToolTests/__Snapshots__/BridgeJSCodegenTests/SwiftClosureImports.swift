@@ -27,8 +27,8 @@ private enum _BJS_Closure_10TestModuleKSS_Sb {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] (param0: String) throws(JSException) -> Bool in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 let ret = invoke_js_callback_TestModule_10TestModuleKSS_Sb(callbackValue, param0Bytes, param0Length)
                 return ret
             }
@@ -110,8 +110,8 @@ private enum _BJS_Closure_10TestModuleSi_Si {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModuleSi_Si(callbackValue, param0Value)
             return Int.bridgeJSLiftReturn(ret)
             #else
@@ -178,8 +178,8 @@ private enum _BJS_Closure_10TestModuleYaKSS_SS {
                 }, makeRejectClosure: {
                     JSTypedClosure<(sending JSValue) -> Void>($0)
                 }) { resolveRef, rejectRef in
-                let callbackValue = callback.bridgeJSLowerParameter()
                 param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                    let callbackValue = callback.bridgeJSLowerParameter()
                     invoke_js_callback_TestModule_10TestModuleYaKSS_SS(resolveRef, rejectRef, callbackValue, param0Bytes, param0Length)
                 }
             }
@@ -244,8 +244,8 @@ private enum _BJS_Closure_10TestModules7JSValueV_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             let (param0Kind, param0Payload1, param0Payload2) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
             invoke_js_callback_TestModule_10TestModules7JSValueV_y(callbackValue, param0Kind, param0Payload1, param0Payload2)
             #else
             fatalError("Only available on WebAssembly")
@@ -305,8 +305,8 @@ private enum _BJS_Closure_10TestModulesSS_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let callbackValue = callback.bridgeJSLowerParameter()
             param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                let callbackValue = callback.bridgeJSLowerParameter()
                 invoke_js_callback_TestModule_10TestModulesSS_y(callbackValue, param0Bytes, param0Length)
             }
             #else
@@ -373,8 +373,8 @@ fileprivate func promise_reject_TestModule_extern(_ promise: Int32, _ valueKind:
 }
 
 func _$Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let (valueKind, valuePayload1, valuePayload2) = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_reject_TestModule(promiseValue, valueKind, valuePayload1, valuePayload2)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -394,8 +394,8 @@ fileprivate func promise_resolve_TestModule_SS_extern(_ promise: Int32, _ valueB
 }
 
 func _$Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        let promiseValue = promise.bridgeJSLowerParameter()
         promise_resolve_TestModule_SS(promiseValue, valueBytes, valueLength)
     }
     if let error = _swift_js_take_exception() { throw error }
@@ -414,9 +414,9 @@ fileprivate func bjs_applyInt_extern(_ value: Int32, _ transform: Int32) -> Int3
 }
 
 func _$applyInt(_ value: Int, _ transform: @escaping (Int) -> Int) throws(JSException) -> Int {
-    let valueValue = value.bridgeJSLowerParameter()
     let transform = JSTypedClosure<(Int) -> Int>(transform)
     let transformFuncRef = transform.bridgeJSLowerParameter()
+    let valueValue = value.bridgeJSLowerParameter()
     let ret = withExtendedLifetime((transform)) {
         bjs_applyInt(valueValue, transformFuncRef)
     }

@@ -9,6 +9,8 @@ export type Exports = {
 export type Imports = {
     roundtrip(items: number[]): number[];
     logStrings(items: string[]): void;
+    optionalArrayThenArray(a: number[] | null, b: number[]): number;
+    borrowedStringAroundStackParams(s: string, a: number[] | null, b: number[]): number;
 }
 export function createInstantiator(options: {
     imports: Imports;

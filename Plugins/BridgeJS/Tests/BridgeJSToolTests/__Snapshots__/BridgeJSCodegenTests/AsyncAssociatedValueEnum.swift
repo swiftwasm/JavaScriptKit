@@ -67,8 +67,8 @@ fileprivate func promise_reject_TestModule_extern(_ promise: Int32, _ valueKind:
 }
 
 func _$Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let (valueKind, valuePayload1, valuePayload2) = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_reject_TestModule(promiseValue, valueKind, valuePayload1, valuePayload2)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -88,8 +88,8 @@ fileprivate func promise_resolve_TestModule_18AsyncPayloadResultO_extern(_ promi
 }
 
 func _$Promise_resolve_18AsyncPayloadResultO(_ promise: JSObject, _ value: AsyncPayloadResult) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let valueCaseId = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_18AsyncPayloadResultO(promiseValue, valueCaseId)
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -109,8 +109,8 @@ fileprivate func promise_resolve_TestModule_Sq18AsyncPayloadResultO_extern(_ pro
 }
 
 func _$Promise_resolve_Sq18AsyncPayloadResultO(_ promise: JSObject, _ value: Optional<AsyncPayloadResult>) throws(JSException) -> Void {
-    let promiseValue = promise.bridgeJSLowerParameter()
     let (valueIsSome, valueCaseId) = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
     promise_resolve_TestModule_Sq18AsyncPayloadResultO(promiseValue, valueIsSome, valueCaseId)
     if let error = _swift_js_take_exception() { throw error }
 }

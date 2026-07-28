@@ -7,23 +7,23 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
     }
 
     func onValueChanged(_ value: String) -> Void {
-        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             _extern_onValueChanged(jsObjectValue, valueBytes, valueLength)
         }
     }
 
     func onCountUpdated(count: Int) -> Bool {
-        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let countValue = count.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let ret = _extern_onCountUpdated(jsObjectValue, countValue)
         return Bool.bridgeJSLiftReturn(ret)
     }
 
     func onLabelUpdated(_ prefix: String, _ suffix: String) -> Void {
-        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         prefix.bridgeJSWithLoweredParameter { (prefixBytes, prefixLength) in
             suffix.bridgeJSWithLoweredParameter { (suffixBytes, suffixLength) in
+                let jsObjectValue = jsObject.bridgeJSLowerParameter()
                 _extern_onLabelUpdated(jsObjectValue, prefixBytes, prefixLength, suffixBytes, suffixLength)
             }
         }
@@ -36,8 +36,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
     }
 
     func onHelperUpdated(_ helper: Helper) -> Void {
-        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let helperPointer = helper.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         _extern_onHelperUpdated(jsObjectValue, helperPointer)
     }
 
@@ -48,8 +48,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
     }
 
     func onOptionalHelperUpdated(_ helper: Optional<Helper>) -> Void {
-        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let (helperIsSome, helperPointer) = helper.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         _extern_onOptionalHelperUpdated(jsObjectValue, helperIsSome, helperPointer)
     }
 
@@ -66,8 +66,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
     }
 
     func handleResult(_ result: Result) -> Void {
-        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         let resultCaseId = result.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
         _extern_handleResult(jsObjectValue, resultCaseId)
     }
 
@@ -84,8 +84,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return Int.bridgeJSLiftReturn(ret)
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let newValueValue = newValue.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_eventCount_set(jsObjectValue, newValueValue)
         }
     }
@@ -105,8 +105,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return Optional<String>.bridgeJSLiftReturnFromSideChannel()
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+                let jsObjectValue = jsObject.bridgeJSLowerParameter()
                 bjs_MyViewControllerDelegate_optionalName_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
             }
         }
@@ -119,8 +119,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return Optional<ExampleEnum>.bridgeJSLiftReturnFromSideChannel()
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+                let jsObjectValue = jsObject.bridgeJSLowerParameter()
                 bjs_MyViewControllerDelegate_optionalRawEnum_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
             }
         }
@@ -133,8 +133,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return ExampleEnum.bridgeJSLiftReturn(ret)
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+                let jsObjectValue = jsObject.bridgeJSLowerParameter()
                 bjs_MyViewControllerDelegate_rawStringEnum_set(jsObjectValue, newValueBytes, newValueLength)
             }
         }
@@ -147,8 +147,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return Result.bridgeJSLiftReturn(ret)
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let newValueCaseId = newValue.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_result_set(jsObjectValue, newValueCaseId)
         }
     }
@@ -160,8 +160,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return Optional<Result>.bridgeJSLiftReturn(ret)
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let (newValueIsSome, newValueCaseId) = newValue.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_optionalResult_set(jsObjectValue, newValueIsSome, newValueCaseId)
         }
     }
@@ -173,8 +173,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return Direction.bridgeJSLiftReturn(ret)
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let newValueValue = newValue.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_direction_set(jsObjectValue, newValueValue)
         }
     }
@@ -186,8 +186,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return Optional<Direction>.bridgeJSLiftReturn(ret)
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_directionOptional_set(jsObjectValue, newValueIsSome, newValueValue)
         }
     }
@@ -199,8 +199,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return Priority.bridgeJSLiftReturn(ret)
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let newValueValue = newValue.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_priority_set(jsObjectValue, newValueValue)
         }
     }
@@ -212,8 +212,8 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             return Optional<Priority>.bridgeJSLiftReturnFromSideChannel()
         }
         set {
-            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
             bjs_MyViewControllerDelegate_priorityOptional_set(jsObjectValue, newValueIsSome, newValueValue)
         }
     }
