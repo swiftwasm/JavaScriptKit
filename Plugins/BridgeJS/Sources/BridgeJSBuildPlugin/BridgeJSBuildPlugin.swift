@@ -27,8 +27,7 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
         .map(\.url)
 
         let configFile = pathToConfigFile(target: target)
-        let inputJavaScriptFiles = discoverJavaScriptModuleFiles(in: target.directoryURL)
-        var inputFiles: [URL] = inputSwiftFiles + inputJavaScriptFiles
+        var inputFiles: [URL] = inputSwiftFiles
         if FileManager.default.fileExists(atPath: configFile.path) {
             inputFiles.append(configFile)
         }
@@ -78,7 +77,7 @@ struct BridgeJSBuildPlugin: BuildToolPlugin {
         }
 
         let allSwiftFiles = inputSwiftFiles + pluginGeneratedSwiftFiles
-        arguments.append(contentsOf: (allSwiftFiles + inputJavaScriptFiles).map(\.path))
+        arguments.append(contentsOf: allSwiftFiles.map(\.path))
 
         return .buildCommand(
             displayName: "Generate BridgeJS code",

@@ -9,8 +9,14 @@ import Testing
     }
     class TestPackagingSystem: PackagingSystem {
         var npmInstallCalls: [String] = []
+        var writtenFiles: [String] = []
         func npmInstall(packageDir: String) throws {
             npmInstallCalls.append(packageDir)
+        }
+
+        func writeFile(atPath: String, content: Data) throws {
+            writtenFiles.append(atPath)
+            try content.write(to: URL(fileURLWithPath: atPath))
         }
 
         func wasmOpt(_ arguments: [String], input: String, output: String) throws {
@@ -108,6 +114,98 @@ import Testing
             let (root, binDir) = try planner.planTestBuild(make: &make)
             #expect(binDir.description == "$OUTPUT/bin")
             return root
+        }
+    }
+
+    @Test func editingJavaScriptModuleOnlyResyncsModules() throws {
+        try withTemporaryDirectory { temporaryDirectory, _ in
+            let skeleton = temporaryDirectory.appending(path: "BridgeJS.json")
+            let module = temporaryDirectory.appending(path: "module.mjs")
+            let wasm = temporaryDirectory.appending(path: "main.wasm")
+            let plannerSource = temporaryDirectory.appending(path: "PackageToJS.swift")
+            let output = temporaryDirectory.appending(path: "output")
+            let intermediates = temporaryDirectory.appending(path: "intermediates")
+
+            let bridgeSkeleton = BridgeJSSkeleton(
+                moduleName: "TestModule",
+                imported: ImportedModuleSkeleton(
+                    children: [
+                        ImportedFileSkeleton(
+                            functions: [
+                                ImportedFunctionSkeleton(
+                                    name: "value",
+                                    from: .module("/module.mjs"),
+                                    parameters: [],
+                                    returnType: .void
+                                )
+                            ],
+                            types: []
+                        )
+                    ]
+                )
+            )
+            try JSONEncoder().encode(bridgeSkeleton).write(to: skeleton)
+            try Data("export const value = 1;\n".utf8).write(to: module)
+            try Data([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]).write(to: wasm)
+            try Data().write(to: plannerSource)
+
+            let system = TestPackagingSystem()
+            let planner = PackagingPlanner(
+                options: PackageToJS.PackageOptions(),
+                packageId: "test",
+                intermediatesDir: BuildPath(absolute: intermediates.path),
+                selfPackageDir: BuildPath(
+                    absolute: URL(fileURLWithPath: #filePath)
+                        .deletingLastPathComponent()
+                        .deletingLastPathComponent()
+                        .deletingLastPathComponent()
+                        .deletingLastPathComponent()
+                        .path
+                ),
+                skeletons: [
+                    .init(
+                        source: skeleton,
+                        targetDirectory: temporaryDirectory
+                    )
+                ],
+                outputDir: BuildPath(absolute: output.path),
+                wasmProductArtifact: BuildPath(absolute: wasm.path),
+                wasmFilename: "main.wasm",
+                configuration: "debug",
+                triple: "wasm32-unknown-wasi",
+                selfPath: BuildPath(absolute: plannerSource.path),
+                system: system
+            )
+            var make = MiniMake(printProgress: { _, _ in })
+            let root = try planner.planBuild(
+                make: &make,
+                buildOptions: PackageToJS.BuildOptions(
+                    product: "test",
+                    noOptimize: false,
+                    debugInfoFormat: .none,
+                    packageOptions: PackageToJS.PackageOptions()
+                )
+            )
+            let scope = MiniMake.VariableScope(variables: [:])
+
+            try make.build(output: root, scope: scope)
+
+            let copiedModule = output.appending(
+                path: "bridge-js-modules/TestModule/module.mjs"
+            )
+            #expect(try String(contentsOf: copiedModule, encoding: .utf8) == "export const value = 1;\n")
+            let initialLinkCount = system.writtenFiles.filter { $0.hasSuffix("/bridge-js.js") }.count
+            #expect(initialLinkCount == 1)
+
+            try Data("export const value = 2;\n".utf8).write(to: module)
+            try FileManager.default.setAttributes(
+                [.modificationDate: Date().addingTimeInterval(10)],
+                ofItemAtPath: module.path
+            )
+            try make.build(output: root, scope: scope)
+
+            #expect(try String(contentsOf: copiedModule, encoding: .utf8) == "export const value = 2;\n")
+            #expect(system.writtenFiles.filter { $0.hasSuffix("/bridge-js.js") }.count == initialLinkCount)
         }
     }
 }

@@ -704,7 +704,7 @@ class SkeletonCollector {
     private var visitedProducts: Set<Product.ID> = []
     private var visitedTargets: Set<Target.ID> = []
 
-    var skeletons: [URL] = []
+    var skeletons: [BridgeJSSkeletonInput] = []
     let skeletonFile = "BridgeJS.json"
     let context: PluginContext
 
@@ -712,7 +712,7 @@ class SkeletonCollector {
         self.context = context
     }
 
-    func collectFromProduct(name: String) -> [URL] {
+    func collectFromProduct(name: String) -> [BridgeJSSkeletonInput] {
         guard let product = context.package.products.first(where: { $0.name == name }) else {
             return []
         }
@@ -720,7 +720,7 @@ class SkeletonCollector {
         return skeletons
     }
 
-    func collectFromTests() -> [URL] {
+    func collectFromTests() -> [BridgeJSSkeletonInput] {
         let tests = context.package.targets.filter {
             guard let target = $0 as? SwiftSourceModuleTarget else { return false }
             return target.kind == .test
@@ -758,7 +758,12 @@ class SkeletonCollector {
             ]
             for skeletonURL in candidates {
                 if FileManager.default.fileExists(atPath: skeletonURL.path) {
-                    skeletons.append(skeletonURL)
+                    skeletons.append(
+                        BridgeJSSkeletonInput(
+                            source: skeletonURL,
+                            targetDirectory: target.directoryURL
+                        )
+                    )
                 }
             }
         }
@@ -788,7 +793,7 @@ extension PackagingPlanner {
         options: PackageToJS.PackageOptions,
         context: PluginContext,
         selfPackage: Package,
-        skeletons: [URL],
+        skeletons: [BridgeJSSkeletonInput],
         outputDir: URL,
         wasmProductArtifact: URL,
         wasmFilename: String
@@ -803,7 +808,7 @@ extension PackagingPlanner {
                 absolute: context.pluginWorkDirectoryURL.appending(path: outputBaseName + ".tmp").path
             ),
             selfPackageDir: BuildPath(absolute: selfPackage.directoryURL.path),
-            skeletons: skeletons.map { BuildPath(absolute: $0.path) },
+            skeletons: skeletons,
             outputDir: BuildPath(absolute: outputDir.path),
             wasmProductArtifact: BuildPath(absolute: wasmProductArtifact.path),
             wasmFilename: wasmFilename,

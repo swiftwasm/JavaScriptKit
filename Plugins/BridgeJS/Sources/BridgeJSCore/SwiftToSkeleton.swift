@@ -23,8 +23,8 @@ public final class SwiftToSkeleton {
 
     private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
     private var usedExternalModules = Set<String>()
-    private let javaScriptModuleSource: (String) throws -> String?
-    private var importedJSModules: [String: ImportedJSModule] = [:]
+    private let javaScriptModuleExists: (String) throws -> Bool
+    private var validatedJavaScriptModulePaths = Set<String>()
 
     /// Non-fatal diagnostics collected during `finalize()`. These do not fail the build.
     public private(set) var warnings: [(file: String, diagnostic: DiagnosticError)] = []
@@ -35,13 +35,13 @@ public final class SwiftToSkeleton {
         exposeToGlobal: Bool,
         externalModuleIndex: ExternalModuleIndex,
         identityMode: String? = nil,
-        javaScriptModuleSource: @escaping (String) throws -> String? = { _ in nil }
+        javaScriptModuleExists: @escaping (String) throws -> Bool = { _ in false }
     ) {
         self.progress = progress
         self.moduleName = moduleName
         self.exposeToGlobal = exposeToGlobal
         self.identityMode = identityMode
-        self.javaScriptModuleSource = javaScriptModuleSource
+        self.javaScriptModuleExists = javaScriptModuleExists
         self.typeDeclResolver = TypeDeclResolver()
         self.externalModuleIndex = externalModuleIndex
 
@@ -100,7 +100,7 @@ public final class SwiftToSkeleton {
                 + importCollector.importedGlobalGetters.compactMap(\.from)
             let modulePaths = Set(importOrigins.compactMap(\.modulePath))
             for path in modulePaths.sorted() {
-                if importedJSModules[path] != nil {
+                if validatedJavaScriptModulePaths.contains(path) {
                     continue
                 }
                 let pathNode = importCollector.importedModulePathNodes[path] ?? Syntax(sourceFile)
@@ -114,7 +114,26 @@ public final class SwiftToSkeleton {
                     )
                     continue
                 }
-                guard let source = try javaScriptModuleSource(path) else {
+                guard !path.split(separator: "/").contains("..") else {
+                    importCollector.errors.append(
+                        DiagnosticError(
+                            node: pathNode,
+                            message: "JavaScript module paths must not contain '..': '\(path)'."
+                        )
+                    )
+                    continue
+                }
+                let lowercasedPath = path.lowercased()
+                guard lowercasedPath.hasSuffix(".js") || lowercasedPath.hasSuffix(".mjs") else {
+                    importCollector.errors.append(
+                        DiagnosticError(
+                            node: pathNode,
+                            message: "JavaScript modules must use a '.js' or '.mjs' extension: '\(path)'."
+                        )
+                    )
+                    continue
+                }
+                guard try javaScriptModuleExists(path) else {
                     importCollector.errors.append(
                         DiagnosticError(
                             node: pathNode,
@@ -123,7 +142,7 @@ public final class SwiftToSkeleton {
                     )
                     continue
                 }
-                importedJSModules[path] = ImportedJSModule(path: path, source: source)
+                validatedJavaScriptModulePaths.insert(path)
             }
 
             let exportErrors = exportCollector.errors.filter { $0.severity == .error }
@@ -164,11 +183,7 @@ public final class SwiftToSkeleton {
             throw BridgeJSCoreDiagnosticError(diagnostics: diagnostics)
         }
         let importedSkeleton: ImportedModuleSkeleton? = {
-            let modules = importedJSModules.values.sorted { $0.path < $1.path }
-            let module = ImportedModuleSkeleton(
-                children: importedFiles,
-                modules: modules.isEmpty ? nil : modules
-            )
+            let module = ImportedModuleSkeleton(children: importedFiles)
             if module.children.allSatisfy({ $0.functions.isEmpty && $0.types.isEmpty && $0.globalGetters.isEmpty }) {
                 return nil
             }

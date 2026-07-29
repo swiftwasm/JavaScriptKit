@@ -103,7 +103,7 @@ import ArgumentParser
         }
     }
 
-    static func linkSkeletons(skeletonFiles: [String]) throws -> BridgeJSLinkOutput {
+    static func linkSkeletons(skeletonFiles: [String]) throws -> (outputJs: String, outputDts: String) {
         var skeletons: [BridgeJSSkeleton] = []
         for skeletonFile in skeletonFiles.sorted() {
             let skeletonData = try readData(from: skeletonFile)

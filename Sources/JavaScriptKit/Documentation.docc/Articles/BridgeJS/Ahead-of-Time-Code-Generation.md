@@ -155,6 +155,8 @@ git add Sources/MyApp/Generated
 git commit -m "Update generated BridgeJS code"
 ```
 
+Changing only the contents of a JavaScript module referenced with `from: .module` does not require regenerating the Swift glue or skeleton. PackageToJS tracks the referenced file as an input and copies its current contents into the generated package on the next build.
+
 ## When to Use Each Approach
 
 **Use the build plugin** when:

@@ -42,7 +42,7 @@ If the JavaScript property is writable and you need to set it from Swift, add a 
 
 ### 3. Provide the value at initialization (injected only)
 
-If you did **not** use `from: .global`, pass the value in the object returned by `getImports()` when initializing the WebAssembly module.
+If you omitted `from`, pass the value in the object returned by `getImports()` when initializing the WebAssembly module.
 
 ```javascript
 // index.js
@@ -57,13 +57,14 @@ const { exports } = await init({
 });
 ```
 
-If you used `from: .global`, do not pass the variable in `getImports()`; the runtime reads it from `globalThis`.
+If you used `from: .global` or `.module`, do not pass the variable in `getImports()`; the runtime resolves it from `globalThis` or the copied module.
 
 ## Supported features
 
 | Feature | Status |
 |:--|:--|
 | Read-only global (e.g. `document`, `console`) | ✅ |
+| Read-only module export | ✅ |
 | Writable global | ✅ (`@JSSetter`) |
 | Injected variable (via `getImports()`) | ✅ |
 

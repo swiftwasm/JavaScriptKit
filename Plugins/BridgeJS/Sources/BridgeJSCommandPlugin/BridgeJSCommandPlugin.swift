@@ -184,7 +184,6 @@ extension BridgeJSCommandPlugin.Context {
                 !$0.url.path.hasPrefix(generatedDirectory.path + "/")
             }.map(\.url.path)
         )
-        generateArguments.append(contentsOf: discoverJavaScriptModuleFiles(in: target.directoryURL).map(\.path))
         generateArguments.append(contentsOf: remainingArguments)
 
         try runBridgeJSTool(arguments: generateArguments)

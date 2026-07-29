@@ -8,8 +8,6 @@
 
 @_spi(BridgeJS) import JavaScriptKit
 
-// BridgeJS JavaScript module fingerprint: 76f49b4593a4f170
-
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests10HttpStatusO_Si_extern(_ callback: Int32, _ param0: Int32) -> Int32
@@ -17072,6 +17070,25 @@ func _$moduleRenamed() throws(JSException) -> String {
         throw error
     }
     return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_moduleThrow")
+fileprivate func bjs_moduleThrow_extern() -> Void
+#else
+fileprivate func bjs_moduleThrow_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_moduleThrow() -> Void {
+    return bjs_moduleThrow_extern()
+}
+
+func _$moduleThrow() throws(JSException) -> Void {
+    bjs_moduleThrow()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
 }
 
 #if arch(wasm32)

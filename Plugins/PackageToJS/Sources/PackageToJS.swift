@@ -273,6 +273,7 @@ struct PackageToJSError: Swift.Error, CustomStringConvertible {
 
 protocol PackagingSystem {
     func createDirectory(atPath: String) throws
+    func removeItemIfExists(atPath: String) throws
     func syncFile(from: String, to: String) throws
     func writeFile(atPath: String, content: Data) throws
 
@@ -281,11 +282,10 @@ protocol PackagingSystem {
 }
 
 extension PackagingSystem {
-    func recreateDirectory(atPath: String) throws {
+    func removeItemIfExists(atPath: String) throws {
         if FileManager.default.fileExists(atPath: atPath) {
             try FileManager.default.removeItem(atPath: atPath)
         }
-        try createDirectory(atPath: atPath)
     }
 
     func createDirectory(atPath: String) throws {
@@ -394,8 +394,18 @@ private func runCommand(_ command: URL, _ arguments: [String]) throws {
     }
 }
 
+struct BridgeJSSkeletonInput {
+    let source: URL
+    let targetDirectory: URL
+}
+
 /// Plans the build for packaging.
 struct PackagingPlanner {
+    struct JavaScriptModuleInput {
+        let source: BuildPath
+        let relativeOutputPath: String
+    }
+
     /// The options for packaging
     let options: PackageToJS.PackageOptions
     /// The package ID of the package that this plugin is running on
@@ -405,7 +415,7 @@ struct PackagingPlanner {
     /// The path of this file itself, used to capture changes of planner code
     let selfPath: BuildPath
     /// The BridgeJS API skeletons source files
-    let skeletons: [BuildPath]
+    let skeletons: [BridgeJSSkeletonInput]
     /// The directory for the final output
     let outputDir: BuildPath
     /// The directory for intermediate files
@@ -426,7 +436,7 @@ struct PackagingPlanner {
         packageId: String,
         intermediatesDir: BuildPath,
         selfPackageDir: BuildPath,
-        skeletons: [BuildPath],
+        skeletons: [BridgeJSSkeletonInput],
         outputDir: BuildPath,
         wasmProductArtifact: BuildPath,
         wasmFilename: String,
@@ -601,23 +611,15 @@ struct PackagingPlanner {
         )
         packageInputs.append(packageJsonTask)
 
-        if skeletons.count > 0 {
+        if !skeletons.isEmpty {
+            let bridge = try loadBridgeJS()
+            let skeletonFiles = skeletons.map { BuildPath(absolute: $0.source.path) }
             let bridgeJs = outputDir.appending(path: "bridge-js.js")
             let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
             let bridgeModules = outputDir.appending(path: "bridge-js-modules")
-            let linkBridgeJS: (MiniMake.VariableScope) throws -> BridgeJSLinkOutput = { scope in
-                var link = BridgeJSLink(
-                    sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
-                )
-                for skeletonPath in skeletons {
-                    let url = URL(fileURLWithPath: scope.resolve(path: skeletonPath).path)
-                    try link.addSkeletonFile(data: Data(contentsOf: url))
-                }
-                return try link.link()
-            }
             packageInputs.append(
-                make.addTask(inputFiles: skeletons + [selfPath], output: bridgeJs) { _, scope in
-                    let output = try linkBridgeJS(scope)
+                make.addTask(inputFiles: skeletonFiles + [selfPath], output: bridgeJs) { _, scope in
+                    let output = try bridge.link.link()
                     try system.writeFile(
                         atPath: scope.resolve(path: bridgeJs).path,
                         content: Data(output.outputJs.utf8)
@@ -628,16 +630,30 @@ struct PackagingPlanner {
                     )
                 }
             )
+            let bridgeModulesStamp = intermediatesDir.appending(path: "bridge-js-modules.stamp")
             packageInputs.append(
-                make.addTask(inputFiles: skeletons + [selfPath], output: bridgeModules) { _, scope in
-                    let output = try linkBridgeJS(scope)
+                make.addTask(
+                    inputFiles: skeletonFiles + bridge.modules.map(\.source) + [selfPath],
+                    inputTasks: [outputDirTask, intermediatesDirTask],
+                    output: bridgeModulesStamp
+                ) { _, scope in
                     let modulesDirectory = scope.resolve(path: bridgeModules)
-                    try system.recreateDirectory(atPath: modulesDirectory.path)
-                    for module in output.modules {
-                        let destination = scope.resolve(path: outputDir.appending(path: module.relativePath))
-                        try system.createDirectory(atPath: destination.deletingLastPathComponent().path)
-                        try system.writeFile(atPath: destination.path, content: Data(module.source.utf8))
+                    try system.removeItemIfExists(atPath: modulesDirectory.path)
+                    if !bridge.modules.isEmpty {
+                        try system.createDirectory(atPath: modulesDirectory.path)
                     }
+                    for module in bridge.modules {
+                        let destination = scope.resolve(path: outputDir.appending(path: module.relativeOutputPath))
+                        try system.createDirectory(atPath: destination.deletingLastPathComponent().path)
+                        try system.syncFile(
+                            from: scope.resolve(path: module.source).path,
+                            to: destination.path
+                        )
+                    }
+                    try system.writeFile(
+                        atPath: scope.resolve(path: bridgeModulesStamp).path,
+                        content: Data()
+                    )
                 }
             )
         }
@@ -669,6 +685,47 @@ struct PackagingPlanner {
             )
         }
         return (packageInputs, outputDirTask, intermediatesDirTask, packageJsonTask)
+    }
+
+    private func loadBridgeJS() throws -> (
+        link: BridgeJSLink,
+        modules: [JavaScriptModuleInput]
+    ) {
+        var link = BridgeJSLink(
+            sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
+        )
+        var moduleSources: [String: BuildPath] = [:]
+
+        for input in skeletons {
+            let skeleton = try link.addSkeletonFile(data: Data(contentsOf: input.source))
+            for reference in ImportedJSModuleRegistry.collectReferences(skeletons: [skeleton]) {
+                guard
+                    let sourceURL = JavaScriptModulePath.resolve(
+                        reference.path,
+                        relativeTo: input.targetDirectory
+                    ),
+                    JavaScriptModulePath.isRegularFile(at: sourceURL)
+                else {
+                    throw PackageToJSError(
+                        "JavaScript module file was not found at '\(reference.path)' in target '\(skeleton.moduleName)'."
+                    )
+                }
+                let source = BuildPath(absolute: sourceURL.path)
+                if let existing = moduleSources[reference.relativeOutputPath], existing != source {
+                    throw PackageToJSError(
+                        "Conflicting JavaScript module sources for '\(reference.relativeOutputPath)'."
+                    )
+                }
+                moduleSources[reference.relativeOutputPath] = source
+            }
+        }
+
+        return (
+            link,
+            moduleSources.sorted { $0.key < $1.key }.map {
+                JavaScriptModuleInput(source: $0.value, relativeOutputPath: $0.key)
+            }
+        )
     }
 
     /// Construct the test build plan and return the root task key

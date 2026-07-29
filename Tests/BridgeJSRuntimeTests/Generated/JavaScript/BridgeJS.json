@@ -24236,6 +24236,24 @@
 
               }
             }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : "\/Modules\/JSImportModule.mjs",
+            "name" : "moduleThrow",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
           }
         ],
         "globalGetters" : [
@@ -25237,16 +25255,6 @@
             ]
           }
         ]
-      }
-    ],
-    "modules" : [
-      {
-        "path" : "\/Modules\/JSImportModule.mjs",
-        "source" : "export function moduleAdd(lhs, rhs) {\n    return lhs + rhs;\n}\n\nexport function renamedFunction() {\n    return \"loaded from a module\";\n}\n\nexport const version = \"module-v1\";\n"
-      },
-      {
-        "path" : "\/Modules\/ModuleCounter.mjs",
-        "source" : "export class ModuleCounter {\n    constructor(value) {\n        this.value = value;\n    }\n\n    static create(value) {\n        return new ModuleCounter(value);\n    }\n\n    increment() {\n        return ++this.value;\n    }\n\n    setValue(value) {\n        this.value = value;\n    }\n}\n"
       }
     ]
   },

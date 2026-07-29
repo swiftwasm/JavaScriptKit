@@ -3,42 +3,41 @@ import BridgeJSSkeleton
 #endif
 
 final class ImportedJSModuleRegistry {
-    private struct Key: Hashable {
+    struct Reference: Hashable {
         let swiftModuleName: String
         let path: String
+
+        var relativeOutputPath: String {
+            "bridge-js-modules/\(swiftModuleName)\(path)"
+        }
     }
 
-    private var aliases: [Key: String] = [:]
-    private(set) var artifacts: [BridgeJSLinkOutput.Module] = []
+    private var aliases: [Reference: String] = [:]
+    private(set) var references: [Reference] = []
 
-    func configure(skeletons: [BridgeJSSkeleton]) throws {
+    func configure(skeletons: [BridgeJSSkeleton]) {
         aliases.removeAll(keepingCapacity: true)
-        artifacts.removeAll(keepingCapacity: true)
+        references = Self.collectReferences(skeletons: skeletons)
+        for (index, reference) in references.enumerated() {
+            aliases[reference] = "__bjs_imported_module_\(index)"
+        }
+    }
 
-        var sources: [Key: String] = [:]
+    static func collectReferences(skeletons: [BridgeJSSkeleton]) -> [Reference] {
+        var references = Set<Reference>()
         for skeleton in skeletons {
-            for module in skeleton.imported?.modules ?? [] {
-                guard module.path.hasPrefix("/") else {
-                    throw BridgeJSLinkError(
-                        message: "JavaScript module path must start with '/': \(module.path)"
-                    )
+            for file in skeleton.imported?.children ?? [] {
+                let origins =
+                    file.functions.compactMap(\.from)
+                    + file.globalGetters.compactMap(\.from)
+                    + file.types.compactMap(\.from)
+                for case .module(let path) in origins {
+                    references.insert(Reference(swiftModuleName: skeleton.moduleName, path: path))
                 }
-                let key = Key(swiftModuleName: skeleton.moduleName, path: module.path)
-                if let existing = sources[key], existing != module.source {
-                    throw BridgeJSLinkError(
-                        message: "Conflicting JavaScript module contents for \(skeleton.moduleName)/\(module.path)"
-                    )
-                }
-                sources[key] = module.source
             }
         }
-
-        for (index, entry) in sources.sorted(by: {
-            ($0.key.swiftModuleName, $0.key.path) < ($1.key.swiftModuleName, $1.key.path)
-        }).enumerated() {
-            let relativePath = "bridge-js-modules/\(entry.key.swiftModuleName)\(entry.key.path)"
-            aliases[entry.key] = "__bjs_imported_module_\(index)"
-            artifacts.append(.init(relativePath: relativePath, source: entry.value))
+        return references.sorted {
+            ($0.swiftModuleName, $0.path) < ($1.swiftModuleName, $1.path)
         }
     }
 
@@ -49,10 +48,10 @@ final class ImportedJSModuleRegistry {
         case .global:
             return "globalThis"
         case .module(let path):
-            let key = Key(swiftModuleName: swiftModuleName, path: path)
-            guard let alias = aliases[key] else {
+            let reference = Reference(swiftModuleName: swiftModuleName, path: path)
+            guard let alias = aliases[reference] else {
                 throw BridgeJSLinkError(
-                    message: "Missing embedded JavaScript module for \(swiftModuleName)/\(path)"
+                    message: "Missing JavaScript module \(swiftModuleName)\(path)"
                 )
             }
             return alias
@@ -60,8 +59,8 @@ final class ImportedJSModuleRegistry {
     }
 
     var importLines: [String] {
-        artifacts.enumerated().map { index, artifact in
-            let path = BridgeJSLink.escapeForJavaScriptStringLiteral(artifact.relativePath)
+        references.enumerated().map { index, reference in
+            let path = BridgeJSLink.escapeForJavaScriptStringLiteral(reference.relativeOutputPath)
             return "import * as __bjs_imported_module_\(index) from \"./\(path)\";"
         }
     }

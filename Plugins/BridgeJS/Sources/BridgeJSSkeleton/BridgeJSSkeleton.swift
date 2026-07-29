@@ -1126,13 +1126,24 @@ private struct AsyncClosureReturnTypeCollector: BridgeSkeletonVisitor {
 /// Controls where BridgeJS reads imported JS values from.
 ///
 /// - `global`: Read from `globalThis`.
+/// - `module`: Read from a target-local ECMAScript module.
 public enum JSImportFrom: Codable, Equatable, Sendable {
     case global
     case module(String)
 
     public init(from decoder: any Decoder) throws {
-        let value = try decoder.singleValueContainer().decode(String.self)
-        self = value == "global" ? .global : .module(value)
+        let container = try decoder.singleValueContainer()
+        let value = try container.decode(String.self)
+        if value == "global" {
+            self = .global
+        } else if value.hasPrefix("/") && !value.split(separator: "/").contains("..") {
+            self = .module(value)
+        } else {
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unknown import origin '\(value)'. Expected \"global\" or a rooted module path."
+            )
+        }
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -1143,17 +1154,6 @@ public enum JSImportFrom: Codable, Equatable, Sendable {
     public var modulePath: String? {
         guard case .module(let path) = self else { return nil }
         return path
-    }
-}
-
-/// A target-local ECMAScript module embedded into a BridgeJS skeleton.
-public struct ImportedJSModule: Codable, Equatable, Sendable {
-    public let path: String
-    public let source: String
-
-    public init(path: String, source: String) {
-        self.path = path
-        self.source = source
     }
 }
 
@@ -1482,32 +1482,9 @@ public struct ImportedFileSkeleton: Codable {
 
 public struct ImportedModuleSkeleton: Codable {
     public var children: [ImportedFileSkeleton]
-    public var modules: [ImportedJSModule]?
 
-    public init(children: [ImportedFileSkeleton], modules: [ImportedJSModule]? = nil) {
+    public init(children: [ImportedFileSkeleton]) {
         self.children = children
-        self.modules = modules
-    }
-
-    /// Deterministic non-cryptographic content fingerprint used to invalidate
-    /// build-plugin outputs when only an embedded JavaScript module changes.
-    public var moduleContentFingerprint: String? {
-        guard let modules, !modules.isEmpty else { return nil }
-        var hash: UInt64 = 0xcbf29ce484222325
-        func combine<S: Sequence>(_ bytes: S) where S.Element == UInt8 {
-            for byte in bytes {
-                hash ^= UInt64(byte)
-                hash &*= 0x100000001b3
-            }
-        }
-        for module in modules.sorted(by: { $0.path < $1.path }) {
-            combine(module.path.utf8)
-            combine(CollectionOfOne(UInt8(0)))
-            combine(module.source.utf8)
-            combine(CollectionOfOne(UInt8(0xff)))
-        }
-        let hexadecimal = String(hash, radix: 16)
-        return String(repeating: "0", count: 16 - hexadecimal.count) + hexadecimal
     }
 }
 

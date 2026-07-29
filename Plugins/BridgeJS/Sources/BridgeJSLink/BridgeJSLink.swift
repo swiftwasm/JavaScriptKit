@@ -41,10 +41,12 @@ public struct BridgeJSLink {
         return configIdentityMode == "pointer"
     }
 
-    mutating func addSkeletonFile(data: Data) throws {
+    @discardableResult
+    mutating func addSkeletonFile(data: Data) throws -> BridgeJSSkeleton {
         do {
             let unified = try JSONDecoder().decode(BridgeJSSkeleton.self, from: data)
             skeletons.append(unified)
+            return unified
         } catch {
             struct SkeletonDecodingError: Error, CustomStringConvertible {
                 let description: String
@@ -1226,9 +1228,9 @@ public struct BridgeJSLink {
         return printer.lines.joined(separator: "\n")
     }
 
-    public func link() throws -> BridgeJSLinkOutput {
+    public func link() throws -> (outputJs: String, outputDts: String) {
         intrinsicRegistry.reset()
-        try importedModuleRegistry.configure(skeletons: skeletons)
+        importedModuleRegistry.configure(skeletons: skeletons)
         intrinsicRegistry.classNamespaces = skeletons.reduce(into: [:]) { result, unified in
             guard let skeleton = unified.exported else { return }
             for klass in skeleton.classes {
@@ -1240,11 +1242,7 @@ public struct BridgeJSLink {
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
         let outputDts = generateTypeScript(data: data)
-        return BridgeJSLinkOutput(
-            outputJs: outputJs,
-            outputDts: outputDts,
-            modules: importedModuleRegistry.artifacts
-        )
+        return (outputJs, outputDts)
     }
 
     private func enumHelperAssignments() -> CodeFragmentPrinter {

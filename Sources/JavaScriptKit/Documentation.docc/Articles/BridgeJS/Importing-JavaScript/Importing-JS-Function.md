@@ -29,7 +29,17 @@ export function add(a, b) { return a + b; }
 func add(_ a: Double, _ b: Double) throws(JSException) -> Double
 ```
 
-The leading `/` denotes the Swift target root, not the filesystem root. BridgeJS copies explicitly referenced modules into the generated PackageToJS package. Multiple declarations may reference the same file; it is embedded and imported only once. `jsName` selects a differently named export, otherwise BridgeJS uses the normalized Swift name.
+The leading `/` denotes the Swift target root, not the filesystem root. BridgeJS copies explicitly referenced modules into the generated PackageToJS package. Multiple declarations may reference the same file; it is copied and imported only once. `jsName` selects a differently named export, otherwise BridgeJS uses the normalized Swift name.
+
+SwiftPM does not know what to do with `.js`/`.mjs` files inside a target, so exclude the directory holding them to avoid an "unhandled files" warning:
+
+```swift
+.target(
+    name: "MyApp",
+    exclude: ["JavaScript"],
+    plugins: [.plugin(name: "BridgeJS", package: "JavaScriptKit")]
+)
+```
 
 ### 2. Provide the implementation at initialization
 

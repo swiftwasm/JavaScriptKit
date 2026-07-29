@@ -8,7 +8,7 @@ Learn how to make JavaScript APIs callable from your Swift code using macro-anno
 
 > Tip: You can quickly preview what interfaces will be exposed on the Swift/JavaScript/TypeScript sides using the [BridgeJS Playground](https://swiftwasm.org/JavaScriptKit/PlayBridgeJS/).
 
-You can import JavaScript APIs into Swift in two ways:
+You can define JavaScript bindings for Swift in two ways:
 
 1. **Annotate Swift with macros** - Use `@JSFunction`, `@JSClass`, `@JSGetter`, and `@JSSetter` to declare bindings directly in Swift. No TypeScript required. Prefer this to get started.
 2. **Generate bindings from TypeScript** - Use a `bridge-js.d.ts` file; the BridgeJS plugin generates the same macro-annotated Swift. See <doc:Generating-from-TypeScript> when you have existing `.d.ts` definitions or many APIs to bind.
@@ -30,6 +30,8 @@ You can bring JavaScript into Swift in three ways:
 - **Inject at initialization**: Declare in Swift and supply the implementation in `getImports()` (e.g. a `today()` function).
 - **Import from `globalThis`**: For APIs on the JavaScript global object (e.g. `console`, `document`), use `@JSGetter(from: .global)` so they are read from `globalThis` and you don't pass them in `getImports()`.
 - **Ship an ECMAScript module**: Use `from: .module("/path/from/target/root.js")` on a top-level function/getter or `@JSClass`. The leading `/` denotes the Swift target root; it is not a filesystem-absolute path. BridgeJS copies the referenced file into the generated package, so it is not supplied through `getImports()`.
+
+Exclude the directory containing `.js` or `.mjs` modules from the Swift target to avoid SwiftPM's unhandled-file warning. See <doc:Importing-JS-Function> for an example.
 
 ```swift
 import JavaScriptKit

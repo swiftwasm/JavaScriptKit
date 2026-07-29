@@ -49,13 +49,24 @@ import Testing
     }
 
     @Test
-    func missingJavaScriptModuleWithTraversalProducesDiagnosticAtPath() throws {
+    func javaScriptModulePathMustNotTraverse() throws {
         let source = """
             let unrelated = 0
             @JSFunction(from: .module("/../missing.js")) func imported() throws(JSException)
             """
         let diagnostics = try #require(moduleDiagnostics(source: source))
-        #expect(diagnostics.description.contains("JavaScript module file was not found at '/../missing.js'"))
+        #expect(diagnostics.description.contains("JavaScript module paths must not contain '..'"))
+        #expect(diagnostics.description.contains("test.swift:2:27:"))
+    }
+
+    @Test
+    func javaScriptModulePathMustUseSupportedExtension() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(from: .module("/module.ts")) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("JavaScript modules must use a '.js' or '.mjs' extension"))
         #expect(diagnostics.description.contains("test.swift:2:27:"))
     }
 

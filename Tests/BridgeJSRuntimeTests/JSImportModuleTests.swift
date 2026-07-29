@@ -7,6 +7,9 @@ func moduleAdd(_ lhs: Int, _ rhs: Int) throws(JSException) -> Int
 @JSFunction(jsName: "renamedFunction", from: .module("/Modules/JSImportModule.mjs"))
 func moduleRenamed() throws(JSException) -> String
 
+@JSFunction(from: .module("/Modules/JSImportModule.mjs"))
+func moduleThrow() throws(JSException)
+
 @JSGetter(jsName: "version", from: .module("/Modules/JSImportModule.mjs"))
 var moduleVersion: String
 
@@ -24,6 +27,12 @@ final class JSImportModuleTests: XCTestCase {
         XCTAssertEqual(try moduleAdd(20, 22), 42)
         XCTAssertEqual(try moduleRenamed(), "loaded from a module")
         XCTAssertEqual(try moduleVersion, "module-v1")
+    }
+
+    func testModuleFunctionPropagatesJavaScriptException() {
+        XCTAssertThrowsError(try moduleThrow()) { error in
+            XCTAssertTrue(error is JSException)
+        }
     }
 
     func testModuleClassStaticAndInstanceAPIs() throws {
