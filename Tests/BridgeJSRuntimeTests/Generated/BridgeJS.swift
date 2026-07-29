@@ -17043,8 +17043,8 @@ fileprivate func bjs_moduleAdd_extern(_ lhs: Int32, _ rhs: Int32) -> Int32 {
 }
 
 func _$moduleAdd(_ lhs: Int, _ rhs: Int) throws(JSException) -> Int {
-    let lhsValue = lhs.bridgeJSLowerParameter()
     let rhsValue = rhs.bridgeJSLowerParameter()
+    let lhsValue = lhs.bridgeJSLowerParameter()
     let ret = bjs_moduleAdd(lhsValue, rhsValue)
     if let error = _swift_js_take_exception() {
         throw error
@@ -17179,8 +17179,8 @@ func _$ModuleCounter_value_get(_ self: JSObject) throws(JSException) -> Int {
 }
 
 func _$ModuleCounter_value_set(_ self: JSObject, _ newValue: Int) throws(JSException) -> Void {
-    let selfValue = self.bridgeJSLowerParameter()
     let newValueValue = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
     bjs_ModuleCounter_value_set(selfValue, newValueValue)
     if let error = _swift_js_take_exception() {
         throw error
