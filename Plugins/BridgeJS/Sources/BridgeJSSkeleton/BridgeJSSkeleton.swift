@@ -1101,7 +1101,7 @@ public struct ExportedSkeleton: Codable {
     }
 
     private var asyncClosureResolveReturnTypes: [BridgeType] {
-        var collector = AsyncClosureReturnTypeCollector()
+        let collector = AsyncClosureReturnTypeCollector()
         var walker = BridgeSkeletonWalker(visitor: collector)
         walker.walk(self)
         return walker.visitor.returnTypes
@@ -1126,8 +1126,35 @@ private struct AsyncClosureReturnTypeCollector: BridgeSkeletonVisitor {
 /// Controls where BridgeJS reads imported JS values from.
 ///
 /// - `global`: Read from `globalThis`.
-public enum JSImportFrom: String, Codable {
+/// - `module`: Read from a target-local ECMAScript module.
+public enum JSImportFrom: Codable, Equatable, Sendable {
     case global
+    case module(String)
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let value = try container.decode(String.self)
+        if value == "global" {
+            self = .global
+        } else if value.hasPrefix("/") && !value.split(separator: "/").contains("..") {
+            self = .module(value)
+        } else {
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unknown import origin '\(value)'. Expected \"global\" or a rooted module path."
+            )
+        }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(modulePath ?? "global")
+    }
+
+    public var modulePath: String? {
+        guard case .module(let path) = self else { return nil }
+        return path
+    }
 }
 
 public struct ImportedFunctionSkeleton: Codable {

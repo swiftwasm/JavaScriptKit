@@ -17,6 +17,20 @@ import JavaScriptKit
 
 To bind a variable that is not on `globalThis`, omit `from: .global` and supply the value in `getImports()` in the next step. Use `jsName` when the Swift name differs from the JavaScript property name - see the ``JSGetter(jsName:from:)`` API reference.
 
+A top-level getter can also read a named export from a target-rooted module:
+
+```javascript
+// JavaScript/config.js
+export const environment = "production";
+```
+
+```swift
+@JSGetter(jsName: "environment", from: .module("/JavaScript/config.js"))
+var currentEnvironment: String
+```
+
+The path's leading `/` denotes the Swift target root, not the filesystem root. Module exports are read-only through this API. Top-level `@JSSetter` remains unsupported.
+
 ### 2. Add a setter for writable variables (optional)
 
 If the JavaScript property is writable and you need to set it from Swift, add a corresponding `@JSSetter` function. Property setters are exposed as functions (e.g. `setMyConfig(_:)`) because Swift property setters cannot `throw`.
@@ -28,7 +42,7 @@ If the JavaScript property is writable and you need to set it from Swift, add a 
 
 ### 3. Provide the value at initialization (injected only)
 
-If you did **not** use `from: .global`, pass the value in the object returned by `getImports()` when initializing the WebAssembly module.
+If you omitted `from`, pass the value in the object returned by `getImports()` when initializing the WebAssembly module.
 
 ```javascript
 // index.js
@@ -43,13 +57,14 @@ const { exports } = await init({
 });
 ```
 
-If you used `from: .global`, do not pass the variable in `getImports()`; the runtime reads it from `globalThis`.
+If you used `from: .global` or `.module`, do not pass the variable in `getImports()`; the runtime resolves it from `globalThis` or the copied module.
 
 ## Supported features
 
 | Feature | Status |
 |:--|:--|
 | Read-only global (e.g. `document`, `console`) | ✅ |
+| Read-only module export | ✅ |
 | Writable global | ✅ (`@JSSetter`) |
 | Injected variable (via `getImports()`) | ✅ |
 

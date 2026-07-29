@@ -1,0 +1,191 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : "\/Modules\/JSImportModule.mjs",
+            "name" : "moduleAdd",
+            "parameters" : [
+              {
+                "name" : "lhs",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "rhs",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : "\/Modules\/JSImportModule.mjs",
+            "jsName" : "renamedFunction",
+            "name" : "moduleRenamed",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "accessLevel" : "internal",
+            "from" : "\/Modules\/JSImportModule.mjs",
+            "jsName" : "version",
+            "name" : "moduleVersion",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "value",
+                  "type" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "from" : "\/Modules\/ModuleCounter.mjs",
+            "getters" : [
+              {
+                "accessLevel" : "internal",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "increment",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "ModuleCounter",
+            "setters" : [
+              {
+                "accessLevel" : "internal",
+                "functionName" : "value_set",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "create",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "ModuleCounter"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

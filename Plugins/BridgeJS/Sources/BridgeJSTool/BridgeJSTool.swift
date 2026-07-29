@@ -176,7 +176,13 @@ import BridgeJSUtilities
                 moduleName: moduleName,
                 exposeToGlobal: config.exposeToGlobal,
                 externalModuleIndex: externalModuleIndex,
-                identityMode: config.identityMode
+                identityMode: config.identityMode,
+                javaScriptModuleExists: { path in
+                    guard let file = JavaScriptModulePath.resolve(path, relativeTo: targetDirectory) else {
+                        return false
+                    }
+                    return JavaScriptModulePath.isRegularFile(at: file)
+                }
             )
             for inputFile in inputFiles.sorted() {
                 try withSpan("Parsing \(inputFile)") {
@@ -396,7 +402,7 @@ private func inputSwiftFiles(targetDirectory: URL, positionalArguments: [String]
     if positionalArguments.isEmpty {
         return recursivelyCollectSwiftFiles(from: targetDirectory).map(\.path)
     }
-    return positionalArguments
+    return positionalArguments.filter { URL(fileURLWithPath: $0).pathExtension == "swift" }
 }
 
 extension Profiling {

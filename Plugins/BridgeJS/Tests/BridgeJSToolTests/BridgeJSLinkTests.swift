@@ -14,13 +14,13 @@ import Testing
         function: String = #function,
         sourceLocation: Testing.SourceLocation = #_sourceLocation
     ) throws {
-        let (outputJs, outputDts) = try bridgeJSLink.link()
+        let output = try bridgeJSLink.link()
         try assertSnapshot(
             name: name,
             filePath: filePath,
             function: function,
             sourceLocation: sourceLocation,
-            input: outputJs.data(using: .utf8)!,
+            input: output.outputJs.data(using: .utf8)!,
             fileExtension: "js"
         )
         try assertSnapshot(
@@ -28,7 +28,7 @@ import Testing
             filePath: filePath,
             function: function,
             sourceLocation: sourceLocation,
-            input: outputDts.data(using: .utf8)!,
+            input: output.outputDts.data(using: .utf8)!,
             fileExtension: "d.ts"
         )
     }
@@ -49,11 +49,19 @@ import Testing
         let name = url.deletingPathExtension().lastPathComponent
 
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
+        let modulePaths: Set<String> =
+            input == "JSImportModule.swift"
+            ? [
+                "/Modules/JSImportModule.mjs",
+                "/Modules/ModuleCounter.mjs",
+            ]
+            : []
         let importSwift = SwiftToSkeleton(
             progress: .silent,
             moduleName: "TestModule",
             exposeToGlobal: false,
-            externalModuleIndex: .empty
+            externalModuleIndex: .empty,
+            javaScriptModuleExists: { modulePaths.contains($0) }
         )
         importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).swift")
         let importResult = try importSwift.finalize()

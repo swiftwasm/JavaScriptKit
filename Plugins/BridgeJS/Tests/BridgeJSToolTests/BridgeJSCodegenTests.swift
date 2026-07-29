@@ -4,6 +4,7 @@ import SwiftParser
 import Testing
 
 @testable import BridgeJSCore
+@testable import BridgeJSLink
 @testable import BridgeJSSkeleton
 
 @Suite struct BridgeJSCodegenTests {
@@ -12,6 +13,44 @@ import Testing
     ).appendingPathComponent("MacroSwift")
     static let multifileInputsDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
         .appendingPathComponent("Inputs").appendingPathComponent("MacroSwift").appendingPathComponent("Multifile")
+
+    @Test
+    func javaScriptModuleReferencesAreStoredWithoutSourceContents() throws {
+        let modulePath = "/Modules/math.mjs"
+        let swiftSource = """
+            @JSFunction(from: .module("/Modules/math.mjs"))
+            func add(_ lhs: Int, _ rhs: Int) throws(JSException) -> Int
+
+            @JSGetter(jsName: "version", from: .module("/Modules/math.mjs"))
+            var moduleVersion: String
+            """
+        var validationCount = 0
+        let generator = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty,
+            javaScriptModuleExists: {
+                validationCount += 1
+                return $0 == modulePath
+            }
+        )
+        generator.addSourceFile(Parser.parse(source: swiftSource), inputFilePath: "Imports.swift")
+        let skeleton = try generator.finalize()
+        let encoded = String(decoding: try JSONEncoder().encode(skeleton), as: UTF8.self)
+        let imported = try #require(skeleton.imported)
+
+        #expect(validationCount == 1)
+        #expect(imported.children.flatMap(\.functions).first?.from == .module(modulePath))
+        #expect(!encoded.contains(#""modules""#))
+    }
+
+    @Test
+    func invalidJSImportFromValueFailsToDecode() {
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(JSImportFrom.self, from: Data(#""module.js""#.utf8))
+        }
+    }
 
     private func snapshotCodegen(
         skeleton: BridgeJSSkeleton,
@@ -77,11 +116,19 @@ import Testing
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let name = url.deletingPathExtension().lastPathComponent
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
+        let modulePaths: Set<String> =
+            input == "JSImportModule.swift"
+            ? [
+                "/Modules/JSImportModule.mjs",
+                "/Modules/ModuleCounter.mjs",
+            ]
+            : []
         let swiftAPI = SwiftToSkeleton(
             progress: .silent,
             moduleName: "TestModule",
             exposeToGlobal: false,
-            externalModuleIndex: .empty
+            externalModuleIndex: .empty,
+            javaScriptModuleExists: { modulePaths.contains($0) }
         )
         swiftAPI.addSourceFile(sourceFile, inputFilePath: input)
         let skeleton = try swiftAPI.finalize()
