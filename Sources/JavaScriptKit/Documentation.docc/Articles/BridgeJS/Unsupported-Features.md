@@ -21,6 +21,8 @@ An **external module** is any other value, passed to the JavaScript module resol
 
 Generated packages use static ECMAScript module imports. This works with the existing PackageToJS browser and Node ESM entry points. CommonJS and classic non-module script output are not generated or translated. Note that named exports of a CommonJS package are only importable when Node can statically detect them; when in doubt, use `jsName: .default` and reach members through the default export.
 
+A module export is called through a named import, so `this` is `undefined` inside the called function rather than the module namespace object. A function that reaches sibling exports through `this` — which happens in CommonJS packages consumed through Node's ESM interop — will fail. Import the default export and call the member through it when a package needs that receiver.
+
 Module origins apply to top-level `@JSFunction`, top-level `@JSGetter`, and an entire `@JSClass`. Per-member origins, top-level setters, inline JavaScript source, package-root-relative paths, and per-member module overrides are not supported. `jsName: .default` is likewise only valid on those three declaration forms and only together with `from: .module(...)`; it cannot be used on `@JSSetter`, because ECMAScript module bindings are read-only.
 
 The TypeScript-definition workflow (`bridge-js.d.ts`) always imports from `globalThis` and cannot yet target a module origin. To import from a module, declare the API with the macros instead.

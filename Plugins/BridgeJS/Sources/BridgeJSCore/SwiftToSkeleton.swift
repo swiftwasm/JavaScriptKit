@@ -2570,6 +2570,30 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return ExtractedJSName(memberName: value, isDefaultExportSpelling: false)
         }
 
+        // An explicit `jsName: nil` means the same as omitting the argument.
+        if argument.expression.is(NilLiteralExprSyntax.self) {
+            return nil
+        }
+
+        // Accept the explicit `.name("...")` spelling of a plain member name.
+        if let call = argument.expression.as(FunctionCallExprSyntax.self),
+            call.calledExpression.trimmedDescription.split(separator: ".").last == "name"
+        {
+            guard call.arguments.count == 1,
+                let literal = call.arguments.first?.expression.as(StringLiteralExprSyntax.self),
+                let value = literal.representedLiteralValue
+            else {
+                errors.append(
+                    DiagnosticError(
+                        node: call.arguments.first?.expression ?? argument.expression,
+                        message: "jsName must be a string literal or '.default'."
+                    )
+                )
+                return nil
+            }
+            return ExtractedJSName(memberName: value, isDefaultExportSpelling: false)
+        }
+
         // Accept `.default`, `JSName.default`, and the backticked spellings.
         let description = argument.expression.trimmedDescription
         let caseName = description.split(separator: ".").last.map(String.init) ?? description

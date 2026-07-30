@@ -88,6 +88,19 @@ import Testing
         }
     }
 
+    /// The keyed form must reject what the string form rejects, so a specifier cannot reach
+    /// code generation through the tagged object that the plain-string path would refuse.
+    @Test(arguments: [
+        #"{"kind": "module", "specifier": ""}"#,
+        #"{"kind": "module", "specifier": "./relative.mjs"}"#,
+        #"{"kind": "module", "specifier": "/../../escape.mjs"}"#,
+    ])
+    func invalidKeyedJSImportFromFailsToDecode(json: String) {
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(JSImportFrom.self, from: Data(json.utf8))
+        }
+    }
+
     private func snapshotCodegen(
         skeleton: BridgeJSSkeleton,
         name: String,

@@ -1161,7 +1161,34 @@ public enum JSImportFrom: Codable, Equatable, Sendable {
                 debugDescription: "Unknown import origin kind '\(kind)'. Expected \"module\"."
             )
         }
-        self = .module(try container.decode(String.self, forKey: .specifier))
+        let specifier = try container.decode(String.self, forKey: .specifier)
+        // Apply the same rules as the single-value form above, so a specifier cannot
+        // reach code generation through this path that the string path would reject.
+        guard !specifier.isEmpty else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .specifier,
+                in: container,
+                debugDescription: "Module specifier must not be empty."
+            )
+        }
+        guard !specifier.hasPrefix(".") else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .specifier,
+                in: container,
+                debugDescription: "Module specifier '\(specifier)' must not be relative."
+            )
+        }
+        // A rooted path names a file we resolve inside the Swift target, so it must not
+        // traverse out of it. A bare specifier is resolved by the JavaScript host, where
+        // path segments carry no such meaning, so it is left alone.
+        guard !specifier.hasPrefix("/") || !specifier.split(separator: "/").contains("..") else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .specifier,
+                in: container,
+                debugDescription: "Local module path '\(specifier)' must not contain '..'."
+            )
+        }
+        self = .module(specifier)
     }
 
     public func encode(to encoder: any Encoder) throws {

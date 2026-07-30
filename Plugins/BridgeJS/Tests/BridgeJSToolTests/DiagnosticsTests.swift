@@ -109,6 +109,26 @@ import Testing
         #expect(diagnostics.description.contains("is not supported on a class member"))
     }
 
+    /// `jsName: nil` is valid Swift and means the same as omitting the argument.
+    @Test
+    func explicitNilJSNameIsAccepted() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(jsName: nil, from: .global) func imported() throws(JSException)
+            """
+        #expect(moduleDiagnostics(source: source) == nil)
+    }
+
+    /// `JSName.name(_:)` is public and documented, so its explicit spelling must work.
+    @Test
+    func explicitNameCaseSpellingIsAccepted() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(jsName: .name("basename"), from: .module("node:path")) func imported() throws(JSException)
+            """
+        #expect(moduleDiagnostics(source: source) == nil)
+    }
+
     @Test
     func jsNameMustBeStringLiteralOrDefault() throws {
         let source = """

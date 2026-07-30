@@ -69,6 +69,66 @@ import Testing
         #expect(lines.contains { $0.contains("bridge-js-modules/Beta/utils.mjs") })
     }
 
+    /// A named import is a hard link-time requirement, so a class whose module export is
+    /// never looked up must not produce one. A wrapper-only `@JSClass` has no constructor
+    /// and no static methods, so nothing references the module's export of that name and
+    /// the module need not export it at all; requiring it would fail the whole module load.
+    @Test func wrapperOnlyClassDoesNotRequireANamedExport() throws {
+        let lines = try importLines([
+            skeleton(
+                moduleName: "Alpha",
+                types: [
+                    ImportedTypeSkeleton(
+                        name: "Wrapper",
+                        from: .module("some-pkg"),
+                        methods: [
+                            ImportedFunctionSkeleton(name: "read", parameters: [], returnType: .void)
+                        ]
+                    )
+                ]
+            )
+        ])
+        #expect(lines.count == 1)
+        #expect(lines[0].hasPrefix("import * as "))
+        #expect(!lines[0].contains("Wrapper as "))
+    }
+
+    /// A class with a constructor does have its export looked up, so it keeps a named import.
+    @Test func classWithConstructorUsesANamedImport() throws {
+        let lines = try importLines([
+            skeleton(
+                moduleName: "Alpha",
+                types: [
+                    ImportedTypeSkeleton(
+                        name: "Wrapper",
+                        from: .module("some-pkg"),
+                        constructor: ImportedConstructorSkeleton(parameters: [])
+                    )
+                ]
+            )
+        ])
+        #expect(lines == [#"import { Wrapper as __bjs_import_0_Wrapper } from "some-pkg";"#])
+    }
+
+    /// A class with only static methods also looks its export up.
+    @Test func classWithOnlyStaticMethodsUsesANamedImport() throws {
+        let lines = try importLines([
+            skeleton(
+                moduleName: "Alpha",
+                types: [
+                    ImportedTypeSkeleton(
+                        name: "Wrapper",
+                        from: .module("some-pkg"),
+                        staticMethods: [
+                            ImportedFunctionSkeleton(name: "create", parameters: [], returnType: .void)
+                        ]
+                    )
+                ]
+            )
+        ])
+        #expect(lines == [#"import { Wrapper as __bjs_import_0_Wrapper } from "some-pkg";"#])
+    }
+
     /// Local references are emitted before bare ones, each group sorted, so that the numbered
     /// aliases in generated JavaScript are stable across runs.
     @Test func referencesAreOrderedDeterministically() throws {

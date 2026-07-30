@@ -61,10 +61,13 @@ final class ImportedJSModuleRegistry {
 
         for (index, reference) in references.enumerated() {
             let members = (membersByReference[reference] ?? []).sorted()
+            // A reference with no member lookups keeps the namespace form: a named import
+            // is a hard link-time requirement, so importing a name nothing references
+            // would fail the whole module load if the module does not export it.
             bindings[reference] = Binding(
                 index: index,
                 members: members,
-                usesNamedImports: members.allSatisfy(Self.isValidJSIdentifier)
+                usesNamedImports: !members.isEmpty && members.allSatisfy(Self.isValidJSIdentifier)
             )
         }
     }
@@ -72,7 +75,7 @@ final class ImportedJSModuleRegistry {
     static func collectReferences(skeletons: [BridgeJSSkeleton]) -> [Reference] {
         var references = Set<Reference>()
         for skeleton in skeletons {
-            forEachMemberLookup(skeleton: skeleton) { reference, _ in
+            forEachOrigin(skeleton: skeleton) { reference in
                 references.insert(reference)
             }
         }
@@ -86,12 +89,40 @@ final class ImportedJSModuleRegistry {
         }
     }
 
+    /// Visits every module origin mentioned by the skeleton, whether or not code
+    /// generation looks a member up on it.
+    ///
+    /// This is what decides which modules are imported at all, and for local paths
+    /// which files packaging copies. It stays broader than `forEachMemberLookup` so
+    /// that a module mentioned only by a wrapper-only `@JSClass` is still imported,
+    /// preserving its side effects.
+    private static func forEachOrigin(
+        skeleton: BridgeJSSkeleton,
+        _ body: (Reference) -> Void
+    ) {
+        func visit(from: JSImportFrom?) {
+            guard let reference = Self.reference(swiftModuleName: skeleton.moduleName, from: from) else { return }
+            body(reference)
+        }
+        for file in skeleton.imported?.children ?? [] {
+            for function in file.functions { visit(from: function.from) }
+            for getter in file.globalGetters { visit(from: getter.from) }
+            for type in file.types { visit(from: type.from) }
+        }
+    }
+
     /// Visits every module member lookup that code generation will emit.
     ///
     /// The member name taken here must match what the corresponding emitter in
-    /// `BridgeJSLink` looks up: a class contributes a single binding that serves both
-    /// its constructor and its static methods, and instance methods contribute nothing
-    /// because they call through an already-constructed instance.
+    /// `BridgeJSLink` looks up, and must not include names it never emits: a named
+    /// import is a hard link-time requirement, so recording a member that no
+    /// generated code references would make the module fail to load whenever the
+    /// module does not happen to export that name.
+    ///
+    /// A class contributes a single binding that serves both its constructor and its
+    /// static methods, and only when it has one of those. Instance methods, getters,
+    /// and setters contribute nothing because they go through an already-constructed
+    /// instance, so a wrapper-only `@JSClass` needs no export from the module at all.
     private static func forEachMemberLookup(
         skeleton: BridgeJSSkeleton,
         _ body: (Reference, String) -> Void
@@ -108,6 +139,7 @@ final class ImportedJSModuleRegistry {
                 visit(from: getter.from, memberName: getter.jsName ?? getter.name)
             }
             for type in file.types {
+                guard type.constructor != nil || !type.staticMethods.isEmpty else { continue }
                 visit(from: type.from, memberName: type.jsName ?? type.name)
             }
         }
