@@ -44,6 +44,18 @@ struct Greeter {
 }
 ```
 
+A specifier without a leading `/` is passed to the JavaScript module resolver verbatim, so you can wrap a class exported by an installed npm package. Pass `jsName: .default` when the class is the module's default export:
+
+```swift
+@JSClass(jsName: "File", from: .module("@bjorn3/browser_wasi_shim"))
+struct WasiFile {
+    @JSFunction init(_ data: JSObject) throws(JSException)
+    @JSGetter var size: Int64
+}
+```
+
+Nothing is copied for these, and you are responsible for making them resolvable at load time — see <doc:Unsupported-Features>.
+
 The path's leading `/` denotes the Swift target root, not the filesystem root. The module's named class export is the root for construction and static methods. Instance methods, getters, and setters operate on the wrapped object and must not specify their own `from:` argument. Use `jsName` on `@JSClass` to select a differently named class export. JavaScript inheritance may be implemented normally in the module; the Swift declaration describes the API visible on the exported class and its instances.
 
 ### 2. Wire the JavaScript side

@@ -1,0 +1,229 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "node:path"
+            },
+            "jsName" : "basename",
+            "name" : "nodeBasename",
+            "parameters" : [
+              {
+                "name" : "path",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "node:path"
+            },
+            "jsName" : "dirname",
+            "name" : "nodeDirname",
+            "parameters" : [
+              {
+                "name" : "path",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "default-export-package"
+            },
+            "jsName" : "default",
+            "name" : "callDefaultExport",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "accessLevel" : "internal",
+            "from" : {
+              "kind" : "module",
+              "specifier" : "some-package"
+            },
+            "jsName" : "version",
+            "name" : "packageVersion",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "from" : "\/Modules\/DefaultExport.mjs",
+            "jsName" : "default",
+            "name" : "localDefaultExport",
+            "type" : {
+              "jsObject" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "value",
+                  "type" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "@scope\/package"
+            },
+            "getters" : [
+              {
+                "accessLevel" : "internal",
+                "name" : "size",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "jsName" : "File",
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "read",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "ScopedFile",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "create",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "ScopedFile"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

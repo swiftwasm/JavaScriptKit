@@ -31,6 +31,18 @@ var currentEnvironment: String
 
 The path's leading `/` denotes the Swift target root, not the filesystem root. Module exports are read-only through this API. Top-level `@JSSetter` remains unsupported.
 
+A specifier without a leading `/` is passed to the JavaScript module resolver verbatim, so a getter can also read from a Node builtin or an installed npm package. Pass `jsName: .default` to read the module's default export, which is how many npm packages expose their main value:
+
+```swift
+@JSGetter(jsName: "version", from: .module("some-package"))
+var packageVersion: String
+
+@JSGetter(jsName: .default, from: .module("some-package"))
+var packageDefault: JSObject
+```
+
+Nothing is copied for these, and you are responsible for making them resolvable at load time — see <doc:Unsupported-Features>.
+
 ### 2. Add a setter for writable variables (optional)
 
 If the JavaScript property is writable and you need to set it from Swift, add a corresponding `@JSSetter` function. Property setters are exposed as functions (e.g. `setMyConfig(_:)`) because Swift property setters cannot `throw`.

@@ -98,22 +98,16 @@ public final class SwiftToSkeleton {
                 importCollector.importedFunctions.compactMap(\.from)
                 + importCollector.importedTypes.compactMap(\.from)
                 + importCollector.importedGlobalGetters.compactMap(\.from)
-            let modulePaths = Set(importOrigins.compactMap(\.modulePath))
+            // Only target-local module paths are validated here. Bare specifiers are
+            // resolved by the JavaScript host (a bundler, an import map, or Node's
+            // `node_modules` lookup), so there is nothing we can check without
+            // rejecting setups that legitimately work.
+            let modulePaths = Set(importOrigins.compactMap(\.localModulePath))
             for path in modulePaths.sorted() {
                 if validatedJavaScriptModulePaths.contains(path) {
                     continue
                 }
                 let pathNode = importCollector.importedModulePathNodes[path] ?? Syntax(sourceFile)
-                guard path.hasPrefix("/") else {
-                    importCollector.errors.append(
-                        DiagnosticError(
-                            node: pathNode,
-                            message: "JavaScript module paths must start with '/' to indicate the Swift target root: "
-                                + "'\(path)'."
-                        )
-                    )
-                    continue
-                }
                 guard !path.split(separator: "/").contains("..") else {
                     importCollector.errors.append(
                         DiagnosticError(
@@ -2548,20 +2542,100 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             }
         }
 
-        /// Extracts the `jsName` argument value from an attribute, if present.
-        static func extractJSName(from attribute: AttributeSyntax) -> String? {
-            guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else {
-                return nil
-            }
-            for argument in arguments {
-                if argument.label?.text == "jsName",
-                    let stringLiteral = argument.expression.as(StringLiteralExprSyntax.self),
-                    let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self)
-                {
-                    return segment.content.text
-                }
-            }
+    }
+
+    /// The result of reading a `jsName:` argument.
+    struct ExtractedJSName {
+        /// The JavaScript member name to look up.
+        ///
+        /// `.default` normalizes to `"default"`: in ECMAScript a module's default
+        /// export *is* its `default` named export, so no separate representation
+        /// is needed downstream.
+        let memberName: String
+        /// True when the source spelled `.default` rather than a string literal.
+        let isDefaultExportSpelling: Bool
+    }
+
+    /// Extracts the `jsName` argument value from an attribute, if present.
+    private func extractJSName(from attribute: AttributeSyntax) -> ExtractedJSName? {
+        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self),
+            let argument = arguments.first(where: { $0.label?.text == "jsName" })
+        else {
             return nil
+        }
+
+        if let stringLiteral = argument.expression.as(StringLiteralExprSyntax.self),
+            let value = stringLiteral.representedLiteralValue
+        {
+            return ExtractedJSName(memberName: value, isDefaultExportSpelling: false)
+        }
+
+        // Accept `.default`, `JSName.default`, and the backticked spellings.
+        let description = argument.expression.trimmedDescription
+        let caseName = description.split(separator: ".").last.map(String.init) ?? description
+        if caseName == "default" || caseName == "`default`" {
+            return ExtractedJSName(memberName: "default", isDefaultExportSpelling: true)
+        }
+
+        errors.append(
+            DiagnosticError(
+                node: argument.expression,
+                message: "jsName must be a string literal or '.default'."
+            )
+        )
+        return nil
+    }
+
+    /// Validates that a `jsName: .default` spelling appears somewhere it can mean something.
+    ///
+    /// `.default` names the default export of an ECMAScript module, so it only makes
+    /// sense on a top-level declaration that has a `from: .module(...)` origin.
+    private func validateDefaultExportUsage(
+        _ extracted: ExtractedJSName?,
+        from: JSImportFrom?,
+        node: some SyntaxProtocol,
+        isSetter: Bool = false
+    ) {
+        guard let extracted, extracted.isDefaultExportSpelling else { return }
+
+        if isSetter {
+            errors.append(
+                DiagnosticError(
+                    node: node,
+                    message: "'jsName: .default' is not supported on @JSSetter; "
+                        + "ECMAScript module bindings are read-only."
+                )
+            )
+            return
+        }
+        if case .jsClassBody = state {
+            errors.append(
+                DiagnosticError(
+                    node: node,
+                    message: "'jsName: .default' is not supported on a class member; "
+                        + "members have no module origin. Did you mean jsName: \"default\"?"
+                )
+            )
+            return
+        }
+        switch from {
+        case .module:
+            return
+        case .global:
+            errors.append(
+                DiagnosticError(
+                    node: node,
+                    message: "'jsName: .default' requires 'from: .module(...)'; "
+                        + "globalThis has no default export."
+                )
+            )
+        case nil:
+            errors.append(
+                DiagnosticError(
+                    node: node,
+                    message: "'jsName: .default' requires 'from: .module(...)'."
+                )
+            )
         }
     }
 
@@ -2584,6 +2658,26 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                     DiagnosticError(
                         node: call.arguments.first?.expression ?? argument.expression,
                         message: "JavaScript module path must be a string literal."
+                    )
+                )
+                return nil
+            }
+            guard !path.isEmpty else {
+                errors.append(
+                    DiagnosticError(
+                        node: literal,
+                        message: "JavaScript module specifier must not be empty."
+                    )
+                )
+                return nil
+            }
+            guard !path.hasPrefix("./"), !path.hasPrefix("../"), path != ".", path != ".." else {
+                errors.append(
+                    DiagnosticError(
+                        node: literal,
+                        message: "Relative JavaScript module specifiers are not supported: '\(path)'. "
+                            + "Use a '/'-prefixed path for a file in this target (e.g. '/Modules/utils.mjs'), "
+                            + "or a bare specifier for an external module (e.g. 'node:path')."
                     )
                 )
                 return nil
@@ -2645,7 +2739,9 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
 
-        let jsName = AttributeChecker.extractJSName(from: jsSetter)
+        let extractedJSName = extractJSName(from: jsSetter)
+        validateDefaultExportUsage(extractedJSName, from: nil, node: node, isSetter: true)
+        let jsName = extractedJSName?.memberName
         let parameters = node.signature.parameterClause.parameters
 
         guard let firstParam = parameters.first else {
@@ -2779,10 +2875,16 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
         if AttributeChecker.hasJSClassAttribute(node.attributes) {
             let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
-            let jsName = attribute.flatMap(AttributeChecker.extractJSName)
+            let extractedJSName = attribute.flatMap { extractJSName(from: $0) }
             let from = attribute.flatMap { extractJSImportFrom(from: $0) }
+            validateDefaultExportUsage(extractedJSName, from: from, node: node)
             let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
-            enterJSClass(node.name.text, jsName: jsName, from: from, accessLevel: accessLevel)
+            enterJSClass(
+                node.name.text,
+                jsName: extractedJSName?.memberName,
+                from: from,
+                accessLevel: accessLevel
+            )
         }
         return .visitChildren
     }
@@ -2796,10 +2898,16 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
         if AttributeChecker.hasJSClassAttribute(node.attributes) {
             let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
-            let jsName = attribute.flatMap(AttributeChecker.extractJSName)
+            let extractedJSName = attribute.flatMap { extractJSName(from: $0) }
             let from = attribute.flatMap { extractJSImportFrom(from: $0) }
+            validateDefaultExportUsage(extractedJSName, from: from, node: node)
             let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
-            enterJSClass(node.name.text, jsName: jsName, from: from, accessLevel: accessLevel)
+            enterJSClass(
+                node.name.text,
+                jsName: extractedJSName?.memberName,
+                from: from,
+                accessLevel: accessLevel
+            )
         }
         return .visitChildren
     }
@@ -2990,8 +3098,10 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
 
         let baseName = SwiftToSkeleton.normalizeIdentifier(node.name.text)
-        let jsName = AttributeChecker.extractJSName(from: jsFunction)
+        let extractedJSName = extractJSName(from: jsFunction)
         let from = extractJSImportFrom(from: jsFunction)
+        validateDefaultExportUsage(extractedJSName, from: from, node: node)
+        let jsName = extractedJSName?.memberName
         let name = baseName
 
         let parameters = parseParameters(from: node.signature.parameterClause)
@@ -3043,12 +3153,13 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
         let propertyName = SwiftToSkeleton.normalizeIdentifier(identifier.identifier.text)
-        let jsName = AttributeChecker.extractJSName(from: jsGetter)
+        let extractedJSName = extractJSName(from: jsGetter)
         let from = extractJSImportFrom(from: jsGetter)
+        validateDefaultExportUsage(extractedJSName, from: from, node: node)
         let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
         return ImportedGetterSkeleton(
             name: propertyName,
-            jsName: jsName,
+            jsName: extractedJSName?.memberName,
             from: from,
             type: propertyType,
             documentation: nil,

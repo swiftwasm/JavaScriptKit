@@ -9,11 +9,38 @@ public enum JSEnumStyle: String {
 /// Controls where BridgeJS reads imported JS values from.
 ///
 /// - `global`: Read from `globalThis`.
-/// - `module`: Read a named export from an ECMAScript module file rooted at the Swift target.
+/// - `module`: Read from an ECMAScript module.
 public enum JSImportFrom {
     case global
-    /// Read from an ECMAScript module file using a `/`-prefixed path rooted at the Swift target directory.
+    /// Read from an ECMAScript module.
+    ///
+    /// A `/`-prefixed value is a path to a JavaScript file rooted at the Swift
+    /// target directory, e.g. `.module("/Modules/utils.mjs")`. Any other value
+    /// is passed to the JavaScript module resolver verbatim, which covers
+    /// Node built-in modules and installed packages, e.g. `.module("node:path")`
+    /// or `.module("lodash/fp")`.
+    ///
+    /// Relative specifiers such as `"./utils.mjs"` are not supported; use the
+    /// `/`-prefixed form to reference a file in your own target.
     case module(String)
+}
+
+/// Names the JavaScript member that an imported declaration refers to.
+///
+/// A string literal is accepted directly, so `jsName: "basename"` means
+/// ``JSName/name(_:)`` with that value.
+public enum JSName: ExpressibleByStringLiteral {
+    /// A member looked up by name.
+    case name(String)
+    /// The default export of an ECMAScript module.
+    ///
+    /// Only valid on a top-level `@JSFunction`, `@JSGetter`, or `@JSClass`
+    /// that also specifies `from: .module(...)`.
+    case `default`
+
+    public init(stringLiteral value: String) {
+        self = .name(value)
+    }
 }
 
 /// A macro that exposes Swift functions, classes, and methods to JavaScript.
@@ -144,9 +171,11 @@ public macro JS(
 ///
 /// - Parameter from: Selects where the property is read from.
 ///   Use `.global` to read from `globalThis` (e.g. `console`, `document`).
-///   Use `.module("/path/to/module.js")` to read a named export from a file rooted at the Swift target.
+///   Use `.module("/path/to/module.js")` to read a named export from a file rooted at the Swift target,
+///   or `.module("node:os")` to read a named export from an external module.
+///   Pass `jsName: .default` to read the module's default export.
 @attached(accessor)
-public macro JSGetter(jsName: String? = nil, from: JSImportFrom? = nil) =
+public macro JSGetter(jsName: JSName? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSGetterMacro")
 
 /// A macro that generates a Swift function body that writes a value to JavaScript.
@@ -164,7 +193,7 @@ public macro JSGetter(jsName: String? = nil, from: JSImportFrom? = nil) =
 /// @JSSetter func setName(_ value: String) throws (JSException)
 /// ```
 @attached(body)
-public macro JSSetter(jsName: String? = nil, from: JSImportFrom? = nil) =
+public macro JSSetter(jsName: JSName? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSSetterMacro")
 
 /// A macro that generates a Swift function body that calls a JavaScript function.
@@ -184,9 +213,11 @@ public macro JSSetter(jsName: String? = nil, from: JSImportFrom? = nil) =
 ///   If not provided, the Swift function name is used.
 /// - Parameter from: Selects where the function is looked up from.
 ///   Use `.global` to call a function on `globalThis` (e.g. `setTimeout`).
-///   Use `.module("/path/to/module.js")` to call a named export from a file rooted at the Swift target.
+///   Use `.module("/path/to/module.js")` to call a named export from a file rooted at the Swift target,
+///   or `.module("node:path")` to call a named export from an external module.
+///   Pass `jsName: .default` to call the module's default export.
 @attached(body)
-public macro JSFunction(jsName: String? = nil, from: JSImportFrom? = nil) =
+public macro JSFunction(jsName: JSName? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSFunctionMacro")
 
 /// A macro that adds bridging members for a Swift type that represents a JavaScript class.
@@ -209,8 +240,10 @@ public macro JSFunction(jsName: String? = nil, from: JSImportFrom? = nil) =
 ///
 /// - Parameter from: Selects where the constructor is looked up from.
 ///   Use `.global` to construct globals like `WebSocket` via `globalThis`.
-///   Use `.module("/path/to/module.js")` to construct a named class export from a file rooted at the Swift target.
+///   Use `.module("/path/to/module.js")` to construct a named class export from a file rooted at the Swift target,
+///   or `.module("@scope/package")` to construct a named class export from an external module.
+///   Pass `jsName: .default` to construct the module's default export.
 @attached(member, names: named(jsObject), named(init(unsafelyWrapping:)))
 @attached(extension, conformances: _JSBridgedClass)
-public macro JSClass(jsName: String? = nil, from: JSImportFrom? = nil) =
+public macro JSClass(jsName: JSName? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSClassMacro")

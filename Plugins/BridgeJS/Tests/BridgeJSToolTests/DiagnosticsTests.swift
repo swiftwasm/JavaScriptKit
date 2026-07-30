@@ -38,14 +38,85 @@ import Testing
     }
 
     @Test
-    func javaScriptModulePathMustStartAtTargetRoot() throws {
+    func bareJavaScriptModuleSpecifierIsAccepted() throws {
         let source = """
             let unrelated = 0
-            @JSFunction(from: .module("missing.js")) func imported() throws(JSException)
+            @JSFunction(jsName: "basename", from: .module("node:path")) func imported() throws(JSException)
+            """
+        #expect(moduleDiagnostics(source: source) == nil)
+    }
+
+    @Test
+    func relativeJavaScriptModuleSpecifierIsRejected() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(from: .module("./missing.js")) func imported() throws(JSException)
             """
         let diagnostics = try #require(moduleDiagnostics(source: source))
-        #expect(diagnostics.description.contains("JavaScript module paths must start with '/'"))
+        #expect(diagnostics.description.contains("Relative JavaScript module specifiers are not supported"))
         #expect(diagnostics.description.contains("test.swift:2:27:"))
+    }
+
+    @Test
+    func emptyJavaScriptModuleSpecifierIsRejected() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(from: .module("")) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("JavaScript module specifier must not be empty."))
+    }
+
+    @Test
+    func defaultExportRequiresModuleOrigin() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(jsName: .default) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("'jsName: .default' requires 'from: .module(...)'."))
+    }
+
+    @Test
+    func defaultExportIsRejectedForGlobalOrigin() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(jsName: .default, from: .global) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("globalThis has no default export"))
+    }
+
+    @Test
+    func defaultExportIsRejectedForSetter() throws {
+        let source = """
+            @JSClass(from: .module("node:fs")) struct Wrapper {
+                @JSSetter(jsName: .default) func setValue(_ value: Int) throws(JSException)
+            }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("ECMAScript module bindings are read-only"))
+    }
+
+    @Test
+    func defaultExportIsRejectedForClassMember() throws {
+        let source = """
+            @JSClass(from: .module("node:fs")) struct Wrapper {
+                @JSFunction(jsName: .default) func value() throws(JSException) -> Int
+            }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("is not supported on a class member"))
+    }
+
+    @Test
+    func jsNameMustBeStringLiteralOrDefault() throws {
+        let source = """
+            let name = "basename"
+            @JSFunction(jsName: name, from: .module("node:path")) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("jsName must be a string literal or '.default'."))
     }
 
     @Test

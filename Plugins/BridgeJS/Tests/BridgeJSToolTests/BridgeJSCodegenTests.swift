@@ -52,6 +52,42 @@ import Testing
         }
     }
 
+    @Test(arguments: [
+        JSImportFrom.global,
+        JSImportFrom.module("/Modules/utils.mjs"),
+        JSImportFrom.module("node:path"),
+        JSImportFrom.module("@scope/package/sub"),
+        // A package literally named "global" is why bare specifiers are encoded as a
+        // tagged object rather than a plain string: a plain string would be
+        // indistinguishable from the `.global` sentinel.
+        JSImportFrom.module("global"),
+        JSImportFrom.module("#internal"),
+        JSImportFrom.module("https://esm.sh/lodash@4"),
+    ])
+    func jsImportFromRoundTrips(origin: JSImportFrom) throws {
+        let encoded = try JSONEncoder().encode(origin)
+        #expect(try JSONDecoder().decode(JSImportFrom.self, from: encoded) == origin)
+    }
+
+    @Test
+    func legacyStringFormIsPreservedForGlobalAndLocalPaths() throws {
+        let encoder = JSONEncoder()
+        #expect(String(data: try encoder.encode(JSImportFrom.global), encoding: .utf8) == #""global""#)
+        #expect(
+            String(data: try encoder.encode(JSImportFrom.module("/a.js")), encoding: .utf8) == #""\/a.js""#
+        )
+    }
+
+    @Test
+    func unknownJSImportFromKindFailsToDecode() {
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(
+                JSImportFrom.self,
+                from: Data(#"{"kind": "somethingElse", "specifier": "x"}"#.utf8)
+            )
+        }
+    }
+
     private func snapshotCodegen(
         skeleton: BridgeJSSkeleton,
         name: String,
@@ -105,6 +141,17 @@ import Testing
         )
     }
 
+    /// Target-local JavaScript module files that each input pretends to have on disk.
+    static let existingModulePaths: [String: Set<String>] = [
+        "JSImportModule.swift": [
+            "/Modules/JSImportModule.mjs",
+            "/Modules/ModuleCounter.mjs",
+        ],
+        "JSImportBareModule.swift": [
+            "/Modules/DefaultExport.mjs"
+        ],
+    ]
+
     static func collectInputs() -> [String] {
         let fileManager = FileManager.default
         let inputs = try! fileManager.contentsOfDirectory(atPath: Self.inputsDirectory.path)
@@ -116,13 +163,7 @@ import Testing
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let name = url.deletingPathExtension().lastPathComponent
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let modulePaths: Set<String> =
-            input == "JSImportModule.swift"
-            ? [
-                "/Modules/JSImportModule.mjs",
-                "/Modules/ModuleCounter.mjs",
-            ]
-            : []
+        let modulePaths = Self.existingModulePaths[input] ?? []
         let swiftAPI = SwiftToSkeleton(
             progress: .silent,
             moduleName: "TestModule",

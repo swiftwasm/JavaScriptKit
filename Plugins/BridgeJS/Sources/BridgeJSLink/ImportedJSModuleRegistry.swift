@@ -2,8 +2,24 @@
 import BridgeJSSkeleton
 #endif
 
+import Foundation
+
 final class ImportedJSModuleRegistry {
-    struct Reference: Hashable {
+    /// A JavaScript module that imported declarations are read from.
+    ///
+    /// A `local` reference is a file inside a Swift target, which packaging copies
+    /// into the generated output. A `bare` reference is a specifier resolved by the
+    /// JavaScript host (a bundler, an import map, or Node's `node_modules` lookup),
+    /// so it has no file and nothing to copy. Because a bare specifier names the
+    /// same module no matter which Swift module mentions it — and ECMAScript caches
+    /// module instances — it is keyed by specifier alone and shared across targets.
+    enum Reference: Hashable {
+        case local(swiftModuleName: String, path: String)
+        case bare(specifier: String)
+    }
+
+    /// A target-local JavaScript file that packaging must copy into the output.
+    struct LocalModule: Hashable {
         let swiftModuleName: String
         let path: String
 
@@ -12,56 +28,175 @@ final class ImportedJSModuleRegistry {
         }
     }
 
-    private var aliases: [Reference: String] = [:]
+    private struct Binding {
+        let index: Int
+        /// Member names looked up on this module, sorted for stable output.
+        let members: [String]
+        /// Whether every member name is a valid JavaScript identifier, and so can be
+        /// reached with a named import instead of a namespace property lookup.
+        let usesNamedImports: Bool
+    }
+
+    private var bindings: [Reference: Binding] = [:]
     private(set) var references: [Reference] = []
 
+    /// The target-local files packaging must copy, in deterministic order.
+    var localModules: [LocalModule] {
+        references.compactMap { reference in
+            guard case .local(let swiftModuleName, let path) = reference else { return nil }
+            return LocalModule(swiftModuleName: swiftModuleName, path: path)
+        }
+    }
+
     func configure(skeletons: [BridgeJSSkeleton]) {
-        aliases.removeAll(keepingCapacity: true)
+        bindings.removeAll(keepingCapacity: true)
         references = Self.collectReferences(skeletons: skeletons)
+
+        var membersByReference: [Reference: Set<String>] = [:]
+        for skeleton in skeletons {
+            Self.forEachMemberLookup(skeleton: skeleton) { reference, memberName in
+                membersByReference[reference, default: []].insert(memberName)
+            }
+        }
+
         for (index, reference) in references.enumerated() {
-            aliases[reference] = "__bjs_imported_module_\(index)"
+            let members = (membersByReference[reference] ?? []).sorted()
+            bindings[reference] = Binding(
+                index: index,
+                members: members,
+                usesNamedImports: members.allSatisfy(Self.isValidJSIdentifier)
+            )
         }
     }
 
     static func collectReferences(skeletons: [BridgeJSSkeleton]) -> [Reference] {
         var references = Set<Reference>()
         for skeleton in skeletons {
-            for file in skeleton.imported?.children ?? [] {
-                let origins =
-                    file.functions.compactMap(\.from)
-                    + file.globalGetters.compactMap(\.from)
-                    + file.types.compactMap(\.from)
-                for case .module(let path) in origins {
-                    references.insert(Reference(swiftModuleName: skeleton.moduleName, path: path))
-                }
+            forEachMemberLookup(skeleton: skeleton) { reference, _ in
+                references.insert(reference)
             }
         }
-        return references.sorted {
-            ($0.swiftModuleName, $0.path) < ($1.swiftModuleName, $1.path)
+        return references.sorted(by: isOrderedBefore)
+    }
+
+    static func collectLocalModules(skeletons: [BridgeJSSkeleton]) -> [LocalModule] {
+        collectReferences(skeletons: skeletons).compactMap { reference in
+            guard case .local(let swiftModuleName, let path) = reference else { return nil }
+            return LocalModule(swiftModuleName: swiftModuleName, path: path)
         }
     }
 
-    func namespaceExpression(swiftModuleName: String, from: JSImportFrom?) throws -> String {
+    /// Visits every module member lookup that code generation will emit.
+    ///
+    /// The member name taken here must match what the corresponding emitter in
+    /// `BridgeJSLink` looks up: a class contributes a single binding that serves both
+    /// its constructor and its static methods, and instance methods contribute nothing
+    /// because they call through an already-constructed instance.
+    private static func forEachMemberLookup(
+        skeleton: BridgeJSSkeleton,
+        _ body: (Reference, String) -> Void
+    ) {
+        func visit(from: JSImportFrom?, memberName: String) {
+            guard let reference = Self.reference(swiftModuleName: skeleton.moduleName, from: from) else { return }
+            body(reference, memberName)
+        }
+        for file in skeleton.imported?.children ?? [] {
+            for function in file.functions {
+                visit(from: function.from, memberName: function.jsName ?? function.name)
+            }
+            for getter in file.globalGetters {
+                visit(from: getter.from, memberName: getter.jsName ?? getter.name)
+            }
+            for type in file.types {
+                visit(from: type.from, memberName: type.jsName ?? type.name)
+            }
+        }
+    }
+
+    private static func reference(swiftModuleName: String, from: JSImportFrom?) -> Reference? {
+        guard let specifier = from?.moduleSpecifier else { return nil }
+        if let path = from?.localModulePath {
+            return .local(swiftModuleName: swiftModuleName, path: path)
+        }
+        return .bare(specifier: specifier)
+    }
+
+    private static func isOrderedBefore(_ lhs: Reference, _ rhs: Reference) -> Bool {
+        switch (lhs, rhs) {
+        case (.local(let lhsModule, let lhsPath), .local(let rhsModule, let rhsPath)):
+            return (lhsModule, lhsPath) < (rhsModule, rhsPath)
+        case (.bare(let lhsSpecifier), .bare(let rhsSpecifier)):
+            return lhsSpecifier < rhsSpecifier
+        case (.local, .bare):
+            return true
+        case (.bare, .local):
+            return false
+        }
+    }
+
+    /// Whether `name` can appear as a bare identifier in generated JavaScript.
+    static func isValidJSIdentifier(_ name: String) -> Bool {
+        name.range(of: #"^[$A-Z_][0-9A-Z_$]*$"#, options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
+    /// Returns the JavaScript expression that evaluates to `memberName` of the given origin.
+    func memberExpression(
+        swiftModuleName: String,
+        from: JSImportFrom?,
+        memberName: String
+    ) throws -> String {
         switch from {
         case nil:
-            return "imports"
+            return BridgeJSLink.ImportedThunkBuilder.propertyAccessExpr(objectExpr: "imports", propertyName: memberName)
         case .global:
-            return "globalThis"
-        case .module(let path):
-            let reference = Reference(swiftModuleName: swiftModuleName, path: path)
-            guard let alias = aliases[reference] else {
+            return BridgeJSLink.ImportedThunkBuilder.propertyAccessExpr(
+                objectExpr: "globalThis",
+                propertyName: memberName
+            )
+        case .module(let specifier):
+            guard let reference = Self.reference(swiftModuleName: swiftModuleName, from: from),
+                let binding = bindings[reference]
+            else {
                 throw BridgeJSLinkError(
-                    message: "Missing JavaScript module \(swiftModuleName)\(path)"
+                    message: "Missing JavaScript module \(swiftModuleName)\(specifier)"
                 )
             }
-            return alias
+            if binding.usesNamedImports {
+                return Self.namedImportBinding(index: binding.index, memberName: memberName)
+            }
+            return BridgeJSLink.ImportedThunkBuilder.propertyAccessExpr(
+                objectExpr: Self.namespaceAlias(index: binding.index),
+                propertyName: memberName
+            )
         }
+    }
+
+    private static func namespaceAlias(index: Int) -> String {
+        "__bjs_imported_module_\(index)"
+    }
+
+    private static func namedImportBinding(index: Int, memberName: String) -> String {
+        "__bjs_import_\(index)_\(memberName)"
     }
 
     var importLines: [String] {
-        references.enumerated().map { index, reference in
-            let path = BridgeJSLink.escapeForJavaScriptStringLiteral(reference.relativeOutputPath)
-            return "import * as __bjs_imported_module_\(index) from \"./\(path)\";"
+        references.compactMap { reference in
+            guard let binding = bindings[reference] else { return nil }
+            let specifier: String
+            switch reference {
+            case .local(let swiftModuleName, let path):
+                let output = LocalModule(swiftModuleName: swiftModuleName, path: path).relativeOutputPath
+                specifier = "./" + BridgeJSLink.escapeForJavaScriptStringLiteral(output)
+            case .bare(let bareSpecifier):
+                specifier = BridgeJSLink.escapeForJavaScriptStringLiteral(bareSpecifier)
+            }
+            guard binding.usesNamedImports else {
+                return "import * as \(Self.namespaceAlias(index: binding.index)) from \"\(specifier)\";"
+            }
+            let clauses = binding.members.map {
+                "\($0) as \(Self.namedImportBinding(index: binding.index, memberName: $0))"
+            }
+            return "import { \(clauses.joined(separator: ", ")) } from \"\(specifier)\";"
         }
     }
 }

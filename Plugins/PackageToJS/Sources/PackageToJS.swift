@@ -698,7 +698,10 @@ struct PackagingPlanner {
 
         for input in skeletons {
             let skeleton = try link.addSkeletonFile(data: Data(contentsOf: input.source))
-            for reference in ImportedJSModuleRegistry.collectReferences(skeletons: [skeleton]) {
+            // Only target-local modules are files we copy. Bare specifiers (e.g. "node:path",
+            // "lodash") are resolved by the JavaScript host at load time, so there is
+            // nothing to find on disk and nothing to place in the output.
+            for reference in ImportedJSModuleRegistry.collectLocalModules(skeletons: [skeleton]) {
                 guard
                     let sourceURL = JavaScriptModulePath.resolve(
                         reference.path,

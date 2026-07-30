@@ -31,6 +31,18 @@ func add(_ a: Double, _ b: Double) throws(JSException) -> Double
 
 The leading `/` denotes the Swift target root, not the filesystem root. BridgeJS copies explicitly referenced modules into the generated PackageToJS package. Multiple declarations may reference the same file; it is copied and imported only once. `jsName` selects a differently named export, otherwise BridgeJS uses the normalized Swift name.
 
+Any specifier *without* a leading `/` is passed to the JavaScript module resolver verbatim, which is how you call a Node builtin or an installed npm package:
+
+```swift
+@JSFunction(jsName: "basename", from: .module("node:path"))
+func basename(_ path: String) throws(JSException) -> String
+
+@JSFunction(jsName: "chunk", from: .module("lodash/fp"))
+func chunk(_ input: JSObject, _ size: Int) throws(JSException) -> JSObject
+```
+
+Nothing is copied for these, and you are responsible for making them resolvable at load time — see <doc:Unsupported-Features> for what that entails. To call the module's default export instead of a named one, pass `jsName: .default`.
+
 SwiftPM does not know what to do with `.js`/`.mjs` files inside a target, so exclude the directory holding them to avoid an "unhandled files" warning:
 
 ```swift

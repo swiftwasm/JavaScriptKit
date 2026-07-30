@@ -1126,34 +1126,71 @@ private struct AsyncClosureReturnTypeCollector: BridgeSkeletonVisitor {
 /// Controls where BridgeJS reads imported JS values from.
 ///
 /// - `global`: Read from `globalThis`.
-/// - `module`: Read from a target-local ECMAScript module.
+/// - `module`: Read from an ECMAScript module. A `/`-prefixed payload is a file
+///   rooted at the Swift target directory; any other payload is a bare specifier
+///   resolved by the JavaScript host (e.g. `node:path`, `lodash/fp`).
 public enum JSImportFrom: Codable, Equatable, Sendable {
     case global
     case module(String)
 
+    private enum CodingKeys: String, CodingKey {
+        case kind, specifier
+    }
+
     public init(from decoder: any Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let value = try container.decode(String.self)
-        if value == "global" {
-            self = .global
-        } else if value.hasPrefix("/") && !value.split(separator: "/").contains("..") {
+        if let container = try? decoder.singleValueContainer(), let value = try? container.decode(String.self) {
+            if value == "global" {
+                self = .global
+                return
+            }
+            guard value.hasPrefix("/"), !value.split(separator: "/").contains("..") else {
+                throw DecodingError.dataCorruptedError(
+                    in: container,
+                    debugDescription: "Unknown import origin '\(value)'. Expected \"global\" or a rooted module path."
+                )
+            }
             self = .module(value)
-        } else {
+            return
+        }
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let kind = try container.decode(String.self, forKey: .kind)
+        guard kind == "module" else {
             throw DecodingError.dataCorruptedError(
+                forKey: .kind,
                 in: container,
-                debugDescription: "Unknown import origin '\(value)'. Expected \"global\" or a rooted module path."
+                debugDescription: "Unknown import origin kind '\(kind)'. Expected \"module\"."
             )
         }
+        self = .module(try container.decode(String.self, forKey: .specifier))
     }
 
     public func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(modulePath ?? "global")
+        guard let specifier = bareModuleSpecifier else {
+            var container = encoder.singleValueContainer()
+            try container.encode(localModulePath ?? "global")
+            return
+        }
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode("module", forKey: .kind)
+        try container.encode(specifier, forKey: .specifier)
     }
 
-    public var modulePath: String? {
-        guard case .module(let path) = self else { return nil }
-        return path
+    /// The raw module specifier, whatever form it takes.
+    public var moduleSpecifier: String? {
+        guard case .module(let specifier) = self else { return nil }
+        return specifier
+    }
+
+    /// The specifier when it denotes a file rooted at the Swift target directory.
+    public var localModulePath: String? {
+        guard let specifier = moduleSpecifier, specifier.hasPrefix("/") else { return nil }
+        return specifier
+    }
+
+    /// The specifier when it is a bare specifier resolved by the JavaScript host.
+    public var bareModuleSpecifier: String? {
+        guard let specifier = moduleSpecifier, !specifier.hasPrefix("/") else { return nil }
+        return specifier
     }
 }
 

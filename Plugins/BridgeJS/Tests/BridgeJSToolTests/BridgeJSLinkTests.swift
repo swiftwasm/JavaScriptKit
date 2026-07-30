@@ -37,6 +37,17 @@ import Testing
         "Inputs"
     ).appendingPathComponent("MacroSwift")
 
+    /// Target-local JavaScript module files that each input pretends to have on disk.
+    static let existingModulePaths: [String: Set<String>] = [
+        "JSImportModule.swift": [
+            "/Modules/JSImportModule.mjs",
+            "/Modules/ModuleCounter.mjs",
+        ],
+        "JSImportBareModule.swift": [
+            "/Modules/DefaultExport.mjs"
+        ],
+    ]
+
     static func collectInputs(extension: String) -> [String] {
         let fileManager = FileManager.default
         let inputs = try! fileManager.contentsOfDirectory(atPath: Self.inputsDirectory.path)
@@ -49,13 +60,7 @@ import Testing
         let name = url.deletingPathExtension().lastPathComponent
 
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let modulePaths: Set<String> =
-            input == "JSImportModule.swift"
-            ? [
-                "/Modules/JSImportModule.mjs",
-                "/Modules/ModuleCounter.mjs",
-            ]
-            : []
+        let modulePaths = Self.existingModulePaths[input] ?? []
         let importSwift = SwiftToSkeleton(
             progress: .silent,
             moduleName: "TestModule",

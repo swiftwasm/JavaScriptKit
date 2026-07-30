@@ -17011,6 +17011,119 @@ func _$JSClassSupportImports_makeJSClassWithArrayMembers(_ numbers: [Int], _ lab
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_defaultExport_get")
+fileprivate func bjs_defaultExport_get_extern() -> Int32
+#else
+fileprivate func bjs_defaultExport_get_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_defaultExport_get() -> Int32 {
+    return bjs_defaultExport_get_extern()
+}
+
+func _$defaultExport_get() throws(JSException) -> JSObject {
+    let ret = bjs_defaultExport_get()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_nodeBasename")
+fileprivate func bjs_nodeBasename_extern(_ pathBytes: Int32, _ pathLength: Int32) -> Int32
+#else
+fileprivate func bjs_nodeBasename_extern(_ pathBytes: Int32, _ pathLength: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_nodeBasename(_ pathBytes: Int32, _ pathLength: Int32) -> Int32 {
+    return bjs_nodeBasename_extern(pathBytes, pathLength)
+}
+
+func _$nodeBasename(_ path: String) throws(JSException) -> String {
+    let ret0 = path.bridgeJSWithLoweredParameter { (pathBytes, pathLength) in
+        let ret = bjs_nodeBasename(pathBytes, pathLength)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_nodeJoin")
+fileprivate func bjs_nodeJoin_extern(_ lhsBytes: Int32, _ lhsLength: Int32, _ rhsBytes: Int32, _ rhsLength: Int32) -> Int32
+#else
+fileprivate func bjs_nodeJoin_extern(_ lhsBytes: Int32, _ lhsLength: Int32, _ rhsBytes: Int32, _ rhsLength: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_nodeJoin(_ lhsBytes: Int32, _ lhsLength: Int32, _ rhsBytes: Int32, _ rhsLength: Int32) -> Int32 {
+    return bjs_nodeJoin_extern(lhsBytes, lhsLength, rhsBytes, rhsLength)
+}
+
+func _$nodeJoin(_ lhs: String, _ rhs: String) throws(JSException) -> String {
+    let ret0 = lhs.bridgeJSWithLoweredParameter { (lhsBytes, lhsLength) in
+        let ret1 = rhs.bridgeJSWithLoweredParameter { (rhsBytes, rhsLength) in
+            let ret = bjs_nodeJoin(lhsBytes, lhsLength, rhsBytes, rhsLength)
+            return ret
+        }
+        return ret1
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_WasiFile_init")
+fileprivate func bjs_WasiFile_init_extern(_ data: Int32) -> Int32
+#else
+fileprivate func bjs_WasiFile_init_extern(_ data: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_WasiFile_init(_ data: Int32) -> Int32 {
+    return bjs_WasiFile_init_extern(data)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_WasiFile_size_get")
+fileprivate func bjs_WasiFile_size_get_extern(_ self: Int32) -> Int64
+#else
+fileprivate func bjs_WasiFile_size_get_extern(_ self: Int32) -> Int64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_WasiFile_size_get(_ self: Int32) -> Int64 {
+    return bjs_WasiFile_size_get_extern(self)
+}
+
+func _$WasiFile_init(_ data: JSObject) throws(JSException) -> JSObject {
+    let dataValue = data.bridgeJSLowerParameter()
+    let ret = bjs_WasiFile_init(dataValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$WasiFile_size_get(_ self: JSObject) throws(JSException) -> Int64 {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_WasiFile_size_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int64.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_moduleVersion_get")
 fileprivate func bjs_moduleVersion_get_extern() -> Int32
 #else
