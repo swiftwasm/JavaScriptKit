@@ -24183,7 +24183,143 @@
               "isStatic" : false,
               "isThrows" : true
             },
-            "from" : "\/Modules\/JSImportModule.mjs",
+            "from" : {
+              "kind" : "module",
+              "specifier" : "node:path"
+            },
+            "jsName" : "basename",
+            "name" : "nodeBasename",
+            "parameters" : [
+              {
+                "name" : "path",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "node:path"
+            },
+            "jsName" : "join",
+            "name" : "nodeJoin",
+            "parameters" : [
+              {
+                "name" : "lhs",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "rhs",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "accessLevel" : "internal",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/DefaultExport.mjs"
+            },
+            "jsName" : "default",
+            "name" : "defaultExport",
+            "type" : {
+              "jsObject" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "data",
+                  "type" : {
+                    "jsObject" : {
+
+                    }
+                  }
+                }
+              ]
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "@bjorn3\/browser_wasi_shim"
+            },
+            "getters" : [
+              {
+                "accessLevel" : "internal",
+                "name" : "size",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "w64"
+                    }
+                  }
+                }
+              }
+            ],
+            "jsName" : "File",
+            "methods" : [
+
+            ],
+            "name" : "WasiFile",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/JSImportModule.mjs"
+            },
             "name" : "moduleAdd",
             "parameters" : [
               {
@@ -24225,7 +24361,10 @@
               "isStatic" : false,
               "isThrows" : true
             },
-            "from" : "\/Modules\/JSImportModule.mjs",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/JSImportModule.mjs"
+            },
             "jsName" : "renamedFunction",
             "name" : "moduleRenamed",
             "parameters" : [
@@ -24244,7 +24383,10 @@
               "isStatic" : false,
               "isThrows" : true
             },
-            "from" : "\/Modules\/JSImportModule.mjs",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/JSImportModule.mjs"
+            },
             "name" : "moduleThrow",
             "parameters" : [
 
@@ -24259,7 +24401,10 @@
         "globalGetters" : [
           {
             "accessLevel" : "internal",
-            "from" : "\/Modules\/JSImportModule.mjs",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/JSImportModule.mjs"
+            },
             "jsName" : "version",
             "name" : "moduleVersion",
             "type" : {
@@ -24288,7 +24433,10 @@
                 }
               ]
             },
-            "from" : "\/Modules\/ModuleCounter.mjs",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/ModuleCounter.mjs"
+            },
             "getters" : [
               {
                 "accessLevel" : "internal",

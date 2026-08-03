@@ -4,8 +4,11 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-import { moduleAdd as __bjs_import_0_moduleAdd, renamedFunction as __bjs_import_0_renamedFunction, version as __bjs_import_0_version } from "./bridge-js-modules/TestModule/Modules/JSImportModule.mjs";
-import { ModuleCounter as __bjs_import_1_ModuleCounter } from "./bridge-js-modules/TestModule/Modules/ModuleCounter.mjs";
+import { default as __bjs_import_0_default } from "./bridge-js-modules/TestModule/Modules/DefaultExport.mjs";
+import { File as __bjs_import_1_File } from "@scope/package";
+import { default as __bjs_import_2_default } from "default-export-package";
+import { basename as __bjs_import_3_basename, dirname as __bjs_import_3_dirname } from "node:path";
+import { version as __bjs_import_4_version } from "some-package";
 
 export async function createInstantiator(options, swift) {
     let instance;
@@ -207,69 +210,82 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_moduleVersion_get"] = function bjs_moduleVersion_get() {
+            TestModule["bjs_packageVersion_get"] = function bjs_packageVersion_get() {
                 try {
-                    let ret = __bjs_import_0_version;
+                    let ret = __bjs_import_4_version;
                     tmpRetBytes = textEncoder.encode(ret);
                     return tmpRetBytes.length;
                 } catch (error) {
                     setException(error);
                 }
             }
-            TestModule["bjs_moduleAdd"] = function bjs_moduleAdd(lhs, rhs) {
+            TestModule["bjs_localDefaultExport_get"] = function bjs_localDefaultExport_get() {
                 try {
-                    let ret = __bjs_import_0_moduleAdd(lhs, rhs);
-                    return ret;
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_moduleRenamed"] = function bjs_moduleRenamed() {
-                try {
-                    let ret = __bjs_import_0_renamedFunction();
-                    tmpRetBytes = textEncoder.encode(ret);
-                    return tmpRetBytes.length;
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_ModuleCounter_init"] = function bjs_ModuleCounter_init(value) {
-                try {
-                    return swift.memory.retain(new __bjs_import_1_ModuleCounter(value));
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_ModuleCounter_value_get"] = function bjs_ModuleCounter_value_get(self) {
-                try {
-                    let ret = swift.memory.getObject(self).value;
-                    return ret;
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            TestModule["bjs_ModuleCounter_value_set"] = function bjs_ModuleCounter_value_set(self, newValue) {
-                try {
-                    swift.memory.getObject(self).value = newValue;
-                } catch (error) {
-                    setException(error);
-                }
-            }
-            TestModule["bjs_ModuleCounter_create_static"] = function bjs_ModuleCounter_create_static(value) {
-                try {
-                    let ret = __bjs_import_1_ModuleCounter.create(value);
+                    let ret = __bjs_import_0_default;
                     return swift.memory.retain(ret);
                 } catch (error) {
                     setException(error);
                     return 0
                 }
             }
-            TestModule["bjs_ModuleCounter_increment"] = function bjs_ModuleCounter_increment(self) {
+            TestModule["bjs_nodeBasename"] = function bjs_nodeBasename(pathBytes, pathCount) {
                 try {
-                    let ret = swift.memory.getObject(self).increment();
+                    const string = decodeString(pathBytes, pathCount);
+                    let ret = __bjs_import_3_basename(string);
+                    tmpRetBytes = textEncoder.encode(ret);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_nodeDirname"] = function bjs_nodeDirname(pathBytes, pathCount) {
+                try {
+                    const string = decodeString(pathBytes, pathCount);
+                    let ret = __bjs_import_3_dirname(string);
+                    tmpRetBytes = textEncoder.encode(ret);
+                    return tmpRetBytes.length;
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_callDefaultExport"] = function bjs_callDefaultExport(value) {
+                try {
+                    let ret = __bjs_import_2_default(value);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_ScopedFile_init"] = function bjs_ScopedFile_init(value) {
+                try {
+                    return swift.memory.retain(new __bjs_import_1_File(value));
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_ScopedFile_size_get"] = function bjs_ScopedFile_size_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).size;
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_ScopedFile_create_static"] = function bjs_ScopedFile_create_static(value) {
+                try {
+                    let ret = __bjs_import_1_File.create(value);
+                    return swift.memory.retain(ret);
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_ScopedFile_read"] = function bjs_ScopedFile_read(self) {
+                try {
+                    let ret = swift.memory.getObject(self).read();
                     return ret;
                 } catch (error) {
                     setException(error);

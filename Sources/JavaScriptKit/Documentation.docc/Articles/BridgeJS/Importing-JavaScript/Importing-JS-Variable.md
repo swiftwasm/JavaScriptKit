@@ -25,11 +25,23 @@ export const environment = "production";
 ```
 
 ```swift
-@JSGetter(jsName: "environment", from: .module("/JavaScript/config.js"))
+@JSGetter(jsName: "environment", from: .snippet("/JavaScript/config.js"))
 var currentEnvironment: String
 ```
 
 The path's leading `/` denotes the Swift target root, not the filesystem root. Module exports are read-only through this API. Top-level `@JSSetter` remains unsupported.
+
+A getter can also read from an external module with `from: .module(...)`, covering Node builtins and installed npm packages. Pass `jsName: .default` to read the module's default export, which is how many npm packages expose their main value:
+
+```swift
+@JSGetter(jsName: "version", from: .module("some-package"))
+var packageVersion: String
+
+@JSGetter(jsName: .default, from: .module("some-package"))
+var packageDefault: JSObject
+```
+
+Nothing is copied for these, and you are responsible for making them resolvable at load time; see <doc:Unsupported-Features>.
 
 ### 2. Add a setter for writable variables (optional)
 

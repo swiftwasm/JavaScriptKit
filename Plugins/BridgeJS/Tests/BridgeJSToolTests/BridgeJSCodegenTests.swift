@@ -18,10 +18,10 @@ import Testing
     func javaScriptModuleReferencesAreStoredWithoutSourceContents() throws {
         let modulePath = "/Modules/math.mjs"
         let swiftSource = """
-            @JSFunction(from: .module("/Modules/math.mjs"))
+            @JSFunction(from: .snippet("/Modules/math.mjs"))
             func add(_ lhs: Int, _ rhs: Int) throws(JSException) -> Int
 
-            @JSGetter(jsName: "version", from: .module("/Modules/math.mjs"))
+            @JSGetter(jsName: "version", from: .snippet("/Modules/math.mjs"))
             var moduleVersion: String
             """
         var validationCount = 0
@@ -41,7 +41,7 @@ import Testing
         let imported = try #require(skeleton.imported)
 
         #expect(validationCount == 1)
-        #expect(imported.children.flatMap(\.functions).first?.from == .module(modulePath))
+        #expect(imported.children.flatMap(\.functions).first?.from == .snippet(modulePath))
         #expect(!encoded.contains(#""modules""#))
     }
 
@@ -49,6 +49,68 @@ import Testing
     func invalidJSImportFromValueFailsToDecode() {
         #expect(throws: DecodingError.self) {
             try JSONDecoder().decode(JSImportFrom.self, from: Data(#""module.js""#.utf8))
+        }
+        // A bare path string is no longer an origin at all; snippets are tagged.
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(JSImportFrom.self, from: Data(#""/Modules/utils.mjs""#.utf8))
+        }
+    }
+
+    @Test(arguments: [
+        JSImportFrom.global,
+        JSImportFrom.snippet("/Modules/utils.mjs"),
+        JSImportFrom.module("node:path"),
+        JSImportFrom.module("@scope/package/sub"),
+        // A package literally named "global" is why specifiers are encoded as tagged
+        // objects rather than plain strings: a plain string would be indistinguishable
+        // from the `.global` sentinel.
+        JSImportFrom.module("global"),
+        JSImportFrom.module("#internal"),
+        JSImportFrom.module("https://esm.sh/lodash@4"),
+    ])
+    func jsImportFromRoundTrips(origin: JSImportFrom) throws {
+        let encoded = try JSONEncoder().encode(origin)
+        #expect(try JSONDecoder().decode(JSImportFrom.self, from: encoded) == origin)
+    }
+
+    @Test
+    func originsEncodeToTheirDocumentedShapes() throws {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        #expect(String(data: try encoder.encode(JSImportFrom.global), encoding: .utf8) == #""global""#)
+        #expect(
+            String(data: try encoder.encode(JSImportFrom.snippet("/a.js")), encoding: .utf8)
+                == #"{"kind":"snippet","path":"\/a.js"}"#
+        )
+        #expect(
+            String(data: try encoder.encode(JSImportFrom.module("node:path")), encoding: .utf8)
+                == #"{"kind":"module","specifier":"node:path"}"#
+        )
+    }
+
+    @Test
+    func unknownJSImportFromKindFailsToDecode() {
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(
+                JSImportFrom.self,
+                from: Data(#"{"kind": "somethingElse", "specifier": "x"}"#.utf8)
+            )
+        }
+    }
+
+    /// The keyed form must reject what the string form rejects, so a specifier cannot reach
+    /// code generation through the tagged object that the plain-string path would refuse.
+    @Test(arguments: [
+        #"{"kind": "module", "specifier": ""}"#,
+        #"{"kind": "module", "specifier": "./relative.mjs"}"#,
+        #"{"kind": "module", "specifier": "/../../escape.mjs"}"#,
+        #"{"kind": "snippet", "path": "node:path"}"#,
+        #"{"kind": "snippet", "path": "/../../escape.mjs"}"#,
+        #"{"kind": "snippet", "path": "relative.mjs"}"#,
+    ])
+    func invalidKeyedJSImportFromFailsToDecode(json: String) {
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(JSImportFrom.self, from: Data(json.utf8))
         }
     }
 
@@ -105,6 +167,17 @@ import Testing
         )
     }
 
+    /// Target-local JavaScript module files that each input pretends to have on disk.
+    static let existingModulePaths: [String: Set<String>] = [
+        "JSImportModule.swift": [
+            "/Modules/JSImportModule.mjs",
+            "/Modules/ModuleCounter.mjs",
+        ],
+        "JSImportBareModule.swift": [
+            "/Modules/DefaultExport.mjs"
+        ],
+    ]
+
     static func collectInputs() -> [String] {
         let fileManager = FileManager.default
         let inputs = try! fileManager.contentsOfDirectory(atPath: Self.inputsDirectory.path)
@@ -116,13 +189,7 @@ import Testing
         let url = Self.inputsDirectory.appendingPathComponent(input)
         let name = url.deletingPathExtension().lastPathComponent
         let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
-        let modulePaths: Set<String> =
-            input == "JSImportModule.swift"
-            ? [
-                "/Modules/JSImportModule.mjs",
-                "/Modules/ModuleCounter.mjs",
-            ]
-            : []
+        let modulePaths = Self.existingModulePaths[input] ?? []
         let swiftAPI = SwiftToSkeleton(
             progress: .silent,
             moduleName: "TestModule",

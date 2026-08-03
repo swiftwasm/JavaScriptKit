@@ -1126,34 +1126,107 @@ private struct AsyncClosureReturnTypeCollector: BridgeSkeletonVisitor {
 /// Controls where BridgeJS reads imported JS values from.
 ///
 /// - `global`: Read from `globalThis`.
-/// - `module`: Read from a target-local ECMAScript module.
+/// - `snippet`: Read from a `/`-rooted JavaScript file inside the Swift target,
+///   which packaging copies into the generated output.
+/// - `module`: Read from an external ECMAScript module named by a bare specifier
+///   that the JavaScript host resolves (e.g. `node:path`, `lodash/fp`).
+///
+/// `.global` encodes as the string `"global"`; the other two encode as tagged
+/// objects that name their kind, so the JSON mirrors the Swift cases and is
+/// readable without knowing that a `/`-prefixed string means one thing and any
+/// other string means another. A plain string is never used for a specifier,
+/// which also avoids colliding with the `"global"` sentinel — `global` is itself
+/// a valid npm package name.
 public enum JSImportFrom: Codable, Equatable, Sendable {
     case global
+    case snippet(String)
     case module(String)
 
+    private enum CodingKeys: String, CodingKey {
+        case kind, path, specifier
+    }
+
     public init(from decoder: any Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let value = try container.decode(String.self)
-        if value == "global" {
+        if let container = try? decoder.singleValueContainer(), let value = try? container.decode(String.self) {
+            guard value == "global" else {
+                throw DecodingError.dataCorruptedError(
+                    in: container,
+                    debugDescription: "Unknown import origin '\(value)'. Expected \"global\"."
+                )
+            }
             self = .global
-        } else if value.hasPrefix("/") && !value.split(separator: "/").contains("..") {
-            self = .module(value)
-        } else {
+            return
+        }
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let kind = try container.decode(String.self, forKey: .kind)
+        switch kind {
+        case "snippet":
+            let path = try container.decode(String.self, forKey: .path)
+            // A snippet names a file we resolve inside the Swift target, so it must be
+            // rooted there and must not traverse out of it.
+            guard path.hasPrefix("/"), !path.split(separator: "/").contains("..") else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .path,
+                    in: container,
+                    debugDescription: "Snippet path '\(path)' must start with '/' and must not contain '..'."
+                )
+            }
+            self = .snippet(path)
+        case "module":
+            let specifier = try container.decode(String.self, forKey: .specifier)
+            // A bare specifier is resolved by the JavaScript host, so almost anything is
+            // legal, but the shapes that can never work are rejected here as well as at
+            // parse time: an empty specifier, a relative one, and a rooted path.
+            guard !specifier.isEmpty else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .specifier,
+                    in: container,
+                    debugDescription: "Module specifier must not be empty."
+                )
+            }
+            guard !specifier.hasPrefix("."), !specifier.hasPrefix("/") else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .specifier,
+                    in: container,
+                    debugDescription: "Module specifier '\(specifier)' must not be a path. Use a snippet instead."
+                )
+            }
+            self = .module(specifier)
+        default:
             throw DecodingError.dataCorruptedError(
+                forKey: .kind,
                 in: container,
-                debugDescription: "Unknown import origin '\(value)'. Expected \"global\" or a rooted module path."
+                debugDescription: "Unknown import origin kind '\(kind)'. Expected \"snippet\" or \"module\"."
             )
         }
     }
 
     public func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(modulePath ?? "global")
+        switch self {
+        case .global:
+            var container = encoder.singleValueContainer()
+            try container.encode("global")
+        case .snippet(let path):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode("snippet", forKey: .kind)
+            try container.encode(path, forKey: .path)
+        case .module(let specifier):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode("module", forKey: .kind)
+            try container.encode(specifier, forKey: .specifier)
+        }
     }
 
-    public var modulePath: String? {
-        guard case .module(let path) = self else { return nil }
+    /// The path of a target-local JavaScript file, rooted at the Swift target directory.
+    public var snippetPath: String? {
+        guard case .snippet(let path) = self else { return nil }
         return path
+    }
+
+    /// The bare specifier of an external ECMAScript module, resolved by the JavaScript host.
+    public var moduleSpecifier: String? {
+        guard case .module(let specifier) = self else { return nil }
+        return specifier
     }
 }
 

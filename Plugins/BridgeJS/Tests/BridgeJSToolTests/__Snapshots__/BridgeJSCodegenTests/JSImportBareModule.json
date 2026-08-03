@@ -11,24 +11,72 @@
               "isThrows" : true
             },
             "from" : {
-              "kind" : "snippet",
-              "path" : "\/Modules\/JSImportModule.mjs"
+              "kind" : "module",
+              "specifier" : "node:path"
             },
-            "name" : "moduleAdd",
+            "jsName" : "basename",
+            "name" : "nodeBasename",
             "parameters" : [
               {
-                "name" : "lhs",
+                "name" : "path",
                 "type" : {
-                  "integer" : {
-                    "_0" : {
-                      "isSigned" : true,
-                      "width" : "word"
-                    }
+                  "string" : {
+
                   }
                 }
-              },
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "node:path"
+            },
+            "jsName" : "dirname",
+            "name" : "nodeDirname",
+            "parameters" : [
               {
-                "name" : "rhs",
+                "name" : "path",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "default-export-package"
+            },
+            "jsName" : "default",
+            "name" : "callDefaultExport",
+            "parameters" : [
+              {
+                "name" : "value",
                 "type" : {
                   "integer" : {
                     "_0" : {
@@ -47,41 +95,33 @@
                 }
               }
             }
-          },
-          {
-            "accessLevel" : "internal",
-            "effects" : {
-              "isAsync" : false,
-              "isStatic" : false,
-              "isThrows" : true
-            },
-            "from" : {
-              "kind" : "snippet",
-              "path" : "\/Modules\/JSImportModule.mjs"
-            },
-            "jsName" : "renamedFunction",
-            "name" : "moduleRenamed",
-            "parameters" : [
-
-            ],
-            "returnType" : {
-              "string" : {
-
-              }
-            }
           }
         ],
         "globalGetters" : [
           {
             "accessLevel" : "internal",
             "from" : {
-              "kind" : "snippet",
-              "path" : "\/Modules\/JSImportModule.mjs"
+              "kind" : "module",
+              "specifier" : "some-package"
             },
             "jsName" : "version",
-            "name" : "moduleVersion",
+            "name" : "packageVersion",
             "type" : {
               "string" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/DefaultExport.mjs"
+            },
+            "jsName" : "default",
+            "name" : "localDefaultExport",
+            "type" : {
+              "jsObject" : {
 
               }
             }
@@ -107,13 +147,13 @@
               ]
             },
             "from" : {
-              "kind" : "snippet",
-              "path" : "\/Modules\/ModuleCounter.mjs"
+              "kind" : "module",
+              "specifier" : "@scope\/package"
             },
             "getters" : [
               {
                 "accessLevel" : "internal",
-                "name" : "value",
+                "name" : "size",
                 "type" : {
                   "integer" : {
                     "_0" : {
@@ -124,6 +164,7 @@
                 }
               }
             ],
+            "jsName" : "File",
             "methods" : [
               {
                 "accessLevel" : "internal",
@@ -132,7 +173,7 @@
                   "isStatic" : false,
                   "isThrows" : true
                 },
-                "name" : "increment",
+                "name" : "read",
                 "parameters" : [
 
                 ],
@@ -146,21 +187,9 @@
                 }
               }
             ],
-            "name" : "ModuleCounter",
+            "name" : "ScopedFile",
             "setters" : [
-              {
-                "accessLevel" : "internal",
-                "functionName" : "value_set",
-                "name" : "value",
-                "type" : {
-                  "integer" : {
-                    "_0" : {
-                      "isSigned" : true,
-                      "width" : "word"
-                    }
-                  }
-                }
-              }
+
             ],
             "staticMethods" : [
               {
@@ -186,7 +215,7 @@
                 ],
                 "returnType" : {
                   "jsObject" : {
-                    "_0" : "ModuleCounter"
+                    "_0" : "ScopedFile"
                   }
                 }
               }

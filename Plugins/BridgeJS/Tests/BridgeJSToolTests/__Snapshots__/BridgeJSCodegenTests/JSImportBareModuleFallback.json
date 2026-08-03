@@ -1,0 +1,95 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "weird-package"
+            },
+            "jsName" : "kebab-case-function",
+            "name" : "kebabCaseFunction",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "from" : {
+              "kind" : "module",
+              "specifier" : "node:path"
+            },
+            "jsName" : "join",
+            "name" : "joinPaths",
+            "parameters" : [
+              {
+                "name" : "lhs",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "rhs",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "accessLevel" : "internal",
+            "from" : {
+              "kind" : "module",
+              "specifier" : "weird-package"
+            },
+            "jsName" : "dashed-property",
+            "name" : "dashedProperty",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

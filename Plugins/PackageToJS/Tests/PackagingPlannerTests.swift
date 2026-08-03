@@ -134,7 +134,7 @@ import Testing
                             functions: [
                                 ImportedFunctionSkeleton(
                                     name: "value",
-                                    from: .module("/module.mjs"),
+                                    from: .snippet("/module.mjs"),
                                     parameters: [],
                                     returnType: .void
                                 )
@@ -206,6 +206,167 @@ import Testing
 
             #expect(try String(contentsOf: copiedModule, encoding: .utf8) == "export const value = 2;\n")
             #expect(system.writtenFiles.filter { $0.hasSuffix("/bridge-js.js") }.count == initialLinkCount)
+        }
+    }
+
+    /// A bare specifier must not suppress copying of local modules that appear alongside it.
+    @Test func mixedLocalAndBareModulesBothWork() throws {
+        try withTemporaryDirectory { temporaryDirectory, _ in
+            let skeleton = temporaryDirectory.appending(path: "BridgeJS.json")
+            let module = temporaryDirectory.appending(path: "module.mjs")
+            let wasm = temporaryDirectory.appending(path: "main.wasm")
+            let plannerSource = temporaryDirectory.appending(path: "PackageToJS.swift")
+            let output = temporaryDirectory.appending(path: "output")
+            let intermediates = temporaryDirectory.appending(path: "intermediates")
+
+            let bridgeSkeleton = BridgeJSSkeleton(
+                moduleName: "TestModule",
+                imported: ImportedModuleSkeleton(
+                    children: [
+                        ImportedFileSkeleton(
+                            functions: [
+                                ImportedFunctionSkeleton(
+                                    name: "value",
+                                    from: .snippet("/module.mjs"),
+                                    parameters: [],
+                                    returnType: .void
+                                ),
+                                ImportedFunctionSkeleton(
+                                    name: "basename",
+                                    from: .module("node:path"),
+                                    parameters: [],
+                                    returnType: .void
+                                ),
+                            ],
+                            types: []
+                        )
+                    ]
+                )
+            )
+            try JSONEncoder().encode(bridgeSkeleton).write(to: skeleton)
+            try Data("export const value = 1;\n".utf8).write(to: module)
+            try Data([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]).write(to: wasm)
+            try Data().write(to: plannerSource)
+
+            let system = TestPackagingSystem()
+            let planner = PackagingPlanner(
+                options: PackageToJS.PackageOptions(),
+                packageId: "test",
+                intermediatesDir: BuildPath(absolute: intermediates.path),
+                selfPackageDir: BuildPath(
+                    absolute: URL(fileURLWithPath: #filePath)
+                        .deletingLastPathComponent()
+                        .deletingLastPathComponent()
+                        .deletingLastPathComponent()
+                        .deletingLastPathComponent()
+                        .path
+                ),
+                skeletons: [.init(source: skeleton, targetDirectory: temporaryDirectory)],
+                outputDir: BuildPath(absolute: output.path),
+                wasmProductArtifact: BuildPath(absolute: wasm.path),
+                wasmFilename: "main.wasm",
+                configuration: "debug",
+                triple: "wasm32-unknown-wasi",
+                selfPath: BuildPath(absolute: plannerSource.path),
+                system: system
+            )
+            var make = MiniMake(printProgress: { _, _ in })
+            let root = try planner.planBuild(
+                make: &make,
+                buildOptions: PackageToJS.BuildOptions(
+                    product: "test",
+                    noOptimize: false,
+                    debugInfoFormat: .none,
+                    packageOptions: PackageToJS.PackageOptions()
+                )
+            )
+            try make.build(output: root, scope: MiniMake.VariableScope(variables: [:]))
+
+            let copiedModule = output.appending(path: "bridge-js-modules/TestModule/module.mjs")
+            #expect(try String(contentsOf: copiedModule, encoding: .utf8) == "export const value = 1;\n")
+            let generated = try String(contentsOf: output.appending(path: "bridge-js.js"), encoding: .utf8)
+            #expect(generated.contains("from \"node:path\""))
+            #expect(generated.contains("bridge-js-modules/TestModule/module.mjs"))
+        }
+    }
+
+    /// A bare specifier such as "node:path" is resolved by the JavaScript host at load
+    /// time, so packaging must not look for a file on disk or copy anything for it.
+    @Test func bareJavaScriptModuleIsNotCopied() throws {
+        try withTemporaryDirectory { temporaryDirectory, _ in
+            let skeleton = temporaryDirectory.appending(path: "BridgeJS.json")
+            let wasm = temporaryDirectory.appending(path: "main.wasm")
+            let plannerSource = temporaryDirectory.appending(path: "PackageToJS.swift")
+            let output = temporaryDirectory.appending(path: "output")
+            let intermediates = temporaryDirectory.appending(path: "intermediates")
+
+            let bridgeSkeleton = BridgeJSSkeleton(
+                moduleName: "TestModule",
+                imported: ImportedModuleSkeleton(
+                    children: [
+                        ImportedFileSkeleton(
+                            functions: [
+                                ImportedFunctionSkeleton(
+                                    name: "basename",
+                                    from: .module("node:path"),
+                                    parameters: [],
+                                    returnType: .void
+                                )
+                            ],
+                            types: []
+                        )
+                    ]
+                )
+            )
+            try JSONEncoder().encode(bridgeSkeleton).write(to: skeleton)
+            try Data([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]).write(to: wasm)
+            try Data().write(to: plannerSource)
+
+            let system = TestPackagingSystem()
+            let planner = PackagingPlanner(
+                options: PackageToJS.PackageOptions(),
+                packageId: "test",
+                intermediatesDir: BuildPath(absolute: intermediates.path),
+                selfPackageDir: BuildPath(
+                    absolute: URL(fileURLWithPath: #filePath)
+                        .deletingLastPathComponent()
+                        .deletingLastPathComponent()
+                        .deletingLastPathComponent()
+                        .deletingLastPathComponent()
+                        .path
+                ),
+                skeletons: [
+                    .init(
+                        source: skeleton,
+                        targetDirectory: temporaryDirectory
+                    )
+                ],
+                outputDir: BuildPath(absolute: output.path),
+                wasmProductArtifact: BuildPath(absolute: wasm.path),
+                wasmFilename: "main.wasm",
+                configuration: "debug",
+                triple: "wasm32-unknown-wasi",
+                selfPath: BuildPath(absolute: plannerSource.path),
+                system: system
+            )
+            var make = MiniMake(printProgress: { _, _ in })
+            let root = try planner.planBuild(
+                make: &make,
+                buildOptions: PackageToJS.BuildOptions(
+                    product: "test",
+                    noOptimize: false,
+                    debugInfoFormat: .none,
+                    packageOptions: PackageToJS.PackageOptions()
+                )
+            )
+            try make.build(output: root, scope: MiniMake.VariableScope(variables: [:]))
+
+            #expect(!FileManager.default.fileExists(atPath: output.appending(path: "bridge-js-modules").path))
+            let generated = try String(
+                contentsOf: output.appending(path: "bridge-js.js"),
+                encoding: .utf8
+            )
+            #expect(generated.contains("from \"node:path\""))
         }
     }
 }

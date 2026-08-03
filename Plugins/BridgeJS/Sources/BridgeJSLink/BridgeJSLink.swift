@@ -2515,7 +2515,13 @@ extension BridgeJSLink {
         }
 
         func callConstructor(jsName: String, swiftTypeName: String, fromObjectExpr: String) throws {
-            let ctorExpr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: jsName)
+            try callConstructor(
+                ctorExpr: Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: jsName),
+                swiftTypeName: swiftTypeName
+            )
+        }
+
+        func callConstructor(ctorExpr: String, swiftTypeName: String) throws {
             let call = "new \(ctorExpr)(\(parameterForwardings.joined(separator: ", ")))"
             let type: BridgeType = .jsObject(swiftTypeName)
             let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: type, context: context)
@@ -2580,12 +2586,18 @@ extension BridgeJSLink {
         }
 
         func getImportProperty(name: String, fromObjectExpr: String, returnType: BridgeType) throws {
+            try getImportProperty(
+                accessExpr: Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: name),
+                returnType: returnType
+            )
+        }
+
+        func getImportProperty(accessExpr expr: String, returnType: BridgeType) throws {
             if returnType == .void {
                 throw BridgeJSLinkError(message: "Void is not supported for imported JS properties")
             }
 
             let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType, context: context)
-            let expr = Self.propertyAccessExpr(objectExpr: fromObjectExpr, propertyName: name)
 
             let returnExpr: String?
             if loweringFragment.parameters.count == 0 {
@@ -2623,8 +2635,7 @@ extension BridgeJSLink {
         }
 
         static func propertyAccessExpr(objectExpr: String, propertyName: String) -> String {
-            if propertyName.range(of: #"^[$A-Z_][0-9A-Z_$]*$"#, options: [.regularExpression, .caseInsensitive]) != nil
-            {
+            if ImportedJSModuleRegistry.isValidJSIdentifier(propertyName) {
                 return "\(objectExpr).\(propertyName)"
             }
             let escapedName = BridgeJSLink.escapeForJavaScriptStringLiteral(propertyName)
@@ -3469,12 +3480,13 @@ extension BridgeJSLink {
             try thunkBuilder.liftParameter(param: param)
         }
         let jsName = function.jsName ?? function.name
-        let importRootExpr = try importedModuleRegistry.namespaceExpression(
+        let calleeExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
-            from: function.from
+            from: function.from,
+            memberName: jsName
         )
 
-        try thunkBuilder.call(name: jsName, fromObjectExpr: importRootExpr)
+        try thunkBuilder.call(calleeExpr: calleeExpr)
         let funcLines = thunkBuilder.renderFunction(name: function.abiName(context: nil))
         if function.from == nil {
             importObjectBuilder.appendDts(
@@ -3496,13 +3508,13 @@ extension BridgeJSLink {
             intrinsicRegistry: intrinsicRegistry
         )
         let jsName = getter.jsName ?? getter.name
-        let importRootExpr = try importedModuleRegistry.namespaceExpression(
+        let accessExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
-            from: getter.from
+            from: getter.from,
+            memberName: jsName
         )
         try thunkBuilder.getImportProperty(
-            name: jsName,
-            fromObjectExpr: importRootExpr,
+            accessExpr: accessExpr,
             returnType: getter.type
         )
         let abiName = getter.abiName(context: nil)
@@ -3602,14 +3614,14 @@ extension BridgeJSLink {
         for param in constructor.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let importRootExpr = try importedModuleRegistry.namespaceExpression(
+        let ctorExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
-            from: type.from
+            from: type.from,
+            memberName: type.jsName ?? type.name
         )
         try thunkBuilder.callConstructor(
-            jsName: type.jsName ?? type.name,
-            swiftTypeName: type.name,
-            fromObjectExpr: importRootExpr
+            ctorExpr: ctorExpr,
+            swiftTypeName: type.name
         )
         let abiName = constructor.abiName(context: type)
         let funcLines = thunkBuilder.renderFunction(name: abiName)
@@ -3661,13 +3673,10 @@ extension BridgeJSLink {
         for param in method.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let importRootExpr = try importedModuleRegistry.namespaceExpression(
+        let constructorExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: swiftModuleName,
-            from: context.from
-        )
-        let constructorExpr = ImportedThunkBuilder.propertyAccessExpr(
-            objectExpr: importRootExpr,
-            propertyName: context.jsName ?? context.name
+            from: context.from,
+            memberName: context.jsName ?? context.name
         )
 
         try thunkBuilder.callStaticMethod(on: constructorExpr, name: method.jsName ?? method.name)
