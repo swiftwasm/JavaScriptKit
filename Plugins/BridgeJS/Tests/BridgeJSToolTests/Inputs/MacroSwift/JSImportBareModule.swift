@@ -10,7 +10,7 @@ var packageVersion: String
 @JSFunction(jsName: .default, from: .module("default-export-package"))
 func callDefaultExport(_ value: Int) throws(JSException) -> Int
 
-@JSGetter(jsName: .default, from: .module("/Modules/DefaultExport.mjs"))
+@JSGetter(jsName: .default, from: .snippet("/Modules/DefaultExport.mjs"))
 var localDefaultExport: JSObject
 
 @JSClass(jsName: "File", from: .module("@scope/package"))

@@ -9,19 +9,26 @@ public enum JSEnumStyle: String {
 /// Controls where BridgeJS reads imported JS values from.
 ///
 /// - `global`: Read from `globalThis`.
-/// - `module`: Read from an ECMAScript module.
+/// - `snippet`: Read from a JavaScript file shipped inside the Swift target.
+/// - `module`: Read from an external ECMAScript module.
 public enum JSImportFrom {
     case global
-    /// Read from an ECMAScript module.
+    /// Read from a JavaScript file that ships with the Swift target.
     ///
-    /// A `/`-prefixed value is a path to a JavaScript file rooted at the Swift
-    /// target directory, e.g. `.module("/Modules/utils.mjs")`. Any other value
-    /// is passed to the JavaScript module resolver verbatim, which covers
-    /// Node built-in modules and installed packages, e.g. `.module("node:path")`
-    /// or `.module("lodash/fp")`.
+    /// The path is rooted at the Swift target directory and must begin with `/`
+    /// and end in `.js` or `.mjs`, e.g. `.snippet("/Modules/utils.mjs")`. The
+    /// leading `/` denotes the target root, not the filesystem root, and the file
+    /// must exist inside that target. BridgeJS copies referenced files into the
+    /// generated package.
+    case snippet(String)
+    /// Read from an external ECMAScript module, resolved by the JavaScript host.
     ///
-    /// Relative specifiers such as `"./utils.mjs"` are not supported; use the
-    /// `/`-prefixed form to reference a file in your own target.
+    /// The value is passed to the module resolver verbatim, which covers Node
+    /// built-in modules and installed packages, e.g. `.module("node:path")`,
+    /// `.module("lodash/fp")`, or `.module("@scope/package")`. Nothing is copied
+    /// for these, and making them resolvable at load time is up to you.
+    ///
+    /// To reference a file in your own target, use ``JSImportFrom/snippet(_:)``.
     case module(String)
 }
 
@@ -35,7 +42,7 @@ public enum JSName: ExpressibleByStringLiteral {
     /// The default export of an ECMAScript module.
     ///
     /// Only valid on a top-level `@JSFunction`, `@JSGetter`, or `@JSClass`
-    /// that also specifies `from: .module(...)`.
+    /// that also specifies `from: .module(...)` or `from: .snippet(...)`.
     case `default`
 
     public init(stringLiteral value: String) {
@@ -171,7 +178,7 @@ public macro JS(
 ///
 /// - Parameter from: Selects where the property is read from.
 ///   Use `.global` to read from `globalThis` (e.g. `console`, `document`).
-///   Use `.module("/path/to/module.js")` to read a named export from a file rooted at the Swift target,
+///   Use `.snippet("/path/to/module.js")` to read a named export from a file rooted at the Swift target,
 ///   or `.module("node:os")` to read a named export from an external module.
 ///   Pass `jsName: .default` to read the module's default export.
 @attached(accessor)
@@ -213,7 +220,7 @@ public macro JSSetter(jsName: JSName? = nil, from: JSImportFrom? = nil) =
 ///   If not provided, the Swift function name is used.
 /// - Parameter from: Selects where the function is looked up from.
 ///   Use `.global` to call a function on `globalThis` (e.g. `setTimeout`).
-///   Use `.module("/path/to/module.js")` to call a named export from a file rooted at the Swift target,
+///   Use `.snippet("/path/to/module.js")` to call a named export from a file rooted at the Swift target,
 ///   or `.module("node:path")` to call a named export from an external module.
 ///   Pass `jsName: .default` to call the module's default export.
 @attached(body)
@@ -240,7 +247,7 @@ public macro JSFunction(jsName: JSName? = nil, from: JSImportFrom? = nil) =
 ///
 /// - Parameter from: Selects where the constructor is looked up from.
 ///   Use `.global` to construct globals like `WebSocket` via `globalThis`.
-///   Use `.module("/path/to/module.js")` to construct a named class export from a file rooted at the Swift target,
+///   Use `.snippet("/path/to/module.js")` to construct a named class export from a file rooted at the Swift target,
 ///   or `.module("@scope/package")` to construct a named class export from an external module.
 ///   Pass `jsName: .default` to construct the module's default export.
 @attached(member, names: named(jsObject), named(init(unsafelyWrapping:)))

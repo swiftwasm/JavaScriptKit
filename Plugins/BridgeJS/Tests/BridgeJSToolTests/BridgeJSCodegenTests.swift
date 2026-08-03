@@ -18,10 +18,10 @@ import Testing
     func javaScriptModuleReferencesAreStoredWithoutSourceContents() throws {
         let modulePath = "/Modules/math.mjs"
         let swiftSource = """
-            @JSFunction(from: .module("/Modules/math.mjs"))
+            @JSFunction(from: .snippet("/Modules/math.mjs"))
             func add(_ lhs: Int, _ rhs: Int) throws(JSException) -> Int
 
-            @JSGetter(jsName: "version", from: .module("/Modules/math.mjs"))
+            @JSGetter(jsName: "version", from: .snippet("/Modules/math.mjs"))
             var moduleVersion: String
             """
         var validationCount = 0
@@ -41,7 +41,7 @@ import Testing
         let imported = try #require(skeleton.imported)
 
         #expect(validationCount == 1)
-        #expect(imported.children.flatMap(\.functions).first?.from == .module(modulePath))
+        #expect(imported.children.flatMap(\.functions).first?.from == .snippet(modulePath))
         #expect(!encoded.contains(#""modules""#))
     }
 
@@ -54,7 +54,7 @@ import Testing
 
     @Test(arguments: [
         JSImportFrom.global,
-        JSImportFrom.module("/Modules/utils.mjs"),
+        JSImportFrom.snippet("/Modules/utils.mjs"),
         JSImportFrom.module("node:path"),
         JSImportFrom.module("@scope/package/sub"),
         // A package literally named "global" is why bare specifiers are encoded as a
@@ -74,7 +74,7 @@ import Testing
         let encoder = JSONEncoder()
         #expect(String(data: try encoder.encode(JSImportFrom.global), encoding: .utf8) == #""global""#)
         #expect(
-            String(data: try encoder.encode(JSImportFrom.module("/a.js")), encoding: .utf8) == #""\/a.js""#
+            String(data: try encoder.encode(JSImportFrom.snippet("/a.js")), encoding: .utf8) == #""\/a.js""#
         )
     }
 

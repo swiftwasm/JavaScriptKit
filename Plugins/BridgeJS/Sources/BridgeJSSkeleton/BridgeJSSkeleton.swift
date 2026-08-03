@@ -1126,11 +1126,18 @@ private struct AsyncClosureReturnTypeCollector: BridgeSkeletonVisitor {
 /// Controls where BridgeJS reads imported JS values from.
 ///
 /// - `global`: Read from `globalThis`.
-/// - `module`: Read from an ECMAScript module. A `/`-prefixed payload is a file
-///   rooted at the Swift target directory; any other payload is a bare specifier
-///   resolved by the JavaScript host (e.g. `node:path`, `lodash/fp`).
+/// - `snippet`: Read from a `/`-rooted JavaScript file inside the Swift target,
+///   which packaging copies into the generated output.
+/// - `module`: Read from an external ECMAScript module named by a bare specifier
+///   that the JavaScript host resolves (e.g. `node:path`, `lodash/fp`).
+///
+/// The JSON encoding keeps `.global` as `"global"` and a snippet as its plain path
+/// string; only `.module` uses a tagged object. That keeps checked-in skeletons
+/// stable and avoids colliding with the `"global"` sentinel, since `global` is
+/// itself a valid package name.
 public enum JSImportFrom: Codable, Equatable, Sendable {
     case global
+    case snippet(String)
     case module(String)
 
     private enum CodingKeys: String, CodingKey {
@@ -1146,10 +1153,10 @@ public enum JSImportFrom: Codable, Equatable, Sendable {
             guard value.hasPrefix("/"), !value.split(separator: "/").contains("..") else {
                 throw DecodingError.dataCorruptedError(
                     in: container,
-                    debugDescription: "Unknown import origin '\(value)'. Expected \"global\" or a rooted module path."
+                    debugDescription: "Unknown import origin '\(value)'. Expected \"global\" or a rooted snippet path."
                 )
             }
-            self = .module(value)
+            self = .snippet(value)
             return
         }
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -1162,8 +1169,10 @@ public enum JSImportFrom: Codable, Equatable, Sendable {
             )
         }
         let specifier = try container.decode(String.self, forKey: .specifier)
-        // Apply the same rules as the single-value form above, so a specifier cannot
-        // reach code generation through this path that the string path would reject.
+        // A bare specifier is resolved by the JavaScript host, so almost anything is
+        // legal, but the shapes that can never work are rejected here as well as at
+        // parse time: an empty specifier, a relative one, and a rooted path (which is
+        // a snippet and must be encoded as a plain string instead).
         guard !specifier.isEmpty else {
             throw DecodingError.dataCorruptedError(
                 forKey: .specifier,
@@ -1171,30 +1180,21 @@ public enum JSImportFrom: Codable, Equatable, Sendable {
                 debugDescription: "Module specifier must not be empty."
             )
         }
-        guard !specifier.hasPrefix(".") else {
+        guard !specifier.hasPrefix("."), !specifier.hasPrefix("/") else {
             throw DecodingError.dataCorruptedError(
                 forKey: .specifier,
                 in: container,
-                debugDescription: "Module specifier '\(specifier)' must not be relative."
-            )
-        }
-        // A rooted path names a file we resolve inside the Swift target, so it must not
-        // traverse out of it. A bare specifier is resolved by the JavaScript host, where
-        // path segments carry no such meaning, so it is left alone.
-        guard !specifier.hasPrefix("/") || !specifier.split(separator: "/").contains("..") else {
-            throw DecodingError.dataCorruptedError(
-                forKey: .specifier,
-                in: container,
-                debugDescription: "Local module path '\(specifier)' must not contain '..'."
+                debugDescription:
+                    "Module specifier '\(specifier)' must not be a path. Rooted snippet paths are encoded as a plain string."
             )
         }
         self = .module(specifier)
     }
 
     public func encode(to encoder: any Encoder) throws {
-        guard let specifier = bareModuleSpecifier else {
+        guard let specifier = moduleSpecifier else {
             var container = encoder.singleValueContainer()
-            try container.encode(localModulePath ?? "global")
+            try container.encode(snippetPath ?? "global")
             return
         }
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -1202,21 +1202,15 @@ public enum JSImportFrom: Codable, Equatable, Sendable {
         try container.encode(specifier, forKey: .specifier)
     }
 
-    /// The raw module specifier, whatever form it takes.
+    /// The path of a target-local JavaScript file, rooted at the Swift target directory.
+    public var snippetPath: String? {
+        guard case .snippet(let path) = self else { return nil }
+        return path
+    }
+
+    /// The bare specifier of an external ECMAScript module, resolved by the JavaScript host.
     public var moduleSpecifier: String? {
         guard case .module(let specifier) = self else { return nil }
-        return specifier
-    }
-
-    /// The specifier when it denotes a file rooted at the Swift target directory.
-    public var localModulePath: String? {
-        guard let specifier = moduleSpecifier, specifier.hasPrefix("/") else { return nil }
-        return specifier
-    }
-
-    /// The specifier when it is a bare specifier resolved by the JavaScript host.
-    public var bareModuleSpecifier: String? {
-        guard let specifier = moduleSpecifier, !specifier.hasPrefix("/") else { return nil }
         return specifier
     }
 }

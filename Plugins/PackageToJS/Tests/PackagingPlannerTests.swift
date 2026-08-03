@@ -134,7 +134,7 @@ import Testing
                             functions: [
                                 ImportedFunctionSkeleton(
                                     name: "value",
-                                    from: .module("/module.mjs"),
+                                    from: .snippet("/module.mjs"),
                                     parameters: [],
                                     returnType: .void
                                 )
@@ -227,7 +227,7 @@ import Testing
                             functions: [
                                 ImportedFunctionSkeleton(
                                     name: "value",
-                                    from: .module("/module.mjs"),
+                                    from: .snippet("/module.mjs"),
                                     parameters: [],
                                     returnType: .void
                                 ),

@@ -61,8 +61,8 @@ import Testing
     /// Swift modules must stay two separate copies with two separate imports.
     @Test func localPathIsNotSharedAcrossSwiftModules() throws {
         let lines = try importLines([
-            skeleton(moduleName: "Alpha", functions: [function("a", from: .module("/utils.mjs"))]),
-            skeleton(moduleName: "Beta", functions: [function("b", from: .module("/utils.mjs"))]),
+            skeleton(moduleName: "Alpha", functions: [function("a", from: .snippet("/utils.mjs"))]),
+            skeleton(moduleName: "Beta", functions: [function("b", from: .snippet("/utils.mjs"))]),
         ])
         #expect(lines.count == 2)
         #expect(lines.contains { $0.contains("bridge-js-modules/Alpha/utils.mjs") })
@@ -138,7 +138,7 @@ import Testing
                 functions: [
                     function("z", jsName: "zeta", from: .module("zzz-package")),
                     function("a", jsName: "alpha", from: .module("aaa-package")),
-                    function("l", from: .module("/local.mjs")),
+                    function("l", from: .snippet("/local.mjs")),
                 ]
             )
         ])

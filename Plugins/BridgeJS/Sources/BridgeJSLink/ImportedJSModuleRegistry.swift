@@ -7,19 +7,19 @@ import Foundation
 final class ImportedJSModuleRegistry {
     /// A JavaScript module that imported declarations are read from.
     ///
-    /// A `local` reference is a file inside a Swift target, which packaging copies
-    /// into the generated output. A `bare` reference is a specifier resolved by the
-    /// JavaScript host (a bundler, an import map, or Node's `node_modules` lookup),
-    /// so it has no file and nothing to copy. Because a bare specifier names the
-    /// same module no matter which Swift module mentions it — and ECMAScript caches
-    /// module instances — it is keyed by specifier alone and shared across targets.
+    /// A `snippet` reference is a file inside a Swift target, which packaging copies
+    /// into the generated output. A `module` reference is a bare specifier resolved by
+    /// the JavaScript host (a bundler, an import map, or Node's `node_modules` lookup),
+    /// so it has no file and nothing to copy. Because a bare specifier names the same
+    /// module no matter which Swift module mentions it — and ECMAScript caches module
+    /// instances — it is keyed by specifier alone and shared across targets.
     enum Reference: Hashable {
-        case local(swiftModuleName: String, path: String)
-        case bare(specifier: String)
+        case snippet(swiftModuleName: String, path: String)
+        case module(specifier: String)
     }
 
-    /// A target-local JavaScript file that packaging must copy into the output.
-    struct LocalModule: Hashable {
+    /// A JavaScript file shipped in a Swift target that packaging must copy into the output.
+    struct SnippetFile: Hashable {
         let swiftModuleName: String
         let path: String
 
@@ -40,11 +40,11 @@ final class ImportedJSModuleRegistry {
     private var bindings: [Reference: Binding] = [:]
     private(set) var references: [Reference] = []
 
-    /// The target-local files packaging must copy, in deterministic order.
-    var localModules: [LocalModule] {
+    /// The snippet files packaging must copy, in deterministic order.
+    var snippetFiles: [SnippetFile] {
         references.compactMap { reference in
-            guard case .local(let swiftModuleName, let path) = reference else { return nil }
-            return LocalModule(swiftModuleName: swiftModuleName, path: path)
+            guard case .snippet(let swiftModuleName, let path) = reference else { return nil }
+            return SnippetFile(swiftModuleName: swiftModuleName, path: path)
         }
     }
 
@@ -82,18 +82,18 @@ final class ImportedJSModuleRegistry {
         return references.sorted(by: isOrderedBefore)
     }
 
-    static func collectLocalModules(skeletons: [BridgeJSSkeleton]) -> [LocalModule] {
+    static func collectSnippetFiles(skeletons: [BridgeJSSkeleton]) -> [SnippetFile] {
         collectReferences(skeletons: skeletons).compactMap { reference in
-            guard case .local(let swiftModuleName, let path) = reference else { return nil }
-            return LocalModule(swiftModuleName: swiftModuleName, path: path)
+            guard case .snippet(let swiftModuleName, let path) = reference else { return nil }
+            return SnippetFile(swiftModuleName: swiftModuleName, path: path)
         }
     }
 
     /// Visits every module origin mentioned by the skeleton, whether or not code
     /// generation looks a member up on it.
     ///
-    /// This is what decides which modules are imported at all, and for local paths
-    /// which files packaging copies. It stays broader than `forEachMemberLookup` so
+    /// This is what decides which modules are imported at all, and for snippets which
+    /// files packaging copies. It stays broader than `forEachMemberLookup` so
     /// that a module mentioned only by a wrapper-only `@JSClass` is still imported,
     /// preserving its side effects.
     private static func forEachOrigin(
@@ -146,22 +146,25 @@ final class ImportedJSModuleRegistry {
     }
 
     private static func reference(swiftModuleName: String, from: JSImportFrom?) -> Reference? {
-        guard let specifier = from?.moduleSpecifier else { return nil }
-        if let path = from?.localModulePath {
-            return .local(swiftModuleName: swiftModuleName, path: path)
+        switch from {
+        case .snippet(let path):
+            return .snippet(swiftModuleName: swiftModuleName, path: path)
+        case .module(let specifier):
+            return .module(specifier: specifier)
+        case .global, nil:
+            return nil
         }
-        return .bare(specifier: specifier)
     }
 
     private static func isOrderedBefore(_ lhs: Reference, _ rhs: Reference) -> Bool {
         switch (lhs, rhs) {
-        case (.local(let lhsModule, let lhsPath), .local(let rhsModule, let rhsPath)):
+        case (.snippet(let lhsModule, let lhsPath), .snippet(let rhsModule, let rhsPath)):
             return (lhsModule, lhsPath) < (rhsModule, rhsPath)
-        case (.bare(let lhsSpecifier), .bare(let rhsSpecifier)):
+        case (.module(let lhsSpecifier), .module(let rhsSpecifier)):
             return lhsSpecifier < rhsSpecifier
-        case (.local, .bare):
+        case (.snippet, .module):
             return true
-        case (.bare, .local):
+        case (.module, .snippet):
             return false
         }
     }
@@ -185,12 +188,13 @@ final class ImportedJSModuleRegistry {
                 objectExpr: "globalThis",
                 propertyName: memberName
             )
-        case .module(let specifier):
+        case .snippet, .module:
             guard let reference = Self.reference(swiftModuleName: swiftModuleName, from: from),
                 let binding = bindings[reference]
             else {
                 throw BridgeJSLinkError(
-                    message: "Missing JavaScript module \(swiftModuleName)\(specifier)"
+                    message:
+                        "Missing JavaScript module \(swiftModuleName)\(from?.snippetPath ?? from?.moduleSpecifier ?? "")"
                 )
             }
             if binding.usesNamedImports {
@@ -216,11 +220,11 @@ final class ImportedJSModuleRegistry {
             guard let binding = bindings[reference] else { return nil }
             let specifier: String
             switch reference {
-            case .local(let swiftModuleName, let path):
-                let output = LocalModule(swiftModuleName: swiftModuleName, path: path).relativeOutputPath
+            case .snippet(let swiftModuleName, let path):
+                let output = SnippetFile(swiftModuleName: swiftModuleName, path: path).relativeOutputPath
                 specifier = "./" + BridgeJSLink.escapeForJavaScriptStringLiteral(output)
-            case .bare(let bareSpecifier):
-                specifier = BridgeJSLink.escapeForJavaScriptStringLiteral(bareSpecifier)
+            case .module(let moduleSpecifier):
+                specifier = BridgeJSLink.escapeForJavaScriptStringLiteral(moduleSpecifier)
             }
             guard binding.usesNamedImports else {
                 return "import * as \(Self.namespaceAlias(index: binding.index)) from \"\(specifier)\";"

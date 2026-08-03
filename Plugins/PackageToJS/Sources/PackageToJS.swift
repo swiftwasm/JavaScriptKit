@@ -701,7 +701,7 @@ struct PackagingPlanner {
             // Only target-local modules are files we copy. Bare specifiers (e.g. "node:path",
             // "lodash") are resolved by the JavaScript host at load time, so there is
             // nothing to find on disk and nothing to place in the output.
-            for reference in ImportedJSModuleRegistry.collectLocalModules(skeletons: [skeleton]) {
+            for reference in ImportedJSModuleRegistry.collectSnippetFiles(skeletons: [skeleton]) {
                 guard
                     let sourceURL = JavaScriptModulePath.resolve(
                         reference.path,

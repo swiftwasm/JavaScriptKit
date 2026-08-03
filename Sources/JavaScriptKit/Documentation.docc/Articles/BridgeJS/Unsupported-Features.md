@@ -8,11 +8,11 @@ BridgeJS generates glue code per Swift target (module). Some patterns that are v
 
 ## JavaScript modules
 
-`JSImportFrom.module` accepts two forms, distinguished by a leading `/`.
+Two origins read from an ECMAScript module, and which one you use depends on who owns the JavaScript.
 
-A **target-local file** is a `/`-prefixed `.js` or `.mjs` path, such as `.module("/Modules/utils.mjs")`. The leading slash denotes the Swift target root, not the filesystem root, and the file must remain within that Swift target. Only explicitly referenced files are copied into the generated package. BridgeJS does not discover or rewrite an imported module's dependency graph, so referenced files should currently be self-contained.
+`JSImportFrom.snippet` names a JavaScript file you ship inside the Swift target, such as `.snippet("/Modules/utils.mjs")`. The path must begin with `/` and end in `.js` or `.mjs`. That leading slash denotes the Swift target root, not the filesystem root, and the file must remain within that Swift target. Only explicitly referenced files are copied into the generated package. BridgeJS does not discover or rewrite a snippet's dependency graph, so snippets should currently be self-contained.
 
-An **external module** is any other value, passed to the JavaScript module resolver verbatim — for example `.module("node:path")`, `.module("lodash/fp")`, or `.module("@scope/package")`. Because resolution is host-defined, BridgeJS deliberately performs no build-time validation of these specifiers beyond rejecting the empty string and relative specifiers (`./x`, `../x`); use the `/`-prefixed form to reference your own files. This has several consequences you are responsible for:
+`JSImportFrom.module` names an external module resolved by the JavaScript host — for example `.module("node:path")`, `.module("lodash/fp")`, or `.module("@scope/package")`. Because resolution is host-defined, BridgeJS deliberately performs no build-time validation of these specifiers beyond rejecting the empty string, relative specifiers (`./x`, `../x`), and rooted paths (which are snippets). This has several consequences you are responsible for:
 
 - Importing a `node:`-prefixed builtin makes the generated package Node-only. It will fail to load in a browser.
 - An npm package must be resolvable at load time — either from the generated output directory (Node walks up to the nearest `node_modules`), or through your bundler's aliasing or an import map.
@@ -23,9 +23,9 @@ Generated packages use static ECMAScript module imports. This works with the exi
 
 A module export is called through a named import, so `this` is `undefined` inside the called function rather than the module namespace object. A function that reaches sibling exports through `this` — which happens in CommonJS packages consumed through Node's ESM interop — will fail. Import the default export and call the member through it when a package needs that receiver.
 
-Module origins apply to top-level `@JSFunction`, top-level `@JSGetter`, and an entire `@JSClass`. Per-member origins, top-level setters, inline JavaScript source, package-root-relative paths, and per-member module overrides are not supported. `jsName: .default` is likewise only valid on those three declaration forms and only together with `from: .module(...)`; it cannot be used on `@JSSetter`, because ECMAScript module bindings are read-only.
+Both origins apply to top-level `@JSFunction`, top-level `@JSGetter`, and an entire `@JSClass`. Per-member origins, top-level setters, inline JavaScript source, package-root-relative paths, and per-member overrides are not supported. `jsName: .default` is likewise only valid on those three declaration forms and only together with `from: .module(...)` or `from: .snippet(...)`; it cannot be used on `@JSSetter`, because ECMAScript module bindings are read-only.
 
-The TypeScript-definition workflow (`bridge-js.d.ts`) always imports from `globalThis` and cannot yet target a module origin. To import from a module, declare the API with the macros instead.
+The TypeScript-definition workflow (`bridge-js.d.ts`) always imports from `globalThis` and cannot yet target a snippet or module origin. To import from either, declare the API with the macros instead.
 
 ## Type usage crossing module boundary
 

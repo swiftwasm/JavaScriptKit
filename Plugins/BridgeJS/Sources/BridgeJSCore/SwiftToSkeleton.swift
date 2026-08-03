@@ -98,21 +98,31 @@ public final class SwiftToSkeleton {
                 importCollector.importedFunctions.compactMap(\.from)
                 + importCollector.importedTypes.compactMap(\.from)
                 + importCollector.importedGlobalGetters.compactMap(\.from)
-            // Only target-local module paths are validated here. Bare specifiers are
-            // resolved by the JavaScript host (a bundler, an import map, or Node's
-            // `node_modules` lookup), so there is nothing we can check without
-            // rejecting setups that legitimately work.
-            let modulePaths = Set(importOrigins.compactMap(\.localModulePath))
-            for path in modulePaths.sorted() {
+            // Only snippet paths are validated here. Bare module specifiers are resolved
+            // by the JavaScript host (a bundler, an import map, or Node's `node_modules`
+            // lookup), so there is nothing we can check without rejecting setups that
+            // legitimately work.
+            let snippetPaths = Set(importOrigins.compactMap(\.snippetPath))
+            for path in snippetPaths.sorted() {
                 if validatedJavaScriptModulePaths.contains(path) {
                     continue
                 }
                 let pathNode = importCollector.importedModulePathNodes[path] ?? Syntax(sourceFile)
+                guard path.hasPrefix("/") else {
+                    importCollector.errors.append(
+                        DiagnosticError(
+                            node: pathNode,
+                            message: "JavaScript snippet paths must start with '/' to indicate the Swift target root: "
+                                + "'\(path)'. For an external module, use 'from: .module(\"\(path)\")' instead."
+                        )
+                    )
+                    continue
+                }
                 guard !path.split(separator: "/").contains("..") else {
                     importCollector.errors.append(
                         DiagnosticError(
                             node: pathNode,
-                            message: "JavaScript module paths must not contain '..': '\(path)'."
+                            message: "JavaScript snippet paths must not contain '..': '\(path)'."
                         )
                     )
                     continue
@@ -122,7 +132,7 @@ public final class SwiftToSkeleton {
                     importCollector.errors.append(
                         DiagnosticError(
                             node: pathNode,
-                            message: "JavaScript modules must use a '.js' or '.mjs' extension: '\(path)'."
+                            message: "JavaScript snippets must use a '.js' or '.mjs' extension: '\(path)'."
                         )
                     )
                     continue
@@ -131,7 +141,7 @@ public final class SwiftToSkeleton {
                     importCollector.errors.append(
                         DiagnosticError(
                             node: pathNode,
-                            message: "JavaScript module file was not found at '\(path)'."
+                            message: "JavaScript snippet file was not found at '\(path)'."
                         )
                     )
                     continue
@@ -2643,13 +2653,13 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return
         }
         switch from {
-        case .module:
+        case .module, .snippet:
             return
         case .global:
             errors.append(
                 DiagnosticError(
                     node: node,
-                    message: "'jsName: .default' requires 'from: .module(...)'; "
+                    message: "'jsName: .default' requires 'from: .module(...)' or 'from: .snippet(...)'; "
                         + "globalThis has no default export."
                 )
             )
@@ -2657,7 +2667,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             errors.append(
                 DiagnosticError(
                     node: node,
-                    message: "'jsName: .default' requires 'from: .module(...)'."
+                    message: "'jsName: .default' requires 'from: .module(...)' or 'from: .snippet(...)'."
                 )
             )
         }
@@ -2671,8 +2681,10 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
 
         if let call = argument.expression.as(FunctionCallExprSyntax.self),
-            call.calledExpression.trimmedDescription.split(separator: ".").last == "module"
+            let caseName = call.calledExpression.trimmedDescription.split(separator: ".").last,
+            caseName == "module" || caseName == "snippet"
         {
+            let isSnippet = caseName == "snippet"
             guard call.arguments.count == 1,
                 let pathExpression = call.arguments.first?.expression,
                 let literal = pathExpression.as(StringLiteralExprSyntax.self),
@@ -2681,7 +2693,9 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 errors.append(
                     DiagnosticError(
                         node: call.arguments.first?.expression ?? argument.expression,
-                        message: "JavaScript module path must be a string literal."
+                        message: isSnippet
+                            ? "JavaScript snippet path must be a string literal."
+                            : "JavaScript module specifier must be a string literal."
                     )
                 )
                 return nil
@@ -2690,7 +2704,28 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 errors.append(
                     DiagnosticError(
                         node: literal,
-                        message: "JavaScript module specifier must not be empty."
+                        message: isSnippet
+                            ? "JavaScript snippet path must not be empty."
+                            : "JavaScript module specifier must not be empty."
+                    )
+                )
+                return nil
+            }
+            if isSnippet {
+                // Full validation of the path happens in `finalize()`, where the file
+                // can also be checked for existence.
+                if importedModulePathNodes[path] == nil {
+                    importedModulePathNodes[path] = Syntax(literal)
+                }
+                return .snippet(path)
+            }
+            guard !path.hasPrefix("/") else {
+                errors.append(
+                    DiagnosticError(
+                        node: literal,
+                        message: "'\(path)' looks like a file in this target. "
+                            + "Use 'from: .snippet(\"\(path)\")' for a JavaScript file you ship with the target, "
+                            + "and 'from: .module(...)' for an external module (e.g. 'node:path')."
                     )
                 )
                 return nil
@@ -2700,14 +2735,11 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                     DiagnosticError(
                         node: literal,
                         message: "Relative JavaScript module specifiers are not supported: '\(path)'. "
-                            + "Use a '/'-prefixed path for a file in this target (e.g. '/Modules/utils.mjs'), "
+                            + "Use 'from: .snippet(\"/path/to/file.js\")' for a file in this target, "
                             + "or a bare specifier for an external module (e.g. 'node:path')."
                     )
                 )
                 return nil
-            }
-            if importedModulePathNodes[path] == nil {
-                importedModulePathNodes[path] = Syntax(literal)
             }
             return .module(path)
         }

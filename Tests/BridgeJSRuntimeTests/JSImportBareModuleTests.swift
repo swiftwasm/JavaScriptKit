@@ -17,7 +17,7 @@ struct WasiFile {
 }
 
 // The default export of a module, reached with `jsName: .default`.
-@JSGetter(jsName: .default, from: .module("/Modules/DefaultExport.mjs"))
+@JSGetter(jsName: .default, from: .snippet("/Modules/DefaultExport.mjs"))
 var defaultExport: JSObject
 
 final class JSImportBareModuleTests: XCTestCase {

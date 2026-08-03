@@ -30,11 +30,11 @@ import Testing
     func missingJavaScriptModuleProducesDiagnostic() throws {
         let source = """
             let unrelated = 0
-            @JSFunction(from: .module("/missing.js")) func imported() throws(JSException)
+            @JSFunction(from: .snippet("/missing.js")) func imported() throws(JSException)
             """
         let diagnostics = try #require(moduleDiagnostics(source: source))
-        #expect(diagnostics.description.contains("JavaScript module file was not found at '/missing.js'"))
-        #expect(diagnostics.description.contains("test.swift:2:27:"))
+        #expect(diagnostics.description.contains("JavaScript snippet file was not found at '/missing.js'"))
+        #expect(diagnostics.description.contains("test.swift:2:28:"))
     }
 
     @Test
@@ -74,7 +74,11 @@ import Testing
             @JSFunction(jsName: .default) func imported() throws(JSException)
             """
         let diagnostics = try #require(moduleDiagnostics(source: source))
-        #expect(diagnostics.description.contains("'jsName: .default' requires 'from: .module(...)'."))
+        #expect(
+            diagnostics.description.contains(
+                "'jsName: .default' requires 'from: .module(...)' or 'from: .snippet(...)'."
+            )
+        )
     }
 
     @Test
@@ -139,26 +143,67 @@ import Testing
         #expect(diagnostics.description.contains("jsName must be a string literal or '.default'."))
     }
 
+    /// A rooted path in `.module(...)` is the most likely mistake now that the two cases
+    /// are separate, so it must point at `.snippet(...)` rather than being passed to the
+    /// JavaScript resolver where it would fail much later.
+    @Test
+    func rootedPathInModuleSuggestsSnippet() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(from: .module("/Modules/utils.mjs")) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("looks like a file in this target"))
+        #expect(diagnostics.description.contains(#"from: .snippet("/Modules/utils.mjs")"#))
+    }
+
+    /// The reverse mistake: a bare specifier in `.snippet(...)` must point at `.module(...)`.
+    @Test
+    func bareSpecifierInSnippetSuggestsModule() throws {
+        let source = """
+            let unrelated = 0
+            @JSFunction(from: .snippet("node:path")) func imported() throws(JSException)
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("JavaScript snippet paths must start with '/'"))
+        #expect(diagnostics.description.contains(#"from: .module("node:path")"#))
+    }
+
+    /// A snippet origin may also name a default export.
+    @Test
+    func defaultExportIsAcceptedForSnippetOrigin() throws {
+        let source = """
+            let unrelated = 0
+            @JSGetter(jsName: .default, from: .snippet("/Modules/utils.mjs")) var value: JSObject
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        // The file does not exist in this fixture, so the missing file must be the only
+        // complaint. Match on the diagnostic wording, not on `.default` itself, since the
+        // rendered diagnostic echoes the source line back.
+        #expect(diagnostics.description.contains("JavaScript snippet file was not found"))
+        #expect(!diagnostics.description.contains("requires 'from:"))
+    }
+
     @Test
     func javaScriptModulePathMustNotTraverse() throws {
         let source = """
             let unrelated = 0
-            @JSFunction(from: .module("/../missing.js")) func imported() throws(JSException)
+            @JSFunction(from: .snippet("/../missing.js")) func imported() throws(JSException)
             """
         let diagnostics = try #require(moduleDiagnostics(source: source))
-        #expect(diagnostics.description.contains("JavaScript module paths must not contain '..'"))
-        #expect(diagnostics.description.contains("test.swift:2:27:"))
+        #expect(diagnostics.description.contains("JavaScript snippet paths must not contain '..'"))
+        #expect(diagnostics.description.contains("test.swift:2:28:"))
     }
 
     @Test
     func javaScriptModulePathMustUseSupportedExtension() throws {
         let source = """
             let unrelated = 0
-            @JSFunction(from: .module("/module.ts")) func imported() throws(JSException)
+            @JSFunction(from: .snippet("/module.ts")) func imported() throws(JSException)
             """
         let diagnostics = try #require(moduleDiagnostics(source: source))
-        #expect(diagnostics.description.contains("JavaScript modules must use a '.js' or '.mjs' extension"))
-        #expect(diagnostics.description.contains("test.swift:2:27:"))
+        #expect(diagnostics.description.contains("JavaScript snippets must use a '.js' or '.mjs' extension"))
+        #expect(diagnostics.description.contains("test.swift:2:28:"))
     }
 
     @Test
@@ -168,7 +213,7 @@ import Testing
             @JSFunction(from: .module(modulePath)) func imported() throws(JSException)
             """
         let diagnostics = try #require(moduleDiagnostics(source: source))
-        #expect(diagnostics.description.contains("JavaScript module path must be a string literal."))
+        #expect(diagnostics.description.contains("JavaScript module specifier must be a string literal."))
         #expect(diagnostics.description.contains("test.swift:2:27:"))
     }
 
