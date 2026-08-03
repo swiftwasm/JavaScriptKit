@@ -10,7 +10,10 @@
               "isStatic" : false,
               "isThrows" : true
             },
-            "from" : "\/Modules\/JSImportModule.mjs",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/JSImportModule.mjs"
+            },
             "name" : "moduleAdd",
             "parameters" : [
               {
@@ -52,7 +55,10 @@
               "isStatic" : false,
               "isThrows" : true
             },
-            "from" : "\/Modules\/JSImportModule.mjs",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/JSImportModule.mjs"
+            },
             "jsName" : "renamedFunction",
             "name" : "moduleRenamed",
             "parameters" : [
@@ -68,7 +74,10 @@
         "globalGetters" : [
           {
             "accessLevel" : "internal",
-            "from" : "\/Modules\/JSImportModule.mjs",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/JSImportModule.mjs"
+            },
             "jsName" : "version",
             "name" : "moduleVersion",
             "type" : {
@@ -97,7 +106,10 @@
                 }
               ]
             },
-            "from" : "\/Modules\/ModuleCounter.mjs",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/ModuleCounter.mjs"
+            },
             "getters" : [
               {
                 "accessLevel" : "internal",

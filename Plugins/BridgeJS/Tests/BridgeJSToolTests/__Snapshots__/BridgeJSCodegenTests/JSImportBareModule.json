@@ -114,7 +114,10 @@
           },
           {
             "accessLevel" : "internal",
-            "from" : "\/Modules\/DefaultExport.mjs",
+            "from" : {
+              "kind" : "snippet",
+              "path" : "\/Modules\/DefaultExport.mjs"
+            },
             "jsName" : "default",
             "name" : "localDefaultExport",
             "type" : {

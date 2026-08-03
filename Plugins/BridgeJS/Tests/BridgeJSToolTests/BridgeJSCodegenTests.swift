@@ -50,6 +50,10 @@ import Testing
         #expect(throws: DecodingError.self) {
             try JSONDecoder().decode(JSImportFrom.self, from: Data(#""module.js""#.utf8))
         }
+        // A bare path string is no longer an origin at all; snippets are tagged.
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(JSImportFrom.self, from: Data(#""/Modules/utils.mjs""#.utf8))
+        }
     }
 
     @Test(arguments: [
@@ -57,9 +61,9 @@ import Testing
         JSImportFrom.snippet("/Modules/utils.mjs"),
         JSImportFrom.module("node:path"),
         JSImportFrom.module("@scope/package/sub"),
-        // A package literally named "global" is why bare specifiers are encoded as a
-        // tagged object rather than a plain string: a plain string would be
-        // indistinguishable from the `.global` sentinel.
+        // A package literally named "global" is why specifiers are encoded as tagged
+        // objects rather than plain strings: a plain string would be indistinguishable
+        // from the `.global` sentinel.
         JSImportFrom.module("global"),
         JSImportFrom.module("#internal"),
         JSImportFrom.module("https://esm.sh/lodash@4"),
@@ -70,11 +74,17 @@ import Testing
     }
 
     @Test
-    func legacyStringFormIsPreservedForGlobalAndLocalPaths() throws {
+    func originsEncodeToTheirDocumentedShapes() throws {
         let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
         #expect(String(data: try encoder.encode(JSImportFrom.global), encoding: .utf8) == #""global""#)
         #expect(
-            String(data: try encoder.encode(JSImportFrom.snippet("/a.js")), encoding: .utf8) == #""\/a.js""#
+            String(data: try encoder.encode(JSImportFrom.snippet("/a.js")), encoding: .utf8)
+                == #"{"kind":"snippet","path":"\/a.js"}"#
+        )
+        #expect(
+            String(data: try encoder.encode(JSImportFrom.module("node:path")), encoding: .utf8)
+                == #"{"kind":"module","specifier":"node:path"}"#
         )
     }
 
@@ -94,6 +104,9 @@ import Testing
         #"{"kind": "module", "specifier": ""}"#,
         #"{"kind": "module", "specifier": "./relative.mjs"}"#,
         #"{"kind": "module", "specifier": "/../../escape.mjs"}"#,
+        #"{"kind": "snippet", "path": "node:path"}"#,
+        #"{"kind": "snippet", "path": "/../../escape.mjs"}"#,
+        #"{"kind": "snippet", "path": "relative.mjs"}"#,
     ])
     func invalidKeyedJSImportFromFailsToDecode(json: String) {
         #expect(throws: DecodingError.self) {
