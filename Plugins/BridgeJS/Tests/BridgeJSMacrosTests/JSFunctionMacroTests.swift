@@ -523,6 +523,25 @@ import BridgeJSMacros
         )
     }
 
+    @Test func keywordEscapedNameIsNormalized() {
+        // A backtick-escaped Swift keyword (e.g. `` `default` ``) must be normalized when
+        // building the glue name: the thunk is `_$default`, not `_$`default``, while the
+        // call site stays valid Swift because `_$default` is a regular identifier.
+        TestSupport.assertMacroExpansion(
+            """
+            @JSFunction
+            func `default`() throws(JSException) -> Void
+            """,
+            expandedSource: """
+                func `default`() throws(JSException) -> Void {
+                    try _$default()
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
     @Test func functionWithExistingBody() {
         TestSupport.assertMacroExpansion(
             """

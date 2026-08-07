@@ -1,0 +1,403 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Parser_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "in",
+              "name" : "in",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Parser_class",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "class",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Parser_static_where",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "where",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "Parser"
+              }
+            }
+          }
+        ],
+        "name" : "Parser",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "in",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "self",
+            "staticContext" : {
+              "className" : {
+                "_0" : "Parser"
+              }
+            },
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Parser"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "break"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "return"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Token",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_Token_static_switch",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "switch",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            },
+            "staticContext" : {
+              "enumName" : {
+                "_0" : "Token"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Token",
+        "tsFullPath" : "Token"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_default",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "default",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_delete",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "delete",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "w32"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "w32"
+            }
+          }
+        }
+      }
+    ],
+    "protocols" : [
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_Observer_if",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "if",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Observer_else",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "else",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Observer",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "name" : "do",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "name" : "for",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Record_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "case",
+              "name" : "case",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            },
+            {
+              "label" : "continue",
+              "name" : "continue",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Record_as",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "as",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Record",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "case",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "continue",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Record"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

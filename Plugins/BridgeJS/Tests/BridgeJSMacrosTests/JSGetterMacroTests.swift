@@ -366,4 +366,24 @@ import BridgeJSMacros
             indentationWidth: indentationWidth,
         )
     }
+
+    @Test func keywordEscapedNameIsNormalized() {
+        // A backtick-escaped Swift keyword property name must be normalized in the
+        // glue name: `_$`self`_get` would be invalid, `_$self_get` is correct.
+        TestSupport.assertMacroExpansion(
+            """
+            @JSGetter
+            var `self`: String
+            """,
+            expandedSource: """
+                var `self`: String {
+                    get throws(JSException) {
+                        return try _$self_get()
+                    }
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
 }
