@@ -1207,8 +1207,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 continue
             }
 
-            let name = param.secondName?.text ?? param.firstName.text
-            let label = param.firstName.text
+            let name = SwiftToSkeleton.normalizeIdentifier(param.secondName?.text ?? param.firstName.text)
+            let label = SwiftToSkeleton.normalizeIdentifier(param.firstName.text)
 
             let defaultValue: DefaultValue?
             if allowDefaults {
@@ -1290,7 +1290,9 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return nil
         }
 
-        let name = node.name.text
+        // Strip backticks from keyword-escaped identifiers (e.g. `` `default` `` -> "default")
+        // so they don't leak into ABI names (`bjs_`default`` is invalid) or JS-side names.
+        let name = SwiftToSkeleton.normalizeIdentifier(node.name.text)
 
         let attributeNamespace = extractNamespace(from: jsAttribute)
         let computedNamespace = computeNamespace(for: node)
@@ -1643,7 +1645,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 continue
             }
 
-            let propertyName = pattern.identifier.text
+            let propertyName = SwiftToSkeleton.normalizeIdentifier(pattern.identifier.text)
 
             guard let typeAnnotation = binding.typeAnnotation else {
                 diagnose(node: binding, message: "@JS property must have explicit type annotation")
@@ -1687,7 +1689,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     }
 
     override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
-        let name = node.name.text
+        let name = SwiftToSkeleton.normalizeIdentifier(node.name.text)
 
         guard let jsAttribute = node.attributes.firstJSAttribute else {
             return .skipChildren
@@ -1848,7 +1850,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return .skipChildren
         }
 
-        let name = node.name.text
+        let name = SwiftToSkeleton.normalizeIdentifier(node.name.text)
 
         let rawType: String? = node.inheritanceClause?.inheritedTypes.first { inheritedType in
             let typeName = inheritedType.type.trimmedDescription
@@ -1968,7 +1970,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return .skipChildren
         }
 
-        let name = node.name.text
+        let name = SwiftToSkeleton.normalizeIdentifier(node.name.text)
 
         let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "protocol")
         guard namespaceResult.isValid else {
@@ -2036,7 +2038,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return .skipChildren
         }
 
-        let name = node.name.text
+        let name = SwiftToSkeleton.normalizeIdentifier(node.name.text)
 
         let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "struct")
         guard namespaceResult.isValid else {
@@ -2075,7 +2077,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                         continue
                     }
 
-                    let fieldName = pattern.identifier.text
+                    let fieldName = SwiftToSkeleton.normalizeIdentifier(pattern.identifier.text)
 
                     guard let typeAnnotation = binding.typeAnnotation else {
                         diagnose(node: binding, message: "Struct field must have explicit type annotation")
@@ -2169,7 +2171,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         protocolName: String,
         namespace: [String]?
     ) -> ExportedFunction? {
-        let name = node.name.text
+        let name = SwiftToSkeleton.normalizeIdentifier(node.name.text)
 
         let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: false)
 
@@ -2221,7 +2223,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 continue
             }
 
-            let propertyName = pattern.identifier.text
+            let propertyName = SwiftToSkeleton.normalizeIdentifier(pattern.identifier.text)
 
             guard let typeAnnotation = binding.typeAnnotation else {
                 diagnose(node: binding, message: "Protocol property must have explicit type annotation")
@@ -2293,7 +2295,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
 
         for element in node.elements {
-            let caseName = element.name.text
+            let caseName = SwiftToSkeleton.normalizeIdentifier(element.name.text)
             let rawValue: String?
             var associatedValues: [AssociatedValue] = []
 
@@ -2331,7 +2333,12 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                         continue
                     }
 
-                    let label = param.firstName?.text
+                    let label: String?
+                    if let firstName = param.firstName, firstName.text != "_" {
+                        label = SwiftToSkeleton.normalizeIdentifier(firstName.text)
+                    } else {
+                        label = nil
+                    }
                     associatedValues.append(AssociatedValue(label: label, type: bridgeType))
                 }
             }
@@ -2936,7 +2943,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             validateDefaultExportUsage(extractedJSName, from: from, node: node)
             let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
             enterJSClass(
-                node.name.text,
+                SwiftToSkeleton.normalizeIdentifier(node.name.text),
                 jsName: extractedJSName?.memberName,
                 from: from,
                 accessLevel: accessLevel
@@ -2959,7 +2966,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             validateDefaultExportUsage(extractedJSName, from: from, node: node)
             let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
             enterJSClass(
-                node.name.text,
+                SwiftToSkeleton.normalizeIdentifier(node.name.text),
                 jsName: extractedJSName?.memberName,
                 from: from,
                 accessLevel: accessLevel
@@ -3274,7 +3281,12 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             let nameToken = param.secondName ?? param.firstName
             let name = SwiftToSkeleton.normalizeIdentifier(nameToken.text)
             let labelToken = param.secondName == nil ? nil : param.firstName
-            let label = labelToken?.text == "_" ? nil : labelToken?.text
+            let label: String?
+            if let labelToken, labelToken.text != "_" {
+                label = SwiftToSkeleton.normalizeIdentifier(labelToken.text)
+            } else {
+                label = nil
+            }
             return Parameter(label: label, name: name, type: bridgeType)
         }
     }

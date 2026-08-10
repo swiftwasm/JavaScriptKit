@@ -1,4 +1,5 @@
 import SwiftBasicFormat
+import SwiftParser
 import SwiftSyntax
 import SwiftSyntaxBuilder
 #if canImport(BridgeJSSkeleton)
@@ -148,10 +149,10 @@ public struct ImportTS {
             switch param.type {
             case .closure(let signature, useJSTypedClosure: false):
                 let jsTypedClosureType = BridgeType.closure(signature, useJSTypedClosure: true).swiftType
-                body.write("let \(param.name) = \(jsTypedClosureType)(\(param.name))")
+                body.write("let \(param.name.backtickIfNeededForLocalReference()) = \(jsTypedClosureType)(\(param.name.backtickIfNeededForLocalReference()))")
                 // The just created JSObject is not owned by the caller unlike those passed in parameters,
                 // so we need to extend its lifetime during the call to ensure the JSObject.id is valid.
-                valuesToExtendLifetimeDuringCall.append(param.name)
+                valuesToExtendLifetimeDuringCall.append(param.name.backtickIfNeededForLocalReference())
             default:
                 break
             }
@@ -172,7 +173,7 @@ public struct ImportTS {
             if loweringInfo.useBorrowing {
                 let returnVariableName = "ret\(borrowedArguments.count)"
                 let assign = needsReturnVariable ? "let \(returnVariableName) = " : ""
-                body.write("\(assign)\(param.name).bridgeJSWithLoweredParameter { \(pattern) in")
+                body.write("\(assign)\(param.name.backtickIfNeededForLocalReference()).bridgeJSWithLoweredParameter { \(pattern) in")
                 body.indent()
                 borrowedArguments.append(
                     BorrowedArgument(
@@ -185,10 +186,10 @@ public struct ImportTS {
                 )
             } else if case .nullable(.swiftProtocol, _) = param.type, context == .exportSwift {
                 body.write("let \(pattern): (Int32, Int32)")
-                body.write("if let \(param.name) {")
+                body.write("if let \(param.name.backtickIfNeededForLocalReference()) {")
                 body.indent {
                     body.write(
-                        "\(pattern) = (1, (\(param.name) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
+                        "\(pattern) = (1, (\(param.name.backtickIfNeededForLocalReference()) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
                     )
                 }
                 body.write("} else {")
@@ -200,10 +201,10 @@ public struct ImportTS {
                 let initializerExpr: ExprSyntax
                 if case .swiftProtocol = param.type, context == .exportSwift {
                     initializerExpr = ExprSyntax(
-                        "(\(raw: param.name) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()"
+                        "(\(raw: param.name.backtickIfNeededForLocalReference()) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()"
                     )
                 } else {
-                    initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
+                    initializerExpr = ExprSyntax("\(raw: param.name.backtickIfNeededForLocalReference()).bridgeJSLowerParameter()")
                 }
 
                 let binding = loweringInfo.loweredParameters.isEmpty ? "_" : pattern
@@ -684,6 +685,9 @@ struct SwiftSignatureBuilder {
             let label = param.label ?? param.name
             let paramType = buildParameterTypeSyntax(from: param.type)
 
+            // Parameter names are valid bare for every keyword except `inout` (which the
+            // parser refuses as an argument label). Don't escape them: `_ where: Int` and
+            // `_ self: Int` are both legal Swift, and backticks here would only add noise.
             if useWildcardLabels {
                 // Always use wildcard labels: "_ name: Type"
                 return "_ \(param.name): \(paramType)"
@@ -839,7 +843,7 @@ enum SwiftCodePattern {
         )
         printer.write("@inline(never) fileprivate func \(functionName)\(signature) {")
         printer.indent {
-            printer.write("return \(inModuleDeclName)(\(parameterNames.joined(separator: ", ")))")
+            printer.write("return \(inModuleDeclName)(\(parameterNames.map { $0.backtickIfNeededForLocalReference() }.joined(separator: ", ")))")
         }
         printer.write("}")
     }
@@ -1017,7 +1021,46 @@ extension BridgeType {
 }
 
 extension String {
+    /// Escapes a name for use in a *declaration* position: `var`/`let`/property
+    /// declarations, `let` binding patterns, and type-name positions. Keywords are
+    /// not valid bare here — `var class: Int` and `let where = …` are invalid — so
+    /// every keyword (including `self`) is escaped.
+    ///
+    /// Escapes each dotted path component independently (qualified type paths such
+    /// as `Outer.Inner` stay valid while keyword components get escaped) and is
+    /// idempotent (surrounding backticks are stripped first so inputs that already
+    /// carry escaping are not double-wrapped).
     func backtickIfNeeded() -> String {
-        return self.isValidSwiftIdentifier(for: .variableName) ? self : "`\(self)`"
+        escapeComponents { $0.escapeSingleIdentifier(using: .variableName) }
+    }
+
+    /// Escapes a name for use in *member access* position (`.name`). Most keywords
+    /// are valid bare here — `obj.class`, `obj.where`, `.break` all compile — so only
+    /// names that are *not* valid member-access identifiers get backticks. The
+    /// notable case is `self`: `obj.self` is the identity expression (returns `obj`),
+    /// not an access of a property named `self`, so a property literally named `self`
+    /// must be written as `` obj.`self` ``.
+    func backtickIfNeededForMemberAccess() -> String {
+        escapeComponents { $0.escapeSingleIdentifier(using: .memberAccess) }
+    }
+
+    /// Escapes a name for use as a *local reference* in expression position (e.g. a
+    /// parameter or local variable referenced inside a generated function body).
+    /// `self` is valid bare here — it refers to the parameter — so it is not escaped;
+    /// other keywords (`class`, `where`, …) still need backticks because they cannot
+    /// appear as a bare identifier expression.
+    func backtickIfNeededForLocalReference() -> String {
+        if self == "self" { return self }
+        return backtickIfNeeded()
+    }
+
+    private func escapeComponents(_ escape: (String) -> String) -> String {
+        self.split(separator: ".").map { String($0) }.map(escape).joined(separator: ".")
+    }
+
+    private func escapeSingleIdentifier(using context: SwiftParser.IdentifierCheckContext) -> String {
+        let stripped =
+            (hasPrefix("`") && hasSuffix("`") && count > 2) ? String(dropFirst().dropLast()) : self
+        return stripped.isValidSwiftIdentifier(for: context) ? stripped : "`\(stripped)`"
     }
 }

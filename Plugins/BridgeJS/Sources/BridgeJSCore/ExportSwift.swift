@@ -209,12 +209,21 @@ public class ExportSwift {
         func liftParameter(param: Parameter) throws {
             parameters.append(param)
             let liftingInfo = try param.type.liftParameterInfo()
-            let argumentsToLift: [String]
+            // `referenceNames` are used in the function body to forward the parameter
+            // into a lifting call, so keyword names (e.g. `in`) must be escaped here.
+            // `declarationNames` are the ABI parameter declaration names, which are valid
+            // bare for every keyword except `inout`, so they stay unescaped.
+            let referenceNames: [String]
+            let declarationNames: [String]
             if liftingInfo.parameters.count == 1 {
-                argumentsToLift = [param.name]
+                referenceNames = [param.name.backtickIfNeededForLocalReference()]
+                declarationNames = [param.name]
             } else {
-                argumentsToLift = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
+                let synthesized = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
+                referenceNames = synthesized
+                declarationNames = synthesized
             }
+            let argumentsToLift = referenceNames
 
             let typeNameForIntrinsic: String
             let liftingExpr: ExprSyntax
@@ -222,7 +231,7 @@ public class ExportSwift {
             switch param.type {
             case .closure(let signature, _):
                 typeNameForIntrinsic = param.type.swiftType
-                liftingExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.name))")
+                liftingExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.name.backtickIfNeededForLocalReference()))")
             case .swiftStruct(let structName):
                 typeNameForIntrinsic = structName
                 liftingExpr = ExprSyntax("\(raw: structName).bridgeJSLiftParameter()")
@@ -248,7 +257,7 @@ public class ExportSwift {
             }
 
             liftedParameterExprs.append(liftingExpr)
-            for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
+            for (name, type) in zip(declarationNames, liftingInfo.parameters.map { $0.type }) {
                 abiParameterSignatures.append((name, type))
             }
         }
@@ -560,15 +569,15 @@ public class ExportSwift {
         func callName(for property: ExportedProperty) -> String {
             switch self {
             case .enumStatic(let enumDef):
-                return "\(enumDef.swiftCallName).\(property.name)"
+                return "\(enumDef.swiftCallName).\(property.name.backtickIfNeededForMemberAccess())"
             case .classStatic(let klass):
                 // property.callName() would use staticContext (the ABI name) as prefix;
                 // use swiftCallName directly so the emitted expression is valid Swift.
-                return "\(klass.swiftCallName).\(property.name)"
+                return "\(klass.swiftCallName).\(property.name.backtickIfNeededForMemberAccess())"
             case .classInstance:
-                return property.callName()
+                return property.name.backtickIfNeededForMemberAccess()
             case .structStatic(let structDef):
-                return "\(structDef.swiftCallName).\(property.name)"
+                return "\(structDef.swiftCallName).\(property.name.backtickIfNeededForMemberAccess())"
             }
         }
     }
@@ -626,7 +635,7 @@ public class ExportSwift {
 
             if isStatic {
                 let klassName = callName.components(separatedBy: ".").dropLast().joined(separator: ".")
-                setterBuilder.callStaticPropertySetter(klassName: klassName, propertyName: property.name)
+                setterBuilder.callStaticPropertySetter(klassName: klassName, propertyName: property.name.backtickIfNeededForMemberAccess())
             } else {
                 setterBuilder.callPropertySetter(propertyName: callName)
             }
@@ -645,10 +654,10 @@ public class ExportSwift {
         }
 
         if function.effects.isStatic, let staticContext = function.staticContext {
-            let callName = "\(staticContextBaseName(staticContext)).\(function.name)"
+            let callName = "\(staticContextBaseName(staticContext).backtickIfNeeded()).\(function.name.backtickIfNeededForMemberAccess())"
             builder.call(name: callName, returnType: function.returnType)
         } else {
-            builder.call(name: function.name, returnType: function.returnType)
+            builder.call(name: function.name.backtickIfNeeded(), returnType: function.returnType)
         }
 
         try builder.lowerReturnValue(returnType: function.returnType)
@@ -691,9 +700,9 @@ public class ExportSwift {
         }
 
         if method.effects.isStatic {
-            builder.call(name: "\(ownerTypeName).\(method.name)", returnType: method.returnType)
+            builder.call(name: "\(ownerTypeName).\(method.name.backtickIfNeededForMemberAccess())", returnType: method.returnType)
         } else {
-            builder.callMethod(methodName: method.name, returnType: method.returnType)
+            builder.callMethod(methodName: method.name.backtickIfNeededForMemberAccess(), returnType: method.returnType)
         }
         try builder.lowerReturnValue(returnType: method.returnType)
         return builder.render(abiName: method.abiName)
@@ -1104,7 +1113,7 @@ struct EnumCodegen {
                 for (index, enumCase) in enumDef.cases.enumerated() {
                     printer.write("case \(index):")
                     printer.indent {
-                        printer.write("self = .\(enumCase.name)")
+                        printer.write("self = .\(enumCase.name.backtickIfNeededForMemberAccess())")
                     }
                 }
                 printer.write("default:")
@@ -1120,7 +1129,7 @@ struct EnumCodegen {
             printer.indent {
                 printer.write("switch self {")
                 for (index, enumCase) in enumDef.cases.enumerated() {
-                    printer.write("case .\(enumCase.name):")
+                    printer.write("case .\(enumCase.name.backtickIfNeededForMemberAccess()):")
                     printer.indent {
                         printer.write("return \(index)")
                     }
@@ -1186,7 +1195,7 @@ struct EnumCodegen {
             if enumCase.associatedValues.isEmpty {
                 printer.write("case \(caseIndex):")
                 printer.indent {
-                    printer.write("return .\(enumCase.name)")
+                    printer.write("return .\(enumCase.name.backtickIfNeededForMemberAccess())")
                 }
             } else {
                 printer.write("case \(caseIndex):")
@@ -1201,7 +1210,7 @@ struct EnumCodegen {
                     return "\(labelPrefix)\(liftExpr)"
                 }
                 printer.indent {
-                    printer.write("return .\(enumCase.name)(\(argList.joined(separator: ", ")))")
+                    printer.write("return .\(enumCase.name.backtickIfNeededForMemberAccess())(\(argList.joined(separator: ", ")))")
                 }
             }
         }
@@ -1215,7 +1224,7 @@ struct EnumCodegen {
             let paramName = associatedValue.label ?? "param\(index)"
             let statements = stackCodegen.lowerStatements(
                 for: associatedValue.type,
-                accessor: paramName,
+                accessor: paramName.backtickIfNeededForLocalReference(),
                 varPrefix: paramName
             )
             for statement in statements {
@@ -1227,15 +1236,15 @@ struct EnumCodegen {
     private func generateReturnSwitchCases(printer: CodeFragmentPrinter, enumDef: ExportedEnum) {
         for (caseIndex, enumCase) in enumDef.cases.enumerated() {
             if enumCase.associatedValues.isEmpty {
-                printer.write("case .\(enumCase.name):")
+                printer.write("case .\(enumCase.name.backtickIfNeededForMemberAccess()):")
                 printer.indent {
                     printer.write("return Int32(\(caseIndex))")
                 }
             } else {
                 let pattern = enumCase.associatedValues.enumerated()
-                    .map { index, associatedValue in "let \(associatedValue.label ?? "param\(index)")" }
+                    .map { index, associatedValue in "let \((associatedValue.label ?? "param\(index)").backtickIfNeeded())" }
                     .joined(separator: ", ")
-                printer.write("case .\(enumCase.name)(\(pattern)):")
+                printer.write("case .\(enumCase.name.backtickIfNeededForMemberAccess())(\(pattern)):")
                 printer.indent {
                     generatePayloadPushingCode(printer: printer, associatedValues: enumCase.associatedValues)
                     // Push tag AFTER payloads so it's popped first (LIFO) by the JS lift function.
@@ -1332,12 +1341,12 @@ struct StructCodegen {
         let instanceProps = structDef.properties.filter { !$0.isStatic }
 
         for property in instanceProps.reversed() {
-            let fieldName = property.name
+            let fieldName = property.name.backtickIfNeeded()
             let liftExpr = stackCodegen.liftExpression(for: property.type)
             lines.append("let \(fieldName) = \(liftExpr)")
         }
 
-        let initArgs = instanceProps.map { "\($0.name): \($0.name)" }.joined(separator: ", ")
+        let initArgs = instanceProps.map { "\($0.name): \($0.name.backtickIfNeededForLocalReference())" }.joined(separator: ", ")
         lines.append("return \(structDef.swiftCallName)(\(initArgs))")
 
         return lines
@@ -1350,7 +1359,7 @@ struct StructCodegen {
         for property in instanceProps {
             let statements = stackCodegen.lowerStatements(
                 for: property.type,
-                accessor: "self.\(property.name)",
+                accessor: "self.\(property.name.backtickIfNeededForMemberAccess())",
                 varPrefix: property.name
             )
             for statement in statements {
@@ -1418,7 +1427,7 @@ struct ProtocolCodegen {
             )
             externDecls.append(DeclSyntax("\(raw: externDeclPrinter.lines.joined(separator: "\n"))"))
             let methodImplPrinter = CodeFragmentPrinter()
-            methodImplPrinter.write("func \(method.name)\(signature) {")
+            methodImplPrinter.write("func \(method.name.backtickIfNeeded())\(signature) {")
             methodImplPrinter.indent {
                 methodImplPrinter.write(lines: builder.body.lines)
             }
@@ -1441,7 +1450,7 @@ struct ProtocolCodegen {
         }
 
         let structDeclPrinter = CodeFragmentPrinter()
-        structDeclPrinter.write("struct \(wrapperName): \(protocolName), _BridgedSwiftProtocolWrapper {")
+        structDeclPrinter.write("struct \(wrapperName): \(protocolName.backtickIfNeeded()), _BridgedSwiftProtocolWrapper {")
         structDeclPrinter.indent {
             structDeclPrinter.write("let jsObject: JSObject")
             structDeclPrinter.nextLine()
@@ -1509,7 +1518,7 @@ struct ProtocolCodegen {
         let getterExternDecl = DeclSyntax("\(raw: getterExternDeclPrinter.lines.joined(separator: "\n"))")
         var externDecls: [DeclSyntax] = [getterExternDecl]
 
-        printer.write("var \(property.name): \(property.type.swiftType) {")
+        printer.write("var \(property.name.backtickIfNeeded()): \(property.type.swiftType) {")
         try printer.indent {
             printer.write("get {")
             printer.indent {
@@ -1612,19 +1621,19 @@ extension BridgeType {
         case .jsValue: return "JSValue"
         case .jsObject(nil): return "JSObject"
         case .jsObject(let name?): return name
-        case .swiftHeapObject(let name): return name
+        case .swiftHeapObject(let name): return name.backtickIfNeeded()
         case .unsafePointer(let ptr): return ptr.swiftType
-        case .swiftProtocol(let name): return "Any\(name)"
+        case .swiftProtocol(let name): return "Any\(name.backtickIfNeeded())"
         case .void: return "Void"
         case .nullable(let wrappedType, let kind):
             return kind == .null ? "Optional<\(wrappedType.swiftType)>" : "JSUndefinedOr<\(wrappedType.swiftType)>"
         case .array(let elementType): return "[\(elementType.swiftType)]"
         case .dictionary(let valueType): return "[String: \(valueType.swiftType)]"
-        case .caseEnum(let name): return name
-        case .rawValueEnum(let name, _): return name
-        case .associatedValueEnum(let name): return name
-        case .swiftStruct(let name): return name
-        case .namespaceEnum(let name): return name
+        case .caseEnum(let name): return name.backtickIfNeeded()
+        case .rawValueEnum(let name, _): return name.backtickIfNeeded()
+        case .associatedValueEnum(let name): return name.backtickIfNeeded()
+        case .swiftStruct(let name): return name.backtickIfNeeded()
+        case .namespaceEnum(let name): return name.backtickIfNeeded()
         case .closure(let signature, let useJSTypedClosure):
             let paramTypes = signature.parameters.map { $0.swiftType }.joined(separator: ", ")
             let effectsStr = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")

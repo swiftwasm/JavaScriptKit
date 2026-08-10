@@ -465,4 +465,22 @@ import BridgeJSMacros
             indentationWidth: indentationWidth,
         )
     }
+
+    @Test func setterWithBacktickEscapedNameIsStripped() {
+        // A backtick-escaped setter name (e.g. `` `setFoo` ``) must be normalized before
+        // deriving the property name: the glue is `_$foo_set`, not `_$`foo`_set`.
+        TestSupport.assertMacroExpansion(
+            """
+            @JSSetter
+            func `setFoo`(_ value: Int) throws(JSException)
+            """,
+            expandedSource: """
+                func `setFoo`(_ value: Int) throws(JSException) {
+                    try _$foo_set(value)
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
 }
