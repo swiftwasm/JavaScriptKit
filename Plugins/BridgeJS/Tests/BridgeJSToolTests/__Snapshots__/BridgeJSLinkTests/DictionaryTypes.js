@@ -31,44 +31,328 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    function __bjs_arrayCodec(elementCodec) {
+        return {
+            lower(value) {
+                for (let i = 0; i < value.length; i++) {
+                    elementCodec.lower(value[i]);
+                }
+                i32Stack.push(value.length);
+            },
+            lift() {
+                const count = i32Stack.pop();
+                if (count === -1) {
+                    return taStack.pop();
+                }
+                const result = new Array(count);
+                for (let i = count - 1; i >= 0; i--) {
+                    result[i] = elementCodec.lift();
+                }
+                return result;
+            },
+        };
+    }
+    function __bjs_optionalCodec(elementCodec, isUndefinedOr = false) {
+        return {
+            lower(value) {
+                const isSome = isUndefinedOr ? value !== undefined : value != null;
+                if (isSome) {
+                    elementCodec.lower(value);
+                    i32Stack.push(1);
+                } else {
+                    i32Stack.push(0);
+                }
+            },
+            lift() {
+                if (i32Stack.pop() === 0) {
+                    return isUndefinedOr ? undefined : null;
+                }
+                return elementCodec.lift();
+            },
+        };
+    }
+    function __bjs_dictCodec(valueCodec) {
+        return {
+            lower(value) {
+                const keys = Object.keys(value);
+                for (let i = 0; i < keys.length; i++) {
+                    __bjs_stringCodec.lower(keys[i]);
+                    valueCodec.lower(value[keys[i]]);
+                }
+                i32Stack.push(keys.length);
+            },
+            lift() {
+                const count = i32Stack.pop();
+                const result = {};
+                for (let i = 0; i < count; i++) {
+                    const value = valueCodec.lift();
+                    const key = __bjs_stringCodec.lift();
+                    result[key] = value;
+                }
+                return result;
+            },
+        };
+    }
+    function __bjs_enumCodec(helper) {
+        return {
+            lower(value) {
+                i32Stack.push(helper.lower(value));
+            },
+            lift() {
+                return helper.lift(i32Stack.pop());
+            },
+        };
+    }
+
+    const __bjs_stringCodec = {
+        lower: (v) => {
+            const bytes = textEncoder.encode(v);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+        },
+        lift: () => {
+            const string = strStack.pop();
+            return string;
+        },
+    };
+    const __bjs_primitiveCodecs = {
+        Bool: {
+            lower: (v) => {
+                i32Stack.push(v ? 1 : 0);
+            },
+            lift: () => {
+                const bool = i32Stack.pop() !== 0;
+                return bool;
+            },
+        },
+        Int: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        Int8: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt8: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int16: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt16: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int32: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt32: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        UInt: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int64: {
+            lower: (v) => {
+                i64Stack.push(v);
+            },
+            lift: () => {
+                const int = i64Stack.pop();
+                return int;
+            },
+        },
+        UInt64: {
+            lower: (v) => {
+                i64Stack.push(v);
+            },
+            lift: () => {
+                const int = i64Stack.pop();
+                return int;
+            },
+        },
+        Float: {
+            lower: (v) => {
+                f32Stack.push(Math.fround(v));
+            },
+            lift: () => {
+                const f32 = f32Stack.pop();
+                return f32;
+            },
+        },
+        Double: {
+            lower: (v) => {
+                f64Stack.push(v);
+            },
+            lift: () => {
+                const f64 = f64Stack.pop();
+                return f64;
+            },
+        },
+        String: __bjs_stringCodec,
+        JSValue: {
+            lower: (v) => {
+                const [vKind, vPayload1, vPayload2] = __bjs_jsValueLower(v);
+                i32Stack.push(vKind);
+                i32Stack.push(vPayload1);
+                f64Stack.push(vPayload2);
+            },
+            lift: () => {
+                const jsValuePayload2 = f64Stack.pop();
+                const jsValuePayload1 = i32Stack.pop();
+                const jsValueKind = i32Stack.pop();
+                const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                return jsValue;
+            },
+        },
+    };
+
+    function __bjs_jsValueLower(value) {
+        let kind;
+        let payload1;
+        let payload2;
+        if (value === null) {
+            kind = 4;
+            payload1 = 0;
+            payload2 = 0;
+        } else {
+            switch (typeof value) {
+                case "boolean":
+                    kind = 0;
+                    payload1 = value ? 1 : 0;
+                    payload2 = 0;
+                    break;
+                case "number":
+                    kind = 2;
+                    payload1 = 0;
+                    payload2 = value;
+                    break;
+                case "string":
+                    kind = 1;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "undefined":
+                    kind = 5;
+                    payload1 = 0;
+                    payload2 = 0;
+                    break;
+                case "object":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "function":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "symbol":
+                    kind = 7;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "bigint":
+                    kind = 8;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                default:
+                    throw new TypeError("Unsupported JSValue type");
+            }
+        }
+        return [kind, payload1, payload2];
+    }
+    function __bjs_jsValueLift(kind, payload1, payload2) {
+        let jsValue;
+        switch (kind) {
+            case 0:
+                jsValue = payload1 !== 0;
+                break;
+            case 1:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 2:
+                jsValue = payload2;
+                break;
+            case 3:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 4:
+                jsValue = null;
+                break;
+            case 5:
+                jsValue = undefined;
+                break;
+            case 7:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 8:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            default:
+                throw new TypeError("Unsupported JSValue kind " + kind);
+        }
+        return jsValue;
+    }
+
     const __bjs_createCountersHelpers = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.name);
             const id = swift.memory.retain(bytes);
             i32Stack.push(bytes.length);
             i32Stack.push(id);
-            const entries = Object.entries(value.counts);
-            for (const entry of entries) {
-                const [key, value] = entry;
-                const bytes1 = textEncoder.encode(key);
-                const id1 = swift.memory.retain(bytes1);
-                i32Stack.push(bytes1.length);
-                i32Stack.push(id1);
-                const isSome = value != null ? 1 : 0;
-                if (isSome) {
-                    i32Stack.push((value | 0));
-                }
-                i32Stack.push(isSome);
-            }
-            i32Stack.push(entries.length);
+            __bjs_dictCodec(__bjs_optionalCodec(__bjs_primitiveCodecs.Int)).lower(value.counts);
         },
         lift: () => {
-            const dictLen = i32Stack.pop();
-            const dictResult = {};
-            for (let i = 0; i < dictLen; i++) {
-                const isSome = i32Stack.pop();
-                let optValue;
-                if (isSome === 0) {
-                    optValue = null;
-                } else {
-                    const int = i32Stack.pop();
-                    optValue = int;
-                }
-                const string = strStack.pop();
-                dictResult[string] = optValue;
-            }
-            const string1 = strStack.pop();
-            return { name: string1, counts: dictResult };
+            const dictResult = __bjs_dictCodec(__bjs_optionalCodec(__bjs_primitiveCodecs.Int)).lift();
+            const string = strStack.pop();
+            return { name: string, counts: dictResult };
         }
     });
 
@@ -154,6 +438,7 @@ export async function createInstantiator(options, swift) {
                 const value = structHelpers.Counters.lift();
                 return swift.memory.retain(value);
             }
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -262,24 +547,9 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_importMirrorDictionary"] = function bjs_importMirrorDictionary() {
                 try {
-                    const dictLen = i32Stack.pop();
-                    const dictResult = {};
-                    for (let i = 0; i < dictLen; i++) {
-                        const f64 = f64Stack.pop();
-                        const string = strStack.pop();
-                        dictResult[string] = f64;
-                    }
+                    const dictResult = __bjs_dictCodec(__bjs_primitiveCodecs.Double).lift();
                     let ret = imports.importMirrorDictionary(dictResult);
-                    const entries = Object.entries(ret);
-                    for (const entry of entries) {
-                        const [key, value] = entry;
-                        const bytes = textEncoder.encode(key);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        f64Stack.push(value);
-                    }
-                    i32Stack.push(entries.length);
+                    __bjs_dictCodec(__bjs_primitiveCodecs.Double).lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -361,149 +631,73 @@ export async function createInstantiator(options, swift) {
 
             const exports = {
                 mirrorDictionary: function bjs_mirrorDictionary(values) {
-                    const entries = Object.entries(values);
-                    for (const entry of entries) {
-                        const [key, value] = entry;
-                        const bytes = textEncoder.encode(key);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        i32Stack.push((value | 0));
-                    }
-                    i32Stack.push(entries.length);
+                    __bjs_dictCodec(__bjs_primitiveCodecs.Int).lower(values);
                     instance.exports.bjs_mirrorDictionary();
-                    const dictLen = i32Stack.pop();
-                    const dictResult = {};
-                    for (let i = 0; i < dictLen; i++) {
-                        const int = i32Stack.pop();
-                        const string = strStack.pop();
-                        dictResult[string] = int;
-                    }
+                    const dictResult = __bjs_dictCodec(__bjs_primitiveCodecs.Int).lift();
                     return dictResult;
                 },
                 optionalDictionary: function bjs_optionalDictionary(values) {
-                    const isSome = values != null;
-                    if (isSome) {
-                        const entries = Object.entries(values);
-                        for (const entry of entries) {
-                            const [key, value] = entry;
-                            const bytes = textEncoder.encode(key);
-                            const id = swift.memory.retain(bytes);
-                            i32Stack.push(bytes.length);
-                            i32Stack.push(id);
-                            const bytes1 = textEncoder.encode(value);
-                            const id1 = swift.memory.retain(bytes1);
-                            i32Stack.push(bytes1.length);
-                            i32Stack.push(id1);
-                        }
-                        i32Stack.push(entries.length);
-                    }
-                    i32Stack.push(+isSome);
+                    __bjs_optionalCodec(__bjs_dictCodec(__bjs_stringCodec)).lower(values);
                     instance.exports.bjs_optionalDictionary();
-                    const isSome1 = i32Stack.pop();
-                    let optResult;
-                    if (isSome1) {
-                        const dictLen = i32Stack.pop();
-                        const dictResult = {};
-                        for (let i = 0; i < dictLen; i++) {
-                            const string = strStack.pop();
-                            const string1 = strStack.pop();
-                            dictResult[string1] = string;
-                        }
-                        optResult = dictResult;
-                    } else {
-                        optResult = null;
-                    }
-                    return optResult;
+                    const optValue = __bjs_optionalCodec(__bjs_dictCodec(__bjs_stringCodec)).lift();
+                    return optValue;
                 },
                 nestedDictionary: function bjs_nestedDictionary(values) {
-                    const entries = Object.entries(values);
-                    for (const entry of entries) {
-                        const [key, value] = entry;
-                        const bytes = textEncoder.encode(key);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        for (const elem of value) {
-                            i32Stack.push((elem | 0));
-                        }
-                        i32Stack.push(value.length);
-                    }
-                    i32Stack.push(entries.length);
+                    __bjs_dictCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lower(values);
                     instance.exports.bjs_nestedDictionary();
-                    const dictLen = i32Stack.pop();
-                    const dictResult = {};
-                    for (let i = 0; i < dictLen; i++) {
-                        const arrayLen = i32Stack.pop();
-                        let arrayResult;
-                        if (arrayLen === -1) {
-                            arrayResult = taStack.pop();
-                        } else {
-                            arrayResult = [];
-                            for (let i1 = 0; i1 < arrayLen; i1++) {
-                                const int = i32Stack.pop();
-                                arrayResult.push(int);
-                            }
-                            arrayResult.reverse();
-                        }
-                        const string = strStack.pop();
-                        dictResult[string] = arrayResult;
-                    }
+                    const dictResult = __bjs_dictCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lift();
                     return dictResult;
                 },
                 boxDictionary: function bjs_boxDictionary(boxes) {
-                    const entries = Object.entries(boxes);
-                    for (const entry of entries) {
-                        const [key, value] = entry;
-                        const bytes = textEncoder.encode(key);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        ptrStack.push(value.pointer);
-                    }
-                    i32Stack.push(entries.length);
+                    const elemCodec = {
+                        lower: (v) => {
+                            ptrStack.push(v.pointer);
+                        },
+                        lift: () => {
+                            const ptr = ptrStack.pop();
+                            const obj = Box.__construct(ptr);
+                            return obj;
+                        },
+                    };
+                    __bjs_dictCodec(elemCodec).lower(boxes);
                     instance.exports.bjs_boxDictionary();
-                    const dictLen = i32Stack.pop();
-                    const dictResult = {};
-                    for (let i = 0; i < dictLen; i++) {
-                        const ptr = ptrStack.pop();
-                        const obj = Box.__construct(ptr);
-                        const string = strStack.pop();
-                        dictResult[string] = obj;
-                    }
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            ptrStack.push(v.pointer);
+                        },
+                        lift: () => {
+                            const ptr = ptrStack.pop();
+                            const obj = Box.__construct(ptr);
+                            return obj;
+                        },
+                    };
+                    const dictResult = __bjs_dictCodec(elemCodec1).lift();
                     return dictResult;
                 },
                 optionalBoxDictionary: function bjs_optionalBoxDictionary(boxes) {
-                    const entries = Object.entries(boxes);
-                    for (const entry of entries) {
-                        const [key, value] = entry;
-                        const bytes = textEncoder.encode(key);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const isSome = value != null ? 1 : 0;
-                        if (isSome) {
-                            ptrStack.push(value.pointer);
-                        }
-                        i32Stack.push(isSome);
-                    }
-                    i32Stack.push(entries.length);
-                    instance.exports.bjs_optionalBoxDictionary();
-                    const dictLen = i32Stack.pop();
-                    const dictResult = {};
-                    for (let i = 0; i < dictLen; i++) {
-                        const isSome1 = i32Stack.pop();
-                        let optValue;
-                        if (isSome1 === 0) {
-                            optValue = null;
-                        } else {
+                    const elemCodec = {
+                        lower: (v) => {
+                            ptrStack.push(v.pointer);
+                        },
+                        lift: () => {
                             const ptr = ptrStack.pop();
                             const obj = Box.__construct(ptr);
-                            optValue = obj;
-                        }
-                        const string = strStack.pop();
-                        dictResult[string] = optValue;
-                    }
+                            return obj;
+                        },
+                    };
+                    __bjs_dictCodec(__bjs_optionalCodec(elemCodec)).lower(boxes);
+                    instance.exports.bjs_optionalBoxDictionary();
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            ptrStack.push(v.pointer);
+                        },
+                        lift: () => {
+                            const ptr = ptrStack.pop();
+                            const obj = Box.__construct(ptr);
+                            return obj;
+                        },
+                    };
+                    const dictResult = __bjs_dictCodec(__bjs_optionalCodec(elemCodec1)).lift();
                     return dictResult;
                 },
                 roundtripCounters: function bjs_roundtripCounters(counters) {

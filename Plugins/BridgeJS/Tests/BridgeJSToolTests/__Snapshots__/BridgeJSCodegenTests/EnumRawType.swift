@@ -451,6 +451,54 @@ public func _bjs_validateSession(_ session: Int64) -> Void {
     #endif
 }
 
+extension Theme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Theme.bridgeJSMakeTypeHandle()
+}
+
+extension TSTheme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSTheme.bridgeJSMakeTypeHandle()
+}
+
+extension FeatureFlag: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FeatureFlag.bridgeJSMakeTypeHandle()
+}
+
+extension HttpStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = HttpStatus.bridgeJSMakeTypeHandle()
+}
+
+extension TSHttpStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSHttpStatus.bridgeJSMakeTypeHandle()
+}
+
+extension Priority: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Priority.bridgeJSMakeTypeHandle()
+}
+
+extension FileSize: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FileSize.bridgeJSMakeTypeHandle()
+}
+
+extension UserId: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = UserId.bridgeJSMakeTypeHandle()
+}
+
+extension TokenId: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TokenId.bridgeJSMakeTypeHandle()
+}
+
+extension SessionId: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = SessionId.bridgeJSMakeTypeHandle()
+}
+
+extension Precision: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Precision.bridgeJSMakeTypeHandle()
+}
+
+extension Ratio: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Ratio.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_takesFeatureFlag")
 fileprivate func bjs_takesFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: Int32) -> Void

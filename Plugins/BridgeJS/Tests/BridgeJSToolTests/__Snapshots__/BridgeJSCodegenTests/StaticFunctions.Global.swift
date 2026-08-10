@@ -208,3 +208,11 @@ fileprivate func _bjs_MathUtils_wrap_extern(_ pointer: UnsafeMutableRawPointer) 
 @inline(never) fileprivate func _bjs_MathUtils_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_MathUtils_wrap_extern(pointer)
 }
+
+extension Calculator: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Calculator.bridgeJSMakeTypeHandle()
+}
+
+extension APIResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIResult.bridgeJSMakeTypeHandle()
+}

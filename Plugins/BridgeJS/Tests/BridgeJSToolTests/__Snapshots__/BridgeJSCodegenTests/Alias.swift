@@ -257,6 +257,18 @@ fileprivate func _bjs_TagReference_wrap_extern(_ pointer: UnsafeMutableRawPointe
     return _bjs_TagReference_wrap_extern(pointer)
 }
 
+extension PolygonReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PolygonReference.bridgeJSMakeTypeHandle()
+}
+
+extension TagReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TagReference.bridgeJSMakeTypeHandle()
+}
+
+extension InnerTag: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = InnerTag.bridgeJSMakeTypeHandle()
+}
+
 extension Polygon: _BridgedSwiftAlias, _BridgedSwiftStackType {}
 
 extension Tag: _BridgedSwiftAlias, _BridgedSwiftStackType {}

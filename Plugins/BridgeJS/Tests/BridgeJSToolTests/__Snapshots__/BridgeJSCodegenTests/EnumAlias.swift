@@ -51,4 +51,8 @@ fileprivate func _bjs_ColorBox_wrap_extern(_ pointer: UnsafeMutableRawPointer) -
     return _bjs_ColorBox_wrap_extern(pointer)
 }
 
+extension ColorBox: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ColorBox.bridgeJSMakeTypeHandle()
+}
+
 extension Color: _BridgedSwiftAlias, _BridgedSwiftStackType {}

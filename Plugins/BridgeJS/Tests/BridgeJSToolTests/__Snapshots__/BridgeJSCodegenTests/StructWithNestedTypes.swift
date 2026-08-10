@@ -247,3 +247,31 @@ public func _bjs_Widget_Bounds_static_zero() -> Void {
     fatalError("Only available on WebAssembly")
     #endif
 }
+
+extension Shape: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Shape.bridgeJSMakeTypeHandle()
+}
+
+extension Widget: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Widget.bridgeJSMakeTypeHandle()
+}
+
+extension Widget.Layout: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Widget.Layout.bridgeJSMakeTypeHandle()
+}
+
+extension Widget.Bounds: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Widget.Bounds.bridgeJSMakeTypeHandle()
+}
+
+extension Shape.Kind: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Shape.Kind.bridgeJSMakeTypeHandle()
+}
+
+extension Widget.Variant: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Widget.Variant.bridgeJSMakeTypeHandle()
+}
+
+extension Widget.Layout.Alignment: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Widget.Layout.Alignment.bridgeJSMakeTypeHandle()
+}

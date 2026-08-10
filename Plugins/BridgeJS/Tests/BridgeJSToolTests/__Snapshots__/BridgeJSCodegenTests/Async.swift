@@ -335,6 +335,18 @@ public func _bjs_asyncRoundTripEnumDictionary() -> Int32 {
     #endif
 }
 
+extension AsyncPoint: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncPoint.bridgeJSMakeTypeHandle()
+}
+
+extension AsyncDirection: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncDirection.bridgeJSMakeTypeHandle()
+}
+
+extension AsyncTheme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncTheme.bridgeJSMakeTypeHandle()
+}
+
 @JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
 
 #if arch(wasm32)

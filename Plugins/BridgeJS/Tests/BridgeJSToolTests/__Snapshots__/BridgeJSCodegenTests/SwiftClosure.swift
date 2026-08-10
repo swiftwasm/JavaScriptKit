@@ -2637,6 +2637,26 @@ fileprivate func _bjs_TestProcessor_wrap_extern(_ pointer: UnsafeMutableRawPoint
     return _bjs_TestProcessor_wrap_extern(pointer)
 }
 
+extension Animal: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Animal.bridgeJSMakeTypeHandle()
+}
+
+extension Direction: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Direction.bridgeJSMakeTypeHandle()
+}
+
+extension Theme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Theme.bridgeJSMakeTypeHandle()
+}
+
+extension HttpStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = HttpStatus.bridgeJSMakeTypeHandle()
+}
+
+extension APIResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIResult.bridgeJSMakeTypeHandle()
+}
+
 @JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
 
 #if arch(wasm32)

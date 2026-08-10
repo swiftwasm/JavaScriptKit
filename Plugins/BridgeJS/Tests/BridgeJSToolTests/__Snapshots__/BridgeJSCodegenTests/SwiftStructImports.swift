@@ -46,6 +46,10 @@ fileprivate func _bjs_struct_lift_Point_extern() -> Int32 {
     return _bjs_struct_lift_Point_extern()
 }
 
+extension Point: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Point.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_translate")
 fileprivate func bjs_translate_extern(_ dx: Int32, _ dy: Int32) -> Void

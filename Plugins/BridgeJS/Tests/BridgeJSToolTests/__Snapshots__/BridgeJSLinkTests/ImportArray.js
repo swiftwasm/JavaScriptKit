@@ -31,6 +31,316 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    function __bjs_arrayCodec(elementCodec) {
+        return {
+            lower(value) {
+                for (let i = 0; i < value.length; i++) {
+                    elementCodec.lower(value[i]);
+                }
+                i32Stack.push(value.length);
+            },
+            lift() {
+                const count = i32Stack.pop();
+                if (count === -1) {
+                    return taStack.pop();
+                }
+                const result = new Array(count);
+                for (let i = count - 1; i >= 0; i--) {
+                    result[i] = elementCodec.lift();
+                }
+                return result;
+            },
+        };
+    }
+    function __bjs_optionalCodec(elementCodec, isUndefinedOr = false) {
+        return {
+            lower(value) {
+                const isSome = isUndefinedOr ? value !== undefined : value != null;
+                if (isSome) {
+                    elementCodec.lower(value);
+                    i32Stack.push(1);
+                } else {
+                    i32Stack.push(0);
+                }
+            },
+            lift() {
+                if (i32Stack.pop() === 0) {
+                    return isUndefinedOr ? undefined : null;
+                }
+                return elementCodec.lift();
+            },
+        };
+    }
+    function __bjs_dictCodec(valueCodec) {
+        return {
+            lower(value) {
+                const keys = Object.keys(value);
+                for (let i = 0; i < keys.length; i++) {
+                    __bjs_stringCodec.lower(keys[i]);
+                    valueCodec.lower(value[keys[i]]);
+                }
+                i32Stack.push(keys.length);
+            },
+            lift() {
+                const count = i32Stack.pop();
+                const result = {};
+                for (let i = 0; i < count; i++) {
+                    const value = valueCodec.lift();
+                    const key = __bjs_stringCodec.lift();
+                    result[key] = value;
+                }
+                return result;
+            },
+        };
+    }
+    function __bjs_enumCodec(helper) {
+        return {
+            lower(value) {
+                i32Stack.push(helper.lower(value));
+            },
+            lift() {
+                return helper.lift(i32Stack.pop());
+            },
+        };
+    }
+
+    const __bjs_stringCodec = {
+        lower: (v) => {
+            const bytes = textEncoder.encode(v);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+        },
+        lift: () => {
+            const string = strStack.pop();
+            return string;
+        },
+    };
+    const __bjs_primitiveCodecs = {
+        Bool: {
+            lower: (v) => {
+                i32Stack.push(v ? 1 : 0);
+            },
+            lift: () => {
+                const bool = i32Stack.pop() !== 0;
+                return bool;
+            },
+        },
+        Int: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        Int8: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt8: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int16: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt16: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int32: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt32: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        UInt: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int64: {
+            lower: (v) => {
+                i64Stack.push(v);
+            },
+            lift: () => {
+                const int = i64Stack.pop();
+                return int;
+            },
+        },
+        UInt64: {
+            lower: (v) => {
+                i64Stack.push(v);
+            },
+            lift: () => {
+                const int = i64Stack.pop();
+                return int;
+            },
+        },
+        Float: {
+            lower: (v) => {
+                f32Stack.push(Math.fround(v));
+            },
+            lift: () => {
+                const f32 = f32Stack.pop();
+                return f32;
+            },
+        },
+        Double: {
+            lower: (v) => {
+                f64Stack.push(v);
+            },
+            lift: () => {
+                const f64 = f64Stack.pop();
+                return f64;
+            },
+        },
+        String: __bjs_stringCodec,
+        JSValue: {
+            lower: (v) => {
+                const [vKind, vPayload1, vPayload2] = __bjs_jsValueLower(v);
+                i32Stack.push(vKind);
+                i32Stack.push(vPayload1);
+                f64Stack.push(vPayload2);
+            },
+            lift: () => {
+                const jsValuePayload2 = f64Stack.pop();
+                const jsValuePayload1 = i32Stack.pop();
+                const jsValueKind = i32Stack.pop();
+                const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                return jsValue;
+            },
+        },
+    };
+
+    function __bjs_jsValueLower(value) {
+        let kind;
+        let payload1;
+        let payload2;
+        if (value === null) {
+            kind = 4;
+            payload1 = 0;
+            payload2 = 0;
+        } else {
+            switch (typeof value) {
+                case "boolean":
+                    kind = 0;
+                    payload1 = value ? 1 : 0;
+                    payload2 = 0;
+                    break;
+                case "number":
+                    kind = 2;
+                    payload1 = 0;
+                    payload2 = value;
+                    break;
+                case "string":
+                    kind = 1;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "undefined":
+                    kind = 5;
+                    payload1 = 0;
+                    payload2 = 0;
+                    break;
+                case "object":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "function":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "symbol":
+                    kind = 7;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "bigint":
+                    kind = 8;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                default:
+                    throw new TypeError("Unsupported JSValue type");
+            }
+        }
+        return [kind, payload1, payload2];
+    }
+    function __bjs_jsValueLift(kind, payload1, payload2) {
+        let jsValue;
+        switch (kind) {
+            case 0:
+                jsValue = payload1 !== 0;
+                break;
+            case 1:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 2:
+                jsValue = payload2;
+                break;
+            case 3:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 4:
+                jsValue = null;
+                break;
+            case 5:
+                jsValue = undefined;
+                break;
+            case 7:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 8:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            default:
+                throw new TypeError("Unsupported JSValue kind " + kind);
+        }
+        return jsValue;
+    }
+
 
     return {
         /**
@@ -207,41 +517,16 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_roundtrip"] = function bjs_roundtrip() {
                 try {
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const int = i32Stack.pop();
-                            arrayResult.push(int);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
                     let ret = imports.roundtrip(arrayResult);
-                    for (const elem of ret) {
-                        i32Stack.push((elem | 0));
-                    }
-                    i32Stack.push(ret.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(ret);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_logStrings"] = function bjs_logStrings() {
                 try {
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const string = strStack.pop();
-                            arrayResult.push(string);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_stringCodec).lift();
                     imports.logStrings(arrayResult);
                 } catch (error) {
                     setException(error);
@@ -251,34 +536,12 @@ export async function createInstantiator(options, swift) {
                 try {
                     let optResult;
                     if (a) {
-                        const arrayLen = i32Stack.pop();
-                        let arrayResult;
-                        if (arrayLen === -1) {
-                            arrayResult = taStack.pop();
-                        } else {
-                            arrayResult = [];
-                            for (let i = 0; i < arrayLen; i++) {
-                                const int = i32Stack.pop();
-                                arrayResult.push(int);
-                            }
-                            arrayResult.reverse();
-                        }
+                        const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
                         optResult = arrayResult;
                     } else {
                         optResult = null;
                     }
-                    const arrayLen1 = i32Stack.pop();
-                    let arrayResult1;
-                    if (arrayLen1 === -1) {
-                        arrayResult1 = taStack.pop();
-                    } else {
-                        arrayResult1 = [];
-                        for (let i1 = 0; i1 < arrayLen1; i1++) {
-                            const int1 = i32Stack.pop();
-                            arrayResult1.push(int1);
-                        }
-                        arrayResult1.reverse();
-                    }
+                    const arrayResult1 = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
                     let ret = imports.optionalArrayThenArray(optResult, arrayResult1);
                     return ret;
                 } catch (error) {
@@ -291,34 +554,12 @@ export async function createInstantiator(options, swift) {
                     const string = decodeString(sBytes, sCount);
                     let optResult;
                     if (a) {
-                        const arrayLen = i32Stack.pop();
-                        let arrayResult;
-                        if (arrayLen === -1) {
-                            arrayResult = taStack.pop();
-                        } else {
-                            arrayResult = [];
-                            for (let i = 0; i < arrayLen; i++) {
-                                const int = i32Stack.pop();
-                                arrayResult.push(int);
-                            }
-                            arrayResult.reverse();
-                        }
+                        const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
                         optResult = arrayResult;
                     } else {
                         optResult = null;
                     }
-                    const arrayLen1 = i32Stack.pop();
-                    let arrayResult1;
-                    if (arrayLen1 === -1) {
-                        arrayResult1 = taStack.pop();
-                    } else {
-                        arrayResult1 = [];
-                        for (let i1 = 0; i1 < arrayLen1; i1++) {
-                            const int1 = i32Stack.pop();
-                            arrayResult1.push(int1);
-                        }
-                        arrayResult1.reverse();
-                    }
+                    const arrayResult1 = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
                     let ret = imports.borrowedStringAroundStackParams(string, optResult, arrayResult1);
                     return ret;
                 } catch (error) {

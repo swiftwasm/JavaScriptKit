@@ -637,3 +637,15 @@ fileprivate func _bjs_ConstructorDefaults_wrap_extern(_ pointer: UnsafeMutableRa
 @inline(never) fileprivate func _bjs_ConstructorDefaults_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_ConstructorDefaults_wrap_extern(pointer)
 }
+
+extension Config: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Config.bridgeJSMakeTypeHandle()
+}
+
+extension MathOperations: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = MathOperations.bridgeJSMakeTypeHandle()
+}
+
+extension Status: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Status.bridgeJSMakeTypeHandle()
+}

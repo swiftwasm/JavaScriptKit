@@ -175,3 +175,11 @@ fileprivate func _bjs_Account_wrap_extern(_ pointer: UnsafeMutableRawPointer) ->
 @inline(never) fileprivate func _bjs_Account_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_Account_wrap_extern(pointer)
 }
+
+extension Account.Credentials: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Account.Credentials.bridgeJSMakeTypeHandle()
+}
+
+extension Account.Role: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Account.Role.bridgeJSMakeTypeHandle()
+}

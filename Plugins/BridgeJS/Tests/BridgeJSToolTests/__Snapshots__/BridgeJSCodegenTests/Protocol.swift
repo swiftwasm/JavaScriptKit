@@ -1044,3 +1044,19 @@ fileprivate func _bjs_DelegateManager_wrap_extern(_ pointer: UnsafeMutableRawPoi
 @inline(never) fileprivate func _bjs_DelegateManager_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_DelegateManager_wrap_extern(pointer)
 }
+
+extension Direction: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Direction.bridgeJSMakeTypeHandle()
+}
+
+extension ExampleEnum: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ExampleEnum.bridgeJSMakeTypeHandle()
+}
+
+extension Result: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Result.bridgeJSMakeTypeHandle()
+}
+
+extension Priority: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Priority.bridgeJSMakeTypeHandle()
+}

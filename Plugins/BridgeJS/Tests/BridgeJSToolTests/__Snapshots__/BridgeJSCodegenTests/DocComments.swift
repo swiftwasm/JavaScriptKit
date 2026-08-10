@@ -315,3 +315,11 @@ fileprivate func _bjs_Greeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) ->
 @inline(never) fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_Greeter_wrap_extern(pointer)
 }
+
+extension Point: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Point.bridgeJSMakeTypeHandle()
+}
+
+extension Color: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Color.bridgeJSMakeTypeHandle()
+}

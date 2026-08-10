@@ -204,6 +204,58 @@ extension _BridgedSwiftStackType {
     }
 }
 
+/// Types usable as the generic argument of a generic imported `@JSFunction`.
+/// Each conforming type owns a ``BridgeJSTypeHandle`` whose pointer is the
+/// runtime type ID that selects the matching JS codec. Do not conform types by
+/// hand; marking them `@JS` emits the conformance together with the JS codec.
+public protocol BridgedSwiftGenericBridgeable: _BridgedSwiftStackType
+where StackLiftResult == Self {
+    @_spi(BridgeJS) static var bridgeJSTypeHandle: BridgeJSTypeHandle { get }
+}
+
+extension BridgedSwiftGenericBridgeable {
+    /// The runtime type ID passed across the bridge for this type.
+    @_spi(BridgeJS) public static var bridgeJSTypeID: Int32 { bridgeJSTypeHandle.typeID }
+
+    /// Creates the type's unique handle. A generic static function so
+    /// conformances compile under Embedded Swift.
+    @_spi(BridgeJS) public static func bridgeJSMakeTypeHandle() -> BridgeJSTypeHandle {
+        #if hasFeature(Embedded)
+        return BridgeJSTypeHandle()
+        #else
+        return BridgeJSTypeHandle(Self.self)
+        #endif
+    }
+}
+
+/// A per-type identity token for generic bridging: each conforming type stores
+/// exactly one handle in a `static let`, so the handle's pointer identifies the
+/// type at runtime without relying on type names, which could collide across
+/// modules.
+public final class BridgeJSTypeHandle: Sendable {
+    #if hasFeature(Embedded)
+    public init() {}
+    #else
+    /// The conforming type, for exported generics (planned follow-up) to map a
+    /// type ID back to. `nonisolated(unsafe)`: an immutable metatype is safe to
+    /// share, but the compiler cannot infer that.
+    public nonisolated(unsafe) let type: any BridgedSwiftGenericBridgeable.Type
+
+    public init(_ type: any BridgedSwiftGenericBridgeable.Type) {
+        self.type = type
+    }
+    #endif
+
+    /// The handle object's own address; pointers are 32-bit on wasm32.
+    @_spi(BridgeJS) public var typeID: Int32 {
+        #if arch(wasm32)
+        return Int32(bitPattern: UInt32(UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())))
+        #else
+        _onlyAvailableOnWasm()
+        #endif
+    }
+}
+
 /// Types that bridge with the same (isSome, value) ABI as Optional.
 /// Used by JSUndefinedOr so all bridge methods delegate to Optional<Wrapped>.
 public protocol _BridgedAsOptional {
@@ -808,6 +860,49 @@ extension String: _BridgedSwiftStackType {
     }
 }
 
+extension Bool: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Bool.bridgeJSMakeTypeHandle()
+}
+extension Int: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Int.bridgeJSMakeTypeHandle()
+}
+extension Float: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Float.bridgeJSMakeTypeHandle()
+}
+extension Double: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Double.bridgeJSMakeTypeHandle()
+}
+extension String: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = String.bridgeJSMakeTypeHandle()
+}
+extension UInt: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = UInt.bridgeJSMakeTypeHandle()
+}
+extension Int8: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Int8.bridgeJSMakeTypeHandle()
+}
+extension UInt8: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = UInt8.bridgeJSMakeTypeHandle()
+}
+extension Int16: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Int16.bridgeJSMakeTypeHandle()
+}
+extension UInt16: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = UInt16.bridgeJSMakeTypeHandle()
+}
+extension Int32: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Int32.bridgeJSMakeTypeHandle()
+}
+extension UInt32: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = UInt32.bridgeJSMakeTypeHandle()
+}
+extension Int64: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Int64.bridgeJSMakeTypeHandle()
+}
+extension UInt64: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = UInt64.bridgeJSMakeTypeHandle()
+}
+
 extension JSObject: _BridgedSwiftStackType {
     // JSObject is a non-final class, so we must explicitly specify the associated type
     // rather than relying on the default `Self` (which Swift requires for covariant returns).
@@ -912,6 +1007,10 @@ extension JSValue: _BridgedSwiftStackType {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
         bridgeJSStackPush()
     }
+}
+
+extension JSValue: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = JSValue.bridgeJSMakeTypeHandle()
 }
 
 /// A protocol that Swift heap objects exposed to JavaScript via `@JS class` must conform to.

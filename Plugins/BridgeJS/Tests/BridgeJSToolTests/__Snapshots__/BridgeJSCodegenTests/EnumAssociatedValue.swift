@@ -632,3 +632,47 @@ fileprivate func _bjs_User_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> In
 @inline(never) fileprivate func _bjs_User_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_User_wrap_extern(pointer)
 }
+
+extension Point: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Point.bridgeJSMakeTypeHandle()
+}
+
+extension APIResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIResult.bridgeJSMakeTypeHandle()
+}
+
+extension ComplexResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ComplexResult.bridgeJSMakeTypeHandle()
+}
+
+extension Utilities.Result: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Utilities.Result.bridgeJSMakeTypeHandle()
+}
+
+extension NetworkingResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NetworkingResult.bridgeJSMakeTypeHandle()
+}
+
+extension APIOptionalResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIOptionalResult.bridgeJSMakeTypeHandle()
+}
+
+extension Precision: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Precision.bridgeJSMakeTypeHandle()
+}
+
+extension CardinalDirection: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = CardinalDirection.bridgeJSMakeTypeHandle()
+}
+
+extension TypedPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TypedPayloadResult.bridgeJSMakeTypeHandle()
+}
+
+extension AllTypesResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AllTypesResult.bridgeJSMakeTypeHandle()
+}
+
+extension OptionalAllTypesResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = OptionalAllTypesResult.bridgeJSMakeTypeHandle()
+}

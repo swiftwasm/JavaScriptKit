@@ -127,6 +127,7 @@
             }
           ]
         },
+        "isFinal" : true,
         "methods" : [
           {
             "abiName" : "bjs_PolygonReference_vertexCount",
@@ -265,6 +266,7 @@
         "swiftCallName" : "PolygonReference"
       },
       {
+        "isFinal" : true,
         "methods" : [
           {
             "abiName" : "bjs_TagReference_describe",
@@ -327,6 +329,7 @@
             }
           ]
         },
+        "isFinal" : true,
         "methods" : [
           {
             "abiName" : "bjs_TagHolderReference_describe",
@@ -380,6 +383,7 @@
         "swiftCallName" : "TagHolderReference"
       },
       {
+        "isFinal" : true,
         "methods" : [
           {
             "abiName" : "bjs_PriorityReference_describe",

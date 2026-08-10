@@ -178,3 +178,7 @@ public func _bjs_roundTripPointerFields() -> Void {
     fatalError("Only available on WebAssembly")
     #endif
 }
+
+extension PointerFields: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PointerFields.bridgeJSMakeTypeHandle()
+}

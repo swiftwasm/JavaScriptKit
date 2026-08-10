@@ -104,6 +104,10 @@ public func _bjs_roundtripFooContainer() -> Void {
     #endif
 }
 
+extension FooContainer: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FooContainer.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Foo_init")
 fileprivate func bjs_Foo_init_extern() -> Int32

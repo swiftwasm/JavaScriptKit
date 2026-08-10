@@ -631,3 +631,39 @@ fileprivate func _bjs_Greeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) ->
 @inline(never) fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_Greeter_wrap_extern(pointer)
 }
+
+extension DataPoint: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = DataPoint.bridgeJSMakeTypeHandle()
+}
+
+extension Address: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Address.bridgeJSMakeTypeHandle()
+}
+
+extension Person: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Person.bridgeJSMakeTypeHandle()
+}
+
+extension Session: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Session.bridgeJSMakeTypeHandle()
+}
+
+extension Measurement: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Measurement.bridgeJSMakeTypeHandle()
+}
+
+extension ConfigStruct: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ConfigStruct.bridgeJSMakeTypeHandle()
+}
+
+extension Container: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Container.bridgeJSMakeTypeHandle()
+}
+
+extension Vector2D: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Vector2D.bridgeJSMakeTypeHandle()
+}
+
+extension Precision: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Precision.bridgeJSMakeTypeHandle()
+}

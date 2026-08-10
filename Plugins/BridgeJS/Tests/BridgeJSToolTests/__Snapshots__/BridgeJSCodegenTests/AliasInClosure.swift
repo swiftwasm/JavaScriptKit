@@ -187,4 +187,8 @@ fileprivate func _bjs_PolygonReference_wrap_extern(_ pointer: UnsafeMutableRawPo
     return _bjs_PolygonReference_wrap_extern(pointer)
 }
 
+extension PolygonReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PolygonReference.bridgeJSMakeTypeHandle()
+}
+
 extension Polygon: _BridgedSwiftAlias, _BridgedSwiftStackType {}

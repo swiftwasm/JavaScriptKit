@@ -349,3 +349,11 @@ fileprivate func _bjs_RenamedMembers_wrap_extern(_ pointer: UnsafeMutableRawPoin
 @inline(never) fileprivate func _bjs_RenamedMembers_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_RenamedMembers_wrap_extern(pointer)
 }
+
+extension RenamedVector: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = RenamedVector.bridgeJSMakeTypeHandle()
+}
+
+extension RenamedEnumMembers: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = RenamedEnumMembers.bridgeJSMakeTypeHandle()
+}

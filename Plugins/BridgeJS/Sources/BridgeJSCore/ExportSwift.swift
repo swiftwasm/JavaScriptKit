@@ -91,6 +91,15 @@ public class ExportSwift {
             }
         }
 
+        withSpan("Render Generic Bridgeable Conformances") { [self] in
+            // Emitted unconditionally: a module cannot know whether a dependent
+            // module passes its types to a generic imported function.
+            let genericConformanceCodegen = GenericConformanceCodegen()
+            for entry in skeleton.genericBridgeableTypeEntries {
+                decls.append(contentsOf: genericConformanceCodegen.renderConformance(typeName: entry.swiftName))
+            }
+        }
+
         try withSpan("Render Async Promise Helpers") { [self] in
             let asyncResolveTypes = skeleton.asyncPromiseResolveReturnTypes
             if !asyncResolveTypes.isEmpty {
@@ -875,6 +884,63 @@ public class ExportSwift {
     }
 }
 
+// MARK: - GenericConformanceCodegen
+
+/// Renders `BridgedSwiftGenericBridgeable` conformances for `@JS` types so they
+/// can be used as the generic argument of a generic imported `@JSFunction`.
+struct GenericConformanceCodegen {
+    func renderConformance(typeName: String) -> [DeclSyntax] {
+        let printer = CodeFragmentPrinter()
+        printer.write("extension \(typeName): BridgedSwiftGenericBridgeable {")
+        printer.indent {
+            printer.write(
+                "@_spi(BridgeJS) public static let bridgeJSTypeHandle = \(typeName).bridgeJSMakeTypeHandle()"
+            )
+        }
+        printer.write("}")
+        return ["\(raw: printer.lines.joined(separator: "\n"))"]
+    }
+}
+
+// MARK: - GenericTypeRegistrationCodegen
+
+/// Renders the `bjs_<Module>_register_type_handles` wasm export: it lowers each
+/// registered type's `bridgeJSTypeID` into a buffer, in the canonical order of
+/// `BridgeJSSkeleton.typeRegistrationEntries`, and passes it to the JS import
+/// hook of the same name, which pairs the IDs with its codec array by index.
+public struct GenericTypeRegistrationCodegen {
+    public init() {}
+
+    public func render(for skeleton: BridgeJSSkeleton) -> String? {
+        guard let entries = skeleton.typeRegistrationEntries else { return nil }
+        let abiName = ABINameGenerator.typeRegistrationFunctionName(moduleName: skeleton.moduleName)
+        let printer = CodeFragmentPrinter()
+        printer.write("#if arch(wasm32)")
+        printer.write("@_extern(wasm, module: \"bjs\", name: \"\(abiName)\")")
+        printer.write("fileprivate func _\(abiName)_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)")
+        printer.nextLine()
+        printer.write("@_expose(wasm, \"\(abiName)\")")
+        printer.write("public func _\(abiName)() {")
+        printer.indent {
+            printer.write("let typeIds: [Int32] = [")
+            printer.indent {
+                for entry in entries {
+                    printer.write("\(entry.swiftName).bridgeJSTypeID,")
+                }
+            }
+            printer.write("]")
+            printer.write("typeIds.withUnsafeBufferPointer { buffer in")
+            printer.indent {
+                printer.write("_\(abiName)_extern(buffer.baseAddress, Int32(buffer.count))")
+            }
+            printer.write("}")
+        }
+        printer.write("}")
+        printer.write("#endif")
+        return printer.lines.joined(separator: "\n")
+    }
+}
+
 // MARK: - StackCodegen
 
 /// Helper for stack-based lifting and lowering operations.
@@ -896,6 +962,10 @@ struct StackCodegen {
             return "JSObject.bridgeJSStackPop()"
         case .void, .namespaceEnum:
             return "()"
+        case .generic:
+            fatalError(
+                "Generic parameters are only supported on imported declarations, not exported concrete-type codegen"
+            )
         }
     }
 
@@ -908,7 +978,7 @@ struct StackCodegen {
             return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: typeName)<JSObject>.bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
-        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol:
+        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol, .generic:
             fatalError("Invalid nullable wrapped type: \(wrappedType)")
         }
     }
@@ -941,6 +1011,10 @@ struct StackCodegen {
             return lowerArrayStatements(elementType: elementType, accessor: accessor, varPrefix: varPrefix)
         case .dictionary(let valueType):
             return lowerDictionaryStatements(valueType: valueType, accessor: accessor, varPrefix: varPrefix)
+        case .generic:
+            fatalError(
+                "Generic parameters are only supported on imported declarations, not exported concrete-type codegen"
+            )
         }
     }
 
@@ -1596,9 +1670,31 @@ extension BridgeType {
         case .associatedValueEnum:
             return ["_BridgedSwiftAssociatedValueEnum"]
         case .rawValueEnum, .void, .unsafePointer, .namespaceEnum,
-            .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias:
+            .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias, .generic:
             // Not supported yet.
             return nil
+        }
+    }
+
+    /// Stack expressions for bare `T` and `T?`, the only generic shapes that
+    /// cannot reuse the concrete emission: `bridgeJSLowerParameter()` names
+    /// per-type members that the generic constraint erases to the stack, so
+    /// `bridgeJSStackPush()`/`bridgeJSStackPop()` is the shared spelling.
+    /// `[T]` and `[String: T]` go through the ordinary paths via the `Array`
+    /// and `Dictionary` stack conformances.
+    var genericStackPopExpression: String? {
+        switch self {
+        case .generic(let name): return "\(name).bridgeJSStackPop()"
+        case .nullable(.generic(let name), _): return "Optional<\(name)>.bridgeJSStackPop()"
+        default: return nil
+        }
+    }
+
+    func genericStackPushStatement(value: String) -> String? {
+        switch self {
+        case .generic, .nullable(.generic, _):
+            return "\(value).bridgeJSStackPush()"
+        default: return nil
         }
     }
 
@@ -1631,6 +1727,7 @@ extension BridgeType {
             let closureType = "(\(paramTypes))\(effectsStr) -> \(signature.returnType.swiftType)"
             return useJSTypedClosure ? "JSTypedClosure<\(closureType)>" : closureType
         case .alias(let name, _): return name
+        case .generic(let name): return name
         }
     }
 
@@ -1717,6 +1814,10 @@ extension BridgeType {
             return LiftingIntrinsicInfo(parameters: [])
         case .alias(_, let underlying):
             return try underlying.liftParameterInfo()
+        case .generic:
+            throw BridgeJSCoreError(
+                "Generic parameters are only supported on imported declarations, not exported concrete-type codegen"
+            )
         }
     }
 
@@ -1770,6 +1871,10 @@ extension BridgeType {
             return .array
         case .alias(_, let underlying):
             return try underlying.loweringReturnInfo()
+        case .generic:
+            throw BridgeJSCoreError(
+                "Generic parameters are only supported on imported declarations, not exported concrete-type codegen"
+            )
         }
     }
 }

@@ -339,3 +339,7 @@ fileprivate func _bjs_PropertyClass_wrap_extern(_ pointer: UnsafeMutableRawPoint
 @inline(never) fileprivate func _bjs_PropertyClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_PropertyClass_wrap_extern(pointer)
 }
+
+extension PropertyEnum: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PropertyEnum.bridgeJSMakeTypeHandle()
+}

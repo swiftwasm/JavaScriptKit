@@ -149,6 +149,10 @@ fileprivate func _bjs_Box_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int
     return _bjs_Box_wrap_extern(pointer)
 }
 
+extension Counters: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Counters.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_importMirrorDictionary")
 fileprivate func bjs_importMirrorDictionary_extern() -> Void

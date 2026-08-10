@@ -84,7 +84,7 @@ async function createInstantiator(options, swift) {
 
 /** @type {import('./instantiate.d').instantiate} */
 export async function instantiate(options) {
-    const result = await _instantiate(options);
+    const { instantiator, ...result } = await _instantiate(options);
     /* #if IS_WASI */
     options.wasi.initialize(result.instance);
     /* #endif */
@@ -94,7 +94,7 @@ export async function instantiate(options) {
 
 /** @type {import('./instantiate.d').instantiateForThread} */
 export async function instantiateForThread(tid, startArg, options) {
-    const result = await _instantiate(options);
+    const { instantiator, ...result } = await _instantiate(options);
     /* #if IS_WASI */
     options.wasi.setInstance(result.instance);
     /* #endif */
@@ -102,7 +102,7 @@ export async function instantiateForThread(tid, startArg, options) {
     return result;
 }
 
-/** @type {import('./instantiate.d').instantiate} */
+/** @param {import('./instantiate.d').InstantiateOptions} options */
 async function _instantiate(options) {
     const _WebAssembly = options.WebAssembly || WebAssembly;
     const moduleSource = options.module;
@@ -184,5 +184,6 @@ async function _instantiate(options) {
         instance,
         swift,
         exports,
+        instantiator,
     };
 }

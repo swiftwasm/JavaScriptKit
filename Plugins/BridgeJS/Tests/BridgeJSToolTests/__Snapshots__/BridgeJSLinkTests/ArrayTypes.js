@@ -44,6 +44,316 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    function __bjs_arrayCodec(elementCodec) {
+        return {
+            lower(value) {
+                for (let i = 0; i < value.length; i++) {
+                    elementCodec.lower(value[i]);
+                }
+                i32Stack.push(value.length);
+            },
+            lift() {
+                const count = i32Stack.pop();
+                if (count === -1) {
+                    return taStack.pop();
+                }
+                const result = new Array(count);
+                for (let i = count - 1; i >= 0; i--) {
+                    result[i] = elementCodec.lift();
+                }
+                return result;
+            },
+        };
+    }
+    function __bjs_optionalCodec(elementCodec, isUndefinedOr = false) {
+        return {
+            lower(value) {
+                const isSome = isUndefinedOr ? value !== undefined : value != null;
+                if (isSome) {
+                    elementCodec.lower(value);
+                    i32Stack.push(1);
+                } else {
+                    i32Stack.push(0);
+                }
+            },
+            lift() {
+                if (i32Stack.pop() === 0) {
+                    return isUndefinedOr ? undefined : null;
+                }
+                return elementCodec.lift();
+            },
+        };
+    }
+    function __bjs_dictCodec(valueCodec) {
+        return {
+            lower(value) {
+                const keys = Object.keys(value);
+                for (let i = 0; i < keys.length; i++) {
+                    __bjs_stringCodec.lower(keys[i]);
+                    valueCodec.lower(value[keys[i]]);
+                }
+                i32Stack.push(keys.length);
+            },
+            lift() {
+                const count = i32Stack.pop();
+                const result = {};
+                for (let i = 0; i < count; i++) {
+                    const value = valueCodec.lift();
+                    const key = __bjs_stringCodec.lift();
+                    result[key] = value;
+                }
+                return result;
+            },
+        };
+    }
+    function __bjs_enumCodec(helper) {
+        return {
+            lower(value) {
+                i32Stack.push(helper.lower(value));
+            },
+            lift() {
+                return helper.lift(i32Stack.pop());
+            },
+        };
+    }
+
+    const __bjs_stringCodec = {
+        lower: (v) => {
+            const bytes = textEncoder.encode(v);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+        },
+        lift: () => {
+            const string = strStack.pop();
+            return string;
+        },
+    };
+    const __bjs_primitiveCodecs = {
+        Bool: {
+            lower: (v) => {
+                i32Stack.push(v ? 1 : 0);
+            },
+            lift: () => {
+                const bool = i32Stack.pop() !== 0;
+                return bool;
+            },
+        },
+        Int: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        Int8: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt8: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int16: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt16: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int32: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt32: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        UInt: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int64: {
+            lower: (v) => {
+                i64Stack.push(v);
+            },
+            lift: () => {
+                const int = i64Stack.pop();
+                return int;
+            },
+        },
+        UInt64: {
+            lower: (v) => {
+                i64Stack.push(v);
+            },
+            lift: () => {
+                const int = i64Stack.pop();
+                return int;
+            },
+        },
+        Float: {
+            lower: (v) => {
+                f32Stack.push(Math.fround(v));
+            },
+            lift: () => {
+                const f32 = f32Stack.pop();
+                return f32;
+            },
+        },
+        Double: {
+            lower: (v) => {
+                f64Stack.push(v);
+            },
+            lift: () => {
+                const f64 = f64Stack.pop();
+                return f64;
+            },
+        },
+        String: __bjs_stringCodec,
+        JSValue: {
+            lower: (v) => {
+                const [vKind, vPayload1, vPayload2] = __bjs_jsValueLower(v);
+                i32Stack.push(vKind);
+                i32Stack.push(vPayload1);
+                f64Stack.push(vPayload2);
+            },
+            lift: () => {
+                const jsValuePayload2 = f64Stack.pop();
+                const jsValuePayload1 = i32Stack.pop();
+                const jsValueKind = i32Stack.pop();
+                const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                return jsValue;
+            },
+        },
+    };
+
+    function __bjs_jsValueLower(value) {
+        let kind;
+        let payload1;
+        let payload2;
+        if (value === null) {
+            kind = 4;
+            payload1 = 0;
+            payload2 = 0;
+        } else {
+            switch (typeof value) {
+                case "boolean":
+                    kind = 0;
+                    payload1 = value ? 1 : 0;
+                    payload2 = 0;
+                    break;
+                case "number":
+                    kind = 2;
+                    payload1 = 0;
+                    payload2 = value;
+                    break;
+                case "string":
+                    kind = 1;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "undefined":
+                    kind = 5;
+                    payload1 = 0;
+                    payload2 = 0;
+                    break;
+                case "object":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "function":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "symbol":
+                    kind = 7;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "bigint":
+                    kind = 8;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                default:
+                    throw new TypeError("Unsupported JSValue type");
+            }
+        }
+        return [kind, payload1, payload2];
+    }
+    function __bjs_jsValueLift(kind, payload1, payload2) {
+        let jsValue;
+        switch (kind) {
+            case 0:
+                jsValue = payload1 !== 0;
+                break;
+            case 1:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 2:
+                jsValue = payload2;
+                break;
+            case 3:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 4:
+                jsValue = null;
+                break;
+            case 5:
+                jsValue = undefined;
+                break;
+            case 7:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 8:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            default:
+                throw new TypeError("Unsupported JSValue kind " + kind);
+        }
+        return jsValue;
+    }
+
     const __bjs_createPointHelpers = () => ({
         lower: (value) => {
             f64Stack.push(value.x);
@@ -138,6 +448,7 @@ export async function createInstantiator(options, swift) {
                 const value = structHelpers.Point.lift();
                 return swift.memory.retain(value);
             }
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -264,18 +575,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_importProcessNumbers"] = function bjs_importProcessNumbers() {
                 try {
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const f64 = f64Stack.pop();
-                            arrayResult.push(f64);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lift();
                     imports.importProcessNumbers(arrayResult);
                 } catch (error) {
                     setException(error);
@@ -284,82 +584,34 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_importGetNumbers"] = function bjs_importGetNumbers() {
                 try {
                     let ret = imports.importGetNumbers();
-                    for (const elem of ret) {
-                        f64Stack.push(elem);
-                    }
-                    i32Stack.push(ret.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lower(ret);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_importTransformNumbers"] = function bjs_importTransformNumbers() {
                 try {
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const f64 = f64Stack.pop();
-                            arrayResult.push(f64);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lift();
                     let ret = imports.importTransformNumbers(arrayResult);
-                    for (const elem of ret) {
-                        f64Stack.push(elem);
-                    }
-                    i32Stack.push(ret.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lower(ret);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_importProcessStrings"] = function bjs_importProcessStrings() {
                 try {
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const string = strStack.pop();
-                            arrayResult.push(string);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_stringCodec).lift();
                     let ret = imports.importProcessStrings(arrayResult);
-                    for (const elem of ret) {
-                        const bytes = textEncoder.encode(elem);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                    }
-                    i32Stack.push(ret.length);
+                    __bjs_arrayCodec(__bjs_stringCodec).lower(ret);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_importProcessBooleans"] = function bjs_importProcessBooleans() {
                 try {
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const bool = i32Stack.pop() !== 0;
-                            arrayResult.push(bool);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lift();
                     let ret = imports.importProcessBooleans(arrayResult);
-                    for (const elem of ret) {
-                        i32Stack.push(elem ? 1 : 0);
-                    }
-                    i32Stack.push(ret.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -442,50 +694,19 @@ export async function createInstantiator(options, swift) {
                 }
 
                 constructor(nums, strs) {
-                    for (const elem of nums) {
-                        i32Stack.push((elem | 0));
-                    }
-                    i32Stack.push(nums.length);
-                    for (const elem1 of strs) {
-                        const bytes = textEncoder.encode(elem1);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                    }
-                    i32Stack.push(strs.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(nums);
+                    __bjs_arrayCodec(__bjs_stringCodec).lower(strs);
                     const ret = instance.exports.bjs_MultiArrayContainer_init();
                     return MultiArrayContainer.__construct(ret);
                 }
                 get numbers() {
                     instance.exports.bjs_MultiArrayContainer_numbers_get(this.pointer);
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const int = i32Stack.pop();
-                            arrayResult.push(int);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
                     return arrayResult;
                 }
                 get strings() {
                     instance.exports.bjs_MultiArrayContainer_strings_get(this.pointer);
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const string = strStack.pop();
-                            arrayResult.push(string);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_stringCodec).lift();
                     return arrayResult;
                 }
             }
@@ -494,161 +715,90 @@ export async function createInstantiator(options, swift) {
 
             const exports = {
                 processIntArray: function bjs_processIntArray(values) {
-                    for (const elem of values) {
-                        i32Stack.push((elem | 0));
-                    }
-                    i32Stack.push(values.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(values);
                     instance.exports.bjs_processIntArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const int = i32Stack.pop();
-                            arrayResult.push(int);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
                     return arrayResult;
                 },
                 processStringArray: function bjs_processStringArray(values) {
-                    for (const elem of values) {
-                        const bytes = textEncoder.encode(elem);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                    }
-                    i32Stack.push(values.length);
+                    __bjs_arrayCodec(__bjs_stringCodec).lower(values);
                     instance.exports.bjs_processStringArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const string = strStack.pop();
-                            arrayResult.push(string);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_stringCodec).lift();
                     return arrayResult;
                 },
                 processDoubleArray: function bjs_processDoubleArray(values) {
-                    for (const elem of values) {
-                        f64Stack.push(elem);
-                    }
-                    i32Stack.push(values.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lower(values);
                     instance.exports.bjs_processDoubleArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const f64 = f64Stack.pop();
-                            arrayResult.push(f64);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lift();
                     return arrayResult;
                 },
                 processBoolArray: function bjs_processBoolArray(values) {
-                    for (const elem of values) {
-                        i32Stack.push(elem ? 1 : 0);
-                    }
-                    i32Stack.push(values.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lower(values);
                     instance.exports.bjs_processBoolArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const bool = i32Stack.pop() !== 0;
-                            arrayResult.push(bool);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lift();
                     return arrayResult;
                 },
                 processPointArray: function bjs_processPointArray(points) {
-                    for (const elem of points) {
-                        structHelpers.Point.lower(elem);
-                    }
-                    i32Stack.push(points.length);
+                    __bjs_arrayCodec(structHelpers.Point).lower(points);
                     instance.exports.bjs_processPointArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const struct = structHelpers.Point.lift();
-                            arrayResult.push(struct);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(structHelpers.Point).lift();
                     return arrayResult;
                 },
                 processDirectionArray: function bjs_processDirectionArray(directions) {
-                    for (const elem of directions) {
-                        i32Stack.push((elem | 0));
-                    }
-                    i32Stack.push(directions.length);
-                    instance.exports.bjs_processDirectionArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
+                    const elemCodec = {
+                        lower: (v) => {
+                            i32Stack.push((v | 0));
+                        },
+                        lift: () => {
                             const caseId = i32Stack.pop();
-                            arrayResult.push(caseId);
-                        }
-                        arrayResult.reverse();
-                    }
+                            return caseId;
+                        },
+                    };
+                    __bjs_arrayCodec(elemCodec).lower(directions);
+                    instance.exports.bjs_processDirectionArray();
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            i32Stack.push((v | 0));
+                        },
+                        lift: () => {
+                            const caseId = i32Stack.pop();
+                            return caseId;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
                     return arrayResult;
                 },
                 processStatusArray: function bjs_processStatusArray(statuses) {
-                    for (const elem of statuses) {
-                        i32Stack.push((elem | 0));
-                    }
-                    i32Stack.push(statuses.length);
-                    instance.exports.bjs_processStatusArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
+                    const elemCodec = {
+                        lower: (v) => {
+                            i32Stack.push((v | 0));
+                        },
+                        lift: () => {
                             const rawValue = i32Stack.pop();
-                            arrayResult.push(rawValue);
-                        }
-                        arrayResult.reverse();
-                    }
+                            return rawValue;
+                        },
+                    };
+                    __bjs_arrayCodec(elemCodec).lower(statuses);
+                    instance.exports.bjs_processStatusArray();
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            i32Stack.push((v | 0));
+                        },
+                        lift: () => {
+                            const rawValue = i32Stack.pop();
+                            return rawValue;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
                     return arrayResult;
                 },
                 sumIntArray: function bjs_sumIntArray(values) {
-                    for (const elem of values) {
-                        i32Stack.push((elem | 0));
-                    }
-                    i32Stack.push(values.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(values);
                     const ret = instance.exports.bjs_sumIntArray();
                     return ret;
                 },
                 findFirstPoint: function bjs_findFirstPoint(points, matching) {
-                    for (const elem of points) {
-                        structHelpers.Point.lower(elem);
-                    }
-                    i32Stack.push(points.length);
+                    __bjs_arrayCodec(structHelpers.Point).lower(points);
                     const matchingBytes = textEncoder.encode(matching);
                     const matchingId = swift.memory.retain(matchingBytes);
                     instance.exports.bjs_findFirstPoint(matchingId, matchingBytes.length);
@@ -656,544 +806,318 @@ export async function createInstantiator(options, swift) {
                     return structValue;
                 },
                 processUnsafeRawPointerArray: function bjs_processUnsafeRawPointerArray(values) {
-                    for (const elem of values) {
-                        ptrStack.push((elem | 0));
-                    }
-                    i32Stack.push(values.length);
-                    instance.exports.bjs_processUnsafeRawPointerArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
+                    const elemCodec = {
+                        lower: (v) => {
+                            ptrStack.push((v | 0));
+                        },
+                        lift: () => {
                             const pointer = ptrStack.pop();
-                            arrayResult.push(pointer);
-                        }
-                        arrayResult.reverse();
-                    }
+                            return pointer;
+                        },
+                    };
+                    __bjs_arrayCodec(elemCodec).lower(values);
+                    instance.exports.bjs_processUnsafeRawPointerArray();
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            ptrStack.push((v | 0));
+                        },
+                        lift: () => {
+                            const pointer = ptrStack.pop();
+                            return pointer;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
                     return arrayResult;
                 },
                 processUnsafeMutableRawPointerArray: function bjs_processUnsafeMutableRawPointerArray(values) {
-                    for (const elem of values) {
-                        ptrStack.push((elem | 0));
-                    }
-                    i32Stack.push(values.length);
-                    instance.exports.bjs_processUnsafeMutableRawPointerArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
+                    const elemCodec = {
+                        lower: (v) => {
+                            ptrStack.push((v | 0));
+                        },
+                        lift: () => {
                             const pointer = ptrStack.pop();
-                            arrayResult.push(pointer);
-                        }
-                        arrayResult.reverse();
-                    }
+                            return pointer;
+                        },
+                    };
+                    __bjs_arrayCodec(elemCodec).lower(values);
+                    instance.exports.bjs_processUnsafeMutableRawPointerArray();
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            ptrStack.push((v | 0));
+                        },
+                        lift: () => {
+                            const pointer = ptrStack.pop();
+                            return pointer;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
                     return arrayResult;
                 },
                 processOpaquePointerArray: function bjs_processOpaquePointerArray(values) {
-                    for (const elem of values) {
-                        ptrStack.push((elem | 0));
-                    }
-                    i32Stack.push(values.length);
-                    instance.exports.bjs_processOpaquePointerArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
+                    const elemCodec = {
+                        lower: (v) => {
+                            ptrStack.push((v | 0));
+                        },
+                        lift: () => {
                             const pointer = ptrStack.pop();
-                            arrayResult.push(pointer);
-                        }
-                        arrayResult.reverse();
-                    }
+                            return pointer;
+                        },
+                    };
+                    __bjs_arrayCodec(elemCodec).lower(values);
+                    instance.exports.bjs_processOpaquePointerArray();
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            ptrStack.push((v | 0));
+                        },
+                        lift: () => {
+                            const pointer = ptrStack.pop();
+                            return pointer;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
                     return arrayResult;
                 },
                 processOptionalIntArray: function bjs_processOptionalIntArray(values) {
-                    for (const elem of values) {
-                        const isSome = elem != null ? 1 : 0;
-                        if (isSome) {
-                            i32Stack.push((elem | 0));
-                        }
-                        i32Stack.push(isSome);
-                    }
-                    i32Stack.push(values.length);
+                    __bjs_arrayCodec(__bjs_optionalCodec(__bjs_primitiveCodecs.Int)).lower(values);
                     instance.exports.bjs_processOptionalIntArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const isSome1 = i32Stack.pop();
-                            let optValue;
-                            if (isSome1 === 0) {
-                                optValue = null;
-                            } else {
-                                const int = i32Stack.pop();
-                                optValue = int;
-                            }
-                            arrayResult.push(optValue);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(__bjs_primitiveCodecs.Int)).lift();
                     return arrayResult;
                 },
                 processOptionalStringArray: function bjs_processOptionalStringArray(values) {
-                    for (const elem of values) {
-                        const isSome = elem != null ? 1 : 0;
-                        if (isSome) {
-                            const bytes = textEncoder.encode(elem);
-                            const id = swift.memory.retain(bytes);
-                            i32Stack.push(bytes.length);
-                            i32Stack.push(id);
-                        }
-                        i32Stack.push(isSome);
-                    }
-                    i32Stack.push(values.length);
+                    __bjs_arrayCodec(__bjs_optionalCodec(__bjs_stringCodec)).lower(values);
                     instance.exports.bjs_processOptionalStringArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const isSome1 = i32Stack.pop();
-                            let optValue;
-                            if (isSome1 === 0) {
-                                optValue = null;
-                            } else {
-                                const string = strStack.pop();
-                                optValue = string;
-                            }
-                            arrayResult.push(optValue);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(__bjs_stringCodec)).lift();
                     return arrayResult;
                 },
                 processOptionalArray: function bjs_processOptionalArray(values) {
-                    const isSome = values != null;
-                    if (isSome) {
-                        for (const elem of values) {
-                            i32Stack.push((elem | 0));
-                        }
-                        i32Stack.push(values.length);
-                    }
-                    i32Stack.push(+isSome);
+                    __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lower(values);
                     instance.exports.bjs_processOptionalArray();
-                    const isSome1 = i32Stack.pop();
-                    let optResult;
-                    if (isSome1) {
-                        const arrayLen = i32Stack.pop();
-                        let arrayResult;
-                        if (arrayLen === -1) {
-                            arrayResult = taStack.pop();
-                        } else {
-                            arrayResult = [];
-                            for (let i = 0; i < arrayLen; i++) {
-                                const int = i32Stack.pop();
-                                arrayResult.push(int);
-                            }
-                            arrayResult.reverse();
-                        }
-                        optResult = arrayResult;
-                    } else {
-                        optResult = null;
-                    }
-                    return optResult;
+                    const optValue = __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lift();
+                    return optValue;
                 },
                 processOptionalPointArray: function bjs_processOptionalPointArray(points) {
-                    for (const elem of points) {
-                        const isSome = elem != null ? 1 : 0;
-                        if (isSome) {
-                            structHelpers.Point.lower(elem);
-                        }
-                        i32Stack.push(isSome);
-                    }
-                    i32Stack.push(points.length);
+                    __bjs_arrayCodec(__bjs_optionalCodec(structHelpers.Point)).lower(points);
                     instance.exports.bjs_processOptionalPointArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const isSome1 = i32Stack.pop();
-                            let optValue;
-                            if (isSome1 === 0) {
-                                optValue = null;
-                            } else {
-                                const struct = structHelpers.Point.lift();
-                                optValue = struct;
-                            }
-                            arrayResult.push(optValue);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(structHelpers.Point)).lift();
                     return arrayResult;
                 },
                 processOptionalDirectionArray: function bjs_processOptionalDirectionArray(directions) {
-                    for (const elem of directions) {
-                        const isSome = elem != null ? 1 : 0;
-                        if (isSome) {
-                            i32Stack.push((elem | 0));
-                        }
-                        i32Stack.push(isSome);
-                    }
-                    i32Stack.push(directions.length);
+                    const elemCodec = {
+                        lower: (v) => {
+                            i32Stack.push((v | 0));
+                        },
+                        lift: () => {
+                            const caseId = i32Stack.pop();
+                            return caseId;
+                        },
+                    };
+                    __bjs_arrayCodec(__bjs_optionalCodec(elemCodec)).lower(directions);
                     instance.exports.bjs_processOptionalDirectionArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const isSome1 = i32Stack.pop();
-                            let optValue;
-                            if (isSome1 === 0) {
-                                optValue = null;
-                            } else {
-                                const caseId = i32Stack.pop();
-                                optValue = caseId;
-                            }
-                            arrayResult.push(optValue);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            i32Stack.push((v | 0));
+                        },
+                        lift: () => {
+                            const caseId = i32Stack.pop();
+                            return caseId;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(elemCodec1)).lift();
                     return arrayResult;
                 },
                 processOptionalStatusArray: function bjs_processOptionalStatusArray(statuses) {
-                    for (const elem of statuses) {
-                        const isSome = elem != null ? 1 : 0;
-                        if (isSome) {
-                            i32Stack.push((elem | 0));
-                        }
-                        i32Stack.push(isSome);
-                    }
-                    i32Stack.push(statuses.length);
+                    const elemCodec = {
+                        lower: (v) => {
+                            i32Stack.push((v | 0));
+                        },
+                        lift: () => {
+                            const rawValue = i32Stack.pop();
+                            return rawValue;
+                        },
+                    };
+                    __bjs_arrayCodec(__bjs_optionalCodec(elemCodec)).lower(statuses);
                     instance.exports.bjs_processOptionalStatusArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const isSome1 = i32Stack.pop();
-                            let optValue;
-                            if (isSome1 === 0) {
-                                optValue = null;
-                            } else {
-                                const rawValue = i32Stack.pop();
-                                optValue = rawValue;
-                            }
-                            arrayResult.push(optValue);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            i32Stack.push((v | 0));
+                        },
+                        lift: () => {
+                            const rawValue = i32Stack.pop();
+                            return rawValue;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(elemCodec1)).lift();
                     return arrayResult;
                 },
                 processNestedIntArray: function bjs_processNestedIntArray(values) {
-                    for (const elem of values) {
-                        for (const elem1 of elem) {
-                            i32Stack.push((elem1 | 0));
-                        }
-                        i32Stack.push(elem.length);
-                    }
-                    i32Stack.push(values.length);
+                    __bjs_arrayCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lower(values);
                     instance.exports.bjs_processNestedIntArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const arrayLen1 = i32Stack.pop();
-                            let arrayResult1;
-                            if (arrayLen1 === -1) {
-                                arrayResult1 = taStack.pop();
-                            } else {
-                                arrayResult1 = [];
-                                for (let i1 = 0; i1 < arrayLen1; i1++) {
-                                    const int = i32Stack.pop();
-                                    arrayResult1.push(int);
-                                }
-                                arrayResult1.reverse();
-                            }
-                            arrayResult.push(arrayResult1);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lift();
                     return arrayResult;
                 },
                 processNestedStringArray: function bjs_processNestedStringArray(values) {
-                    for (const elem of values) {
-                        for (const elem1 of elem) {
-                            const bytes = textEncoder.encode(elem1);
-                            const id = swift.memory.retain(bytes);
-                            i32Stack.push(bytes.length);
-                            i32Stack.push(id);
-                        }
-                        i32Stack.push(elem.length);
-                    }
-                    i32Stack.push(values.length);
+                    __bjs_arrayCodec(__bjs_arrayCodec(__bjs_stringCodec)).lower(values);
                     instance.exports.bjs_processNestedStringArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const arrayLen1 = i32Stack.pop();
-                            let arrayResult1;
-                            if (arrayLen1 === -1) {
-                                arrayResult1 = taStack.pop();
-                            } else {
-                                arrayResult1 = [];
-                                for (let i1 = 0; i1 < arrayLen1; i1++) {
-                                    const string = strStack.pop();
-                                    arrayResult1.push(string);
-                                }
-                                arrayResult1.reverse();
-                            }
-                            arrayResult.push(arrayResult1);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(__bjs_stringCodec)).lift();
                     return arrayResult;
                 },
                 processNestedPointArray: function bjs_processNestedPointArray(points) {
-                    for (const elem of points) {
-                        for (const elem1 of elem) {
-                            structHelpers.Point.lower(elem1);
-                        }
-                        i32Stack.push(elem.length);
-                    }
-                    i32Stack.push(points.length);
+                    __bjs_arrayCodec(__bjs_arrayCodec(structHelpers.Point)).lower(points);
                     instance.exports.bjs_processNestedPointArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const arrayLen1 = i32Stack.pop();
-                            let arrayResult1;
-                            if (arrayLen1 === -1) {
-                                arrayResult1 = taStack.pop();
-                            } else {
-                                arrayResult1 = [];
-                                for (let i1 = 0; i1 < arrayLen1; i1++) {
-                                    const struct = structHelpers.Point.lift();
-                                    arrayResult1.push(struct);
-                                }
-                                arrayResult1.reverse();
-                            }
-                            arrayResult.push(arrayResult1);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(structHelpers.Point)).lift();
                     return arrayResult;
                 },
                 processItemArray: function bjs_processItemArray(items) {
-                    for (const elem of items) {
-                        ptrStack.push(elem.pointer);
-                    }
-                    i32Stack.push(items.length);
-                    instance.exports.bjs_processItemArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
+                    const elemCodec = {
+                        lower: (v) => {
+                            ptrStack.push(v.pointer);
+                        },
+                        lift: () => {
                             const ptr = ptrStack.pop();
                             const obj = Item.__construct(ptr);
-                            arrayResult.push(obj);
-                        }
-                        arrayResult.reverse();
-                    }
+                            return obj;
+                        },
+                    };
+                    __bjs_arrayCodec(elemCodec).lower(items);
+                    instance.exports.bjs_processItemArray();
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            ptrStack.push(v.pointer);
+                        },
+                        lift: () => {
+                            const ptr = ptrStack.pop();
+                            const obj = Item.__construct(ptr);
+                            return obj;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
                     return arrayResult;
                 },
                 processNestedItemArray: function bjs_processNestedItemArray(items) {
-                    for (const elem of items) {
-                        for (const elem1 of elem) {
-                            ptrStack.push(elem1.pointer);
-                        }
-                        i32Stack.push(elem.length);
-                    }
-                    i32Stack.push(items.length);
+                    const elemCodec = {
+                        lower: (v) => {
+                            ptrStack.push(v.pointer);
+                        },
+                        lift: () => {
+                            const ptr = ptrStack.pop();
+                            const obj = Item.__construct(ptr);
+                            return obj;
+                        },
+                    };
+                    __bjs_arrayCodec(__bjs_arrayCodec(elemCodec)).lower(items);
                     instance.exports.bjs_processNestedItemArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const arrayLen1 = i32Stack.pop();
-                            let arrayResult1;
-                            if (arrayLen1 === -1) {
-                                arrayResult1 = taStack.pop();
-                            } else {
-                                arrayResult1 = [];
-                                for (let i1 = 0; i1 < arrayLen1; i1++) {
-                                    const ptr = ptrStack.pop();
-                                    const obj = Item.__construct(ptr);
-                                    arrayResult1.push(obj);
-                                }
-                                arrayResult1.reverse();
-                            }
-                            arrayResult.push(arrayResult1);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            ptrStack.push(v.pointer);
+                        },
+                        lift: () => {
+                            const ptr = ptrStack.pop();
+                            const obj = Item.__construct(ptr);
+                            return obj;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(elemCodec1)).lift();
                     return arrayResult;
                 },
                 processJSObjectArray: function bjs_processJSObjectArray(objects) {
-                    for (const elem of objects) {
-                        const objId = swift.memory.retain(elem);
-                        i32Stack.push(objId);
-                    }
-                    i32Stack.push(objects.length);
+                    const elemCodec = {
+                        lower: (v) => {
+                            const objId = swift.memory.retain(v);
+                            i32Stack.push(objId);
+                        },
+                        lift: () => {
+                            const objId = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId);
+                            swift.memory.release(objId);
+                            return obj;
+                        },
+                    };
+                    __bjs_arrayCodec(elemCodec).lower(objects);
                     instance.exports.bjs_processJSObjectArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const objId1 = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId1);
-                            swift.memory.release(objId1);
-                            arrayResult.push(obj);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            const objId = swift.memory.retain(v);
+                            i32Stack.push(objId);
+                        },
+                        lift: () => {
+                            const objId = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId);
+                            swift.memory.release(objId);
+                            return obj;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
                     return arrayResult;
                 },
                 processOptionalJSObjectArray: function bjs_processOptionalJSObjectArray(objects) {
-                    for (const elem of objects) {
-                        const isSome = elem != null ? 1 : 0;
-                        if (isSome) {
-                            const objId = swift.memory.retain(elem);
+                    const elemCodec = {
+                        lower: (v) => {
+                            const objId = swift.memory.retain(v);
                             i32Stack.push(objId);
-                        }
-                        i32Stack.push(isSome);
-                    }
-                    i32Stack.push(objects.length);
+                        },
+                        lift: () => {
+                            const objId = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId);
+                            swift.memory.release(objId);
+                            return obj;
+                        },
+                    };
+                    __bjs_arrayCodec(__bjs_optionalCodec(elemCodec)).lower(objects);
                     instance.exports.bjs_processOptionalJSObjectArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const isSome1 = i32Stack.pop();
-                            let optValue;
-                            if (isSome1 === 0) {
-                                optValue = null;
-                            } else {
-                                const objId1 = i32Stack.pop();
-                                const obj = swift.memory.getObject(objId1);
-                                swift.memory.release(objId1);
-                                optValue = obj;
-                            }
-                            arrayResult.push(optValue);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            const objId = swift.memory.retain(v);
+                            i32Stack.push(objId);
+                        },
+                        lift: () => {
+                            const objId = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId);
+                            swift.memory.release(objId);
+                            return obj;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(elemCodec1)).lift();
                     return arrayResult;
                 },
                 processNestedJSObjectArray: function bjs_processNestedJSObjectArray(objects) {
-                    for (const elem of objects) {
-                        for (const elem1 of elem) {
-                            const objId = swift.memory.retain(elem1);
+                    const elemCodec = {
+                        lower: (v) => {
+                            const objId = swift.memory.retain(v);
                             i32Stack.push(objId);
-                        }
-                        i32Stack.push(elem.length);
-                    }
-                    i32Stack.push(objects.length);
+                        },
+                        lift: () => {
+                            const objId = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId);
+                            swift.memory.release(objId);
+                            return obj;
+                        },
+                    };
+                    __bjs_arrayCodec(__bjs_arrayCodec(elemCodec)).lower(objects);
                     instance.exports.bjs_processNestedJSObjectArray();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const arrayLen1 = i32Stack.pop();
-                            let arrayResult1;
-                            if (arrayLen1 === -1) {
-                                arrayResult1 = taStack.pop();
-                            } else {
-                                arrayResult1 = [];
-                                for (let i1 = 0; i1 < arrayLen1; i1++) {
-                                    const objId1 = i32Stack.pop();
-                                    const obj = swift.memory.getObject(objId1);
-                                    swift.memory.release(objId1);
-                                    arrayResult1.push(obj);
-                                }
-                                arrayResult1.reverse();
-                            }
-                            arrayResult.push(arrayResult1);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const elemCodec1 = {
+                        lower: (v) => {
+                            const objId = swift.memory.retain(v);
+                            i32Stack.push(objId);
+                        },
+                        lift: () => {
+                            const objId = i32Stack.pop();
+                            const obj = swift.memory.getObject(objId);
+                            swift.memory.release(objId);
+                            return obj;
+                        },
+                    };
+                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(elemCodec1)).lift();
                     return arrayResult;
                 },
                 multiArrayParams: function bjs_multiArrayParams(nums, strs) {
-                    for (const elem of nums) {
-                        i32Stack.push((elem | 0));
-                    }
-                    i32Stack.push(nums.length);
-                    for (const elem1 of strs) {
-                        const bytes = textEncoder.encode(elem1);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                    }
-                    i32Stack.push(strs.length);
+                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(nums);
+                    __bjs_arrayCodec(__bjs_stringCodec).lower(strs);
                     const ret = instance.exports.bjs_multiArrayParams();
                     return ret;
                 },
                 multiOptionalArrayParams: function bjs_multiOptionalArrayParams(a, b) {
-                    const isSome = a != null;
-                    if (isSome) {
-                        for (const elem of a) {
-                            i32Stack.push((elem | 0));
-                        }
-                        i32Stack.push(a.length);
-                    }
-                    i32Stack.push(+isSome);
-                    const isSome1 = b != null;
-                    if (isSome1) {
-                        for (const elem1 of b) {
-                            const bytes = textEncoder.encode(elem1);
-                            const id = swift.memory.retain(bytes);
-                            i32Stack.push(bytes.length);
-                            i32Stack.push(id);
-                        }
-                        i32Stack.push(b.length);
-                    }
-                    i32Stack.push(+isSome1);
+                    __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lower(a);
+                    __bjs_optionalCodec(__bjs_arrayCodec(__bjs_stringCodec)).lower(b);
                     const ret = instance.exports.bjs_multiOptionalArrayParams();
                     return ret;
                 },

@@ -359,3 +359,19 @@ fileprivate func _bjs_Formatting_Converter_wrap_extern(_ pointer: UnsafeMutableR
 @inline(never) fileprivate func _bjs_Formatting_Converter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_Formatting_Converter_wrap_extern(pointer)
 }
+
+extension Networking.API.Method: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Networking.API.Method.bridgeJSMakeTypeHandle()
+}
+
+extension Configuration.LogLevel: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Configuration.LogLevel.bridgeJSMakeTypeHandle()
+}
+
+extension Configuration.Port: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Configuration.Port.bridgeJSMakeTypeHandle()
+}
+
+extension Internal.SupportedMethod: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Internal.SupportedMethod.bridgeJSMakeTypeHandle()
+}

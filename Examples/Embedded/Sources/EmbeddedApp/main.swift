@@ -1,5 +1,12 @@
 import JavaScriptKit
 
+@JS struct CounterLabel {
+    var count: Int
+    var text: String
+}
+
+@JSFunction func echoValue<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
+
 let alert = JSObject.global.alert.object!
 let document = JSObject.global.document
 
@@ -45,6 +52,17 @@ let encoderContainer = document.createElement("div")
 _ = encoderContainer.appendChild(textInputElement)
 _ = encoderContainer.appendChild(encodeResultElement)
 _ = document.body.appendChild(encoderContainer)
+
+let genericResultElement = document.createElement("pre")
+do {
+    let number = try echoValue(42)
+    let text = try echoValue("hello")
+    let label = try echoValue(CounterLabel(count: number, text: text))
+    genericResultElement.innerText = .string("Generic import round-trip: \(label.text) \(label.count)")
+} catch {
+    genericResultElement.innerText = "Generic import round-trip failed"
+}
+_ = document.body.appendChild(genericResultElement)
 
 func print(_ message: String) {
     _ = JSObject.global.console.log(message)

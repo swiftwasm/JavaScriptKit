@@ -26,6 +26,10 @@ extension PayloadSignal: _BridgedSwiftAssociatedValueEnum {
     }
 }
 
+extension PayloadSignal: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PayloadSignal.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_PayloadSignalControls_roundTrip_static")
 fileprivate func bjs_PayloadSignalControls_roundTrip_static_extern(_ signal: Int32) -> Int32

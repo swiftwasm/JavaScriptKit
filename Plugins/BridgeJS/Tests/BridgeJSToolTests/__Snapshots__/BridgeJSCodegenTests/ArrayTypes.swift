@@ -501,6 +501,18 @@ fileprivate func _bjs_MultiArrayContainer_wrap_extern(_ pointer: UnsafeMutableRa
     return _bjs_MultiArrayContainer_wrap_extern(pointer)
 }
 
+extension Point: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Point.bridgeJSMakeTypeHandle()
+}
+
+extension Direction: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Direction.bridgeJSMakeTypeHandle()
+}
+
+extension Status: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Status.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_checkArray")
 fileprivate func bjs_checkArray_extern(_ a: Int32) -> Void

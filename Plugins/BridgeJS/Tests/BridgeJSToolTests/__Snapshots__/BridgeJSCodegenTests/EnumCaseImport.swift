@@ -33,6 +33,10 @@ extension Signal: _BridgedSwiftCaseEnum {
     }
 }
 
+extension Signal: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Signal.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_SignalControls_roundTrip_static")
 fileprivate func bjs_SignalControls_roundTrip_static_extern(_ signal: Int32) -> Int32

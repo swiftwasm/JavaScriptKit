@@ -177,3 +177,11 @@ fileprivate func _bjs_Player_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> 
 @inline(never) fileprivate func _bjs_Player_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_Player_wrap_extern(pointer)
 }
+
+extension User.Stats: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = User.Stats.bridgeJSMakeTypeHandle()
+}
+
+extension Player.Stats: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Player.Stats.bridgeJSMakeTypeHandle()
+}

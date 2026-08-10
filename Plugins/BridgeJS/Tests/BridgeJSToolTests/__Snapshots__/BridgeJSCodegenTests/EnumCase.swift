@@ -228,3 +228,19 @@ public func _bjs_roundTripOptionalTSDirection(_ inputIsSome: Int32, _ inputValue
     fatalError("Only available on WebAssembly")
     #endif
 }
+
+extension Direction: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Direction.bridgeJSMakeTypeHandle()
+}
+
+extension Status: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Status.bridgeJSMakeTypeHandle()
+}
+
+extension TSDirection: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSDirection.bridgeJSMakeTypeHandle()
+}
+
+extension PublicStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PublicStatus.bridgeJSMakeTypeHandle()
+}

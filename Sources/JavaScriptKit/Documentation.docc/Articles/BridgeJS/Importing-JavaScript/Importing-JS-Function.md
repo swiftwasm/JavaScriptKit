@@ -77,11 +77,23 @@ If you used `from: .global` or `.module`, do not pass the function in `getImport
 
 Bound functions are `throws(JSException)`. Call them with `try` or `try?`; they throw when the JavaScript implementation throws.
 
+## Generic functions
+
+A `@JSFunction` can be generic over a type parameter constrained to `BridgedSwiftGenericBridgeable`, so one declaration serves every bridged type:
+
+```swift
+@JSFunction func parse<T: BridgedSwiftGenericBridgeable>(_ json: String) throws(JSException) -> T
+
+let user: User = try parse(jsonString)   // T inferred from the call site
+```
+
+`T` can be any supported primitive, `String`, `JSValue`, or a `@JS` struct, `@JS` enum, or `final @JS class` (see <doc:Supported-Types>), used bare or wrapped as `[T]`, `T?`, or `[String: T]`. A function may declare multiple type parameters, and a return-only generic (`func make<T>() -> T`) works too. Generic initializers, methods, and static methods on `@JSClass` types are supported the same way. `async` generic functions and `where` clauses are not supported.
+
 ## Supported features
 
 | Feature | Status |
 |:--|:--|
 | Primitive parameter/result types (e.g. `Double`, `Bool`) | ✅ |
 | `String` parameter/result type | ✅ |
+| Generic parameter/result types (constrained to `BridgedSwiftGenericBridgeable`) | ✅ |
 | Async function | ❌ |
-| Generics | ❌ |

@@ -13608,6 +13608,246 @@ fileprivate func _bjs_LeakCheck_wrap_extern(_ pointer: UnsafeMutableRawPointer) 
     return _bjs_LeakCheck_wrap_extern(pointer)
 }
 
+extension JSCoordinate: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = JSCoordinate.bridgeJSMakeTypeHandle()
+}
+
+extension NestedStructGroupA.Metadata: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedStructGroupA.Metadata.bridgeJSMakeTypeHandle()
+}
+
+extension NestedStructGroupB.Metadata: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedStructGroupB.Metadata.bridgeJSMakeTypeHandle()
+}
+
+extension NestedTypeHost.Label: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedTypeHost.Label.bridgeJSMakeTypeHandle()
+}
+
+extension Point: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Point.bridgeJSMakeTypeHandle()
+}
+
+extension PointerFields: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PointerFields.bridgeJSMakeTypeHandle()
+}
+
+extension DataPoint: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = DataPoint.bridgeJSMakeTypeHandle()
+}
+
+extension PublicPoint: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PublicPoint.bridgeJSMakeTypeHandle()
+}
+
+extension Address: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Address.bridgeJSMakeTypeHandle()
+}
+
+extension Contact: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Contact.bridgeJSMakeTypeHandle()
+}
+
+extension Config: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Config.bridgeJSMakeTypeHandle()
+}
+
+extension SessionData: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = SessionData.bridgeJSMakeTypeHandle()
+}
+
+extension ValidationReport: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ValidationReport.bridgeJSMakeTypeHandle()
+}
+
+extension AdvancedConfig: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AdvancedConfig.bridgeJSMakeTypeHandle()
+}
+
+extension MeasurementConfig: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = MeasurementConfig.bridgeJSMakeTypeHandle()
+}
+
+extension MathOperations: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = MathOperations.bridgeJSMakeTypeHandle()
+}
+
+extension CopyableCart: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = CopyableCart.bridgeJSMakeTypeHandle()
+}
+
+extension CopyableCartItem: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = CopyableCartItem.bridgeJSMakeTypeHandle()
+}
+
+extension CopyableNestedCart: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = CopyableNestedCart.bridgeJSMakeTypeHandle()
+}
+
+extension ConfigStruct: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ConfigStruct.bridgeJSMakeTypeHandle()
+}
+
+extension Vector2D: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Vector2D.bridgeJSMakeTypeHandle()
+}
+
+extension JSObjectContainer: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = JSObjectContainer.bridgeJSMakeTypeHandle()
+}
+
+extension FooContainer: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FooContainer.bridgeJSMakeTypeHandle()
+}
+
+extension ArrayMembers: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ArrayMembers.bridgeJSMakeTypeHandle()
+}
+
+extension PolygonReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PolygonReference.bridgeJSMakeTypeHandle()
+}
+
+extension TagReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TagReference.bridgeJSMakeTypeHandle()
+}
+
+extension TagHolderReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TagHolderReference.bridgeJSMakeTypeHandle()
+}
+
+extension PriorityReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PriorityReference.bridgeJSMakeTypeHandle()
+}
+
+extension Severity: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Severity.bridgeJSMakeTypeHandle()
+}
+
+extension Shape: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Shape.bridgeJSMakeTypeHandle()
+}
+
+extension InnerTag: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = InnerTag.bridgeJSMakeTypeHandle()
+}
+
+extension AsyncImportedPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncImportedPayloadResult.bridgeJSMakeTypeHandle()
+}
+
+extension Direction: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Direction.bridgeJSMakeTypeHandle()
+}
+
+extension Status: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Status.bridgeJSMakeTypeHandle()
+}
+
+extension Theme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Theme.bridgeJSMakeTypeHandle()
+}
+
+extension HttpStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = HttpStatus.bridgeJSMakeTypeHandle()
+}
+
+extension FileSize: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FileSize.bridgeJSMakeTypeHandle()
+}
+
+extension SessionId: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = SessionId.bridgeJSMakeTypeHandle()
+}
+
+extension Precision: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Precision.bridgeJSMakeTypeHandle()
+}
+
+extension Ratio: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Ratio.bridgeJSMakeTypeHandle()
+}
+
+extension TSDirection: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSDirection.bridgeJSMakeTypeHandle()
+}
+
+extension TSTheme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSTheme.bridgeJSMakeTypeHandle()
+}
+
+extension AsyncPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncPayloadResult.bridgeJSMakeTypeHandle()
+}
+
+extension Networking.API.Method: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Networking.API.Method.bridgeJSMakeTypeHandle()
+}
+
+extension Configuration.LogLevel: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Configuration.LogLevel.bridgeJSMakeTypeHandle()
+}
+
+extension Configuration.Port: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Configuration.Port.bridgeJSMakeTypeHandle()
+}
+
+extension Internal.SupportedMethod: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Internal.SupportedMethod.bridgeJSMakeTypeHandle()
+}
+
+extension APIResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIResult.bridgeJSMakeTypeHandle()
+}
+
+extension ComplexResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ComplexResult.bridgeJSMakeTypeHandle()
+}
+
+extension Utilities.Result: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Utilities.Result.bridgeJSMakeTypeHandle()
+}
+
+extension API.NetworkingResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = API.NetworkingResult.bridgeJSMakeTypeHandle()
+}
+
+extension AllTypesResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AllTypesResult.bridgeJSMakeTypeHandle()
+}
+
+extension TypedPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TypedPayloadResult.bridgeJSMakeTypeHandle()
+}
+
+extension StaticCalculator: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = StaticCalculator.bridgeJSMakeTypeHandle()
+}
+
+extension StaticPropertyEnum: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = StaticPropertyEnum.bridgeJSMakeTypeHandle()
+}
+
+extension NestedTypeHost.Variant: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedTypeHost.Variant.bridgeJSMakeTypeHandle()
+}
+
+extension LightColor: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = LightColor.bridgeJSMakeTypeHandle()
+}
+
+extension ImportedPayloadSignal: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ImportedPayloadSignal.bridgeJSMakeTypeHandle()
+}
+
+extension OptionalAllTypesResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = OptionalAllTypesResult.bridgeJSMakeTypeHandle()
+}
+
+extension APIOptionalResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIOptionalResult.bridgeJSMakeTypeHandle()
+}
+
 @JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
 
 #if arch(wasm32)
@@ -18192,3 +18432,92 @@ func _$SwiftClassSupportImports_jsConsumeOptionalLeakCheck(_ value: Optional<Lea
         throw error
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_BridgeJSRuntimeTests_register_type_handles")
+fileprivate func _bjs_BridgeJSRuntimeTests_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_BridgeJSRuntimeTests_register_type_handles")
+public func _bjs_BridgeJSRuntimeTests_register_type_handles() {
+    let typeIds: [Int32] = [
+        Bool.bridgeJSTypeID,
+        Int.bridgeJSTypeID,
+        Int8.bridgeJSTypeID,
+        UInt8.bridgeJSTypeID,
+        Int16.bridgeJSTypeID,
+        UInt16.bridgeJSTypeID,
+        Int32.bridgeJSTypeID,
+        UInt32.bridgeJSTypeID,
+        UInt.bridgeJSTypeID,
+        Int64.bridgeJSTypeID,
+        UInt64.bridgeJSTypeID,
+        Float.bridgeJSTypeID,
+        Double.bridgeJSTypeID,
+        String.bridgeJSTypeID,
+        JSValue.bridgeJSTypeID,
+        JSCoordinate.bridgeJSTypeID,
+        NestedStructGroupA.Metadata.bridgeJSTypeID,
+        NestedStructGroupB.Metadata.bridgeJSTypeID,
+        NestedTypeHost.Label.bridgeJSTypeID,
+        Point.bridgeJSTypeID,
+        PointerFields.bridgeJSTypeID,
+        DataPoint.bridgeJSTypeID,
+        PublicPoint.bridgeJSTypeID,
+        Address.bridgeJSTypeID,
+        Contact.bridgeJSTypeID,
+        Config.bridgeJSTypeID,
+        SessionData.bridgeJSTypeID,
+        ValidationReport.bridgeJSTypeID,
+        AdvancedConfig.bridgeJSTypeID,
+        MeasurementConfig.bridgeJSTypeID,
+        MathOperations.bridgeJSTypeID,
+        CopyableCart.bridgeJSTypeID,
+        CopyableCartItem.bridgeJSTypeID,
+        CopyableNestedCart.bridgeJSTypeID,
+        ConfigStruct.bridgeJSTypeID,
+        Vector2D.bridgeJSTypeID,
+        JSObjectContainer.bridgeJSTypeID,
+        FooContainer.bridgeJSTypeID,
+        ArrayMembers.bridgeJSTypeID,
+        PolygonReference.bridgeJSTypeID,
+        TagReference.bridgeJSTypeID,
+        TagHolderReference.bridgeJSTypeID,
+        PriorityReference.bridgeJSTypeID,
+        Severity.bridgeJSTypeID,
+        Shape.bridgeJSTypeID,
+        InnerTag.bridgeJSTypeID,
+        AsyncImportedPayloadResult.bridgeJSTypeID,
+        Direction.bridgeJSTypeID,
+        Status.bridgeJSTypeID,
+        Theme.bridgeJSTypeID,
+        HttpStatus.bridgeJSTypeID,
+        FileSize.bridgeJSTypeID,
+        SessionId.bridgeJSTypeID,
+        Precision.bridgeJSTypeID,
+        Ratio.bridgeJSTypeID,
+        TSDirection.bridgeJSTypeID,
+        TSTheme.bridgeJSTypeID,
+        AsyncPayloadResult.bridgeJSTypeID,
+        Networking.API.Method.bridgeJSTypeID,
+        Configuration.LogLevel.bridgeJSTypeID,
+        Configuration.Port.bridgeJSTypeID,
+        Internal.SupportedMethod.bridgeJSTypeID,
+        APIResult.bridgeJSTypeID,
+        ComplexResult.bridgeJSTypeID,
+        Utilities.Result.bridgeJSTypeID,
+        API.NetworkingResult.bridgeJSTypeID,
+        AllTypesResult.bridgeJSTypeID,
+        TypedPayloadResult.bridgeJSTypeID,
+        StaticCalculator.bridgeJSTypeID,
+        StaticPropertyEnum.bridgeJSTypeID,
+        NestedTypeHost.Variant.bridgeJSTypeID,
+        LightColor.bridgeJSTypeID,
+        ImportedPayloadSignal.bridgeJSTypeID,
+        OptionalAllTypesResult.bridgeJSTypeID,
+        APIOptionalResult.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_BridgeJSRuntimeTests_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

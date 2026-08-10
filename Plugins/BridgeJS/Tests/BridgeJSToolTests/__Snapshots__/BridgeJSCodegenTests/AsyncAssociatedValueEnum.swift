@@ -52,6 +52,10 @@ public func _bjs_asyncRoundTripOptionalAssociatedValueEnum(_ valueIsSome: Int32,
     #endif
 }
 
+extension AsyncPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncPayloadResult.bridgeJSMakeTypeHandle()
+}
+
 @JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
 
 #if arch(wasm32)

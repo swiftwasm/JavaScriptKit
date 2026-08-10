@@ -240,9 +240,12 @@ import BridgeJSUtilities
                 return try exporter?.finalize()
             }
 
+            // Type-handle registration is shared by exported types and generic imports.
+            let typeRegistration = GenericTypeRegistrationCodegen().render(for: skeleton)
+
             // Combine and write unified Swift output
             let outputSwiftURL = outputDirectory.appending(path: "BridgeJS.swift")
-            let combinedSwift = [closureSupport, exportResult, importResult].compactMap { $0 }
+            let combinedSwift = [closureSupport, exportResult, importResult, typeRegistration].compactMap { $0 }
             let outputSwift = combineGeneratedSwift(
                 combinedSwift,
                 importingExternalModules: skeleton.usedExternalModules
