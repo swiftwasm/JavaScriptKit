@@ -141,6 +141,9 @@ import Testing
                 swiftParts.append(s)
             }
         }
+        if let typeRegistration = GenericTypeRegistrationCodegen().render(for: skeleton) {
+            swiftParts.append(typeRegistration)
+        }
         let combinedSwift =
             swiftParts
             .map { $0.trimmingCharacters(in: .newlines) }

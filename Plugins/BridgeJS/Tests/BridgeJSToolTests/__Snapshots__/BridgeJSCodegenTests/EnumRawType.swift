@@ -539,3 +539,44 @@ func _$returnsFeatureFlag() throws(JSException) -> FeatureFlag {
     }
     return FeatureFlag.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        Bool.bridgeJSTypeID,
+        Int.bridgeJSTypeID,
+        Int8.bridgeJSTypeID,
+        UInt8.bridgeJSTypeID,
+        Int16.bridgeJSTypeID,
+        UInt16.bridgeJSTypeID,
+        Int32.bridgeJSTypeID,
+        UInt32.bridgeJSTypeID,
+        UInt.bridgeJSTypeID,
+        Int64.bridgeJSTypeID,
+        UInt64.bridgeJSTypeID,
+        Float.bridgeJSTypeID,
+        Double.bridgeJSTypeID,
+        String.bridgeJSTypeID,
+        JSValue.bridgeJSTypeID,
+        Theme.bridgeJSTypeID,
+        TSTheme.bridgeJSTypeID,
+        FeatureFlag.bridgeJSTypeID,
+        HttpStatus.bridgeJSTypeID,
+        TSHttpStatus.bridgeJSTypeID,
+        Priority.bridgeJSTypeID,
+        FileSize.bridgeJSTypeID,
+        UserId.bridgeJSTypeID,
+        TokenId.bridgeJSTypeID,
+        SessionId.bridgeJSTypeID,
+        Precision.bridgeJSTypeID,
+        Ratio.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif
