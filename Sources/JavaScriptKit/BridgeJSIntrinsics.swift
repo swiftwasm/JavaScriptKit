@@ -1133,13 +1133,12 @@ where StackLiftResult == Self {
 }
 
 extension _BridgedSwiftStruct {
-    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> Int32 {
-        return toJSObject().bridgeJSLowerReturn()
-    }
-
-    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ objectId: Int32) -> Self {
-        let jsObject = JSObject.bridgeJSLiftReturn(objectId)
-        return Self(unsafelyCopying: jsObject)
+    /// Lower a struct parameter onto the shared stacks for the peer to `lift()`.
+    ///
+    /// Same convention as arrays/dictionaries. Use ``toJSObject()`` when a real JS object
+    /// representation is needed (e.g. `init(unsafelyCopying:)` round-trips).
+    @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() {
+        bridgeJSStackPush()
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> Self {

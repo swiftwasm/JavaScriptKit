@@ -223,12 +223,11 @@ export async function createInstantiator(options, swift) {
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
-            TestModule["bjs_translate"] = function bjs_translate(point, dx, dy) {
+            TestModule["bjs_translate"] = function bjs_translate(dx, dy) {
                 try {
-                    const value = swift.memory.getObject(point);
-                    swift.memory.release(point);
-                    let ret = imports.translate(value, dx, dy);
-                    return swift.memory.retain(ret);
+                    const structValue = structHelpers.Point.lift();
+                    let ret = imports.translate(structValue, dx, dy);
+                    structHelpers.Point.lower(ret);
                 } catch (error) {
                     setException(error);
                 }

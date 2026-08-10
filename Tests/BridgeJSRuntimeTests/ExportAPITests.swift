@@ -1339,6 +1339,15 @@ enum GraphOperations {
         let noneStr = none.map { "(\($0.dx),\($0.dy))" } ?? "nil"
         return "\(someStr) | \(noneStr)"
     }
+
+    /// Swift→JS callback with a struct parameter (ExportSwift stack ABI).
+    @JS func observeVector(_ callback: (Vector2D) -> Void) {
+        callback(Vector2D(dx: 1.5, dy: 2.5))
+    }
+
+    @JS func mapVector(_ vector: Vector2D, _ callback: (Vector2D) -> Vector2D) -> Vector2D {
+        return callback(vector)
+    }
 }
 
 @JS enum NestedStructGroupA {

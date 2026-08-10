@@ -4697,6 +4697,104 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_TextProcessor_observeVector",
+            "documentation" : "Swift→JS callback with a struct parameter (ExportSwift stack ABI).",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "observeVector",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "callback",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTests8Vector2DV_y",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "swiftStruct" : {
+                            "_0" : "Vector2D"
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "void" : {
+
+                        }
+                      },
+                      "sendingParameters" : false
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_TextProcessor_mapVector",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "mapVector",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "vector",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Vector2D"
+                  }
+                }
+              },
+              {
+                "label" : "_",
+                "name" : "callback",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "20BridgeJSRuntimeTests8Vector2DV_8Vector2DV",
+                      "moduleName" : "BridgeJSRuntimeTests",
+                      "parameters" : [
+                        {
+                          "swiftStruct" : {
+                            "_0" : "Vector2D"
+                          }
+                        }
+                      ],
+                      "returnType" : {
+                        "swiftStruct" : {
+                          "_0" : "Vector2D"
+                        }
+                      },
+                      "sendingParameters" : false
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Vector2D"
+              }
+            }
           }
         ],
         "name" : "TextProcessor",

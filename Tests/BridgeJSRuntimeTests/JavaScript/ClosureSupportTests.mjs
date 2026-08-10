@@ -366,6 +366,24 @@ export function runJsClosureSupportTests(exports) {
     );
     assert.equal(optVectorResult, "(2.0,4.0) | nil");
 
+    // Swift→JS callback with a struct parameter must deliver the struct fields.
+    // Regression: empty-stack lift previously yielded `dx`/`dy` as `undefined`
+    // (and Bool fields wrongly became `true`).
+    let observed = null;
+    processor.observeVector((vector) => {
+        observed = vector;
+    });
+    assert.ok(observed, "observeVector must invoke the callback");
+    assert.equal(observed.dx, 1.5);
+    assert.equal(observed.dy, 2.5);
+
+    const mapped = processor.mapVector({ dx: 3, dy: 4 }, (vector) => ({
+        dx: vector.dx * 2,
+        dy: vector.dy * 2,
+    }));
+    assert.equal(mapped.dx, 6);
+    assert.equal(mapped.dy, 8);
+
     processor.release();
 
     const intToInt = exports.ClosureSupportExports.makeIntToInt(10);

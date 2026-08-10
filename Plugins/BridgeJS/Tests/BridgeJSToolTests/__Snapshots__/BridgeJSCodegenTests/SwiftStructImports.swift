@@ -48,25 +48,25 @@ fileprivate func _bjs_struct_lift_Point_extern() -> Int32 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_translate")
-fileprivate func bjs_translate_extern(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32
+fileprivate func bjs_translate_extern(_ dx: Int32, _ dy: Int32) -> Void
 #else
-fileprivate func bjs_translate_extern(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32 {
+fileprivate func bjs_translate_extern(_ dx: Int32, _ dy: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_translate(_ point: Int32, _ dx: Int32, _ dy: Int32) -> Int32 {
-    return bjs_translate_extern(point, dx, dy)
+@inline(never) fileprivate func bjs_translate(_ dx: Int32, _ dy: Int32) -> Void {
+    return bjs_translate_extern(dx, dy)
 }
 
 func _$translate(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException) -> Point {
     let dyValue = dy.bridgeJSLowerParameter()
     let dxValue = dx.bridgeJSLowerParameter()
-    let pointObjectId = point.bridgeJSLowerParameter()
-    let ret = bjs_translate(pointObjectId, dxValue, dyValue)
+    let _ = point.bridgeJSLowerParameter()
+    bjs_translate(dxValue, dyValue)
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return Point.bridgeJSLiftReturn(ret)
+    return Point.bridgeJSLiftReturn()
 }
 
 #if arch(wasm32)

@@ -933,19 +933,10 @@ extension BridgeType {
         case .associatedValueEnum:
             return LoweringParameterInfo(loweredParameters: [("caseId", .i32)])
         case .swiftStruct:
-            switch context {
-            case .importTS:
-                // Swift structs are bridged as JS objects (object IDs) in imported signatures.
-                return LoweringParameterInfo(loweredParameters: [("objectId", .i32)])
-            case .exportSwift:
-                return LoweringParameterInfo(loweredParameters: [])
-            }
+            // `@JS struct` parameters always use the stack ABI (same as arrays/dictionaries).
+            return LoweringParameterInfo(loweredParameters: [])
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
-        case .nullable(.swiftStruct, _) where context == .importTS:
-            // Optional `@JS struct`s bridge through the stack (isSome discriminator + fields),
-            // like optional arrays/dictionaries, rather than the non-optional object-id ABI.
-            return LoweringParameterInfo(loweredParameters: [("isSome", .i32)])
         case .nullable(let wrappedType, _):
             let wrappedInfo = try wrappedType.loweringParameterInfo(context: context)
             var params = [("isSome", WasmCoreType.i32)]
@@ -1005,22 +996,14 @@ extension BridgeType {
         case .associatedValueEnum:
             return LiftingReturnInfo(valueToLift: .i32)
         case .swiftStruct:
-            switch context {
-            case .importTS:
-                // Swift structs are bridged as JS objects (object IDs) in imported signatures.
-                return LiftingReturnInfo(valueToLift: .i32)
-            case .exportSwift:
-                return LiftingReturnInfo(valueToLift: nil)
-            }
+            // `@JS struct` returns always use the stack ABI (same as arrays/dictionaries).
+            return LiftingReturnInfo(valueToLift: nil)
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as return values")
         case .nullable(let wrappedType, _):
-            // jsObject and `@JS struct` use the stack ABI for optionals — the thunk returns
-            // void and the value (plus isSome discriminator) flows through the stacks.
+            // jsObject uses the stack ABI for optionals — the thunk returns void and the
+            // value (plus isSome discriminator) flows through the stacks.
             if case .jsObject = wrappedType {
-                return LiftingReturnInfo(valueToLift: nil)
-            }
-            if case .swiftStruct = wrappedType, context == .importTS {
                 return LiftingReturnInfo(valueToLift: nil)
             }
             let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)

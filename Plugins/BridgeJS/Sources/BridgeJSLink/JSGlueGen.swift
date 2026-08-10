@@ -1437,23 +1437,18 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         case .swiftStruct(let fullName):
-            switch context {
-            case .importTS:
-                return .jsObjectLiftRetainedObjectId
-            case .exportSwift:
-                let base = fullName.replacingOccurrences(of: ".", with: "_")
-                return IntrinsicJSFragment(
-                    parameters: [],
-                    printCode: { arguments, context in
-                        let (scope, printer) = (context.scope, context.printer)
-                        let resultVar = scope.variable("structValue")
-                        printer.write(
-                            "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(base).lift();"
-                        )
-                        return [resultVar]
-                    }
-                )
-            }
+            let base = fullName.replacingOccurrences(of: ".", with: "_")
+            return IntrinsicJSFragment(
+                parameters: [],
+                printCode: { arguments, context in
+                    let (scope, printer) = (context.scope, context.printer)
+                    let resultVar = scope.variable("structValue")
+                    printer.write(
+                        "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(base).lift();"
+                    )
+                    return [resultVar]
+                }
+            )
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["funcRef"],
@@ -1497,12 +1492,7 @@ struct IntrinsicJSFragment: Sendable {
         case .associatedValueEnum(let fullName):
             return associatedValueLowerReturn(fullName: fullName)
         case .swiftStruct(let fullName):
-            switch context {
-            case .importTS:
-                return .jsObjectLowerReturn
-            case .exportSwift:
-                return swiftStructLowerReturn(fullName: fullName)
-            }
+            return swiftStructLowerReturn(fullName: fullName)
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["value"],

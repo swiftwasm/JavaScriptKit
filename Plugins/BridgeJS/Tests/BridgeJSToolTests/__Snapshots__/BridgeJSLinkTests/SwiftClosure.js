@@ -345,11 +345,10 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            bjs["promise_resolve_TestModule_6AnimalV"] = function(promise, value) {
+            bjs["promise_resolve_TestModule_6AnimalV"] = function(promise) {
                 try {
-                    const value1 = swift.memory.getObject(value);
-                    swift.memory.release(value);
-                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(value1);
+                    const structValue = structHelpers.Animal.lift();
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(structValue);
                 } catch (error) {
                     setException(error);
                 }

@@ -2684,20 +2684,20 @@ func _$Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSExcepti
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "promise_resolve_TestModule_6AnimalV")
-fileprivate func promise_resolve_TestModule_6AnimalV_extern(_ promise: Int32, _ value: Int32) -> Void
+fileprivate func promise_resolve_TestModule_6AnimalV_extern(_ promise: Int32) -> Void
 #else
-fileprivate func promise_resolve_TestModule_6AnimalV_extern(_ promise: Int32, _ value: Int32) -> Void {
+fileprivate func promise_resolve_TestModule_6AnimalV_extern(_ promise: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func promise_resolve_TestModule_6AnimalV(_ promise: Int32, _ value: Int32) -> Void {
-    return promise_resolve_TestModule_6AnimalV_extern(promise, value)
+@inline(never) fileprivate func promise_resolve_TestModule_6AnimalV(_ promise: Int32) -> Void {
+    return promise_resolve_TestModule_6AnimalV_extern(promise)
 }
 
 func _$Promise_resolve_6AnimalV(_ promise: JSObject, _ value: Animal) throws(JSException) -> Void {
-    let valueObjectId = value.bridgeJSLowerParameter()
+    let _ = value.bridgeJSLowerParameter()
     let promiseValue = promise.bridgeJSLowerParameter()
-    promise_resolve_TestModule_6AnimalV(promiseValue, valueObjectId)
+    promise_resolve_TestModule_6AnimalV(promiseValue)
     if let error = _swift_js_take_exception() { throw error }
 }
 
