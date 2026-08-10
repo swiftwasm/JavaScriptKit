@@ -507,20 +507,20 @@ func _$Promise_resolve_8JSObjectC(_ promise: JSObject, _ value: JSObject) throws
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "promise_resolve_TestModule_10AsyncPointV")
-fileprivate func promise_resolve_TestModule_10AsyncPointV_extern(_ promise: Int32, _ value: Int32) -> Void
+fileprivate func promise_resolve_TestModule_10AsyncPointV_extern(_ promise: Int32) -> Void
 #else
-fileprivate func promise_resolve_TestModule_10AsyncPointV_extern(_ promise: Int32, _ value: Int32) -> Void {
+fileprivate func promise_resolve_TestModule_10AsyncPointV_extern(_ promise: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func promise_resolve_TestModule_10AsyncPointV(_ promise: Int32, _ value: Int32) -> Void {
-    return promise_resolve_TestModule_10AsyncPointV_extern(promise, value)
+@inline(never) fileprivate func promise_resolve_TestModule_10AsyncPointV(_ promise: Int32) -> Void {
+    return promise_resolve_TestModule_10AsyncPointV_extern(promise)
 }
 
 func _$Promise_resolve_10AsyncPointV(_ promise: JSObject, _ value: AsyncPoint) throws(JSException) -> Void {
-    let valueObjectId = value.bridgeJSLowerParameter()
+    let _ = value.bridgeJSLowerParameter()
     let promiseValue = promise.bridgeJSLowerParameter()
-    promise_resolve_TestModule_10AsyncPointV(promiseValue, valueObjectId)
+    promise_resolve_TestModule_10AsyncPointV(promiseValue)
     if let error = _swift_js_take_exception() { throw error }
 }
 
