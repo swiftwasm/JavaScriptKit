@@ -70,6 +70,9 @@ async function createInstantiator(options, swift) {
                 swift_js_closure_unregister: unexpectedBjsCall,
                 swift_js_push_typed_array: unexpectedBjsCall,
                 swift_js_make_promise: unexpectedBjsCall,
+                // Imported unconditionally by JavaScriptKit's core type-handle
+                // registration export, which is only invoked by BridgeJS glue.
+                bjs_core_register_type_handles: unexpectedBjsCall,
             };
         },
         /** @param {WebAssembly.Instance} instance */

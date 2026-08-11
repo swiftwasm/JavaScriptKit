@@ -1013,6 +1013,56 @@ extension JSValue: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeHandle = JSValue.bridgeJSMakeTypeHandle()
 }
 
+// MARK: Core generic type-handle registration
+//
+// Every `BridgedSwiftGenericBridgeable` type publishes its runtime type ID to the
+// JS glue, which pairs the IDs with the codec array it emitted in the same order.
+// The core types below are owned by this library, so their registration lives
+// here once for the whole binary instead of being copied into every module's
+// generated registration function; generated per-module registration only carries
+// that module's own `@JS` types.
+//
+// The order is the ABI contract with the JS side: it must match
+// `BridgeType.genericBridgeablePrimitives` in
+// `Plugins/BridgeJS/Sources/BridgeJSSkeleton/BridgeJSSkeleton.swift`, from which
+// the link step builds the core codec array. `CoreTypeRegistrationContractTests`
+// checks the two lists stay in sync at build time, and the generated JS verifies
+// the count at registration time.
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_core_register_type_handles")
+private func _bjs_core_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+/// Publishes the core (primitive) BridgeJS type handles to the JS glue.
+///
+/// Called by the generated glue once per instance, before any module's own
+/// registration function. Not intended to be called from user code.
+@_expose(wasm, "bjs_core_register_type_handles")
+public func _bjs_core_register_type_handles() {
+    // BEGIN bjs_core_type_handles
+    let typeIds: [Int32] = [
+        Bool.bridgeJSTypeID,
+        Int.bridgeJSTypeID,
+        Int8.bridgeJSTypeID,
+        UInt8.bridgeJSTypeID,
+        Int16.bridgeJSTypeID,
+        UInt16.bridgeJSTypeID,
+        Int32.bridgeJSTypeID,
+        UInt32.bridgeJSTypeID,
+        UInt.bridgeJSTypeID,
+        Int64.bridgeJSTypeID,
+        UInt64.bridgeJSTypeID,
+        Float.bridgeJSTypeID,
+        Double.bridgeJSTypeID,
+        String.bridgeJSTypeID,
+        JSValue.bridgeJSTypeID,
+    ]
+    // END bjs_core_type_handles
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_core_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif
+
 /// A protocol that Swift heap objects exposed to JavaScript via `@JS class` must conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.

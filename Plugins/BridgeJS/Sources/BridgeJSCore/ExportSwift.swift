@@ -908,6 +908,10 @@ struct GenericConformanceCodegen {
 /// registered type's `bridgeJSTypeID` into a buffer, in the canonical order of
 /// `BridgeJSSkeleton.typeRegistrationEntries`, and passes it to the JS import
 /// hook of the same name, which pairs the IDs with its codec array by index.
+///
+/// Only the module's own `@JS` types are listed; the core (primitive) handles are
+/// registered once by the JavaScriptKit library itself
+/// (`_bjs_core_register_type_handles`).
 public struct GenericTypeRegistrationCodegen {
     public init() {}
 

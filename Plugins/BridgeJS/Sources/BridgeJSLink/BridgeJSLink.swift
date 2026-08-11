@@ -348,6 +348,11 @@ public struct BridgeJSLink {
             declarations.append("        return;")
             declarations.append("    }")
             declarations.append("    __bjs_typeHandlesRegistered = true;")
+            // The core (primitive) handles live in the JavaScriptKit library, so
+            // they are registered once here rather than by every module.
+            declarations.append(
+                "    \(JSGlueVariableScope.reservedInstance).exports[\"\(ABINameGenerator.coreTypeRegistrationFunctionName)\"]();"
+            )
             for skeleton in skeletons {
                 guard skeleton.typeRegistrationEntries != nil else { continue }
                 let name = ABINameGenerator.typeRegistrationFunctionName(moduleName: skeleton.moduleName)
@@ -426,46 +431,70 @@ public struct BridgeJSLink {
         )
     }
 
+    /// Pairs the type IDs Swift pushed with codecs in the matching skeleton order.
+    private func writeTypeHandleRegistrationBody(into printer: CodeFragmentPrinter) {
+        printer.write(
+            "const typeIds = new Int32Array(\(JSGlueVariableScope.reservedMemory).buffer, base >>> 0, count >>> 0);"
+        )
+        printer.write("for (let i = 0; i < count; i++) {")
+        printer.indent {
+            printer.write("\(JSGlueVariableScope.reservedCodecByTypeId).set(typeIds[i], codecs[i]);")
+        }
+        printer.write("}")
+    }
+
+    /// Installs the `bjs_core_register_type_handles` hook. The core handles are
+    /// owned by the JavaScriptKit library rather than by generated code, so the
+    /// wasm import exists in every binary that links JavaScriptKit and the hook
+    /// is always installed; without generics anywhere in the build it is a no-op
+    /// and the registration export is never called.
+    private func generateCoreTypeRegistrationHook(into printer: CodeFragmentPrinter) throws {
+        let hookName = ABINameGenerator.coreTypeRegistrationFunctionName
+        guard hasGenerics else {
+            printer.write("bjs[\"\(hookName)\"] = function() {};")
+            return
+        }
+        try ContainerCodecJS.registerPrimitiveCodecs(context: makeCodecPrintContext(printer: printer))
+        printer.write("bjs[\"\(hookName)\"] = function(base, count) {")
+        printer.indent {
+            // Same canonical order as `_bjs_core_register_type_handles` in the
+            // JavaScriptKit library.
+            printer.write("const codecs = [")
+            printer.indent {
+                for primitive in BridgeType.genericBridgeablePrimitives {
+                    printer.write("\(JSGlueVariableScope.reservedPrimitiveCodecs).\(primitive.token),")
+                }
+            }
+            printer.write("];")
+            writeTypeHandleRegistrationBody(into: printer)
+        }
+        printer.write("}")
+    }
+
     /// Installs the per-module `bjs_<Module>_register_type_handles` import
     /// hooks. A module with a registration function always carries the wasm
     /// import, so a hook is always installed; without generics anywhere in the
     /// build it is a no-op and the registration export is never called.
     private func generateTypeRegistrationHooks(into printer: CodeFragmentPrinter) throws {
+        try generateCoreTypeRegistrationHook(into: printer)
         for skeleton in skeletons {
-            guard skeleton.typeRegistrationEntries != nil else { continue }
+            guard let moduleEntries = skeleton.typeRegistrationEntries else { continue }
             let hookName = ABINameGenerator.typeRegistrationFunctionName(moduleName: skeleton.moduleName)
             guard hasGenerics else {
                 printer.write("bjs[\"\(hookName)\"] = function() {};")
                 continue
             }
-            // The hooks resolve type IDs against the shared primitive codec table.
-            try ContainerCodecJS.registerPrimitiveCodecs(context: makeCodecPrintContext(printer: printer))
-            let moduleEntries = skeleton.exported?.genericBridgeableTypeEntries ?? []
             printer.write("bjs[\"\(hookName)\"] = function(base, count) {")
             try printer.indent {
-                // Same canonical order as the Swift registration function:
-                // primitives first, then the module's own types.
+                // Same order as the module's Swift registration function.
                 printer.write("const codecs = [")
-                printer.indent {
-                    for primitive in BridgeType.genericBridgeablePrimitives {
-                        printer.write("\(JSGlueVariableScope.reservedPrimitiveCodecs).\(primitive.token),")
-                    }
-                }
-                printer.write("].concat([")
                 try printer.indent {
                     for entry in moduleEntries {
                         try appendGenericCodecLiteral(type: entry.bridgeType, into: printer)
                     }
                 }
-                printer.write("]);")
-                printer.write(
-                    "const typeIds = new Int32Array(\(JSGlueVariableScope.reservedMemory).buffer, base >>> 0, count >>> 0);"
-                )
-                printer.write("for (let i = 0; i < count; i++) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedCodecByTypeId).set(typeIds[i], codecs[i]);")
-                }
-                printer.write("}")
+                printer.write("];")
+                writeTypeHandleRegistrationBody(into: printer)
             }
             printer.write("}")
         }

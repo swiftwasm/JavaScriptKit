@@ -51,6 +51,7 @@ export async function createInstantiator(options, swift) {
             return;
         }
         __bjs_typeHandlesRegistered = true;
+        instance.exports["bjs_core_register_type_handles"]();
         instance.exports["bjs_TestModule_register_type_handles"]();
     }
     function __bjs_codecForTypeId(typeId) {
@@ -501,7 +502,7 @@ export async function createInstantiator(options, swift) {
                 const value = structHelpers.GenericPoint.lift();
                 return swift.memory.retain(value);
             }
-            bjs["bjs_TestModule_register_type_handles"] = function(base, count) {
+            bjs["bjs_core_register_type_handles"] = function(base, count) {
                 const codecs = [
                     __bjs_primitiveCodecs.Bool,
                     __bjs_primitiveCodecs.Int,
@@ -518,7 +519,17 @@ export async function createInstantiator(options, swift) {
                     __bjs_primitiveCodecs.Double,
                     __bjs_primitiveCodecs.String,
                     __bjs_primitiveCodecs.JSValue,
-                ].concat([
+                ];
+                if (count !== codecs.length) {
+                    throw new Error("BridgeJS: type handle registration mismatch for core types");
+                }
+                const typeIds = new Int32Array(memory.buffer, base >>> 0, count >>> 0);
+                for (let i = 0; i < count; i++) {
+                    __bjs_codecByTypeId.set(typeIds[i], codecs[i]);
+                }
+            }
+            bjs["bjs_TestModule_register_type_handles"] = function(base, count) {
+                const codecs = [
                     {
                         lower: (v) => {
                             structHelpers.GenericPoint.lower(v);
@@ -569,7 +580,7 @@ export async function createInstantiator(options, swift) {
                             return enumValue;
                         },
                     },
-                ]);
+                ];
                 const typeIds = new Int32Array(memory.buffer, base >>> 0, count >>> 0);
                 for (let i = 0; i < count; i++) {
                     __bjs_codecByTypeId.set(typeIds[i], codecs[i]);

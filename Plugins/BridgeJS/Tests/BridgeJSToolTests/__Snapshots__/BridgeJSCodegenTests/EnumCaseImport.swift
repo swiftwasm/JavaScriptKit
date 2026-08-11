@@ -107,21 +107,6 @@ fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePoin
 @_expose(wasm, "bjs_TestModule_register_type_handles")
 public func _bjs_TestModule_register_type_handles() {
     let typeIds: [Int32] = [
-        Bool.bridgeJSTypeID,
-        Int.bridgeJSTypeID,
-        Int8.bridgeJSTypeID,
-        UInt8.bridgeJSTypeID,
-        Int16.bridgeJSTypeID,
-        UInt16.bridgeJSTypeID,
-        Int32.bridgeJSTypeID,
-        UInt32.bridgeJSTypeID,
-        UInt.bridgeJSTypeID,
-        Int64.bridgeJSTypeID,
-        UInt64.bridgeJSTypeID,
-        Float.bridgeJSTypeID,
-        Double.bridgeJSTypeID,
-        String.bridgeJSTypeID,
-        JSValue.bridgeJSTypeID,
         Signal.bridgeJSTypeID,
     ]
     typeIds.withUnsafeBufferPointer { buffer in

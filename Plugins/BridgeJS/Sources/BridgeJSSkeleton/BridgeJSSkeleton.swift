@@ -32,6 +32,13 @@ public struct ABINameGenerator {
         "bjs_\(moduleName)_register_type_handles"
     }
 
+    /// Name of the core type-handle registration function. Unlike the per-module
+    /// ones, this is defined once in the JavaScriptKit library (see
+    /// `_bjs_core_register_type_handles` in `BridgeJSIntrinsics.swift`) so the
+    /// primitive handles exist exactly once in the final binary and the JS glue
+    /// registers their codecs once per linked bundle.
+    public static let coreTypeRegistrationFunctionName = "bjs_core_register_type_handles"
+
     /// Generates ABI name using standardized namespace + context pattern
     public static func generateABIName(
         baseName: String,
@@ -383,17 +390,17 @@ extension ExportedSkeleton {
 
 extension BridgeJSSkeleton {
     /// The ordered list of types this module registers type handles for, or
-    /// `nil` when it emits no registration function. Primitive handles are
-    /// library singletons, so every module re-registering them writes the same
-    /// ID-to-codec pair, and a pure-import build still gets a populated table.
+    /// `nil` when it emits no registration function.
+    ///
+    /// Only the module's own `@JS` types appear here: the core (primitive)
+    /// handles are owned by the JavaScriptKit library, which registers them once
+    /// for the whole binary via ``ABINameGenerator/coreTypeRegistrationFunctionName``.
+    /// A module that only *uses* generics therefore needs no registration
+    /// function of its own.
     public var typeRegistrationEntries: [GenericBridgeableTypeEntry]? {
         let exportedEntries = exported?.genericBridgeableTypeEntries ?? []
-        let hasGenericImports = imported?.hasGenericDeclarations ?? false
-        guard !exportedEntries.isEmpty || hasGenericImports else { return nil }
-        let primitives = BridgeType.genericBridgeablePrimitives.map {
-            GenericBridgeableTypeEntry(swiftName: $0.token, bridgeType: $0.type)
-        }
-        return primitives + exportedEntries
+        guard !exportedEntries.isEmpty else { return nil }
+        return exportedEntries
     }
 }
 
