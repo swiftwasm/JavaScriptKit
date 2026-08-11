@@ -216,12 +216,23 @@ enum ContainerCodecJS {
     private static let primitiveCodecIntrinsicName = "containerPrimitiveCodecs"
 
     /// The single description of each container shape's stack ABI.
+    ///
+    /// The combinators memoize per element codec object. Statically known
+    /// compositions are hoisted into module-scope `const`s and so instantiate a
+    /// combinator only once, but a generic call site resolves its element codec
+    /// from a runtime type ID and cannot be hoisted; memoizing keeps those call
+    /// sites from allocating a fresh codec on every call.
     static func combinatorDeclarations() -> [String] {
         let i32 = JSGlueVariableScope.reservedI32Stack
         let stringCodec = JSGlueVariableScope.reservedStringCodec
         return [
+            "const \(arrayCodec)Cache = new WeakMap();",
             "function \(arrayCodec)(elementCodec) {",
-            "    return {",
+            "    let codec = \(arrayCodec)Cache.get(elementCodec);",
+            "    if (codec !== undefined) {",
+            "        return codec;",
+            "    }",
+            "    codec = {",
             "        lower(value) {",
             "            for (let i = 0; i < value.length; i++) {",
             "                elementCodec.lower(value[i]);",
@@ -240,11 +251,22 @@ enum ContainerCodecJS {
             "            return result;",
             "        },",
             "    };",
+            "    \(arrayCodec)Cache.set(elementCodec, codec);",
+            "    return codec;",
             "}",
             // `isUndefinedOr` selects the `JSUndefinedOr` flavor: `null` is then a
             // present value and absence surfaces as `undefined` instead of `null`.
+            // The two flavors are cached separately because they differ in
+            // behavior, not just in the element codec.
+            "const \(optionalCodec)Cache = new WeakMap();",
+            "const \(optionalCodec)UndefinedOrCache = new WeakMap();",
             "function \(optionalCodec)(elementCodec, isUndefinedOr = false) {",
-            "    return {",
+            "    const cache = isUndefinedOr ? \(optionalCodec)UndefinedOrCache : \(optionalCodec)Cache;",
+            "    let codec = cache.get(elementCodec);",
+            "    if (codec !== undefined) {",
+            "        return codec;",
+            "    }",
+            "    codec = {",
             "        lower(value) {",
             "            const isSome = isUndefinedOr ? value !== undefined : value != null;",
             "            if (isSome) {",
@@ -261,9 +283,16 @@ enum ContainerCodecJS {
             "            return elementCodec.lift();",
             "        },",
             "    };",
+            "    cache.set(elementCodec, codec);",
+            "    return codec;",
             "}",
+            "const \(dictCodec)Cache = new WeakMap();",
             "function \(dictCodec)(valueCodec) {",
-            "    return {",
+            "    let codec = \(dictCodec)Cache.get(valueCodec);",
+            "    if (codec !== undefined) {",
+            "        return codec;",
+            "    }",
+            "    codec = {",
             "        lower(value) {",
             "            const keys = Object.keys(value);",
             "            for (let i = 0; i < keys.length; i++) {",
@@ -283,6 +312,8 @@ enum ContainerCodecJS {
             "            return result;",
             "        },",
             "    };",
+            "    \(dictCodec)Cache.set(valueCodec, codec);",
+            "    return codec;",
             "}",
         ]
     }

@@ -41,8 +41,13 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    const __bjs_arrayCodecCache = new WeakMap();
     function __bjs_arrayCodec(elementCodec) {
-        return {
+        let codec = __bjs_arrayCodecCache.get(elementCodec);
+        if (codec !== undefined) {
+            return codec;
+        }
+        codec = {
             lower(value) {
                 for (let i = 0; i < value.length; i++) {
                     elementCodec.lower(value[i]);
@@ -61,9 +66,18 @@ export async function createInstantiator(options, swift) {
                 return result;
             },
         };
+        __bjs_arrayCodecCache.set(elementCodec, codec);
+        return codec;
     }
+    const __bjs_optionalCodecCache = new WeakMap();
+    const __bjs_optionalCodecUndefinedOrCache = new WeakMap();
     function __bjs_optionalCodec(elementCodec, isUndefinedOr = false) {
-        return {
+        const cache = isUndefinedOr ? __bjs_optionalCodecUndefinedOrCache : __bjs_optionalCodecCache;
+        let codec = cache.get(elementCodec);
+        if (codec !== undefined) {
+            return codec;
+        }
+        codec = {
             lower(value) {
                 const isSome = isUndefinedOr ? value !== undefined : value != null;
                 if (isSome) {
@@ -80,9 +94,16 @@ export async function createInstantiator(options, swift) {
                 return elementCodec.lift();
             },
         };
+        cache.set(elementCodec, codec);
+        return codec;
     }
+    const __bjs_dictCodecCache = new WeakMap();
     function __bjs_dictCodec(valueCodec) {
-        return {
+        let codec = __bjs_dictCodecCache.get(valueCodec);
+        if (codec !== undefined) {
+            return codec;
+        }
+        codec = {
             lower(value) {
                 const keys = Object.keys(value);
                 for (let i = 0; i < keys.length; i++) {
@@ -102,6 +123,8 @@ export async function createInstantiator(options, swift) {
                 return result;
             },
         };
+        __bjs_dictCodecCache.set(valueCodec, codec);
+        return codec;
     }
 
     const __bjs_stringCodec = {
