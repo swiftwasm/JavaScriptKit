@@ -354,7 +354,7 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
-    const __bjs_codec_TestModule_Greeter = {
+    const __bjs_codec_M10TestModuleT7Greeter = {
         lower: (v) => {
             ptrStack.push(v.pointer);
         },
@@ -364,7 +364,7 @@ export async function createInstantiator(options, swift) {
             return obj;
         },
     };
-    const __bjs_codec_Array_TestModule_Greeter = __bjs_arrayCodec(__bjs_codec_TestModule_Greeter);
+    const __bjs_codec_Array_M10TestModuleT7Greeter = __bjs_arrayCodec(__bjs_codec_M10TestModuleT7Greeter);
 
 
     return {
@@ -692,7 +692,7 @@ export async function createInstantiator(options, swift) {
                 }
                 getItems() {
                     instance.exports.bjs_Collections_Container_getItems(this.pointer);
-                    const arrayResult = __bjs_codec_Array_TestModule_Greeter.lift();
+                    const arrayResult = __bjs_codec_Array_M10TestModuleT7Greeter.lift();
                     return arrayResult;
                 }
                 addItem(item) {

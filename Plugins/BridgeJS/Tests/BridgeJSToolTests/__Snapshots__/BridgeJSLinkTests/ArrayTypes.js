@@ -371,17 +371,17 @@ export async function createInstantiator(options, swift) {
     const __bjs_codec_Array_String = __bjs_arrayCodec(__bjs_stringCodec);
     const __bjs_codec_Array_Double = __bjs_arrayCodec(__bjs_primitiveCodecs.Double);
     const __bjs_codec_Array_Bool = __bjs_arrayCodec(__bjs_primitiveCodecs.Bool);
-    const __bjs_codec_TestModule_Point = {
+    const __bjs_codec_M10TestModuleT5Point = {
         lower: (v) => {
-            structHelpers.Point.lower(v);
+            structHelpers.M10TestModuleT5Point.lower(v);
         },
         lift: () => {
-            const struct = structHelpers.Point.lift();
+            const struct = structHelpers.M10TestModuleT5Point.lift();
             return struct;
         },
     };
-    const __bjs_codec_Array_TestModule_Point = __bjs_arrayCodec(__bjs_codec_TestModule_Point);
-    const __bjs_codec_TestModule_Direction = {
+    const __bjs_codec_Array_M10TestModuleT5Point = __bjs_arrayCodec(__bjs_codec_M10TestModuleT5Point);
+    const __bjs_codec_M10TestModuleT9Direction = {
         lower: (v) => {
             i32Stack.push((v | 0));
         },
@@ -390,8 +390,8 @@ export async function createInstantiator(options, swift) {
             return caseId;
         },
     };
-    const __bjs_codec_Array_TestModule_Direction = __bjs_arrayCodec(__bjs_codec_TestModule_Direction);
-    const __bjs_codec_TestModule_Status = {
+    const __bjs_codec_Array_M10TestModuleT9Direction = __bjs_arrayCodec(__bjs_codec_M10TestModuleT9Direction);
+    const __bjs_codec_M10TestModuleT6Status = {
         lower: (v) => {
             i32Stack.push((v | 0));
         },
@@ -400,7 +400,7 @@ export async function createInstantiator(options, swift) {
             return rawValue;
         },
     };
-    const __bjs_codec_Array_TestModule_Status = __bjs_arrayCodec(__bjs_codec_TestModule_Status);
+    const __bjs_codec_Array_M10TestModuleT6Status = __bjs_arrayCodec(__bjs_codec_M10TestModuleT6Status);
     const __bjs_codec_Surp = {
         lower: (v) => {
             ptrStack.push((v | 0));
@@ -436,16 +436,16 @@ export async function createInstantiator(options, swift) {
     const __bjs_codec_Optional_String = __bjs_optionalCodec(__bjs_stringCodec);
     const __bjs_codec_Array_Optional_String = __bjs_arrayCodec(__bjs_codec_Optional_String);
     const __bjs_codec_Optional_Array_Int = __bjs_optionalCodec(__bjs_codec_Array_Int);
-    const __bjs_codec_Optional_TestModule_Point = __bjs_optionalCodec(__bjs_codec_TestModule_Point);
-    const __bjs_codec_Array_Optional_TestModule_Point = __bjs_arrayCodec(__bjs_codec_Optional_TestModule_Point);
-    const __bjs_codec_Optional_TestModule_Direction = __bjs_optionalCodec(__bjs_codec_TestModule_Direction);
-    const __bjs_codec_Array_Optional_TestModule_Direction = __bjs_arrayCodec(__bjs_codec_Optional_TestModule_Direction);
-    const __bjs_codec_Optional_TestModule_Status = __bjs_optionalCodec(__bjs_codec_TestModule_Status);
-    const __bjs_codec_Array_Optional_TestModule_Status = __bjs_arrayCodec(__bjs_codec_Optional_TestModule_Status);
+    const __bjs_codec_Optional_M10TestModuleT5Point = __bjs_optionalCodec(__bjs_codec_M10TestModuleT5Point);
+    const __bjs_codec_Array_Optional_M10TestModuleT5Point = __bjs_arrayCodec(__bjs_codec_Optional_M10TestModuleT5Point);
+    const __bjs_codec_Optional_M10TestModuleT9Direction = __bjs_optionalCodec(__bjs_codec_M10TestModuleT9Direction);
+    const __bjs_codec_Array_Optional_M10TestModuleT9Direction = __bjs_arrayCodec(__bjs_codec_Optional_M10TestModuleT9Direction);
+    const __bjs_codec_Optional_M10TestModuleT6Status = __bjs_optionalCodec(__bjs_codec_M10TestModuleT6Status);
+    const __bjs_codec_Array_Optional_M10TestModuleT6Status = __bjs_arrayCodec(__bjs_codec_Optional_M10TestModuleT6Status);
     const __bjs_codec_Array_Array_Int = __bjs_arrayCodec(__bjs_codec_Array_Int);
     const __bjs_codec_Array_Array_String = __bjs_arrayCodec(__bjs_codec_Array_String);
-    const __bjs_codec_Array_Array_TestModule_Point = __bjs_arrayCodec(__bjs_codec_Array_TestModule_Point);
-    const __bjs_codec_TestModule_Item = {
+    const __bjs_codec_Array_Array_M10TestModuleT5Point = __bjs_arrayCodec(__bjs_codec_Array_M10TestModuleT5Point);
+    const __bjs_codec_M10TestModuleT4Item = {
         lower: (v) => {
             ptrStack.push(v.pointer);
         },
@@ -455,8 +455,8 @@ export async function createInstantiator(options, swift) {
             return obj;
         },
     };
-    const __bjs_codec_Array_TestModule_Item = __bjs_arrayCodec(__bjs_codec_TestModule_Item);
-    const __bjs_codec_Array_Array_TestModule_Item = __bjs_arrayCodec(__bjs_codec_Array_TestModule_Item);
+    const __bjs_codec_Array_M10TestModuleT4Item = __bjs_arrayCodec(__bjs_codec_M10TestModuleT4Item);
+    const __bjs_codec_Array_Array_M10TestModuleT4Item = __bjs_arrayCodec(__bjs_codec_Array_M10TestModuleT4Item);
     const __bjs_codec_JSObject = {
         lower: (v) => {
             const objId = swift.memory.retain(v);
@@ -475,7 +475,7 @@ export async function createInstantiator(options, swift) {
     const __bjs_codec_Array_Array_JSObject = __bjs_arrayCodec(__bjs_codec_Array_JSObject);
     const __bjs_codec_Optional_Array_String = __bjs_optionalCodec(__bjs_codec_Array_String);
 
-    const __bjs_createPointHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT5Point = () => ({
         lower: (value) => {
             f64Stack.push(value.x);
             f64Stack.push(value.y);
@@ -563,10 +563,10 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Point"] = function(objectId) {
-                structHelpers.Point.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT5Point.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Point"] = function() {
-                const value = structHelpers.Point.lift();
+                const value = structHelpers.M10TestModuleT5Point.lift();
                 return swift.memory.retain(value);
             }
             bjs["bjs_core_register_type_handles"] = function() {};
@@ -832,8 +832,8 @@ export async function createInstantiator(options, swift) {
                     return arrayResult;
                 }
             }
-            const PointHelpers = __bjs_createPointHelpers();
-            structHelpers.Point = PointHelpers;
+            const __bjs_helpers_M10TestModuleT5Point = __bjs_createStructHelpers_M10TestModuleT5Point();
+            structHelpers.M10TestModuleT5Point = __bjs_helpers_M10TestModuleT5Point;
 
             const exports = {
                 processIntArray: function bjs_processIntArray(values) {
@@ -861,21 +861,21 @@ export async function createInstantiator(options, swift) {
                     return arrayResult;
                 },
                 processPointArray: function bjs_processPointArray(points) {
-                    __bjs_codec_Array_TestModule_Point.lower(points);
+                    __bjs_codec_Array_M10TestModuleT5Point.lower(points);
                     instance.exports.bjs_processPointArray();
-                    const arrayResult = __bjs_codec_Array_TestModule_Point.lift();
+                    const arrayResult = __bjs_codec_Array_M10TestModuleT5Point.lift();
                     return arrayResult;
                 },
                 processDirectionArray: function bjs_processDirectionArray(directions) {
-                    __bjs_codec_Array_TestModule_Direction.lower(directions);
+                    __bjs_codec_Array_M10TestModuleT9Direction.lower(directions);
                     instance.exports.bjs_processDirectionArray();
-                    const arrayResult = __bjs_codec_Array_TestModule_Direction.lift();
+                    const arrayResult = __bjs_codec_Array_M10TestModuleT9Direction.lift();
                     return arrayResult;
                 },
                 processStatusArray: function bjs_processStatusArray(statuses) {
-                    __bjs_codec_Array_TestModule_Status.lower(statuses);
+                    __bjs_codec_Array_M10TestModuleT6Status.lower(statuses);
                     instance.exports.bjs_processStatusArray();
-                    const arrayResult = __bjs_codec_Array_TestModule_Status.lift();
+                    const arrayResult = __bjs_codec_Array_M10TestModuleT6Status.lift();
                     return arrayResult;
                 },
                 sumIntArray: function bjs_sumIntArray(values) {
@@ -884,11 +884,11 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 findFirstPoint: function bjs_findFirstPoint(points, matching) {
-                    __bjs_codec_Array_TestModule_Point.lower(points);
+                    __bjs_codec_Array_M10TestModuleT5Point.lower(points);
                     const matchingBytes = textEncoder.encode(matching);
                     const matchingId = swift.memory.retain(matchingBytes);
                     instance.exports.bjs_findFirstPoint(matchingId, matchingBytes.length);
-                    const structValue = structHelpers.Point.lift();
+                    const structValue = structHelpers.M10TestModuleT5Point.lift();
                     return structValue;
                 },
                 processUnsafeRawPointerArray: function bjs_processUnsafeRawPointerArray(values) {
@@ -928,21 +928,21 @@ export async function createInstantiator(options, swift) {
                     return optValue;
                 },
                 processOptionalPointArray: function bjs_processOptionalPointArray(points) {
-                    __bjs_codec_Array_Optional_TestModule_Point.lower(points);
+                    __bjs_codec_Array_Optional_M10TestModuleT5Point.lower(points);
                     instance.exports.bjs_processOptionalPointArray();
-                    const arrayResult = __bjs_codec_Array_Optional_TestModule_Point.lift();
+                    const arrayResult = __bjs_codec_Array_Optional_M10TestModuleT5Point.lift();
                     return arrayResult;
                 },
                 processOptionalDirectionArray: function bjs_processOptionalDirectionArray(directions) {
-                    __bjs_codec_Array_Optional_TestModule_Direction.lower(directions);
+                    __bjs_codec_Array_Optional_M10TestModuleT9Direction.lower(directions);
                     instance.exports.bjs_processOptionalDirectionArray();
-                    const arrayResult = __bjs_codec_Array_Optional_TestModule_Direction.lift();
+                    const arrayResult = __bjs_codec_Array_Optional_M10TestModuleT9Direction.lift();
                     return arrayResult;
                 },
                 processOptionalStatusArray: function bjs_processOptionalStatusArray(statuses) {
-                    __bjs_codec_Array_Optional_TestModule_Status.lower(statuses);
+                    __bjs_codec_Array_Optional_M10TestModuleT6Status.lower(statuses);
                     instance.exports.bjs_processOptionalStatusArray();
-                    const arrayResult = __bjs_codec_Array_Optional_TestModule_Status.lift();
+                    const arrayResult = __bjs_codec_Array_Optional_M10TestModuleT6Status.lift();
                     return arrayResult;
                 },
                 processNestedIntArray: function bjs_processNestedIntArray(values) {
@@ -958,21 +958,21 @@ export async function createInstantiator(options, swift) {
                     return arrayResult;
                 },
                 processNestedPointArray: function bjs_processNestedPointArray(points) {
-                    __bjs_codec_Array_Array_TestModule_Point.lower(points);
+                    __bjs_codec_Array_Array_M10TestModuleT5Point.lower(points);
                     instance.exports.bjs_processNestedPointArray();
-                    const arrayResult = __bjs_codec_Array_Array_TestModule_Point.lift();
+                    const arrayResult = __bjs_codec_Array_Array_M10TestModuleT5Point.lift();
                     return arrayResult;
                 },
                 processItemArray: function bjs_processItemArray(items) {
-                    __bjs_codec_Array_TestModule_Item.lower(items);
+                    __bjs_codec_Array_M10TestModuleT4Item.lower(items);
                     instance.exports.bjs_processItemArray();
-                    const arrayResult = __bjs_codec_Array_TestModule_Item.lift();
+                    const arrayResult = __bjs_codec_Array_M10TestModuleT4Item.lift();
                     return arrayResult;
                 },
                 processNestedItemArray: function bjs_processNestedItemArray(items) {
-                    __bjs_codec_Array_Array_TestModule_Item.lower(items);
+                    __bjs_codec_Array_Array_M10TestModuleT4Item.lower(items);
                     instance.exports.bjs_processNestedItemArray();
-                    const arrayResult = __bjs_codec_Array_Array_TestModule_Item.lift();
+                    const arrayResult = __bjs_codec_Array_Array_M10TestModuleT4Item.lift();
                     return arrayResult;
                 },
                 processJSObjectArray: function bjs_processJSObjectArray(objects) {

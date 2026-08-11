@@ -354,7 +354,7 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
-    const __bjs_codec_TestModule_Foo = {
+    const __bjs_codec_Foo = {
         lower: (v) => {
             const objId = swift.memory.retain(v);
             i32Stack.push(objId);
@@ -366,11 +366,11 @@ export async function createInstantiator(options, swift) {
             return obj;
         },
     };
-    const __bjs_codec_Array_TestModule_Foo = __bjs_arrayCodec(__bjs_codec_TestModule_Foo);
-    const __bjs_codec_Optional_TestModule_Foo = __bjs_optionalCodec(__bjs_codec_TestModule_Foo);
-    const __bjs_codec_Array_Optional_TestModule_Foo = __bjs_arrayCodec(__bjs_codec_Optional_TestModule_Foo);
+    const __bjs_codec_Array_Foo = __bjs_arrayCodec(__bjs_codec_Foo);
+    const __bjs_codec_Optional_Foo = __bjs_optionalCodec(__bjs_codec_Foo);
+    const __bjs_codec_Array_Optional_Foo = __bjs_arrayCodec(__bjs_codec_Optional_Foo);
 
-    const __bjs_createFooContainerHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT12FooContainer = () => ({
         lower: (value) => {
             let id;
             if (value.foo != null) {
@@ -379,10 +379,10 @@ export async function createInstantiator(options, swift) {
                 id = undefined;
             }
             i32Stack.push(id !== undefined ? id : 0);
-            __bjs_codec_Optional_TestModule_Foo.lower(value.optionalFoo);
+            __bjs_codec_Optional_Foo.lower(value.optionalFoo);
         },
         lift: () => {
-            const optValue = __bjs_codec_Optional_TestModule_Foo.lift();
+            const optValue = __bjs_codec_Optional_Foo.lift();
             const objectId = i32Stack.pop();
             let value;
             if (objectId !== 0) {
@@ -471,10 +471,10 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_FooContainer"] = function(objectId) {
-                structHelpers.FooContainer.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT12FooContainer.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_FooContainer"] = function() {
-                const value = structHelpers.FooContainer.lift();
+                const value = structHelpers.M10TestModuleT12FooContainer.lift();
                 return swift.memory.retain(value);
             }
             bjs["bjs_core_register_type_handles"] = function() {};
@@ -599,8 +599,8 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const FooContainerHelpers = __bjs_createFooContainerHelpers();
-            structHelpers.FooContainer = FooContainerHelpers;
+            const __bjs_helpers_M10TestModuleT12FooContainer = __bjs_createStructHelpers_M10TestModuleT12FooContainer();
+            structHelpers.M10TestModuleT12FooContainer = __bjs_helpers_M10TestModuleT12FooContainer;
 
             const exports = {
                 makeFoo: function bjs_makeFoo() {
@@ -616,21 +616,21 @@ export async function createInstantiator(options, swift) {
                     return ret1;
                 },
                 processFooArray: function bjs_processFooArray(foos) {
-                    __bjs_codec_Array_TestModule_Foo.lower(foos);
+                    __bjs_codec_Array_Foo.lower(foos);
                     instance.exports.bjs_processFooArray();
-                    const arrayResult = __bjs_codec_Array_TestModule_Foo.lift();
+                    const arrayResult = __bjs_codec_Array_Foo.lift();
                     return arrayResult;
                 },
                 processOptionalFooArray: function bjs_processOptionalFooArray(foos) {
-                    __bjs_codec_Array_Optional_TestModule_Foo.lower(foos);
+                    __bjs_codec_Array_Optional_Foo.lower(foos);
                     instance.exports.bjs_processOptionalFooArray();
-                    const arrayResult = __bjs_codec_Array_Optional_TestModule_Foo.lift();
+                    const arrayResult = __bjs_codec_Array_Optional_Foo.lift();
                     return arrayResult;
                 },
                 roundtripFooContainer: function bjs_roundtripFooContainer(container) {
-                    structHelpers.FooContainer.lower(container);
+                    structHelpers.M10TestModuleT12FooContainer.lower(container);
                     instance.exports.bjs_roundtripFooContainer();
-                    const structValue = structHelpers.FooContainer.lift();
+                    const structValue = structHelpers.M10TestModuleT12FooContainer.lift();
                     return structValue;
                 },
             };

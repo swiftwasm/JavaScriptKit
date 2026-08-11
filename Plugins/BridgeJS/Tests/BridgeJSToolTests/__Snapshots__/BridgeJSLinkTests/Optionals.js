@@ -367,7 +367,7 @@ export async function createInstantiator(options, swift) {
         },
     };
     const __bjs_codec_Optional_JSObject = __bjs_optionalCodec(__bjs_codec_JSObject);
-    const __bjs_codec_TestModule_WithOptionalJSClass = {
+    const __bjs_codec_WithOptionalJSClass = {
         lower: (v) => {
             const objId = swift.memory.retain(v);
             i32Stack.push(objId);
@@ -379,7 +379,7 @@ export async function createInstantiator(options, swift) {
             return obj;
         },
     };
-    const __bjs_codec_Optional_TestModule_WithOptionalJSClass = __bjs_optionalCodec(__bjs_codec_TestModule_WithOptionalJSClass);
+    const __bjs_codec_Optional_WithOptionalJSClass = __bjs_optionalCodec(__bjs_codec_WithOptionalJSClass);
 
 
     return {
@@ -665,7 +665,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_WithOptionalJSClass_childOrNull_get"] = function bjs_WithOptionalJSClass_childOrNull_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).childOrNull;
-                    __bjs_codec_Optional_TestModule_WithOptionalJSClass.lower(ret);
+                    __bjs_codec_Optional_WithOptionalJSClass.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -836,7 +836,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_WithOptionalJSClass_roundTripChildOrNull"] = function bjs_WithOptionalJSClass_roundTripChildOrNull(self, valueIsSome, valueObjectId) {
                 try {
                     let ret = swift.memory.getObject(self).roundTripChildOrNull(valueIsSome ? swift.memory.getObject(valueObjectId) : null);
-                    __bjs_codec_Optional_TestModule_WithOptionalJSClass.lower(ret);
+                    __bjs_codec_Optional_WithOptionalJSClass.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -1075,7 +1075,7 @@ export async function createInstantiator(options, swift) {
                         result = 0;
                     }
                     instance.exports.bjs_roundTripExportedOptionalJSClass(+isSome, result);
-                    const optValue = __bjs_codec_Optional_TestModule_WithOptionalJSClass.lift();
+                    const optValue = __bjs_codec_Optional_WithOptionalJSClass.lift();
                     return optValue;
                 },
                 roundTripString: function bjs_roundTripString(name) {

@@ -127,7 +127,7 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
-    const __bjs_createAsyncPayloadResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT18AsyncPayloadResult = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -250,7 +250,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["promise_resolve_TestModule_18AsyncPayloadResultO"] = function(promise, value) {
                 try {
-                    const enumValue = enumHelpers.AsyncPayloadResult.lift(value);
+                    const enumValue = enumHelpers.M10TestModuleT18AsyncPayloadResult.lift(value);
                     swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(enumValue);
                 } catch (error) {
                     setException(error);
@@ -260,7 +260,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     let optResult;
                     if (valueIsSome) {
-                        const enumValue = enumHelpers.AsyncPayloadResult.lift(valueCaseId);
+                        const enumValue = enumHelpers.M10TestModuleT18AsyncPayloadResult.lift(valueCaseId);
                         optResult = enumValue;
                     } else {
                         optResult = null;
@@ -382,12 +382,12 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const AsyncPayloadResultHelpers = __bjs_createAsyncPayloadResultValuesHelpers();
-            enumHelpers.AsyncPayloadResult = AsyncPayloadResultHelpers;
+            const __bjs_helpers_M10TestModuleT18AsyncPayloadResult = __bjs_createEnumHelpers_M10TestModuleT18AsyncPayloadResult();
+            enumHelpers.M10TestModuleT18AsyncPayloadResult = __bjs_helpers_M10TestModuleT18AsyncPayloadResult;
 
             const exports = {
                 asyncRoundTripAssociatedValueEnum: function bjs_asyncRoundTripAssociatedValueEnum(value) {
-                    const valueCaseId = enumHelpers.AsyncPayloadResult.lower(value);
+                    const valueCaseId = enumHelpers.M10TestModuleT18AsyncPayloadResult.lower(value);
                     const ret = instance.exports.bjs_asyncRoundTripAssociatedValueEnum(valueCaseId);
                     const ret1 = swift.memory.getObject(ret);
                     swift.memory.release(ret);
@@ -397,7 +397,7 @@ export async function createInstantiator(options, swift) {
                     const isSome = value != null;
                     let result;
                     if (isSome) {
-                        const valueCaseId = enumHelpers.AsyncPayloadResult.lower(value);
+                        const valueCaseId = enumHelpers.M10TestModuleT18AsyncPayloadResult.lower(value);
                         result = valueCaseId;
                     } else {
                         result = 0;

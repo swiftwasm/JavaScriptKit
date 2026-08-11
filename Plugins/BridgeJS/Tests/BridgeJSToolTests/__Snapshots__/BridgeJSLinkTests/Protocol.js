@@ -378,7 +378,7 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
-    const __bjs_codec_TestModule_MyViewControllerDelegate = {
+    const __bjs_codec_M10TestModuleT24MyViewControllerDelegate = {
         lower: (v) => {
             const objId = swift.memory.retain(v);
             i32Stack.push(objId);
@@ -390,10 +390,10 @@ export async function createInstantiator(options, swift) {
             return obj;
         },
     };
-    const __bjs_codec_Array_TestModule_MyViewControllerDelegate = __bjs_arrayCodec(__bjs_codec_TestModule_MyViewControllerDelegate);
-    const __bjs_codec_Dict_TestModule_MyViewControllerDelegate = __bjs_dictCodec(__bjs_codec_TestModule_MyViewControllerDelegate);
+    const __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate = __bjs_arrayCodec(__bjs_codec_M10TestModuleT24MyViewControllerDelegate);
+    const __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate = __bjs_dictCodec(__bjs_codec_M10TestModuleT24MyViewControllerDelegate);
 
-    const __bjs_createResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT6Result = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -706,7 +706,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_MyViewControllerDelegate_result_get"] = function bjs_MyViewControllerDelegate_result_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).result;
-                    const caseId = enumHelpers.Result.lower(ret);
+                    const caseId = enumHelpers.M10TestModuleT6Result.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -714,7 +714,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_result_set"] = function bjs_MyViewControllerDelegate_result_set(self, value) {
                 try {
-                    const enumValue = enumHelpers.Result.lift(value);
+                    const enumValue = enumHelpers.M10TestModuleT6Result.lift(value);
                     swift.memory.getObject(self).result = enumValue;
                 } catch (error) {
                     setException(error);
@@ -725,7 +725,7 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).optionalResult;
                     const isSome = ret != null;
                     if (isSome) {
-                        const caseId = enumHelpers.Result.lower(ret);
+                        const caseId = enumHelpers.M10TestModuleT6Result.lower(ret);
                         return caseId;
                     } else {
                         return -1;
@@ -738,7 +738,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     let optResult;
                     if (valueIsSome) {
-                        const enumValue = enumHelpers.Result.lift(valueCaseId);
+                        const enumValue = enumHelpers.M10TestModuleT6Result.lift(valueCaseId);
                         optResult = enumValue;
                     } else {
                         optResult = null;
@@ -896,7 +896,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_handleResult"] = function bjs_MyViewControllerDelegate_handleResult(self, result) {
                 try {
-                    const enumValue = enumHelpers.Result.lift(result);
+                    const enumValue = enumHelpers.M10TestModuleT6Result.lift(result);
                     swift.memory.getObject(self).handleResult(enumValue);
                 } catch (error) {
                     setException(error);
@@ -905,7 +905,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_MyViewControllerDelegate_getResult"] = function bjs_MyViewControllerDelegate_getResult(self) {
                 try {
                     let ret = swift.memory.getObject(self).getResult();
-                    const caseId = enumHelpers.Result.lower(ret);
+                    const caseId = enumHelpers.M10TestModuleT6Result.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -1064,7 +1064,7 @@ export async function createInstantiator(options, swift) {
                 }
 
                 constructor(delegates) {
-                    __bjs_codec_Array_TestModule_MyViewControllerDelegate.lower(delegates);
+                    __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lower(delegates);
                     const ret = instance.exports.bjs_DelegateManager_init();
                     return DelegateManager.__construct(ret);
                 }
@@ -1073,37 +1073,37 @@ export async function createInstantiator(options, swift) {
                 }
                 get delegates() {
                     instance.exports.bjs_DelegateManager_delegates_get(this.pointer);
-                    const arrayResult = __bjs_codec_Array_TestModule_MyViewControllerDelegate.lift();
+                    const arrayResult = __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lift();
                     return arrayResult;
                 }
                 set delegates(value) {
-                    __bjs_codec_Array_TestModule_MyViewControllerDelegate.lower(value);
+                    __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lower(value);
                     instance.exports.bjs_DelegateManager_delegates_set(this.pointer);
                 }
                 get delegatesByName() {
                     instance.exports.bjs_DelegateManager_delegatesByName_get(this.pointer);
-                    const dictResult = __bjs_codec_Dict_TestModule_MyViewControllerDelegate.lift();
+                    const dictResult = __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate.lift();
                     return dictResult;
                 }
                 set delegatesByName(value) {
-                    __bjs_codec_Dict_TestModule_MyViewControllerDelegate.lower(value);
+                    __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate.lower(value);
                     instance.exports.bjs_DelegateManager_delegatesByName_set(this.pointer);
                 }
             }
-            const ResultHelpers = __bjs_createResultValuesHelpers();
-            enumHelpers.Result = ResultHelpers;
+            const __bjs_helpers_M10TestModuleT6Result = __bjs_createEnumHelpers_M10TestModuleT6Result();
+            enumHelpers.M10TestModuleT6Result = __bjs_helpers_M10TestModuleT6Result;
 
             const exports = {
                 processDelegates: function bjs_processDelegates(delegates) {
-                    __bjs_codec_Array_TestModule_MyViewControllerDelegate.lower(delegates);
+                    __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lower(delegates);
                     instance.exports.bjs_processDelegates();
-                    const arrayResult = __bjs_codec_Array_TestModule_MyViewControllerDelegate.lift();
+                    const arrayResult = __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lift();
                     return arrayResult;
                 },
                 processDelegatesByName: function bjs_processDelegatesByName(delegates) {
-                    __bjs_codec_Dict_TestModule_MyViewControllerDelegate.lower(delegates);
+                    __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate.lower(delegates);
                     instance.exports.bjs_processDelegatesByName();
-                    const dictResult = __bjs_codec_Dict_TestModule_MyViewControllerDelegate.lift();
+                    const dictResult = __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate.lift();
                     return dictResult;
                 },
                 Direction: DirectionValues,

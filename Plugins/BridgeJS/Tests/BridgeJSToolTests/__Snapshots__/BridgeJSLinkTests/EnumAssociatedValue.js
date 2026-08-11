@@ -438,7 +438,7 @@ export async function createInstantiator(options, swift) {
     const __bjs_codec_Optional_String = __bjs_optionalCodec(__bjs_stringCodec);
     const __bjs_codec_Optional_Bool = __bjs_optionalCodec(__bjs_primitiveCodecs.Bool);
     const __bjs_codec_Optional_Int = __bjs_optionalCodec(__bjs_primitiveCodecs.Int);
-    const __bjs_codec_TestModule_Precision = {
+    const __bjs_codec_M10TestModuleT9Precision = {
         lower: (v) => {
             f32Stack.push(Math.fround(v));
         },
@@ -447,8 +447,8 @@ export async function createInstantiator(options, swift) {
             return rawValue;
         },
     };
-    const __bjs_codec_Optional_TestModule_Precision = __bjs_optionalCodec(__bjs_codec_TestModule_Precision);
-    const __bjs_codec_TestModule_CardinalDirection = {
+    const __bjs_codec_Optional_M10TestModuleT9Precision = __bjs_optionalCodec(__bjs_codec_M10TestModuleT9Precision);
+    const __bjs_codec_M10TestModuleT17CardinalDirection = {
         lower: (v) => {
             i32Stack.push((v | 0));
         },
@@ -457,19 +457,19 @@ export async function createInstantiator(options, swift) {
             return caseId;
         },
     };
-    const __bjs_codec_Optional_TestModule_CardinalDirection = __bjs_optionalCodec(__bjs_codec_TestModule_CardinalDirection);
+    const __bjs_codec_Optional_M10TestModuleT17CardinalDirection = __bjs_optionalCodec(__bjs_codec_M10TestModuleT17CardinalDirection);
     const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
-    const __bjs_codec_TestModule_Point = {
+    const __bjs_codec_M10TestModuleT5Point = {
         lower: (v) => {
-            structHelpers.Point.lower(v);
+            structHelpers.M10TestModuleT5Point.lower(v);
         },
         lift: () => {
-            const struct = structHelpers.Point.lift();
+            const struct = structHelpers.M10TestModuleT5Point.lift();
             return struct;
         },
     };
-    const __bjs_codec_Optional_TestModule_Point = __bjs_optionalCodec(__bjs_codec_TestModule_Point);
-    const __bjs_codec_TestModule_User = {
+    const __bjs_codec_Optional_M10TestModuleT5Point = __bjs_optionalCodec(__bjs_codec_M10TestModuleT5Point);
+    const __bjs_codec_M10TestModuleT4User = {
         lower: (v) => {
             ptrStack.push(v.pointer);
         },
@@ -479,7 +479,7 @@ export async function createInstantiator(options, swift) {
             return obj;
         },
     };
-    const __bjs_codec_Optional_TestModule_User = __bjs_optionalCodec(__bjs_codec_TestModule_User);
+    const __bjs_codec_Optional_M10TestModuleT4User = __bjs_optionalCodec(__bjs_codec_M10TestModuleT4User);
     const __bjs_codec_JSObject = {
         lower: (v) => {
             const objId = swift.memory.retain(v);
@@ -493,20 +493,20 @@ export async function createInstantiator(options, swift) {
         },
     };
     const __bjs_codec_Optional_JSObject = __bjs_optionalCodec(__bjs_codec_JSObject);
-    const __bjs_codec_TestModule_APIResult = {
+    const __bjs_codec_M10TestModuleT9APIResult = {
         lower: (v) => {
-            const caseId = enumHelpers.APIResult.lower(v);
+            const caseId = enumHelpers.M10TestModuleT9APIResult.lower(v);
             i32Stack.push(caseId);
         },
         lift: () => {
-            const enumValue = enumHelpers.APIResult.lift(i32Stack.pop());
+            const enumValue = enumHelpers.M10TestModuleT9APIResult.lift(i32Stack.pop());
             return enumValue;
         },
     };
-    const __bjs_codec_Optional_TestModule_APIResult = __bjs_optionalCodec(__bjs_codec_TestModule_APIResult);
+    const __bjs_codec_Optional_M10TestModuleT9APIResult = __bjs_optionalCodec(__bjs_codec_M10TestModuleT9APIResult);
     const __bjs_codec_Optional_Array_Int = __bjs_optionalCodec(__bjs_codec_Array_Int);
 
-    const __bjs_createPointHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT5Point = () => ({
         lower: (value) => {
             f64Stack.push(value.x);
             f64Stack.push(value.y);
@@ -517,7 +517,7 @@ export async function createInstantiator(options, swift) {
             return { x: f641, y: f64 };
         }
     });
-    const __bjs_createAPIResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT9APIResult = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -578,7 +578,7 @@ export async function createInstantiator(options, swift) {
             }
         }
     });
-    const __bjs_createComplexResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT13ComplexResult = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -680,7 +680,7 @@ export async function createInstantiator(options, swift) {
             }
         }
     });
-    const __bjs_createResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT9UtilitiesT6Result = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -733,7 +733,7 @@ export async function createInstantiator(options, swift) {
             }
         }
     });
-    const __bjs_createNetworkingResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT16NetworkingResult = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -771,7 +771,7 @@ export async function createInstantiator(options, swift) {
             }
         }
     });
-    const __bjs_createAPIOptionalResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT17APIOptionalResult = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -815,7 +815,7 @@ export async function createInstantiator(options, swift) {
             }
         }
     });
-    const __bjs_createTypedPayloadResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT18TypedPayloadResult = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -828,11 +828,11 @@ export async function createInstantiator(options, swift) {
                     return TypedPayloadResultValues.Tag.Direction;
                 }
                 case TypedPayloadResultValues.Tag.OptPrecision: {
-                    __bjs_codec_Optional_TestModule_Precision.lower(value.param0);
+                    __bjs_codec_Optional_M10TestModuleT9Precision.lower(value.param0);
                     return TypedPayloadResultValues.Tag.OptPrecision;
                 }
                 case TypedPayloadResultValues.Tag.OptDirection: {
-                    __bjs_codec_Optional_TestModule_CardinalDirection.lower(value.param0);
+                    __bjs_codec_Optional_M10TestModuleT17CardinalDirection.lower(value.param0);
                     return TypedPayloadResultValues.Tag.OptDirection;
                 }
                 case TypedPayloadResultValues.Tag.Empty: {
@@ -853,11 +853,11 @@ export async function createInstantiator(options, swift) {
                     return { tag: TypedPayloadResultValues.Tag.Direction, param0: caseId };
                 }
                 case TypedPayloadResultValues.Tag.OptPrecision: {
-                    const optValue = __bjs_codec_Optional_TestModule_Precision.lift();
+                    const optValue = __bjs_codec_Optional_M10TestModuleT9Precision.lift();
                     return { tag: TypedPayloadResultValues.Tag.OptPrecision, param0: optValue };
                 }
                 case TypedPayloadResultValues.Tag.OptDirection: {
-                    const optValue = __bjs_codec_Optional_TestModule_CardinalDirection.lift();
+                    const optValue = __bjs_codec_Optional_M10TestModuleT17CardinalDirection.lift();
                     return { tag: TypedPayloadResultValues.Tag.OptDirection, param0: optValue };
                 }
                 case TypedPayloadResultValues.Tag.Empty: return { tag: TypedPayloadResultValues.Tag.Empty };
@@ -865,12 +865,12 @@ export async function createInstantiator(options, swift) {
             }
         }
     });
-    const __bjs_createAllTypesResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT14AllTypesResult = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
                 case AllTypesResultValues.Tag.StructPayload: {
-                    structHelpers.Point.lower(value.param0);
+                    structHelpers.M10TestModuleT5Point.lower(value.param0);
                     return AllTypesResultValues.Tag.StructPayload;
                 }
                 case AllTypesResultValues.Tag.ClassPayload: {
@@ -883,7 +883,7 @@ export async function createInstantiator(options, swift) {
                     return AllTypesResultValues.Tag.JsObjectPayload;
                 }
                 case AllTypesResultValues.Tag.NestedEnum: {
-                    const caseId = enumHelpers.APIResult.lower(value.param0);
+                    const caseId = enumHelpers.M10TestModuleT9APIResult.lower(value.param0);
                     i32Stack.push(caseId);
                     return AllTypesResultValues.Tag.NestedEnum;
                 }
@@ -901,7 +901,7 @@ export async function createInstantiator(options, swift) {
             tag = tag | 0;
             switch (tag) {
                 case AllTypesResultValues.Tag.StructPayload: {
-                    const struct = structHelpers.Point.lift();
+                    const struct = structHelpers.M10TestModuleT5Point.lift();
                     return { tag: AllTypesResultValues.Tag.StructPayload, param0: struct };
                 }
                 case AllTypesResultValues.Tag.ClassPayload: {
@@ -916,7 +916,7 @@ export async function createInstantiator(options, swift) {
                     return { tag: AllTypesResultValues.Tag.JsObjectPayload, param0: obj };
                 }
                 case AllTypesResultValues.Tag.NestedEnum: {
-                    const enumValue = enumHelpers.APIResult.lift(i32Stack.pop());
+                    const enumValue = enumHelpers.M10TestModuleT9APIResult.lift(i32Stack.pop());
                     return { tag: AllTypesResultValues.Tag.NestedEnum, param0: enumValue };
                 }
                 case AllTypesResultValues.Tag.ArrayPayload: {
@@ -928,16 +928,16 @@ export async function createInstantiator(options, swift) {
             }
         }
     });
-    const __bjs_createOptionalAllTypesResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT22OptionalAllTypesResult = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
                 case OptionalAllTypesResultValues.Tag.OptStruct: {
-                    __bjs_codec_Optional_TestModule_Point.lower(value.param0);
+                    __bjs_codec_Optional_M10TestModuleT5Point.lower(value.param0);
                     return OptionalAllTypesResultValues.Tag.OptStruct;
                 }
                 case OptionalAllTypesResultValues.Tag.OptClass: {
-                    __bjs_codec_Optional_TestModule_User.lower(value.param0);
+                    __bjs_codec_Optional_M10TestModuleT4User.lower(value.param0);
                     return OptionalAllTypesResultValues.Tag.OptClass;
                 }
                 case OptionalAllTypesResultValues.Tag.OptJSObject: {
@@ -945,7 +945,7 @@ export async function createInstantiator(options, swift) {
                     return OptionalAllTypesResultValues.Tag.OptJSObject;
                 }
                 case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                    __bjs_codec_Optional_TestModule_APIResult.lower(value.param0);
+                    __bjs_codec_Optional_M10TestModuleT9APIResult.lower(value.param0);
                     return OptionalAllTypesResultValues.Tag.OptNestedEnum;
                 }
                 case OptionalAllTypesResultValues.Tag.OptArray: {
@@ -962,11 +962,11 @@ export async function createInstantiator(options, swift) {
             tag = tag | 0;
             switch (tag) {
                 case OptionalAllTypesResultValues.Tag.OptStruct: {
-                    const optValue = __bjs_codec_Optional_TestModule_Point.lift();
+                    const optValue = __bjs_codec_Optional_M10TestModuleT5Point.lift();
                     return { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptClass: {
-                    const optValue = __bjs_codec_Optional_TestModule_User.lift();
+                    const optValue = __bjs_codec_Optional_M10TestModuleT4User.lift();
                     return { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptJSObject: {
@@ -974,7 +974,7 @@ export async function createInstantiator(options, swift) {
                     return { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                    const optValue = __bjs_codec_Optional_TestModule_APIResult.lift();
+                    const optValue = __bjs_codec_Optional_M10TestModuleT9APIResult.lift();
                     return { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptArray: {
@@ -1062,10 +1062,10 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Point"] = function(objectId) {
-                structHelpers.Point.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT5Point.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Point"] = function() {
-                const value = structHelpers.Point.lift();
+                const value = structHelpers.M10TestModuleT5Point.lift();
                 return swift.memory.retain(value);
             }
             bjs["bjs_core_register_type_handles"] = function() {};
@@ -1247,139 +1247,139 @@ export async function createInstantiator(options, swift) {
                 }
 
             }
-            const PointHelpers = __bjs_createPointHelpers();
-            structHelpers.Point = PointHelpers;
+            const __bjs_helpers_M10TestModuleT5Point = __bjs_createStructHelpers_M10TestModuleT5Point();
+            structHelpers.M10TestModuleT5Point = __bjs_helpers_M10TestModuleT5Point;
 
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers();
-            enumHelpers.APIResult = APIResultHelpers;
+            const __bjs_helpers_M10TestModuleT9APIResult = __bjs_createEnumHelpers_M10TestModuleT9APIResult();
+            enumHelpers.M10TestModuleT9APIResult = __bjs_helpers_M10TestModuleT9APIResult;
 
-            const ComplexResultHelpers = __bjs_createComplexResultValuesHelpers();
-            enumHelpers.ComplexResult = ComplexResultHelpers;
+            const __bjs_helpers_M10TestModuleT13ComplexResult = __bjs_createEnumHelpers_M10TestModuleT13ComplexResult();
+            enumHelpers.M10TestModuleT13ComplexResult = __bjs_helpers_M10TestModuleT13ComplexResult;
 
-            const ResultHelpers = __bjs_createResultValuesHelpers();
-            enumHelpers.Result = ResultHelpers;
+            const __bjs_helpers_M10TestModuleT9UtilitiesT6Result = __bjs_createEnumHelpers_M10TestModuleT9UtilitiesT6Result();
+            enumHelpers.M10TestModuleT9UtilitiesT6Result = __bjs_helpers_M10TestModuleT9UtilitiesT6Result;
 
-            const NetworkingResultHelpers = __bjs_createNetworkingResultValuesHelpers();
-            enumHelpers.NetworkingResult = NetworkingResultHelpers;
+            const __bjs_helpers_M10TestModuleT16NetworkingResult = __bjs_createEnumHelpers_M10TestModuleT16NetworkingResult();
+            enumHelpers.M10TestModuleT16NetworkingResult = __bjs_helpers_M10TestModuleT16NetworkingResult;
 
-            const APIOptionalResultHelpers = __bjs_createAPIOptionalResultValuesHelpers();
-            enumHelpers.APIOptionalResult = APIOptionalResultHelpers;
+            const __bjs_helpers_M10TestModuleT17APIOptionalResult = __bjs_createEnumHelpers_M10TestModuleT17APIOptionalResult();
+            enumHelpers.M10TestModuleT17APIOptionalResult = __bjs_helpers_M10TestModuleT17APIOptionalResult;
 
-            const TypedPayloadResultHelpers = __bjs_createTypedPayloadResultValuesHelpers();
-            enumHelpers.TypedPayloadResult = TypedPayloadResultHelpers;
+            const __bjs_helpers_M10TestModuleT18TypedPayloadResult = __bjs_createEnumHelpers_M10TestModuleT18TypedPayloadResult();
+            enumHelpers.M10TestModuleT18TypedPayloadResult = __bjs_helpers_M10TestModuleT18TypedPayloadResult;
 
-            const AllTypesResultHelpers = __bjs_createAllTypesResultValuesHelpers();
-            enumHelpers.AllTypesResult = AllTypesResultHelpers;
+            const __bjs_helpers_M10TestModuleT14AllTypesResult = __bjs_createEnumHelpers_M10TestModuleT14AllTypesResult();
+            enumHelpers.M10TestModuleT14AllTypesResult = __bjs_helpers_M10TestModuleT14AllTypesResult;
 
-            const OptionalAllTypesResultHelpers = __bjs_createOptionalAllTypesResultValuesHelpers();
-            enumHelpers.OptionalAllTypesResult = OptionalAllTypesResultHelpers;
+            const __bjs_helpers_M10TestModuleT22OptionalAllTypesResult = __bjs_createEnumHelpers_M10TestModuleT22OptionalAllTypesResult();
+            enumHelpers.M10TestModuleT22OptionalAllTypesResult = __bjs_helpers_M10TestModuleT22OptionalAllTypesResult;
 
             const exports = {
                 handle: function bjs_handle(result) {
-                    const resultCaseId = enumHelpers.APIResult.lower(result);
+                    const resultCaseId = enumHelpers.M10TestModuleT9APIResult.lower(result);
                     instance.exports.bjs_handle(resultCaseId);
                 },
                 getResult: function bjs_getResult() {
                     instance.exports.bjs_getResult();
-                    const ret = enumHelpers.APIResult.lift(i32Stack.pop());
+                    const ret = enumHelpers.M10TestModuleT9APIResult.lift(i32Stack.pop());
                     return ret;
                 },
                 roundtripAPIResult: function bjs_roundtripAPIResult(result) {
-                    const resultCaseId = enumHelpers.APIResult.lower(result);
+                    const resultCaseId = enumHelpers.M10TestModuleT9APIResult.lower(result);
                     instance.exports.bjs_roundtripAPIResult(resultCaseId);
-                    const ret = enumHelpers.APIResult.lift(i32Stack.pop());
+                    const ret = enumHelpers.M10TestModuleT9APIResult.lift(i32Stack.pop());
                     return ret;
                 },
                 roundTripOptionalAPIResult: function bjs_roundTripOptionalAPIResult(result) {
                     const isSome = result != null;
                     let result1;
                     if (isSome) {
-                        const resultCaseId = enumHelpers.APIResult.lower(result);
+                        const resultCaseId = enumHelpers.M10TestModuleT9APIResult.lower(result);
                         result1 = resultCaseId;
                     } else {
                         result1 = 0;
                     }
                     instance.exports.bjs_roundTripOptionalAPIResult(+isSome, result1);
                     const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.APIResult.lift(tag);
+                    const optResult = tag === -1 ? null : enumHelpers.M10TestModuleT9APIResult.lift(tag);
                     return optResult;
                 },
                 handleComplex: function bjs_handleComplex(result) {
-                    const resultCaseId = enumHelpers.ComplexResult.lower(result);
+                    const resultCaseId = enumHelpers.M10TestModuleT13ComplexResult.lower(result);
                     instance.exports.bjs_handleComplex(resultCaseId);
                 },
                 getComplexResult: function bjs_getComplexResult() {
                     instance.exports.bjs_getComplexResult();
-                    const ret = enumHelpers.ComplexResult.lift(i32Stack.pop());
+                    const ret = enumHelpers.M10TestModuleT13ComplexResult.lift(i32Stack.pop());
                     return ret;
                 },
                 roundtripComplexResult: function bjs_roundtripComplexResult(result) {
-                    const resultCaseId = enumHelpers.ComplexResult.lower(result);
+                    const resultCaseId = enumHelpers.M10TestModuleT13ComplexResult.lower(result);
                     instance.exports.bjs_roundtripComplexResult(resultCaseId);
-                    const ret = enumHelpers.ComplexResult.lift(i32Stack.pop());
+                    const ret = enumHelpers.M10TestModuleT13ComplexResult.lift(i32Stack.pop());
                     return ret;
                 },
                 roundTripOptionalComplexResult: function bjs_roundTripOptionalComplexResult(result) {
                     const isSome = result != null;
                     let result1;
                     if (isSome) {
-                        const resultCaseId = enumHelpers.ComplexResult.lower(result);
+                        const resultCaseId = enumHelpers.M10TestModuleT13ComplexResult.lower(result);
                         result1 = resultCaseId;
                     } else {
                         result1 = 0;
                     }
                     instance.exports.bjs_roundTripOptionalComplexResult(+isSome, result1);
                     const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.ComplexResult.lift(tag);
+                    const optResult = tag === -1 ? null : enumHelpers.M10TestModuleT13ComplexResult.lift(tag);
                     return optResult;
                 },
                 roundTripOptionalUtilitiesResult: function bjs_roundTripOptionalUtilitiesResult(result) {
                     const isSome = result != null;
                     let result1;
                     if (isSome) {
-                        const resultCaseId = enumHelpers.Result.lower(result);
+                        const resultCaseId = enumHelpers.M10TestModuleT9UtilitiesT6Result.lower(result);
                         result1 = resultCaseId;
                     } else {
                         result1 = 0;
                     }
                     instance.exports.bjs_roundTripOptionalUtilitiesResult(+isSome, result1);
                     const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.Result.lift(tag);
+                    const optResult = tag === -1 ? null : enumHelpers.M10TestModuleT9UtilitiesT6Result.lift(tag);
                     return optResult;
                 },
                 roundTripOptionalNetworkingResult: function bjs_roundTripOptionalNetworkingResult(result) {
                     const isSome = result != null;
                     let result1;
                     if (isSome) {
-                        const resultCaseId = enumHelpers.NetworkingResult.lower(result);
+                        const resultCaseId = enumHelpers.M10TestModuleT16NetworkingResult.lower(result);
                         result1 = resultCaseId;
                     } else {
                         result1 = 0;
                     }
                     instance.exports.bjs_roundTripOptionalNetworkingResult(+isSome, result1);
                     const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.NetworkingResult.lift(tag);
+                    const optResult = tag === -1 ? null : enumHelpers.M10TestModuleT16NetworkingResult.lift(tag);
                     return optResult;
                 },
                 roundTripOptionalAPIOptionalResult: function bjs_roundTripOptionalAPIOptionalResult(result) {
                     const isSome = result != null;
                     let result1;
                     if (isSome) {
-                        const resultCaseId = enumHelpers.APIOptionalResult.lower(result);
+                        const resultCaseId = enumHelpers.M10TestModuleT17APIOptionalResult.lower(result);
                         result1 = resultCaseId;
                     } else {
                         result1 = 0;
                     }
                     instance.exports.bjs_roundTripOptionalAPIOptionalResult(+isSome, result1);
                     const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.APIOptionalResult.lift(tag);
+                    const optResult = tag === -1 ? null : enumHelpers.M10TestModuleT17APIOptionalResult.lift(tag);
                     return optResult;
                 },
                 compareAPIResults: function bjs_compareAPIResults(result1, result2) {
                     const isSome = result1 != null;
                     let result;
                     if (isSome) {
-                        const result1CaseId = enumHelpers.APIOptionalResult.lower(result1);
+                        const result1CaseId = enumHelpers.M10TestModuleT17APIOptionalResult.lower(result1);
                         result = result1CaseId;
                     } else {
                         result = 0;
@@ -1387,74 +1387,74 @@ export async function createInstantiator(options, swift) {
                     const isSome1 = result2 != null;
                     let result3;
                     if (isSome1) {
-                        const result2CaseId = enumHelpers.APIOptionalResult.lower(result2);
+                        const result2CaseId = enumHelpers.M10TestModuleT17APIOptionalResult.lower(result2);
                         result3 = result2CaseId;
                     } else {
                         result3 = 0;
                     }
                     instance.exports.bjs_compareAPIResults(+isSome, result, +isSome1, result3);
                     const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.APIOptionalResult.lift(tag);
+                    const optResult = tag === -1 ? null : enumHelpers.M10TestModuleT17APIOptionalResult.lift(tag);
                     return optResult;
                 },
                 roundTripTypedPayloadResult: function bjs_roundTripTypedPayloadResult(result) {
-                    const resultCaseId = enumHelpers.TypedPayloadResult.lower(result);
+                    const resultCaseId = enumHelpers.M10TestModuleT18TypedPayloadResult.lower(result);
                     instance.exports.bjs_roundTripTypedPayloadResult(resultCaseId);
-                    const ret = enumHelpers.TypedPayloadResult.lift(i32Stack.pop());
+                    const ret = enumHelpers.M10TestModuleT18TypedPayloadResult.lift(i32Stack.pop());
                     return ret;
                 },
                 roundTripOptionalTypedPayloadResult: function bjs_roundTripOptionalTypedPayloadResult(result) {
                     const isSome = result != null;
                     let result1;
                     if (isSome) {
-                        const resultCaseId = enumHelpers.TypedPayloadResult.lower(result);
+                        const resultCaseId = enumHelpers.M10TestModuleT18TypedPayloadResult.lower(result);
                         result1 = resultCaseId;
                     } else {
                         result1 = 0;
                     }
                     instance.exports.bjs_roundTripOptionalTypedPayloadResult(+isSome, result1);
                     const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.TypedPayloadResult.lift(tag);
+                    const optResult = tag === -1 ? null : enumHelpers.M10TestModuleT18TypedPayloadResult.lift(tag);
                     return optResult;
                 },
                 roundTripAllTypesResult: function bjs_roundTripAllTypesResult(result) {
-                    const resultCaseId = enumHelpers.AllTypesResult.lower(result);
+                    const resultCaseId = enumHelpers.M10TestModuleT14AllTypesResult.lower(result);
                     instance.exports.bjs_roundTripAllTypesResult(resultCaseId);
-                    const ret = enumHelpers.AllTypesResult.lift(i32Stack.pop());
+                    const ret = enumHelpers.M10TestModuleT14AllTypesResult.lift(i32Stack.pop());
                     return ret;
                 },
                 roundTripOptionalAllTypesResult: function bjs_roundTripOptionalAllTypesResult(result) {
                     const isSome = result != null;
                     let result1;
                     if (isSome) {
-                        const resultCaseId = enumHelpers.AllTypesResult.lower(result);
+                        const resultCaseId = enumHelpers.M10TestModuleT14AllTypesResult.lower(result);
                         result1 = resultCaseId;
                     } else {
                         result1 = 0;
                     }
                     instance.exports.bjs_roundTripOptionalAllTypesResult(+isSome, result1);
                     const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.AllTypesResult.lift(tag);
+                    const optResult = tag === -1 ? null : enumHelpers.M10TestModuleT14AllTypesResult.lift(tag);
                     return optResult;
                 },
                 roundTripOptionalPayloadResult: function bjs_roundTripOptionalPayloadResult(result) {
-                    const resultCaseId = enumHelpers.OptionalAllTypesResult.lower(result);
+                    const resultCaseId = enumHelpers.M10TestModuleT22OptionalAllTypesResult.lower(result);
                     instance.exports.bjs_roundTripOptionalPayloadResult(resultCaseId);
-                    const ret = enumHelpers.OptionalAllTypesResult.lift(i32Stack.pop());
+                    const ret = enumHelpers.M10TestModuleT22OptionalAllTypesResult.lift(i32Stack.pop());
                     return ret;
                 },
                 roundTripOptionalPayloadResultOpt: function bjs_roundTripOptionalPayloadResultOpt(result) {
                     const isSome = result != null;
                     let result1;
                     if (isSome) {
-                        const resultCaseId = enumHelpers.OptionalAllTypesResult.lower(result);
+                        const resultCaseId = enumHelpers.M10TestModuleT22OptionalAllTypesResult.lower(result);
                         result1 = resultCaseId;
                     } else {
                         result1 = 0;
                     }
                     instance.exports.bjs_roundTripOptionalPayloadResultOpt(+isSome, result1);
                     const tag = i32Stack.pop();
-                    const optResult = tag === -1 ? null : enumHelpers.OptionalAllTypesResult.lift(tag);
+                    const optResult = tag === -1 ? null : enumHelpers.M10TestModuleT22OptionalAllTypesResult.lift(tag);
                     return optResult;
                 },
                 APIResult: APIResultValues,

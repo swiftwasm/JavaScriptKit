@@ -92,8 +92,6 @@ public class ExportSwift {
         }
 
         withSpan("Render Generic Bridgeable Conformances") { [self] in
-            // Emitted unconditionally: a module cannot know whether a dependent
-            // module passes its types to a generic imported function.
             let genericConformanceCodegen = GenericConformanceCodegen()
             for entry in skeleton.genericBridgeableTypeEntries {
                 decls.append(contentsOf: genericConformanceCodegen.renderConformance(typeName: entry.swiftName))
@@ -886,8 +884,6 @@ public class ExportSwift {
 
 // MARK: - GenericConformanceCodegen
 
-/// Renders `BridgedSwiftGenericBridgeable` conformances for `@JS` types so they
-/// can be used as the generic argument of a generic imported `@JSFunction`.
 struct GenericConformanceCodegen {
     func renderConformance(typeName: String) -> [DeclSyntax] {
         let printer = CodeFragmentPrinter()
@@ -904,14 +900,6 @@ struct GenericConformanceCodegen {
 
 // MARK: - GenericTypeRegistrationCodegen
 
-/// Renders the `bjs_<Module>_register_type_handles` wasm export: it lowers each
-/// registered type's `bridgeJSTypeID` into a buffer, in the canonical order of
-/// `BridgeJSSkeleton.typeRegistrationEntries`, and passes it to the JS import
-/// hook of the same name, which pairs the IDs with its codec array by index.
-///
-/// Only the module's own `@JS` types are listed; the core (primitive) handles are
-/// registered once by the JavaScriptKit library itself
-/// (`_bjs_core_register_type_handles`).
 public struct GenericTypeRegistrationCodegen {
     public init() {}
 

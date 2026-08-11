@@ -362,7 +362,7 @@ export async function createInstantiator(options, swift) {
     const __bjs_codec_Optional_Int = __bjs_optionalCodec(__bjs_primitiveCodecs.Int);
     const __bjs_codec_Optional_Bool = __bjs_optionalCodec(__bjs_primitiveCodecs.Bool);
     const __bjs_codec_Optional_String = __bjs_optionalCodec(__bjs_stringCodec);
-    const __bjs_codec_TestModule_Precision = {
+    const __bjs_codec_M10TestModuleT9Precision = {
         lower: (v) => {
             f32Stack.push(Math.fround(v));
         },
@@ -371,7 +371,7 @@ export async function createInstantiator(options, swift) {
             return rawValue;
         },
     };
-    const __bjs_codec_Optional_TestModule_Precision = __bjs_optionalCodec(__bjs_codec_TestModule_Precision);
+    const __bjs_codec_Optional_M10TestModuleT9Precision = __bjs_optionalCodec(__bjs_codec_M10TestModuleT9Precision);
     const __bjs_codec_JSObject = {
         lower: (v) => {
             const objId = swift.memory.retain(v);
@@ -386,7 +386,7 @@ export async function createInstantiator(options, swift) {
     };
     const __bjs_codec_Optional_JSObject = __bjs_optionalCodec(__bjs_codec_JSObject);
 
-    const __bjs_createDataPointHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT9DataPoint = () => ({
         lower: (value) => {
             f64Stack.push(value.x);
             f64Stack.push(value.y);
@@ -406,7 +406,7 @@ export async function createInstantiator(options, swift) {
             return { x: f641, y: f64, label: string, optCount: optValue1, optFlag: optValue };
         }
     });
-    const __bjs_createAddressHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT7Address = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.street);
             const id = swift.memory.retain(bytes);
@@ -425,25 +425,25 @@ export async function createInstantiator(options, swift) {
             return { street: string1, city: string, zipCode: optValue };
         }
     });
-    const __bjs_createPersonHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT6Person = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.name);
             const id = swift.memory.retain(bytes);
             i32Stack.push(bytes.length);
             i32Stack.push(id);
             i32Stack.push((value.age | 0));
-            structHelpers.Address.lower(value.address);
+            structHelpers.M10TestModuleT7Address.lower(value.address);
             __bjs_codec_Optional_String.lower(value.email);
         },
         lift: () => {
             const optValue = __bjs_codec_Optional_String.lift();
-            const struct = structHelpers.Address.lift();
+            const struct = structHelpers.M10TestModuleT7Address.lift();
             const int = i32Stack.pop();
             const string = strStack.pop();
             return { name: string, age: int, address: struct, email: optValue };
         }
     });
-    const __bjs_createSessionHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT7Session = () => ({
         lower: (value) => {
             i32Stack.push((value.id | 0));
             ptrStack.push(value.owner.pointer);
@@ -455,27 +455,27 @@ export async function createInstantiator(options, swift) {
             return { id: int, owner: obj };
         }
     });
-    const __bjs_createMeasurementHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT11Measurement = () => ({
         lower: (value) => {
             f64Stack.push(value.value);
             f32Stack.push(Math.fround(value.precision));
-            __bjs_codec_Optional_TestModule_Precision.lower(value.optionalPrecision);
+            __bjs_codec_Optional_M10TestModuleT9Precision.lower(value.optionalPrecision);
         },
         lift: () => {
-            const optValue = __bjs_codec_Optional_TestModule_Precision.lift();
+            const optValue = __bjs_codec_Optional_M10TestModuleT9Precision.lift();
             const rawValue = f32Stack.pop();
             const f64 = f64Stack.pop();
             return { value: f64, precision: rawValue, optionalPrecision: optValue };
         }
     });
-    const __bjs_createConfigStructHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT12ConfigStruct = () => ({
         lower: (value) => {
         },
         lift: () => {
             return {  };
         }
     });
-    const __bjs_createContainerHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT9Container = () => ({
         lower: (value) => {
             let id;
             if (value.object != null) {
@@ -499,7 +499,7 @@ export async function createInstantiator(options, swift) {
             return { object: value, optionalObject: optValue };
         }
     });
-    const __bjs_createVector2DHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT8Vector2D = () => ({
         lower: (value) => {
             f64Stack.push(value.dx);
             f64Stack.push(value.dy);
@@ -509,18 +509,18 @@ export async function createInstantiator(options, swift) {
             const f641 = f64Stack.pop();
             const instance1 = { dx: f641, dy: f64 };
             instance1.magnitude = function() {
-                structHelpers.Vector2D.lower(this);
+                structHelpers.M10TestModuleT8Vector2D.lower(this);
                 const ret = instance.exports.bjs_Vector2D_magnitude();
                 return ret;
             }.bind(instance1);
             instance1.scaled = function(factor) {
-                structHelpers.Vector2D.lower(this);
+                structHelpers.M10TestModuleT8Vector2D.lower(this);
                 const ret1 = instance.exports.bjs_Vector2D_scaled(factor);
-                const structValue = structHelpers.Vector2D.lift();
+                const structValue = structHelpers.M10TestModuleT8Vector2D.lift();
                 return structValue;
             }.bind(instance1);
             instance1.describe = function() {
-                structHelpers.Vector2D.lower(this);
+                structHelpers.M10TestModuleT8Vector2D.lower(this);
                 const ret2 = instance.exports.bjs_Vector2D_describe();
                 const ret3 = tmpRetString;
                 tmpRetString = undefined;
@@ -605,59 +605,59 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_DataPoint"] = function(objectId) {
-                structHelpers.DataPoint.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT9DataPoint.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_DataPoint"] = function() {
-                const value = structHelpers.DataPoint.lift();
+                const value = structHelpers.M10TestModuleT9DataPoint.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Address"] = function(objectId) {
-                structHelpers.Address.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT7Address.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Address"] = function() {
-                const value = structHelpers.Address.lift();
+                const value = structHelpers.M10TestModuleT7Address.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Person"] = function(objectId) {
-                structHelpers.Person.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT6Person.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Person"] = function() {
-                const value = structHelpers.Person.lift();
+                const value = structHelpers.M10TestModuleT6Person.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Session"] = function(objectId) {
-                structHelpers.Session.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT7Session.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Session"] = function() {
-                const value = structHelpers.Session.lift();
+                const value = structHelpers.M10TestModuleT7Session.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Measurement"] = function(objectId) {
-                structHelpers.Measurement.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT11Measurement.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Measurement"] = function() {
-                const value = structHelpers.Measurement.lift();
+                const value = structHelpers.M10TestModuleT11Measurement.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_ConfigStruct"] = function(objectId) {
-                structHelpers.ConfigStruct.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT12ConfigStruct.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_ConfigStruct"] = function() {
-                const value = structHelpers.ConfigStruct.lift();
+                const value = structHelpers.M10TestModuleT12ConfigStruct.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Container"] = function(objectId) {
-                structHelpers.Container.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT9Container.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Container"] = function() {
-                const value = structHelpers.Container.lift();
+                const value = structHelpers.M10TestModuleT9Container.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Vector2D"] = function(objectId) {
-                structHelpers.Vector2D.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT8Vector2D.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Vector2D"] = function() {
-                const value = structHelpers.Vector2D.lift();
+                const value = structHelpers.M10TestModuleT8Vector2D.lift();
                 return swift.memory.retain(value);
             }
             bjs["bjs_core_register_type_handles"] = function() {};
@@ -862,41 +862,41 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_Greeter_name_set(this.pointer, valueId, valueBytes.length);
                 }
             }
-            const DataPointHelpers = __bjs_createDataPointHelpers();
-            structHelpers.DataPoint = DataPointHelpers;
+            const __bjs_helpers_M10TestModuleT9DataPoint = __bjs_createStructHelpers_M10TestModuleT9DataPoint();
+            structHelpers.M10TestModuleT9DataPoint = __bjs_helpers_M10TestModuleT9DataPoint;
 
-            const AddressHelpers = __bjs_createAddressHelpers();
-            structHelpers.Address = AddressHelpers;
+            const __bjs_helpers_M10TestModuleT7Address = __bjs_createStructHelpers_M10TestModuleT7Address();
+            structHelpers.M10TestModuleT7Address = __bjs_helpers_M10TestModuleT7Address;
 
-            const PersonHelpers = __bjs_createPersonHelpers();
-            structHelpers.Person = PersonHelpers;
+            const __bjs_helpers_M10TestModuleT6Person = __bjs_createStructHelpers_M10TestModuleT6Person();
+            structHelpers.M10TestModuleT6Person = __bjs_helpers_M10TestModuleT6Person;
 
-            const SessionHelpers = __bjs_createSessionHelpers();
-            structHelpers.Session = SessionHelpers;
+            const __bjs_helpers_M10TestModuleT7Session = __bjs_createStructHelpers_M10TestModuleT7Session();
+            structHelpers.M10TestModuleT7Session = __bjs_helpers_M10TestModuleT7Session;
 
-            const MeasurementHelpers = __bjs_createMeasurementHelpers();
-            structHelpers.Measurement = MeasurementHelpers;
+            const __bjs_helpers_M10TestModuleT11Measurement = __bjs_createStructHelpers_M10TestModuleT11Measurement();
+            structHelpers.M10TestModuleT11Measurement = __bjs_helpers_M10TestModuleT11Measurement;
 
-            const ConfigStructHelpers = __bjs_createConfigStructHelpers();
-            structHelpers.ConfigStruct = ConfigStructHelpers;
+            const __bjs_helpers_M10TestModuleT12ConfigStruct = __bjs_createStructHelpers_M10TestModuleT12ConfigStruct();
+            structHelpers.M10TestModuleT12ConfigStruct = __bjs_helpers_M10TestModuleT12ConfigStruct;
 
-            const ContainerHelpers = __bjs_createContainerHelpers();
-            structHelpers.Container = ContainerHelpers;
+            const __bjs_helpers_M10TestModuleT9Container = __bjs_createStructHelpers_M10TestModuleT9Container();
+            structHelpers.M10TestModuleT9Container = __bjs_helpers_M10TestModuleT9Container;
 
-            const Vector2DHelpers = __bjs_createVector2DHelpers();
-            structHelpers.Vector2D = Vector2DHelpers;
+            const __bjs_helpers_M10TestModuleT8Vector2D = __bjs_createStructHelpers_M10TestModuleT8Vector2D();
+            structHelpers.M10TestModuleT8Vector2D = __bjs_helpers_M10TestModuleT8Vector2D;
 
             const exports = {
                 roundtrip: function bjs_roundtrip(session) {
-                    structHelpers.Person.lower(session);
+                    structHelpers.M10TestModuleT6Person.lower(session);
                     instance.exports.bjs_roundtrip();
-                    const structValue = structHelpers.Person.lift();
+                    const structValue = structHelpers.M10TestModuleT6Person.lift();
                     return structValue;
                 },
                 roundtripContainer: function bjs_roundtripContainer(container) {
-                    structHelpers.Container.lower(container);
+                    structHelpers.M10TestModuleT9Container.lower(container);
                     instance.exports.bjs_roundtripContainer();
-                    const structValue = structHelpers.Container.lift();
+                    const structValue = structHelpers.M10TestModuleT9Container.lift();
                     return structValue;
                 },
                 Precision: PrecisionValues,
@@ -941,7 +941,7 @@ export async function createInstantiator(options, swift) {
                         const isSome = optCount != null;
                         const isSome1 = optFlag != null;
                         instance.exports.bjs_DataPoint_init(x, y, labelId, labelBytes.length, +isSome, isSome ? optCount : 0, +isSome1, isSome1 ? optFlag ? 1 : 0 : 0);
-                        const structValue = structHelpers.DataPoint.lift();
+                        const structValue = structHelpers.M10TestModuleT9DataPoint.lift();
                         return structValue;
                     },
                     get dimensions() {
@@ -950,7 +950,7 @@ export async function createInstantiator(options, swift) {
                     },
                     origin: function() {
                         instance.exports.bjs_DataPoint_static_origin();
-                        const structValue = structHelpers.DataPoint.lift();
+                        const structValue = structHelpers.M10TestModuleT9DataPoint.lift();
                         return structValue;
                     },
                 },

@@ -359,7 +359,7 @@ export async function createInstantiator(options, swift) {
     const __bjs_codec_Optional_Dict_String = __bjs_optionalCodec(__bjs_codec_Dict_String);
     const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
     const __bjs_codec_Dict_Array_Int = __bjs_dictCodec(__bjs_codec_Array_Int);
-    const __bjs_codec_TestModule_Box = {
+    const __bjs_codec_M10TestModuleT3Box = {
         lower: (v) => {
             ptrStack.push(v.pointer);
         },
@@ -369,14 +369,14 @@ export async function createInstantiator(options, swift) {
             return obj;
         },
     };
-    const __bjs_codec_Dict_TestModule_Box = __bjs_dictCodec(__bjs_codec_TestModule_Box);
-    const __bjs_codec_Optional_TestModule_Box = __bjs_optionalCodec(__bjs_codec_TestModule_Box);
-    const __bjs_codec_Dict_Optional_TestModule_Box = __bjs_dictCodec(__bjs_codec_Optional_TestModule_Box);
+    const __bjs_codec_Dict_M10TestModuleT3Box = __bjs_dictCodec(__bjs_codec_M10TestModuleT3Box);
+    const __bjs_codec_Optional_M10TestModuleT3Box = __bjs_optionalCodec(__bjs_codec_M10TestModuleT3Box);
+    const __bjs_codec_Dict_Optional_M10TestModuleT3Box = __bjs_dictCodec(__bjs_codec_Optional_M10TestModuleT3Box);
     const __bjs_codec_Dict_Double = __bjs_dictCodec(__bjs_primitiveCodecs.Double);
     const __bjs_codec_Optional_Int = __bjs_optionalCodec(__bjs_primitiveCodecs.Int);
     const __bjs_codec_Dict_Optional_Int = __bjs_dictCodec(__bjs_codec_Optional_Int);
 
-    const __bjs_createCountersHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT8Counters = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.name);
             const id = swift.memory.retain(bytes);
@@ -467,10 +467,10 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Counters"] = function(objectId) {
-                structHelpers.Counters.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT8Counters.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Counters"] = function() {
-                const value = structHelpers.Counters.lift();
+                const value = structHelpers.M10TestModuleT8Counters.lift();
                 return swift.memory.retain(value);
             }
             bjs["bjs_core_register_type_handles"] = function() {};
@@ -662,8 +662,8 @@ export async function createInstantiator(options, swift) {
                 }
 
             }
-            const CountersHelpers = __bjs_createCountersHelpers();
-            structHelpers.Counters = CountersHelpers;
+            const __bjs_helpers_M10TestModuleT8Counters = __bjs_createStructHelpers_M10TestModuleT8Counters();
+            structHelpers.M10TestModuleT8Counters = __bjs_helpers_M10TestModuleT8Counters;
 
             const exports = {
                 mirrorDictionary: function bjs_mirrorDictionary(values) {
@@ -685,21 +685,21 @@ export async function createInstantiator(options, swift) {
                     return dictResult;
                 },
                 boxDictionary: function bjs_boxDictionary(boxes) {
-                    __bjs_codec_Dict_TestModule_Box.lower(boxes);
+                    __bjs_codec_Dict_M10TestModuleT3Box.lower(boxes);
                     instance.exports.bjs_boxDictionary();
-                    const dictResult = __bjs_codec_Dict_TestModule_Box.lift();
+                    const dictResult = __bjs_codec_Dict_M10TestModuleT3Box.lift();
                     return dictResult;
                 },
                 optionalBoxDictionary: function bjs_optionalBoxDictionary(boxes) {
-                    __bjs_codec_Dict_Optional_TestModule_Box.lower(boxes);
+                    __bjs_codec_Dict_Optional_M10TestModuleT3Box.lower(boxes);
                     instance.exports.bjs_optionalBoxDictionary();
-                    const dictResult = __bjs_codec_Dict_Optional_TestModule_Box.lift();
+                    const dictResult = __bjs_codec_Dict_Optional_M10TestModuleT3Box.lift();
                     return dictResult;
                 },
                 roundtripCounters: function bjs_roundtripCounters(counters) {
-                    structHelpers.Counters.lower(counters);
+                    structHelpers.M10TestModuleT8Counters.lower(counters);
                     instance.exports.bjs_roundtripCounters();
-                    const structValue = structHelpers.Counters.lift();
+                    const structValue = structHelpers.M10TestModuleT8Counters.lift();
                     return structValue;
                 },
                 Box,

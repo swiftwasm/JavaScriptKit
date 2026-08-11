@@ -348,8 +348,6 @@ public struct BridgeJSLink {
             declarations.append("        return;")
             declarations.append("    }")
             declarations.append("    __bjs_typeHandlesRegistered = true;")
-            // The core (primitive) handles live in the JavaScriptKit library, so
-            // they are registered once here rather than by every module.
             declarations.append(
                 "    \(JSGlueVariableScope.reservedInstance).exports[\"\(ABINameGenerator.coreTypeRegistrationFunctionName)\"]();"
             )
@@ -403,7 +401,6 @@ public struct BridgeJSLink {
         printer.write(lines: lines)
     }
 
-    /// A print context detached from any thunk, used for codec literal emission.
     private func makeCodecPrintContext(printer: CodeFragmentPrinter) -> IntrinsicJSFragment.PrintCodeContext {
         IntrinsicJSFragment.PrintCodeContext(
             scope: JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry),
@@ -413,16 +410,10 @@ public struct BridgeJSLink {
         )
     }
 
-    /// Returns the module-scope codec helper for one bridgeable type, declaring
-    /// it if this is the first reference.
-    ///
-    /// The registration table and the container combinators' element positions
-    /// go through the same helper, so a type's stack ABI is described once.
     private func genericCodecReference(type: BridgeType, into printer: CodeFragmentPrinter) throws -> String {
         try ContainerCodecJS.codecExpression(for: type, context: makeCodecPrintContext(printer: printer))
     }
 
-    /// Pairs the type IDs Swift pushed with codecs in the matching skeleton order.
     private func writeTypeHandleRegistrationBody(into printer: CodeFragmentPrinter) {
         printer.write(
             "const typeIds = new Int32Array(\(JSGlueVariableScope.reservedMemory).buffer, base >>> 0, count >>> 0);"
@@ -434,11 +425,6 @@ public struct BridgeJSLink {
         printer.write("}")
     }
 
-    /// Installs the `bjs_core_register_type_handles` hook. The core handles are
-    /// owned by the JavaScriptKit library rather than by generated code, so the
-    /// wasm import exists in every binary that links JavaScriptKit and the hook
-    /// is always installed; without generics anywhere in the build it is a no-op
-    /// and the registration export is never called.
     private func generateCoreTypeRegistrationHook(into printer: CodeFragmentPrinter) throws {
         let hookName = ABINameGenerator.coreTypeRegistrationFunctionName
         guard hasGenerics else {
@@ -448,8 +434,6 @@ public struct BridgeJSLink {
         try ContainerCodecJS.registerPrimitiveCodecs(context: makeCodecPrintContext(printer: printer))
         printer.write("bjs[\"\(hookName)\"] = function(base, count) {")
         printer.indent {
-            // Same canonical order as `_bjs_core_register_type_handles` in the
-            // JavaScriptKit library.
             printer.write("const codecs = [")
             printer.indent {
                 for primitive in BridgeType.genericBridgeablePrimitives {
@@ -462,10 +446,6 @@ public struct BridgeJSLink {
         printer.write("}")
     }
 
-    /// Installs the per-module `bjs_<Module>_register_type_handles` import
-    /// hooks. A module with a registration function always carries the wasm
-    /// import, so a hook is always installed; without generics anywhere in the
-    /// build it is a no-op and the registration export is never called.
     private func generateTypeRegistrationHooks(into printer: CodeFragmentPrinter) throws {
         try generateCoreTypeRegistrationHook(into: printer)
         for skeleton in skeletons {
@@ -477,7 +457,6 @@ public struct BridgeJSLink {
             }
             printer.write("bjs[\"\(hookName)\"] = function(base, count) {")
             try printer.indent {
-                // Same order as the module's Swift registration function.
                 let codecNames = try moduleEntries.map {
                     try genericCodecReference(type: $0.bridgeType, into: printer)
                 }
@@ -496,7 +475,9 @@ public struct BridgeJSLink {
 
     private func generateAddImports(needsImportsObject: Bool) throws -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
-        let allStructs = skeletons.compactMap { $0.exported?.structs }.flatMap { $0 }
+        let allStructs = skeletons.flatMap { unified in
+            (unified.exported?.structs ?? []).map { (moduleName: unified.moduleName, structDef: $0) }
+        }
         printer.write("return {")
         try printer.indent {
             printer.write(lines: [
@@ -644,11 +625,12 @@ public struct BridgeJSLink {
                 }
                 printer.write("}")
                 if !allStructs.isEmpty {
-                    for structDef in allStructs {
+                    for (moduleName, structDef) in allStructs {
+                        let key = HelperNaming.type(module: moduleName, swiftName: structDef.swiftCallName)
                         printer.write("bjs[\"swift_js_struct_lower_\(structDef.abiName)\"] = function(objectId) {")
                         printer.indent {
                             printer.write(
-                                "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
+                                "\(JSGlueVariableScope.reservedStructHelpers).\(key).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
                             )
                         }
                         printer.write("}")
@@ -656,7 +638,7 @@ public struct BridgeJSLink {
                         printer.write("bjs[\"swift_js_struct_lift_\(structDef.abiName)\"] = function() {")
                         printer.indent {
                             printer.write(
-                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName).lift();"
+                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(key).lift();"
                             )
                             printer.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(value);")
                         }
@@ -1229,12 +1211,18 @@ public struct BridgeJSLink {
 
             let bodyPrinter = CodeFragmentPrinter()
             let allStructs = exportedSkeletons.flatMap { $0.structs }
-            for structDef in allStructs {
+            for (moduleName, structDef) in skeletons.flatMap({ unified in
+                (unified.exported?.structs ?? []).map { (unified.moduleName, $0) }
+            }) {
                 let structPrinter = CodeFragmentPrinter()
                 let structScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-                let fragment = IntrinsicJSFragment.structHelper(structDefinition: structDef, allStructs: allStructs)
+                let fragment = IntrinsicJSFragment.structHelper(
+                    structDefinition: structDef,
+                    allStructs: allStructs,
+                    moduleName: moduleName
+                )
                 _ = try fragment.printCode(
-                    [structDef.abiName],
+                    [],
                     IntrinsicJSFragment.PrintCodeContext(
                         scope: structScope,
                         printer: structPrinter,
@@ -1245,13 +1233,16 @@ public struct BridgeJSLink {
                 bodyPrinter.write(lines: structPrinter.lines)
             }
 
-            let allAssocEnums = exportedSkeletons.flatMap {
-                $0.enums.filter { $0.enumType == .associatedValue }
-            }
-            for enumDef in allAssocEnums {
+            for (moduleName, enumDef) in skeletons.flatMap({ unified in
+                (unified.exported?.enums ?? []).filter { $0.enumType == .associatedValue }
+                    .map { (unified.moduleName, $0) }
+            }) {
                 let enumPrinter = CodeFragmentPrinter()
                 let enumScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-                let fragment = IntrinsicJSFragment.associatedValueEnumHelperFactory(enumDefinition: enumDef)
+                let fragment = IntrinsicJSFragment.associatedValueEnumHelperFactory(
+                    enumDefinition: enumDef,
+                    moduleName: moduleName
+                )
                 _ = try fragment.printCode(
                     [enumDef.valuesName],
                     IntrinsicJSFragment.PrintCodeContext(
@@ -1271,13 +1262,6 @@ public struct BridgeJSLink {
                 printer.nextLine()
             }
 
-            // The named codec helpers come after the intrinsics because they are
-            // built out of the combinators and the primitive codec table, and
-            // before everything that uses them: they are hoisted here so that no
-            // call site ever composes a codec. Helpers that delegate to the
-            // `structHelpers` / `enumHelpers` tables only read those tables when
-            // called, so declaring them ahead of the tables being populated is
-            // fine.
             if intrinsicRegistry.hasNamedCodecs {
                 printer.write(lines: intrinsicRegistry.emitNamedCodecLines())
                 printer.nextLine()
@@ -1380,12 +1364,6 @@ public struct BridgeJSLink {
         return (outputJs, outputDts)
     }
 
-    /// Maps every type name a `BridgeType` can carry to the module that declares
-    /// it, so identifiers minted from type names can be module-qualified.
-    ///
-    /// A name declared by two modules is a pre-existing ambiguity in the
-    /// skeleton format (`BridgeType` carries only the name), so the first
-    /// declaration wins, which keeps the output deterministic.
     private func collectTypeOwnerModules() -> [String: String] {
         var result: [String: String] = [:]
         func record(_ name: String, _ moduleName: String) {
@@ -1399,6 +1377,7 @@ public struct BridgeJSLink {
                 for structDef in skeleton.structs {
                     record(structDef.name, moduleName)
                     record(structDef.abiName, moduleName)
+                    record(structDef.swiftCallName, moduleName)
                 }
                 for klass in skeleton.classes {
                     record(klass.name, moduleName)
@@ -1407,14 +1386,10 @@ public struct BridgeJSLink {
                 for enumDef in skeleton.enums {
                     record(enumDef.name, moduleName)
                     record(enumDef.abiName, moduleName)
+                    record(enumDef.swiftCallName, moduleName)
                 }
                 for protocolDef in skeleton.protocols {
                     record(protocolDef.name, moduleName)
-                }
-            }
-            for file in unified.imported?.children ?? [] {
-                for type in file.types {
-                    record(type.name, moduleName)
                 }
             }
         }
@@ -1424,12 +1399,13 @@ public struct BridgeJSLink {
     private func enumHelperAssignments() -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
 
-        for skeleton in skeletons.compactMap(\.exported) {
+        for unified in skeletons {
+            guard let skeleton = unified.exported else { continue }
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
-                printer.write(
-                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers();"
-                )
-                printer.write("\(JSGlueVariableScope.reservedEnumHelpers).\(enumDef.name) = \(enumDef.name)Helpers;")
+                let key = HelperNaming.type(module: unified.moduleName, swiftName: enumDef.swiftCallName)
+                let local = HelperNaming.helperConstant(key)
+                printer.write("const \(local) = \(HelperNaming.enumHelperFactory(key))();")
+                printer.write("\(JSGlueVariableScope.reservedEnumHelpers).\(key) = \(local);")
                 printer.nextLine()
             }
         }
@@ -1440,14 +1416,13 @@ public struct BridgeJSLink {
     private func structHelperAssignments() -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
 
-        for skeleton in skeletons.compactMap(\.exported) {
+        for unified in skeletons {
+            guard let skeleton = unified.exported else { continue }
             for structDef in skeleton.structs {
-                printer.write(
-                    "const \(structDef.abiName)Helpers = __bjs_create\(structDef.abiName)Helpers();"
-                )
-                printer.write(
-                    "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName) = \(structDef.abiName)Helpers;"
-                )
+                let key = HelperNaming.type(module: unified.moduleName, swiftName: structDef.swiftCallName)
+                let local = HelperNaming.helperConstant(key)
+                printer.write("const \(local) = \(HelperNaming.structHelperFactory(key))();")
+                printer.write("\(JSGlueVariableScope.reservedStructHelpers).\(key) = \(local);")
                 printer.nextLine()
             }
         }
@@ -2593,8 +2568,6 @@ extension BridgeJSLink {
 
         func declareGenericCodecs(genericParameters: [String]) {
             if !genericParameters.isEmpty {
-                // Generic call sites instantiate the shared container codec
-                // combinators with the codecs resolved from type IDs.
                 ContainerCodecJS.registerCombinators(scope: scope)
             }
             for genericParam in genericParameters {

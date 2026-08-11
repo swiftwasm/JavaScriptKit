@@ -429,7 +429,7 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
-    const __bjs_codec_TestModule_FileSize = {
+    const __bjs_codec_M10TestModuleT8FileSize = {
         lower: (v) => {
             i64Stack.push(v);
         },
@@ -438,8 +438,8 @@ export async function createInstantiator(options, swift) {
             return rawValue;
         },
     };
-    const __bjs_codec_Optional_TestModule_FileSize = __bjs_optionalCodec(__bjs_codec_TestModule_FileSize);
-    const __bjs_codec_TestModule_SessionId = {
+    const __bjs_codec_Optional_M10TestModuleT8FileSize = __bjs_optionalCodec(__bjs_codec_M10TestModuleT8FileSize);
+    const __bjs_codec_M10TestModuleT9SessionId = {
         lower: (v) => {
             i64Stack.push(v);
         },
@@ -448,7 +448,7 @@ export async function createInstantiator(options, swift) {
             return rawValue;
         },
     };
-    const __bjs_codec_Optional_TestModule_SessionId = __bjs_optionalCodec(__bjs_codec_TestModule_SessionId);
+    const __bjs_codec_Optional_M10TestModuleT9SessionId = __bjs_optionalCodec(__bjs_codec_M10TestModuleT9SessionId);
 
 
     return {
@@ -794,7 +794,7 @@ export async function createInstantiator(options, swift) {
                 roundTripOptionalFileSize: function bjs_roundTripOptionalFileSize(input) {
                     const isSome = input != null;
                     instance.exports.bjs_roundTripOptionalFileSize(+isSome, isSome ? input : 0n);
-                    const optValue = __bjs_codec_Optional_TestModule_FileSize.lift();
+                    const optValue = __bjs_codec_Optional_M10TestModuleT8FileSize.lift();
                     return optValue;
                 },
                 setUserId: function bjs_setUserId(id) {
@@ -835,7 +835,7 @@ export async function createInstantiator(options, swift) {
                 roundTripOptionalSessionId: function bjs_roundTripOptionalSessionId(input) {
                     const isSome = input != null;
                     instance.exports.bjs_roundTripOptionalSessionId(+isSome, isSome ? input : 0n);
-                    const optValue = __bjs_codec_Optional_TestModule_SessionId.lift();
+                    const optValue = __bjs_codec_Optional_M10TestModuleT9SessionId.lift();
                     return optValue;
                 },
                 setPrecision: function bjs_setPrecision(precision) {

@@ -354,18 +354,18 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
-    const __bjs_codec_TestModule_Point = {
+    const __bjs_codec_M10TestModuleT5Point = {
         lower: (v) => {
-            structHelpers.Point.lower(v);
+            structHelpers.M10TestModuleT5Point.lower(v);
         },
         lift: () => {
-            const struct = structHelpers.Point.lift();
+            const struct = structHelpers.M10TestModuleT5Point.lift();
             return struct;
         },
     };
-    const __bjs_codec_Optional_TestModule_Point = __bjs_optionalCodec(__bjs_codec_TestModule_Point);
+    const __bjs_codec_Optional_M10TestModuleT5Point = __bjs_optionalCodec(__bjs_codec_M10TestModuleT5Point);
 
-    const __bjs_createPointHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT5Point = () => ({
         lower: (value) => {
             i32Stack.push((value.x | 0));
             i32Stack.push((value.y | 0));
@@ -453,10 +453,10 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Point"] = function(objectId) {
-                structHelpers.Point.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT5Point.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Point"] = function() {
-                const value = structHelpers.Point.lift();
+                const value = structHelpers.M10TestModuleT5Point.lift();
                 return swift.memory.retain(value);
             }
             bjs["bjs_core_register_type_handles"] = function() {};
@@ -561,9 +561,9 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_translate"] = function bjs_translate(dx, dy) {
                 try {
-                    const structValue = structHelpers.Point.lift();
+                    const structValue = structHelpers.M10TestModuleT5Point.lift();
                     let ret = imports.translate(structValue, dx, dy);
-                    structHelpers.Point.lower(ret);
+                    structHelpers.M10TestModuleT5Point.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -572,13 +572,13 @@ export async function createInstantiator(options, swift) {
                 try {
                     let optResult;
                     if (point) {
-                        const struct = structHelpers.Point.lift();
+                        const struct = structHelpers.M10TestModuleT5Point.lift();
                         optResult = struct;
                     } else {
                         optResult = null;
                     }
                     let ret = imports.roundTripOptional(optResult);
-                    __bjs_codec_Optional_TestModule_Point.lower(ret);
+                    __bjs_codec_Optional_M10TestModuleT5Point.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -597,8 +597,8 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PointHelpers = __bjs_createPointHelpers();
-            structHelpers.Point = PointHelpers;
+            const __bjs_helpers_M10TestModuleT5Point = __bjs_createStructHelpers_M10TestModuleT5Point();
+            structHelpers.M10TestModuleT5Point = __bjs_helpers_M10TestModuleT5Point;
 
             const exports = {
             };

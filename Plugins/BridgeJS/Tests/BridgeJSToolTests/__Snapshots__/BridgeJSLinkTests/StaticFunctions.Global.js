@@ -42,7 +42,7 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createAPIResultValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT9APIResult = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -353,8 +353,8 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-            const APIResultHelpers = __bjs_createAPIResultValuesHelpers();
-            enumHelpers.APIResult = APIResultHelpers;
+            const __bjs_helpers_M10TestModuleT9APIResult = __bjs_createEnumHelpers_M10TestModuleT9APIResult();
+            enumHelpers.M10TestModuleT9APIResult = __bjs_helpers_M10TestModuleT9APIResult;
 
             if (typeof globalThis.Utils === 'undefined') {
                 globalThis.Utils = {};
@@ -383,9 +383,9 @@ export async function createInstantiator(options, swift) {
                 APIResult: {
                     ...APIResultValues,
                     roundtrip: function(value) {
-                        const valueCaseId = enumHelpers.APIResult.lower(value);
+                        const valueCaseId = enumHelpers.M10TestModuleT9APIResult.lower(value);
                         instance.exports.bjs_APIResult_static_roundtrip(valueCaseId);
-                        const ret = enumHelpers.APIResult.lift(i32Stack.pop());
+                        const ret = enumHelpers.M10TestModuleT9APIResult.lift(i32Stack.pop());
                         return ret;
                     }
                 },

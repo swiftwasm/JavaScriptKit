@@ -360,22 +360,22 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
-    const __bjs_codec_TestModule_Config = {
+    const __bjs_codec_M10TestModuleT6Config = {
         lower: (v) => {
-            structHelpers.Config.lower(v);
+            structHelpers.M10TestModuleT6Config.lower(v);
         },
         lift: () => {
-            const struct = structHelpers.Config.lift();
+            const struct = structHelpers.M10TestModuleT6Config.lift();
             return struct;
         },
     };
-    const __bjs_codec_Optional_TestModule_Config = __bjs_optionalCodec(__bjs_codec_TestModule_Config);
+    const __bjs_codec_Optional_M10TestModuleT6Config = __bjs_optionalCodec(__bjs_codec_M10TestModuleT6Config);
     const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
     const __bjs_codec_Array_String = __bjs_arrayCodec(__bjs_stringCodec);
     const __bjs_codec_Array_Double = __bjs_arrayCodec(__bjs_primitiveCodecs.Double);
     const __bjs_codec_Array_Bool = __bjs_arrayCodec(__bjs_primitiveCodecs.Bool);
 
-    const __bjs_createConfigHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT6Config = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.name);
             const id = swift.memory.retain(bytes);
@@ -391,7 +391,7 @@ export async function createInstantiator(options, swift) {
             return { name: string, value: int, enabled: bool };
         }
     });
-    const __bjs_createMathOperationsHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT14MathOperations = () => ({
         lower: (value) => {
             f64Stack.push(value.baseValue);
         },
@@ -399,12 +399,12 @@ export async function createInstantiator(options, swift) {
             const f64 = f64Stack.pop();
             const instance1 = { baseValue: f64 };
             instance1.add = function(a, b = 10.0) {
-                structHelpers.MathOperations.lower(this);
+                structHelpers.M10TestModuleT14MathOperations.lower(this);
                 const ret = instance.exports.bjs_MathOperations_add(a, b);
                 return ret;
             }.bind(instance1);
             instance1.multiply = function(a, b) {
-                structHelpers.MathOperations.lower(this);
+                structHelpers.M10TestModuleT14MathOperations.lower(this);
                 const ret1 = instance.exports.bjs_MathOperations_multiply(a, b);
                 return ret1;
             }.bind(instance1);
@@ -487,17 +487,17 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Config"] = function(objectId) {
-                structHelpers.Config.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT6Config.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Config"] = function() {
-                const value = structHelpers.Config.lift();
+                const value = structHelpers.M10TestModuleT6Config.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_MathOperations"] = function(objectId) {
-                structHelpers.MathOperations.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT14MathOperations.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_MathOperations"] = function() {
-                const value = structHelpers.MathOperations.lift();
+                const value = structHelpers.M10TestModuleT14MathOperations.lift();
                 return swift.memory.retain(value);
             }
             bjs["bjs_core_register_type_handles"] = function() {};
@@ -789,11 +789,11 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_ConstructorDefaults_tag_set(this.pointer, +isSome, result, result1);
                 }
             }
-            const ConfigHelpers = __bjs_createConfigHelpers();
-            structHelpers.Config = ConfigHelpers;
+            const __bjs_helpers_M10TestModuleT6Config = __bjs_createStructHelpers_M10TestModuleT6Config();
+            structHelpers.M10TestModuleT6Config = __bjs_helpers_M10TestModuleT6Config;
 
-            const MathOperationsHelpers = __bjs_createMathOperationsHelpers();
-            structHelpers.MathOperations = MathOperationsHelpers;
+            const __bjs_helpers_M10TestModuleT14MathOperations = __bjs_createStructHelpers_M10TestModuleT14MathOperations();
+            structHelpers.M10TestModuleT14MathOperations = __bjs_helpers_M10TestModuleT14MathOperations;
 
             const exports = {
                 testStringDefault: function bjs_testStringDefault(message = "Hello World") {
@@ -875,15 +875,15 @@ export async function createInstantiator(options, swift) {
                     return EmptyGreeter.__construct(ret);
                 },
                 testOptionalStructDefault: function bjs_testOptionalStructDefault(point = null) {
-                    __bjs_codec_Optional_TestModule_Config.lower(point);
+                    __bjs_codec_Optional_M10TestModuleT6Config.lower(point);
                     instance.exports.bjs_testOptionalStructDefault();
-                    const optValue = __bjs_codec_Optional_TestModule_Config.lift();
+                    const optValue = __bjs_codec_Optional_M10TestModuleT6Config.lift();
                     return optValue;
                 },
                 testOptionalStructWithValueDefault: function bjs_testOptionalStructWithValueDefault(point = { name: "default", value: 42, enabled: true }) {
-                    __bjs_codec_Optional_TestModule_Config.lower(point);
+                    __bjs_codec_Optional_M10TestModuleT6Config.lower(point);
                     instance.exports.bjs_testOptionalStructWithValueDefault();
-                    const optValue = __bjs_codec_Optional_TestModule_Config.lift();
+                    const optValue = __bjs_codec_Optional_M10TestModuleT6Config.lift();
                     return optValue;
                 },
                 testIntArrayDefault: function bjs_testIntArrayDefault(values = [1, 2, 3]) {
@@ -932,7 +932,7 @@ export async function createInstantiator(options, swift) {
                 MathOperations: {
                     init: function(baseValue = 0.0) {
                         instance.exports.bjs_MathOperations_init(baseValue);
-                        const structValue = structHelpers.MathOperations.lift();
+                        const structValue = structHelpers.M10TestModuleT14MathOperations.lift();
                         return structValue;
                     },
                     subtract: function(a, b = 5.0) {

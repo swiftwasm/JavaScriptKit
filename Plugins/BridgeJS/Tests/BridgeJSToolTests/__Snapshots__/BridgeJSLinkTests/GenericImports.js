@@ -389,16 +389,16 @@ export async function createInstantiator(options, swift) {
     }
 
     const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
-    const __bjs_codec_TestModule_GenericPoint = {
+    const __bjs_codec_M10TestModuleT12GenericPoint = {
         lower: (v) => {
-            structHelpers.GenericPoint.lower(v);
+            structHelpers.M10TestModuleT12GenericPoint.lower(v);
         },
         lift: () => {
-            const struct = structHelpers.GenericPoint.lift();
+            const struct = structHelpers.M10TestModuleT12GenericPoint.lift();
             return struct;
         },
     };
-    const __bjs_codec_TestModule_GenericImportBox = {
+    const __bjs_codec_M10TestModuleT16GenericImportBox = {
         lower: (v) => {
             ptrStack.push(v.pointer);
         },
@@ -408,7 +408,7 @@ export async function createInstantiator(options, swift) {
             return obj;
         },
     };
-    const __bjs_codec_TestModule_GenericColor = {
+    const __bjs_codec_M10TestModuleT12GenericColor = {
         lower: (v) => {
             i32Stack.push((v | 0));
         },
@@ -417,18 +417,18 @@ export async function createInstantiator(options, swift) {
             return caseId;
         },
     };
-    const __bjs_codec_TestModule_GenericTagged = {
+    const __bjs_codec_M10TestModuleT13GenericTagged = {
         lower: (v) => {
-            const caseId = enumHelpers.GenericTagged.lower(v);
+            const caseId = enumHelpers.M10TestModuleT13GenericTagged.lower(v);
             i32Stack.push(caseId);
         },
         lift: () => {
-            const enumValue = enumHelpers.GenericTagged.lift(i32Stack.pop());
+            const enumValue = enumHelpers.M10TestModuleT13GenericTagged.lift(i32Stack.pop());
             return enumValue;
         },
     };
 
-    const __bjs_createGenericPointHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT12GenericPoint = () => ({
         lower: (value) => {
             i32Stack.push((value.x | 0));
             i32Stack.push((value.y | 0));
@@ -439,7 +439,7 @@ export async function createInstantiator(options, swift) {
             return { x: int1, y: int };
         }
     });
-    const __bjs_createGenericTaggedValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT13GenericTagged = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -549,10 +549,10 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_GenericPoint"] = function(objectId) {
-                structHelpers.GenericPoint.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT12GenericPoint.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_GenericPoint"] = function() {
-                const value = structHelpers.GenericPoint.lift();
+                const value = structHelpers.M10TestModuleT12GenericPoint.lift();
                 return swift.memory.retain(value);
             }
             bjs["bjs_core_register_type_handles"] = function(base, count) {
@@ -573,9 +573,6 @@ export async function createInstantiator(options, swift) {
                     __bjs_primitiveCodecs.String,
                     __bjs_primitiveCodecs.JSValue,
                 ];
-                if (count !== codecs.length) {
-                    throw new Error("BridgeJS: type handle registration mismatch for core types");
-                }
                 const typeIds = new Int32Array(memory.buffer, base >>> 0, count >>> 0);
                 for (let i = 0; i < count; i++) {
                     __bjs_codecByTypeId.set(typeIds[i], codecs[i]);
@@ -583,11 +580,11 @@ export async function createInstantiator(options, swift) {
             }
             bjs["bjs_TestModule_register_type_handles"] = function(base, count) {
                 const codecs = [
-                    __bjs_codec_TestModule_GenericPoint,
-                    __bjs_codec_TestModule_GenericImportBox,
-                    __bjs_codec_TestModule_GenericColor,
+                    __bjs_codec_M10TestModuleT12GenericPoint,
+                    __bjs_codec_M10TestModuleT16GenericImportBox,
+                    __bjs_codec_M10TestModuleT12GenericColor,
                     __bjs_stringCodec,
-                    __bjs_codec_TestModule_GenericTagged,
+                    __bjs_codec_M10TestModuleT13GenericTagged,
                 ];
                 const typeIds = new Int32Array(memory.buffer, base >>> 0, count >>> 0);
                 for (let i = 0; i < count; i++) {
@@ -930,11 +927,11 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_GenericImportBox_value_set(this.pointer, value);
                 }
             }
-            const GenericPointHelpers = __bjs_createGenericPointHelpers();
-            structHelpers.GenericPoint = GenericPointHelpers;
+            const __bjs_helpers_M10TestModuleT12GenericPoint = __bjs_createStructHelpers_M10TestModuleT12GenericPoint();
+            structHelpers.M10TestModuleT12GenericPoint = __bjs_helpers_M10TestModuleT12GenericPoint;
 
-            const GenericTaggedHelpers = __bjs_createGenericTaggedValuesHelpers();
-            enumHelpers.GenericTagged = GenericTaggedHelpers;
+            const __bjs_helpers_M10TestModuleT13GenericTagged = __bjs_createEnumHelpers_M10TestModuleT13GenericTagged();
+            enumHelpers.M10TestModuleT13GenericTagged = __bjs_helpers_M10TestModuleT13GenericTagged;
 
             const exports = {
                 GenericColor: GenericColorValues,

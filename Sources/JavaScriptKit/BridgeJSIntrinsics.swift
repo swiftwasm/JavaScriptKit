@@ -204,21 +204,15 @@ extension _BridgedSwiftStackType {
     }
 }
 
-/// Types usable as the generic argument of a generic imported `@JSFunction`.
-/// Each conforming type owns a ``BridgeJSTypeHandle`` whose pointer is the
-/// runtime type ID that selects the matching JS codec. Do not conform types by
-/// hand; marking them `@JS` emits the conformance together with the JS codec.
+/// A type usable as a generic argument of an imported `@JSFunction`.
 public protocol BridgedSwiftGenericBridgeable: _BridgedSwiftStackType
 where StackLiftResult == Self {
     @_spi(BridgeJS) static var bridgeJSTypeHandle: BridgeJSTypeHandle { get }
 }
 
 extension BridgedSwiftGenericBridgeable {
-    /// The runtime type ID passed across the bridge for this type.
     @_spi(BridgeJS) public static var bridgeJSTypeID: Int32 { bridgeJSTypeHandle.typeID }
 
-    /// Creates the type's unique handle. A generic static function so
-    /// conformances compile under Embedded Swift.
     @_spi(BridgeJS) public static func bridgeJSMakeTypeHandle() -> BridgeJSTypeHandle {
         #if hasFeature(Embedded)
         return BridgeJSTypeHandle()
@@ -228,17 +222,11 @@ extension BridgedSwiftGenericBridgeable {
     }
 }
 
-/// A per-type identity token for generic bridging: each conforming type stores
-/// exactly one handle in a `static let`, so the handle's pointer identifies the
-/// type at runtime without relying on type names, which could collide across
-/// modules.
+/// A per-type identity token for generic bridging.
 public final class BridgeJSTypeHandle: Sendable {
     #if hasFeature(Embedded)
     public init() {}
     #else
-    /// The conforming type, for exported generics (planned follow-up) to map a
-    /// type ID back to. `nonisolated(unsafe)`: an immutable metatype is safe to
-    /// share, but the compiler cannot infer that.
     public nonisolated(unsafe) let type: any BridgedSwiftGenericBridgeable.Type
 
     public init(_ type: any BridgedSwiftGenericBridgeable.Type) {
@@ -246,7 +234,6 @@ public final class BridgeJSTypeHandle: Sendable {
     }
     #endif
 
-    /// The handle object's own address; pointers are 32-bit on wasm32.
     @_spi(BridgeJS) public var typeID: Int32 {
         #if arch(wasm32)
         return Int32(bitPattern: UInt32(UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())))
@@ -1013,29 +1000,11 @@ extension JSValue: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeHandle = JSValue.bridgeJSMakeTypeHandle()
 }
 
-// MARK: Core generic type-handle registration
-//
-// Every `BridgedSwiftGenericBridgeable` type publishes its runtime type ID to the
-// JS glue, which pairs the IDs with the codec array it emitted in the same order.
-// The core types below are owned by this library, so their registration lives
-// here once for the whole binary instead of being copied into every module's
-// generated registration function; generated per-module registration only carries
-// that module's own `@JS` types.
-//
-// The order is the ABI contract with the JS side: it must match
-// `BridgeType.genericBridgeablePrimitives` in
-// `Plugins/BridgeJS/Sources/BridgeJSSkeleton/BridgeJSSkeleton.swift`, from which
-// the link step builds the core codec array. `CoreTypeRegistrationContractTests`
-// checks the two lists stay in sync at build time, and the generated JS verifies
-// the count at registration time.
+// Keep this order in sync with BridgeType.genericBridgeablePrimitives.
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "bjs_core_register_type_handles")
 private func _bjs_core_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
 
-/// Publishes the core (primitive) BridgeJS type handles to the JS glue.
-///
-/// Called by the generated glue once per instance, before any module's own
-/// registration function. Not intended to be called from user code.
 @_expose(wasm, "bjs_core_register_type_handles")
 public func _bjs_core_register_type_handles() {
     // BEGIN bjs_core_type_handles

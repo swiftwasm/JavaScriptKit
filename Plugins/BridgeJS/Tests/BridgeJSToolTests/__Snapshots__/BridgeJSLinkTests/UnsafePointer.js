@@ -31,7 +31,7 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createPointerFieldsHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT13PointerFields = () => ({
         lower: (value) => {
             ptrStack.push((value.raw | 0));
             ptrStack.push((value.mutRaw | 0));
@@ -124,10 +124,10 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_PointerFields"] = function(objectId) {
-                structHelpers.PointerFields.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT13PointerFields.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_PointerFields"] = function() {
-                const value = structHelpers.PointerFields.lift();
+                const value = structHelpers.M10TestModuleT13PointerFields.lift();
                 return swift.memory.retain(value);
             }
             bjs["bjs_core_register_type_handles"] = function() {};
@@ -243,8 +243,8 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PointerFieldsHelpers = __bjs_createPointerFieldsHelpers();
-            structHelpers.PointerFields = PointerFieldsHelpers;
+            const __bjs_helpers_M10TestModuleT13PointerFields = __bjs_createStructHelpers_M10TestModuleT13PointerFields();
+            structHelpers.M10TestModuleT13PointerFields = __bjs_helpers_M10TestModuleT13PointerFields;
 
             const exports = {
                 takeUnsafeRawPointer: function bjs_takeUnsafeRawPointer(p) {
@@ -283,15 +283,15 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 },
                 roundTripPointerFields: function bjs_roundTripPointerFields(value) {
-                    structHelpers.PointerFields.lower(value);
+                    structHelpers.M10TestModuleT13PointerFields.lower(value);
                     instance.exports.bjs_roundTripPointerFields();
-                    const structValue = structHelpers.PointerFields.lift();
+                    const structValue = structHelpers.M10TestModuleT13PointerFields.lift();
                     return structValue;
                 },
                 PointerFields: {
                     init: function(raw, mutRaw, opaque, ptr, mutPtr) {
                         instance.exports.bjs_PointerFields_init(raw, mutRaw, opaque, ptr, mutPtr);
-                        const structValue = structHelpers.PointerFields.lift();
+                        const structValue = structHelpers.M10TestModuleT13PointerFields.lift();
                         return structValue;
                     },
                 },

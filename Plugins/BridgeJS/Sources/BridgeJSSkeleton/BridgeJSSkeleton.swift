@@ -22,21 +22,12 @@ extension NamespacedExportedType {
 public struct ABINameGenerator {
     static let prefixComponent = "bjs"
 
-    /// ABI parameter name carrying the runtime type ID for the generic parameter at `index`.
     public static func genericTypeIdParameterName(index: Int) -> String { "_generic\(index)TypeId" }
 
-    /// Name of the per-module type-handle registration function. The wasm module
-    /// exports it under this name, and it calls back into a JS import hook of the
-    /// same name (in the `bjs` import namespace) with a buffer of type IDs.
     public static func typeRegistrationFunctionName(moduleName: String) -> String {
         "bjs_\(moduleName)_register_type_handles"
     }
 
-    /// Name of the core type-handle registration function. Unlike the per-module
-    /// ones, this is defined once in the JavaScriptKit library (see
-    /// `_bjs_core_register_type_handles` in `BridgeJSIntrinsics.swift`) so the
-    /// primitive handles exist exactly once in the final binary and the JS glue
-    /// registers their codecs once per linked bundle.
     public static let coreTypeRegistrationFunctionName = "bjs_core_register_type_handles"
 
     /// Generates ABI name using standardized namespace + context pattern
@@ -326,13 +317,6 @@ extension BridgeType {
 
 }
 
-// MARK: - Generic type registration
-
-/// One `BridgedSwiftGenericBridgeable` type participating in generic bridging.
-///
-/// `swiftName` is the Swift expression naming the type (used by Swift codegen to
-/// read `<swiftName>.bridgeJSTypeID`); `bridgeType` describes the stack ABI (used
-/// by the JS link layer to emit the matching codec).
 public struct GenericBridgeableTypeEntry: Sendable {
     public let swiftName: String
     public let bridgeType: BridgeType
@@ -344,17 +328,15 @@ public struct GenericBridgeableTypeEntry: Sendable {
 }
 
 extension ExportedEnum {
-    /// The `BridgeType` an enum bridges as when used as a generic argument, or
-    /// `nil` when it can't be one (namespace enums).
     public var genericBridgeType: BridgeType? {
         switch enumType {
         case .simple:
-            return .caseEnum(name)
+            return .caseEnum(swiftCallName)
         case .rawValue:
             guard let rawType = rawType else { return nil }
-            return .rawValueEnum(name, rawType)
+            return .rawValueEnum(swiftCallName, rawType)
         case .associatedValue:
-            return .associatedValueEnum(name)
+            return .associatedValueEnum(swiftCallName)
         case .namespace:
             return nil
         }
@@ -362,22 +344,23 @@ extension ExportedEnum {
 }
 
 extension ExportedSkeleton {
-    /// The module's `@JS` types that conform to `BridgedSwiftGenericBridgeable`.
-    /// The order is the contract between the Swift registration function and the
-    /// JS codec array; both derive it from this skeleton, so they line up.
+    /// Keep this order in sync with the generated registration codec array.
     public var genericBridgeableTypeEntries: [GenericBridgeableTypeEntry] {
         var entries: [GenericBridgeableTypeEntry] = []
         for structDef in structs {
             entries.append(
                 GenericBridgeableTypeEntry(
                     swiftName: structDef.swiftCallName,
-                    bridgeType: .swiftStruct(structDef.abiName)
+                    bridgeType: .swiftStruct(structDef.swiftCallName)
                 )
             )
         }
         for klass in classes where klass.isFinal == true {
             entries.append(
-                GenericBridgeableTypeEntry(swiftName: klass.swiftCallName, bridgeType: .swiftHeapObject(klass.name))
+                GenericBridgeableTypeEntry(
+                    swiftName: klass.swiftCallName,
+                    bridgeType: .swiftHeapObject(klass.swiftCallName)
+                )
             )
         }
         for enumDef in enums {
@@ -389,14 +372,6 @@ extension ExportedSkeleton {
 }
 
 extension BridgeJSSkeleton {
-    /// The ordered list of types this module registers type handles for, or
-    /// `nil` when it emits no registration function.
-    ///
-    /// Only the module's own `@JS` types appear here: the core (primitive)
-    /// handles are owned by the JavaScriptKit library, which registers them once
-    /// for the whole binary via ``ABINameGenerator/coreTypeRegistrationFunctionName``.
-    /// A module that only *uses* generics therefore needs no registration
-    /// function of its own.
     public var typeRegistrationEntries: [GenericBridgeableTypeEntry]? {
         let exportedEntries = exported?.genericBridgeableTypeEntries ?? []
         guard !exportedEntries.isEmpty else { return nil }
