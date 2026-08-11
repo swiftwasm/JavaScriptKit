@@ -871,6 +871,7 @@ function testStructSupport(exports) {
     const scaled = vec.scaled(2.0);
     assert.equal(scaled.dx, 6.0);
     assert.equal(scaled.dy, 8.0);
+    assert.equal(vec.describe(), "Vector2D(3.0, 4.0)");
 
     const publicPoint = { x: 9, y: -3 };
     assert.deepEqual(exports.roundTripPublicPoint(publicPoint), publicPoint);
