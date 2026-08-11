@@ -41,20 +41,20 @@ func _$logStrings(_ items: [String]) throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_optionalArrayThenArray")
-fileprivate func bjs_optionalArrayThenArray_extern(_ a: Int32) -> Int32
+fileprivate func bjs_optionalArrayThenArray_extern() -> Int32
 #else
-fileprivate func bjs_optionalArrayThenArray_extern(_ a: Int32) -> Int32 {
+fileprivate func bjs_optionalArrayThenArray_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_optionalArrayThenArray(_ a: Int32) -> Int32 {
-    return bjs_optionalArrayThenArray_extern(a)
+@inline(never) fileprivate func bjs_optionalArrayThenArray() -> Int32 {
+    return bjs_optionalArrayThenArray_extern()
 }
 
 func _$optionalArrayThenArray(_ a: Optional<[Int]>, _ b: [Int]) throws(JSException) -> Int {
     let _ = b.bridgeJSLowerParameter()
-    let aIsSome = a.bridgeJSLowerParameter()
-    let ret = bjs_optionalArrayThenArray(aIsSome)
+    let _ = a.bridgeJSLowerParameter()
+    let ret = bjs_optionalArrayThenArray()
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -63,21 +63,21 @@ func _$optionalArrayThenArray(_ a: Optional<[Int]>, _ b: [Int]) throws(JSExcepti
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_borrowedStringAroundStackParams")
-fileprivate func bjs_borrowedStringAroundStackParams_extern(_ sBytes: Int32, _ sLength: Int32, _ a: Int32) -> Int32
+fileprivate func bjs_borrowedStringAroundStackParams_extern(_ sBytes: Int32, _ sLength: Int32) -> Int32
 #else
-fileprivate func bjs_borrowedStringAroundStackParams_extern(_ sBytes: Int32, _ sLength: Int32, _ a: Int32) -> Int32 {
+fileprivate func bjs_borrowedStringAroundStackParams_extern(_ sBytes: Int32, _ sLength: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_borrowedStringAroundStackParams(_ sBytes: Int32, _ sLength: Int32, _ a: Int32) -> Int32 {
-    return bjs_borrowedStringAroundStackParams_extern(sBytes, sLength, a)
+@inline(never) fileprivate func bjs_borrowedStringAroundStackParams(_ sBytes: Int32, _ sLength: Int32) -> Int32 {
+    return bjs_borrowedStringAroundStackParams_extern(sBytes, sLength)
 }
 
 func _$borrowedStringAroundStackParams(_ s: String, _ a: Optional<[Int]>, _ b: [Int]) throws(JSException) -> Int {
     let ret0 = s.bridgeJSWithLoweredParameter { (sBytes, sLength) in
         let _ = b.bridgeJSLowerParameter()
-        let aIsSome = a.bridgeJSLowerParameter()
-        let ret = bjs_borrowedStringAroundStackParams(sBytes, sLength, aIsSome)
+        let _ = a.bridgeJSLowerParameter()
+        let ret = bjs_borrowedStringAroundStackParams(sBytes, sLength)
         return ret
     }
     let ret = ret0

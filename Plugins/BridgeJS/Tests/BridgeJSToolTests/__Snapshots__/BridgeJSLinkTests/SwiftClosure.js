@@ -1099,17 +1099,11 @@ export async function createInstantiator(options, swift) {
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO);
             }
-            bjs["invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV"] = function(callbackId, param0) {
+            bjs["invoke_js_callback_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV"] = function(callbackId) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
-                    let optResult;
-                    if (param0) {
-                        const struct = structHelpers.M10TestModuleT6Animal.lift();
-                        optResult = struct;
-                    } else {
-                        optResult = null;
-                    }
-                    let ret = callback(optResult);
+                    const optValue = __bjs_codec_Optional_M10TestModuleT6Animal.lift();
+                    let ret = callback(optValue);
                     __bjs_codec_Optional_M10TestModuleT6Animal.lower(ret);
                 } catch (error) {
                     setException(error);

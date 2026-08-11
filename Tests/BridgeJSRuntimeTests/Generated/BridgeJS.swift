@@ -14625,20 +14625,20 @@ func _$Promise_resolve_Sa11PublicPointV(_ promise: JSObject, _ value: [PublicPoi
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV")
-fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV_extern(_ promise: Int32, _ value: Int32) -> Void
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV_extern(_ promise: Int32) -> Void
 #else
-fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV_extern(_ promise: Int32, _ value: Int32) -> Void {
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV_extern(_ promise: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV(_ promise: Int32, _ value: Int32) -> Void {
-    return promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV_extern(promise, value)
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV(_ promise: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV_extern(promise)
 }
 
 func _$Promise_resolve_Sq11PublicPointV(_ promise: JSObject, _ value: Optional<PublicPoint>) throws(JSException) -> Void {
-    let valueIsSome = value.bridgeJSLowerParameter()
+    let _ = value.bridgeJSLowerParameter()
     let promiseValue = promise.bridgeJSLowerParameter()
-    promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV(promiseValue, valueIsSome)
+    promise_resolve_BridgeJSRuntimeTests_Sq11PublicPointV(promiseValue)
     if let error = _swift_js_take_exception() { throw error }
 }
 
@@ -17234,20 +17234,20 @@ func _$jsRoundTripOptionalImportedPayloadSignal(_ value: Optional<ImportedPayloa
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsJoinOptionalArrayThenArray")
-fileprivate func bjs_jsJoinOptionalArrayThenArray_extern(_ a: Int32) -> Int32
+fileprivate func bjs_jsJoinOptionalArrayThenArray_extern() -> Int32
 #else
-fileprivate func bjs_jsJoinOptionalArrayThenArray_extern(_ a: Int32) -> Int32 {
+fileprivate func bjs_jsJoinOptionalArrayThenArray_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsJoinOptionalArrayThenArray(_ a: Int32) -> Int32 {
-    return bjs_jsJoinOptionalArrayThenArray_extern(a)
+@inline(never) fileprivate func bjs_jsJoinOptionalArrayThenArray() -> Int32 {
+    return bjs_jsJoinOptionalArrayThenArray_extern()
 }
 
 func _$jsJoinOptionalArrayThenArray(_ a: Optional<[Int]>, _ b: [Int]) throws(JSException) -> String {
     let _ = b.bridgeJSLowerParameter()
-    let aIsSome = a.bridgeJSLowerParameter()
-    let ret = bjs_jsJoinOptionalArrayThenArray(aIsSome)
+    let _ = a.bridgeJSLowerParameter()
+    let ret = bjs_jsJoinOptionalArrayThenArray()
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -17256,20 +17256,20 @@ func _$jsJoinOptionalArrayThenArray(_ a: Optional<[Int]>, _ b: [Int]) throws(JSE
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsJoinOptionalStructThenArray")
-fileprivate func bjs_jsJoinOptionalStructThenArray_extern(_ a: Int32) -> Int32
+fileprivate func bjs_jsJoinOptionalStructThenArray_extern() -> Int32
 #else
-fileprivate func bjs_jsJoinOptionalStructThenArray_extern(_ a: Int32) -> Int32 {
+fileprivate func bjs_jsJoinOptionalStructThenArray_extern() -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsJoinOptionalStructThenArray(_ a: Int32) -> Int32 {
-    return bjs_jsJoinOptionalStructThenArray_extern(a)
+@inline(never) fileprivate func bjs_jsJoinOptionalStructThenArray() -> Int32 {
+    return bjs_jsJoinOptionalStructThenArray_extern()
 }
 
 func _$jsJoinOptionalStructThenArray(_ a: Optional<Point>, _ b: [Int]) throws(JSException) -> String {
     let _ = b.bridgeJSLowerParameter()
-    let aIsSome = a.bridgeJSLowerParameter()
-    let ret = bjs_jsJoinOptionalStructThenArray(aIsSome)
+    let _ = a.bridgeJSLowerParameter()
+    let ret = bjs_jsJoinOptionalStructThenArray()
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -17300,21 +17300,21 @@ func _$jsJoinEnumThenArray(_ a: ImportedPayloadSignal, _ b: [Int]) throws(JSExce
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsJoinStringThenStackParams")
-fileprivate func bjs_jsJoinStringThenStackParams_extern(_ sBytes: Int32, _ sLength: Int32, _ a: Int32) -> Int32
+fileprivate func bjs_jsJoinStringThenStackParams_extern(_ sBytes: Int32, _ sLength: Int32) -> Int32
 #else
-fileprivate func bjs_jsJoinStringThenStackParams_extern(_ sBytes: Int32, _ sLength: Int32, _ a: Int32) -> Int32 {
+fileprivate func bjs_jsJoinStringThenStackParams_extern(_ sBytes: Int32, _ sLength: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsJoinStringThenStackParams(_ sBytes: Int32, _ sLength: Int32, _ a: Int32) -> Int32 {
-    return bjs_jsJoinStringThenStackParams_extern(sBytes, sLength, a)
+@inline(never) fileprivate func bjs_jsJoinStringThenStackParams(_ sBytes: Int32, _ sLength: Int32) -> Int32 {
+    return bjs_jsJoinStringThenStackParams_extern(sBytes, sLength)
 }
 
 func _$jsJoinStringThenStackParams(_ s: String, _ a: Optional<[Int]>, _ b: [Int]) throws(JSException) -> String {
     let ret0 = s.bridgeJSWithLoweredParameter { (sBytes, sLength) in
         let _ = b.bridgeJSLowerParameter()
-        let aIsSome = a.bridgeJSLowerParameter()
-        let ret = bjs_jsJoinStringThenStackParams(sBytes, sLength, aIsSome)
+        let _ = a.bridgeJSLowerParameter()
+        let ret = bjs_jsJoinStringThenStackParams(sBytes, sLength)
         return ret
     }
     let ret = ret0
@@ -17517,20 +17517,20 @@ func _$jsGenericDictRoundTrip<T: BridgedSwiftGenericBridgeable>(_ values: [Strin
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericAfterOptionalArray")
-fileprivate func bjs_jsGenericAfterOptionalArray_extern(_ values: Int32, _ _generic0TypeId: Int32) -> Int32
+fileprivate func bjs_jsGenericAfterOptionalArray_extern(_ _generic0TypeId: Int32) -> Int32
 #else
-fileprivate func bjs_jsGenericAfterOptionalArray_extern(_ values: Int32, _ _generic0TypeId: Int32) -> Int32 {
+fileprivate func bjs_jsGenericAfterOptionalArray_extern(_ _generic0TypeId: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsGenericAfterOptionalArray(_ values: Int32, _ _generic0TypeId: Int32) -> Int32 {
-    return bjs_jsGenericAfterOptionalArray_extern(values, _generic0TypeId)
+@inline(never) fileprivate func bjs_jsGenericAfterOptionalArray(_ _generic0TypeId: Int32) -> Int32 {
+    return bjs_jsGenericAfterOptionalArray_extern(_generic0TypeId)
 }
 
 func _$jsGenericAfterOptionalArray<T: BridgedSwiftGenericBridgeable>(_ values: Optional<[Int]>, _ value: T) throws(JSException) -> String {
     value.bridgeJSStackPush()
-    let valuesIsSome = values.bridgeJSLowerParameter()
-    let ret = bjs_jsGenericAfterOptionalArray(valuesIsSome, T.bridgeJSTypeID)
+    let _ = values.bridgeJSLowerParameter()
+    let ret = bjs_jsGenericAfterOptionalArray(T.bridgeJSTypeID)
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -17689,19 +17689,19 @@ func _$jsTranslatePoint(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripOptionalPoint")
-fileprivate func bjs_jsRoundTripOptionalPoint_extern(_ point: Int32) -> Void
+fileprivate func bjs_jsRoundTripOptionalPoint_extern() -> Void
 #else
-fileprivate func bjs_jsRoundTripOptionalPoint_extern(_ point: Int32) -> Void {
+fileprivate func bjs_jsRoundTripOptionalPoint_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsRoundTripOptionalPoint(_ point: Int32) -> Void {
-    return bjs_jsRoundTripOptionalPoint_extern(point)
+@inline(never) fileprivate func bjs_jsRoundTripOptionalPoint() -> Void {
+    return bjs_jsRoundTripOptionalPoint_extern()
 }
 
 func _$jsRoundTripOptionalPoint(_ point: Optional<Point>) throws(JSException) -> Optional<Point> {
-    let pointIsSome = point.bridgeJSLowerParameter()
-    bjs_jsRoundTripOptionalPoint(pointIsSome)
+    let _ = point.bridgeJSLowerParameter()
+    bjs_jsRoundTripOptionalPoint()
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -18758,50 +18758,50 @@ fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_s
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static")
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static_extern(_ v: Int32) -> Void
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static_extern() -> Void
 #else
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static_extern(_ v: Int32) -> Void {
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static(_ v: Int32) -> Void {
-    return bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static_extern(v)
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static() -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static_extern()
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static")
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static_extern(_ v: Int32) -> Void
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static_extern() -> Void
 #else
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static_extern(_ v: Int32) -> Void {
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static(_ v: Int32) -> Void {
-    return bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static_extern(v)
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static() -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static_extern()
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static")
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern(_ v: Int32) -> Void
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern() -> Void
 #else
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern(_ v: Int32) -> Void {
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static(_ v: Int32) -> Void {
-    return bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern(v)
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static() -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static_extern()
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static")
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static_extern(_ v: Int32) -> Void
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static_extern() -> Void
 #else
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static_extern(_ v: Int32) -> Void {
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static(_ v: Int32) -> Void {
-    return bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static_extern(v)
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static() -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static_extern()
 }
 
 #if arch(wasm32)
@@ -18867,8 +18867,8 @@ func _$OptionalSupportImports_jsRoundTripOptionalStringUndefined(_ name: JSUndef
 }
 
 func _$OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull(_ v: Optional<[JSValue]>) throws(JSException) -> Optional<[JSValue]> {
-    let vIsSome = v.bridgeJSLowerParameter()
-    bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static(vIsSome)
+    let _ = v.bridgeJSLowerParameter()
+    bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull_static()
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -18876,8 +18876,8 @@ func _$OptionalSupportImports_jsRoundTripOptionalJSValueArrayNull(_ v: Optional<
 }
 
 func _$OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined(_ v: JSUndefinedOr<[JSValue]>) throws(JSException) -> JSUndefinedOr<[JSValue]> {
-    let vIsSome = v.bridgeJSLowerParameter()
-    bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static(vIsSome)
+    let _ = v.bridgeJSLowerParameter()
+    bjs_OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined_static()
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -18885,8 +18885,8 @@ func _$OptionalSupportImports_jsRoundTripOptionalJSValueArrayUndefined(_ v: JSUn
 }
 
 func _$OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull(_ v: Optional<[String: String]>) throws(JSException) -> Optional<[String: String]> {
-    let vIsSome = v.bridgeJSLowerParameter()
-    bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static(vIsSome)
+    let _ = v.bridgeJSLowerParameter()
+    bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull_static()
     if let error = _swift_js_take_exception() {
         throw error
     }
@@ -18894,8 +18894,8 @@ func _$OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryNull(_ 
 }
 
 func _$OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined(_ v: JSUndefinedOr<[String: String]>) throws(JSException) -> JSUndefinedOr<[String: String]> {
-    let vIsSome = v.bridgeJSLowerParameter()
-    bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static(vIsSome)
+    let _ = v.bridgeJSLowerParameter()
+    bjs_OptionalSupportImports_jsRoundTripOptionalStringToStringDictionaryUndefined_static()
     if let error = _swift_js_take_exception() {
         throw error
     }

@@ -1051,16 +1051,13 @@ struct IntrinsicJSFragment: Sendable {
             )
         }
 
-        let innerFragment =
-            if wrappedType.optionalParameterUsesStackABI {
-                try stackLiftFragment(elementType: wrappedType)
-            } else {
-                try liftParameter(type: wrappedType, context: bridgeContext)
-            }
+        if wrappedType.optionalParameterUsesStackABI {
+            return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
+        }
         return compositeOptionalLiftParameter(
             wrappedType: wrappedType,
             kind: kind,
-            innerFragment: innerFragment
+            innerFragment: try liftParameter(type: wrappedType, context: bridgeContext)
         )
     }
 
@@ -1075,22 +1072,14 @@ struct IntrinsicJSFragment: Sendable {
         kind: JSOptionalKind,
         innerFragment: IntrinsicJSFragment
     ) -> IntrinsicJSFragment {
-        let isStackConvention = wrappedType.optionalParameterUsesStackABI
         let absenceLiteral = kind.absenceLiteral
 
-        let outerParams: [String]
-        if isStackConvention {
-            outerParams = ["isSome"]
-        } else {
-            outerParams = ["isSome"] + innerFragment.parameters
-        }
-
         return IntrinsicJSFragment(
-            parameters: outerParams,
+            parameters: ["isSome"] + innerFragment.parameters,
             printCode: { arguments, context in
                 let (scope, printer) = (context.scope, context.printer)
                 let isSome = arguments[0]
-                let innerArgs = isStackConvention ? [] : Array(arguments.dropFirst())
+                let innerArgs = Array(arguments.dropFirst())
 
                 let bufferPrinter = CodeFragmentPrinter()
                 let innerResults = try innerFragment.printCode(

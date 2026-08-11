@@ -568,16 +568,10 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_roundTripOptional"] = function bjs_roundTripOptional(point) {
+            TestModule["bjs_roundTripOptional"] = function bjs_roundTripOptional() {
                 try {
-                    let optResult;
-                    if (point) {
-                        const struct = structHelpers.M10TestModuleT5Point.lift();
-                        optResult = struct;
-                    } else {
-                        optResult = null;
-                    }
-                    let ret = imports.roundTripOptional(optResult);
+                    const optValue = __bjs_codec_Optional_M10TestModuleT5Point.lift();
+                    let ret = imports.roundTripOptional(optValue);
                     __bjs_codec_Optional_M10TestModuleT5Point.lower(ret);
                 } catch (error) {
                     setException(error);

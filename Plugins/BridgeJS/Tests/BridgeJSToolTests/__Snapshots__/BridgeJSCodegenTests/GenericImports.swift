@@ -354,20 +354,20 @@ func _$importGenericDictionary<T: BridgedSwiftGenericBridgeable>(_ values: [Stri
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_importGenericAfterOptionalArray")
-fileprivate func bjs_importGenericAfterOptionalArray_extern(_ values: Int32, _ _generic0TypeId: Int32) -> Void
+fileprivate func bjs_importGenericAfterOptionalArray_extern(_ _generic0TypeId: Int32) -> Void
 #else
-fileprivate func bjs_importGenericAfterOptionalArray_extern(_ values: Int32, _ _generic0TypeId: Int32) -> Void {
+fileprivate func bjs_importGenericAfterOptionalArray_extern(_ _generic0TypeId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_importGenericAfterOptionalArray(_ values: Int32, _ _generic0TypeId: Int32) -> Void {
-    return bjs_importGenericAfterOptionalArray_extern(values, _generic0TypeId)
+@inline(never) fileprivate func bjs_importGenericAfterOptionalArray(_ _generic0TypeId: Int32) -> Void {
+    return bjs_importGenericAfterOptionalArray_extern(_generic0TypeId)
 }
 
 func _$importGenericAfterOptionalArray<T: BridgedSwiftGenericBridgeable>(_ values: Optional<[Int]>, _ value: T) throws(JSException) -> T {
     value.bridgeJSStackPush()
-    let valuesIsSome = values.bridgeJSLowerParameter()
-    bjs_importGenericAfterOptionalArray(valuesIsSome, T.bridgeJSTypeID)
+    let _ = values.bridgeJSLowerParameter()
+    bjs_importGenericAfterOptionalArray(T.bridgeJSTypeID)
     if let error = _swift_js_take_exception() {
         throw error
     }
