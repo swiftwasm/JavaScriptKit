@@ -281,6 +281,18 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
         assert.equal(exports.roundTripUnsafeMutablePointer(p), p);
     }
 
+    assert.equal(exports.renamedEcho("hi"), "echo: hi");
+    assert.equal(exports.jsNameEcho, undefined);
+    assert.equal(exports.greetName("John"), "Hello, John!");
+    assert.equal(exports.greetCount(3), "Hello, 3 people!");
+    const renamed = new exports.JSNameRenamedClass(21);
+    assert.equal(renamed.doubled(), 42);
+    assert.equal(renamed.current, 21);
+    renamed.current = 5;
+    assert.equal(renamed.doubled(), 10);
+    const madeRenamed = exports.JSNameRenamedClass.makeWithValue(7);
+    assert.equal(madeRenamed.current, 7);
+
     const g = new exports.Greeter("John");
     assert.equal(g.greet(), "Hello, John!");
 

@@ -731,6 +731,23 @@ public final class SwiftToSkeleton {
         return String(name.dropFirst().dropLast())
     }
 
+    fileprivate static func isValidJSIdentifier(_ name: String) -> Bool {
+        func isIdentifierPart(_ scalar: Unicode.Scalar, isStart: Bool) -> Bool {
+            switch scalar {
+            case "a"..."z", "A"..."Z", "_", "$":
+                return true
+            case "0"..."9":
+                return !isStart
+            default:
+                return false
+            }
+        }
+        guard let first = name.unicodeScalars.first, isIdentifierPart(first, isStart: true) else {
+            return false
+        }
+        return name.unicodeScalars.dropFirst().allSatisfy { isIdentifierPart($0, isStart: false) }
+    }
+
 }
 
 private enum ExportSwiftConstants {
@@ -1291,6 +1308,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         }
 
         let name = node.name.text
+        let jsName = extractValidatedJSName(from: jsAttribute)
 
         let attributeNamespace = extractNamespace(from: jsAttribute)
         let computedNamespace = computeNamespace(for: node)
@@ -1378,7 +1396,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             classNameForABI = nil
         }
         abiName = ABINameGenerator.generateABIName(
-            baseName: name,
+            baseName: jsName ?? name,
             namespace: finalNamespace,
             staticContext: isStatic ? staticContext : nil,
             className: classNameForABI
@@ -1390,6 +1408,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
         return ExportedFunction(
             name: name,
+            jsName: jsName,
             abiName: abiName,
             parameters: parameters,
             returnType: returnType,
@@ -1469,6 +1488,45 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         return Effects(isAsync: isAsync, isThrows: isThrows, isStatic: isStatic)
     }
 
+    private func extractJSName(
+        from jsAttribute: AttributeSyntax
+    ) -> String? {
+        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+            let nameArg = arguments.first,
+            nameArg.label == nil,
+            let stringLiteral = nameArg.expression.as(StringLiteralExprSyntax.self),
+            stringLiteral.segments.count == 1,
+            let name = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
+        else {
+            return nil
+        }
+        return name
+    }
+
+    private func extractValidatedJSName(
+        from jsAttribute: AttributeSyntax
+    ) -> String? {
+        guard let jsName = extractJSName(from: jsAttribute) else { return nil }
+        guard SwiftToSkeleton.isValidJSIdentifier(jsName) else {
+            diagnose(
+                node: jsAttribute,
+                message: "`\(jsName)` is not a valid JavaScript identifier"
+            )
+            return nil
+        }
+        return jsName
+    }
+
+    private func diagnoseUnsupportedJSName(
+        from jsAttribute: AttributeSyntax
+    ) {
+        guard extractJSName(from: jsAttribute) != nil else { return }
+        diagnose(
+            node: jsAttribute,
+            message: "A separate name for JavaScript is not supported here"
+        )
+    }
+
     private func extractNamespace(
         from jsAttribute: AttributeSyntax
     ) -> [String]? {
@@ -1514,6 +1572,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
     override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
         guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
+
+        diagnoseUnsupportedJSName(from: jsAttribute)
 
         switch state {
         case .classBody(_, let classKey):
@@ -1636,6 +1696,15 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             }
         }
 
+        let jsName = extractValidatedJSName(from: jsAttribute)
+        if jsName != nil, node.bindings.count > 1 {
+            diagnose(
+                node: jsAttribute,
+                message: "Name targets declaration with multiple bindings",
+                hint: "Declare each property with a different JS name separately"
+            )
+        }
+
         // Process each binding (variable declaration)
         for binding in node.bindings {
             guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
@@ -1663,6 +1732,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
             let exportedProperty = ExportedProperty(
                 name: propertyName,
+                jsName: jsName,
                 type: propertyType,
                 isReadonly: isReadonly,
                 isStatic: isStatic,
@@ -1692,6 +1762,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         guard let jsAttribute = node.attributes.firstJSAttribute else {
             return .skipChildren
         }
+
+        diagnoseUnsupportedJSName(from: jsAttribute)
 
         if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
             recordAlias(node: node, jsAttribute: jsAttribute, aliasTarget: aliasTarget)
@@ -1843,6 +1915,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return .skipChildren
         }
 
+        diagnoseUnsupportedJSName(from: jsAttribute)
+
         if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
             recordAlias(node: node, jsAttribute: jsAttribute, aliasTarget: aliasTarget)
             return .skipChildren
@@ -1968,6 +2042,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return .skipChildren
         }
 
+        diagnoseUnsupportedJSName(from: jsAttribute)
+
         let name = node.name.text
 
         let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "protocol")
@@ -2030,6 +2106,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         guard let jsAttribute = node.attributes.firstJSAttribute else {
             return .skipChildren
         }
+
+        diagnoseUnsupportedJSName(from: jsAttribute)
 
         if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
             recordAlias(node: node, jsAttribute: jsAttribute, aliasTarget: aliasTarget)
@@ -2169,6 +2247,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         protocolName: String,
         namespace: [String]?
     ) -> ExportedFunction? {
+        if let jsAttribute = node.attributes.firstJSAttribute {
+            diagnoseUnsupportedJSName(from: jsAttribute)
+        }
+
         let name = node.name.text
 
         let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: false)
@@ -2215,6 +2297,10 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         protocolName: String,
         protocolKey: String
     ) -> SyntaxVisitorContinueKind {
+        if let jsAttribute = node.attributes.firstJSAttribute {
+            diagnoseUnsupportedJSName(from: jsAttribute)
+        }
+
         for binding in node.bindings {
             guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
                 diagnose(node: binding.pattern, message: "Complex patterns not supported for protocol properties")

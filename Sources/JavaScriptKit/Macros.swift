@@ -140,6 +140,7 @@ public enum JSName: ExpressibleByStringLiteral {
 ///
 /// For detailed usage information, see the article <doc:Exporting-Swift-to-JavaScript>.
 ///
+/// - Parameter name: A different name to use in the exported JavaScript.
 /// - Parameter namespace: A dot-separated string that defines the namespace hierarchy in JavaScript.
 ///                        Each segment becomes a nested object in the resulting JavaScript structure.
 /// - Parameter enumStyle: Controls how enums are emitted to TypeScript for this declaration:
@@ -151,6 +152,7 @@ public enum JSName: ExpressibleByStringLiteral {
 /// - Important: This feature is still experimental. No API stability is guaranteed, and the API may change in future releases.
 @attached(peer)
 public macro JS(
+    _ name: String? = nil,
     as aliasOf: Any.Type? = nil,
     namespace: String? = nil,
     enumStyle: JSEnumStyle = .const,

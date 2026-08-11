@@ -2353,7 +2353,7 @@ struct IntrinsicJSFragment: Sendable {
             for method in structDef.methods where !method.effects.isStatic {
                 let paramList = DefaultValueUtils.formatParameterList(method.parameters)
                 printer.write(
-                    "\(instanceVar).\(method.name) = function(\(paramList)) {"
+                    "\(instanceVar).\(method.resolvedJSName) = function(\(paramList)) {"
                 )
                 try printer.indent {
                     printer.write(

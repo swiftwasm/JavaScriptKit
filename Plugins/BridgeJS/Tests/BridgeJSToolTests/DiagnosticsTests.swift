@@ -659,6 +659,87 @@ import Testing
     }
 
     @Test
+    func jsNameOnClassDiagnostic() throws {
+        let source = """
+            @JS("Renamed") class Box { @JS init() {} }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("A separate name for JavaScript is not supported here"))
+    }
+
+    @Test
+    func jsNameOnStructDiagnostic() throws {
+        let source = """
+            @JS("Renamed") struct Box { var x: Int }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("A separate name for JavaScript is not supported here"))
+    }
+
+    @Test
+    func jsNameOnEnumDiagnostic() throws {
+        let source = """
+            @JS("Renamed") enum Box { case a }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("A separate name for JavaScript is not supported here"))
+    }
+
+    @Test
+    func jsNameOnProtocolDiagnostic() throws {
+        let source = """
+            @JS("Renamed") protocol Box { func run() }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("A separate name for JavaScript is not supported here"))
+    }
+
+    @Test
+    func jsNameOnInitializerDiagnostic() throws {
+        let source = """
+            @JS class Box { @JS("create") init() {} }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("A separate name for JavaScript is not supported here"))
+    }
+
+    @Test
+    func jsNameOnProtocolRequirementDiagnostic() throws {
+        let source = """
+            @JS protocol Box { @JS("run") func run() }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("A separate name for JavaScript is not supported here"))
+    }
+
+    @Test
+    func invalidJSNameDiagnostic() throws {
+        let source = """
+            @JS("1notAnIdentifier") func a() -> Int { 42 }
+            @JS("has space") func b() -> Int { 42 }
+            @JS("has-dash") func c() -> Int { 42 }
+            @JS("") func d() -> Int { 42 }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("`1notAnIdentifier` is not a valid JavaScript identifier"))
+        #expect(diagnostics.description.contains("`has space` is not a valid JavaScript identifier"))
+        #expect(diagnostics.description.contains("`has-dash` is not a valid JavaScript identifier"))
+        #expect(diagnostics.description.contains("`` is not a valid JavaScript identifier"))
+    }
+
+    @Test
+    func jsNameOnMultipleBindingsDiagnostic() throws {
+        let source = """
+            @JS class Box {
+                @JS init() {}
+                @JS("renamed") var first: Int = 1, second: Int = 2
+            }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("Name targets declaration with multiple bindings"))
+    }
+
+    @Test
     func omitsNextLineWhenErrorIsOnLastLine() throws {
         let source = """
             preamble

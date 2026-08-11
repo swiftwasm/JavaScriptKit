@@ -133,14 +133,14 @@ final class ImportedJSModuleRegistry {
         }
         for file in skeleton.imported?.children ?? [] {
             for function in file.functions {
-                visit(from: function.from, memberName: function.jsName ?? function.name)
+                visit(from: function.from, memberName: function.resolvedJSName)
             }
             for getter in file.globalGetters {
-                visit(from: getter.from, memberName: getter.jsName ?? getter.name)
+                visit(from: getter.from, memberName: getter.resolvedJSName)
             }
             for type in file.types {
                 guard type.constructor != nil || !type.staticMethods.isEmpty else { continue }
-                visit(from: type.from, memberName: type.jsName ?? type.name)
+                visit(from: type.from, memberName: type.resolvedJSName)
             }
         }
     }
