@@ -93,16 +93,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -341,16 +331,38 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const __bjs_codec_Dict_Int = __bjs_dictCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_Dict_String = __bjs_dictCodec(__bjs_stringCodec);
+    const __bjs_codec_Optional_Dict_String = __bjs_optionalCodec(__bjs_codec_Dict_String);
+    const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_Dict_Array_Int = __bjs_dictCodec(__bjs_codec_Array_Int);
+    const __bjs_codec_TestModule_Box = {
+        lower: (v) => {
+            ptrStack.push(v.pointer);
+        },
+        lift: () => {
+            const ptr = ptrStack.pop();
+            const obj = _exports['Box'].__construct(ptr);
+            return obj;
+        },
+    };
+    const __bjs_codec_Dict_TestModule_Box = __bjs_dictCodec(__bjs_codec_TestModule_Box);
+    const __bjs_codec_Optional_TestModule_Box = __bjs_optionalCodec(__bjs_codec_TestModule_Box);
+    const __bjs_codec_Dict_Optional_TestModule_Box = __bjs_dictCodec(__bjs_codec_Optional_TestModule_Box);
+    const __bjs_codec_Dict_Double = __bjs_dictCodec(__bjs_primitiveCodecs.Double);
+    const __bjs_codec_Optional_Int = __bjs_optionalCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_Dict_Optional_Int = __bjs_dictCodec(__bjs_codec_Optional_Int);
+
     const __bjs_createCountersHelpers = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.name);
             const id = swift.memory.retain(bytes);
             i32Stack.push(bytes.length);
             i32Stack.push(id);
-            __bjs_dictCodec(__bjs_optionalCodec(__bjs_primitiveCodecs.Int)).lower(value.counts);
+            __bjs_codec_Dict_Optional_Int.lower(value.counts);
         },
         lift: () => {
-            const dictResult = __bjs_dictCodec(__bjs_optionalCodec(__bjs_primitiveCodecs.Int)).lift();
+            const dictResult = __bjs_codec_Dict_Optional_Int.lift();
             const string = strStack.pop();
             return { name: string, counts: dictResult };
         }
@@ -548,9 +560,9 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_importMirrorDictionary"] = function bjs_importMirrorDictionary() {
                 try {
-                    const dictResult = __bjs_dictCodec(__bjs_primitiveCodecs.Double).lift();
+                    const dictResult = __bjs_codec_Dict_Double.lift();
                     let ret = imports.importMirrorDictionary(dictResult);
-                    __bjs_dictCodec(__bjs_primitiveCodecs.Double).lower(ret);
+                    __bjs_codec_Dict_Double.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -632,73 +644,33 @@ export async function createInstantiator(options, swift) {
 
             const exports = {
                 mirrorDictionary: function bjs_mirrorDictionary(values) {
-                    __bjs_dictCodec(__bjs_primitiveCodecs.Int).lower(values);
+                    __bjs_codec_Dict_Int.lower(values);
                     instance.exports.bjs_mirrorDictionary();
-                    const dictResult = __bjs_dictCodec(__bjs_primitiveCodecs.Int).lift();
+                    const dictResult = __bjs_codec_Dict_Int.lift();
                     return dictResult;
                 },
                 optionalDictionary: function bjs_optionalDictionary(values) {
-                    __bjs_optionalCodec(__bjs_dictCodec(__bjs_stringCodec)).lower(values);
+                    __bjs_codec_Optional_Dict_String.lower(values);
                     instance.exports.bjs_optionalDictionary();
-                    const optValue = __bjs_optionalCodec(__bjs_dictCodec(__bjs_stringCodec)).lift();
+                    const optValue = __bjs_codec_Optional_Dict_String.lift();
                     return optValue;
                 },
                 nestedDictionary: function bjs_nestedDictionary(values) {
-                    __bjs_dictCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lower(values);
+                    __bjs_codec_Dict_Array_Int.lower(values);
                     instance.exports.bjs_nestedDictionary();
-                    const dictResult = __bjs_dictCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lift();
+                    const dictResult = __bjs_codec_Dict_Array_Int.lift();
                     return dictResult;
                 },
                 boxDictionary: function bjs_boxDictionary(boxes) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = Box.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    __bjs_dictCodec(elemCodec).lower(boxes);
+                    __bjs_codec_Dict_TestModule_Box.lower(boxes);
                     instance.exports.bjs_boxDictionary();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = Box.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    const dictResult = __bjs_dictCodec(elemCodec1).lift();
+                    const dictResult = __bjs_codec_Dict_TestModule_Box.lift();
                     return dictResult;
                 },
                 optionalBoxDictionary: function bjs_optionalBoxDictionary(boxes) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = Box.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    __bjs_dictCodec(__bjs_optionalCodec(elemCodec)).lower(boxes);
+                    __bjs_codec_Dict_Optional_TestModule_Box.lower(boxes);
                     instance.exports.bjs_optionalBoxDictionary();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = Box.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    const dictResult = __bjs_dictCodec(__bjs_optionalCodec(elemCodec1)).lift();
+                    const dictResult = __bjs_codec_Dict_Optional_TestModule_Box.lift();
                     return dictResult;
                 },
                 roundtripCounters: function bjs_roundtripCounters(counters) {

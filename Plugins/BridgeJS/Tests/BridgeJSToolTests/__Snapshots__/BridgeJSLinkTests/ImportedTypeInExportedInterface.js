@@ -93,16 +93,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -341,6 +331,22 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const __bjs_codec_TestModule_Foo = {
+        lower: (v) => {
+            const objId = swift.memory.retain(v);
+            i32Stack.push(objId);
+        },
+        lift: () => {
+            const objId = i32Stack.pop();
+            const obj = swift.memory.getObject(objId);
+            swift.memory.release(objId);
+            return obj;
+        },
+    };
+    const __bjs_codec_Array_TestModule_Foo = __bjs_arrayCodec(__bjs_codec_TestModule_Foo);
+    const __bjs_codec_Optional_TestModule_Foo = __bjs_optionalCodec(__bjs_codec_TestModule_Foo);
+    const __bjs_codec_Array_Optional_TestModule_Foo = __bjs_arrayCodec(__bjs_codec_Optional_TestModule_Foo);
+
     const __bjs_createFooContainerHelpers = () => ({
         lower: (value) => {
             let id;
@@ -350,34 +356,10 @@ export async function createInstantiator(options, swift) {
                 id = undefined;
             }
             i32Stack.push(id !== undefined ? id : 0);
-            const elemCodec = {
-                lower: (v) => {
-                    const objId = swift.memory.retain(v);
-                    i32Stack.push(objId);
-                },
-                lift: () => {
-                    const objId = i32Stack.pop();
-                    const obj = swift.memory.getObject(objId);
-                    swift.memory.release(objId);
-                    return obj;
-                },
-            };
-            __bjs_optionalCodec(elemCodec).lower(value.optionalFoo);
+            __bjs_codec_Optional_TestModule_Foo.lower(value.optionalFoo);
         },
         lift: () => {
-            const elemCodec = {
-                lower: (v) => {
-                    const objId = swift.memory.retain(v);
-                    i32Stack.push(objId);
-                },
-                lift: () => {
-                    const objId = i32Stack.pop();
-                    const obj = swift.memory.getObject(objId);
-                    swift.memory.release(objId);
-                    return obj;
-                },
-            };
-            const optValue = __bjs_optionalCodec(elemCodec).lift();
+            const optValue = __bjs_codec_Optional_TestModule_Foo.lift();
             const objectId = i32Stack.pop();
             let value;
             if (objectId !== 0) {
@@ -611,63 +593,15 @@ export async function createInstantiator(options, swift) {
                     return ret1;
                 },
                 processFooArray: function bjs_processFooArray(foos) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(foos);
+                    __bjs_codec_Array_TestModule_Foo.lower(foos);
                     instance.exports.bjs_processFooArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_Foo.lift();
                     return arrayResult;
                 },
                 processOptionalFooArray: function bjs_processOptionalFooArray(foos) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(__bjs_optionalCodec(elemCodec)).lower(foos);
+                    __bjs_codec_Array_Optional_TestModule_Foo.lower(foos);
                     instance.exports.bjs_processOptionalFooArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(elemCodec1)).lift();
+                    const arrayResult = __bjs_codec_Array_Optional_TestModule_Foo.lift();
                     return arrayResult;
                 },
                 roundtripFooContainer: function bjs_roundtripFooContainer(container) {

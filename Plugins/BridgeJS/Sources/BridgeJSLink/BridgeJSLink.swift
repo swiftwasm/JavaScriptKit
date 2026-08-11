@@ -413,22 +413,13 @@ public struct BridgeJSLink {
         )
     }
 
-    /// Emits a `{ lower, lift }` codec literal for one bridgeable type.
-    /// `prefix` is prepended to the opening brace (e.g. an assignment) and
-    /// `suffix` is appended to the closing brace (e.g. `","` in an array).
-    private func appendGenericCodecLiteral(
-        type: BridgeType,
-        into printer: CodeFragmentPrinter,
-        prefix: String = "",
-        suffix: String = ","
-    ) throws {
-        try ContainerCodecJS.writeCodecLiteral(
-            type: type,
-            into: printer,
-            context: makeCodecPrintContext(printer: printer),
-            prefix: prefix,
-            suffix: suffix
-        )
+    /// Returns the module-scope codec helper for one bridgeable type, declaring
+    /// it if this is the first reference.
+    ///
+    /// The registration table and the container combinators' element positions
+    /// go through the same helper, so a type's stack ABI is described once.
+    private func genericCodecReference(type: BridgeType, into printer: CodeFragmentPrinter) throws -> String {
+        try ContainerCodecJS.codecExpression(for: type, context: makeCodecPrintContext(printer: printer))
     }
 
     /// Pairs the type IDs Swift pushed with codecs in the matching skeleton order.
@@ -487,10 +478,13 @@ public struct BridgeJSLink {
             printer.write("bjs[\"\(hookName)\"] = function(base, count) {")
             try printer.indent {
                 // Same order as the module's Swift registration function.
+                let codecNames = try moduleEntries.map {
+                    try genericCodecReference(type: $0.bridgeType, into: printer)
+                }
                 printer.write("const codecs = [")
-                try printer.indent {
-                    for entry in moduleEntries {
-                        try appendGenericCodecLiteral(type: entry.bridgeType, into: printer)
+                printer.indent {
+                    for name in codecNames {
+                        printer.write("\(name),")
                     }
                 }
                 printer.write("];")
@@ -1277,6 +1271,18 @@ public struct BridgeJSLink {
                 printer.nextLine()
             }
 
+            // The named codec helpers come after the intrinsics because they are
+            // built out of the combinators and the primitive codec table, and
+            // before everything that uses them: they are hoisted here so that no
+            // call site ever composes a codec. Helpers that delegate to the
+            // `structHelpers` / `enumHelpers` tables only read those tables when
+            // called, so declaring them ahead of the tables being populated is
+            // fine.
+            if intrinsicRegistry.hasNamedCodecs {
+                printer.write(lines: intrinsicRegistry.emitNamedCodecLines())
+                printer.nextLine()
+            }
+
             printer.write(lines: bodyPrinter.lines)
         }
         printer.indent()
@@ -1367,10 +1373,52 @@ public struct BridgeJSLink {
                 }
             }
         }
+        intrinsicRegistry.typeOwnerModules = collectTypeOwnerModules()
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
         let outputDts = generateTypeScript(data: data)
         return (outputJs, outputDts)
+    }
+
+    /// Maps every type name a `BridgeType` can carry to the module that declares
+    /// it, so identifiers minted from type names can be module-qualified.
+    ///
+    /// A name declared by two modules is a pre-existing ambiguity in the
+    /// skeleton format (`BridgeType` carries only the name), so the first
+    /// declaration wins, which keeps the output deterministic.
+    private func collectTypeOwnerModules() -> [String: String] {
+        var result: [String: String] = [:]
+        func record(_ name: String, _ moduleName: String) {
+            if result[name] == nil {
+                result[name] = moduleName
+            }
+        }
+        for unified in skeletons {
+            let moduleName = unified.moduleName
+            if let skeleton = unified.exported {
+                for structDef in skeleton.structs {
+                    record(structDef.name, moduleName)
+                    record(structDef.abiName, moduleName)
+                }
+                for klass in skeleton.classes {
+                    record(klass.name, moduleName)
+                    record(klass.abiName, moduleName)
+                }
+                for enumDef in skeleton.enums {
+                    record(enumDef.name, moduleName)
+                    record(enumDef.abiName, moduleName)
+                }
+                for protocolDef in skeleton.protocols {
+                    record(protocolDef.name, moduleName)
+                }
+            }
+            for file in unified.imported?.children ?? [] {
+                for type in file.types {
+                    record(type.name, moduleName)
+                }
+            }
+        }
+        return result
     }
 
     private func enumHelperAssignments() -> CodeFragmentPrinter {

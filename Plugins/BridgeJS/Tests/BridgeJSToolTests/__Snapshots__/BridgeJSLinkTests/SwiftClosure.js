@@ -123,16 +123,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -395,6 +385,17 @@ export async function createInstantiator(options, swift) {
         swiftClosureRegistry.register(real, state, state);
         return swift.memory.retain(real);
     };
+
+    const __bjs_codec_TestModule_Animal = {
+        lower: (v) => {
+            structHelpers.Animal.lower(v);
+        },
+        lift: () => {
+            const struct = structHelpers.Animal.lift();
+            return struct;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_Animal = __bjs_optionalCodec(__bjs_codec_TestModule_Animal);
 
     const __bjs_createAnimalHelpers = () => ({
         lower: (value) => {
@@ -1086,16 +1087,16 @@ export async function createInstantiator(options, swift) {
                         optResult = null;
                     }
                     let ret = callback(optResult);
-                    __bjs_optionalCodec(structHelpers.Animal).lower(ret);
+                    __bjs_codec_Optional_TestModule_Animal.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
             }
             bjs["make_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV = function(param0) {
-                    __bjs_optionalCodec(structHelpers.Animal).lower(param0);
+                    __bjs_codec_Optional_TestModule_Animal.lower(param0);
                     instance.exports.invoke_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV(boxPtr);
-                    const optValue = __bjs_optionalCodec(structHelpers.Animal).lift();
+                    const optValue = __bjs_codec_Optional_TestModule_Animal.lift();
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);

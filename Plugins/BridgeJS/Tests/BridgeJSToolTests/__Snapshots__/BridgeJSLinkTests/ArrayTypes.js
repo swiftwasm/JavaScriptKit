@@ -106,16 +106,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -354,6 +344,114 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_Array_String = __bjs_arrayCodec(__bjs_stringCodec);
+    const __bjs_codec_Array_Double = __bjs_arrayCodec(__bjs_primitiveCodecs.Double);
+    const __bjs_codec_Array_Bool = __bjs_arrayCodec(__bjs_primitiveCodecs.Bool);
+    const __bjs_codec_TestModule_Point = {
+        lower: (v) => {
+            structHelpers.Point.lower(v);
+        },
+        lift: () => {
+            const struct = structHelpers.Point.lift();
+            return struct;
+        },
+    };
+    const __bjs_codec_Array_TestModule_Point = __bjs_arrayCodec(__bjs_codec_TestModule_Point);
+    const __bjs_codec_TestModule_Direction = {
+        lower: (v) => {
+            i32Stack.push((v | 0));
+        },
+        lift: () => {
+            const caseId = i32Stack.pop();
+            return caseId;
+        },
+    };
+    const __bjs_codec_Array_TestModule_Direction = __bjs_arrayCodec(__bjs_codec_TestModule_Direction);
+    const __bjs_codec_TestModule_Status = {
+        lower: (v) => {
+            i32Stack.push((v | 0));
+        },
+        lift: () => {
+            const rawValue = i32Stack.pop();
+            return rawValue;
+        },
+    };
+    const __bjs_codec_Array_TestModule_Status = __bjs_arrayCodec(__bjs_codec_TestModule_Status);
+    const __bjs_codec_Surp = {
+        lower: (v) => {
+            ptrStack.push((v | 0));
+        },
+        lift: () => {
+            const pointer = ptrStack.pop();
+            return pointer;
+        },
+    };
+    const __bjs_codec_Array_Surp = __bjs_arrayCodec(__bjs_codec_Surp);
+    const __bjs_codec_Sumrp = {
+        lower: (v) => {
+            ptrStack.push((v | 0));
+        },
+        lift: () => {
+            const pointer = ptrStack.pop();
+            return pointer;
+        },
+    };
+    const __bjs_codec_Array_Sumrp = __bjs_arrayCodec(__bjs_codec_Sumrp);
+    const __bjs_codec_Sop = {
+        lower: (v) => {
+            ptrStack.push((v | 0));
+        },
+        lift: () => {
+            const pointer = ptrStack.pop();
+            return pointer;
+        },
+    };
+    const __bjs_codec_Array_Sop = __bjs_arrayCodec(__bjs_codec_Sop);
+    const __bjs_codec_Optional_Int = __bjs_optionalCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_Array_Optional_Int = __bjs_arrayCodec(__bjs_codec_Optional_Int);
+    const __bjs_codec_Optional_String = __bjs_optionalCodec(__bjs_stringCodec);
+    const __bjs_codec_Array_Optional_String = __bjs_arrayCodec(__bjs_codec_Optional_String);
+    const __bjs_codec_Optional_Array_Int = __bjs_optionalCodec(__bjs_codec_Array_Int);
+    const __bjs_codec_Optional_TestModule_Point = __bjs_optionalCodec(__bjs_codec_TestModule_Point);
+    const __bjs_codec_Array_Optional_TestModule_Point = __bjs_arrayCodec(__bjs_codec_Optional_TestModule_Point);
+    const __bjs_codec_Optional_TestModule_Direction = __bjs_optionalCodec(__bjs_codec_TestModule_Direction);
+    const __bjs_codec_Array_Optional_TestModule_Direction = __bjs_arrayCodec(__bjs_codec_Optional_TestModule_Direction);
+    const __bjs_codec_Optional_TestModule_Status = __bjs_optionalCodec(__bjs_codec_TestModule_Status);
+    const __bjs_codec_Array_Optional_TestModule_Status = __bjs_arrayCodec(__bjs_codec_Optional_TestModule_Status);
+    const __bjs_codec_Array_Array_Int = __bjs_arrayCodec(__bjs_codec_Array_Int);
+    const __bjs_codec_Array_Array_String = __bjs_arrayCodec(__bjs_codec_Array_String);
+    const __bjs_codec_Array_Array_TestModule_Point = __bjs_arrayCodec(__bjs_codec_Array_TestModule_Point);
+    const __bjs_codec_TestModule_Item = {
+        lower: (v) => {
+            ptrStack.push(v.pointer);
+        },
+        lift: () => {
+            const ptr = ptrStack.pop();
+            const obj = _exports['Item'].__construct(ptr);
+            return obj;
+        },
+    };
+    const __bjs_codec_Array_TestModule_Item = __bjs_arrayCodec(__bjs_codec_TestModule_Item);
+    const __bjs_codec_Array_Array_TestModule_Item = __bjs_arrayCodec(__bjs_codec_Array_TestModule_Item);
+    const __bjs_codec_JSObject = {
+        lower: (v) => {
+            const objId = swift.memory.retain(v);
+            i32Stack.push(objId);
+        },
+        lift: () => {
+            const objId = i32Stack.pop();
+            const obj = swift.memory.getObject(objId);
+            swift.memory.release(objId);
+            return obj;
+        },
+    };
+    const __bjs_codec_Array_JSObject = __bjs_arrayCodec(__bjs_codec_JSObject);
+    const __bjs_codec_Optional_JSObject = __bjs_optionalCodec(__bjs_codec_JSObject);
+    const __bjs_codec_Array_Optional_JSObject = __bjs_arrayCodec(__bjs_codec_Optional_JSObject);
+    const __bjs_codec_Array_Array_JSObject = __bjs_arrayCodec(__bjs_codec_Array_JSObject);
+    const __bjs_codec_Optional_Array_String = __bjs_optionalCodec(__bjs_codec_Array_String);
+
     const __bjs_createPointHelpers = () => ({
         lower: (value) => {
             f64Stack.push(value.x);
@@ -576,7 +674,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_importProcessNumbers"] = function bjs_importProcessNumbers() {
                 try {
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lift();
+                    const arrayResult = __bjs_codec_Array_Double.lift();
                     imports.importProcessNumbers(arrayResult);
                 } catch (error) {
                     setException(error);
@@ -585,34 +683,34 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_importGetNumbers"] = function bjs_importGetNumbers() {
                 try {
                     let ret = imports.importGetNumbers();
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lower(ret);
+                    __bjs_codec_Array_Double.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_importTransformNumbers"] = function bjs_importTransformNumbers() {
                 try {
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lift();
+                    const arrayResult = __bjs_codec_Array_Double.lift();
                     let ret = imports.importTransformNumbers(arrayResult);
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lower(ret);
+                    __bjs_codec_Array_Double.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_importProcessStrings"] = function bjs_importProcessStrings() {
                 try {
-                    const arrayResult = __bjs_arrayCodec(__bjs_stringCodec).lift();
+                    const arrayResult = __bjs_codec_Array_String.lift();
                     let ret = imports.importProcessStrings(arrayResult);
-                    __bjs_arrayCodec(__bjs_stringCodec).lower(ret);
+                    __bjs_codec_Array_String.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_importProcessBooleans"] = function bjs_importProcessBooleans() {
                 try {
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lift();
+                    const arrayResult = __bjs_codec_Array_Bool.lift();
                     let ret = imports.importProcessBooleans(arrayResult);
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lower(ret);
+                    __bjs_codec_Array_Bool.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -695,19 +793,19 @@ export async function createInstantiator(options, swift) {
                 }
 
                 constructor(nums, strs) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(nums);
-                    __bjs_arrayCodec(__bjs_stringCodec).lower(strs);
+                    __bjs_codec_Array_Int.lower(nums);
+                    __bjs_codec_Array_String.lower(strs);
                     const ret = instance.exports.bjs_MultiArrayContainer_init();
                     return MultiArrayContainer.__construct(ret);
                 }
                 get numbers() {
                     instance.exports.bjs_MultiArrayContainer_numbers_get(this.pointer);
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                    const arrayResult = __bjs_codec_Array_Int.lift();
                     return arrayResult;
                 }
                 get strings() {
                     instance.exports.bjs_MultiArrayContainer_strings_get(this.pointer);
-                    const arrayResult = __bjs_arrayCodec(__bjs_stringCodec).lift();
+                    const arrayResult = __bjs_codec_Array_String.lift();
                     return arrayResult;
                 }
             }
@@ -716,90 +814,54 @@ export async function createInstantiator(options, swift) {
 
             const exports = {
                 processIntArray: function bjs_processIntArray(values) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(values);
+                    __bjs_codec_Array_Int.lower(values);
                     instance.exports.bjs_processIntArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                    const arrayResult = __bjs_codec_Array_Int.lift();
                     return arrayResult;
                 },
                 processStringArray: function bjs_processStringArray(values) {
-                    __bjs_arrayCodec(__bjs_stringCodec).lower(values);
+                    __bjs_codec_Array_String.lower(values);
                     instance.exports.bjs_processStringArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_stringCodec).lift();
+                    const arrayResult = __bjs_codec_Array_String.lift();
                     return arrayResult;
                 },
                 processDoubleArray: function bjs_processDoubleArray(values) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lower(values);
+                    __bjs_codec_Array_Double.lower(values);
                     instance.exports.bjs_processDoubleArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lift();
+                    const arrayResult = __bjs_codec_Array_Double.lift();
                     return arrayResult;
                 },
                 processBoolArray: function bjs_processBoolArray(values) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lower(values);
+                    __bjs_codec_Array_Bool.lower(values);
                     instance.exports.bjs_processBoolArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lift();
+                    const arrayResult = __bjs_codec_Array_Bool.lift();
                     return arrayResult;
                 },
                 processPointArray: function bjs_processPointArray(points) {
-                    __bjs_arrayCodec(structHelpers.Point).lower(points);
+                    __bjs_codec_Array_TestModule_Point.lower(points);
                     instance.exports.bjs_processPointArray();
-                    const arrayResult = __bjs_arrayCodec(structHelpers.Point).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_Point.lift();
                     return arrayResult;
                 },
                 processDirectionArray: function bjs_processDirectionArray(directions) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(directions);
+                    __bjs_codec_Array_TestModule_Direction.lower(directions);
                     instance.exports.bjs_processDirectionArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_Direction.lift();
                     return arrayResult;
                 },
                 processStatusArray: function bjs_processStatusArray(statuses) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const rawValue = i32Stack.pop();
-                            return rawValue;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(statuses);
+                    __bjs_codec_Array_TestModule_Status.lower(statuses);
                     instance.exports.bjs_processStatusArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const rawValue = i32Stack.pop();
-                            return rawValue;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_Status.lift();
                     return arrayResult;
                 },
                 sumIntArray: function bjs_sumIntArray(values) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(values);
+                    __bjs_codec_Array_Int.lower(values);
                     const ret = instance.exports.bjs_sumIntArray();
                     return ret;
                 },
                 findFirstPoint: function bjs_findFirstPoint(points, matching) {
-                    __bjs_arrayCodec(structHelpers.Point).lower(points);
+                    __bjs_codec_Array_TestModule_Point.lower(points);
                     const matchingBytes = textEncoder.encode(matching);
                     const matchingId = swift.memory.retain(matchingBytes);
                     instance.exports.bjs_findFirstPoint(matchingId, matchingBytes.length);
@@ -807,318 +869,116 @@ export async function createInstantiator(options, swift) {
                     return structValue;
                 },
                 processUnsafeRawPointerArray: function bjs_processUnsafeRawPointerArray(values) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push((v | 0));
-                        },
-                        lift: () => {
-                            const pointer = ptrStack.pop();
-                            return pointer;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(values);
+                    __bjs_codec_Array_Surp.lower(values);
                     instance.exports.bjs_processUnsafeRawPointerArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            ptrStack.push((v | 0));
-                        },
-                        lift: () => {
-                            const pointer = ptrStack.pop();
-                            return pointer;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_Surp.lift();
                     return arrayResult;
                 },
                 processUnsafeMutableRawPointerArray: function bjs_processUnsafeMutableRawPointerArray(values) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push((v | 0));
-                        },
-                        lift: () => {
-                            const pointer = ptrStack.pop();
-                            return pointer;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(values);
+                    __bjs_codec_Array_Sumrp.lower(values);
                     instance.exports.bjs_processUnsafeMutableRawPointerArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            ptrStack.push((v | 0));
-                        },
-                        lift: () => {
-                            const pointer = ptrStack.pop();
-                            return pointer;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_Sumrp.lift();
                     return arrayResult;
                 },
                 processOpaquePointerArray: function bjs_processOpaquePointerArray(values) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push((v | 0));
-                        },
-                        lift: () => {
-                            const pointer = ptrStack.pop();
-                            return pointer;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(values);
+                    __bjs_codec_Array_Sop.lower(values);
                     instance.exports.bjs_processOpaquePointerArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            ptrStack.push((v | 0));
-                        },
-                        lift: () => {
-                            const pointer = ptrStack.pop();
-                            return pointer;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_Sop.lift();
                     return arrayResult;
                 },
                 processOptionalIntArray: function bjs_processOptionalIntArray(values) {
-                    __bjs_arrayCodec(__bjs_optionalCodec(__bjs_primitiveCodecs.Int)).lower(values);
+                    __bjs_codec_Array_Optional_Int.lower(values);
                     instance.exports.bjs_processOptionalIntArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(__bjs_primitiveCodecs.Int)).lift();
+                    const arrayResult = __bjs_codec_Array_Optional_Int.lift();
                     return arrayResult;
                 },
                 processOptionalStringArray: function bjs_processOptionalStringArray(values) {
-                    __bjs_arrayCodec(__bjs_optionalCodec(__bjs_stringCodec)).lower(values);
+                    __bjs_codec_Array_Optional_String.lower(values);
                     instance.exports.bjs_processOptionalStringArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(__bjs_stringCodec)).lift();
+                    const arrayResult = __bjs_codec_Array_Optional_String.lift();
                     return arrayResult;
                 },
                 processOptionalArray: function bjs_processOptionalArray(values) {
-                    __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lower(values);
+                    __bjs_codec_Optional_Array_Int.lower(values);
                     instance.exports.bjs_processOptionalArray();
-                    const optValue = __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lift();
+                    const optValue = __bjs_codec_Optional_Array_Int.lift();
                     return optValue;
                 },
                 processOptionalPointArray: function bjs_processOptionalPointArray(points) {
-                    __bjs_arrayCodec(__bjs_optionalCodec(structHelpers.Point)).lower(points);
+                    __bjs_codec_Array_Optional_TestModule_Point.lower(points);
                     instance.exports.bjs_processOptionalPointArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(structHelpers.Point)).lift();
+                    const arrayResult = __bjs_codec_Array_Optional_TestModule_Point.lift();
                     return arrayResult;
                 },
                 processOptionalDirectionArray: function bjs_processOptionalDirectionArray(directions) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    __bjs_arrayCodec(__bjs_optionalCodec(elemCodec)).lower(directions);
+                    __bjs_codec_Array_Optional_TestModule_Direction.lower(directions);
                     instance.exports.bjs_processOptionalDirectionArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(elemCodec1)).lift();
+                    const arrayResult = __bjs_codec_Array_Optional_TestModule_Direction.lift();
                     return arrayResult;
                 },
                 processOptionalStatusArray: function bjs_processOptionalStatusArray(statuses) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const rawValue = i32Stack.pop();
-                            return rawValue;
-                        },
-                    };
-                    __bjs_arrayCodec(__bjs_optionalCodec(elemCodec)).lower(statuses);
+                    __bjs_codec_Array_Optional_TestModule_Status.lower(statuses);
                     instance.exports.bjs_processOptionalStatusArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const rawValue = i32Stack.pop();
-                            return rawValue;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(elemCodec1)).lift();
+                    const arrayResult = __bjs_codec_Array_Optional_TestModule_Status.lift();
                     return arrayResult;
                 },
                 processNestedIntArray: function bjs_processNestedIntArray(values) {
-                    __bjs_arrayCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lower(values);
+                    __bjs_codec_Array_Array_Int.lower(values);
                     instance.exports.bjs_processNestedIntArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lift();
+                    const arrayResult = __bjs_codec_Array_Array_Int.lift();
                     return arrayResult;
                 },
                 processNestedStringArray: function bjs_processNestedStringArray(values) {
-                    __bjs_arrayCodec(__bjs_arrayCodec(__bjs_stringCodec)).lower(values);
+                    __bjs_codec_Array_Array_String.lower(values);
                     instance.exports.bjs_processNestedStringArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(__bjs_stringCodec)).lift();
+                    const arrayResult = __bjs_codec_Array_Array_String.lift();
                     return arrayResult;
                 },
                 processNestedPointArray: function bjs_processNestedPointArray(points) {
-                    __bjs_arrayCodec(__bjs_arrayCodec(structHelpers.Point)).lower(points);
+                    __bjs_codec_Array_Array_TestModule_Point.lower(points);
                     instance.exports.bjs_processNestedPointArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(structHelpers.Point)).lift();
+                    const arrayResult = __bjs_codec_Array_Array_TestModule_Point.lift();
                     return arrayResult;
                 },
                 processItemArray: function bjs_processItemArray(items) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = Item.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(items);
+                    __bjs_codec_Array_TestModule_Item.lower(items);
                     instance.exports.bjs_processItemArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = Item.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_Item.lift();
                     return arrayResult;
                 },
                 processNestedItemArray: function bjs_processNestedItemArray(items) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = Item.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(__bjs_arrayCodec(elemCodec)).lower(items);
+                    __bjs_codec_Array_Array_TestModule_Item.lower(items);
                     instance.exports.bjs_processNestedItemArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = Item.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(elemCodec1)).lift();
+                    const arrayResult = __bjs_codec_Array_Array_TestModule_Item.lift();
                     return arrayResult;
                 },
                 processJSObjectArray: function bjs_processJSObjectArray(objects) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(objects);
+                    __bjs_codec_Array_JSObject.lower(objects);
                     instance.exports.bjs_processJSObjectArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_JSObject.lift();
                     return arrayResult;
                 },
                 processOptionalJSObjectArray: function bjs_processOptionalJSObjectArray(objects) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(__bjs_optionalCodec(elemCodec)).lower(objects);
+                    __bjs_codec_Array_Optional_JSObject.lower(objects);
                     instance.exports.bjs_processOptionalJSObjectArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(elemCodec1)).lift();
+                    const arrayResult = __bjs_codec_Array_Optional_JSObject.lift();
                     return arrayResult;
                 },
                 processNestedJSObjectArray: function bjs_processNestedJSObjectArray(objects) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(__bjs_arrayCodec(elemCodec)).lower(objects);
+                    __bjs_codec_Array_Array_JSObject.lower(objects);
                     instance.exports.bjs_processNestedJSObjectArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(__bjs_arrayCodec(elemCodec1)).lift();
+                    const arrayResult = __bjs_codec_Array_Array_JSObject.lift();
                     return arrayResult;
                 },
                 multiArrayParams: function bjs_multiArrayParams(nums, strs) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(nums);
-                    __bjs_arrayCodec(__bjs_stringCodec).lower(strs);
+                    __bjs_codec_Array_Int.lower(nums);
+                    __bjs_codec_Array_String.lower(strs);
                     const ret = instance.exports.bjs_multiArrayParams();
                     return ret;
                 },
                 multiOptionalArrayParams: function bjs_multiOptionalArrayParams(a, b) {
-                    __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lower(a);
-                    __bjs_optionalCodec(__bjs_arrayCodec(__bjs_stringCodec)).lower(b);
+                    __bjs_codec_Optional_Array_Int.lower(a);
+                    __bjs_codec_Optional_Array_String.lower(b);
                     const ret = instance.exports.bjs_multiOptionalArrayParams();
                     return ret;
                 },

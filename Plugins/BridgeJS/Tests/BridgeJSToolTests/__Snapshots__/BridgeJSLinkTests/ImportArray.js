@@ -93,16 +93,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -341,6 +331,9 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_Array_String = __bjs_arrayCodec(__bjs_stringCodec);
+
 
     return {
         /**
@@ -518,16 +511,16 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_roundtrip"] = function bjs_roundtrip() {
                 try {
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                    const arrayResult = __bjs_codec_Array_Int.lift();
                     let ret = imports.roundtrip(arrayResult);
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(ret);
+                    __bjs_codec_Array_Int.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
             }
             TestModule["bjs_logStrings"] = function bjs_logStrings() {
                 try {
-                    const arrayResult = __bjs_arrayCodec(__bjs_stringCodec).lift();
+                    const arrayResult = __bjs_codec_Array_String.lift();
                     imports.logStrings(arrayResult);
                 } catch (error) {
                     setException(error);
@@ -537,12 +530,12 @@ export async function createInstantiator(options, swift) {
                 try {
                     let optResult;
                     if (a) {
-                        const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                        const arrayResult = __bjs_codec_Array_Int.lift();
                         optResult = arrayResult;
                     } else {
                         optResult = null;
                     }
-                    const arrayResult1 = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                    const arrayResult1 = __bjs_codec_Array_Int.lift();
                     let ret = imports.optionalArrayThenArray(optResult, arrayResult1);
                     return ret;
                 } catch (error) {
@@ -555,12 +548,12 @@ export async function createInstantiator(options, swift) {
                     const string = decodeString(sBytes, sCount);
                     let optResult;
                     if (a) {
-                        const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                        const arrayResult = __bjs_codec_Array_Int.lift();
                         optResult = arrayResult;
                     } else {
                         optResult = null;
                     }
-                    const arrayResult1 = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                    const arrayResult1 = __bjs_codec_Array_Int.lift();
                     let ret = imports.borrowedStringAroundStackParams(string, optResult, arrayResult1);
                     return ret;
                 } catch (error) {

@@ -174,16 +174,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -421,6 +411,77 @@ export async function createInstantiator(options, swift) {
         }
         return jsValue;
     }
+
+    const __bjs_codec_Optional_String = __bjs_optionalCodec(__bjs_stringCodec);
+    const __bjs_codec_Optional_Bool = __bjs_optionalCodec(__bjs_primitiveCodecs.Bool);
+    const __bjs_codec_Optional_Int = __bjs_optionalCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_TestModule_Precision = {
+        lower: (v) => {
+            f32Stack.push(Math.fround(v));
+        },
+        lift: () => {
+            const rawValue = f32Stack.pop();
+            return rawValue;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_Precision = __bjs_optionalCodec(__bjs_codec_TestModule_Precision);
+    const __bjs_codec_TestModule_CardinalDirection = {
+        lower: (v) => {
+            i32Stack.push((v | 0));
+        },
+        lift: () => {
+            const caseId = i32Stack.pop();
+            return caseId;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_CardinalDirection = __bjs_optionalCodec(__bjs_codec_TestModule_CardinalDirection);
+    const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_TestModule_Point = {
+        lower: (v) => {
+            structHelpers.Point.lower(v);
+        },
+        lift: () => {
+            const struct = structHelpers.Point.lift();
+            return struct;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_Point = __bjs_optionalCodec(__bjs_codec_TestModule_Point);
+    const __bjs_codec_TestModule_User = {
+        lower: (v) => {
+            ptrStack.push(v.pointer);
+        },
+        lift: () => {
+            const ptr = ptrStack.pop();
+            const obj = _exports['User'].__construct(ptr);
+            return obj;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_User = __bjs_optionalCodec(__bjs_codec_TestModule_User);
+    const __bjs_codec_JSObject = {
+        lower: (v) => {
+            const objId = swift.memory.retain(v);
+            i32Stack.push(objId);
+        },
+        lift: () => {
+            const objId = i32Stack.pop();
+            const obj = swift.memory.getObject(objId);
+            swift.memory.release(objId);
+            return obj;
+        },
+    };
+    const __bjs_codec_Optional_JSObject = __bjs_optionalCodec(__bjs_codec_JSObject);
+    const __bjs_codec_TestModule_APIResult = {
+        lower: (v) => {
+            const caseId = enumHelpers.APIResult.lower(v);
+            i32Stack.push(caseId);
+        },
+        lift: () => {
+            const enumValue = enumHelpers.APIResult.lift(i32Stack.pop());
+            return enumValue;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_APIResult = __bjs_optionalCodec(__bjs_codec_TestModule_APIResult);
+    const __bjs_codec_Optional_Array_Int = __bjs_optionalCodec(__bjs_codec_Array_Int);
 
     const __bjs_createPointHelpers = () => ({
         lower: (value) => {
@@ -692,18 +753,18 @@ export async function createInstantiator(options, swift) {
             const enumTag = value.tag;
             switch (enumTag) {
                 case APIOptionalResultValues.Tag.Success: {
-                    __bjs_optionalCodec(__bjs_stringCodec).lower(value.param0);
+                    __bjs_codec_Optional_String.lower(value.param0);
                     return APIOptionalResultValues.Tag.Success;
                 }
                 case APIOptionalResultValues.Tag.Failure: {
-                    __bjs_optionalCodec(__bjs_primitiveCodecs.Bool).lower(value.param1);
-                    __bjs_optionalCodec(__bjs_primitiveCodecs.Int).lower(value.param0);
+                    __bjs_codec_Optional_Bool.lower(value.param1);
+                    __bjs_codec_Optional_Int.lower(value.param0);
                     return APIOptionalResultValues.Tag.Failure;
                 }
                 case APIOptionalResultValues.Tag.Status: {
-                    __bjs_optionalCodec(__bjs_stringCodec).lower(value.param2);
-                    __bjs_optionalCodec(__bjs_primitiveCodecs.Int).lower(value.param1);
-                    __bjs_optionalCodec(__bjs_primitiveCodecs.Bool).lower(value.param0);
+                    __bjs_codec_Optional_String.lower(value.param2);
+                    __bjs_codec_Optional_Int.lower(value.param1);
+                    __bjs_codec_Optional_Bool.lower(value.param0);
                     return APIOptionalResultValues.Tag.Status;
                 }
                 default: throw new Error("Unknown APIOptionalResultValues tag: " + String(enumTag));
@@ -713,18 +774,18 @@ export async function createInstantiator(options, swift) {
             tag = tag | 0;
             switch (tag) {
                 case APIOptionalResultValues.Tag.Success: {
-                    const optValue = __bjs_optionalCodec(__bjs_stringCodec).lift();
+                    const optValue = __bjs_codec_Optional_String.lift();
                     return { tag: APIOptionalResultValues.Tag.Success, param0: optValue };
                 }
                 case APIOptionalResultValues.Tag.Failure: {
-                    const optValue = __bjs_optionalCodec(__bjs_primitiveCodecs.Bool).lift();
-                    const optValue1 = __bjs_optionalCodec(__bjs_primitiveCodecs.Int).lift();
+                    const optValue = __bjs_codec_Optional_Bool.lift();
+                    const optValue1 = __bjs_codec_Optional_Int.lift();
                     return { tag: APIOptionalResultValues.Tag.Failure, param0: optValue1, param1: optValue };
                 }
                 case APIOptionalResultValues.Tag.Status: {
-                    const optValue = __bjs_optionalCodec(__bjs_stringCodec).lift();
-                    const optValue1 = __bjs_optionalCodec(__bjs_primitiveCodecs.Int).lift();
-                    const optValue2 = __bjs_optionalCodec(__bjs_primitiveCodecs.Bool).lift();
+                    const optValue = __bjs_codec_Optional_String.lift();
+                    const optValue1 = __bjs_codec_Optional_Int.lift();
+                    const optValue2 = __bjs_codec_Optional_Bool.lift();
                     return { tag: APIOptionalResultValues.Tag.Status, param0: optValue2, param1: optValue1, param2: optValue };
                 }
                 default: throw new Error("Unknown APIOptionalResultValues tag returned from Swift: " + String(tag));
@@ -744,29 +805,11 @@ export async function createInstantiator(options, swift) {
                     return TypedPayloadResultValues.Tag.Direction;
                 }
                 case TypedPayloadResultValues.Tag.OptPrecision: {
-                    const elemCodec = {
-                        lower: (v) => {
-                            f32Stack.push(Math.fround(v));
-                        },
-                        lift: () => {
-                            const rawValue = f32Stack.pop();
-                            return rawValue;
-                        },
-                    };
-                    __bjs_optionalCodec(elemCodec).lower(value.param0);
+                    __bjs_codec_Optional_TestModule_Precision.lower(value.param0);
                     return TypedPayloadResultValues.Tag.OptPrecision;
                 }
                 case TypedPayloadResultValues.Tag.OptDirection: {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    __bjs_optionalCodec(elemCodec).lower(value.param0);
+                    __bjs_codec_Optional_TestModule_CardinalDirection.lower(value.param0);
                     return TypedPayloadResultValues.Tag.OptDirection;
                 }
                 case TypedPayloadResultValues.Tag.Empty: {
@@ -787,29 +830,11 @@ export async function createInstantiator(options, swift) {
                     return { tag: TypedPayloadResultValues.Tag.Direction, param0: caseId };
                 }
                 case TypedPayloadResultValues.Tag.OptPrecision: {
-                    const elemCodec = {
-                        lower: (v) => {
-                            f32Stack.push(Math.fround(v));
-                        },
-                        lift: () => {
-                            const rawValue = f32Stack.pop();
-                            return rawValue;
-                        },
-                    };
-                    const optValue = __bjs_optionalCodec(elemCodec).lift();
+                    const optValue = __bjs_codec_Optional_TestModule_Precision.lift();
                     return { tag: TypedPayloadResultValues.Tag.OptPrecision, param0: optValue };
                 }
                 case TypedPayloadResultValues.Tag.OptDirection: {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    const optValue = __bjs_optionalCodec(elemCodec).lift();
+                    const optValue = __bjs_codec_Optional_TestModule_CardinalDirection.lift();
                     return { tag: TypedPayloadResultValues.Tag.OptDirection, param0: optValue };
                 }
                 case TypedPayloadResultValues.Tag.Empty: return { tag: TypedPayloadResultValues.Tag.Empty };
@@ -840,7 +865,7 @@ export async function createInstantiator(options, swift) {
                     return AllTypesResultValues.Tag.NestedEnum;
                 }
                 case AllTypesResultValues.Tag.ArrayPayload: {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(value.param0);
+                    __bjs_codec_Array_Int.lower(value.param0);
                     return AllTypesResultValues.Tag.ArrayPayload;
                 }
                 case AllTypesResultValues.Tag.Empty: {
@@ -872,7 +897,7 @@ export async function createInstantiator(options, swift) {
                     return { tag: AllTypesResultValues.Tag.NestedEnum, param0: enumValue };
                 }
                 case AllTypesResultValues.Tag.ArrayPayload: {
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                    const arrayResult = __bjs_codec_Array_Int.lift();
                     return { tag: AllTypesResultValues.Tag.ArrayPayload, param0: arrayResult };
                 }
                 case AllTypesResultValues.Tag.Empty: return { tag: AllTypesResultValues.Tag.Empty };
@@ -885,45 +910,23 @@ export async function createInstantiator(options, swift) {
             const enumTag = value.tag;
             switch (enumTag) {
                 case OptionalAllTypesResultValues.Tag.OptStruct: {
-                    __bjs_optionalCodec(structHelpers.Point).lower(value.param0);
+                    __bjs_codec_Optional_TestModule_Point.lower(value.param0);
                     return OptionalAllTypesResultValues.Tag.OptStruct;
                 }
                 case OptionalAllTypesResultValues.Tag.OptClass: {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = _exports['User'].__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    __bjs_optionalCodec(elemCodec).lower(value.param0);
+                    __bjs_codec_Optional_TestModule_User.lower(value.param0);
                     return OptionalAllTypesResultValues.Tag.OptClass;
                 }
                 case OptionalAllTypesResultValues.Tag.OptJSObject: {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_optionalCodec(elemCodec).lower(value.param0);
+                    __bjs_codec_Optional_JSObject.lower(value.param0);
                     return OptionalAllTypesResultValues.Tag.OptJSObject;
                 }
                 case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                    __bjs_optionalCodec(__bjs_enumCodec(enumHelpers.APIResult)).lower(value.param0);
+                    __bjs_codec_Optional_TestModule_APIResult.lower(value.param0);
                     return OptionalAllTypesResultValues.Tag.OptNestedEnum;
                 }
                 case OptionalAllTypesResultValues.Tag.OptArray: {
-                    __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lower(value.param0);
+                    __bjs_codec_Optional_Array_Int.lower(value.param0);
                     return OptionalAllTypesResultValues.Tag.OptArray;
                 }
                 case OptionalAllTypesResultValues.Tag.Empty: {
@@ -936,45 +939,23 @@ export async function createInstantiator(options, swift) {
             tag = tag | 0;
             switch (tag) {
                 case OptionalAllTypesResultValues.Tag.OptStruct: {
-                    const optValue = __bjs_optionalCodec(structHelpers.Point).lift();
+                    const optValue = __bjs_codec_Optional_TestModule_Point.lift();
                     return { tag: OptionalAllTypesResultValues.Tag.OptStruct, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptClass: {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = _exports['User'].__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    const optValue = __bjs_optionalCodec(elemCodec).lift();
+                    const optValue = __bjs_codec_Optional_TestModule_User.lift();
                     return { tag: OptionalAllTypesResultValues.Tag.OptClass, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptJSObject: {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const optValue = __bjs_optionalCodec(elemCodec).lift();
+                    const optValue = __bjs_codec_Optional_JSObject.lift();
                     return { tag: OptionalAllTypesResultValues.Tag.OptJSObject, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptNestedEnum: {
-                    const optValue = __bjs_optionalCodec(__bjs_enumCodec(enumHelpers.APIResult)).lift();
+                    const optValue = __bjs_codec_Optional_TestModule_APIResult.lift();
                     return { tag: OptionalAllTypesResultValues.Tag.OptNestedEnum, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.OptArray: {
-                    const optValue = __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.Int)).lift();
+                    const optValue = __bjs_codec_Optional_Array_Int.lift();
                     return { tag: OptionalAllTypesResultValues.Tag.OptArray, param0: optValue };
                 }
                 case OptionalAllTypesResultValues.Tag.Empty: return { tag: OptionalAllTypesResultValues.Tag.Empty };

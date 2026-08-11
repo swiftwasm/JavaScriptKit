@@ -99,16 +99,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -346,6 +336,43 @@ export async function createInstantiator(options, swift) {
         }
         return jsValue;
     }
+
+    const __bjs_codec_TestModule_PolygonReference = {
+        lower: (v) => {
+            ptrStack.push(v.pointer);
+        },
+        lift: () => {
+            const ptr = ptrStack.pop();
+            const obj = _exports['PolygonReference'].__construct(ptr);
+            return obj;
+        },
+    };
+    const __bjs_codec_Array_TestModule_PolygonReference = __bjs_arrayCodec(__bjs_codec_TestModule_PolygonReference);
+    const __bjs_codec_TestModule_InnerTag = {
+        lower: (v) => {
+            const caseId = enumHelpers.InnerTag.lower(v);
+            i32Stack.push(caseId);
+        },
+        lift: () => {
+            const enumValue = enumHelpers.InnerTag.lift(i32Stack.pop());
+            return enumValue;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_InnerTag = __bjs_optionalCodec(__bjs_codec_TestModule_InnerTag);
+    const __bjs_codec_Array_Optional_TestModule_InnerTag = __bjs_arrayCodec(__bjs_codec_Optional_TestModule_InnerTag);
+    const __bjs_codec_TestModule_Surface = {
+        lower: (v) => {
+            const objId = swift.memory.retain(v);
+            i32Stack.push(objId);
+        },
+        lift: () => {
+            const objId = i32Stack.pop();
+            const obj = swift.memory.getObject(objId);
+            swift.memory.release(objId);
+            return obj;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_Surface = __bjs_optionalCodec(__bjs_codec_TestModule_Surface);
 
     const __bjs_createInnerTagValuesHelpers = () => ({
         lower: (value) => {
@@ -596,19 +623,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_produceOptionalCanvas"] = function bjs_produceOptionalCanvas() {
                 try {
                     let ret = imports.produceOptionalCanvas();
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_optionalCodec(elemCodec).lower(ret);
+                    __bjs_codec_Optional_TestModule_Surface.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -759,29 +774,9 @@ export async function createInstantiator(options, swift) {
                     return optResult;
                 },
                 polygonArray: function bjs_polygonArray(polygons) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = PolygonReference.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(polygons);
+                    __bjs_codec_Array_TestModule_PolygonReference.lower(polygons);
                     instance.exports.bjs_polygonArray();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = PolygonReference.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_PolygonReference.lift();
                     return arrayResult;
                 },
                 validatePolygon: function bjs_validatePolygon(polygon) {
@@ -801,9 +796,9 @@ export async function createInstantiator(options, swift) {
                     return TagReference.__construct(ret);
                 },
                 roundtripTags: function bjs_roundtripTags(xs) {
-                    __bjs_arrayCodec(__bjs_optionalCodec(__bjs_enumCodec(enumHelpers.InnerTag))).lower(xs);
+                    __bjs_codec_Array_Optional_TestModule_InnerTag.lower(xs);
                     instance.exports.bjs_roundtripTags();
-                    const arrayResult = __bjs_arrayCodec(__bjs_optionalCodec(__bjs_enumCodec(enumHelpers.InnerTag))).lift();
+                    const arrayResult = __bjs_codec_Array_Optional_TestModule_InnerTag.lift();
                     return arrayResult;
                 },
                 describeUser: function bjs_describeUser(owner) {

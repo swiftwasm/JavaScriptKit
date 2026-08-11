@@ -93,16 +93,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -340,6 +330,18 @@ export async function createInstantiator(options, swift) {
         }
         return jsValue;
     }
+
+    const __bjs_codec_TestModule_Greeter = {
+        lower: (v) => {
+            ptrStack.push(v.pointer);
+        },
+        lift: () => {
+            const ptr = ptrStack.pop();
+            const obj = _exports.__Swift.Foundation.Greeter.__construct(ptr);
+            return obj;
+        },
+    };
+    const __bjs_codec_Array_TestModule_Greeter = __bjs_arrayCodec(__bjs_codec_TestModule_Greeter);
 
 
     return {
@@ -667,17 +669,7 @@ export async function createInstantiator(options, swift) {
                 }
                 getItems() {
                     instance.exports.bjs_Collections_Container_getItems(this.pointer);
-                    const elemCodec = {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = Greeter.__construct(ptr);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_Greeter.lift();
                     return arrayResult;
                 }
                 addItem(item) {

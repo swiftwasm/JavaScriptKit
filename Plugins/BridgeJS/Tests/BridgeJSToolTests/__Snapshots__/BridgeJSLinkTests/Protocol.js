@@ -117,16 +117,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -364,6 +354,21 @@ export async function createInstantiator(options, swift) {
         }
         return jsValue;
     }
+
+    const __bjs_codec_TestModule_MyViewControllerDelegate = {
+        lower: (v) => {
+            const objId = swift.memory.retain(v);
+            i32Stack.push(objId);
+        },
+        lift: () => {
+            const objId = i32Stack.pop();
+            const obj = swift.memory.getObject(objId);
+            swift.memory.release(objId);
+            return obj;
+        },
+    };
+    const __bjs_codec_Array_TestModule_MyViewControllerDelegate = __bjs_arrayCodec(__bjs_codec_TestModule_MyViewControllerDelegate);
+    const __bjs_codec_Dict_TestModule_MyViewControllerDelegate = __bjs_dictCodec(__bjs_codec_TestModule_MyViewControllerDelegate);
 
     const __bjs_createResultValuesHelpers = () => ({
         lower: (value) => {
@@ -1036,19 +1041,7 @@ export async function createInstantiator(options, swift) {
                 }
 
                 constructor(delegates) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(delegates);
+                    __bjs_codec_Array_TestModule_MyViewControllerDelegate.lower(delegates);
                     const ret = instance.exports.bjs_DelegateManager_init();
                     return DelegateManager.__construct(ret);
                 }
@@ -1057,68 +1050,20 @@ export async function createInstantiator(options, swift) {
                 }
                 get delegates() {
                     instance.exports.bjs_DelegateManager_delegates_get(this.pointer);
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_MyViewControllerDelegate.lift();
                     return arrayResult;
                 }
                 set delegates(value) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(value);
+                    __bjs_codec_Array_TestModule_MyViewControllerDelegate.lower(value);
                     instance.exports.bjs_DelegateManager_delegates_set(this.pointer);
                 }
                 get delegatesByName() {
                     instance.exports.bjs_DelegateManager_delegatesByName_get(this.pointer);
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const dictResult = __bjs_dictCodec(elemCodec).lift();
+                    const dictResult = __bjs_codec_Dict_TestModule_MyViewControllerDelegate.lift();
                     return dictResult;
                 }
                 set delegatesByName(value) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_dictCodec(elemCodec).lower(value);
+                    __bjs_codec_Dict_TestModule_MyViewControllerDelegate.lower(value);
                     instance.exports.bjs_DelegateManager_delegatesByName_set(this.pointer);
                 }
             }
@@ -1127,63 +1072,15 @@ export async function createInstantiator(options, swift) {
 
             const exports = {
                 processDelegates: function bjs_processDelegates(delegates) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(delegates);
+                    __bjs_codec_Array_TestModule_MyViewControllerDelegate.lower(delegates);
                     instance.exports.bjs_processDelegates();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec1).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_MyViewControllerDelegate.lift();
                     return arrayResult;
                 },
                 processDelegatesByName: function bjs_processDelegatesByName(delegates) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    __bjs_dictCodec(elemCodec).lower(delegates);
+                    __bjs_codec_Dict_TestModule_MyViewControllerDelegate.lower(delegates);
                     instance.exports.bjs_processDelegatesByName();
-                    const elemCodec1 = {
-                        lower: (v) => {
-                            const objId = swift.memory.retain(v);
-                            i32Stack.push(objId);
-                        },
-                        lift: () => {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            return obj;
-                        },
-                    };
-                    const dictResult = __bjs_dictCodec(elemCodec1).lift();
+                    const dictResult = __bjs_codec_Dict_TestModule_MyViewControllerDelegate.lift();
                     return dictResult;
                 },
                 Direction: DirectionValues,

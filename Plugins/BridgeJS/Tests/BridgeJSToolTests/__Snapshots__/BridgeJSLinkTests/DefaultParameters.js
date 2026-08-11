@@ -99,16 +99,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -346,6 +336,21 @@ export async function createInstantiator(options, swift) {
         }
         return jsValue;
     }
+
+    const __bjs_codec_TestModule_Config = {
+        lower: (v) => {
+            structHelpers.Config.lower(v);
+        },
+        lift: () => {
+            const struct = structHelpers.Config.lift();
+            return struct;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_Config = __bjs_optionalCodec(__bjs_codec_TestModule_Config);
+    const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_Array_String = __bjs_arrayCodec(__bjs_stringCodec);
+    const __bjs_codec_Array_Double = __bjs_arrayCodec(__bjs_primitiveCodecs.Double);
+    const __bjs_codec_Array_Bool = __bjs_arrayCodec(__bjs_primitiveCodecs.Bool);
 
     const __bjs_createConfigHelpers = () => ({
         lower: (value) => {
@@ -847,51 +852,51 @@ export async function createInstantiator(options, swift) {
                     return EmptyGreeter.__construct(ret);
                 },
                 testOptionalStructDefault: function bjs_testOptionalStructDefault(point = null) {
-                    __bjs_optionalCodec(structHelpers.Config).lower(point);
+                    __bjs_codec_Optional_TestModule_Config.lower(point);
                     instance.exports.bjs_testOptionalStructDefault();
-                    const optValue = __bjs_optionalCodec(structHelpers.Config).lift();
+                    const optValue = __bjs_codec_Optional_TestModule_Config.lift();
                     return optValue;
                 },
                 testOptionalStructWithValueDefault: function bjs_testOptionalStructWithValueDefault(point = { name: "default", value: 42, enabled: true }) {
-                    __bjs_optionalCodec(structHelpers.Config).lower(point);
+                    __bjs_codec_Optional_TestModule_Config.lower(point);
                     instance.exports.bjs_testOptionalStructWithValueDefault();
-                    const optValue = __bjs_optionalCodec(structHelpers.Config).lift();
+                    const optValue = __bjs_codec_Optional_TestModule_Config.lift();
                     return optValue;
                 },
                 testIntArrayDefault: function bjs_testIntArrayDefault(values = [1, 2, 3]) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(values);
+                    __bjs_codec_Array_Int.lower(values);
                     instance.exports.bjs_testIntArrayDefault();
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                    const arrayResult = __bjs_codec_Array_Int.lift();
                     return arrayResult;
                 },
                 testStringArrayDefault: function bjs_testStringArrayDefault(names = ["a", "b", "c"]) {
-                    __bjs_arrayCodec(__bjs_stringCodec).lower(names);
+                    __bjs_codec_Array_String.lower(names);
                     instance.exports.bjs_testStringArrayDefault();
-                    const arrayResult = __bjs_arrayCodec(__bjs_stringCodec).lift();
+                    const arrayResult = __bjs_codec_Array_String.lift();
                     return arrayResult;
                 },
                 testDoubleArrayDefault: function bjs_testDoubleArrayDefault(values = [1.5, 2.5, 3.5]) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lower(values);
+                    __bjs_codec_Array_Double.lower(values);
                     instance.exports.bjs_testDoubleArrayDefault();
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Double).lift();
+                    const arrayResult = __bjs_codec_Array_Double.lift();
                     return arrayResult;
                 },
                 testBoolArrayDefault: function bjs_testBoolArrayDefault(flags = [true, false, true]) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lower(flags);
+                    __bjs_codec_Array_Bool.lower(flags);
                     instance.exports.bjs_testBoolArrayDefault();
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Bool).lift();
+                    const arrayResult = __bjs_codec_Array_Bool.lift();
                     return arrayResult;
                 },
                 testEmptyArrayDefault: function bjs_testEmptyArrayDefault(items = []) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(items);
+                    __bjs_codec_Array_Int.lower(items);
                     instance.exports.bjs_testEmptyArrayDefault();
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                    const arrayResult = __bjs_codec_Array_Int.lift();
                     return arrayResult;
                 },
                 testMixedWithArrayDefault: function bjs_testMixedWithArrayDefault(name = "test", values = [10, 20, 30], enabled = true) {
                     const nameBytes = textEncoder.encode(name);
                     const nameId = swift.memory.retain(nameBytes);
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lower(values);
+                    __bjs_codec_Array_Int.lower(values);
                     instance.exports.bjs_testMixedWithArrayDefault(nameId, nameBytes.length, enabled);
                     const ret = tmpRetString;
                     tmpRetString = undefined;

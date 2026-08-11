@@ -127,16 +127,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -375,6 +365,46 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_TestModule_GenericPoint = {
+        lower: (v) => {
+            structHelpers.GenericPoint.lower(v);
+        },
+        lift: () => {
+            const struct = structHelpers.GenericPoint.lift();
+            return struct;
+        },
+    };
+    const __bjs_codec_TestModule_GenericImportBox = {
+        lower: (v) => {
+            ptrStack.push(v.pointer);
+        },
+        lift: () => {
+            const ptr = ptrStack.pop();
+            const obj = _exports['GenericImportBox'].__construct(ptr);
+            return obj;
+        },
+    };
+    const __bjs_codec_TestModule_GenericColor = {
+        lower: (v) => {
+            i32Stack.push((v | 0));
+        },
+        lift: () => {
+            const caseId = i32Stack.pop();
+            return caseId;
+        },
+    };
+    const __bjs_codec_TestModule_GenericTagged = {
+        lower: (v) => {
+            const caseId = enumHelpers.GenericTagged.lower(v);
+            i32Stack.push(caseId);
+        },
+        lift: () => {
+            const enumValue = enumHelpers.GenericTagged.lift(i32Stack.pop());
+            return enumValue;
+        },
+    };
+
     const __bjs_createGenericPointHelpers = () => ({
         lower: (value) => {
             i32Stack.push((value.x | 0));
@@ -530,56 +560,11 @@ export async function createInstantiator(options, swift) {
             }
             bjs["bjs_TestModule_register_type_handles"] = function(base, count) {
                 const codecs = [
-                    {
-                        lower: (v) => {
-                            structHelpers.GenericPoint.lower(v);
-                        },
-                        lift: () => {
-                            const struct = structHelpers.GenericPoint.lift();
-                            return struct;
-                        },
-                    },
-                    {
-                        lower: (v) => {
-                            ptrStack.push(v.pointer);
-                        },
-                        lift: () => {
-                            const ptr = ptrStack.pop();
-                            const obj = _exports['GenericImportBox'].__construct(ptr);
-                            return obj;
-                        },
-                    },
-                    {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    },
-                    {
-                        lower: (v) => {
-                            const bytes = textEncoder.encode(v);
-                            const id = swift.memory.retain(bytes);
-                            i32Stack.push(bytes.length);
-                            i32Stack.push(id);
-                        },
-                        lift: () => {
-                            const rawValue = strStack.pop();
-                            return rawValue;
-                        },
-                    },
-                    {
-                        lower: (v) => {
-                            const caseId = enumHelpers.GenericTagged.lower(v);
-                            i32Stack.push(caseId);
-                        },
-                        lift: () => {
-                            const enumValue = enumHelpers.GenericTagged.lift(i32Stack.pop());
-                            return enumValue;
-                        },
-                    },
+                    __bjs_codec_TestModule_GenericPoint,
+                    __bjs_codec_TestModule_GenericImportBox,
+                    __bjs_codec_TestModule_GenericColor,
+                    __bjs_stringCodec,
+                    __bjs_codec_TestModule_GenericTagged,
                 ];
                 const typeIds = new Int32Array(memory.buffer, base >>> 0, count >>> 0);
                 for (let i = 0; i < count; i++) {
@@ -771,7 +756,7 @@ export async function createInstantiator(options, swift) {
                     const codecT = __bjs_codecForTypeId(tTypeId);
                     let optResult;
                     if (values) {
-                        const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.Int).lift();
+                        const arrayResult = __bjs_codec_Array_Int.lift();
                         optResult = arrayResult;
                     } else {
                         optResult = null;

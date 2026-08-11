@@ -93,16 +93,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -341,6 +331,17 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const __bjs_codec_TestModule_Point = {
+        lower: (v) => {
+            structHelpers.Point.lower(v);
+        },
+        lift: () => {
+            const struct = structHelpers.Point.lift();
+            return struct;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_Point = __bjs_optionalCodec(__bjs_codec_TestModule_Point);
+
     const __bjs_createPointHelpers = () => ({
         lower: (value) => {
             i32Stack.push((value.x | 0));
@@ -554,7 +555,7 @@ export async function createInstantiator(options, swift) {
                         optResult = null;
                     }
                     let ret = imports.roundTripOptional(optResult);
-                    __bjs_optionalCodec(structHelpers.Point).lower(ret);
+                    __bjs_codec_Optional_TestModule_Point.lower(ret);
                 } catch (error) {
                     setException(error);
                 }

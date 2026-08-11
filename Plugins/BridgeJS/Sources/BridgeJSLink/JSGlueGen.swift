@@ -102,6 +102,17 @@ final class JSGlueVariableScope {
         try intrinsicRegistry.register(name: name, build: build)
     }
 
+    /// Registers a module-scope `{ lower, lift }` codec helper shared by every
+    /// site that needs a codec for the same type shape.
+    func registerNamedCodec(_ name: String, build: (CodeFragmentPrinter) throws -> Void) rethrows {
+        try intrinsicRegistry.registerNamedCodec(name: name, build: build)
+    }
+
+    /// The module declaring `typeName`, when the link step knows it.
+    func moduleName(declaringType typeName: String) -> String? {
+        intrinsicRegistry.typeOwnerModules[typeName]
+    }
+
     func makeChildScope() -> JSGlueVariableScope {
         JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
     }
@@ -197,7 +208,9 @@ enum ContainerCodecJS {
     static let arrayCodec = "__bjs_arrayCodec"
     static let optionalCodec = "__bjs_optionalCodec"
     static let dictCodec = "__bjs_dictCodec"
-    static let enumCodec = "__bjs_enumCodec"
+
+    /// Prefix of the module-scope codec helper `const`s.
+    static let namedCodecPrefix = "__bjs_codec_"
 
     private static let combinatorIntrinsicName = "containerCodecCombinators"
     private static let primitiveCodecIntrinsicName = "containerPrimitiveCodecs"
@@ -268,18 +281,6 @@ enum ContainerCodecJS {
             "                result[key] = value;",
             "            }",
             "            return result;",
-            "        },",
-            "    };",
-            "}",
-            // Adapts an associated-value enum helper (whose lower returns the case
-            // tag and whose lift takes it) to the plain stack codec protocol.
-            "function \(enumCodec)(helper) {",
-            "    return {",
-            "        lower(value) {",
-            "            \(i32).push(helper.lower(value));",
-            "        },",
-            "        lift() {",
-            "            return helper.lift(\(i32).pop());",
             "        },",
             "    };",
             "}",
@@ -365,50 +366,145 @@ enum ContainerCodecJS {
         printer.write("}\(suffix)")
     }
 
-    /// Returns a JS expression evaluating to the `{ lower, lift }` codec for
-    /// one element type, registering the shared codec runtime as needed. May
-    /// write supporting statements (a local codec literal) to the context's
-    /// printer for element shapes without a named shared codec.
+    /// A codec that is reachable by name from module scope.
+    ///
+    /// `token` is the stable, module-qualified spelling of the type shape; codec
+    /// names for compositions are derived from their elements' tokens, so the
+    /// whole naming scheme inherits module qualification from its leaves.
+    struct NamedCodec {
+        let expression: String
+        let token: String
+    }
+
+    /// Returns a JS expression evaluating to the `{ lower, lift }` codec for one
+    /// element type, registering the shared codec runtime as needed.
+    ///
+    /// Every codec is a module-scope `const`, so a call site never builds one:
+    /// the same type shape resolves to the same helper wherever it appears,
+    /// including the generic type-handle registration table.
     static func codecExpression(
         for elementType: BridgeType,
         context: IntrinsicJSFragment.PrintCodeContext
     ) throws -> String {
+        try namedCodec(for: elementType, context: context).expression
+    }
+
+    static func namedCodec(
+        for elementType: BridgeType,
+        context: IntrinsicJSFragment.PrintCodeContext
+    ) throws -> NamedCodec {
         registerCombinators(scope: context.scope)
         try registerPrimitiveCodecs(context: context)
         let type = elementType.unaliased
         switch type {
         case .array(let element):
-            return "\(arrayCodec)(\(try codecExpression(for: element, context: context)))"
+            let element = try namedCodec(for: element, context: context)
+            return composedCodec(
+                token: "Array_\(element.token)",
+                factory: "\(arrayCodec)(\(element.expression))",
+                context: context
+            )
         case .dictionary(let value):
-            return "\(dictCodec)(\(try codecExpression(for: value, context: context)))"
+            let value = try namedCodec(for: value, context: context)
+            return composedCodec(
+                token: "Dict_\(value.token)",
+                factory: "\(dictCodec)(\(value.expression))",
+                context: context
+            )
         case .nullable(let wrapped, let kind):
-            let element = try codecExpression(for: wrapped, context: context)
-            return optionalCodecExpression(elementCodec: element, kind: kind)
+            let wrapped = try namedCodec(for: wrapped, context: context)
+            let prefix = kind == .null ? "Optional" : "UndefinedOr"
+            return composedCodec(
+                token: "\(prefix)_\(wrapped.token)",
+                factory: optionalCodecExpression(elementCodec: wrapped.expression, kind: kind),
+                context: context
+            )
         case .string, .rawValueEnum(_, .string):
-            return JSGlueVariableScope.reservedStringCodec
-        case .swiftStruct(let fullName):
-            // `@JS` struct helpers already expose the codec protocol.
-            let base = fullName.replacingOccurrences(of: ".", with: "_")
-            return "\(JSGlueVariableScope.reservedStructHelpers).\(base)"
-        case .associatedValueEnum(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
-            return "\(enumCodec)(\(JSGlueVariableScope.reservedEnumHelpers).\(base))"
+            // A string-backed raw value enum bridges exactly as its raw value.
+            return NamedCodec(expression: JSGlueVariableScope.reservedStringCodec, token: "String")
         default:
             if let token = BridgeType.genericBridgeablePrimitives.first(where: { $0.type == type })?.token {
-                return "\(JSGlueVariableScope.reservedPrimitiveCodecs).\(token)"
+                return NamedCodec(
+                    expression: "\(JSGlueVariableScope.reservedPrimitiveCodecs).\(token)",
+                    token: token
+                )
             }
-            // Element shapes without a named shared codec (case enums, non-string
-            // raw-value enums, JSObject, Swift heap objects, ...) get a local
-            // codec literal built from the same element stack fragments.
-            let codecVar = context.scope.variable("elemCodec")
+            return try leafCodec(for: type, context: context)
+        }
+    }
+
+    /// Declares (once) a module-scope `const` holding a container combinator
+    /// instantiated with an already-declared element codec.
+    private static func composedCodec(
+        token: String,
+        factory: String,
+        context: IntrinsicJSFragment.PrintCodeContext
+    ) -> NamedCodec {
+        let name = "\(namedCodecPrefix)\(token)"
+        context.scope.registerNamedCodec(name) { printer in
+            printer.write("const \(name) = \(factory);")
+        }
+        return NamedCodec(expression: name, token: token)
+    }
+
+    /// Declares (once) a module-scope `const` holding the codec for a type that
+    /// is not a container: primitives are handled by the shared table, so this
+    /// covers `@JS` structs, enums, classes, `JSObject`, protocols and friends.
+    ///
+    /// The body comes from ``writeCodecLiteral``, the same emitter the generic
+    /// type-handle registration uses, so both reference one helper per type.
+    private static func leafCodec(
+        for type: BridgeType,
+        context: IntrinsicJSFragment.PrintCodeContext
+    ) throws -> NamedCodec {
+        let token = leafToken(for: type, scope: context.scope)
+        let name = "\(namedCodecPrefix)\(token)"
+        // The helper lives at module scope, outside `createExports`, so exported
+        // Swift classes are not in lexical scope here and must be reached
+        // through `_exports`.
+        let hoistedContext = context.with(\.hasDirectAccessToSwiftClass, false)
+        try context.scope.registerNamedCodec(name) { printer in
             try writeCodecLiteral(
                 type: type,
-                into: context.printer,
-                context: context,
-                prefix: "const \(codecVar) = ",
+                into: printer,
+                context: hoistedContext,
+                prefix: "const \(name) = ",
                 suffix: ";"
             )
-            return codecVar
+        }
+        return NamedCodec(expression: name, token: token)
+    }
+
+    /// The module-qualified token identifying a non-container type shape.
+    ///
+    /// Types declared by a `@JS` module are qualified with the declaring module
+    /// so two modules declaring the same type name do not mint the same helper.
+    private static func leafToken(for type: BridgeType, scope: JSGlueVariableScope) -> String {
+        func sanitized(_ name: String) -> String {
+            String(name.map { $0.isLetter || $0.isNumber || $0 == "_" ? $0 : "_" })
+        }
+        func qualified(_ name: String) -> String {
+            let base = sanitized(name)
+            guard let module = scope.moduleName(declaringType: name) ?? scope.moduleName(declaringType: base) else {
+                return base
+            }
+            return "\(sanitized(module))_\(base)"
+        }
+        switch type {
+        case .jsObject(nil):
+            return "JSObject"
+        case .jsObject(let name?):
+            return qualified(name)
+        case .swiftStruct(let name),
+            .swiftHeapObject(let name),
+            .swiftProtocol(let name),
+            .caseEnum(let name),
+            .rawValueEnum(let name, _),
+            .associatedValueEnum(let name),
+            .namespaceEnum(let name):
+            return qualified(name)
+        default:
+            return sanitized(type.mangleTypeName)
         }
     }
 }
@@ -2033,8 +2129,8 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["arr"],
             printCode: { arguments, context in
-                let element = try ContainerCodecJS.codecExpression(for: elementType, context: context)
-                context.printer.write("\(ContainerCodecJS.arrayCodec)(\(element)).lower(\(arguments[0]));")
+                let codec = try ContainerCodecJS.codecExpression(for: .array(elementType), context: context)
+                context.printer.write("\(codec).lower(\(arguments[0]));")
                 return []
             }
         )
@@ -2045,8 +2141,8 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["dict"],
             printCode: { arguments, context in
-                let value = try ContainerCodecJS.codecExpression(for: valueType, context: context)
-                context.printer.write("\(ContainerCodecJS.dictCodec)(\(value)).lower(\(arguments[0]));")
+                let codec = try ContainerCodecJS.codecExpression(for: .dictionary(valueType), context: context)
+                context.printer.write("\(codec).lower(\(arguments[0]));")
                 return []
             }
         )
@@ -2057,11 +2153,9 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: [],
             printCode: { _, context in
-                let element = try ContainerCodecJS.codecExpression(for: elementType, context: context)
+                let codec = try ContainerCodecJS.codecExpression(for: .array(elementType), context: context)
                 let resultVar = context.scope.variable("arrayResult")
-                context.printer.write(
-                    "const \(resultVar) = \(ContainerCodecJS.arrayCodec)(\(element)).lift();"
-                )
+                context.printer.write("const \(resultVar) = \(codec).lift();")
                 return [resultVar]
             }
         )
@@ -2072,11 +2166,9 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: [],
             printCode: { _, context in
-                let value = try ContainerCodecJS.codecExpression(for: valueType, context: context)
+                let codec = try ContainerCodecJS.codecExpression(for: .dictionary(valueType), context: context)
                 let resultVar = context.scope.variable("dictResult")
-                context.printer.write(
-                    "const \(resultVar) = \(ContainerCodecJS.dictCodec)(\(value)).lift();"
-                )
+                context.printer.write("const \(resultVar) = \(codec).lift();")
                 return [resultVar]
             }
         )
@@ -2339,9 +2431,11 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: [],
             printCode: { _, context in
-                let element = try ContainerCodecJS.codecExpression(for: wrappedType, context: context)
+                let codec = try ContainerCodecJS.codecExpression(
+                    for: .nullable(wrappedType, kind),
+                    context: context
+                )
                 let resultVar = context.scope.variable("optValue")
-                let codec = ContainerCodecJS.optionalCodecExpression(elementCodec: element, kind: kind)
                 context.printer.write("const \(resultVar) = \(codec).lift();")
                 return [resultVar]
             }
@@ -2358,8 +2452,10 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let element = try ContainerCodecJS.codecExpression(for: wrappedType, context: context)
-                let codec = ContainerCodecJS.optionalCodecExpression(elementCodec: element, kind: kind)
+                let codec = try ContainerCodecJS.codecExpression(
+                    for: .nullable(wrappedType, kind),
+                    context: context
+                )
                 context.printer.write("\(codec).lower(\(arguments[0]));")
                 return []
             }

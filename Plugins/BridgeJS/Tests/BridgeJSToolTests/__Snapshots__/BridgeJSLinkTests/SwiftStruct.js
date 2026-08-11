@@ -98,16 +98,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -346,6 +336,33 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const __bjs_codec_Optional_Int = __bjs_optionalCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_Optional_Bool = __bjs_optionalCodec(__bjs_primitiveCodecs.Bool);
+    const __bjs_codec_Optional_String = __bjs_optionalCodec(__bjs_stringCodec);
+    const __bjs_codec_TestModule_Precision = {
+        lower: (v) => {
+            f32Stack.push(Math.fround(v));
+        },
+        lift: () => {
+            const rawValue = f32Stack.pop();
+            return rawValue;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_Precision = __bjs_optionalCodec(__bjs_codec_TestModule_Precision);
+    const __bjs_codec_JSObject = {
+        lower: (v) => {
+            const objId = swift.memory.retain(v);
+            i32Stack.push(objId);
+        },
+        lift: () => {
+            const objId = i32Stack.pop();
+            const obj = swift.memory.getObject(objId);
+            swift.memory.release(objId);
+            return obj;
+        },
+    };
+    const __bjs_codec_Optional_JSObject = __bjs_optionalCodec(__bjs_codec_JSObject);
+
     const __bjs_createDataPointHelpers = () => ({
         lower: (value) => {
             f64Stack.push(value.x);
@@ -354,12 +371,12 @@ export async function createInstantiator(options, swift) {
             const id = swift.memory.retain(bytes);
             i32Stack.push(bytes.length);
             i32Stack.push(id);
-            __bjs_optionalCodec(__bjs_primitiveCodecs.Int).lower(value.optCount);
-            __bjs_optionalCodec(__bjs_primitiveCodecs.Bool).lower(value.optFlag);
+            __bjs_codec_Optional_Int.lower(value.optCount);
+            __bjs_codec_Optional_Bool.lower(value.optFlag);
         },
         lift: () => {
-            const optValue = __bjs_optionalCodec(__bjs_primitiveCodecs.Bool).lift();
-            const optValue1 = __bjs_optionalCodec(__bjs_primitiveCodecs.Int).lift();
+            const optValue = __bjs_codec_Optional_Bool.lift();
+            const optValue1 = __bjs_codec_Optional_Int.lift();
             const string = strStack.pop();
             const f64 = f64Stack.pop();
             const f641 = f64Stack.pop();
@@ -376,10 +393,10 @@ export async function createInstantiator(options, swift) {
             const id1 = swift.memory.retain(bytes1);
             i32Stack.push(bytes1.length);
             i32Stack.push(id1);
-            __bjs_optionalCodec(__bjs_primitiveCodecs.Int).lower(value.zipCode);
+            __bjs_codec_Optional_Int.lower(value.zipCode);
         },
         lift: () => {
-            const optValue = __bjs_optionalCodec(__bjs_primitiveCodecs.Int).lift();
+            const optValue = __bjs_codec_Optional_Int.lift();
             const string = strStack.pop();
             const string1 = strStack.pop();
             return { street: string1, city: string, zipCode: optValue };
@@ -393,10 +410,10 @@ export async function createInstantiator(options, swift) {
             i32Stack.push(id);
             i32Stack.push((value.age | 0));
             structHelpers.Address.lower(value.address);
-            __bjs_optionalCodec(__bjs_stringCodec).lower(value.email);
+            __bjs_codec_Optional_String.lower(value.email);
         },
         lift: () => {
-            const optValue = __bjs_optionalCodec(__bjs_stringCodec).lift();
+            const optValue = __bjs_codec_Optional_String.lift();
             const struct = structHelpers.Address.lift();
             const int = i32Stack.pop();
             const string = strStack.pop();
@@ -419,28 +436,10 @@ export async function createInstantiator(options, swift) {
         lower: (value) => {
             f64Stack.push(value.value);
             f32Stack.push(Math.fround(value.precision));
-            const elemCodec = {
-                lower: (v) => {
-                    f32Stack.push(Math.fround(v));
-                },
-                lift: () => {
-                    const rawValue = f32Stack.pop();
-                    return rawValue;
-                },
-            };
-            __bjs_optionalCodec(elemCodec).lower(value.optionalPrecision);
+            __bjs_codec_Optional_TestModule_Precision.lower(value.optionalPrecision);
         },
         lift: () => {
-            const elemCodec = {
-                lower: (v) => {
-                    f32Stack.push(Math.fround(v));
-                },
-                lift: () => {
-                    const rawValue = f32Stack.pop();
-                    return rawValue;
-                },
-            };
-            const optValue = __bjs_optionalCodec(elemCodec).lift();
+            const optValue = __bjs_codec_Optional_TestModule_Precision.lift();
             const rawValue = f32Stack.pop();
             const f64 = f64Stack.pop();
             return { value: f64, precision: rawValue, optionalPrecision: optValue };
@@ -462,34 +461,10 @@ export async function createInstantiator(options, swift) {
                 id = undefined;
             }
             i32Stack.push(id !== undefined ? id : 0);
-            const elemCodec = {
-                lower: (v) => {
-                    const objId = swift.memory.retain(v);
-                    i32Stack.push(objId);
-                },
-                lift: () => {
-                    const objId = i32Stack.pop();
-                    const obj = swift.memory.getObject(objId);
-                    swift.memory.release(objId);
-                    return obj;
-                },
-            };
-            __bjs_optionalCodec(elemCodec).lower(value.optionalObject);
+            __bjs_codec_Optional_JSObject.lower(value.optionalObject);
         },
         lift: () => {
-            const elemCodec = {
-                lower: (v) => {
-                    const objId = swift.memory.retain(v);
-                    i32Stack.push(objId);
-                },
-                lift: () => {
-                    const objId = i32Stack.pop();
-                    const obj = swift.memory.getObject(objId);
-                    swift.memory.release(objId);
-                    return obj;
-                },
-            };
-            const optValue = __bjs_optionalCodec(elemCodec).lift();
+            const optValue = __bjs_codec_Optional_JSObject.lift();
             const objectId = i32Stack.pop();
             let value;
             if (objectId !== 0) {

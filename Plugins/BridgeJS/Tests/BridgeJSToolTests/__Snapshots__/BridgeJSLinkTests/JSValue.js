@@ -93,16 +93,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -341,6 +331,9 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const __bjs_codec_Array_JSValue = __bjs_arrayCodec(__bjs_primitiveCodecs.JSValue);
+    const __bjs_codec_Optional_Array_JSValue = __bjs_optionalCodec(__bjs_codec_Array_JSValue);
+
 
     return {
         /**
@@ -538,9 +531,9 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_jsEchoJSValueArray"] = function bjs_jsEchoJSValueArray() {
                 try {
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.JSValue).lift();
+                    const arrayResult = __bjs_codec_Array_JSValue.lift();
                     let ret = imports.jsEchoJSValueArray(arrayResult);
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.JSValue).lower(ret);
+                    __bjs_codec_Array_JSValue.lower(ret);
                 } catch (error) {
                     setException(error);
                 }
@@ -766,15 +759,15 @@ export async function createInstantiator(options, swift) {
                     return optResult;
                 },
                 roundTripJSValueArray: function bjs_roundTripJSValueArray(values) {
-                    __bjs_arrayCodec(__bjs_primitiveCodecs.JSValue).lower(values);
+                    __bjs_codec_Array_JSValue.lower(values);
                     instance.exports.bjs_roundTripJSValueArray();
-                    const arrayResult = __bjs_arrayCodec(__bjs_primitiveCodecs.JSValue).lift();
+                    const arrayResult = __bjs_codec_Array_JSValue.lift();
                     return arrayResult;
                 },
                 roundTripOptionalJSValueArray: function bjs_roundTripOptionalJSValueArray(values) {
-                    __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.JSValue)).lower(values);
+                    __bjs_codec_Optional_Array_JSValue.lower(values);
                     instance.exports.bjs_roundTripOptionalJSValueArray();
-                    const optValue = __bjs_optionalCodec(__bjs_arrayCodec(__bjs_primitiveCodecs.JSValue)).lift();
+                    const optValue = __bjs_codec_Optional_Array_JSValue.lift();
                     return optValue;
                 },
                 JSValueHolder,

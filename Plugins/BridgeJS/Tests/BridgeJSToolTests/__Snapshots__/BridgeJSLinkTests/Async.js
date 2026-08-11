@@ -103,16 +103,6 @@ export async function createInstantiator(options, swift) {
             },
         };
     }
-    function __bjs_enumCodec(helper) {
-        return {
-            lower(value) {
-                i32Stack.push(helper.lower(value));
-            },
-            lift() {
-                return helper.lift(i32Stack.pop());
-            },
-        };
-    }
 
     const __bjs_stringCodec = {
         lower: (v) => {
@@ -351,6 +341,30 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const __bjs_codec_TestModule_AsyncPoint = {
+        lower: (v) => {
+            structHelpers.AsyncPoint.lower(v);
+        },
+        lift: () => {
+            const struct = structHelpers.AsyncPoint.lift();
+            return struct;
+        },
+    };
+    const __bjs_codec_Optional_TestModule_AsyncPoint = __bjs_optionalCodec(__bjs_codec_TestModule_AsyncPoint);
+    const __bjs_codec_Array_TestModule_AsyncPoint = __bjs_arrayCodec(__bjs_codec_TestModule_AsyncPoint);
+    const __bjs_codec_TestModule_AsyncDirection = {
+        lower: (v) => {
+            i32Stack.push((v | 0));
+        },
+        lift: () => {
+            const caseId = i32Stack.pop();
+            return caseId;
+        },
+    };
+    const __bjs_codec_Array_TestModule_AsyncDirection = __bjs_arrayCodec(__bjs_codec_TestModule_AsyncDirection);
+    const __bjs_codec_Dict_TestModule_AsyncPoint = __bjs_dictCodec(__bjs_codec_TestModule_AsyncPoint);
+    const __bjs_codec_Dict_TestModule_AsyncDirection = __bjs_dictCodec(__bjs_codec_TestModule_AsyncDirection);
+
     const __bjs_createAsyncPointHelpers = () => ({
         lower: (value) => {
             i32Stack.push((value.x | 0));
@@ -563,7 +577,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["promise_resolve_TestModule_Sa10AsyncPointV"] = function(promise) {
                 try {
-                    const arrayResult = __bjs_arrayCodec(structHelpers.AsyncPoint).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_AsyncPoint.lift();
                     swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(arrayResult);
                 } catch (error) {
                     setException(error);
@@ -571,16 +585,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["promise_resolve_TestModule_Sa14AsyncDirectionO"] = function(promise) {
                 try {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    const arrayResult = __bjs_arrayCodec(elemCodec).lift();
+                    const arrayResult = __bjs_codec_Array_TestModule_AsyncDirection.lift();
                     swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(arrayResult);
                 } catch (error) {
                     setException(error);
@@ -588,7 +593,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["promise_resolve_TestModule_SD10AsyncPointV"] = function(promise) {
                 try {
-                    const dictResult = __bjs_dictCodec(structHelpers.AsyncPoint).lift();
+                    const dictResult = __bjs_codec_Dict_TestModule_AsyncPoint.lift();
                     swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(dictResult);
                 } catch (error) {
                     setException(error);
@@ -596,16 +601,7 @@ export async function createInstantiator(options, swift) {
             }
             bjs["promise_resolve_TestModule_SD14AsyncDirectionO"] = function(promise) {
                 try {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    const dictResult = __bjs_dictCodec(elemCodec).lift();
+                    const dictResult = __bjs_codec_Dict_TestModule_AsyncDirection.lift();
                     swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(dictResult);
                 } catch (error) {
                     setException(error);
@@ -850,53 +846,35 @@ export async function createInstantiator(options, swift) {
                     return ret1;
                 },
                 asyncRoundTripOptionalStruct: function bjs_asyncRoundTripOptionalStruct(v) {
-                    __bjs_optionalCodec(structHelpers.AsyncPoint).lower(v);
+                    __bjs_codec_Optional_TestModule_AsyncPoint.lower(v);
                     const ret = instance.exports.bjs_asyncRoundTripOptionalStruct();
                     const ret1 = swift.memory.getObject(ret);
                     swift.memory.release(ret);
                     return ret1;
                 },
                 asyncRoundTripStructArray: function bjs_asyncRoundTripStructArray(v) {
-                    __bjs_arrayCodec(structHelpers.AsyncPoint).lower(v);
+                    __bjs_codec_Array_TestModule_AsyncPoint.lower(v);
                     const ret = instance.exports.bjs_asyncRoundTripStructArray();
                     const ret1 = swift.memory.getObject(ret);
                     swift.memory.release(ret);
                     return ret1;
                 },
                 asyncRoundTripEnumArray: function bjs_asyncRoundTripEnumArray(v) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    __bjs_arrayCodec(elemCodec).lower(v);
+                    __bjs_codec_Array_TestModule_AsyncDirection.lower(v);
                     const ret = instance.exports.bjs_asyncRoundTripEnumArray();
                     const ret1 = swift.memory.getObject(ret);
                     swift.memory.release(ret);
                     return ret1;
                 },
                 asyncRoundTripStructDictionary: function bjs_asyncRoundTripStructDictionary(v) {
-                    __bjs_dictCodec(structHelpers.AsyncPoint).lower(v);
+                    __bjs_codec_Dict_TestModule_AsyncPoint.lower(v);
                     const ret = instance.exports.bjs_asyncRoundTripStructDictionary();
                     const ret1 = swift.memory.getObject(ret);
                     swift.memory.release(ret);
                     return ret1;
                 },
                 asyncRoundTripEnumDictionary: function bjs_asyncRoundTripEnumDictionary(v) {
-                    const elemCodec = {
-                        lower: (v) => {
-                            i32Stack.push((v | 0));
-                        },
-                        lift: () => {
-                            const caseId = i32Stack.pop();
-                            return caseId;
-                        },
-                    };
-                    __bjs_dictCodec(elemCodec).lower(v);
+                    __bjs_codec_Dict_TestModule_AsyncDirection.lower(v);
                     const ret = instance.exports.bjs_asyncRoundTripEnumDictionary();
                     const ret1 = swift.memory.getObject(ret);
                     swift.memory.release(ret);
