@@ -7861,6 +7861,17 @@ public func _bjs_Vector2D_scaled(_ factor: Float64) -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_Vector2D_describe")
+@_cdecl("bjs_Vector2D_describe")
+public func _bjs_Vector2D_describe() -> Void {
+    #if arch(wasm32)
+    let ret = Vector2D.bridgeJSLiftParameter().describe()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 extension JSObjectContainer: _BridgedSwiftStruct {
     @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> JSObjectContainer {
         let optionalObject = Optional<JSObject>.bridgeJSStackPop()
