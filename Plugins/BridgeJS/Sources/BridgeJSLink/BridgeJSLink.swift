@@ -235,7 +235,7 @@ public struct BridgeJSLink {
             for function in skeleton.functions {
                 if function.namespace == nil {
                     var (js, dts) = try renderExportedFunction(function: function)
-                    js[0] = "\(function.name): " + js[0]
+                    js[0] = "\(function.resolvedJSName): " + js[0]
                     js[js.count - 1] += ","
                     data.exportsLines.append(contentsOf: js)
                     data.dtsExportLines.append(contentsOf: dts)
@@ -973,13 +973,15 @@ public struct BridgeJSLink {
                                 )
                             )
                             printer.write(
-                                "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+                                "\(function.resolvedJSName)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
                             )
                         }
                         for property in enumDefinition.staticProperties {
                             let readonly = property.isReadonly ? "readonly " : ""
                             printer.write(lines: renderJSDoc(documentation: property.documentation, parameters: []))
-                            printer.write("\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
+                            printer.write(
+                                "\(readonly)\(property.resolvedJSName): \(resolveTypeScriptType(property.type));"
+                            )
                         }
                     }
                     printer.write("};")
@@ -1025,13 +1027,13 @@ public struct BridgeJSLink {
             renderFunctionEntry: { function in
                 self.renderJSDoc(documentation: function.documentation, parameters: function.parameters)
                     + [
-                        "\(function.name)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+                        "\(function.resolvedJSName)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
                     ]
             },
             renderPropertyEntry: { property in
                 let readonly = property.isReadonly ? "readonly " : ""
                 return self.renderJSDoc(documentation: property.documentation, parameters: [])
-                    + ["\(readonly)\(property.name): \(property.type.tsType);"]
+                    + ["\(readonly)\(property.resolvedJSName): \(property.type.tsType);"]
             }
         )
         printer.write("export type Exports = {")
@@ -1370,7 +1372,7 @@ public struct BridgeJSLink {
 
                     // Add methods
                     for method in type.methods {
-                        let methodName = method.jsName ?? method.name
+                        let methodName = method.resolvedJSName
                         let methodSignature =
                             "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                         printer.write(methodSignature)
@@ -1379,9 +1381,9 @@ public struct BridgeJSLink {
                     // Add properties from getters
                     var propertyNames = Set<String>()
                     for getter in type.getters {
-                        let propertyName = getter.jsName ?? getter.name
+                        let propertyName = getter.resolvedJSName
                         propertyNames.insert(propertyName)
-                        let hasSetter = type.setters.contains { ($0.jsName ?? $0.name) == propertyName }
+                        let hasSetter = type.setters.contains { $0.resolvedJSName == propertyName }
                         let propertySignature =
                             hasSetter
                             ? "\(renderTSPropertyName(propertyName)): \(resolveTypeScriptType(getter.type));"
@@ -1390,7 +1392,7 @@ public struct BridgeJSLink {
                     }
                     // Add setters that don't have corresponding getters
                     for setter in type.setters {
-                        let propertyName = setter.jsName ?? setter.name
+                        let propertyName = setter.resolvedJSName
                         guard !propertyNames.contains(propertyName) else { continue }
                         printer.write("\(renderTSPropertyName(propertyName)): \(resolveTypeScriptType(setter.type));")
                     }
@@ -1628,7 +1630,7 @@ public struct BridgeJSLink {
                     returnType: method.returnType,
                     effects: method.effects
                 )
-                dtsTypePrinter.write("\(method.name)\(signature);")
+                dtsTypePrinter.write("\(method.resolvedJSName)\(signature);")
             }
         }
         dtsTypePrinter.write("}")
@@ -1649,13 +1651,15 @@ public struct BridgeJSLink {
         for property in structDefinition.properties where property.isStatic {
             let readonly = property.isReadonly ? "readonly " : ""
             dtsExportEntryPrinter.write(lines: renderJSDoc(documentation: property.documentation, parameters: []))
-            dtsExportEntryPrinter.write("\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
+            dtsExportEntryPrinter.write(
+                "\(readonly)\(property.resolvedJSName): \(resolveTypeScriptType(property.type));"
+            )
         }
         for method in structDefinition.methods where method.effects.isStatic {
             let jsDocLines = renderJSDoc(documentation: method.documentation, parameters: method.parameters)
             dtsExportEntryPrinter.write(lines: jsDocLines)
             dtsExportEntryPrinter.write(
-                "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                "\(method.resolvedJSName)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
             )
         }
 
@@ -1914,7 +1918,7 @@ extension BridgeJSLink {
         dtsLines.append(contentsOf: renderJSDoc(documentation: function.documentation, parameters: function.parameters))
 
         dtsLines.append(
-            "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+            "\(function.resolvedJSName)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
         )
 
         return (funcLines, dtsLines)
@@ -1955,7 +1959,7 @@ extension BridgeJSLink {
         let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
 
         let funcLines = thunkBuilder.renderFunction(
-            name: function.name,
+            name: function.resolvedJSName,
             parameters: function.parameters,
             returnExpr: returnExpr,
             declarationPrefixKeyword: "static"
@@ -1966,7 +1970,7 @@ extension BridgeJSLink {
         dtsLines.append(contentsOf: renderJSDoc(documentation: function.documentation, parameters: function.parameters))
 
         dtsLines.append(
-            "static \(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+            "static \(function.resolvedJSName)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
         )
 
         return (funcLines, dtsLines)
@@ -1986,7 +1990,7 @@ extension BridgeJSLink {
         let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
 
         let printer = CodeFragmentPrinter()
-        printer.write("\(function.name)(\(DefaultValueUtils.formatParameterList(function.parameters))) {")
+        printer.write("\(function.resolvedJSName)(\(DefaultValueUtils.formatParameterList(function.parameters))) {")
         printer.indent {
             thunkBuilder.renderFunctionBody(into: printer, returnExpr: returnExpr)
         }
@@ -1997,7 +2001,7 @@ extension BridgeJSLink {
         dtsLines.append(contentsOf: renderJSDoc(documentation: function.documentation, parameters: function.parameters))
 
         dtsLines.append(
-            "\(function.name)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+            "\(function.resolvedJSName)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
         )
 
         return (printer.lines, dtsLines)
@@ -2043,7 +2047,7 @@ extension BridgeJSLink {
 
         let methodPrinter = CodeFragmentPrinter()
         methodPrinter.write(
-            "\(method.name): function(\(DefaultValueUtils.formatParameterList(method.parameters))) {"
+            "\(method.resolvedJSName): function(\(DefaultValueUtils.formatParameterList(method.parameters))) {"
         )
         methodPrinter.indent {
             thunkBuilder.renderFunctionBody(into: methodPrinter, returnExpr: returnExpr)
@@ -2071,7 +2075,7 @@ extension BridgeJSLink {
             returnType: property.type
         )
 
-        propertyPrinter.write("get \(property.name)() {")
+        propertyPrinter.write("get \(property.resolvedJSName)() {")
         propertyPrinter.indent {
             getterThunkBuilder.renderFunctionBody(into: propertyPrinter, returnExpr: getterReturnExpr)
         }
@@ -2093,7 +2097,7 @@ extension BridgeJSLink {
                 returnType: .void
             )
 
-            propertyPrinter.write("set \(property.name)(value) {")
+            propertyPrinter.write("set \(property.resolvedJSName)(value) {")
             propertyPrinter.indent {
                 setterThunkBuilder.renderFunctionBody(into: propertyPrinter, returnExpr: nil)
             }
@@ -2177,7 +2181,7 @@ extension BridgeJSLink {
                 jsPrinter.indent {
                     jsPrinter.write(
                         lines: thunkBuilder.renderFunction(
-                            name: method.name,
+                            name: method.resolvedJSName,
                             parameters: method.parameters,
                             returnExpr: returnExpr,
                             declarationPrefixKeyword: "static"
@@ -2198,7 +2202,7 @@ extension BridgeJSLink {
                 jsPrinter.indent {
                     jsPrinter.write(
                         lines: thunkBuilder.renderFunction(
-                            name: method.name,
+                            name: method.resolvedJSName,
                             parameters: method.parameters,
                             returnExpr: returnExpr,
                             declarationPrefixKeyword: nil
@@ -2214,7 +2218,7 @@ extension BridgeJSLink {
                         dtsTypePrinter.write(line)
                     }
                     dtsTypePrinter.write(
-                        "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                        "\(method.resolvedJSName)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                     )
                 }
             }
@@ -2252,13 +2256,13 @@ extension BridgeJSLink {
         for method in klass.methods where method.effects.isStatic {
             printer.write(lines: renderJSDoc(documentation: method.documentation, parameters: method.parameters))
             printer.write(
-                "\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                "\(method.resolvedJSName)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
             )
         }
         for property in klass.properties where property.isStatic {
             let readonly = property.isReadonly ? "readonly " : ""
             printer.write(lines: renderJSDoc(documentation: property.documentation, parameters: []))
-            printer.write("\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
+            printer.write("\(readonly)\(property.resolvedJSName): \(resolveTypeScriptType(property.type));")
         }
         return printer.lines
     }
@@ -2280,18 +2284,20 @@ extension BridgeJSLink {
                 )
                 printer.write("constructor(\(paramSignatures.joined(separator: ", ")));")
             }
-            for method in klass.methods.sorted(by: { $0.name < $1.name }) {
+            for method in klass.methods.sorted(by: { $0.resolvedJSName < $1.resolvedJSName }) {
                 let staticKeyword = method.effects.isStatic ? "static " : ""
                 printer.write(lines: renderJSDoc(documentation: method.documentation, parameters: method.parameters))
                 printer.write(
-                    "\(staticKeyword)\(method.name)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                    "\(staticKeyword)\(method.resolvedJSName)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                 )
             }
-            for property in klass.properties.sorted(by: { $0.name < $1.name }) {
+            for property in klass.properties.sorted(by: { $0.resolvedJSName < $1.resolvedJSName }) {
                 let staticKeyword = property.isStatic ? "static " : ""
                 let readonly = property.isReadonly ? "readonly " : ""
                 printer.write(lines: renderJSDoc(documentation: property.documentation, parameters: []))
-                printer.write("\(staticKeyword)\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
+                printer.write(
+                    "\(staticKeyword)\(readonly)\(property.resolvedJSName): \(resolveTypeScriptType(property.type));"
+                )
             }
             printer.write("release(): void;")
         }
@@ -2321,7 +2327,7 @@ extension BridgeJSLink {
         jsPrinter.indent {
             jsPrinter.write(
                 lines: getterThunkBuilder.renderFunction(
-                    name: property.name,
+                    name: property.resolvedJSName,
                     parameters: [],
                     returnExpr: getterReturnExpr,
                     declarationPrefixKeyword: getterKeyword
@@ -2349,7 +2355,7 @@ extension BridgeJSLink {
             jsPrinter.indent {
                 jsPrinter.write(
                     lines: setterThunkBuilder.renderFunction(
-                        name: property.name,
+                        name: property.resolvedJSName,
                         parameters: [.init(label: nil, name: "value", type: property.type)],
                         returnExpr: nil,
                         declarationPrefixKeyword: setterKeyword
@@ -2365,7 +2371,7 @@ extension BridgeJSLink {
                 for line in renderJSDoc(documentation: property.documentation, parameters: []) {
                     dtsPrinter.write(line)
                 }
-                dtsPrinter.write("\(readonly)\(property.name): \(resolveTypeScriptType(property.type));")
+                dtsPrinter.write("\(readonly)\(property.resolvedJSName): \(resolveTypeScriptType(property.type));")
             }
         }
     }
@@ -2738,7 +2744,7 @@ extension BridgeJSLink {
                 for function in skeleton.functions where function.namespace != nil {
                     let namespacePath = function.namespace!.joined(separator: ".")
                     printer.write(
-                        "globalThis.\(namespacePath).\(function.name) = exports.\(namespacePath).\(function.name);"
+                        "globalThis.\(namespacePath).\(function.resolvedJSName) = exports.\(namespacePath).\(function.resolvedJSName);"
                     )
                 }
                 for enumDef in skeleton.enums where enumDef.enumType == .namespace {
@@ -2746,7 +2752,7 @@ extension BridgeJSLink {
                         let fullNamespace = (enumDef.namespace ?? []) + [enumDef.name]
                         let namespacePath = fullNamespace.joined(separator: ".")
                         printer.write(
-                            "globalThis.\(namespacePath).\(function.name) = exports.\(namespacePath).\(function.name);"
+                            "globalThis.\(namespacePath).\(function.resolvedJSName) = exports.\(namespacePath).\(function.resolvedJSName);"
                         )
                     }
                     for property in enumDef.staticProperties {
@@ -2754,11 +2760,13 @@ extension BridgeJSLink {
                         let namespacePath = fullNamespace.joined(separator: ".")
                         let exportsPath = "exports.\(namespacePath)"
 
-                        printer.write("Object.defineProperty(globalThis.\(namespacePath), '\(property.name)', {")
+                        printer.write(
+                            "Object.defineProperty(globalThis.\(namespacePath), '\(property.resolvedJSName)', {"
+                        )
                         printer.indent {
-                            printer.write("get: () => \(exportsPath).\(property.name),")
+                            printer.write("get: () => \(exportsPath).\(property.resolvedJSName),")
                             if !property.isReadonly {
-                                printer.write("set: (value) => { \(exportsPath).\(property.name) = value; }")
+                                printer.write("set: (value) => { \(exportsPath).\(property.resolvedJSName) = value; }")
                             }
                         }
                         printer.write("});")
@@ -2940,7 +2948,7 @@ extension BridgeJSLink {
             renderPropertyEntry: (ExportedProperty) -> [String]
         ) {
             for function in node.content.functions {
-                node.content.functionDtsLines.append((function.name, renderFunctionEntry(function)))
+                node.content.functionDtsLines.append((function.resolvedJSName, renderFunctionEntry(function)))
             }
 
             switch node.content.declaration {
@@ -2953,7 +2961,7 @@ extension BridgeJSLink {
             }
 
             for property in node.content.staticProperties {
-                node.content.staticPropertyDtsLines.append((property.name, renderPropertyEntry(property)))
+                node.content.staticPropertyDtsLines.append((property.resolvedJSName, renderPropertyEntry(property)))
             }
 
             for enumDef in node.content.enums {
@@ -3005,7 +3013,7 @@ extension BridgeJSLink {
         ) throws {
             for function in node.content.functions {
                 let impl = try renderFunctionImpl(function)
-                node.content.functionJsLines.append((function.name, impl))
+                node.content.functionJsLines.append((function.resolvedJSName, impl))
             }
 
             switch node.content.declaration {
@@ -3039,7 +3047,7 @@ extension BridgeJSLink {
                 )
 
                 let getterPrinter = CodeFragmentPrinter()
-                getterPrinter.write("get \(property.name)() {")
+                getterPrinter.write("get \(property.resolvedJSName)() {")
                 getterPrinter.indent {
                     getterPrinter.write(contentsOf: getterThunkBuilder.body)
                     getterPrinter.write(lines: getterThunkBuilder.checkExceptionLines())
@@ -3066,7 +3074,7 @@ extension BridgeJSLink {
                     )
 
                     let setterPrinter = CodeFragmentPrinter()
-                    setterPrinter.write("set \(property.name)(value) {")
+                    setterPrinter.write("set \(property.resolvedJSName)(value) {")
                     setterPrinter.indent {
                         setterPrinter.write(contentsOf: setterThunkBuilder.body)
                         setterPrinter.write(lines: setterThunkBuilder.checkExceptionLines())
@@ -3431,18 +3439,22 @@ extension BridgeJSLink {
 
                     // Only include functions and properties when exposeToGlobal is true
                     if exposeToGlobal {
-                        let sortedFunctions = childNode.content.functions.sorted { $0.name < $1.name }
+                        let sortedFunctions = childNode.content.functions.sorted {
+                            $0.resolvedJSName < $1.resolvedJSName
+                        }
                         for function in sortedFunctions {
                             let signature =
-                                "function \(function.name)\(renderTSSignatureCallback(function.parameters, function.returnType, function.effects));"
+                                "function \(function.resolvedJSName)\(renderTSSignatureCallback(function.parameters, function.returnType, function.effects));"
                             printer.write(lines: renderDocCallback(function.documentation, function.parameters))
                             printer.write(signature)
                         }
-                        let sortedProperties = childNode.content.staticProperties.sorted { $0.name < $1.name }
+                        let sortedProperties = childNode.content.staticProperties.sorted {
+                            $0.resolvedJSName < $1.resolvedJSName
+                        }
                         for property in sortedProperties {
                             let readonly = property.isReadonly ? "var " : "let "
                             printer.write(lines: renderDocCallback(property.documentation, []))
-                            printer.write("\(readonly)\(property.name): \(property.type.tsType);")
+                            printer.write("\(readonly)\(property.resolvedJSName): \(property.type.tsType);")
                         }
                     }
 
@@ -3479,7 +3491,7 @@ extension BridgeJSLink {
         for param in function.parameters {
             try thunkBuilder.liftParameter(param: param)
         }
-        let jsName = function.jsName ?? function.name
+        let jsName = function.resolvedJSName
         let calleeExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
             from: function.from,
@@ -3507,7 +3519,7 @@ extension BridgeJSLink {
             returnType: getter.type,
             intrinsicRegistry: intrinsicRegistry
         )
-        let jsName = getter.jsName ?? getter.name
+        let jsName = getter.resolvedJSName
         let accessExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
             from: getter.from,
@@ -3542,7 +3554,7 @@ extension BridgeJSLink {
                 getter: getter,
                 abiName: getterAbiName,
                 emitCall: { thunkBuilder in
-                    return try thunkBuilder.callPropertyGetter(name: getter.jsName ?? getter.name)
+                    return try thunkBuilder.callPropertyGetter(name: getter.resolvedJSName)
                 }
             )
             importObjectBuilder.assignToImportObject(name: getterAbiName, function: js)
@@ -3558,7 +3570,7 @@ extension BridgeJSLink {
                     try thunkBuilder.liftParameter(
                         param: Parameter(label: nil, name: "newValue", type: setter.type)
                     )
-                    thunkBuilder.callPropertySetter(name: setter.jsName ?? setter.name)
+                    thunkBuilder.callPropertySetter(name: setter.resolvedJSName)
                 }
             )
             importObjectBuilder.assignToImportObject(name: setterAbiName, function: js)
@@ -3585,7 +3597,7 @@ extension BridgeJSLink {
                     )
                 }
                 for method in type.staticMethods {
-                    let methodName = method.jsName ?? method.name
+                    let methodName = method.resolvedJSName
                     let signature =
                         "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                     dtsPrinter.write(signature)
@@ -3617,7 +3629,7 @@ extension BridgeJSLink {
         let ctorExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
             from: type.from,
-            memberName: type.jsName ?? type.name
+            memberName: type.resolvedJSName
         )
         try thunkBuilder.callConstructor(
             ctorExpr: ctorExpr,
@@ -3676,10 +3688,10 @@ extension BridgeJSLink {
         let constructorExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: swiftModuleName,
             from: context.from,
-            memberName: context.jsName ?? context.name
+            memberName: context.resolvedJSName
         )
 
-        try thunkBuilder.callStaticMethod(on: constructorExpr, name: method.jsName ?? method.name)
+        try thunkBuilder.callStaticMethod(on: constructorExpr, name: method.resolvedJSName)
         let funcLines = thunkBuilder.renderFunction(name: method.abiName(context: context, operation: "static"))
         return (funcLines, [])
     }
@@ -3698,7 +3710,7 @@ extension BridgeJSLink {
             try thunkBuilder.liftParameter(param: param)
         }
 
-        try thunkBuilder.callMethod(name: method.jsName ?? method.name)
+        try thunkBuilder.callMethod(name: method.resolvedJSName)
         let funcLines = thunkBuilder.renderFunction(name: method.abiName(context: context))
         return (funcLines, [])
     }

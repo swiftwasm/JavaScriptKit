@@ -37,6 +37,27 @@ export type Exports = {
 }
 ```
 
+### Renaming functions in JavaScript
+
+If a different name is more appropriate in JavaScript or to export multiple overloaded Swift functions with distinct JavaScript names, you can pass a JavaScript identifier as the first argument to `@JS`.
+
+```swift
+import JavaScriptKit
+
+@JS("greetName") public func greet(_ name: String) -> String {
+    return "Hello, \(name)!"
+}
+
+@JS("greetPerson") public func greet(_ person: Person) -> String {
+    return "Hello, \(person.name)!"
+}
+```
+
+```javascript
+exports.greetName("World");
+exports.greetPerson({ name: "World" });
+```
+
 ### Throwing functions
 
 Swift functions can throw JavaScript errors using `throws(JSException)`.

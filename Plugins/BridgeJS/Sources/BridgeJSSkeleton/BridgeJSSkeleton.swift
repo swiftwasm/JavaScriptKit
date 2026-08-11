@@ -861,6 +861,7 @@ public struct ExportedProtocol: Codable, Equatable {
 
 public struct ExportedFunction: Codable, Equatable, Sendable {
     public var name: String
+    public var jsName: String?
     public var abiName: String
     public var parameters: [Parameter]
     public var returnType: BridgeType
@@ -869,8 +870,11 @@ public struct ExportedFunction: Codable, Equatable, Sendable {
     public var staticContext: StaticContext?
     public var documentation: String?
 
+    public var resolvedJSName: String { jsName ?? name }
+
     public init(
         name: String,
+        jsName: String? = nil,
         abiName: String,
         parameters: [Parameter],
         returnType: BridgeType,
@@ -880,6 +884,7 @@ public struct ExportedFunction: Codable, Equatable, Sendable {
         documentation: String? = nil
     ) {
         self.name = name
+        self.jsName = jsName
         self.abiName = abiName
         self.parameters = parameters
         self.returnType = returnType
@@ -948,6 +953,7 @@ public struct ExportedConstructor: Codable, Equatable, Sendable {
 
 public struct ExportedProperty: Codable, Equatable, Sendable {
     public var name: String
+    public var jsName: String?
     public var type: BridgeType
     public var isReadonly: Bool
     public var isStatic: Bool
@@ -955,8 +961,11 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
     public var staticContext: StaticContext?
     public var documentation: String?
 
+    public var resolvedJSName: String { jsName ?? name }
+
     public init(
         name: String,
+        jsName: String? = nil,
         type: BridgeType,
         isReadonly: Bool = false,
         isStatic: Bool = false,
@@ -965,6 +974,7 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
         documentation: String? = nil
     ) {
         self.name = name
+        self.jsName = jsName
         self.type = type
         self.isReadonly = isReadonly
         self.isStatic = isStatic
@@ -1245,6 +1255,8 @@ public struct ImportedFunctionSkeleton: Codable {
     /// closure inits) that surface through this function's signature.
     public let accessLevel: BridgeJSAccessLevel
 
+    public var resolvedJSName: String { jsName ?? name }
+
     public init(
         name: String,
         jsName: String? = nil,
@@ -1336,6 +1348,8 @@ public struct ImportedGetterSkeleton: Codable {
     /// Source access level of the originating Swift declaration.
     public let accessLevel: BridgeJSAccessLevel
 
+    public var resolvedJSName: String { jsName ?? name }
+
     public init(
         name: String,
         jsName: String? = nil,
@@ -1395,6 +1409,8 @@ public struct ImportedSetterSkeleton: Codable {
     public let functionName: String?
     /// Source access level of the originating Swift declaration.
     public let accessLevel: BridgeJSAccessLevel
+
+    public var resolvedJSName: String { jsName ?? name }
 
     public init(
         name: String,
@@ -1457,6 +1473,8 @@ public struct ImportedTypeSkeleton: Codable {
     public let documentation: String?
     /// Source access level of the originating Swift `@JSClass` declaration.
     public let accessLevel: BridgeJSAccessLevel
+
+    public var resolvedJSName: String { jsName ?? name }
 
     public init(
         name: String,

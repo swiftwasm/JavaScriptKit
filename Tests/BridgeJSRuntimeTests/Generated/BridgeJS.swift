@@ -9825,6 +9825,39 @@ public func _bjs_makeAdder(_ base: Int32) -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_renamedEcho")
+@_cdecl("bjs_renamedEcho")
+public func _bjs_renamedEcho(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = jsNameEcho(_: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_greetName")
+@_cdecl("bjs_greetName")
+public func _bjs_greetName(_ nameBytes: Int32, _ nameLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = greet(_: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_greetCount")
+@_cdecl("bjs_greetCount")
+public func _bjs_greetCount(_ count: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = greet(_: Int.bridgeJSLiftParameter(count))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripPointerFields")
 @_cdecl("bjs_roundTripPointerFields")
 public func _bjs_roundTripPointerFields() -> Void {
@@ -13171,6 +13204,91 @@ fileprivate func _bjs_NestedTypeHost_wrap_extern(_ pointer: UnsafeMutableRawPoin
 #endif
 @inline(never) fileprivate func _bjs_NestedTypeHost_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_NestedTypeHost_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_JSNameRenamedClass_init")
+@_cdecl("bjs_JSNameRenamedClass_init")
+public func _bjs_JSNameRenamedClass_init(_ value: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = JSNameRenamedClass(value: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_JSNameRenamedClass_doubled")
+@_cdecl("bjs_JSNameRenamedClass_doubled")
+public func _bjs_JSNameRenamedClass_doubled(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSNameRenamedClass.bridgeJSLiftParameter(_self).timesTwo()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_JSNameRenamedClass_static_makeWithValue")
+@_cdecl("bjs_JSNameRenamedClass_static_makeWithValue")
+public func _bjs_JSNameRenamedClass_static_makeWithValue(_ value: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = JSNameRenamedClass.create(value: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_JSNameRenamedClass_value_get")
+@_cdecl("bjs_JSNameRenamedClass_value_get")
+public func _bjs_JSNameRenamedClass_value_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = JSNameRenamedClass.bridgeJSLiftParameter(_self).value
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_JSNameRenamedClass_value_set")
+@_cdecl("bjs_JSNameRenamedClass_value_set")
+public func _bjs_JSNameRenamedClass_value_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    JSNameRenamedClass.bridgeJSLiftParameter(_self).value = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_JSNameRenamedClass_deinit")
+@_cdecl("bjs_JSNameRenamedClass_deinit")
+public func _bjs_JSNameRenamedClass_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<JSNameRenamedClass>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension JSNameRenamedClass: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_JSNameRenamedClass_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_JSNameRenamedClass_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSNameRenamedClass_wrap")
+fileprivate func _bjs_JSNameRenamedClass_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_JSNameRenamedClass_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_JSNameRenamedClass_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_JSNameRenamedClass_wrap_extern(pointer)
 }
 
 @_expose(wasm, "bjs_OptionalHolder_init")

@@ -1,0 +1,524 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_RenamedMembers_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "title",
+              "name" : "title",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            },
+            {
+              "label" : "count",
+              "name" : "count",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_RenamedMembers_makeGreeting",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "jsName" : "makeGreeting",
+            "name" : "greet",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_RenamedMembers_static_makeDefault",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "jsName" : "makeDefault",
+            "name" : "createDefault",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "RenamedMembers"
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "RenamedMembers"
+              }
+            }
+          }
+        ],
+        "name" : "RenamedMembers",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "jsName" : "label",
+            "name" : "title",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "jsName" : "total",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : true,
+            "jsName" : "sharedTotal",
+            "name" : "sharedCount",
+            "staticContext" : {
+              "className" : {
+                "_0" : "RenamedMembers"
+              }
+            },
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "jsName" : "readOnlyLimit",
+            "name" : "limit",
+            "staticContext" : {
+              "className" : {
+                "_0" : "RenamedMembers"
+              }
+            },
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "RenamedMembers"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "active"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "inactive"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "RenamedEnumMembers",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_RenamedEnumMembers_static_describeCase",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "jsName" : "describeCase",
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "enumName" : {
+                "_0" : "RenamedEnumMembers"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : true,
+            "jsName" : "currentDefault",
+            "name" : "defaultValue",
+            "staticContext" : {
+              "enumName" : {
+                "_0" : "RenamedEnumMembers"
+              }
+            },
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "RenamedEnumMembers",
+        "tsFullPath" : "RenamedEnumMembers"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "RenamedNamespaceMembers",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_RenamedNamespaceMembers_static_plus",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "jsName" : "plus",
+            "name" : "add",
+            "namespace" : [
+              "RenamedNamespaceMembers"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "a",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "label" : "_",
+                "name" : "b",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "RenamedNamespaceMembers"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : true,
+            "jsName" : "theAnswer",
+            "name" : "answer",
+            "namespace" : [
+              "RenamedNamespaceMembers"
+            ],
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "RenamedNamespaceMembers"
+              }
+            },
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "RenamedNamespaceMembers",
+        "tsFullPath" : "RenamedNamespaceMembers"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_makeGreeting",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "jsName" : "makeGreeting",
+        "name" : "renderGreeting",
+        "parameters" : [
+          {
+            "label" : "name",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_greetName",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "jsName" : "greetName",
+        "name" : "greet",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_greetCount",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "jsName" : "greetCount",
+        "name" : "greet",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_Utils_Text_namespacedRenamed",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "jsName" : "namespacedRenamed",
+        "name" : "namespacedFunction",
+        "namespace" : [
+          "Utils",
+          "Text"
+        ],
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_RenamedVector_magnitude",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "jsName" : "magnitude",
+            "name" : "length",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_RenamedVector_static_fromPolar",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "jsName" : "fromPolar",
+            "name" : "polar",
+            "parameters" : [
+              {
+                "label" : "radius",
+                "name" : "radius",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "label" : "angle",
+                "name" : "angle",
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "RenamedVector"
+              }
+            },
+            "staticContext" : {
+              "structName" : {
+                "_0" : "RenamedVector"
+              }
+            }
+          }
+        ],
+        "name" : "RenamedVector",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "dx",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "dy",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "jsName" : "originVector",
+            "name" : "origin",
+            "staticContext" : {
+              "structName" : {
+                "_0" : "RenamedVector"
+              }
+            },
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "RenamedVector"
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "RenamedVector"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

@@ -4842,6 +4842,105 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_JSNameRenamedClass_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_JSNameRenamedClass_doubled",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "jsName" : "doubled",
+            "name" : "timesTwo",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_JSNameRenamedClass_static_makeWithValue",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "jsName" : "makeWithValue",
+            "name" : "create",
+            "parameters" : [
+              {
+                "label" : "value",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftHeapObject" : {
+                "_0" : "JSNameRenamedClass"
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "JSNameRenamedClass"
+              }
+            }
+          }
+        ],
+        "name" : "JSNameRenamedClass",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "jsName" : "current",
+            "name" : "value",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "JSNameRenamedClass"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_OptionalHolder_init",
           "effects" : {
             "isAsync" : false,
@@ -16829,6 +16928,87 @@
               "sendingParameters" : false
             },
             "useJSTypedClosure" : false
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_renamedEcho",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "jsName" : "renamedEcho",
+        "name" : "jsNameEcho",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "value",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_greetName",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "jsName" : "greetName",
+        "name" : "greet",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_greetCount",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "jsName" : "greetCount",
+        "name" : "greet",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
           }
         }
       },
