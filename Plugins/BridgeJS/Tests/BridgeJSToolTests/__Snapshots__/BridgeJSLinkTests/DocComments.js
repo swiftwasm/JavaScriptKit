@@ -37,7 +37,7 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createPointHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT5Point = () => ({
         lower: (value) => {
             f64Stack.push(value.x);
             f64Stack.push(value.y);
@@ -124,12 +124,14 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Point"] = function(objectId) {
-                structHelpers.Point.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT5Point.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Point"] = function() {
-                const value = structHelpers.Point.lift();
+                const value = structHelpers.M10TestModuleT5Point.lift();
                 return swift.memory.retain(value);
             }
+            bjs["bjs_core_register_type_handles"] = function() {};
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -347,8 +349,8 @@ export async function createInstantiator(options, swift) {
                     instance.exports.bjs_Greeter_name_set(this.pointer, valueId, valueBytes.length);
                 }
             }
-            const PointHelpers = __bjs_createPointHelpers();
-            structHelpers.Point = PointHelpers;
+            const __bjs_helpers_M10TestModuleT5Point = __bjs_createStructHelpers_M10TestModuleT5Point();
+            structHelpers.M10TestModuleT5Point = __bjs_helpers_M10TestModuleT5Point;
 
             const exports = {
                 greet: function bjs_greet(name, greeting = "Hello") {

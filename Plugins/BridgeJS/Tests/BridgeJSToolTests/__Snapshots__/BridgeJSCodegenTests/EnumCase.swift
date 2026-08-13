@@ -228,3 +228,37 @@ public func _bjs_roundTripOptionalTSDirection(_ inputIsSome: Int32, _ inputValue
     fatalError("Only available on WebAssembly")
     #endif
 }
+
+extension Direction: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Direction.bridgeJSMakeTypeHandle()
+}
+
+extension Status: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Status.bridgeJSMakeTypeHandle()
+}
+
+extension TSDirection: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSDirection.bridgeJSMakeTypeHandle()
+}
+
+extension PublicStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PublicStatus.bridgeJSMakeTypeHandle()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        Direction.bridgeJSTypeID,
+        Status.bridgeJSTypeID,
+        TSDirection.bridgeJSTypeID,
+        PublicStatus.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

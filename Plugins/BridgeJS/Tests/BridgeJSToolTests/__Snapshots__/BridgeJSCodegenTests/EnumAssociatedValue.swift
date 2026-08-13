@@ -632,3 +632,72 @@ fileprivate func _bjs_User_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> In
 @inline(never) fileprivate func _bjs_User_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_User_wrap_extern(pointer)
 }
+
+extension Point: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Point.bridgeJSMakeTypeHandle()
+}
+
+extension APIResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIResult.bridgeJSMakeTypeHandle()
+}
+
+extension ComplexResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ComplexResult.bridgeJSMakeTypeHandle()
+}
+
+extension Utilities.Result: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Utilities.Result.bridgeJSMakeTypeHandle()
+}
+
+extension NetworkingResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NetworkingResult.bridgeJSMakeTypeHandle()
+}
+
+extension APIOptionalResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIOptionalResult.bridgeJSMakeTypeHandle()
+}
+
+extension Precision: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Precision.bridgeJSMakeTypeHandle()
+}
+
+extension CardinalDirection: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = CardinalDirection.bridgeJSMakeTypeHandle()
+}
+
+extension TypedPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TypedPayloadResult.bridgeJSMakeTypeHandle()
+}
+
+extension AllTypesResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AllTypesResult.bridgeJSMakeTypeHandle()
+}
+
+extension OptionalAllTypesResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = OptionalAllTypesResult.bridgeJSMakeTypeHandle()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        Point.bridgeJSTypeID,
+        APIResult.bridgeJSTypeID,
+        ComplexResult.bridgeJSTypeID,
+        Utilities.Result.bridgeJSTypeID,
+        NetworkingResult.bridgeJSTypeID,
+        APIOptionalResult.bridgeJSTypeID,
+        Precision.bridgeJSTypeID,
+        CardinalDirection.bridgeJSTypeID,
+        TypedPayloadResult.bridgeJSTypeID,
+        AllTypesResult.bridgeJSTypeID,
+        OptionalAllTypesResult.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

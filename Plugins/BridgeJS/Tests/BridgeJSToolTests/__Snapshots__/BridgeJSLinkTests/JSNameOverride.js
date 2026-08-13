@@ -36,7 +36,7 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createRenamedVectorHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT13RenamedVector = () => ({
         lower: (value) => {
             f64Stack.push(value.dx);
             f64Stack.push(value.dy);
@@ -46,7 +46,7 @@ export async function createInstantiator(options, swift) {
             const f641 = f64Stack.pop();
             const instance1 = { dx: f641, dy: f64 };
             instance1.magnitude = function() {
-                structHelpers.RenamedVector.lower(this);
+                structHelpers.M10TestModuleT13RenamedVector.lower(this);
                 const ret = instance.exports.bjs_RenamedVector_magnitude();
                 return ret;
             }.bind(instance1);
@@ -129,12 +129,14 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_RenamedVector"] = function(objectId) {
-                structHelpers.RenamedVector.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT13RenamedVector.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_RenamedVector"] = function() {
-                const value = structHelpers.RenamedVector.lift();
+                const value = structHelpers.M10TestModuleT13RenamedVector.lift();
                 return swift.memory.retain(value);
             }
+            bjs["bjs_core_register_type_handles"] = function() {};
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -354,8 +356,8 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-            const RenamedVectorHelpers = __bjs_createRenamedVectorHelpers();
-            structHelpers.RenamedVector = RenamedVectorHelpers;
+            const __bjs_helpers_M10TestModuleT13RenamedVector = __bjs_createStructHelpers_M10TestModuleT13RenamedVector();
+            structHelpers.M10TestModuleT13RenamedVector = __bjs_helpers_M10TestModuleT13RenamedVector;
 
             const exports = {
                 makeGreeting: function bjs_makeGreeting(name) {
@@ -417,12 +419,12 @@ export async function createInstantiator(options, swift) {
                 RenamedVector: {
                     get originVector() {
                         instance.exports.bjs_RenamedVector_static_origin_get();
-                        const structValue = structHelpers.RenamedVector.lift();
+                        const structValue = structHelpers.M10TestModuleT13RenamedVector.lift();
                         return structValue;
                     },
                     fromPolar: function(radius, angle) {
                         instance.exports.bjs_RenamedVector_static_fromPolar(radius, angle);
-                        const structValue = structHelpers.RenamedVector.lift();
+                        const structValue = structHelpers.M10TestModuleT13RenamedVector.lift();
                         return structValue;
                     },
                 },

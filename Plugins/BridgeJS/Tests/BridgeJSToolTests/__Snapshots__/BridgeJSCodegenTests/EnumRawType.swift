@@ -451,6 +451,54 @@ public func _bjs_validateSession(_ session: Int64) -> Void {
     #endif
 }
 
+extension Theme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Theme.bridgeJSMakeTypeHandle()
+}
+
+extension TSTheme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSTheme.bridgeJSMakeTypeHandle()
+}
+
+extension FeatureFlag: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FeatureFlag.bridgeJSMakeTypeHandle()
+}
+
+extension HttpStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = HttpStatus.bridgeJSMakeTypeHandle()
+}
+
+extension TSHttpStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSHttpStatus.bridgeJSMakeTypeHandle()
+}
+
+extension Priority: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Priority.bridgeJSMakeTypeHandle()
+}
+
+extension FileSize: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FileSize.bridgeJSMakeTypeHandle()
+}
+
+extension UserId: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = UserId.bridgeJSMakeTypeHandle()
+}
+
+extension TokenId: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TokenId.bridgeJSMakeTypeHandle()
+}
+
+extension SessionId: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = SessionId.bridgeJSMakeTypeHandle()
+}
+
+extension Precision: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Precision.bridgeJSMakeTypeHandle()
+}
+
+extension Ratio: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Ratio.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_takesFeatureFlag")
 fileprivate func bjs_takesFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: Int32) -> Void
@@ -491,3 +539,29 @@ func _$returnsFeatureFlag() throws(JSException) -> FeatureFlag {
     }
     return FeatureFlag.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        Theme.bridgeJSTypeID,
+        TSTheme.bridgeJSTypeID,
+        FeatureFlag.bridgeJSTypeID,
+        HttpStatus.bridgeJSTypeID,
+        TSHttpStatus.bridgeJSTypeID,
+        Priority.bridgeJSTypeID,
+        FileSize.bridgeJSTypeID,
+        UserId.bridgeJSTypeID,
+        TokenId.bridgeJSTypeID,
+        SessionId.bridgeJSTypeID,
+        Precision.bridgeJSTypeID,
+        Ratio.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

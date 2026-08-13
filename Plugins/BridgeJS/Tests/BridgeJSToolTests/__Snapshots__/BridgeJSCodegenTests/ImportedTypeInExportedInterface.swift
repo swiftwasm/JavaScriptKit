@@ -104,6 +104,10 @@ public func _bjs_roundtripFooContainer() -> Void {
     #endif
 }
 
+extension FooContainer: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FooContainer.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Foo_init")
 fileprivate func bjs_Foo_init_extern() -> Int32
@@ -123,3 +127,18 @@ func _$Foo_init() throws(JSException) -> JSObject {
     }
     return JSObject.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        FooContainer.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

@@ -46,6 +46,10 @@ fileprivate func _bjs_struct_lift_Point_extern() -> Int32 {
     return _bjs_struct_lift_Point_extern()
 }
 
+extension Point: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Point.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_translate")
 fileprivate func bjs_translate_extern(_ dx: Int32, _ dy: Int32) -> Void
@@ -89,3 +93,18 @@ func _$roundTripOptional(_ point: Optional<Point>) throws(JSException) -> Option
     }
     return Optional<Point>.bridgeJSLiftReturn()
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        Point.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

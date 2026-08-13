@@ -416,4 +416,4 @@ When a TypeScript name is not a valid Swift identifier (e.g. contains dashes, sp
 ## Limitations
 
 - No first-class support for async/Promise-returning functions;.
-- No generic type parameter can appear on a bridged function signature.
+- No generic type parameter can appear on a bridged function signature generated from TypeScript; a type parameter is lowered to `JSObject`. Generic imports are available only through `@JSFunction` declarations written in Swift — see <doc:Importing-JS-Function>.

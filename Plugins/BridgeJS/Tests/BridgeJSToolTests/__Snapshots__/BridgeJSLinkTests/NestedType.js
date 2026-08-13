@@ -31,7 +31,7 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createUser_StatsHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT4UserT5Stats = () => ({
         lower: (value) => {
             i32Stack.push((value.health | 0));
             f64Stack.push(value.score);
@@ -42,7 +42,7 @@ export async function createInstantiator(options, swift) {
             return { health: int, score: f64 };
         }
     });
-    const __bjs_createPlayer_StatsHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT6PlayerT5Stats = () => ({
         lower: (value) => {
             i32Stack.push((value.level | 0));
             const bytes = textEncoder.encode(value.rating);
@@ -132,19 +132,21 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_User_Stats"] = function(objectId) {
-                structHelpers.User_Stats.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT4UserT5Stats.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_User_Stats"] = function() {
-                const value = structHelpers.User_Stats.lift();
+                const value = structHelpers.M10TestModuleT4UserT5Stats.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Player_Stats"] = function(objectId) {
-                structHelpers.Player_Stats.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT6PlayerT5Stats.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Player_Stats"] = function() {
-                const value = structHelpers.Player_Stats.lift();
+                const value = structHelpers.M10TestModuleT6PlayerT5Stats.lift();
                 return swift.memory.retain(value);
             }
+            bjs["bjs_core_register_type_handles"] = function() {};
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -344,11 +346,11 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-            const User_StatsHelpers = __bjs_createUser_StatsHelpers();
-            structHelpers.User_Stats = User_StatsHelpers;
+            const __bjs_helpers_M10TestModuleT4UserT5Stats = __bjs_createStructHelpers_M10TestModuleT4UserT5Stats();
+            structHelpers.M10TestModuleT4UserT5Stats = __bjs_helpers_M10TestModuleT4UserT5Stats;
 
-            const Player_StatsHelpers = __bjs_createPlayer_StatsHelpers();
-            structHelpers.Player_Stats = Player_StatsHelpers;
+            const __bjs_helpers_M10TestModuleT6PlayerT5Stats = __bjs_createStructHelpers_M10TestModuleT6PlayerT5Stats();
+            structHelpers.M10TestModuleT6PlayerT5Stats = __bjs_helpers_M10TestModuleT6PlayerT5Stats;
 
             const exports = {
                 Player,

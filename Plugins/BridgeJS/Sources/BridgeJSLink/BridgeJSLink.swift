@@ -31,6 +31,10 @@ public struct BridgeJSLink {
         skeletons.compactMap(\.exported).compactMap(\.identityMode).first ?? "none"
     }
 
+    var hasGenerics: Bool {
+        skeletons.contains { $0.imported?.hasGenericDeclarations ?? false }
+    }
+
     /// Whether a class should use identity caching based on its annotation and the config default.
     private func shouldUseIdentityCache(for klass: ExportedClass) -> Bool {
         // Per-class annotation takes priority
@@ -311,7 +315,7 @@ public struct BridgeJSLink {
     }
 
     private func generateVariableDeclarations() -> [String] {
-        return [
+        var declarations: [String] = [
             "let \(JSGlueVariableScope.reservedInstance);",
             "let \(JSGlueVariableScope.reservedMemory);",
             "let \(JSGlueVariableScope.reservedSetException);",
@@ -335,10 +339,32 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedTaStack) = [];",
             "const \(JSGlueVariableScope.reservedEnumHelpers) = {};",
             "const \(JSGlueVariableScope.reservedStructHelpers) = {};",
+        ]
+        if hasGenerics {
+            declarations.append("const \(JSGlueVariableScope.reservedCodecByTypeId) = new Map();")
+            declarations.append("let __bjs_typeHandlesRegistered = false;")
+            declarations.append("function __bjs_registerTypeHandles() {")
+            declarations.append("    if (__bjs_typeHandlesRegistered) {")
+            declarations.append("        return;")
+            declarations.append("    }")
+            declarations.append("    __bjs_typeHandlesRegistered = true;")
+            declarations.append(
+                "    \(JSGlueVariableScope.reservedInstance).exports[\"\(ABINameGenerator.coreTypeRegistrationFunctionName)\"]();"
+            )
+            for skeleton in skeletons {
+                guard skeleton.typeRegistrationEntries != nil else { continue }
+                let name = ABINameGenerator.typeRegistrationFunctionName(moduleName: skeleton.moduleName)
+                declarations.append("    \(JSGlueVariableScope.reservedInstance).exports[\"\(name)\"]();")
+            }
+            declarations.append("}")
+            declarations.append(contentsOf: GenericJSCodegen.runtimeHelperDeclarations())
+        }
+        declarations.append(contentsOf: [
             "",
             "let _exports = null;",
             "let bjs = null;",
-        ]
+        ])
+        return declarations
     }
 
     /// JS const (in the import glue scope) holding the `Symbol` under which a promise's
@@ -375,9 +401,83 @@ public struct BridgeJSLink {
         printer.write(lines: lines)
     }
 
+    private func makeCodecPrintContext(printer: CodeFragmentPrinter) -> IntrinsicJSFragment.PrintCodeContext {
+        IntrinsicJSFragment.PrintCodeContext(
+            scope: JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry),
+            printer: printer,
+            hasDirectAccessToSwiftClass: false,
+            classNamespaces: intrinsicRegistry.classNamespaces
+        )
+    }
+
+    private func genericCodecReference(type: BridgeType, into printer: CodeFragmentPrinter) throws -> String {
+        try ContainerCodecJS.codecExpression(for: type, context: makeCodecPrintContext(printer: printer))
+    }
+
+    private func writeTypeHandleRegistrationBody(into printer: CodeFragmentPrinter) {
+        printer.write(
+            "const typeIds = new Int32Array(\(JSGlueVariableScope.reservedMemory).buffer, base >>> 0, count >>> 0);"
+        )
+        printer.write("for (let i = 0; i < count; i++) {")
+        printer.indent {
+            printer.write("\(JSGlueVariableScope.reservedCodecByTypeId).set(typeIds[i], codecs[i]);")
+        }
+        printer.write("}")
+    }
+
+    private func generateCoreTypeRegistrationHook(into printer: CodeFragmentPrinter) throws {
+        let hookName = ABINameGenerator.coreTypeRegistrationFunctionName
+        guard hasGenerics else {
+            printer.write("bjs[\"\(hookName)\"] = function() {};")
+            return
+        }
+        try ContainerCodecJS.registerPrimitiveCodecs(context: makeCodecPrintContext(printer: printer))
+        printer.write("bjs[\"\(hookName)\"] = function(base, count) {")
+        printer.indent {
+            printer.write("const codecs = [")
+            printer.indent {
+                for primitive in BridgeType.genericBridgeablePrimitives {
+                    printer.write("\(JSGlueVariableScope.reservedPrimitiveCodecs).\(primitive.token),")
+                }
+            }
+            printer.write("];")
+            writeTypeHandleRegistrationBody(into: printer)
+        }
+        printer.write("}")
+    }
+
+    private func generateTypeRegistrationHooks(into printer: CodeFragmentPrinter) throws {
+        try generateCoreTypeRegistrationHook(into: printer)
+        for skeleton in skeletons {
+            guard let moduleEntries = skeleton.typeRegistrationEntries else { continue }
+            let hookName = ABINameGenerator.typeRegistrationFunctionName(moduleName: skeleton.moduleName)
+            guard hasGenerics else {
+                printer.write("bjs[\"\(hookName)\"] = function() {};")
+                continue
+            }
+            printer.write("bjs[\"\(hookName)\"] = function(base, count) {")
+            try printer.indent {
+                let codecNames = try moduleEntries.map {
+                    try genericCodecReference(type: $0.bridgeType, into: printer)
+                }
+                printer.write("const codecs = [")
+                printer.indent {
+                    for name in codecNames {
+                        printer.write("\(name),")
+                    }
+                }
+                printer.write("];")
+                writeTypeHandleRegistrationBody(into: printer)
+            }
+            printer.write("}")
+        }
+    }
+
     private func generateAddImports(needsImportsObject: Bool) throws -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
-        let allStructs = skeletons.compactMap { $0.exported?.structs }.flatMap { $0 }
+        let allStructs = skeletons.flatMap { unified in
+            (unified.exported?.structs ?? []).map { (moduleName: unified.moduleName, structDef: $0) }
+        }
         printer.write("return {")
         try printer.indent {
             printer.write(lines: [
@@ -525,11 +625,12 @@ public struct BridgeJSLink {
                 }
                 printer.write("}")
                 if !allStructs.isEmpty {
-                    for structDef in allStructs {
+                    for (moduleName, structDef) in allStructs {
+                        let key = HelperNaming.type(module: moduleName, swiftName: structDef.swiftCallName)
                         printer.write("bjs[\"swift_js_struct_lower_\(structDef.abiName)\"] = function(objectId) {")
                         printer.indent {
                             printer.write(
-                                "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
+                                "\(JSGlueVariableScope.reservedStructHelpers).\(key).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
                             )
                         }
                         printer.write("}")
@@ -537,13 +638,14 @@ public struct BridgeJSLink {
                         printer.write("bjs[\"swift_js_struct_lift_\(structDef.abiName)\"] = function() {")
                         printer.indent {
                             printer.write(
-                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName).lift();"
+                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(key).lift();"
                             )
                             printer.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(value);")
                         }
                         printer.write("}")
                     }
                 }
+                try generateTypeRegistrationHooks(into: printer)
 
                 // Always provided: the runtime's `_bjs_makePromise` imports it unconditionally.
                 // The settlers are stored under a Symbol to avoid clashing with promise fields.
@@ -1025,7 +1127,7 @@ public struct BridgeJSLink {
                 self.renderExportedStructExportEntry(structDef)
             },
             renderFunctionEntry: { function in
-                self.renderJSDoc(documentation: function.documentation, parameters: function.parameters)
+                return self.renderJSDoc(documentation: function.documentation, parameters: function.parameters)
                     + [
                         "\(function.resolvedJSName)\(self.renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
                     ]
@@ -1109,12 +1211,18 @@ public struct BridgeJSLink {
 
             let bodyPrinter = CodeFragmentPrinter()
             let allStructs = exportedSkeletons.flatMap { $0.structs }
-            for structDef in allStructs {
+            for (moduleName, structDef) in skeletons.flatMap({ unified in
+                (unified.exported?.structs ?? []).map { (unified.moduleName, $0) }
+            }) {
                 let structPrinter = CodeFragmentPrinter()
                 let structScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-                let fragment = IntrinsicJSFragment.structHelper(structDefinition: structDef, allStructs: allStructs)
+                let fragment = IntrinsicJSFragment.structHelper(
+                    structDefinition: structDef,
+                    allStructs: allStructs,
+                    moduleName: moduleName
+                )
                 _ = try fragment.printCode(
-                    [structDef.abiName],
+                    [],
                     IntrinsicJSFragment.PrintCodeContext(
                         scope: structScope,
                         printer: structPrinter,
@@ -1125,13 +1233,16 @@ public struct BridgeJSLink {
                 bodyPrinter.write(lines: structPrinter.lines)
             }
 
-            let allAssocEnums = exportedSkeletons.flatMap {
-                $0.enums.filter { $0.enumType == .associatedValue }
-            }
-            for enumDef in allAssocEnums {
+            for (moduleName, enumDef) in skeletons.flatMap({ unified in
+                (unified.exported?.enums ?? []).filter { $0.enumType == .associatedValue }
+                    .map { (unified.moduleName, $0) }
+            }) {
                 let enumPrinter = CodeFragmentPrinter()
                 let enumScope = JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
-                let fragment = IntrinsicJSFragment.associatedValueEnumHelperFactory(enumDefinition: enumDef)
+                let fragment = IntrinsicJSFragment.associatedValueEnumHelperFactory(
+                    enumDefinition: enumDef,
+                    moduleName: moduleName
+                )
                 _ = try fragment.printCode(
                     [enumDef.valuesName],
                     IntrinsicJSFragment.PrintCodeContext(
@@ -1148,6 +1259,11 @@ public struct BridgeJSLink {
 
             if !intrinsicRegistry.isEmpty {
                 printer.write(lines: intrinsicRegistry.emitLines())
+                printer.nextLine()
+            }
+
+            if intrinsicRegistry.hasNamedCodecs {
+                printer.write(lines: intrinsicRegistry.emitNamedCodecLines())
                 printer.nextLine()
             }
 
@@ -1241,21 +1357,55 @@ public struct BridgeJSLink {
                 }
             }
         }
+        intrinsicRegistry.typeOwnerModules = collectTypeOwnerModules()
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data)
         let outputDts = generateTypeScript(data: data)
         return (outputJs, outputDts)
     }
 
+    private func collectTypeOwnerModules() -> [String: String] {
+        var result: [String: String] = [:]
+        func record(_ name: String, _ moduleName: String) {
+            if result[name] == nil {
+                result[name] = moduleName
+            }
+        }
+        for unified in skeletons {
+            let moduleName = unified.moduleName
+            if let skeleton = unified.exported {
+                for structDef in skeleton.structs {
+                    record(structDef.name, moduleName)
+                    record(structDef.abiName, moduleName)
+                    record(structDef.swiftCallName, moduleName)
+                }
+                for klass in skeleton.classes {
+                    record(klass.name, moduleName)
+                    record(klass.abiName, moduleName)
+                }
+                for enumDef in skeleton.enums {
+                    record(enumDef.name, moduleName)
+                    record(enumDef.abiName, moduleName)
+                    record(enumDef.swiftCallName, moduleName)
+                }
+                for protocolDef in skeleton.protocols {
+                    record(protocolDef.name, moduleName)
+                }
+            }
+        }
+        return result
+    }
+
     private func enumHelperAssignments() -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
 
-        for skeleton in skeletons.compactMap(\.exported) {
+        for unified in skeletons {
+            guard let skeleton = unified.exported else { continue }
             for enumDef in skeleton.enums where enumDef.enumType == .associatedValue {
-                printer.write(
-                    "const \(enumDef.name)Helpers = __bjs_create\(enumDef.valuesName)Helpers();"
-                )
-                printer.write("\(JSGlueVariableScope.reservedEnumHelpers).\(enumDef.name) = \(enumDef.name)Helpers;")
+                let key = HelperNaming.type(module: unified.moduleName, swiftName: enumDef.swiftCallName)
+                let local = HelperNaming.helperConstant(key)
+                printer.write("const \(local) = \(HelperNaming.enumHelperFactory(key))();")
+                printer.write("\(JSGlueVariableScope.reservedEnumHelpers).\(key) = \(local);")
                 printer.nextLine()
             }
         }
@@ -1266,14 +1416,13 @@ public struct BridgeJSLink {
     private func structHelperAssignments() -> CodeFragmentPrinter {
         let printer = CodeFragmentPrinter()
 
-        for skeleton in skeletons.compactMap(\.exported) {
+        for unified in skeletons {
+            guard let skeleton = unified.exported else { continue }
             for structDef in skeleton.structs {
-                printer.write(
-                    "const \(structDef.abiName)Helpers = __bjs_create\(structDef.abiName)Helpers();"
-                )
-                printer.write(
-                    "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName) = \(structDef.abiName)Helpers;"
-                )
+                let key = HelperNaming.type(module: unified.moduleName, swiftName: structDef.swiftCallName)
+                let local = HelperNaming.helperConstant(key)
+                printer.write("const \(local) = \(HelperNaming.structHelperFactory(key))();")
+                printer.write("\(JSGlueVariableScope.reservedStructHelpers).\(key) = \(local);")
                 printer.nextLine()
             }
         }
@@ -1373,8 +1522,9 @@ public struct BridgeJSLink {
                     // Add methods
                     for method in type.methods {
                         let methodName = method.resolvedJSName
+                        let genericClause = renderGenericClause(method.genericParameterNames)
                         let methodSignature =
-                            "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                            "\(renderTSPropertyName(methodName))\(genericClause)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                         printer.write(methodSignature)
                     }
 
@@ -1587,6 +1737,10 @@ public struct BridgeJSLink {
             return "\(param.name)\(optional): \(resolveTypeScriptType(param.type))"
         }
         return "(\(parameterSignatures.joined(separator: ", "))): \(returnTypeWithEffect)"
+    }
+
+    private func renderGenericClause(_ genericParameterNames: [String]) -> String {
+        genericParameterNames.isEmpty ? "" : "<\(genericParameterNames.joined(separator: ", "))>"
     }
 
     private func renderTSPropertyName(_ name: String) -> String {
@@ -2385,6 +2539,8 @@ extension BridgeJSLink {
         var parameterNames: [String] = []
         var parameterForwardings: [String] = []
         var returnExpr: String?
+        var genericCodecVariables: [String: String] = [:]
+        var genericTypeIdParameters: [String: String] = [:]
         let printContext: IntrinsicJSFragment.PrintCodeContext
 
         init(
@@ -2410,7 +2566,34 @@ extension BridgeJSLink {
             parameterNames.append("self")
         }
 
+        func declareGenericCodecs(genericParameters: [String]) {
+            if !genericParameters.isEmpty {
+                ContainerCodecJS.registerCombinators(scope: scope)
+            }
+            for genericParam in genericParameters {
+                let typeIdParam = scope.variable("\(genericParam.lowercased())TypeId")
+                let codecVar = scope.variable("codec\(genericParam)")
+                body.write("const \(codecVar) = __bjs_codecForTypeId(\(typeIdParam));")
+                genericCodecVariables[genericParam] = codecVar
+                genericTypeIdParameters[genericParam] = typeIdParam
+            }
+        }
+
         func liftParameter(param: Parameter) throws {
+            if let name = param.type.referencedGenericName {
+                guard let codecVar = genericCodecVariables[name] else {
+                    throw BridgeJSLinkError(
+                        message: "Generic codec for '\(name)' was not declared before lifting parameter '\(param.name)'"
+                    )
+                }
+                let valueVar = scope.variable(param.name)
+                let liftExpr =
+                    GenericJSCodegen.genericCodecLiftExpression(type: param.type, codec: codecVar)
+                    ?? "\(codecVar).lift()"
+                body.write("const \(valueVar) = \(liftExpr);")
+                parameterForwardings.append(valueVar)
+                return
+            }
             let liftingFragment = try IntrinsicJSFragment.liftParameter(type: param.type, context: context)
             let valuesToLift: [String]
             if liftingFragment.parameters.count == 0 {
@@ -2425,6 +2608,16 @@ extension BridgeJSLink {
             let liftedValues = try liftingFragment.printCode(valuesToLift, printContext)
             assert(liftedValues.count == 1, "Lifting fragment should produce exactly one value")
             parameterForwardings.append(contentsOf: liftedValues)
+        }
+
+        func liftParametersAndGenericTypeIds(_ parameters: [Parameter], genericParameters: [String]) throws {
+            declareGenericCodecs(genericParameters: genericParameters)
+            for param in parameters {
+                try liftParameter(param: param)
+            }
+            for genericParam in genericParameters {
+                parameterNames.append(genericTypeIdParameters[genericParam] ?? genericParam)
+            }
         }
 
         func renderFunction(name: String?) -> [String] {
@@ -2501,6 +2694,25 @@ extension BridgeJSLink {
         private func call(callExpr: String) throws {
             if effects.isAsync {
                 body.write("\(callExpr).then(resolve, reject);")
+                return
+            }
+            if let name = returnType.referencedGenericName {
+                guard let codecVar = genericCodecVariables[name] else {
+                    throw BridgeJSLinkError(
+                        message: "Generic codec for return type '\(name)' was not declared before the call"
+                    )
+                }
+                let resultVariable = scope.variable("ret")
+                body.write("let \(resultVariable) = \(callExpr);")
+                let lowerStmt =
+                    GenericJSCodegen.genericCodecLowerStatement(
+                        type: returnType,
+                        codec: codecVar,
+                        value: resultVariable
+                    )
+                    ?? "\(codecVar).lower(\(resultVariable));"
+                body.write(lowerStmt)
+                self.returnExpr = nil
                 return
             }
             let loweringFragment = try IntrinsicJSFragment.lowerReturn(type: returnType, context: context)
@@ -3488,9 +3700,11 @@ extension BridgeJSLink {
             returnType: function.returnType,
             intrinsicRegistry: intrinsicRegistry
         )
-        for param in function.parameters {
-            try thunkBuilder.liftParameter(param: param)
-        }
+        let genericParameters = function.genericParameterNames
+        try thunkBuilder.liftParametersAndGenericTypeIds(
+            function.parameters,
+            genericParameters: genericParameters
+        )
         let jsName = function.resolvedJSName
         let calleeExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
@@ -3501,9 +3715,10 @@ extension BridgeJSLink {
         try thunkBuilder.call(calleeExpr: calleeExpr)
         let funcLines = thunkBuilder.renderFunction(name: function.abiName(context: nil))
         if function.from == nil {
+            let genericClause = renderGenericClause(genericParameters)
             importObjectBuilder.appendDts(
                 [
-                    "\(renderTSPropertyName(jsName))\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+                    "\(renderTSPropertyName(jsName))\(genericClause)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
                 ]
             )
         }
@@ -3592,14 +3807,16 @@ extension BridgeJSLink {
             dtsPrinter.indent {
                 if let constructor = type.constructor {
                     let returnType = BridgeType.jsObject(type.name)
+                    let genericClause = renderGenericClause(constructor.genericParameterNames)
                     dtsPrinter.write(
-                        "new\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
+                        "new\(genericClause)\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
                     )
                 }
                 for method in type.staticMethods {
                     let methodName = method.resolvedJSName
+                    let genericClause = renderGenericClause(method.genericParameterNames)
                     let signature =
-                        "\(renderTSPropertyName(methodName))\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                        "\(renderTSPropertyName(methodName))\(genericClause)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                     dtsPrinter.write(signature)
                 }
             }
@@ -3623,9 +3840,10 @@ extension BridgeJSLink {
             returnType: BridgeType.jsObject(type.name),
             intrinsicRegistry: intrinsicRegistry
         )
-        for param in constructor.parameters {
-            try thunkBuilder.liftParameter(param: param)
-        }
+        try thunkBuilder.liftParametersAndGenericTypeIds(
+            constructor.parameters,
+            genericParameters: constructor.genericParameterNames
+        )
         let ctorExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
             from: type.from,
@@ -3682,9 +3900,10 @@ extension BridgeJSLink {
             returnType: method.returnType,
             intrinsicRegistry: intrinsicRegistry
         )
-        for param in method.parameters {
-            try thunkBuilder.liftParameter(param: param)
-        }
+        try thunkBuilder.liftParametersAndGenericTypeIds(
+            method.parameters,
+            genericParameters: method.genericParameterNames
+        )
         let constructorExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: swiftModuleName,
             from: context.from,
@@ -3706,9 +3925,11 @@ extension BridgeJSLink {
             intrinsicRegistry: intrinsicRegistry
         )
         thunkBuilder.liftSelf()
-        for param in method.parameters {
-            try thunkBuilder.liftParameter(param: param)
-        }
+        let genericParameters = method.genericParameterNames
+        try thunkBuilder.liftParametersAndGenericTypeIds(
+            method.parameters,
+            genericParameters: genericParameters
+        )
 
         try thunkBuilder.callMethod(name: method.resolvedJSName)
         let funcLines = thunkBuilder.renderFunction(name: method.abiName(context: context))
@@ -4052,6 +4273,8 @@ extension BridgeType {
             return "Record<string, \(valueType.tsType)>"
         case .alias(_, let underlying):
             return underlying.tsType
+        case .generic(let name):
+            return name
         }
     }
 

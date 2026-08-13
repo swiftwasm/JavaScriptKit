@@ -98,7 +98,8 @@ import ArgumentParser
                     skeleton: $0
                 ).finalize()
             }
-            let combinedSwift = [exported, imported].compactMap { $0 }
+            let typeRegistration = GenericTypeRegistrationCodegen().render(for: skeleton)
+            let combinedSwift = [exported, imported, typeRegistration].compactMap { $0 }
             print(combinedSwift.joined(separator: "\n\n"))
         }
     }

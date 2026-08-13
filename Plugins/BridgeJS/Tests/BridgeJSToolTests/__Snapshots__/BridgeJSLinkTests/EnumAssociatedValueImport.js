@@ -38,7 +38,7 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createPayloadSignalValuesHelpers = () => ({
+    const __bjs_createEnumHelpers_M10TestModuleT13PayloadSignal = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -150,6 +150,8 @@ export async function createInstantiator(options, swift) {
                 const copy = memory.buffer.slice(ptr, ptr + byteLen);
                 taStack.push(Array.from(new Ctor(copy)));
             }
+            bjs["bjs_core_register_type_handles"] = function() {};
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -250,9 +252,9 @@ export async function createInstantiator(options, swift) {
             const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
             TestModule["bjs_PayloadSignalControls_roundTrip_static"] = function bjs_PayloadSignalControls_roundTrip_static(signal) {
                 try {
-                    const enumValue = enumHelpers.PayloadSignal.lift(signal);
+                    const enumValue = enumHelpers.M10TestModuleT13PayloadSignal.lift(signal);
                     let ret = imports.PayloadSignalControls.roundTrip(enumValue);
-                    const caseId = enumHelpers.PayloadSignal.lower(ret);
+                    const caseId = enumHelpers.M10TestModuleT13PayloadSignal.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -260,7 +262,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_PayloadSignalControls_send"] = function bjs_PayloadSignalControls_send(self, signal) {
                 try {
-                    const enumValue = enumHelpers.PayloadSignal.lift(signal);
+                    const enumValue = enumHelpers.M10TestModuleT13PayloadSignal.lift(signal);
                     swift.memory.getObject(self).send(enumValue);
                 } catch (error) {
                     setException(error);
@@ -269,7 +271,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_PayloadSignalControls_current"] = function bjs_PayloadSignalControls_current(self) {
                 try {
                     let ret = swift.memory.getObject(self).current();
-                    const caseId = enumHelpers.PayloadSignal.lower(ret);
+                    const caseId = enumHelpers.M10TestModuleT13PayloadSignal.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -279,7 +281,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     let optResult;
                     if (signalIsSome) {
-                        const enumValue = enumHelpers.PayloadSignal.lift(signalCaseId);
+                        const enumValue = enumHelpers.M10TestModuleT13PayloadSignal.lift(signalCaseId);
                         optResult = enumValue;
                     } else {
                         optResult = null;
@@ -287,7 +289,7 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).roundTripOptional(optResult);
                     const isSome = ret != null;
                     if (isSome) {
-                        const caseId = enumHelpers.PayloadSignal.lower(ret);
+                        const caseId = enumHelpers.M10TestModuleT13PayloadSignal.lower(ret);
                         return caseId;
                     } else {
                         return -1;
@@ -310,8 +312,8 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const PayloadSignalHelpers = __bjs_createPayloadSignalValuesHelpers();
-            enumHelpers.PayloadSignal = PayloadSignalHelpers;
+            const __bjs_helpers_M10TestModuleT13PayloadSignal = __bjs_createEnumHelpers_M10TestModuleT13PayloadSignal();
+            enumHelpers.M10TestModuleT13PayloadSignal = __bjs_helpers_M10TestModuleT13PayloadSignal;
 
             const exports = {
                 PayloadSignal: PayloadSignalValues,

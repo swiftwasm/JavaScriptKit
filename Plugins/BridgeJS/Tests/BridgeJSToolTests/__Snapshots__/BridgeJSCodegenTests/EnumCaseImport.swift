@@ -33,6 +33,10 @@ extension Signal: _BridgedSwiftCaseEnum {
     }
 }
 
+extension Signal: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Signal.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_SignalControls_roundTrip_static")
 fileprivate func bjs_SignalControls_roundTrip_static_extern(_ signal: Int32) -> Int32
@@ -95,3 +99,18 @@ func _$SignalControls_current(_ self: JSObject) throws(JSException) -> Signal {
     }
     return Signal.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        Signal.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

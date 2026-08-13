@@ -5991,6 +5991,75 @@ extension ImportedPayloadSignal: _BridgedSwiftAssociatedValueEnum {
     }
 }
 
+extension GenericRTColor: _BridgedSwiftCaseEnum {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> GenericRTColor {
+        return bridgeJSLiftParameter(value)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> GenericRTColor {
+        return GenericRTColor(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSLowerParameter()
+    }
+
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .red
+        case 1:
+            self = .green
+        case 2:
+            self = .blue
+        default:
+            return nil
+        }
+    }
+
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
+        switch self {
+        case .red:
+            return 0
+        case .green:
+            return 1
+        case .blue:
+            return 2
+        }
+    }
+}
+
+extension GenericRTMode: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+}
+
+extension GenericRTLevel: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+}
+
+extension GenericRTOutcome: _BridgedSwiftAssociatedValueEnum {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> GenericRTOutcome {
+        switch caseId {
+        case 0:
+            return .ok(code: Int.bridgeJSStackPop())
+        case 1:
+            return .fail(message: String.bridgeJSStackPop())
+        default:
+            fatalError("Unknown GenericRTOutcome case ID: \(caseId)")
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
+        switch self {
+        case .ok(let code):
+            code.bridgeJSStackPush()
+            return Int32(0)
+        case .fail(let message):
+            message.bridgeJSStackPush()
+            return Int32(1)
+        }
+    }
+}
+
 @_expose(wasm, "bjs_IntegerTypesSupportExports_static_roundTripInt")
 @_cdecl("bjs_IntegerTypesSupportExports_static_roundTripInt")
 public func _bjs_IntegerTypesSupportExports_static_roundTripInt(_ v: Int32) -> Int32 {
@@ -6777,6 +6846,102 @@ public func _bjs_NestedTypeHost_Label_static_untitled() -> Void {
     #else
     fatalError("Only available on WebAssembly")
     #endif
+}
+
+extension GenericRTPoint: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> GenericRTPoint {
+        let y = Int.bridgeJSStackPop()
+        let x = Int.bridgeJSStackPop()
+        return GenericRTPoint(x: x, y: y)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.x.bridgeJSStackPush()
+        self.y.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_GenericRTPoint(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_GenericRTPoint()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_GenericRTPoint")
+fileprivate func _bjs_struct_lower_GenericRTPoint_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_GenericRTPoint_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_GenericRTPoint(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_GenericRTPoint_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_GenericRTPoint")
+fileprivate func _bjs_struct_lift_GenericRTPoint_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_GenericRTPoint_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_GenericRTPoint() -> Int32 {
+    return _bjs_struct_lift_GenericRTPoint_extern()
+}
+
+extension GenericRTNamespace.Metadata: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> GenericRTNamespace.Metadata {
+        let count = Int.bridgeJSStackPop()
+        let label = String.bridgeJSStackPop()
+        return GenericRTNamespace.Metadata(label: label, count: count)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.label.bridgeJSStackPush()
+        self.count.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_GenericRTNamespace_Metadata(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_GenericRTNamespace_Metadata()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_GenericRTNamespace_Metadata")
+fileprivate func _bjs_struct_lower_GenericRTNamespace_Metadata_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_GenericRTNamespace_Metadata_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_GenericRTNamespace_Metadata(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_GenericRTNamespace_Metadata_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_GenericRTNamespace_Metadata")
+fileprivate func _bjs_struct_lift_GenericRTNamespace_Metadata_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_GenericRTNamespace_Metadata_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_GenericRTNamespace_Metadata() -> Int32 {
+    return _bjs_struct_lift_GenericRTNamespace_Metadata_extern()
 }
 
 extension Point: _BridgedSwiftStruct {
@@ -13206,6 +13371,80 @@ fileprivate func _bjs_NestedTypeHost_wrap_extern(_ pointer: UnsafeMutableRawPoin
     return _bjs_NestedTypeHost_wrap_extern(pointer)
 }
 
+@_expose(wasm, "bjs_ImportGenericBox_init")
+@_cdecl("bjs_ImportGenericBox_init")
+public func _bjs_ImportGenericBox_init(_ value: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = ImportGenericBox(value: Int.bridgeJSLiftParameter(value))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ImportGenericBox_get")
+@_cdecl("bjs_ImportGenericBox_get")
+public func _bjs_ImportGenericBox_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = ImportGenericBox.bridgeJSLiftParameter(_self).get()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ImportGenericBox_value_get")
+@_cdecl("bjs_ImportGenericBox_value_get")
+public func _bjs_ImportGenericBox_value_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let ret = ImportGenericBox.bridgeJSLiftParameter(_self).value
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ImportGenericBox_value_set")
+@_cdecl("bjs_ImportGenericBox_value_set")
+public func _bjs_ImportGenericBox_value_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    ImportGenericBox.bridgeJSLiftParameter(_self).value = Int.bridgeJSLiftParameter(value)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_ImportGenericBox_deinit")
+@_cdecl("bjs_ImportGenericBox_deinit")
+public func _bjs_ImportGenericBox_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<ImportGenericBox>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension ImportGenericBox: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_ImportGenericBox_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_ImportGenericBox_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportGenericBox_wrap")
+fileprivate func _bjs_ImportGenericBox_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_ImportGenericBox_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_ImportGenericBox_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_ImportGenericBox_wrap_extern(pointer)
+}
+
 @_expose(wasm, "bjs_JSNameRenamedClass_init")
 @_cdecl("bjs_JSNameRenamedClass_init")
 public func _bjs_JSNameRenamedClass_init(_ value: Int32) -> UnsafeMutableRawPointer {
@@ -13606,6 +13845,274 @@ fileprivate func _bjs_LeakCheck_wrap_extern(_ pointer: UnsafeMutableRawPointer) 
 #endif
 @inline(never) fileprivate func _bjs_LeakCheck_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_LeakCheck_wrap_extern(pointer)
+}
+
+extension JSCoordinate: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = JSCoordinate.bridgeJSMakeTypeHandle()
+}
+
+extension NestedStructGroupA.Metadata: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedStructGroupA.Metadata.bridgeJSMakeTypeHandle()
+}
+
+extension NestedStructGroupB.Metadata: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedStructGroupB.Metadata.bridgeJSMakeTypeHandle()
+}
+
+extension NestedTypeHost.Label: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedTypeHost.Label.bridgeJSMakeTypeHandle()
+}
+
+extension GenericRTPoint: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = GenericRTPoint.bridgeJSMakeTypeHandle()
+}
+
+extension GenericRTNamespace.Metadata: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = GenericRTNamespace.Metadata.bridgeJSMakeTypeHandle()
+}
+
+extension Point: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Point.bridgeJSMakeTypeHandle()
+}
+
+extension PointerFields: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PointerFields.bridgeJSMakeTypeHandle()
+}
+
+extension DataPoint: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = DataPoint.bridgeJSMakeTypeHandle()
+}
+
+extension PublicPoint: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PublicPoint.bridgeJSMakeTypeHandle()
+}
+
+extension Address: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Address.bridgeJSMakeTypeHandle()
+}
+
+extension Contact: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Contact.bridgeJSMakeTypeHandle()
+}
+
+extension Config: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Config.bridgeJSMakeTypeHandle()
+}
+
+extension SessionData: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = SessionData.bridgeJSMakeTypeHandle()
+}
+
+extension ValidationReport: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ValidationReport.bridgeJSMakeTypeHandle()
+}
+
+extension AdvancedConfig: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AdvancedConfig.bridgeJSMakeTypeHandle()
+}
+
+extension MeasurementConfig: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = MeasurementConfig.bridgeJSMakeTypeHandle()
+}
+
+extension MathOperations: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = MathOperations.bridgeJSMakeTypeHandle()
+}
+
+extension CopyableCart: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = CopyableCart.bridgeJSMakeTypeHandle()
+}
+
+extension CopyableCartItem: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = CopyableCartItem.bridgeJSMakeTypeHandle()
+}
+
+extension CopyableNestedCart: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = CopyableNestedCart.bridgeJSMakeTypeHandle()
+}
+
+extension ConfigStruct: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ConfigStruct.bridgeJSMakeTypeHandle()
+}
+
+extension Vector2D: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Vector2D.bridgeJSMakeTypeHandle()
+}
+
+extension JSObjectContainer: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = JSObjectContainer.bridgeJSMakeTypeHandle()
+}
+
+extension FooContainer: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FooContainer.bridgeJSMakeTypeHandle()
+}
+
+extension ArrayMembers: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ArrayMembers.bridgeJSMakeTypeHandle()
+}
+
+extension PolygonReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PolygonReference.bridgeJSMakeTypeHandle()
+}
+
+extension TagReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TagReference.bridgeJSMakeTypeHandle()
+}
+
+extension TagHolderReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TagHolderReference.bridgeJSMakeTypeHandle()
+}
+
+extension PriorityReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PriorityReference.bridgeJSMakeTypeHandle()
+}
+
+extension ImportGenericBox: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ImportGenericBox.bridgeJSMakeTypeHandle()
+}
+
+extension Severity: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Severity.bridgeJSMakeTypeHandle()
+}
+
+extension Shape: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Shape.bridgeJSMakeTypeHandle()
+}
+
+extension InnerTag: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = InnerTag.bridgeJSMakeTypeHandle()
+}
+
+extension AsyncImportedPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncImportedPayloadResult.bridgeJSMakeTypeHandle()
+}
+
+extension Direction: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Direction.bridgeJSMakeTypeHandle()
+}
+
+extension Status: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Status.bridgeJSMakeTypeHandle()
+}
+
+extension Theme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Theme.bridgeJSMakeTypeHandle()
+}
+
+extension HttpStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = HttpStatus.bridgeJSMakeTypeHandle()
+}
+
+extension FileSize: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = FileSize.bridgeJSMakeTypeHandle()
+}
+
+extension SessionId: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = SessionId.bridgeJSMakeTypeHandle()
+}
+
+extension Precision: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Precision.bridgeJSMakeTypeHandle()
+}
+
+extension Ratio: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Ratio.bridgeJSMakeTypeHandle()
+}
+
+extension TSDirection: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSDirection.bridgeJSMakeTypeHandle()
+}
+
+extension TSTheme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TSTheme.bridgeJSMakeTypeHandle()
+}
+
+extension AsyncPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncPayloadResult.bridgeJSMakeTypeHandle()
+}
+
+extension Networking.API.Method: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Networking.API.Method.bridgeJSMakeTypeHandle()
+}
+
+extension Configuration.LogLevel: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Configuration.LogLevel.bridgeJSMakeTypeHandle()
+}
+
+extension Configuration.Port: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Configuration.Port.bridgeJSMakeTypeHandle()
+}
+
+extension Internal.SupportedMethod: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Internal.SupportedMethod.bridgeJSMakeTypeHandle()
+}
+
+extension APIResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIResult.bridgeJSMakeTypeHandle()
+}
+
+extension ComplexResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ComplexResult.bridgeJSMakeTypeHandle()
+}
+
+extension Utilities.Result: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Utilities.Result.bridgeJSMakeTypeHandle()
+}
+
+extension API.NetworkingResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = API.NetworkingResult.bridgeJSMakeTypeHandle()
+}
+
+extension AllTypesResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AllTypesResult.bridgeJSMakeTypeHandle()
+}
+
+extension TypedPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TypedPayloadResult.bridgeJSMakeTypeHandle()
+}
+
+extension StaticCalculator: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = StaticCalculator.bridgeJSMakeTypeHandle()
+}
+
+extension StaticPropertyEnum: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = StaticPropertyEnum.bridgeJSMakeTypeHandle()
+}
+
+extension NestedTypeHost.Variant: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedTypeHost.Variant.bridgeJSMakeTypeHandle()
+}
+
+extension LightColor: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = LightColor.bridgeJSMakeTypeHandle()
+}
+
+extension ImportedPayloadSignal: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ImportedPayloadSignal.bridgeJSMakeTypeHandle()
+}
+
+extension GenericRTColor: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = GenericRTColor.bridgeJSMakeTypeHandle()
+}
+
+extension GenericRTMode: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = GenericRTMode.bridgeJSMakeTypeHandle()
+}
+
+extension GenericRTLevel: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = GenericRTLevel.bridgeJSMakeTypeHandle()
+}
+
+extension GenericRTOutcome: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = GenericRTOutcome.bridgeJSMakeTypeHandle()
+}
+
+extension OptionalAllTypesResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = OptionalAllTypesResult.bridgeJSMakeTypeHandle()
+}
+
+extension APIOptionalResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIOptionalResult.bridgeJSMakeTypeHandle()
 }
 
 @JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
@@ -16818,6 +17325,346 @@ func _$jsJoinStringThenStackParams(_ s: String, _ a: Optional<[Int]>, _ b: [Int]
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericRoundTrip")
+fileprivate func bjs_jsGenericRoundTrip_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsGenericRoundTrip_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericRoundTrip(_ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericRoundTrip_extern(_generic0TypeId)
+}
+
+func _$jsGenericRoundTrip<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    bjs_jsGenericRoundTrip(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericRoundTripClass")
+fileprivate func bjs_jsGenericRoundTripClass_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsGenericRoundTripClass_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericRoundTripClass(_ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericRoundTripClass_extern(_generic0TypeId)
+}
+
+func _$jsGenericRoundTripClass<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    bjs_jsGenericRoundTripClass(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericParsePoint")
+fileprivate func bjs_jsGenericParsePoint_extern(_ jsonBytes: Int32, _ jsonLength: Int32, _ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsGenericParsePoint_extern(_ jsonBytes: Int32, _ jsonLength: Int32, _ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericParsePoint(_ jsonBytes: Int32, _ jsonLength: Int32, _ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericParsePoint_extern(jsonBytes, jsonLength, _generic0TypeId)
+}
+
+func _$jsGenericParsePoint<T: BridgedSwiftGenericBridgeable>(_ json: String) throws(JSException) -> T {
+    json.bridgeJSWithLoweredParameter { (jsonBytes, jsonLength) in
+        bjs_jsGenericParsePoint(jsonBytes, jsonLength, T.bridgeJSTypeID)
+    }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsImportPickFirst")
+fileprivate func bjs_jsImportPickFirst_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsImportPickFirst_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsImportPickFirst(_ _generic0TypeId: Int32) -> Void {
+    return bjs_jsImportPickFirst_extern(_generic0TypeId)
+}
+
+func _$jsImportPickFirst<T: BridgedSwiftGenericBridgeable>(_ a: T, _ b: T) throws(JSException) -> T {
+    b.bridgeJSStackPush()
+    a.bridgeJSStackPush()
+    bjs_jsImportPickFirst(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsImportMakeInt")
+fileprivate func bjs_jsImportMakeInt_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsImportMakeInt_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsImportMakeInt(_ _generic0TypeId: Int32) -> Void {
+    return bjs_jsImportMakeInt_extern(_generic0TypeId)
+}
+
+func _$jsImportMakeInt<T: BridgedSwiftGenericBridgeable>() throws(JSException) -> T {
+    bjs_jsImportMakeInt(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsImportCombineSecond")
+fileprivate func bjs_jsImportCombineSecond_extern(_ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsImportCombineSecond_extern(_ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsImportCombineSecond(_ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Void {
+    return bjs_jsImportCombineSecond_extern(_generic0TypeId, _generic1TypeId)
+}
+
+func _$jsImportCombineSecond<T: BridgedSwiftGenericBridgeable, U: BridgedSwiftGenericBridgeable>(_ a: T, _ b: U) throws(JSException) -> U {
+    b.bridgeJSStackPush()
+    a.bridgeJSStackPush()
+    bjs_jsImportCombineSecond(T.bridgeJSTypeID, U.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return U.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericArrayRoundTrip")
+fileprivate func bjs_jsGenericArrayRoundTrip_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsGenericArrayRoundTrip_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericArrayRoundTrip(_ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericArrayRoundTrip_extern(_generic0TypeId)
+}
+
+func _$jsGenericArrayRoundTrip<T: BridgedSwiftGenericBridgeable>(_ values: [T]) throws(JSException) -> [T] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_jsGenericArrayRoundTrip(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [T].bridgeJSLiftReturn()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericOptionalRoundTrip")
+fileprivate func bjs_jsGenericOptionalRoundTrip_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsGenericOptionalRoundTrip_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericOptionalRoundTrip(_ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericOptionalRoundTrip_extern(_generic0TypeId)
+}
+
+func _$jsGenericOptionalRoundTrip<T: BridgedSwiftGenericBridgeable>(_ value: Optional<T>) throws(JSException) -> Optional<T> {
+    value.bridgeJSStackPush()
+    bjs_jsGenericOptionalRoundTrip(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<T>.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericDictRoundTrip")
+fileprivate func bjs_jsGenericDictRoundTrip_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsGenericDictRoundTrip_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericDictRoundTrip(_ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericDictRoundTrip_extern(_generic0TypeId)
+}
+
+func _$jsGenericDictRoundTrip<T: BridgedSwiftGenericBridgeable>(_ values: [String: T]) throws(JSException) -> [String: T] {
+    let _ = values.bridgeJSLowerParameter()
+    bjs_jsGenericDictRoundTrip(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [String: T].bridgeJSLiftReturn()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericAfterOptionalArray")
+fileprivate func bjs_jsGenericAfterOptionalArray_extern(_ values: Int32, _ _generic0TypeId: Int32) -> Int32
+#else
+fileprivate func bjs_jsGenericAfterOptionalArray_extern(_ values: Int32, _ _generic0TypeId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericAfterOptionalArray(_ values: Int32, _ _generic0TypeId: Int32) -> Int32 {
+    return bjs_jsGenericAfterOptionalArray_extern(values, _generic0TypeId)
+}
+
+func _$jsGenericAfterOptionalArray<T: BridgedSwiftGenericBridgeable>(_ values: Optional<[Int]>, _ value: T) throws(JSException) -> String {
+    value.bridgeJSStackPush()
+    let valuesIsSome = values.bridgeJSLowerParameter()
+    let ret = bjs_jsGenericAfterOptionalArray(valuesIsSome, T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericThrowOrRoundTrip")
+fileprivate func bjs_jsGenericThrowOrRoundTrip_extern(_ shouldThrow: Int32, _ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsGenericThrowOrRoundTrip_extern(_ shouldThrow: Int32, _ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericThrowOrRoundTrip(_ shouldThrow: Int32, _ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericThrowOrRoundTrip_extern(shouldThrow, _generic0TypeId)
+}
+
+func _$jsGenericThrowOrRoundTrip<T: BridgedSwiftGenericBridgeable>(_ shouldThrow: Bool, _ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    let shouldThrowValue = shouldThrow.bridgeJSLowerParameter()
+    bjs_jsGenericThrowOrRoundTrip(shouldThrowValue, T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportGenericConsumer_init")
+fileprivate func bjs_ImportGenericConsumer_init_extern() -> Int32
+#else
+fileprivate func bjs_ImportGenericConsumer_init_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportGenericConsumer_init() -> Int32 {
+    return bjs_ImportGenericConsumer_init_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportGenericConsumer_box_static")
+fileprivate func bjs_ImportGenericConsumer_box_static_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_ImportGenericConsumer_box_static_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportGenericConsumer_box_static(_ _generic0TypeId: Int32) -> Void {
+    return bjs_ImportGenericConsumer_box_static_extern(_generic0TypeId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportGenericConsumer_identity")
+fileprivate func bjs_ImportGenericConsumer_identity_extern(_ self: Int32, _ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_ImportGenericConsumer_identity_extern(_ self: Int32, _ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportGenericConsumer_identity(_ self: Int32, _ _generic0TypeId: Int32) -> Void {
+    return bjs_ImportGenericConsumer_identity_extern(self, _generic0TypeId)
+}
+
+func _$ImportGenericConsumer_init() throws(JSException) -> JSObject {
+    let ret = bjs_ImportGenericConsumer_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$ImportGenericConsumer_box<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    bjs_ImportGenericConsumer_box_static(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+func _$ImportGenericConsumer_identity<T: BridgedSwiftGenericBridgeable>(_ self: JSObject, _ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_ImportGenericConsumer_identity(selfValue, T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportGenericBoxed_init")
+fileprivate func bjs_ImportGenericBoxed_init_extern(_ _generic0TypeId: Int32) -> Int32
+#else
+fileprivate func bjs_ImportGenericBoxed_init_extern(_ _generic0TypeId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportGenericBoxed_init(_ _generic0TypeId: Int32) -> Int32 {
+    return bjs_ImportGenericBoxed_init_extern(_generic0TypeId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportGenericBoxed_unwrap")
+fileprivate func bjs_ImportGenericBoxed_unwrap_extern(_ self: Int32, _ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_ImportGenericBoxed_unwrap_extern(_ self: Int32, _ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportGenericBoxed_unwrap(_ self: Int32, _ _generic0TypeId: Int32) -> Void {
+    return bjs_ImportGenericBoxed_unwrap_extern(self, _generic0TypeId)
+}
+
+func _$ImportGenericBoxed_init<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> JSObject {
+    value.bridgeJSStackPush()
+    let ret = bjs_ImportGenericBoxed_init(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$ImportGenericBoxed_unwrap<T: BridgedSwiftGenericBridgeable>(_ self: JSObject) throws(JSException) -> T {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_ImportGenericBoxed_unwrap(selfValue, T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsTranslatePoint")
 fileprivate func bjs_jsTranslatePoint_extern(_ dx: Int32, _ dy: Int32) -> Void
 #else
@@ -18192,3 +19039,84 @@ func _$SwiftClassSupportImports_jsConsumeOptionalLeakCheck(_ value: Optional<Lea
         throw error
     }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_BridgeJSRuntimeTests_register_type_handles")
+fileprivate func _bjs_BridgeJSRuntimeTests_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_BridgeJSRuntimeTests_register_type_handles")
+public func _bjs_BridgeJSRuntimeTests_register_type_handles() {
+    let typeIds: [Int32] = [
+        JSCoordinate.bridgeJSTypeID,
+        NestedStructGroupA.Metadata.bridgeJSTypeID,
+        NestedStructGroupB.Metadata.bridgeJSTypeID,
+        NestedTypeHost.Label.bridgeJSTypeID,
+        GenericRTPoint.bridgeJSTypeID,
+        GenericRTNamespace.Metadata.bridgeJSTypeID,
+        Point.bridgeJSTypeID,
+        PointerFields.bridgeJSTypeID,
+        DataPoint.bridgeJSTypeID,
+        PublicPoint.bridgeJSTypeID,
+        Address.bridgeJSTypeID,
+        Contact.bridgeJSTypeID,
+        Config.bridgeJSTypeID,
+        SessionData.bridgeJSTypeID,
+        ValidationReport.bridgeJSTypeID,
+        AdvancedConfig.bridgeJSTypeID,
+        MeasurementConfig.bridgeJSTypeID,
+        MathOperations.bridgeJSTypeID,
+        CopyableCart.bridgeJSTypeID,
+        CopyableCartItem.bridgeJSTypeID,
+        CopyableNestedCart.bridgeJSTypeID,
+        ConfigStruct.bridgeJSTypeID,
+        Vector2D.bridgeJSTypeID,
+        JSObjectContainer.bridgeJSTypeID,
+        FooContainer.bridgeJSTypeID,
+        ArrayMembers.bridgeJSTypeID,
+        PolygonReference.bridgeJSTypeID,
+        TagReference.bridgeJSTypeID,
+        TagHolderReference.bridgeJSTypeID,
+        PriorityReference.bridgeJSTypeID,
+        ImportGenericBox.bridgeJSTypeID,
+        Severity.bridgeJSTypeID,
+        Shape.bridgeJSTypeID,
+        InnerTag.bridgeJSTypeID,
+        AsyncImportedPayloadResult.bridgeJSTypeID,
+        Direction.bridgeJSTypeID,
+        Status.bridgeJSTypeID,
+        Theme.bridgeJSTypeID,
+        HttpStatus.bridgeJSTypeID,
+        FileSize.bridgeJSTypeID,
+        SessionId.bridgeJSTypeID,
+        Precision.bridgeJSTypeID,
+        Ratio.bridgeJSTypeID,
+        TSDirection.bridgeJSTypeID,
+        TSTheme.bridgeJSTypeID,
+        AsyncPayloadResult.bridgeJSTypeID,
+        Networking.API.Method.bridgeJSTypeID,
+        Configuration.LogLevel.bridgeJSTypeID,
+        Configuration.Port.bridgeJSTypeID,
+        Internal.SupportedMethod.bridgeJSTypeID,
+        APIResult.bridgeJSTypeID,
+        ComplexResult.bridgeJSTypeID,
+        Utilities.Result.bridgeJSTypeID,
+        API.NetworkingResult.bridgeJSTypeID,
+        AllTypesResult.bridgeJSTypeID,
+        TypedPayloadResult.bridgeJSTypeID,
+        StaticCalculator.bridgeJSTypeID,
+        StaticPropertyEnum.bridgeJSTypeID,
+        NestedTypeHost.Variant.bridgeJSTypeID,
+        LightColor.bridgeJSTypeID,
+        ImportedPayloadSignal.bridgeJSTypeID,
+        GenericRTColor.bridgeJSTypeID,
+        GenericRTMode.bridgeJSTypeID,
+        GenericRTLevel.bridgeJSTypeID,
+        GenericRTOutcome.bridgeJSTypeID,
+        OptionalAllTypesResult.bridgeJSTypeID,
+        APIOptionalResult.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_BridgeJSRuntimeTests_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

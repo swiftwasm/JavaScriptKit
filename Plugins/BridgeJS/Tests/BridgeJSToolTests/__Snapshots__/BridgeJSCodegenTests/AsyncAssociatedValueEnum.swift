@@ -52,6 +52,10 @@ public func _bjs_asyncRoundTripOptionalAssociatedValueEnum(_ valueIsSome: Int32,
     #endif
 }
 
+extension AsyncPayloadResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncPayloadResult.bridgeJSMakeTypeHandle()
+}
+
 @JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
 
 #if arch(wasm32)
@@ -114,3 +118,18 @@ func _$Promise_resolve_Sq18AsyncPayloadResultO(_ promise: JSObject, _ value: Opt
     promise_resolve_TestModule_Sq18AsyncPayloadResultO(promiseValue, valueIsSome, valueCaseId)
     if let error = _swift_js_take_exception() { throw error }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        AsyncPayloadResult.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

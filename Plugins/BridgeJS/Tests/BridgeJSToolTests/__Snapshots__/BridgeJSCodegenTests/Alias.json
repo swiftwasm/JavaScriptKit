@@ -79,6 +79,7 @@
             }
           ]
         },
+        "isFinal" : true,
         "methods" : [
           {
             "abiName" : "bjs_PolygonReference_snapshot",
@@ -196,6 +197,7 @@
             }
           ]
         },
+        "isFinal" : true,
         "methods" : [
 
         ],

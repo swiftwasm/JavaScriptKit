@@ -16,6 +16,9 @@ let package = Package(
             swiftSettings: [
                 .enableExperimentalFeature("Extern")
             ],
+            plugins: [
+                .plugin(name: "BridgeJS", package: "JavaScriptKit")
+            ]
         )
     ],
     swiftLanguageModes: [.v5]

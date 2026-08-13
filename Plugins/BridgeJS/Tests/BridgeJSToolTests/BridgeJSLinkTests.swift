@@ -139,6 +139,26 @@ import Testing
         try snapshot(bridgeJSLink: bridgeJSLink, name: "MixedModules")
     }
 
+    private func linkedJS(forFixture input: String) throws -> String {
+        let url = Self.inputsDirectory.appendingPathComponent(input)
+        let name = url.deletingPathExtension().lastPathComponent
+        let sourceFile = Parser.parse(source: try String(contentsOf: url, encoding: .utf8))
+        let importSwift = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).swift")
+        let importResult = try importSwift.finalize()
+        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let unifiedData = try encoder.encode(importResult)
+        try bridgeJSLink.addSkeletonFile(data: unifiedData)
+        return try bridgeJSLink.link().0
+    }
+
     @Test
     func perClassIdentityModeFromAnnotation() throws {
         let url = Self.inputsDirectory.appendingPathComponent("IdentityModeClass.swift")

@@ -127,6 +127,7 @@
             }
           ]
         },
+        "isFinal" : true,
         "methods" : [
           {
             "abiName" : "bjs_PolygonReference_vertexCount",
@@ -265,6 +266,7 @@
         "swiftCallName" : "PolygonReference"
       },
       {
+        "isFinal" : true,
         "methods" : [
           {
             "abiName" : "bjs_TagReference_describe",
@@ -327,6 +329,7 @@
             }
           ]
         },
+        "isFinal" : true,
         "methods" : [
           {
             "abiName" : "bjs_TagHolderReference_describe",
@@ -380,6 +383,7 @@
         "swiftCallName" : "TagHolderReference"
       },
       {
+        "isFinal" : true,
         "methods" : [
           {
             "abiName" : "bjs_PriorityReference_describe",
@@ -4839,6 +4843,70 @@
 
         ],
         "swiftCallName" : "NestedTypeHost"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_ImportGenericBox_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "value",
+              "name" : "value",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "isFinal" : true,
+        "methods" : [
+          {
+            "abiName" : "bjs_ImportGenericBox_get",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "get",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "ImportGenericBox",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "value",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "ImportGenericBox"
       },
       {
         "constructor" : {
@@ -10339,6 +10407,152 @@
         ],
         "swiftCallName" : "ImportedPayloadSignal",
         "tsFullPath" : "ImportedPayloadSignal"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "GenericRTNamespace",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "GenericRTNamespace",
+        "tsFullPath" : "GenericRTNamespace"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "red"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "green"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "blue"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "GenericRTColor",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "GenericRTColor",
+        "tsFullPath" : "GenericRTColor"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "light"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "dark"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "GenericRTMode",
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "GenericRTMode",
+        "tsFullPath" : "GenericRTMode"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "low",
+            "rawValue" : "1"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "high",
+            "rawValue" : "9"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "GenericRTLevel",
+        "rawType" : "Int",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "GenericRTLevel",
+        "tsFullPath" : "GenericRTLevel"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "label" : "code",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "ok"
+          },
+          {
+            "associatedValues" : [
+              {
+                "label" : "message",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "fail"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "GenericRTOutcome",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "GenericRTOutcome",
+        "tsFullPath" : "GenericRTOutcome"
       },
       {
         "cases" : [
@@ -18469,6 +18683,82 @@
         "methods" : [
 
         ],
+        "name" : "GenericRTPoint",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "y",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "GenericRTPoint"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Metadata",
+        "namespace" : [
+          "GenericRTNamespace"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "namespace" : [
+              "GenericRTNamespace"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "count",
+            "namespace" : [
+              "GenericRTNamespace"
+            ],
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "GenericRTNamespace.Metadata"
+      },
+      {
+        "methods" : [
+
+        ],
         "name" : "Point",
         "properties" : [
           {
@@ -23773,6 +24063,498 @@
         ],
         "types" : [
 
+        ]
+      },
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsGenericRoundTrip",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsGenericRoundTripClass",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsGenericParsePoint",
+            "parameters" : [
+              {
+                "name" : "json",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsImportPickFirst",
+            "parameters" : [
+              {
+                "name" : "a",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              },
+              {
+                "name" : "b",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsImportMakeInt",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T",
+              "U"
+            ],
+            "name" : "jsImportCombineSecond",
+            "parameters" : [
+              {
+                "name" : "a",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              },
+              {
+                "name" : "b",
+                "type" : {
+                  "generic" : {
+                    "_0" : "U"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "U"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsGenericArrayRoundTrip",
+            "parameters" : [
+              {
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsGenericOptionalRoundTrip",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsGenericDictRoundTrip",
+            "parameters" : [
+              {
+                "name" : "values",
+                "type" : {
+                  "dictionary" : {
+                    "_0" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "dictionary" : {
+                "_0" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsGenericAfterOptionalArray",
+            "parameters" : [
+              {
+                "name" : "values",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "name" : "value",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              "T"
+            ],
+            "name" : "jsGenericThrowOrRoundTrip",
+            "parameters" : [
+              {
+                "name" : "shouldThrow",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "value",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "genericParameters" : [
+                  "T"
+                ],
+                "name" : "identity",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "name" : "ImportGenericConsumer",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "genericParameters" : [
+                  "T"
+                ],
+                "name" : "box",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "genericParameters" : [
+                "T"
+              ],
+              "parameters" : [
+                {
+                  "name" : "value",
+                  "type" : {
+                    "generic" : {
+                      "_0" : "T"
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "genericParameters" : [
+                  "T"
+                ],
+                "name" : "unwrap",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "name" : "ImportGenericBoxed",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
         ]
       },
       {

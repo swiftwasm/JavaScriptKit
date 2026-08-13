@@ -2637,6 +2637,26 @@ fileprivate func _bjs_TestProcessor_wrap_extern(_ pointer: UnsafeMutableRawPoint
     return _bjs_TestProcessor_wrap_extern(pointer)
 }
 
+extension Animal: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Animal.bridgeJSMakeTypeHandle()
+}
+
+extension Direction: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Direction.bridgeJSMakeTypeHandle()
+}
+
+extension Theme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Theme.bridgeJSMakeTypeHandle()
+}
+
+extension HttpStatus: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = HttpStatus.bridgeJSMakeTypeHandle()
+}
+
+extension APIResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIResult.bridgeJSMakeTypeHandle()
+}
+
 @JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
 
 #if arch(wasm32)
@@ -2721,3 +2741,22 @@ func _$Promise_resolve_9APIResultO(_ promise: JSObject, _ value: APIResult) thro
     promise_resolve_TestModule_9APIResultO(promiseValue, valueCaseId)
     if let error = _swift_js_take_exception() { throw error }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        Animal.bridgeJSTypeID,
+        Direction.bridgeJSTypeID,
+        Theme.bridgeJSTypeID,
+        HttpStatus.bridgeJSTypeID,
+        APIResult.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

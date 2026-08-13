@@ -143,6 +143,11 @@ public struct ImportTS {
         }
 
         func lowerParameter(param: Parameter) throws {
+            if let genericPush = param.type.genericStackPushStatement(value: param.name) {
+                stackLoweringStmts.insert(genericPush, at: 0)
+                return
+            }
+
             let loweringInfo = try param.type.loweringParameterInfo(context: context)
 
             switch param.type {
@@ -237,6 +242,18 @@ public struct ImportTS {
             abiParameterForwardings.insert(contentsOf: ["resolveRef", "rejectRef"], at: 0)
         }
 
+        private func appendTypeIDParameter(index: Int, genericParameterName: String) {
+            let abiParamName = ABINameGenerator.genericTypeIdParameterName(index: index)
+            abiParameterSignatures.append((abiParamName, .i32))
+            abiParameterForwardings.append("\(genericParameterName).bridgeJSTypeID")
+        }
+
+        func appendTypeIDParameters(_ genericParameterNames: [String]) {
+            for (index, name) in genericParameterNames.enumerated() {
+                appendTypeIDParameter(index: index, genericParameterName: name)
+            }
+        }
+
         func call() throws {
             for stmt in stackLoweringStmts {
                 body.write(stmt.description)
@@ -293,14 +310,18 @@ public struct ImportTS {
                 body.write("return \(returnType.swiftType).bridgeJSLiftReturnFromSideChannel()")
             } else {
                 let liftExpr: String
-                switch returnType {
-                case .closure(let signature, _):
-                    liftExpr = "_BJS_Closure_\(signature.mangleName).bridgeJSLift(ret)"
-                default:
-                    if liftingInfo.valueToLift != nil {
-                        liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn(ret)"
-                    } else {
-                        liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn()"
+                if let genericPop = returnType.genericStackPopExpression {
+                    liftExpr = genericPop
+                } else {
+                    switch returnType {
+                    case .closure(let signature, _):
+                        liftExpr = "_BJS_Closure_\(signature.mangleName).bridgeJSLift(ret)"
+                    default:
+                        if liftingInfo.valueToLift != nil {
+                            liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn(ret)"
+                        } else {
+                            liftExpr = "\(returnType.swiftType).bridgeJSLiftReturn()"
+                        }
                     }
                 }
                 body.write("return \(liftExpr)")
@@ -359,7 +380,8 @@ public struct ImportTS {
             name: String,
             parameters: [Parameter],
             returnType: BridgeType,
-            effects: Effects
+            effects: Effects,
+            genericParameters: [String] = []
         ) -> DeclSyntax {
             let printer = CodeFragmentPrinter()
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
@@ -368,7 +390,12 @@ public struct ImportTS {
                 effects: effects,
                 useWildcardLabels: true
             )
-            printer.write("func \(name.backtickIfNeeded())\(signature) {")
+            let genericClause =
+                genericParameters.isEmpty
+                ? ""
+                : "<" + genericParameters.map { "\($0): BridgedSwiftGenericBridgeable" }.joined(separator: ", ")
+                    + ">"
+            printer.write("func \(name.backtickIfNeeded())\(genericClause)\(signature) {")
             printer.indent {
                 printer.write(lines: body.lines)
             }
@@ -428,6 +455,7 @@ public struct ImportTS {
         for param in function.parameters {
             try builder.lowerParameter(param: param)
         }
+        builder.appendTypeIDParameters(function.genericParameterNames)
         try builder.call()
         try builder.liftReturnValue()
         topLevelDecls.append(builder.renderImportDecl())
@@ -436,7 +464,8 @@ public struct ImportTS {
                 name: Self.thunkName(function: function),
                 parameters: function.parameters,
                 returnType: function.returnType,
-                effects: function.effects
+                effects: function.effects,
+                genericParameters: function.genericParameterNames
             )
             .with(\.leadingTrivia, Self.renderDocumentation(documentation: function.documentation))
         ]
@@ -457,6 +486,7 @@ public struct ImportTS {
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
+            builder.appendTypeIDParameters(method.genericParameterNames)
             try builder.call()
             try builder.liftReturnValue()
             topLevelDecls.append(builder.renderImportDecl())
@@ -465,7 +495,8 @@ public struct ImportTS {
                     name: Self.thunkName(type: type, method: method),
                     parameters: [selfParameter] + method.parameters,
                     returnType: method.returnType,
-                    effects: method.effects
+                    effects: method.effects,
+                    genericParameters: method.genericParameterNames
                 )
             ]
         }
@@ -481,6 +512,7 @@ public struct ImportTS {
             for param in method.parameters {
                 try builder.lowerParameter(param: param)
             }
+            builder.appendTypeIDParameters(method.genericParameterNames)
             try builder.call()
             try builder.liftReturnValue()
             topLevelDecls.append(builder.renderImportDecl())
@@ -489,7 +521,8 @@ public struct ImportTS {
                     name: Self.thunkName(type: type, method: method),
                     parameters: method.parameters,
                     returnType: method.returnType,
-                    effects: method.effects
+                    effects: method.effects,
+                    genericParameters: method.genericParameterNames
                 )
             ]
         }
@@ -505,6 +538,7 @@ public struct ImportTS {
             for param in constructor.parameters {
                 try builder.lowerParameter(param: param)
             }
+            builder.appendTypeIDParameters(constructor.genericParameterNames)
             try builder.call()
             try builder.liftReturnValue()
             topLevelDecls.append(builder.renderImportDecl())
@@ -513,7 +547,8 @@ public struct ImportTS {
                     name: Self.thunkName(type: type),
                     parameters: constructor.parameters,
                     returnType: .jsObject(nil),
-                    effects: effects
+                    effects: effects,
+                    genericParameters: constructor.genericParameterNames
                 )
             ]
         }
@@ -932,9 +967,6 @@ extension BridgeType {
             return LoweringParameterInfo(loweredParameters: [("value", wasmType)])
         case .associatedValueEnum:
             return LoweringParameterInfo(loweredParameters: [("caseId", .i32)])
-        case .swiftStruct:
-            // `@JS struct` parameters always use the stack ABI (same as arrays/dictionaries).
-            return LoweringParameterInfo(loweredParameters: [])
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as parameters")
         case .nullable(let wrappedType, _):
@@ -942,7 +974,10 @@ extension BridgeType {
             var params = [("isSome", WasmCoreType.i32)]
             params.append(contentsOf: wrappedInfo.loweredParameters)
             return LoweringParameterInfo(loweredParameters: params, useBorrowing: wrappedInfo.useBorrowing)
-        case .array, .dictionary:
+        case .swiftStruct:
+            // `@JS struct` parameters always use the stack ABI (same as arrays/dictionaries).
+            return LoweringParameterInfo(loweredParameters: [])
+        case .array, .dictionary, .generic:
             return LoweringParameterInfo(loweredParameters: [])
         case .alias:
             preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching loweringParameterInfo")
@@ -995,9 +1030,6 @@ extension BridgeType {
             return LiftingReturnInfo(valueToLift: wasmType)
         case .associatedValueEnum:
             return LiftingReturnInfo(valueToLift: .i32)
-        case .swiftStruct:
-            // `@JS struct` returns always use the stack ABI (same as arrays/dictionaries).
-            return LiftingReturnInfo(valueToLift: nil)
         case .namespaceEnum:
             throw BridgeJSCoreError("Namespace enums cannot be used as return values")
         case .nullable(let wrappedType, _):
@@ -1008,7 +1040,10 @@ extension BridgeType {
             }
             let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
             return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)
-        case .array, .dictionary:
+        case .swiftStruct:
+            // `@JS struct` returns always use the stack ABI (same as arrays/dictionaries).
+            return LiftingReturnInfo(valueToLift: nil)
+        case .array, .dictionary, .generic:
             return LiftingReturnInfo(valueToLift: nil)
         case .alias:
             preconditionFailure("`.alias` must be resolved by `.unaliased` before reaching liftingReturnInfo")

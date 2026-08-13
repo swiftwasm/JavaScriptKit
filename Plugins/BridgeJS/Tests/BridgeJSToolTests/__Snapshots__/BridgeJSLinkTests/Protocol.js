@@ -55,7 +55,345 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createResultValuesHelpers = () => ({
+    const __bjs_arrayCodecCache = new WeakMap();
+    function __bjs_arrayCodec(elementCodec) {
+        let codec = __bjs_arrayCodecCache.get(elementCodec);
+        if (codec !== undefined) {
+            return codec;
+        }
+        codec = {
+            lower(value) {
+                for (let i = 0; i < value.length; i++) {
+                    elementCodec.lower(value[i]);
+                }
+                i32Stack.push(value.length);
+            },
+            lift() {
+                const count = i32Stack.pop();
+                if (count === -1) {
+                    return taStack.pop();
+                }
+                const result = new Array(count);
+                for (let i = count - 1; i >= 0; i--) {
+                    result[i] = elementCodec.lift();
+                }
+                return result;
+            },
+        };
+        __bjs_arrayCodecCache.set(elementCodec, codec);
+        return codec;
+    }
+    const __bjs_optionalCodecCache = new WeakMap();
+    const __bjs_optionalCodecUndefinedOrCache = new WeakMap();
+    function __bjs_optionalCodec(elementCodec, isUndefinedOr = false) {
+        const cache = isUndefinedOr ? __bjs_optionalCodecUndefinedOrCache : __bjs_optionalCodecCache;
+        let codec = cache.get(elementCodec);
+        if (codec !== undefined) {
+            return codec;
+        }
+        codec = {
+            lower(value) {
+                const isSome = isUndefinedOr ? value !== undefined : value != null;
+                if (isSome) {
+                    elementCodec.lower(value);
+                    i32Stack.push(1);
+                } else {
+                    i32Stack.push(0);
+                }
+            },
+            lift() {
+                if (i32Stack.pop() === 0) {
+                    return isUndefinedOr ? undefined : null;
+                }
+                return elementCodec.lift();
+            },
+        };
+        cache.set(elementCodec, codec);
+        return codec;
+    }
+    const __bjs_dictCodecCache = new WeakMap();
+    function __bjs_dictCodec(valueCodec) {
+        let codec = __bjs_dictCodecCache.get(valueCodec);
+        if (codec !== undefined) {
+            return codec;
+        }
+        codec = {
+            lower(value) {
+                const keys = Object.keys(value);
+                for (let i = 0; i < keys.length; i++) {
+                    __bjs_stringCodec.lower(keys[i]);
+                    valueCodec.lower(value[keys[i]]);
+                }
+                i32Stack.push(keys.length);
+            },
+            lift() {
+                const count = i32Stack.pop();
+                const result = {};
+                for (let i = 0; i < count; i++) {
+                    const value = valueCodec.lift();
+                    const key = __bjs_stringCodec.lift();
+                    result[key] = value;
+                }
+                return result;
+            },
+        };
+        __bjs_dictCodecCache.set(valueCodec, codec);
+        return codec;
+    }
+
+    const __bjs_stringCodec = {
+        lower: (v) => {
+            const bytes = textEncoder.encode(v);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+        },
+        lift: () => {
+            const string = strStack.pop();
+            return string;
+        },
+    };
+    const __bjs_primitiveCodecs = {
+        Bool: {
+            lower: (v) => {
+                i32Stack.push(v ? 1 : 0);
+            },
+            lift: () => {
+                const bool = i32Stack.pop() !== 0;
+                return bool;
+            },
+        },
+        Int: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        Int8: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt8: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int16: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt16: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int32: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop();
+                return int;
+            },
+        },
+        UInt32: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        UInt: {
+            lower: (v) => {
+                i32Stack.push((v | 0));
+            },
+            lift: () => {
+                const int = i32Stack.pop() >>> 0;
+                return int;
+            },
+        },
+        Int64: {
+            lower: (v) => {
+                i64Stack.push(v);
+            },
+            lift: () => {
+                const int = i64Stack.pop();
+                return int;
+            },
+        },
+        UInt64: {
+            lower: (v) => {
+                i64Stack.push(v);
+            },
+            lift: () => {
+                const int = i64Stack.pop();
+                return int;
+            },
+        },
+        Float: {
+            lower: (v) => {
+                f32Stack.push(Math.fround(v));
+            },
+            lift: () => {
+                const f32 = f32Stack.pop();
+                return f32;
+            },
+        },
+        Double: {
+            lower: (v) => {
+                f64Stack.push(v);
+            },
+            lift: () => {
+                const f64 = f64Stack.pop();
+                return f64;
+            },
+        },
+        String: __bjs_stringCodec,
+        JSValue: {
+            lower: (v) => {
+                const [vKind, vPayload1, vPayload2] = __bjs_jsValueLower(v);
+                i32Stack.push(vKind);
+                i32Stack.push(vPayload1);
+                f64Stack.push(vPayload2);
+            },
+            lift: () => {
+                const jsValuePayload2 = f64Stack.pop();
+                const jsValuePayload1 = i32Stack.pop();
+                const jsValueKind = i32Stack.pop();
+                const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                return jsValue;
+            },
+        },
+    };
+
+    function __bjs_jsValueLower(value) {
+        let kind;
+        let payload1;
+        let payload2;
+        if (value === null) {
+            kind = 4;
+            payload1 = 0;
+            payload2 = 0;
+        } else {
+            switch (typeof value) {
+                case "boolean":
+                    kind = 0;
+                    payload1 = value ? 1 : 0;
+                    payload2 = 0;
+                    break;
+                case "number":
+                    kind = 2;
+                    payload1 = 0;
+                    payload2 = value;
+                    break;
+                case "string":
+                    kind = 1;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "undefined":
+                    kind = 5;
+                    payload1 = 0;
+                    payload2 = 0;
+                    break;
+                case "object":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "function":
+                    kind = 3;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "symbol":
+                    kind = 7;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                case "bigint":
+                    kind = 8;
+                    payload1 = swift.memory.retain(value);
+                    payload2 = 0;
+                    break;
+                default:
+                    throw new TypeError("Unsupported JSValue type");
+            }
+        }
+        return [kind, payload1, payload2];
+    }
+    function __bjs_jsValueLift(kind, payload1, payload2) {
+        let jsValue;
+        switch (kind) {
+            case 0:
+                jsValue = payload1 !== 0;
+                break;
+            case 1:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 2:
+                jsValue = payload2;
+                break;
+            case 3:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 4:
+                jsValue = null;
+                break;
+            case 5:
+                jsValue = undefined;
+                break;
+            case 7:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            case 8:
+                jsValue = swift.memory.getObject(payload1);
+                break;
+            default:
+                throw new TypeError("Unsupported JSValue kind " + kind);
+        }
+        return jsValue;
+    }
+
+    const __bjs_codec_M10TestModuleT24MyViewControllerDelegate = {
+        lower: (v) => {
+            const objId = swift.memory.retain(v);
+            i32Stack.push(objId);
+        },
+        lift: () => {
+            const objId = i32Stack.pop();
+            const obj = swift.memory.getObject(objId);
+            swift.memory.release(objId);
+            return obj;
+        },
+    };
+    const __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate = __bjs_arrayCodec(__bjs_codec_M10TestModuleT24MyViewControllerDelegate);
+    const __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate = __bjs_dictCodec(__bjs_codec_M10TestModuleT24MyViewControllerDelegate);
+
+    const __bjs_createEnumHelpers_M10TestModuleT6Result = () => ({
         lower: (value) => {
             const enumTag = value.tag;
             switch (enumTag) {
@@ -163,6 +501,8 @@ export async function createInstantiator(options, swift) {
                 const copy = memory.buffer.slice(ptr, ptr + byteLen);
                 taStack.push(Array.from(new Ctor(copy)));
             }
+            bjs["bjs_core_register_type_handles"] = function() {};
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -366,7 +706,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_MyViewControllerDelegate_result_get"] = function bjs_MyViewControllerDelegate_result_get(self) {
                 try {
                     let ret = swift.memory.getObject(self).result;
-                    const caseId = enumHelpers.Result.lower(ret);
+                    const caseId = enumHelpers.M10TestModuleT6Result.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -374,7 +714,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_result_set"] = function bjs_MyViewControllerDelegate_result_set(self, value) {
                 try {
-                    const enumValue = enumHelpers.Result.lift(value);
+                    const enumValue = enumHelpers.M10TestModuleT6Result.lift(value);
                     swift.memory.getObject(self).result = enumValue;
                 } catch (error) {
                     setException(error);
@@ -385,7 +725,7 @@ export async function createInstantiator(options, swift) {
                     let ret = swift.memory.getObject(self).optionalResult;
                     const isSome = ret != null;
                     if (isSome) {
-                        const caseId = enumHelpers.Result.lower(ret);
+                        const caseId = enumHelpers.M10TestModuleT6Result.lower(ret);
                         return caseId;
                     } else {
                         return -1;
@@ -398,7 +738,7 @@ export async function createInstantiator(options, swift) {
                 try {
                     let optResult;
                     if (valueIsSome) {
-                        const enumValue = enumHelpers.Result.lift(valueCaseId);
+                        const enumValue = enumHelpers.M10TestModuleT6Result.lift(valueCaseId);
                         optResult = enumValue;
                     } else {
                         optResult = null;
@@ -556,7 +896,7 @@ export async function createInstantiator(options, swift) {
             }
             TestModule["bjs_MyViewControllerDelegate_handleResult"] = function bjs_MyViewControllerDelegate_handleResult(self, result) {
                 try {
-                    const enumValue = enumHelpers.Result.lift(result);
+                    const enumValue = enumHelpers.M10TestModuleT6Result.lift(result);
                     swift.memory.getObject(self).handleResult(enumValue);
                 } catch (error) {
                     setException(error);
@@ -565,7 +905,7 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_MyViewControllerDelegate_getResult"] = function bjs_MyViewControllerDelegate_getResult(self) {
                 try {
                     let ret = swift.memory.getObject(self).getResult();
-                    const caseId = enumHelpers.Result.lower(ret);
+                    const caseId = enumHelpers.M10TestModuleT6Result.lower(ret);
                     return caseId;
                 } catch (error) {
                     setException(error);
@@ -724,11 +1064,7 @@ export async function createInstantiator(options, swift) {
                 }
 
                 constructor(delegates) {
-                    for (const elem of delegates) {
-                        const objId = swift.memory.retain(elem);
-                        i32Stack.push(objId);
-                    }
-                    i32Stack.push(delegates.length);
+                    __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lower(delegates);
                     const ret = instance.exports.bjs_DelegateManager_init();
                     return DelegateManager.__construct(ret);
                 }
@@ -737,107 +1073,37 @@ export async function createInstantiator(options, swift) {
                 }
                 get delegates() {
                     instance.exports.bjs_DelegateManager_delegates_get(this.pointer);
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const objId = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId);
-                            swift.memory.release(objId);
-                            arrayResult.push(obj);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lift();
                     return arrayResult;
                 }
                 set delegates(value) {
-                    for (const elem of value) {
-                        const objId = swift.memory.retain(elem);
-                        i32Stack.push(objId);
-                    }
-                    i32Stack.push(value.length);
+                    __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lower(value);
                     instance.exports.bjs_DelegateManager_delegates_set(this.pointer);
                 }
                 get delegatesByName() {
                     instance.exports.bjs_DelegateManager_delegatesByName_get(this.pointer);
-                    const dictLen = i32Stack.pop();
-                    const dictResult = {};
-                    for (let i = 0; i < dictLen; i++) {
-                        const objId = i32Stack.pop();
-                        const obj = swift.memory.getObject(objId);
-                        swift.memory.release(objId);
-                        const string = strStack.pop();
-                        dictResult[string] = obj;
-                    }
+                    const dictResult = __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate.lift();
                     return dictResult;
                 }
                 set delegatesByName(value) {
-                    const entries = Object.entries(value);
-                    for (const entry of entries) {
-                        const [key, value1] = entry;
-                        const bytes = textEncoder.encode(key);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const objId = swift.memory.retain(value1);
-                        i32Stack.push(objId);
-                    }
-                    i32Stack.push(entries.length);
+                    __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate.lower(value);
                     instance.exports.bjs_DelegateManager_delegatesByName_set(this.pointer);
                 }
             }
-            const ResultHelpers = __bjs_createResultValuesHelpers();
-            enumHelpers.Result = ResultHelpers;
+            const __bjs_helpers_M10TestModuleT6Result = __bjs_createEnumHelpers_M10TestModuleT6Result();
+            enumHelpers.M10TestModuleT6Result = __bjs_helpers_M10TestModuleT6Result;
 
             const exports = {
                 processDelegates: function bjs_processDelegates(delegates) {
-                    for (const elem of delegates) {
-                        const objId = swift.memory.retain(elem);
-                        i32Stack.push(objId);
-                    }
-                    i32Stack.push(delegates.length);
+                    __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lower(delegates);
                     instance.exports.bjs_processDelegates();
-                    const arrayLen = i32Stack.pop();
-                    let arrayResult;
-                    if (arrayLen === -1) {
-                        arrayResult = taStack.pop();
-                    } else {
-                        arrayResult = [];
-                        for (let i = 0; i < arrayLen; i++) {
-                            const objId1 = i32Stack.pop();
-                            const obj = swift.memory.getObject(objId1);
-                            swift.memory.release(objId1);
-                            arrayResult.push(obj);
-                        }
-                        arrayResult.reverse();
-                    }
+                    const arrayResult = __bjs_codec_Array_M10TestModuleT24MyViewControllerDelegate.lift();
                     return arrayResult;
                 },
                 processDelegatesByName: function bjs_processDelegatesByName(delegates) {
-                    const entries = Object.entries(delegates);
-                    for (const entry of entries) {
-                        const [key, value] = entry;
-                        const bytes = textEncoder.encode(key);
-                        const id = swift.memory.retain(bytes);
-                        i32Stack.push(bytes.length);
-                        i32Stack.push(id);
-                        const objId = swift.memory.retain(value);
-                        i32Stack.push(objId);
-                    }
-                    i32Stack.push(entries.length);
+                    __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate.lower(delegates);
                     instance.exports.bjs_processDelegatesByName();
-                    const dictLen = i32Stack.pop();
-                    const dictResult = {};
-                    for (let i = 0; i < dictLen; i++) {
-                        const objId1 = i32Stack.pop();
-                        const obj = swift.memory.getObject(objId1);
-                        swift.memory.release(objId1);
-                        const string = strStack.pop();
-                        dictResult[string] = obj;
-                    }
+                    const dictResult = __bjs_codec_Dict_M10TestModuleT24MyViewControllerDelegate.lift();
                     return dictResult;
                 },
                 Direction: DirectionValues,

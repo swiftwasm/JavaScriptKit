@@ -359,3 +359,37 @@ fileprivate func _bjs_Formatting_Converter_wrap_extern(_ pointer: UnsafeMutableR
 @inline(never) fileprivate func _bjs_Formatting_Converter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_Formatting_Converter_wrap_extern(pointer)
 }
+
+extension Networking.API.Method: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Networking.API.Method.bridgeJSMakeTypeHandle()
+}
+
+extension Configuration.LogLevel: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Configuration.LogLevel.bridgeJSMakeTypeHandle()
+}
+
+extension Configuration.Port: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Configuration.Port.bridgeJSMakeTypeHandle()
+}
+
+extension Internal.SupportedMethod: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Internal.SupportedMethod.bridgeJSMakeTypeHandle()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        Networking.API.Method.bridgeJSTypeID,
+        Configuration.LogLevel.bridgeJSTypeID,
+        Configuration.Port.bridgeJSTypeID,
+        Internal.SupportedMethod.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

@@ -22,6 +22,14 @@ extension NamespacedExportedType {
 public struct ABINameGenerator {
     static let prefixComponent = "bjs"
 
+    public static func genericTypeIdParameterName(index: Int) -> String { "_generic\(index)TypeId" }
+
+    public static func typeRegistrationFunctionName(moduleName: String) -> String {
+        "bjs_\(moduleName)_register_type_handles"
+    }
+
+    public static let coreTypeRegistrationFunctionName = "bjs_core_register_type_handles"
+
     /// Generates ABI name using standardized namespace + context pattern
     public static func generateABIName(
         baseName: String,
@@ -273,8 +281,102 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case namespaceEnum(String)
     case swiftProtocol(String)
     case swiftStruct(String)
+    case generic(String)
     indirect case closure(ClosureSignature, useJSTypedClosure: Bool)
     indirect case alias(name: String, underlying: BridgeType)
+}
+
+extension BridgeType {
+    public var referencedGenericName: String? {
+        switch self {
+        case .generic(let name): return name
+        case .array(.generic(let name)): return name
+        case .nullable(.generic(let name), _): return name
+        case .dictionary(.generic(let name)): return name
+        default: return nil
+        }
+    }
+
+    public static let genericBridgeablePrimitives: [(token: String, type: BridgeType)] = [
+        ("Bool", .bool),
+        ("Int", .integer(.int)),
+        ("Int8", .integer(.int8)),
+        ("UInt8", .integer(.uint8)),
+        ("Int16", .integer(.int16)),
+        ("UInt16", .integer(.uint16)),
+        ("Int32", .integer(.int32)),
+        ("UInt32", .integer(.uint32)),
+        ("UInt", .integer(.uint)),
+        ("Int64", .integer(.int64)),
+        ("UInt64", .integer(.uint64)),
+        ("Float", .float),
+        ("Double", .double),
+        ("String", .string),
+        ("JSValue", .jsValue),
+    ]
+
+}
+
+public struct GenericBridgeableTypeEntry: Sendable {
+    public let swiftName: String
+    public let bridgeType: BridgeType
+
+    public init(swiftName: String, bridgeType: BridgeType) {
+        self.swiftName = swiftName
+        self.bridgeType = bridgeType
+    }
+}
+
+extension ExportedEnum {
+    public var genericBridgeType: BridgeType? {
+        switch enumType {
+        case .simple:
+            return .caseEnum(swiftCallName)
+        case .rawValue:
+            guard let rawType = rawType else { return nil }
+            return .rawValueEnum(swiftCallName, rawType)
+        case .associatedValue:
+            return .associatedValueEnum(swiftCallName)
+        case .namespace:
+            return nil
+        }
+    }
+}
+
+extension ExportedSkeleton {
+    /// Keep this order in sync with the generated registration codec array.
+    public var genericBridgeableTypeEntries: [GenericBridgeableTypeEntry] {
+        var entries: [GenericBridgeableTypeEntry] = []
+        for structDef in structs {
+            entries.append(
+                GenericBridgeableTypeEntry(
+                    swiftName: structDef.swiftCallName,
+                    bridgeType: .swiftStruct(structDef.swiftCallName)
+                )
+            )
+        }
+        for klass in classes where klass.isFinal == true {
+            entries.append(
+                GenericBridgeableTypeEntry(
+                    swiftName: klass.swiftCallName,
+                    bridgeType: .swiftHeapObject(klass.swiftCallName)
+                )
+            )
+        }
+        for enumDef in enums {
+            guard let bridgeType = enumDef.genericBridgeType else { continue }
+            entries.append(GenericBridgeableTypeEntry(swiftName: enumDef.swiftCallName, bridgeType: bridgeType))
+        }
+        return entries
+    }
+}
+
+extension BridgeJSSkeleton {
+    public var typeRegistrationEntries: [GenericBridgeableTypeEntry]? {
+        let exportedEntries = exported?.genericBridgeableTypeEntries ?? []
+        guard !exportedEntries.isEmpty else { return nil }
+        return exportedEntries
+    }
 }
 
 public enum WasmCoreType: String, Codable, Sendable {
@@ -905,6 +1007,7 @@ public struct ExportedClass: Codable, NamespacedExportedType {
     public var namespace: [String]?
     public var identityMode: Bool?  // nil = use config default, true/false = override
     public var documentation: String?
+    public var isFinal: Bool?
 
     public init(
         name: String,
@@ -915,7 +1018,8 @@ public struct ExportedClass: Codable, NamespacedExportedType {
         properties: [ExportedProperty] = [],
         namespace: [String]? = nil,
         identityMode: Bool? = nil,
-        documentation: String? = nil
+        documentation: String? = nil,
+        isFinal: Bool? = nil
     ) {
         self.name = name
         self.swiftCallName = swiftCallName
@@ -926,6 +1030,7 @@ public struct ExportedClass: Codable, NamespacedExportedType {
         self.namespace = namespace
         self.identityMode = identityMode
         self.documentation = documentation
+        self.isFinal = isFinal
     }
 }
 
@@ -1254,6 +1359,9 @@ public struct ImportedFunctionSkeleton: Codable {
     /// determine the access level of bridge-generated helpers (e.g. typed
     /// closure inits) that surface through this function's signature.
     public let accessLevel: BridgeJSAccessLevel
+    public let genericParameters: [String]?
+    public var genericParameterNames: [String] { genericParameters ?? [] }
+    public var isGeneric: Bool { !genericParameterNames.isEmpty }
 
     public var resolvedJSName: String { jsName ?? name }
 
@@ -1265,7 +1373,8 @@ public struct ImportedFunctionSkeleton: Codable {
         returnType: BridgeType,
         effects: Effects = Effects(isAsync: false, isThrows: true),
         documentation: String? = nil,
-        accessLevel: BridgeJSAccessLevel = .internal
+        accessLevel: BridgeJSAccessLevel = .internal,
+        genericParameters: [String]? = nil
     ) {
         self.name = name
         self.jsName = jsName
@@ -1275,10 +1384,11 @@ public struct ImportedFunctionSkeleton: Codable {
         self.effects = effects
         self.documentation = documentation
         self.accessLevel = accessLevel
+        self.genericParameters = genericParameters
     }
 
     private enum CodingKeys: String, CodingKey {
-        case name, jsName, from, parameters, returnType, effects, documentation, accessLevel
+        case name, jsName, from, parameters, returnType, effects, documentation, accessLevel, genericParameters
     }
 
     public init(from decoder: any Decoder) throws {
@@ -1291,6 +1401,7 @@ public struct ImportedFunctionSkeleton: Codable {
         self.effects = try container.decode(Effects.self, forKey: .effects)
         self.documentation = try container.decodeIfPresent(String.self, forKey: .documentation)
         self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
+        self.genericParameters = try container.decodeIfPresent([String].self, forKey: .genericParameters)
     }
 
     public func abiName(context: ImportedTypeSkeleton?) -> String {
@@ -1311,20 +1422,29 @@ public struct ImportedConstructorSkeleton: Codable {
     /// Source access level of the originating Swift `init`. Inherits from the
     /// enclosing `@JSClass` type when not annotated explicitly.
     public let accessLevel: BridgeJSAccessLevel
+    public let genericParameters: [String]?
+    public var genericParameterNames: [String] { genericParameters ?? [] }
+    public var isGeneric: Bool { !genericParameterNames.isEmpty }
 
-    public init(parameters: [Parameter], accessLevel: BridgeJSAccessLevel = .internal) {
+    public init(
+        parameters: [Parameter],
+        accessLevel: BridgeJSAccessLevel = .internal,
+        genericParameters: [String]? = nil
+    ) {
         self.parameters = parameters
         self.accessLevel = accessLevel
+        self.genericParameters = genericParameters
     }
 
     private enum CodingKeys: String, CodingKey {
-        case parameters, accessLevel
+        case parameters, accessLevel, genericParameters
     }
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.parameters = try container.decode([Parameter].self, forKey: .parameters)
         self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
+        self.genericParameters = try container.decodeIfPresent([String].self, forKey: .genericParameters)
     }
 
     public func abiName(context: ImportedTypeSkeleton) -> String {
@@ -1571,11 +1691,28 @@ public struct ImportedFileSkeleton: Codable {
     }
 }
 
+extension ImportedFileSkeleton {
+    public var hasGenericDeclarations: Bool {
+        functions.contains(where: \.isGeneric)
+            || types.contains {
+                $0.methods.contains(where: \.isGeneric)
+                    || $0.staticMethods.contains(where: \.isGeneric)
+                    || ($0.constructor?.isGeneric ?? false)
+            }
+    }
+}
+
 public struct ImportedModuleSkeleton: Codable {
     public var children: [ImportedFileSkeleton]
 
     public init(children: [ImportedFileSkeleton]) {
         self.children = children
+    }
+}
+
+extension ImportedModuleSkeleton {
+    public var hasGenericDeclarations: Bool {
+        children.contains { $0.hasGenericDeclarations }
     }
 }
 
@@ -1753,7 +1890,7 @@ extension BridgeType {
         case .bool, .integer, .float, .double, .string, .jsValue, .jsObject,
             .swiftHeapObject, .unsafePointer, .swiftProtocol, .void,
             .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct,
-            .namespaceEnum, .closure:
+            .namespaceEnum, .closure, .generic:
             return self
         }
     }
@@ -1800,6 +1937,8 @@ extension BridgeType {
             return nil
         case .alias(_, let underlying):
             return underlying.abiReturnType
+        case .generic:
+            return nil
         }
     }
 
@@ -1891,6 +2030,8 @@ extension BridgeType {
             // `name` is the namespace-qualified swiftCallName (unique), so the underlying
             // representation isn't mangled in - aliases bridge via their JS type's ABI.
             return "Al\(name.count)\(name)"
+        case .generic(let name):
+            return "\(name.count)\(name)T"
         }
     }
 

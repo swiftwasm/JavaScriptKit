@@ -35,6 +35,11 @@ final class JSGlueVariableScope {
     static let reservedSwiftClosureRegistry = "swiftClosureRegistry"
     static let reservedMakeSwiftClosure = "makeClosure"
     static let reservedTaStack = "taStack"
+    static let reservedCodecByTypeId = "__bjs_codecByTypeId"
+    static let reservedPrimitiveCodecs = "__bjs_primitiveCodecs"
+    static let reservedStringCodec = "__bjs_stringCodec"
+    static let reservedTypeHandlesRegistered = "__bjs_typeHandlesRegistered"
+    static let reservedRegisterTypeHandles = "__bjs_registerTypeHandles"
 
     private let intrinsicRegistry: JSIntrinsicRegistry
 
@@ -65,6 +70,11 @@ final class JSGlueVariableScope {
         reservedSwiftClosureRegistry,
         reservedMakeSwiftClosure,
         reservedTaStack,
+        reservedCodecByTypeId,
+        reservedPrimitiveCodecs,
+        reservedStringCodec,
+        reservedTypeHandlesRegistered,
+        reservedRegisterTypeHandles,
     ]
 
     init(intrinsicRegistry: JSIntrinsicRegistry) {
@@ -92,10 +102,60 @@ final class JSGlueVariableScope {
         try intrinsicRegistry.register(name: name, build: build)
     }
 
+    func registerNamedCodec(_ name: String, build: (CodeFragmentPrinter) throws -> Void) rethrows {
+        try intrinsicRegistry.registerNamedCodec(name: name, build: build)
+    }
+
+    func moduleName(declaringType typeName: String) -> String? {
+        intrinsicRegistry.typeOwnerModules[typeName]
+    }
+
     func makeChildScope() -> JSGlueVariableScope {
         JSGlueVariableScope(intrinsicRegistry: intrinsicRegistry)
     }
 
+}
+
+extension JSGlueVariableScope {
+    func helperKey(forTypeNamed fullName: String) -> String {
+        HelperNaming.type(
+            module: moduleName(declaringType: fullName),
+            swiftName: fullName
+        )
+    }
+}
+
+enum HelperNaming {
+    static func identifierComponent(_ name: String) -> String {
+        name.utf8.map { byte in
+            switch byte {
+            case 48...57, 65...90, 97...122:
+                return String(UnicodeScalar(byte))
+            default:
+                return "_\(String(byte, radix: 16))_"
+            }
+        }.joined()
+    }
+
+    static func type(module: String?, swiftName: String) -> String {
+        let module = module.map { "M\($0.utf8.count)\(identifierComponent($0))" } ?? ""
+        let type = swiftName.split(separator: ".").map { component in
+            "T\(component.utf8.count)\(identifierComponent(String(component)))"
+        }.joined()
+        return module + type
+    }
+
+    static func structHelperFactory(_ qualifiedKey: String) -> String {
+        "__bjs_createStructHelpers_\(qualifiedKey)"
+    }
+
+    static func enumHelperFactory(_ qualifiedKey: String) -> String {
+        "__bjs_createEnumHelpers_\(qualifiedKey)"
+    }
+
+    static func helperConstant(_ qualifiedKey: String) -> String {
+        "__bjs_helpers_\(qualifiedKey)"
+    }
 }
 
 extension JSGlueVariableScope {
@@ -135,6 +195,327 @@ extension JSGlueVariableScope {
     }
     func popPointer() -> String {
         return "\(JSGlueVariableScope.reservedPointerStack).pop()"
+    }
+}
+
+enum GenericJSCodegen {
+    static func genericCodecExpression(type: BridgeType, codec: String) -> String? {
+        switch type {
+        case .generic: return codec
+        case .array(.generic): return "\(ContainerCodecJS.arrayCodec)(\(codec))"
+        case .nullable(.generic, let kind):
+            return ContainerCodecJS.optionalCodecExpression(elementCodec: codec, kind: kind)
+        case .dictionary(.generic): return "\(ContainerCodecJS.dictCodec)(\(codec))"
+        default: return nil
+        }
+    }
+
+    static func genericCodecLowerStatement(type: BridgeType, codec: String, value: String) -> String? {
+        genericCodecExpression(type: type, codec: codec).map { "\($0).lower(\(value));" }
+    }
+
+    static func genericCodecLiftExpression(type: BridgeType, codec: String) -> String? {
+        genericCodecExpression(type: type, codec: codec).map { "\($0).lift()" }
+    }
+
+    static func runtimeHelperDeclarations() -> [String] {
+        let codecByTypeId = JSGlueVariableScope.reservedCodecByTypeId
+        return [
+            "function __bjs_codecForTypeId(typeId) {",
+            "    __bjs_registerTypeHandles();",
+            "    const codec = \(codecByTypeId).get(typeId);",
+            "    if (!codec) {",
+            "        throw new Error(\"BridgeJS: no codec registered for type ID \" + typeId);",
+            "    }",
+            "    return codec;",
+            "}",
+        ]
+    }
+}
+
+enum ContainerCodecJS {
+    static let arrayCodec = "__bjs_arrayCodec"
+    static let optionalCodec = "__bjs_optionalCodec"
+    static let dictCodec = "__bjs_dictCodec"
+
+    static let namedCodecPrefix = "__bjs_codec_"
+
+    private static let combinatorIntrinsicName = "containerCodecCombinators"
+    private static let primitiveCodecIntrinsicName = "containerPrimitiveCodecs"
+
+    static func combinatorDeclarations() -> [String] {
+        let i32 = JSGlueVariableScope.reservedI32Stack
+        let stringCodec = JSGlueVariableScope.reservedStringCodec
+        return [
+            "const \(arrayCodec)Cache = new WeakMap();",
+            "function \(arrayCodec)(elementCodec) {",
+            "    let codec = \(arrayCodec)Cache.get(elementCodec);",
+            "    if (codec !== undefined) {",
+            "        return codec;",
+            "    }",
+            "    codec = {",
+            "        lower(value) {",
+            "            for (let i = 0; i < value.length; i++) {",
+            "                elementCodec.lower(value[i]);",
+            "            }",
+            "            \(i32).push(value.length);",
+            "        },",
+            "        lift() {",
+            "            const count = \(i32).pop();",
+            "            if (count === -1) {",
+            "                return \(JSGlueVariableScope.reservedTaStack).pop();",
+            "            }",
+            "            const result = new Array(count);",
+            "            for (let i = count - 1; i >= 0; i--) {",
+            "                result[i] = elementCodec.lift();",
+            "            }",
+            "            return result;",
+            "        },",
+            "    };",
+            "    \(arrayCodec)Cache.set(elementCodec, codec);",
+            "    return codec;",
+            "}",
+            "const \(optionalCodec)Cache = new WeakMap();",
+            "const \(optionalCodec)UndefinedOrCache = new WeakMap();",
+            "function \(optionalCodec)(elementCodec, isUndefinedOr = false) {",
+            "    const cache = isUndefinedOr ? \(optionalCodec)UndefinedOrCache : \(optionalCodec)Cache;",
+            "    let codec = cache.get(elementCodec);",
+            "    if (codec !== undefined) {",
+            "        return codec;",
+            "    }",
+            "    codec = {",
+            "        lower(value) {",
+            "            const isSome = isUndefinedOr ? value !== undefined : value != null;",
+            "            if (isSome) {",
+            "                elementCodec.lower(value);",
+            "                \(i32).push(1);",
+            "            } else {",
+            "                \(i32).push(0);",
+            "            }",
+            "        },",
+            "        lift() {",
+            "            if (\(i32).pop() === 0) {",
+            "                return isUndefinedOr ? undefined : null;",
+            "            }",
+            "            return elementCodec.lift();",
+            "        },",
+            "    };",
+            "    cache.set(elementCodec, codec);",
+            "    return codec;",
+            "}",
+            "const \(dictCodec)Cache = new WeakMap();",
+            "function \(dictCodec)(valueCodec) {",
+            "    let codec = \(dictCodec)Cache.get(valueCodec);",
+            "    if (codec !== undefined) {",
+            "        return codec;",
+            "    }",
+            "    codec = {",
+            "        lower(value) {",
+            "            const keys = Object.keys(value);",
+            "            for (let i = 0; i < keys.length; i++) {",
+            "                \(stringCodec).lower(keys[i]);",
+            "                valueCodec.lower(value[keys[i]]);",
+            "            }",
+            "            \(i32).push(keys.length);",
+            "        },",
+            "        lift() {",
+            "            const count = \(i32).pop();",
+            "            const result = {};",
+            "            for (let i = 0; i < count; i++) {",
+            "                const value = valueCodec.lift();",
+            "                const key = \(stringCodec).lift();",
+            "                result[key] = value;",
+            "            }",
+            "            return result;",
+            "        },",
+            "    };",
+            "    \(dictCodec)Cache.set(valueCodec, codec);",
+            "    return codec;",
+            "}",
+        ]
+    }
+
+    static func optionalCodecExpression(elementCodec: String, kind: JSOptionalKind) -> String {
+        switch kind {
+        case .null: return "\(optionalCodec)(\(elementCodec))"
+        case .undefined: return "\(optionalCodec)(\(elementCodec), true)"
+        }
+    }
+
+    static func registerCombinators(scope: JSGlueVariableScope) {
+        scope.registerIntrinsic(combinatorIntrinsicName) { printer in
+            printer.write(lines: combinatorDeclarations())
+        }
+    }
+
+    static func registerPrimitiveCodecs(context: IntrinsicJSFragment.PrintCodeContext) throws {
+        try context.scope.registerIntrinsic(primitiveCodecIntrinsicName) { printer in
+            let stringCodec = JSGlueVariableScope.reservedStringCodec
+            try writeCodecLiteral(
+                type: .string,
+                into: printer,
+                context: context,
+                prefix: "const \(stringCodec) = ",
+                suffix: ";"
+            )
+            printer.write("const \(JSGlueVariableScope.reservedPrimitiveCodecs) = {")
+            try printer.indent {
+                for primitive in BridgeType.genericBridgeablePrimitives {
+                    if case .string = primitive.type {
+                        printer.write("\(primitive.token): \(stringCodec),")
+                    } else {
+                        try writeCodecLiteral(
+                            type: primitive.type,
+                            into: printer,
+                            context: context,
+                            prefix: "\(primitive.token): ",
+                            suffix: ","
+                        )
+                    }
+                }
+            }
+            printer.write("};")
+        }
+    }
+
+    static func writeCodecLiteral(
+        type: BridgeType,
+        into printer: CodeFragmentPrinter,
+        context: IntrinsicJSFragment.PrintCodeContext,
+        prefix: String = "",
+        suffix: String = ","
+    ) throws {
+        func literalContext() -> IntrinsicJSFragment.PrintCodeContext {
+            context.with(\.printer, printer).with(\.scope, context.scope.makeChildScope())
+        }
+        let lowerFragment = try IntrinsicJSFragment.stackLowerFragment(elementType: type)
+        let liftFragment = try IntrinsicJSFragment.stackLiftFragment(elementType: type)
+        printer.write("\(prefix){")
+        try printer.indent {
+            printer.write("lower: (v) => {")
+            try printer.indent {
+                _ = try lowerFragment.printCode(["v"], literalContext())
+            }
+            printer.write("},")
+            printer.write("lift: () => {")
+            try printer.indent {
+                let results = try liftFragment.printCode([], literalContext())
+                printer.write("return \(results[0]);")
+            }
+            printer.write("},")
+        }
+        printer.write("}\(suffix)")
+    }
+
+    struct NamedCodec {
+        let expression: String
+        let token: String
+    }
+
+    static func codecExpression(
+        for elementType: BridgeType,
+        context: IntrinsicJSFragment.PrintCodeContext
+    ) throws -> String {
+        try namedCodec(for: elementType, context: context).expression
+    }
+
+    static func namedCodec(
+        for elementType: BridgeType,
+        context: IntrinsicJSFragment.PrintCodeContext
+    ) throws -> NamedCodec {
+        registerCombinators(scope: context.scope)
+        try registerPrimitiveCodecs(context: context)
+        let type = elementType.unaliased
+        switch type {
+        case .array(let element):
+            let element = try namedCodec(for: element, context: context)
+            return composedCodec(
+                token: "Array_\(element.token)",
+                factory: "\(arrayCodec)(\(element.expression))",
+                context: context
+            )
+        case .dictionary(let value):
+            let value = try namedCodec(for: value, context: context)
+            return composedCodec(
+                token: "Dict_\(value.token)",
+                factory: "\(dictCodec)(\(value.expression))",
+                context: context
+            )
+        case .nullable(let wrapped, let kind):
+            let wrapped = try namedCodec(for: wrapped, context: context)
+            let prefix = kind == .null ? "Optional" : "UndefinedOr"
+            return composedCodec(
+                token: "\(prefix)_\(wrapped.token)",
+                factory: optionalCodecExpression(elementCodec: wrapped.expression, kind: kind),
+                context: context
+            )
+        case .string, .rawValueEnum(_, .string):
+            return NamedCodec(expression: JSGlueVariableScope.reservedStringCodec, token: "String")
+        default:
+            if let token = BridgeType.genericBridgeablePrimitives.first(where: { $0.type == type })?.token {
+                return NamedCodec(
+                    expression: "\(JSGlueVariableScope.reservedPrimitiveCodecs).\(token)",
+                    token: token
+                )
+            }
+            return try leafCodec(for: type, context: context)
+        }
+    }
+
+    private static func composedCodec(
+        token: String,
+        factory: String,
+        context: IntrinsicJSFragment.PrintCodeContext
+    ) -> NamedCodec {
+        let name = "\(namedCodecPrefix)\(token)"
+        context.scope.registerNamedCodec(name) { printer in
+            printer.write("const \(name) = \(factory);")
+        }
+        return NamedCodec(expression: name, token: token)
+    }
+
+    private static func leafCodec(
+        for type: BridgeType,
+        context: IntrinsicJSFragment.PrintCodeContext
+    ) throws -> NamedCodec {
+        let token = leafToken(for: type, scope: context.scope)
+        let name = "\(namedCodecPrefix)\(token)"
+        let hoistedContext = context.with(\.hasDirectAccessToSwiftClass, false)
+        try context.scope.registerNamedCodec(name) { printer in
+            try writeCodecLiteral(
+                type: type,
+                into: printer,
+                context: hoistedContext,
+                prefix: "const \(name) = ",
+                suffix: ";"
+            )
+        }
+        return NamedCodec(expression: name, token: token)
+    }
+
+    private static func leafToken(for type: BridgeType, scope: JSGlueVariableScope) -> String {
+        func identifierComponent(_ name: String) -> String {
+            HelperNaming.identifierComponent(name)
+        }
+        func qualified(_ name: String) -> String {
+            scope.helperKey(forTypeNamed: name)
+        }
+        switch type {
+        case .jsObject(nil):
+            return "JSObject"
+        case .jsObject(let name?):
+            return identifierComponent(name)
+        case .swiftStruct(let name),
+            .swiftHeapObject(let name),
+            .swiftProtocol(let name),
+            .caseEnum(let name),
+            .rawValueEnum(let name, _),
+            .associatedValueEnum(let name),
+            .namespaceEnum(let name):
+            return qualified(name)
+        default:
+            return identifierComponent(type.mangleTypeName)
+        }
     }
 }
 
@@ -615,12 +996,13 @@ struct IntrinsicJSFragment: Sendable {
 
     // MARK: - Associated Enum Fragments
 
-    static func associatedEnumLowerParameter(enumBase: String) -> IntrinsicJSFragment {
+    static func associatedEnumLowerParameter(enumName: String) -> IntrinsicJSFragment {
         IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
                 let (scope, printer) = (context.scope, context.printer)
                 let value = arguments[0]
+                let enumBase = scope.helperKey(forTypeNamed: enumName)
                 let caseIdName = scope.variable("\(value)CaseId")
                 printer.write(
                     "const \(caseIdName) = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lower(\(value));"
@@ -630,11 +1012,12 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
-    static func associatedEnumLiftReturn(enumBase: String) -> IntrinsicJSFragment {
+    static func associatedEnumLiftReturn(enumName: String) -> IntrinsicJSFragment {
         IntrinsicJSFragment(
             parameters: [],
             printCode: { _, context in
                 let (scope, printer) = (context.scope, context.printer)
+                let enumBase = scope.helperKey(forTypeNamed: enumName)
                 let retName = scope.variable("ret")
                 printer.write(
                     "const \(retName) = \(JSGlueVariableScope.reservedEnumHelpers).\(enumBase).lift(\(scope.popI32()));"
@@ -681,6 +1064,12 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
+    /// Lift an optional parameter whose presence flag arrives as a wasm
+    /// parameter (not on the i32 stack), with the payload either in further
+    /// wasm parameters or on the stacks. The shared optional codec combinator
+    /// pops its flag from the i32 stack, so this ABI cannot go through it;
+    /// stack-convention payloads still lift through the shared container
+    /// codecs via `stackLiftFragment`.
     private static func compositeOptionalLiftParameter(
         wrappedType: BridgeType,
         kind: JSOptionalKind,
@@ -761,26 +1150,26 @@ struct IntrinsicJSFragment: Sendable {
             )
         }
 
-        let innerFragment =
-            if wrappedType.optionalParameterUsesStackABI {
-                try stackLowerFragment(elementType: wrappedType)
-            } else {
-                try lowerParameter(type: wrappedType)
-            }
+        if wrappedType.optionalParameterUsesStackABI {
+            // Stack convention: the conditional flag-plus-payload protocol is
+            // the shared optional codec's stack ABI.
+            return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
+        }
         return try compositeOptionalLowerParameter(
             wrappedType: wrappedType,
             kind: kind,
-            innerFragment: innerFragment
+            innerFragment: try lowerParameter(type: wrappedType)
         )
     }
 
+    /// Lower an optional parameter using the direct `(isSome, ...payload)` wasm
+    /// parameter ABI with zero placeholders for nil. This is not the container
+    /// stack ABI, so it cannot go through the shared optional codec combinator.
     private static func compositeOptionalLowerParameter(
         wrappedType: BridgeType,
         kind: JSOptionalKind,
         innerFragment: IntrinsicJSFragment
     ) throws -> IntrinsicJSFragment {
-        let isStackConvention = wrappedType.optionalParameterUsesStackABI
-
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
@@ -797,7 +1186,7 @@ struct IntrinsicJSFragment: Sendable {
 
                 let resultVars = innerResults.map { _ in scope.variable("result") }
                 assert(
-                    isStackConvention || resultVars.count == wrappedType.wasmParams.count,
+                    resultVars.count == wrappedType.wasmParams.count,
                     "Inner fragment result count (\(resultVars.count)) must match wasmParams count (\(wrappedType.wasmParams.count)) for \(wrappedType)"
                 )
                 if !resultVars.isEmpty {
@@ -814,8 +1203,7 @@ struct IntrinsicJSFragment: Sendable {
                     }
                 }
 
-                let hasPlaceholders = !isStackConvention && !wrappedType.wasmParams.isEmpty
-                if hasPlaceholders {
+                if !wrappedType.wasmParams.isEmpty {
                     printer.write("} else {")
                     printer.indent {
                         for (resultVar, param) in zip(resultVars, wrappedType.wasmParams) {
@@ -825,12 +1213,7 @@ struct IntrinsicJSFragment: Sendable {
                 }
                 printer.write("}")
 
-                if isStackConvention {
-                    scope.emitPushI32Parameter("+\(isSomeVar)", printer: printer)
-                    return []
-                } else {
-                    return ["+\(isSomeVar)"] + resultVars
-                }
+                return ["+\(isSomeVar)"] + resultVars
             }
         )
     }
@@ -848,6 +1231,9 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
+    /// Lift an optional return whose presence flag travels on the i32 stack but
+    /// whose payload uses the wrapped type's regular (non-stack) return ABI, so
+    /// it cannot go through the shared optional codec combinator.
     private static func optionalLiftReturnWithPresenceFlag(
         wrappedType: BridgeType,
         kind: JSOptionalKind
@@ -860,12 +1246,7 @@ struct IntrinsicJSFragment: Sendable {
                 let isSomeVar = scope.variable("isSome")
                 printer.write("const \(isSomeVar) = \(scope.popI32());")
 
-                let innerFragment =
-                    if wrappedType.optionalConvention == .stackABI {
-                        try stackLiftFragment(elementType: wrappedType)
-                    } else {
-                        try liftReturn(type: wrappedType)
-                    }
+                let innerFragment = try liftReturn(type: wrappedType)
 
                 let innerPrinter = CodeFragmentPrinter()
                 let innerResults = try innerFragment.printCode([], context.with(\.printer, innerPrinter))
@@ -898,12 +1279,12 @@ struct IntrinsicJSFragment: Sendable {
         fullName: String,
         kind: JSOptionalKind
     ) -> IntrinsicJSFragment {
-        let base = fullName.components(separatedBy: ".").last ?? fullName
         let absenceLiteral = kind.absenceLiteral
         return IntrinsicJSFragment(
             parameters: [],
             printCode: { _, context in
                 let (scope, printer) = (context.scope, context.printer)
+                let base = scope.helperKey(forTypeNamed: fullName)
                 let resultVar = scope.variable("optResult")
                 let tagVar = scope.variable("tag")
                 printer.write("const \(tagVar) = \(scope.popI32());")
@@ -942,31 +1323,13 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
-    private static func optionalLiftReturnStruct(
-        fullName: String,
-        kind: JSOptionalKind
-    ) -> IntrinsicJSFragment {
-        let base = fullName.replacingOccurrences(of: ".", with: "_")
-        let absenceLiteral = kind.absenceLiteral
-        return IntrinsicJSFragment(
-            parameters: [],
-            printCode: { _, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let isSomeVar = scope.variable("isSome")
-                let resultVar = scope.variable("optResult")
-                printer.write("const \(isSomeVar) = \(scope.popI32());")
-                printer.write(
-                    "const \(resultVar) = \(isSomeVar) ? \(JSGlueVariableScope.reservedStructHelpers).\(base).lift() : \(absenceLiteral);"
-                )
-                return [resultVar]
-            }
-        )
-    }
-
     static func optionalLiftReturn(
         wrappedType: BridgeType,
         kind: JSOptionalKind
-    ) -> IntrinsicJSFragment {
+    ) throws -> IntrinsicJSFragment {
+        // Side-channel optionals deliver their payload through dedicated
+        // storage/imports instead of the bridge stacks, so they cannot go
+        // through the shared optional codec combinator.
         if let scalarKind = wrappedType.optionalScalarKind {
             return optionalLiftReturnFromStorage(storage: scalarKind.storageName)
         }
@@ -974,16 +1337,19 @@ struct IntrinsicJSFragment: Sendable {
             return optionalLiftReturnFromStorage(storage: JSGlueVariableScope.reservedStorageToReturnString)
         }
 
+        // Heap object optionals use the tmpRetOptionalHeapObject side channel.
         if case .swiftHeapObject(let className) = wrappedType {
             return optionalLiftReturnHeapObject(className: className, kind: kind)
         }
 
-        if case .swiftStruct(let fullName) = wrappedType {
-            return optionalLiftReturnStruct(fullName: fullName, kind: kind)
-        }
-
+        // Sentinel optionals encode nil in-band (tag -1), with no presence flag.
         if wrappedType.nilSentinel.hasSentinel, case .associatedValueEnum(let fullName) = wrappedType {
             return optionalLiftReturnAssociatedEnum(fullName: fullName, kind: kind)
+        }
+
+        if wrappedType.optionalConvention == .stackABI {
+            // Stack convention: route through the shared optional codec combinator.
+            return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
         }
 
         return optionalLiftReturnWithPresenceFlag(wrappedType: wrappedType, kind: kind)
@@ -1111,12 +1477,8 @@ struct IntrinsicJSFragment: Sendable {
         }
 
         if wrappedType.optionalConvention == .stackABI {
-            let innerFragment = try stackLowerFragment(elementType: wrappedType)
-            return stackOptionalLower(
-                wrappedType: wrappedType,
-                kind: kind,
-                innerFragment: innerFragment
-            )
+            // Stack convention: route through the shared optional codec combinator.
+            return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
         }
 
         if wrappedType.nilSentinel.hasSentinel {
@@ -1248,39 +1610,6 @@ struct IntrinsicJSFragment: Sendable {
         }
     }
 
-    /// Lower an optional value to the stack using the **conditional** protocol:
-    /// push isSome flag, then conditionally push the payload (no placeholders for nil).
-    private static func stackOptionalLower(
-        wrappedType: BridgeType,
-        kind: JSOptionalKind,
-        innerFragment: IntrinsicJSFragment
-    ) -> IntrinsicJSFragment {
-        IntrinsicJSFragment(
-            parameters: ["value"],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let value = arguments[0]
-                let isSomeVar = scope.variable("isSome")
-                printer.write("const \(isSomeVar) = \(kind.presenceCheck(value: value));")
-
-                let ifBodyPrinter = CodeFragmentPrinter()
-                try ifBodyPrinter.indent {
-                    let _ = try innerFragment.printCode(
-                        [value],
-                        context.with(\.printer, ifBodyPrinter)
-                    )
-                }
-                printer.write("if (\(isSomeVar)) {")
-                for line in ifBodyPrinter.lines {
-                    printer.write(line)
-                }
-                printer.write("}")
-                scope.emitPushI32Parameter("\(isSomeVar) ? 1 : 0", printer: printer)
-                return []
-            }
-        )
-    }
-
     // MARK: - ExportSwift
 
     /// Returns a fragment that lowers a JS value to Wasm core values for parameters
@@ -1300,11 +1629,9 @@ struct IntrinsicJSFragment: Sendable {
             return try .optionalLowerParameter(wrappedType: wrappedType, kind: kind)
         case .rawValueEnum(_, .string): return .stringLowerParameter
         case .associatedValueEnum(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
-            return .associatedEnumLowerParameter(enumBase: base)
+            return .associatedEnumLowerParameter(enumName: fullName)
         case .swiftStruct(let fullName):
-            let base = fullName.replacingOccurrences(of: ".", with: "_")
-            return swiftStructLowerParameter(structBase: base)
+            return swiftStructLowerParameter(structName: fullName)
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["closure"],
@@ -1357,14 +1684,12 @@ struct IntrinsicJSFragment: Sendable {
         case .swiftProtocol: return .jsObjectLiftReturn
         case .void: return .void
         case .nullable(let wrappedType, let kind):
-            return .optionalLiftReturn(wrappedType: wrappedType, kind: kind)
+            return try .optionalLiftReturn(wrappedType: wrappedType, kind: kind)
         case .rawValueEnum(_, .string): return .stringLiftReturn
         case .associatedValueEnum(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
-            return .associatedEnumLiftReturn(enumBase: base)
+            return .associatedEnumLiftReturn(enumName: fullName)
         case .swiftStruct(let fullName):
-            let base = fullName.replacingOccurrences(of: ".", with: "_")
-            return swiftStructLiftReturn(structBase: base)
+            return swiftStructLiftReturn(structName: fullName)
         case .closure:
             return IntrinsicJSFragment(
                 parameters: ["funcRef"],
@@ -1423,11 +1748,11 @@ struct IntrinsicJSFragment: Sendable {
             return try .optionalLiftParameter(wrappedType: wrappedType, kind: kind, context: context)
         case .rawValueEnum(_, .string): return .stringLiftParameter
         case .associatedValueEnum(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
             return IntrinsicJSFragment(
                 parameters: ["caseId"],
                 printCode: { arguments, context in
                     let (scope, printer) = (context.scope, context.printer)
+                    let base = scope.helperKey(forTypeNamed: fullName)
                     let caseId = arguments[0]
                     let resultVar = scope.variable("enumValue")
                     printer.write(
@@ -1437,11 +1762,11 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         case .swiftStruct(let fullName):
-            let base = fullName.replacingOccurrences(of: ".", with: "_")
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, context in
                     let (scope, printer) = (context.scope, context.printer)
+                    let base = scope.helperKey(forTypeNamed: fullName)
                     let resultVar = scope.variable("structValue")
                     printer.write(
                         "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(base).lift();"
@@ -1523,11 +1848,11 @@ struct IntrinsicJSFragment: Sendable {
     // MARK: - Enums Payload Fragments
 
     static func associatedValueLowerReturn(fullName: String) -> IntrinsicJSFragment {
-        let base = fullName.components(separatedBy: ".").last ?? fullName
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
                 let (scope, printer) = (context.scope, context.printer)
+                let base = scope.helperKey(forTypeNamed: fullName)
                 let value = arguments[0]
                 let caseIdVar = scope.variable("caseId")
                 printer.write(
@@ -1566,17 +1891,20 @@ struct IntrinsicJSFragment: Sendable {
         )
     }
 
-    /// Generates the enum helper factory function (lower/lift closures).
-    /// This is placed inside `createInstantiator` alongside struct helpers,
-    /// so it has access to `_exports` for class references.
-    static func associatedValueEnumHelperFactory(enumDefinition: ExportedEnum) -> IntrinsicJSFragment {
+    static func associatedValueEnumHelperFactory(
+        enumDefinition: ExportedEnum,
+        moduleName: String
+    ) -> IntrinsicJSFragment {
+        let factoryName = HelperNaming.enumHelperFactory(
+            HelperNaming.type(module: moduleName, swiftName: enumDefinition.swiftCallName)
+        )
         return IntrinsicJSFragment(
             parameters: ["enumName"],
             printCode: { arguments, context in
                 let (scope, printer) = (context.scope, context.printer)
                 let enumName = arguments[0]
 
-                printer.write("const __bjs_create\(enumName)Helpers = () => ({")
+                printer.write("const \(factoryName) = () => ({")
                 try printer.indent {
                     printer.write("lower: (value) => {")
                     try printer.indent {
@@ -1769,11 +2097,12 @@ struct IntrinsicJSFragment: Sendable {
         }
     }
 
-    private static func swiftStructLower(structBase: String) -> IntrinsicJSFragment {
+    private static func swiftStructLower(structName: String) -> IntrinsicJSFragment {
         IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
                 let printer = context.printer
+                let structBase = context.scope.helperKey(forTypeNamed: structName)
                 let value = arguments[0]
                 printer.write(
                     "\(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
@@ -1784,18 +2113,19 @@ struct IntrinsicJSFragment: Sendable {
     }
 
     static func swiftStructLowerReturn(fullName: String) -> IntrinsicJSFragment {
-        swiftStructLower(structBase: fullName.replacingOccurrences(of: ".", with: "_"))
+        swiftStructLower(structName: fullName)
     }
 
-    static func swiftStructLowerParameter(structBase: String) -> IntrinsicJSFragment {
-        swiftStructLower(structBase: structBase)
+    static func swiftStructLowerParameter(structName: String) -> IntrinsicJSFragment {
+        swiftStructLower(structName: structName)
     }
 
-    static func swiftStructLiftReturn(structBase: String) -> IntrinsicJSFragment {
+    static func swiftStructLiftReturn(structName: String) -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: [],
             printCode: { arguments, context in
                 let (scope, printer) = (context.scope, context.printer)
+                let structBase = scope.helperKey(forTypeNamed: structName)
                 let resultVar = scope.variable("structValue")
                 printer.write(
                     "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).lift();"
@@ -1807,133 +2137,53 @@ struct IntrinsicJSFragment: Sendable {
 
     // MARK: - Array Helpers
 
-    /// Lowers an array from JS to Swift by iterating elements and pushing to stacks
     static func arrayLower(elementType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["arr"],
             printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let arr = arguments[0]
-
-                let elemVar = scope.variable("elem")
-                printer.write("for (const \(elemVar) of \(arr)) {")
-                try printer.indent {
-                    let elementFragment = try stackLowerFragment(elementType: elementType)
-                    let _ = try elementFragment.printCode(
-                        [elemVar],
-                        context
-                    )
-                }
-                printer.write("}")
-                scope.emitPushI32Parameter("\(arr).length", printer: printer)
+                let codec = try ContainerCodecJS.codecExpression(for: .array(elementType), context: context)
+                context.printer.write("\(codec).lower(\(arguments[0]));")
                 return []
             }
         )
     }
 
-    /// Lowers a dictionary from JS to Swift by iterating entries and pushing to stacks
     static func dictionaryLower(valueType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: ["dict"],
             printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let dict = arguments[0]
-
-                let entriesVar = scope.variable("entries")
-                let entryVar = scope.variable("entry")
-                printer.write("const \(entriesVar) = Object.entries(\(dict));")
-                printer.write("for (const \(entryVar) of \(entriesVar)) {")
-                try printer.indent {
-                    let keyVar = scope.variable("key")
-                    let valueVar = scope.variable("value")
-                    printer.write("const [\(keyVar), \(valueVar)] = \(entryVar);")
-
-                    let keyFragment = try stackLowerFragment(elementType: .string)
-                    let _ = try keyFragment.printCode(
-                        [keyVar],
-                        context
-                    )
-
-                    let valueFragment = try stackLowerFragment(elementType: valueType)
-                    let _ = try valueFragment.printCode(
-                        [valueVar],
-                        context
-                    )
-                }
-                printer.write("}")
-                scope.emitPushI32Parameter("\(entriesVar).length", printer: printer)
+                let codec = try ContainerCodecJS.codecExpression(for: .dictionary(valueType), context: context)
+                context.printer.write("\(codec).lower(\(arguments[0]));")
                 return []
             }
         )
     }
 
-    /// Lifts an array from Swift to JS by popping elements from stacks
     static func arrayLift(elementType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let resultVar = scope.variable("arrayResult")
-                let lenVar = scope.variable("arrayLen")
-
-                printer.write("const \(lenVar) = \(scope.popI32());")
-                printer.write("let \(resultVar);")
-                printer.write("if (\(lenVar) === -1) {")
-                printer.indent {
-                    // Bulk path: Swift pushed a typed array onto the typed-array stack
-                    printer.write("\(resultVar) = \(JSGlueVariableScope.reservedTaStack).pop();")
-                }
-                printer.write("} else {")
-                try printer.indent {
-                    // Element-by-element path (original behavior)
-                    let iVar = scope.variable("i")
-                    printer.write("\(resultVar) = [];")
-                    printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
-                    try printer.indent {
-                        let elementFragment = try stackLiftFragment(elementType: elementType)
-                        let elementResults = try elementFragment.printCode([], context)
-                        if let elementExpr = elementResults.first {
-                            printer.write("\(resultVar).push(\(elementExpr));")
-                        }
-                    }
-                    printer.write("}")
-                    printer.write("\(resultVar).reverse();")
-                }
-                printer.write("}")
+            printCode: { _, context in
+                let codec = try ContainerCodecJS.codecExpression(for: .array(elementType), context: context)
+                let resultVar = context.scope.variable("arrayResult")
+                context.printer.write("const \(resultVar) = \(codec).lift();")
                 return [resultVar]
             }
         )
     }
 
-    /// Lifts a dictionary from Swift to JS by popping key/value pairs from stacks
     static func dictionaryLift(valueType: BridgeType) throws -> IntrinsicJSFragment {
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let resultVar = scope.variable("dictResult")
-                let lenVar = scope.variable("dictLen")
-                let iVar = scope.variable("i")
-
-                printer.write("const \(lenVar) = \(scope.popI32());")
-                printer.write("const \(resultVar) = {};")
-                printer.write("for (let \(iVar) = 0; \(iVar) < \(lenVar); \(iVar)++) {")
-                try printer.indent {
-                    let valueFragment = try stackLiftFragment(elementType: valueType)
-                    let valueResults = try valueFragment.printCode([], context)
-                    let keyFragment = try stackLiftFragment(elementType: .string)
-                    let keyResults = try keyFragment.printCode([], context)
-                    if let keyExpr = keyResults.first, let valueExpr = valueResults.first {
-                        printer.write("\(resultVar)[\(keyExpr)] = \(valueExpr);")
-                    }
-                }
-                printer.write("}")
+            printCode: { _, context in
+                let codec = try ContainerCodecJS.codecExpression(for: .dictionary(valueType), context: context)
+                let resultVar = context.scope.variable("dictResult")
+                context.printer.write("const \(resultVar) = \(codec).lift();")
                 return [resultVar]
             }
         )
     }
 
-    private static func stackLiftFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
+    static func stackLiftFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
         if case .nullable(let wrappedType, let kind) = elementType {
             return try optionalElementRaiseFragment(wrappedType: wrappedType, kind: kind)
         }
@@ -1998,11 +2248,11 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         case .swiftStruct(let fullName):
-            let structBase = fullName.replacingOccurrences(of: ".", with: "_")
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, context in
                     let (scope, printer) = (context.scope, context.printer)
+                    let structBase = scope.helperKey(forTypeNamed: fullName)
                     let resultVar = scope.variable("struct")
                     printer.write(
                         "const \(resultVar) = \(JSGlueVariableScope.reservedStructHelpers).\(structBase).lift();"
@@ -2011,11 +2261,11 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         case .associatedValueEnum(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, context in
                     let (scope, printer) = (context.scope, context.printer)
+                    let base = scope.helperKey(forTypeNamed: fullName)
                     let resultVar = scope.variable("enumValue")
                     printer.write(
                         "const \(resultVar) = \(JSGlueVariableScope.reservedEnumHelpers).\(base).lift(\(scope.popI32()));"
@@ -2060,7 +2310,7 @@ struct IntrinsicJSFragment: Sendable {
         }
     }
 
-    private static func stackLowerFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
+    static func stackLowerFragment(elementType: BridgeType) throws -> IntrinsicJSFragment {
         if case .nullable(let wrappedType, let kind) = elementType {
             return try optionalElementLowerFragment(wrappedType: wrappedType, kind: kind)
         }
@@ -2120,11 +2370,11 @@ struct IntrinsicJSFragment: Sendable {
                 }
             )
         case .swiftStruct(let fullName):
-            let structBase = fullName.replacingOccurrences(of: ".", with: "_")
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
                     let printer = context.printer
+                    let structBase = context.scope.helperKey(forTypeNamed: fullName)
                     let value = arguments[0]
                     printer.write(
                         "\(JSGlueVariableScope.reservedStructHelpers).\(structBase).lower(\(value));"
@@ -2134,11 +2384,11 @@ struct IntrinsicJSFragment: Sendable {
             )
 
         case .associatedValueEnum(let fullName):
-            let base = fullName.components(separatedBy: ".").last ?? fullName
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
                     let (scope, printer) = (context.scope, context.printer)
+                    let base = scope.helperKey(forTypeNamed: fullName)
                     let value = arguments[0]
                     let caseIdVar = scope.variable("caseId")
                     printer.write(
@@ -2185,39 +2435,20 @@ struct IntrinsicJSFragment: Sendable {
         wrappedType: BridgeType,
         kind: JSOptionalKind
     ) throws -> IntrinsicJSFragment {
-        let absenceLiteral = kind.absenceLiteral
         return IntrinsicJSFragment(
             parameters: [],
-            printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let isSomeVar = scope.variable("isSome")
-                let resultVar = scope.variable("optValue")
-
-                printer.write("const \(isSomeVar) = \(scope.popI32());")
-                printer.write("let \(resultVar);")
-                printer.write("if (\(isSomeVar) === 0) {")
-                printer.indent {
-                    printer.write("\(resultVar) = \(absenceLiteral);")
-                }
-                printer.write("} else {")
-                try printer.indent {
-                    let innerFragment = try stackLiftFragment(elementType: wrappedType)
-                    let innerResults = try innerFragment.printCode([], context)
-                    if let innerResult = innerResults.first {
-                        printer.write("\(resultVar) = \(innerResult);")
-                    } else {
-                        printer.write("\(resultVar) = undefined;")
-                    }
-                }
-                printer.write("}")
-
+            printCode: { _, context in
+                let codec = try ContainerCodecJS.codecExpression(
+                    for: .nullable(wrappedType, kind),
+                    context: context
+                )
+                let resultVar = context.scope.variable("optValue")
+                context.printer.write("const \(resultVar) = \(codec).lift();")
                 return [resultVar]
             }
         )
     }
 
-    /// Lower an optional element to the stack using the **conditional** protocol:
-    /// push isSome flag, then conditionally push the payload (no placeholders for nil).
     private static func optionalElementLowerFragment(
         wrappedType: BridgeType,
         kind: JSOptionalKind
@@ -2225,23 +2456,11 @@ struct IntrinsicJSFragment: Sendable {
         return IntrinsicJSFragment(
             parameters: ["value"],
             printCode: { arguments, context in
-                let (scope, printer) = (context.scope, context.printer)
-                let value = arguments[0]
-                let isSomeVar = scope.variable("isSome")
-
-                let presenceExpr = kind.presenceCheck(value: value)
-                printer.write("const \(isSomeVar) = \(presenceExpr) ? 1 : 0;")
-                printer.write("if (\(isSomeVar)) {")
-                try printer.indent {
-                    let innerFragment = try stackLowerFragment(elementType: wrappedType)
-                    let _ = try innerFragment.printCode(
-                        [value],
-                        context
-                    )
-                }
-                printer.write("}")
-                scope.emitPushI32Parameter(isSomeVar, printer: printer)
-
+                let codec = try ContainerCodecJS.codecExpression(
+                    for: .nullable(wrappedType, kind),
+                    context: context
+                )
+                context.printer.write("\(codec).lower(\(arguments[0]));")
                 return []
             }
         )
@@ -2249,16 +2468,22 @@ struct IntrinsicJSFragment: Sendable {
 
     // MARK: - Struct Helpers
 
-    static func structHelper(structDefinition: ExportedStruct, allStructs: [ExportedStruct]) -> IntrinsicJSFragment {
+    static func structHelper(
+        structDefinition: ExportedStruct,
+        allStructs: [ExportedStruct],
+        moduleName: String
+    ) -> IntrinsicJSFragment {
+        let factoryName = HelperNaming.structHelperFactory(
+            HelperNaming.type(module: moduleName, swiftName: structDefinition.swiftCallName)
+        )
         return IntrinsicJSFragment(
-            parameters: ["structName"],
+            parameters: [],
             printCode: { arguments, context in
                 let printer = context.printer
-                let structName = arguments[0]
                 let capturedStructDef = structDefinition
                 let capturedAllStructs = allStructs
 
-                printer.write("const __bjs_create\(structName)Helpers = () => ({")
+                printer.write("const \(factoryName) = () => ({")
                 try printer.indent {
                     printer.write("lower: (value) => {")
                     try printer.indent {
@@ -2357,7 +2582,7 @@ struct IntrinsicJSFragment: Sendable {
                 )
                 try printer.indent {
                     printer.write(
-                        "\(JSGlueVariableScope.reservedStructHelpers).\(structDef.abiName).lower(this);"
+                        "\(JSGlueVariableScope.reservedStructHelpers).\(context.scope.helperKey(forTypeNamed: structDef.swiftCallName)).lower(this);"
                     )
 
                     var paramForwardings: [String] = []
@@ -2428,9 +2653,10 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: ["value"],
                 printCode: { arguments, context in
                     let printer = context.printer
+                    let nestedBase = context.scope.helperKey(forTypeNamed: nestedName)
                     let value = arguments[0]
                     printer.write(
-                        "\(JSGlueVariableScope.reservedStructHelpers).\(nestedName.replacingOccurrences(of: ".", with: "_")).lower(\(value));"
+                        "\(JSGlueVariableScope.reservedStructHelpers).\(nestedBase).lower(\(value));"
                     )
                     return []
                 }
@@ -2467,9 +2693,10 @@ struct IntrinsicJSFragment: Sendable {
                 parameters: [],
                 printCode: { arguments, context in
                     let (scope, printer) = (context.scope, context.printer)
+                    let nestedBase = scope.helperKey(forTypeNamed: nestedName)
                     let structVar = scope.variable("struct")
                     printer.write(
-                        "const \(structVar) = \(JSGlueVariableScope.reservedStructHelpers).\(nestedName.replacingOccurrences(of: ".", with: "_")).lift();"
+                        "const \(structVar) = \(JSGlueVariableScope.reservedStructHelpers).\(nestedBase).lift();"
                     )
                     return [structVar]
                 }
@@ -2608,7 +2835,7 @@ private extension BridgeType {
             return .inlineFlag
         case .closure:
             return .inlineFlag
-        case .swiftStruct, .array, .dictionary, .void, .namespaceEnum:
+        case .swiftStruct, .array, .dictionary, .void, .namespaceEnum, .generic:
             return .stackABI
         case .nullable(let wrapped, _):
             return wrapped.optionalConvention
@@ -2706,7 +2933,7 @@ private extension BridgeType {
             return [("caseId", .i32)]
         case .closure:
             return [("funcRef", .i32)]
-        case .void, .namespaceEnum, .swiftStruct, .array, .dictionary:
+        case .void, .namespaceEnum, .swiftStruct, .array, .dictionary, .generic:
             return []
         case .nullable(let wrapped, _):
             return wrapped.wasmParams

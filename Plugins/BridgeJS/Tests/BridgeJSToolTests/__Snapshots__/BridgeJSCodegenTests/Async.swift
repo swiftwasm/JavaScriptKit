@@ -335,6 +335,18 @@ public func _bjs_asyncRoundTripEnumDictionary() -> Int32 {
     #endif
 }
 
+extension AsyncPoint: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncPoint.bridgeJSMakeTypeHandle()
+}
+
+extension AsyncDirection: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncDirection.bridgeJSMakeTypeHandle()
+}
+
+extension AsyncTheme: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncTheme.bridgeJSMakeTypeHandle()
+}
+
 @JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
 
 #if arch(wasm32)
@@ -714,3 +726,20 @@ func _$Promise_resolve_SD14AsyncDirectionO(_ promise: JSObject, _ value: [String
     promise_resolve_TestModule_SD14AsyncDirectionO(promiseValue)
     if let error = _swift_js_take_exception() { throw error }
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        AsyncPoint.bridgeJSTypeID,
+        AsyncDirection.bridgeJSTypeID,
+        AsyncTheme.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

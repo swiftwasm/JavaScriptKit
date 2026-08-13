@@ -161,6 +161,38 @@ export async function setupOptions(options, context) {
                 jsJoinOptionalStructThenArray: joinStackParams,
                 jsJoinEnumThenArray: joinStackParams,
                 jsJoinStringThenStackParams: joinStackParams,
+                jsGenericRoundTrip: (v) => v,
+                jsGenericRoundTripClass: (v) => v,
+                jsGenericParsePoint: (json) => JSON.parse(json),
+                jsImportPickFirst: (a, b) => a,
+                jsImportMakeInt: () => 123,
+                jsImportCombineSecond: (a, b) => b,
+                jsGenericThrowOrRoundTrip: (shouldThrow, v) => {
+                    if (shouldThrow) {
+                        throw new Error("TestError");
+                    }
+                    return v;
+                },
+                jsGenericArrayRoundTrip: (v) => v,
+                jsGenericOptionalRoundTrip: (v) => v,
+                jsGenericDictRoundTrip: (v) => v,
+                jsGenericAfterOptionalArray: (a, b) => `${JSON.stringify(a)}|${JSON.stringify(b)}`,
+                ImportGenericConsumer: class {
+                    identity(value) {
+                        return value;
+                    }
+                    static box(value) {
+                        return value;
+                    }
+                },
+                ImportGenericBoxed: class {
+                    constructor(value) {
+                        this.value = value;
+                    }
+                    unwrap() {
+                        return this.value;
+                    }
+                },
                 roundTripArrayMembers: (value) => {
                     return value;
                 },

@@ -257,6 +257,18 @@ fileprivate func _bjs_TagReference_wrap_extern(_ pointer: UnsafeMutableRawPointe
     return _bjs_TagReference_wrap_extern(pointer)
 }
 
+extension PolygonReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PolygonReference.bridgeJSMakeTypeHandle()
+}
+
+extension TagReference: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = TagReference.bridgeJSMakeTypeHandle()
+}
+
+extension InnerTag: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = InnerTag.bridgeJSMakeTypeHandle()
+}
+
 extension Polygon: _BridgedSwiftAlias, _BridgedSwiftStackType {}
 
 extension Tag: _BridgedSwiftAlias, _BridgedSwiftStackType {}
@@ -395,3 +407,20 @@ func _$Surface_label_get(_ self: JSObject) throws(JSException) -> String {
     }
     return String.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        PolygonReference.bridgeJSTypeID,
+        TagReference.bridgeJSTypeID,
+        InnerTag.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

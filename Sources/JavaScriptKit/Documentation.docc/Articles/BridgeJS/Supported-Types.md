@@ -31,6 +31,10 @@ When using `JSTypedArray<T>` (or convenience typealiases) in `@JS` signatures, t
 
 See <doc:Exporting-Swift-Array> for usage details.
 
+## Generic type parameters
+
+An imported `@JSFunction` can be generic over a type parameter constrained to `BridgedSwiftGenericBridgeable` (see <doc:Importing-JS-Function>); exported `@JS` functions cannot yet. The constraint is satisfied by all supported primitives, `String`, `JSValue`, and any `@JS` struct, `@JS` enum, or `final @JS class`, including ones from another linked module. Do not write the conformance by hand; marking the type `@JS` is what provides it, together with the JavaScript side of the bridge.
+
 ## See Also
 
 - <doc:Generating-from-TypeScript>

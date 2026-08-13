@@ -46,7 +46,7 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createShapeHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT5Shape = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.label);
             const id = swift.memory.retain(bytes);
@@ -58,7 +58,7 @@ export async function createInstantiator(options, swift) {
             return { label: string };
         }
     });
-    const __bjs_createWidgetHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT6Widget = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.name);
             const id = swift.memory.retain(bytes);
@@ -70,7 +70,7 @@ export async function createInstantiator(options, swift) {
             return { name: string };
         }
     });
-    const __bjs_createWidget_LayoutHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT6WidgetT6Layout = () => ({
         lower: (value) => {
             i32Stack.push((value.padding | 0));
         },
@@ -79,7 +79,7 @@ export async function createInstantiator(options, swift) {
             return { padding: int };
         }
     });
-    const __bjs_createWidget_BoundsHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT6WidgetT6Bounds = () => ({
         lower: (value) => {
             i32Stack.push((value.width | 0));
             i32Stack.push((value.height | 0));
@@ -166,33 +166,35 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Shape"] = function(objectId) {
-                structHelpers.Shape.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT5Shape.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Shape"] = function() {
-                const value = structHelpers.Shape.lift();
+                const value = structHelpers.M10TestModuleT5Shape.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Widget"] = function(objectId) {
-                structHelpers.Widget.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT6Widget.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Widget"] = function() {
-                const value = structHelpers.Widget.lift();
+                const value = structHelpers.M10TestModuleT6Widget.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Widget_Layout"] = function(objectId) {
-                structHelpers.Widget_Layout.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT6WidgetT6Layout.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Widget_Layout"] = function() {
-                const value = structHelpers.Widget_Layout.lift();
+                const value = structHelpers.M10TestModuleT6WidgetT6Layout.lift();
                 return swift.memory.retain(value);
             }
             bjs["swift_js_struct_lower_Widget_Bounds"] = function(objectId) {
-                structHelpers.Widget_Bounds.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT6WidgetT6Bounds.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Widget_Bounds"] = function() {
-                const value = structHelpers.Widget_Bounds.lift();
+                const value = structHelpers.M10TestModuleT6WidgetT6Bounds.lift();
                 return swift.memory.retain(value);
             }
+            bjs["bjs_core_register_type_handles"] = function() {};
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -304,17 +306,17 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const ShapeHelpers = __bjs_createShapeHelpers();
-            structHelpers.Shape = ShapeHelpers;
+            const __bjs_helpers_M10TestModuleT5Shape = __bjs_createStructHelpers_M10TestModuleT5Shape();
+            structHelpers.M10TestModuleT5Shape = __bjs_helpers_M10TestModuleT5Shape;
 
-            const WidgetHelpers = __bjs_createWidgetHelpers();
-            structHelpers.Widget = WidgetHelpers;
+            const __bjs_helpers_M10TestModuleT6Widget = __bjs_createStructHelpers_M10TestModuleT6Widget();
+            structHelpers.M10TestModuleT6Widget = __bjs_helpers_M10TestModuleT6Widget;
 
-            const Widget_LayoutHelpers = __bjs_createWidget_LayoutHelpers();
-            structHelpers.Widget_Layout = Widget_LayoutHelpers;
+            const __bjs_helpers_M10TestModuleT6WidgetT6Layout = __bjs_createStructHelpers_M10TestModuleT6WidgetT6Layout();
+            structHelpers.M10TestModuleT6WidgetT6Layout = __bjs_helpers_M10TestModuleT6WidgetT6Layout;
 
-            const Widget_BoundsHelpers = __bjs_createWidget_BoundsHelpers();
-            structHelpers.Widget_Bounds = Widget_BoundsHelpers;
+            const __bjs_helpers_M10TestModuleT6WidgetT6Bounds = __bjs_createStructHelpers_M10TestModuleT6WidgetT6Bounds();
+            structHelpers.M10TestModuleT6WidgetT6Bounds = __bjs_helpers_M10TestModuleT6WidgetT6Bounds;
 
             const exports = {
                 Shape: {
@@ -322,7 +324,7 @@ export async function createInstantiator(options, swift) {
                         const labelBytes = textEncoder.encode(label);
                         const labelId = swift.memory.retain(labelBytes);
                         instance.exports.bjs_Shape_init(labelId, labelBytes.length);
-                        const structValue = structHelpers.Shape.lift();
+                        const structValue = structHelpers.M10TestModuleT5Shape.lift();
                         return structValue;
                     },
                     Kind: KindValues,
@@ -332,14 +334,14 @@ export async function createInstantiator(options, swift) {
                         const nameBytes = textEncoder.encode(name);
                         const nameId = swift.memory.retain(nameBytes);
                         instance.exports.bjs_Widget_init(nameId, nameBytes.length);
-                        const structValue = structHelpers.Widget.lift();
+                        const structValue = structHelpers.M10TestModuleT6Widget.lift();
                         return structValue;
                     },
                     Variant: VariantValues,
                     Bounds: {
                         init: function(width, height) {
                             instance.exports.bjs_Widget_Bounds_init(width, height);
-                            const structValue = structHelpers.Widget_Bounds.lift();
+                            const structValue = structHelpers.M10TestModuleT6WidgetT6Bounds.lift();
                             return structValue;
                         },
                         get dimensions() {
@@ -348,7 +350,7 @@ export async function createInstantiator(options, swift) {
                         },
                         zero: function() {
                             instance.exports.bjs_Widget_Bounds_static_zero();
-                            const structValue = structHelpers.Widget_Bounds.lift();
+                            const structValue = structHelpers.M10TestModuleT6WidgetT6Bounds.lift();
                             return structValue;
                         },
                     },

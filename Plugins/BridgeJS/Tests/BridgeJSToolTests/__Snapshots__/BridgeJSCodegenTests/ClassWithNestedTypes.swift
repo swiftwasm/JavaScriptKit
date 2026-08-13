@@ -175,3 +175,27 @@ fileprivate func _bjs_Account_wrap_extern(_ pointer: UnsafeMutableRawPointer) ->
 @inline(never) fileprivate func _bjs_Account_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_Account_wrap_extern(pointer)
 }
+
+extension Account.Credentials: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Account.Credentials.bridgeJSMakeTypeHandle()
+}
+
+extension Account.Role: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Account.Role.bridgeJSMakeTypeHandle()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        Account.Credentials.bridgeJSTypeID,
+        Account.Role.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

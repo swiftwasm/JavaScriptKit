@@ -631,3 +631,62 @@ fileprivate func _bjs_Greeter_wrap_extern(_ pointer: UnsafeMutableRawPointer) ->
 @inline(never) fileprivate func _bjs_Greeter_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_Greeter_wrap_extern(pointer)
 }
+
+extension DataPoint: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = DataPoint.bridgeJSMakeTypeHandle()
+}
+
+extension Address: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Address.bridgeJSMakeTypeHandle()
+}
+
+extension Person: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Person.bridgeJSMakeTypeHandle()
+}
+
+extension Session: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Session.bridgeJSMakeTypeHandle()
+}
+
+extension Measurement: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Measurement.bridgeJSMakeTypeHandle()
+}
+
+extension ConfigStruct: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = ConfigStruct.bridgeJSMakeTypeHandle()
+}
+
+extension Container: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Container.bridgeJSMakeTypeHandle()
+}
+
+extension Vector2D: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Vector2D.bridgeJSMakeTypeHandle()
+}
+
+extension Precision: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Precision.bridgeJSMakeTypeHandle()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        DataPoint.bridgeJSTypeID,
+        Address.bridgeJSTypeID,
+        Person.bridgeJSTypeID,
+        Session.bridgeJSTypeID,
+        Measurement.bridgeJSTypeID,
+        ConfigStruct.bridgeJSTypeID,
+        Container.bridgeJSTypeID,
+        Vector2D.bridgeJSTypeID,
+        Precision.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

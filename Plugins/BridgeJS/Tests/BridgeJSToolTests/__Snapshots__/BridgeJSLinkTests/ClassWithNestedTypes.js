@@ -36,7 +36,7 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const __bjs_createAccount_CredentialsHelpers = () => ({
+    const __bjs_createStructHelpers_M10TestModuleT7AccountT11Credentials = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.token);
             const id = swift.memory.retain(bytes);
@@ -124,12 +124,14 @@ export async function createInstantiator(options, swift) {
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_Account_Credentials"] = function(objectId) {
-                structHelpers.Account_Credentials.lower(swift.memory.getObject(objectId));
+                structHelpers.M10TestModuleT7AccountT11Credentials.lower(swift.memory.getObject(objectId));
             }
             bjs["swift_js_struct_lift_Account_Credentials"] = function() {
-                const value = structHelpers.Account_Credentials.lift();
+                const value = structHelpers.M10TestModuleT7AccountT11Credentials.lift();
                 return swift.memory.retain(value);
             }
+            bjs["bjs_core_register_type_handles"] = function() {};
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -342,8 +344,8 @@ export async function createInstantiator(options, swift) {
                     return ret;
                 }
             }
-            const Account_CredentialsHelpers = __bjs_createAccount_CredentialsHelpers();
-            structHelpers.Account_Credentials = Account_CredentialsHelpers;
+            const __bjs_helpers_M10TestModuleT7AccountT11Credentials = __bjs_createStructHelpers_M10TestModuleT7AccountT11Credentials();
+            structHelpers.M10TestModuleT7AccountT11Credentials = __bjs_helpers_M10TestModuleT7AccountT11Credentials;
 
             const exports = {
                 Account: Object.assign(Account, {
@@ -353,7 +355,7 @@ export async function createInstantiator(options, swift) {
                             const tokenBytes = textEncoder.encode(token);
                             const tokenId = swift.memory.retain(tokenBytes);
                             instance.exports.bjs_Account_Credentials_init(tokenId, tokenBytes.length);
-                            const structValue = structHelpers.Account_Credentials.lift();
+                            const structValue = structHelpers.M10TestModuleT7AccountT11Credentials.lift();
                             return structValue;
                         },
                         get maxLength() {
@@ -362,7 +364,7 @@ export async function createInstantiator(options, swift) {
                         },
                         empty: function() {
                             instance.exports.bjs_Account_Credentials_static_empty();
-                            const structValue = structHelpers.Account_Credentials.lift();
+                            const structValue = structHelpers.M10TestModuleT7AccountT11Credentials.lift();
                             return structValue;
                         },
                     },

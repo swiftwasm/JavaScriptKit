@@ -231,6 +231,18 @@ fileprivate func _bjs_PlayBridgeJS_wrap_extern(_ pointer: UnsafeMutableRawPointe
     return _bjs_PlayBridgeJS_wrap_extern(pointer)
 }
 
+extension PlayBridgeJSOutput: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PlayBridgeJSOutput.bridgeJSMakeTypeHandle()
+}
+
+extension PlayBridgeJSDiagnostic: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PlayBridgeJSDiagnostic.bridgeJSMakeTypeHandle()
+}
+
+extension PlayBridgeJSResult: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PlayBridgeJSResult.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "PlayBridgeJS", name: "bjs_createTS2Swift")
 fileprivate func bjs_createTS2Swift_extern() -> Int32
@@ -275,3 +287,20 @@ func _$TS2Swift_convert(_ self: JSObject, _ ts: String) throws(JSException) -> S
     }
     return String.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_PlayBridgeJS_register_type_handles")
+fileprivate func _bjs_PlayBridgeJS_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_PlayBridgeJS_register_type_handles")
+public func _bjs_PlayBridgeJS_register_type_handles() {
+    let typeIds: [Int32] = [
+        PlayBridgeJSOutput.bridgeJSTypeID,
+        PlayBridgeJSDiagnostic.bridgeJSTypeID,
+        PlayBridgeJSResult.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_PlayBridgeJS_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif

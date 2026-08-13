@@ -26,6 +26,10 @@ extension PayloadSignal: _BridgedSwiftAssociatedValueEnum {
     }
 }
 
+extension PayloadSignal: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = PayloadSignal.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_PayloadSignalControls_roundTrip_static")
 fileprivate func bjs_PayloadSignalControls_roundTrip_static_extern(_ signal: Int32) -> Int32
@@ -110,3 +114,18 @@ func _$PayloadSignalControls_roundTripOptional(_ self: JSObject, _ signal: Optio
     }
     return Optional<PayloadSignal>.bridgeJSLiftReturn(ret)
 }
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
+fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
+
+@_expose(wasm, "bjs_TestModule_register_type_handles")
+public func _bjs_TestModule_register_type_handles() {
+    let typeIds: [Int32] = [
+        PayloadSignal.bridgeJSTypeID,
+    ]
+    typeIds.withUnsafeBufferPointer { buffer in
+        _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))
+    }
+}
+#endif
