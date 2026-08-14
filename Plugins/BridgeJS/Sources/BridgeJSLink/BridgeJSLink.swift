@@ -1704,6 +1704,24 @@ public struct BridgeJSLink {
                 }
             }
             return type.tsType
+        case .swiftStruct(let name):
+            for skeleton in exportedSkeletons {
+                for structDef in skeleton.structs {
+                    if structDef.name == name || structDef.swiftCallName == name {
+                        return structDef.tsFullPath
+                    }
+                }
+            }
+            return type.tsType
+        case .swiftHeapObject(let name):
+            for skeleton in exportedSkeletons {
+                for klass in skeleton.classes {
+                    if klass.name == name || klass.swiftCallName == name {
+                        return klass.name
+                    }
+                }
+            }
+            return type.tsType
         case .alias(_, let underlying):
             return resolveTypeScriptType(underlying, exportedSkeletons: exportedSkeletons)
         case .nullable(let wrapped, let kind):
@@ -2903,7 +2921,7 @@ extension BridgeJSLink {
                     let namespaceEnumPaths = skeleton.enums
                         .filter { $0.enumType == .namespace }
                         .filter { !$0.staticProperties.isEmpty || !$0.staticMethods.isEmpty }
-                        .map { ($0.namespace ?? []) + [$0.name] }
+                        .map(\.tsPathComponents)
 
                     return itemNamespaces + namespaceEnumPaths
                 }
@@ -2961,15 +2979,13 @@ extension BridgeJSLink {
                 }
                 for enumDef in skeleton.enums where enumDef.enumType == .namespace {
                     for function in enumDef.staticMethods {
-                        let fullNamespace = (enumDef.namespace ?? []) + [enumDef.name]
-                        let namespacePath = fullNamespace.joined(separator: ".")
+                        let namespacePath = enumDef.tsFullPath
                         printer.write(
                             "globalThis.\(namespacePath).\(function.resolvedJSName) = exports.\(namespacePath).\(function.resolvedJSName);"
                         )
                     }
                     for property in enumDef.staticProperties {
-                        let fullNamespace = (enumDef.namespace ?? []) + [enumDef.name]
-                        let namespacePath = fullNamespace.joined(separator: ".")
+                        let namespacePath = enumDef.tsFullPath
                         let exportsPath = "exports.\(namespacePath)"
 
                         printer.write(
@@ -3082,7 +3098,7 @@ extension BridgeJSLink {
 
                 for klass in skeleton.classes {
                     var currentNode = rootNode
-                    for part in (klass.namespace ?? []) + [klass.name] {
+                    for part in klass.tsPathComponents {
                         currentNode = currentNode.addChild(part)
                     }
                     currentNode.content.declaration = .classType(klass)
@@ -3090,7 +3106,7 @@ extension BridgeJSLink {
 
                 for structDef in skeleton.structs {
                     var currentNode = rootNode
-                    for part in (structDef.namespace ?? []) + [structDef.name] {
+                    for part in structDef.tsPathComponents {
                         currentNode = currentNode.addChild(part)
                     }
                     currentNode.content.declaration = .structType(structDef)
@@ -3106,17 +3122,15 @@ extension BridgeJSLink {
 
                 for enumDef in skeleton.enums where enumDef.enumType == .namespace {
                     for property in enumDef.staticProperties {
-                        let fullNamespace = (enumDef.namespace ?? []) + [enumDef.name]
                         var currentNode = rootNode
-                        for part in fullNamespace {
+                        for part in enumDef.tsPathComponents {
                             currentNode = currentNode.addChild(part)
                         }
                         currentNode.content.staticProperties.append(property)
                     }
                     for function in enumDef.staticMethods {
-                        let fullNamespace = (enumDef.namespace ?? []) + [enumDef.name]
                         var currentNode = rootNode
-                        for part in fullNamespace {
+                        for part in enumDef.tsPathComponents {
                             currentNode = currentNode.addChild(part)
                         }
                         currentNode.content.functions.append(function)

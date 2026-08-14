@@ -1,0 +1,80 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Workshop_Bench_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Bench",
+        "namespace" : [
+          "Workshop"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Workshop.Bench"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "Workshop",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Workshop",
+        "tsFullPath" : "Workshop"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_makeBench",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeBench",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "Workshop.Bench"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

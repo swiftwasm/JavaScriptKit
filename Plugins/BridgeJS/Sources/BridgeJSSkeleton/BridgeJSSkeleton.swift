@@ -14,6 +14,14 @@ extension NamespacedExportedType {
         }
         return name
     }
+
+    public var tsPathComponents: [String] {
+        (namespace ?? []) + [name]
+    }
+
+    public var tsFullPath: String {
+        tsPathComponents.joined(separator: ".")
+    }
 }
 
 // MARK: - ABI Name Generation
