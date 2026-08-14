@@ -27,6 +27,44 @@ import Testing
     }
 
     @Test
+    func extensionOfUnknownTypeWithJSMemberProducesDiagnostic() throws {
+        let source = """
+            extension Unknown {
+                @JS func bridged() -> Int { 42 }
+            }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("Unsupported type 'Unknown'"))
+    }
+
+    @Test
+    func extensionWithoutJSMembersIsIgnored() throws {
+        let source = """
+            extension String {
+                func helper() -> Int { 42 }
+            }
+            """
+        #expect(moduleDiagnostics(source: source) == nil)
+    }
+
+    @Test
+    func invalidJSMemberInsideExtensionProducesDiagnostic() throws {
+        let source = """
+            @JS class Host {
+                @JS init() {}
+            }
+
+            extension Host {
+                @JS struct Bad {
+                    var field = 1
+                }
+            }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("Struct field must have explicit type annotation"))
+    }
+
+    @Test
     func missingJavaScriptModuleProducesDiagnostic() throws {
         let source = """
             let unrelated = 0
