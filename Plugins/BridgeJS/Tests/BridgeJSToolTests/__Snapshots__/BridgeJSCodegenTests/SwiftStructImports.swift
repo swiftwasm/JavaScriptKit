@@ -75,19 +75,19 @@ func _$translate(_ point: Point, _ dx: Int, _ dy: Int) throws(JSException) -> Po
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_roundTripOptional")
-fileprivate func bjs_roundTripOptional_extern(_ point: Int32) -> Void
+fileprivate func bjs_roundTripOptional_extern() -> Void
 #else
-fileprivate func bjs_roundTripOptional_extern(_ point: Int32) -> Void {
+fileprivate func bjs_roundTripOptional_extern() -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_roundTripOptional(_ point: Int32) -> Void {
-    return bjs_roundTripOptional_extern(point)
+@inline(never) fileprivate func bjs_roundTripOptional() -> Void {
+    return bjs_roundTripOptional_extern()
 }
 
 func _$roundTripOptional(_ point: Optional<Point>) throws(JSException) -> Optional<Point> {
-    let pointIsSome = point.bridgeJSLowerParameter()
-    bjs_roundTripOptional(pointIsSome)
+    let _ = point.bridgeJSLowerParameter()
+    bjs_roundTripOptional()
     if let error = _swift_js_take_exception() {
         throw error
     }

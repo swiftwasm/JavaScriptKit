@@ -356,6 +356,7 @@ export async function createInstantiator(options, swift) {
 
     const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
     const __bjs_codec_Array_String = __bjs_arrayCodec(__bjs_stringCodec);
+    const __bjs_codec_Optional_Array_Int = __bjs_optionalCodec(__bjs_codec_Array_Int);
 
 
     return {
@@ -549,35 +550,23 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_optionalArrayThenArray"] = function bjs_optionalArrayThenArray(a) {
+            TestModule["bjs_optionalArrayThenArray"] = function bjs_optionalArrayThenArray() {
                 try {
-                    let optResult;
-                    if (a) {
-                        const arrayResult = __bjs_codec_Array_Int.lift();
-                        optResult = arrayResult;
-                    } else {
-                        optResult = null;
-                    }
-                    const arrayResult1 = __bjs_codec_Array_Int.lift();
-                    let ret = imports.optionalArrayThenArray(optResult, arrayResult1);
+                    const optValue = __bjs_codec_Optional_Array_Int.lift();
+                    const arrayResult = __bjs_codec_Array_Int.lift();
+                    let ret = imports.optionalArrayThenArray(optValue, arrayResult);
                     return ret;
                 } catch (error) {
                     setException(error);
                     return 0
                 }
             }
-            TestModule["bjs_borrowedStringAroundStackParams"] = function bjs_borrowedStringAroundStackParams(sBytes, sCount, a) {
+            TestModule["bjs_borrowedStringAroundStackParams"] = function bjs_borrowedStringAroundStackParams(sBytes, sCount) {
                 try {
                     const string = decodeString(sBytes, sCount);
-                    let optResult;
-                    if (a) {
-                        const arrayResult = __bjs_codec_Array_Int.lift();
-                        optResult = arrayResult;
-                    } else {
-                        optResult = null;
-                    }
-                    const arrayResult1 = __bjs_codec_Array_Int.lift();
-                    let ret = imports.borrowedStringAroundStackParams(string, optResult, arrayResult1);
+                    const optValue = __bjs_codec_Optional_Array_Int.lift();
+                    const arrayResult = __bjs_codec_Array_Int.lift();
+                    let ret = imports.borrowedStringAroundStackParams(string, optValue, arrayResult);
                     return ret;
                 } catch (error) {
                     setException(error);

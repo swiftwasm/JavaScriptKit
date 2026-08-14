@@ -389,6 +389,7 @@ export async function createInstantiator(options, swift) {
     }
 
     const __bjs_codec_Array_Int = __bjs_arrayCodec(__bjs_primitiveCodecs.Int);
+    const __bjs_codec_Optional_Array_Int = __bjs_optionalCodec(__bjs_codec_Array_Int);
     const __bjs_codec_M10TestModuleT12GenericPoint = {
         lower: (v) => {
             structHelpers.M10TestModuleT12GenericPoint.lower(v);
@@ -771,18 +772,12 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
-            TestModule["bjs_importGenericAfterOptionalArray"] = function bjs_importGenericAfterOptionalArray(values, tTypeId) {
+            TestModule["bjs_importGenericAfterOptionalArray"] = function bjs_importGenericAfterOptionalArray(tTypeId) {
                 try {
                     const codecT = __bjs_codecForTypeId(tTypeId);
-                    let optResult;
-                    if (values) {
-                        const arrayResult = __bjs_codec_Array_Int.lift();
-                        optResult = arrayResult;
-                    } else {
-                        optResult = null;
-                    }
+                    const optValue = __bjs_codec_Optional_Array_Int.lift();
                     const value = codecT.lift();
-                    let ret = imports.importGenericAfterOptionalArray(optResult, value);
+                    let ret = imports.importGenericAfterOptionalArray(optValue, value);
                     codecT.lower(ret);
                 } catch (error) {
                     setException(error);
