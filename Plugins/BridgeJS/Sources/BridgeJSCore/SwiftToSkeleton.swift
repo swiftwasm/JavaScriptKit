@@ -222,15 +222,14 @@ public final class SwiftToSkeleton {
                 validatedJavaScriptModulePaths.insert(path)
             }
 
-            let exportErrors = exportCollector.errors.filter { $0.severity == .error }
             let importErrorsFatal = importCollector.errors.filter {
                 $0.severity == .error && !$0.message.contains("Unsupported type '")
             }
-            let fileWarnings = (exportCollector.errors + importCollector.errors).filter { $0.severity == .warning }
+            let fileWarnings = importCollector.errors.filter { $0.severity == .warning }
             warnings.append(contentsOf: fileWarnings.map { (file: inputFilePath, diagnostic: $0) })
-            if !exportErrors.isEmpty || !importErrorsFatal.isEmpty {
+            if !importErrorsFatal.isEmpty {
                 perSourceErrors.append(
-                    (inputFilePath: inputFilePath, errors: exportErrors + importErrorsFatal)
+                    (inputFilePath: inputFilePath, errors: importErrorsFatal)
                 )
             }
 
@@ -247,6 +246,18 @@ public final class SwiftToSkeleton {
         // Resolve extensions against all collectors. This needs to happen at this point so we can resolve both same file and cross file extensions.
         for source in exportCollectors {
             source.resolveDeferredExtensions(against: exportCollectors)
+        }
+
+        // We have to collect diagnostics after all deferred extensions are resolved, since they could generate some.
+        for ((_, inputFilePath), exportCollector) in zip(sourceFiles, exportCollectors) {
+            let exportErrors = exportCollector.errors.filter { $0.severity == .error }
+            let fileWarnings = exportCollector.errors.filter { $0.severity == .warning }
+            warnings.append(contentsOf: fileWarnings.map { (file: inputFilePath, diagnostic: $0) })
+            if !exportErrors.isEmpty {
+                perSourceErrors.append(
+                    (inputFilePath: inputFilePath, errors: exportErrors)
+                )
+            }
         }
 
         for collector in exportCollectors {
@@ -855,6 +866,17 @@ extension AttributeListSyntax {
             guard let syntax = attribute.as(AttributeSyntax.self) else { return false }
             return syntax.attributeNameText == name
         }
+    }
+}
+
+private final class JSAttributeFinder: SyntaxVisitor {
+    private(set) var found = false
+
+    override func visit(_ node: AttributeSyntax) -> SyntaxVisitorContinueKind {
+        if node.attributeNameText == "JS" {
+            found = true
+        }
+        return .skipChildren
     }
 }
 
@@ -1910,7 +1932,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                     break
                 }
             }
-            if !resolved {
+            if !resolved, containsJSAnnotatedDeclaration(ext.memberBlock.members) {
                 diagnose(
                     node: ext.extendedType,
                     message: "Unsupported type '\(ext.extendedType.trimmedDescription)'.",
@@ -1918,6 +1940,12 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 )
             }
         }
+    }
+
+    private func containsJSAnnotatedDeclaration(_ members: MemberBlockItemListSyntax) -> Bool {
+        let finder = JSAttributeFinder(viewMode: .sourceAccurate)
+        finder.walk(members)
+        return finder.found
     }
 
     /// Walks extension members under the matching type’s state, returning whether the type was found.
