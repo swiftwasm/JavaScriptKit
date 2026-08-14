@@ -16,8 +16,7 @@ class TypeDeclResolver {
 
     private class TypeDeclCollector: SyntaxVisitor {
         let resolver: TypeDeclResolver
-        var scope: [TypeDecl] = []
-        var rootTypeDecls: [TypeDecl] = []
+        var scope: [String] = []
 
         init(resolver: TypeDeclResolver) {
             self.resolver = resolver
@@ -26,17 +25,14 @@ class TypeDeclResolver {
 
         func visitNominalDecl(_ node: TypeDecl) -> SyntaxVisitorContinueKind {
             let name = node.name.text
-            let qualifiedName = scope.map(\.name.text) + [name]
+            let qualifiedName = scope + [name]
             resolver.typeDeclByQualifiedName[qualifiedName] = node
-            scope.append(node)
+            scope.append(name)
             return .visitChildren
         }
 
         func visitPostNominalDecl() {
-            let type = scope.removeLast()
-            if scope.isEmpty {
-                rootTypeDecls.append(type)
-            }
+            scope.removeLast()
         }
 
         override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
@@ -72,9 +68,20 @@ class TypeDeclResolver {
 
         override func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
             let name = node.name.text
-            let qualifiedName = scope.map(\.name.text) + [name]
+            let qualifiedName = scope + [name]
             resolver.typeAliasByQualifiedName[qualifiedName] = node
             return .skipChildren
+        }
+
+        override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
+            guard let components = node.memberScopeComponents else {
+                return .skipChildren
+            }
+            scope.append(contentsOf: components)
+            return .visitChildren
+        }
+        override func visitPost(_ node: ExtensionDeclSyntax) {
+            scope.removeLast(node.memberScopeComponents?.count ?? 0)
         }
     }
 
@@ -91,6 +98,10 @@ class TypeDeclResolver {
         while let parent = context.parent {
             if let parent = parent.asProtocol(NamedDeclSyntax.self), parent.isProtocol(DeclGroupSyntax.self) {
                 innerToOuter.append(parent.name.text)
+            } else if let extensionDecl = parent.as(ExtensionDeclSyntax.self),
+                let components = extensionDecl.memberScopeComponents
+            {
+                innerToOuter.append(contentsOf: components.reversed())
             }
             context = parent
         }
@@ -106,7 +117,7 @@ class TypeDeclResolver {
         /// Search for the type declaration from the innermost scope to the outermost scope
         for i in (0...scope.count).reversed() {
             let qualifiedName = Array(scope[0..<i] + [name])
-            if typeDeclByQualifiedName[qualifiedName] != nil {
+            if typeDeclByQualifiedName[qualifiedName] != nil || typeAliasByQualifiedName[qualifiedName] != nil {
                 return qualifiedName
             }
         }
@@ -132,7 +143,7 @@ class TypeDeclResolver {
     ///
     /// Resolution strategy:
     /// 1. If the node is IdentifierTypeSyntax, call `lookupType(for:)` which attempts scope-aware qualification via `tryQualify`.
-    /// 2. Otherwise, attempt to build a fully qualified name with `qualifiedComponents(from:)` and look it up with `lookupType(fullyQualified:)`.
+    /// 2. Otherwise, attempt to build a fully qualified name with `qualifiedComponents` and look it up with `lookupType(fullyQualified:)`.
     ///
     /// - Parameter type: The SwiftSyntax node representing a type appearance in source code.
     /// - Returns: The nominal declaration (enum/class/actor/struct) if found, otherwise nil.
@@ -140,7 +151,7 @@ class TypeDeclResolver {
         if let id = type.as(IdentifierTypeSyntax.self) {
             return lookupType(for: id)
         }
-        if let components = qualifiedComponents(from: type) {
+        if let components = type.qualifiedComponents {
             return lookupType(fullyQualified: components)
         }
         return nil
@@ -155,20 +166,29 @@ class TypeDeclResolver {
             let qualifiedName = tryQualify(type: id)
             return typeAliasByQualifiedName[qualifiedName]
         }
-        if let components = qualifiedComponents(from: type) {
+        if let components = type.qualifiedComponents {
             return typeAliasByQualifiedName[components]
         }
         return nil
     }
 
-    func qualifiedComponents(from type: TypeSyntax) -> QualifiedName? {
-        if let m = type.as(MemberTypeSyntax.self) {
-            guard let base = qualifiedComponents(from: TypeSyntax(m.baseType)) else { return nil }
+}
+
+extension TypeSyntax {
+    var qualifiedComponents: TypeDeclResolver.QualifiedName? {
+        if let m = self.as(MemberTypeSyntax.self) {
+            guard let base = TypeSyntax(m.baseType).qualifiedComponents else { return nil }
             return base + [m.name.text]
-        } else if let id = type.as(IdentifierTypeSyntax.self) {
+        } else if let id = self.as(IdentifierTypeSyntax.self) {
             return [id.name.text]
         } else {
             return nil
         }
+    }
+}
+
+extension ExtensionDeclSyntax {
+    var memberScopeComponents: TypeDeclResolver.QualifiedName? {
+        extendedType.qualifiedComponents
     }
 }
