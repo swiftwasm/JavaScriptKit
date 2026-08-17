@@ -233,7 +233,7 @@ export async function createInstantiator(options, swift) {
                 const func = swift.memory.getObject(funcRef);
                 func.__unregister();
             }
-            bjs["invoke_js_callback_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC"] = function(callbackId, param0) {
+            bjs["invoke_js_callback_TestModule_10TestModule8Workshop5BenchC_8Workshop5BenchC"] = function(callbackId, param0) {
                 try {
                     const callback = swift.memory.getObject(callbackId);
                     let ret = callback(_exports.Workshop.Bench.__construct(param0));
@@ -243,9 +243,9 @@ export async function createInstantiator(options, swift) {
                     return 0
                 }
             }
-            bjs["make_swift_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC"] = function(boxPtr, file, line) {
-                const lower_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC = function(param0) {
-                    const ret = instance.exports.invoke_swift_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC(boxPtr, param0.pointer);
+            bjs["make_swift_closure_TestModule_10TestModule8Workshop5BenchC_8Workshop5BenchC"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModule8Workshop5BenchC_8Workshop5BenchC = function(param0) {
+                    const ret = instance.exports.invoke_swift_closure_TestModule_10TestModule8Workshop5BenchC_8Workshop5BenchC(boxPtr, param0.pointer);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
@@ -254,7 +254,7 @@ export async function createInstantiator(options, swift) {
                     }
                     return _exports.Workshop.Bench.__construct(ret);
                 };
-                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC);
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule8Workshop5BenchC_8Workshop5BenchC);
             }
             // Wrapper functions for module: TestModule
             if (!importObject["TestModule"]) {
