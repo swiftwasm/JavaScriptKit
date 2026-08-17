@@ -31,31 +31,27 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const swiftClosureRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
-        if (state.unregistered) { return; }
-        instance?.exports?.bjs_release_swift_closure(state.pointer);
+    const __bjs_createStructHelpers_M10TestModuleT7CatalogT5Entry = () => ({
+        lower: (value) => {
+            const bytes = textEncoder.encode(value.title);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+        },
+        lift: () => {
+            const string = strStack.pop();
+            return { title: string };
+        }
     });
-    const makeClosure = (pointer, file, line, func) => {
-        const state = { pointer, file, line, unregistered: false };
-        const real = (...args) => {
-            if (state.unregistered) {
-                const bytes = new Uint8Array(memory.buffer, state.file >>> 0);
-                let length = 0;
-                while (bytes[length] !== 0) { length += 1; }
-                const fileID = decodeString(state.file, length);
-                throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);
-            }
-            return func(...args);
-        };
-        real.__unregister = () => {
-            if (state.unregistered) { return; }
-            state.unregistered = true;
-            swiftClosureRegistry.unregister(state);
-        };
-        swiftClosureRegistry.register(real, state, state);
-        return swift.memory.retain(real);
-    };
-
+    const __bjs_createStructHelpers_M10TestModuleT5Entry = () => ({
+        lower: (value) => {
+            i32Stack.push((value.identifier | 0));
+        },
+        lift: () => {
+            const int = i32Stack.pop();
+            return { identifier: int };
+        }
+    });
 
     return {
         /**
@@ -131,7 +127,22 @@ export async function createInstantiator(options, swift) {
                 const copy = memory.buffer.slice(ptr, ptr + byteLen);
                 taStack.push(Array.from(new Ctor(copy)));
             }
+            bjs["swift_js_struct_lower_Catalog_Entry"] = function(objectId) {
+                structHelpers.M10TestModuleT7CatalogT5Entry.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Catalog_Entry"] = function() {
+                const value = structHelpers.M10TestModuleT7CatalogT5Entry.lift();
+                return swift.memory.retain(value);
+            }
+            bjs["swift_js_struct_lower_Entry"] = function(objectId) {
+                structHelpers.M10TestModuleT5Entry.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Entry"] = function() {
+                const value = structHelpers.M10TestModuleT5Entry.lift();
+                return swift.memory.retain(value);
+            }
             bjs["bjs_core_register_type_handles"] = function() {};
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -229,41 +240,6 @@ export async function createInstantiator(options, swift) {
                 return pointer || 0;
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
-            bjs["swift_js_closure_unregister"] = function(funcRef) {
-                const func = swift.memory.getObject(funcRef);
-                func.__unregister();
-            }
-            bjs["invoke_js_callback_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC"] = function(callbackId, param0) {
-                try {
-                    const callback = swift.memory.getObject(callbackId);
-                    let ret = callback(_exports.Workshop.Bench.__construct(param0));
-                    return ret.pointer;
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            bjs["make_swift_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC"] = function(boxPtr, file, line) {
-                const lower_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC = function(param0) {
-                    const ret = instance.exports.invoke_swift_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC(boxPtr, param0.pointer);
-                    if (tmpRetException) {
-                        const error = swift.memory.getObject(tmpRetException);
-                        swift.memory.release(tmpRetException);
-                        tmpRetException = undefined;
-                        throw error;
-                    }
-                    return _exports.Workshop.Bench.__construct(ret);
-                };
-                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC);
-            }
-            // Wrapper functions for module: TestModule
-            if (!importObject["TestModule"]) {
-                importObject["TestModule"] = {};
-            }
-            importObject["TestModule"]["bjs_Workshop_Bench_wrap"] = function(pointer) {
-                const obj = _exports.Workshop.Bench.__construct(pointer);
-                return swift.memory.retain(obj);
-            };
         },
         setInstance: (i) => {
             instance = i;
@@ -278,80 +254,42 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
-            const swiftHeapObjectFinalizationRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
-                if (state.hasReleased) {
-                    return;
-                }
-                state.hasReleased = true;
-                state.identityMap?.delete(state.pointer);
-                state.deinit(state.pointer);
-            });
+            const __bjs_helpers_M10TestModuleT7CatalogT5Entry = __bjs_createStructHelpers_M10TestModuleT7CatalogT5Entry();
+            structHelpers.M10TestModuleT7CatalogT5Entry = __bjs_helpers_M10TestModuleT7CatalogT5Entry;
 
-            /// Represents a Swift heap object like a class instance or an actor instance.
-            class SwiftHeapObject {
-                static __wrap(pointer, deinit, prototype, identityCache) {
-                    pointer = pointer >>> 0;
-                    const makeFresh = (identityMap) => {
-                        const obj = Object.create(prototype);
-                        const state = { pointer, deinit, hasReleased: false, identityMap };
-                        obj.pointer = pointer;
-                        obj.__swiftHeapObjectState = state;
-                        swiftHeapObjectFinalizationRegistry.register(obj, state, state);
-                        if (identityMap) {
-                            identityMap.set(pointer, new WeakRef(obj));
-                        }
-                        return obj;
-                    };
+            const __bjs_helpers_M10TestModuleT5Entry = __bjs_createStructHelpers_M10TestModuleT5Entry();
+            structHelpers.M10TestModuleT5Entry = __bjs_helpers_M10TestModuleT5Entry;
 
-                    if (!identityCache) {
-                        return makeFresh(null);
-                    }
-
-                    const cached = identityCache.get(pointer)?.deref();
-                    if (cached && !cached.__swiftHeapObjectState.hasReleased) {
-                        deinit(pointer);
-                        return cached;
-                    }
-                    if (identityCache.has(pointer)) {
-                        identityCache.delete(pointer);
-                    }
-
-                    return makeFresh(identityCache);
-                }
-
-                release() {
-                    const state = this.__swiftHeapObjectState;
-                    if (state.hasReleased) {
-                        return;
-                    }
-                    state.hasReleased = true;
-                    swiftHeapObjectFinalizationRegistry.unregister(state);
-                    state.identityMap?.delete(state.pointer);
-                    state.deinit(state.pointer);
-                }
-            }
-            class Bench extends SwiftHeapObject {
-                static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Workshop_Bench_deinit, Bench.prototype, null);
-                }
-
-                constructor() {
-                    const ret = instance.exports.bjs_Workshop_Bench_init();
-                    return Bench.__construct(ret);
-                }
-            }
             const exports = {
-                makeBench: function bjs_makeBench() {
-                    const ret = instance.exports.bjs_makeBench();
-                    return Bench.__construct(ret);
+                takeEntry: function bjs_takeEntry(entry) {
+                    structHelpers.M10TestModuleT5Entry.lower(entry);
+                    instance.exports.bjs_takeEntry();
+                    const structValue = structHelpers.M10TestModuleT5Entry.lift();
+                    return structValue;
                 },
-                refitBench: function bjs_refitBench(bench, transform) {
-                    const callbackId = swift.memory.retain(transform);
-                    const ret = instance.exports.bjs_refitBench(bench.pointer, callbackId);
-                    return Bench.__construct(ret);
+                takeCatalogEntry: function bjs_takeCatalogEntry(entry) {
+                    structHelpers.M10TestModuleT7CatalogT5Entry.lower(entry);
+                    instance.exports.bjs_takeCatalogEntry();
+                    const structValue = structHelpers.M10TestModuleT7CatalogT5Entry.lift();
+                    return structValue;
                 },
-                Workshop: {
-                    Bench,
+                Catalog: {
+                    Entry: {
+                        init: function(title) {
+                            const titleBytes = textEncoder.encode(title);
+                            const titleId = swift.memory.retain(titleBytes);
+                            instance.exports.bjs_Catalog_Entry_init(titleId, titleBytes.length);
+                            const structValue = structHelpers.M10TestModuleT7CatalogT5Entry.lift();
+                            return structValue;
+                        },
+                    },
+                },
+                Entry: {
+                    init: function(identifier) {
+                        instance.exports.bjs_Entry_init(identifier);
+                        const structValue = structHelpers.M10TestModuleT5Entry.lift();
+                        return structValue;
+                    },
                 },
             };
             _exports = exports;

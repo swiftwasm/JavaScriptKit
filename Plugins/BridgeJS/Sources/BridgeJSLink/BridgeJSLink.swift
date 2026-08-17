@@ -1689,7 +1689,7 @@ public struct BridgeJSLink {
             // Look up the enum to get its tsFullPath
             for skeleton in exportedSkeletons {
                 for enumDef in skeleton.enums {
-                    if enumDef.name == name || enumDef.swiftCallName == name {
+                    if enumDef.swiftCallName == name {
                         // Use the stored tsFullPath which has the full namespace
                         switch type {
                         case .namespaceEnum:
@@ -1707,7 +1707,7 @@ public struct BridgeJSLink {
         case .swiftStruct(let name):
             for skeleton in exportedSkeletons {
                 for structDef in skeleton.structs {
-                    if structDef.name == name || structDef.swiftCallName == name {
+                    if structDef.swiftCallName == name {
                         return structDef.tsFullPath
                     }
                 }
@@ -1716,12 +1716,14 @@ public struct BridgeJSLink {
         case .swiftHeapObject(let name):
             for skeleton in exportedSkeletons {
                 for klass in skeleton.classes {
-                    if klass.name == name || klass.swiftCallName == name {
+                    if klass.swiftCallName == name {
                         return klass.name
                     }
                 }
             }
             return type.tsType
+        case .closure(let signature, _):
+            return signature.renderTSFunctionType { resolveTypeScriptType($0, exportedSkeletons: exportedSkeletons) }
         case .alias(_, let underlying):
             return resolveTypeScriptType(underlying, exportedSkeletons: exportedSkeletons)
         case .nullable(let wrapped, let kind):
@@ -3761,7 +3763,8 @@ extension BridgeJSLink {
         let abiName = getter.abiName(context: nil)
         let funcLines = thunkBuilder.renderFunction(name: abiName)
         if getter.from == nil {
-            importObjectBuilder.appendDts(["readonly \(renderTSPropertyName(jsName)): \(getter.type.tsType);"])
+            importObjectBuilder.appendDts(["readonly \(renderTSPropertyName(jsName)): \(getter.type.tsType);"]
+            )
         }
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
     }
@@ -4230,6 +4233,17 @@ struct BridgeJSLinkError: Error {
     let message: String
 }
 
+extension ClosureSignature {
+    fileprivate func renderTSFunctionType(renderType: (BridgeType) -> String) -> String {
+        let renderedParameters = parameters.enumerated().map { index, parameter in
+            "arg\(index): \(renderType(parameter))"
+        }.joined(separator: ", ")
+        let renderedReturnType = renderType(returnType)
+        let returnTypeWithEffect = isAsync ? "Promise<\(renderedReturnType)>" : renderedReturnType
+        return "(\(renderedParameters)) => \(returnTypeWithEffect)"
+    }
+}
+
 extension BridgeType {
     var tsType: String {
         switch self {
@@ -4271,12 +4285,7 @@ extension BridgeType {
         case .swiftProtocol(let name):
             return name
         case .closure(let signature, _):
-            let paramTypes = signature.parameters.enumerated().map { index, param in
-                "arg\(index): \(param.tsType)"
-            }.joined(separator: ", ")
-            let returnTS =
-                signature.isAsync ? "Promise<\(signature.returnType.tsType)>" : signature.returnType.tsType
-            return "(\(paramTypes)) => \(returnTS)"
+            return signature.renderTSFunctionType { $0.tsType }
         case .array(let elementType):
             let inner = elementType.tsType
             if inner.contains("|") || inner.contains("=>") {

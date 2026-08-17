@@ -31,31 +31,26 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
-    const swiftClosureRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
-        if (state.unregistered) { return; }
-        instance?.exports?.bjs_release_swift_closure(state.pointer);
+    const __bjs_createStructHelpers_M10TestModuleT5DepotT5Crate = () => ({
+        lower: (value) => {
+            const bytes = textEncoder.encode(value.label);
+            const id = swift.memory.retain(bytes);
+            i32Stack.push(bytes.length);
+            i32Stack.push(id);
+        },
+        lift: () => {
+            const string = strStack.pop();
+            const instance1 = { label: string };
+            instance1.describeCrate = function() {
+                structHelpers.M10TestModuleT5DepotT5Crate.lower(this);
+                const ret = instance.exports.bjs_Depot_Crate_describeCrate();
+                const ret1 = tmpRetString;
+                tmpRetString = undefined;
+                return ret1;
+            }.bind(instance1);
+            return instance1;
+        }
     });
-    const makeClosure = (pointer, file, line, func) => {
-        const state = { pointer, file, line, unregistered: false };
-        const real = (...args) => {
-            if (state.unregistered) {
-                const bytes = new Uint8Array(memory.buffer, state.file >>> 0);
-                let length = 0;
-                while (bytes[length] !== 0) { length += 1; }
-                const fileID = decodeString(state.file, length);
-                throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);
-            }
-            return func(...args);
-        };
-        real.__unregister = () => {
-            if (state.unregistered) { return; }
-            state.unregistered = true;
-            swiftClosureRegistry.unregister(state);
-        };
-        swiftClosureRegistry.register(real, state, state);
-        return swift.memory.retain(real);
-    };
-
 
     return {
         /**
@@ -131,7 +126,15 @@ export async function createInstantiator(options, swift) {
                 const copy = memory.buffer.slice(ptr, ptr + byteLen);
                 taStack.push(Array.from(new Ctor(copy)));
             }
+            bjs["swift_js_struct_lower_Depot_Crate"] = function(objectId) {
+                structHelpers.M10TestModuleT5DepotT5Crate.lower(swift.memory.getObject(objectId));
+            }
+            bjs["swift_js_struct_lift_Depot_Crate"] = function() {
+                const value = structHelpers.M10TestModuleT5DepotT5Crate.lift();
+                return swift.memory.retain(value);
+            }
             bjs["bjs_core_register_type_handles"] = function() {};
+            bjs["bjs_TestModule_register_type_handles"] = function() {};
             const __bjs_promiseSettlers = Symbol("JavaScriptKit.promiseSettlers");
             bjs["swift_js_make_promise"] = function() {
                 let resolve, reject;
@@ -229,39 +232,12 @@ export async function createInstantiator(options, swift) {
                 return pointer || 0;
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
-            bjs["swift_js_closure_unregister"] = function(funcRef) {
-                const func = swift.memory.getObject(funcRef);
-                func.__unregister();
-            }
-            bjs["invoke_js_callback_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC"] = function(callbackId, param0) {
-                try {
-                    const callback = swift.memory.getObject(callbackId);
-                    let ret = callback(_exports.Workshop.Bench.__construct(param0));
-                    return ret.pointer;
-                } catch (error) {
-                    setException(error);
-                    return 0
-                }
-            }
-            bjs["make_swift_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC"] = function(boxPtr, file, line) {
-                const lower_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC = function(param0) {
-                    const ret = instance.exports.invoke_swift_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC(boxPtr, param0.pointer);
-                    if (tmpRetException) {
-                        const error = swift.memory.getObject(tmpRetException);
-                        swift.memory.release(tmpRetException);
-                        tmpRetException = undefined;
-                        throw error;
-                    }
-                    return _exports.Workshop.Bench.__construct(ret);
-                };
-                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule14Workshop.BenchC_14Workshop.BenchC);
-            }
             // Wrapper functions for module: TestModule
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
             }
-            importObject["TestModule"]["bjs_Workshop_Bench_wrap"] = function(pointer) {
-                const obj = _exports.Workshop.Bench.__construct(pointer);
+            importObject["TestModule"]["bjs_Depot_wrap"] = function(pointer) {
+                const obj = _exports['Depot'].__construct(pointer);
                 return swift.memory.retain(obj);
             };
         },
@@ -330,29 +306,31 @@ export async function createInstantiator(options, swift) {
                     state.deinit(state.pointer);
                 }
             }
-            class Bench extends SwiftHeapObject {
+            class Depot extends SwiftHeapObject {
                 static __construct(ptr) {
-                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Workshop_Bench_deinit, Bench.prototype, null);
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_Depot_deinit, Depot.prototype, null);
                 }
 
                 constructor() {
-                    const ret = instance.exports.bjs_Workshop_Bench_init();
-                    return Bench.__construct(ret);
+                    const ret = instance.exports.bjs_Depot_init();
+                    return Depot.__construct(ret);
                 }
             }
+            const __bjs_helpers_M10TestModuleT5DepotT5Crate = __bjs_createStructHelpers_M10TestModuleT5DepotT5Crate();
+            structHelpers.M10TestModuleT5DepotT5Crate = __bjs_helpers_M10TestModuleT5DepotT5Crate;
+
             const exports = {
-                makeBench: function bjs_makeBench() {
-                    const ret = instance.exports.bjs_makeBench();
-                    return Bench.__construct(ret);
-                },
-                refitBench: function bjs_refitBench(bench, transform) {
-                    const callbackId = swift.memory.retain(transform);
-                    const ret = instance.exports.bjs_refitBench(bench.pointer, callbackId);
-                    return Bench.__construct(ret);
-                },
-                Workshop: {
-                    Bench,
-                },
+                Depot: Object.assign(Depot, {
+                    Crate: {
+                        init: function(label) {
+                            const labelBytes = textEncoder.encode(label);
+                            const labelId = swift.memory.retain(labelBytes);
+                            instance.exports.bjs_Depot_Crate_init(labelId, labelBytes.length);
+                            const structValue = structHelpers.M10TestModuleT5DepotT5Crate.lift();
+                            return structValue;
+                        },
+                    },
+                }),
             };
             _exports = exports;
             return exports;

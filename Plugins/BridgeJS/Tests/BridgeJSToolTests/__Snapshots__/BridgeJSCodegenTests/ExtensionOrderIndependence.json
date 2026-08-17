@@ -1,0 +1,106 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Depot_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Depot",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Depot"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Depot_Crate_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "label",
+              "name" : "label",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Depot_Crate_describeCrate",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describeCrate",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Crate",
+        "namespace" : [
+          "Depot"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "namespace" : [
+              "Depot"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Depot.Crate"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

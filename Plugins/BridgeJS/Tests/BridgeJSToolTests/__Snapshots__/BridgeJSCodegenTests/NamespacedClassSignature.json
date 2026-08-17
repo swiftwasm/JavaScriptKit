@@ -64,6 +64,59 @@
             "_0" : "Workshop.Bench"
           }
         }
+      },
+      {
+        "abiName" : "bjs_refitBench",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "refitBench",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "bench",
+            "type" : {
+              "swiftHeapObject" : {
+                "_0" : "Workshop.Bench"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "transform",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModule14Workshop.BenchC_14Workshop.BenchC",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "swiftHeapObject" : {
+                        "_0" : "Workshop.Bench"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "swiftHeapObject" : {
+                      "_0" : "Workshop.Bench"
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "Workshop.Bench"
+          }
+        }
       }
     ],
     "protocols" : [

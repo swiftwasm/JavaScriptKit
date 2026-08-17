@@ -139,6 +139,39 @@ public final class SwiftToSkeleton {
         sourceFiles.append((sourceFile, inputFilePath))
     }
 
+    private func resolveDeferredExtensions(_ exportCollectors: [ExportSwiftAPICollector]) {
+        var pendingExtensions = exportCollectors.flatMap { collector in
+            collector.deferredExtensions.map { (owner: collector, declaration: $0) }
+        }
+        var previousCount: Int
+        // An extended type might be defined in another extension, so keep resolving until no more progress is made.
+        repeat {
+            previousCount = pendingExtensions.count
+            var nextPendingExtensions: [(owner: ExportSwiftAPICollector, declaration: ExtensionDeclSyntax)] = []
+            for pending in pendingExtensions {
+                if !resolveExtension(pending.declaration, in: exportCollectors) {
+                    nextPendingExtensions.append(pending)
+                }
+            }
+            pendingExtensions = nextPendingExtensions
+        } while pendingExtensions.count < previousCount
+        for pending in pendingExtensions {
+            pending.owner.diagnoseUnresolvedExtension(pending.declaration)
+        }
+    }
+
+    private func resolveExtension(
+        _ declaration: ExtensionDeclSyntax,
+        in exportCollectors: [ExportSwiftAPICollector]
+    ) -> Bool {
+        for collector in exportCollectors {
+            if collector.resolveExtension(declaration) {
+                return true
+            }
+        }
+        return false
+    }
+
     public func finalize() throws -> BridgeJSSkeleton {
         var perSourceErrors: [(inputFilePath: String, errors: [DiagnosticError])] = []
         var importedFiles: [ImportedFileSkeleton] = []
@@ -244,9 +277,7 @@ public final class SwiftToSkeleton {
         }
 
         // Resolve extensions against all collectors. This needs to happen at this point so we can resolve both same file and cross file extensions.
-        for source in exportCollectors {
-            source.resolveDeferredExtensions(against: exportCollectors)
-        }
+        resolveDeferredExtensions(exportCollectors)
 
         // We have to collect diagnostics after all deferred extensions are resolved, since they could generate some.
         for ((_, inputFilePath), exportCollector) in zip(sourceFiles, exportCollectors) {
@@ -1946,23 +1977,15 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         return .skipChildren
     }
 
-    func resolveDeferredExtensions(against collectors: [ExportSwiftAPICollector]) {
-        for ext in deferredExtensions {
-            var resolved = false
-            for collector in collectors {
-                if collector.resolveExtension(ext) {
-                    resolved = true
-                    break
-                }
-            }
-            if !resolved, containsJSAnnotatedDeclaration(ext.memberBlock.members) {
-                diagnose(
-                    node: ext.extendedType,
-                    message: "Unsupported type '\(ext.extendedType.trimmedDescription)'.",
-                    hint: "You can only extend `@JS` annotated types defined in the same module"
-                )
-            }
+    func diagnoseUnresolvedExtension(_ ext: ExtensionDeclSyntax) {
+        guard containsJSAnnotatedDeclaration(ext.memberBlock.members) else {
+            return
         }
+        diagnose(
+            node: ext.extendedType,
+            message: "Unsupported type '\(ext.extendedType.trimmedDescription)'.",
+            hint: "You can only extend `@JS` annotated types defined in the same module"
+        )
     }
 
     private func containsJSAnnotatedDeclaration(_ members: MemberBlockItemListSyntax) -> Bool {

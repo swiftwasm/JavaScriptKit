@@ -359,6 +359,30 @@ import Testing
     }
 
     @Test
+    func codegenCrossFileExtensionOrderIndependence() throws {
+        let swiftAPI = SwiftToSkeleton(
+            progress: .silent,
+            moduleName: "TestModule",
+            exposeToGlobal: false,
+            externalModuleIndex: .empty
+        )
+        let memberURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileExtensionOrderMember.swift")
+        swiftAPI.addSourceFile(
+            Parser.parse(source: try String(contentsOf: memberURL, encoding: .utf8)),
+            inputFilePath: "CrossFileExtensionOrderMember.swift"
+        )
+        let typeURL = Self.multifileInputsDirectory.appendingPathComponent("CrossFileExtensionOrderType.swift")
+        swiftAPI.addSourceFile(
+            Parser.parse(source: try String(contentsOf: typeURL, encoding: .utf8)),
+            inputFilePath: "CrossFileExtensionOrderType.swift"
+        )
+        let skeleton = try swiftAPI.finalize()
+        let record = skeleton.exported?.structs.first { $0.swiftCallName == "Archive.Record" }
+        #expect(record?.methods.map(\.name) == ["describeRecord"])
+        try snapshotCodegen(skeleton: skeleton, name: "CrossFileExtensionOrderIndependence")
+    }
+
+    @Test
     func codegenSkipsEmptySkeletons() throws {
         let swiftAPI = SwiftToSkeleton(
             progress: .silent,

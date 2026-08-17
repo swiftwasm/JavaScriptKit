@@ -1,0 +1,106 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Archive_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Archive",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Archive"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Archive_Record_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "label",
+              "name" : "label",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Archive_Record_describeRecord",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describeRecord",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Record",
+        "namespace" : [
+          "Archive"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "namespace" : [
+              "Archive"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Archive.Record"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

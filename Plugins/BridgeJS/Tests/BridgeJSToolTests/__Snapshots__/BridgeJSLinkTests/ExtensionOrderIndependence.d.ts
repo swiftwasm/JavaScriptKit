@@ -4,6 +4,12 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export namespace Depot {
+    export interface Crate {
+        label: string;
+        describeCrate(): string;
+    }
+}
 /// Represents a Swift heap object like a class instance or an actor instance.
 export interface SwiftHeapObject {
     /// Release the heap object.
@@ -11,14 +17,13 @@ export interface SwiftHeapObject {
     /// Note: Calling this method will release the heap object and it will no longer be accessible.
     release(): void;
 }
-export interface Bench extends SwiftHeapObject {
+export interface Depot extends SwiftHeapObject {
 }
 export type Exports = {
-    makeBench(): Bench;
-    refitBench(bench: Bench, transform: (arg0: Bench) => Bench): Bench;
-    Workshop: {
-        Bench: {
-            new(): Bench;
+    Depot: {
+        new(): Depot;
+        Crate: {
+            init(label: string): Depot.Crate;
         },
     },
 }

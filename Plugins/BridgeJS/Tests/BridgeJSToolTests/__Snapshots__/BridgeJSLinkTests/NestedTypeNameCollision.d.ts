@@ -4,22 +4,24 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
-/// Represents a Swift heap object like a class instance or an actor instance.
-export interface SwiftHeapObject {
-    /// Release the heap object.
-    ///
-    /// Note: Calling this method will release the heap object and it will no longer be accessible.
-    release(): void;
+export interface Entry {
+    identifier: number;
 }
-export interface Bench extends SwiftHeapObject {
+export namespace Catalog {
+    export interface Entry {
+        title: string;
+    }
 }
 export type Exports = {
-    makeBench(): Bench;
-    refitBench(bench: Bench, transform: (arg0: Bench) => Bench): Bench;
-    Workshop: {
-        Bench: {
-            new(): Bench;
+    takeEntry(entry: Entry): Entry;
+    takeCatalogEntry(entry: Catalog.Entry): Catalog.Entry;
+    Catalog: {
+        Entry: {
+            init(title: string): Catalog.Entry;
         },
+    },
+    Entry: {
+        init(identifier: number): Entry;
     },
 }
 export type Imports = {

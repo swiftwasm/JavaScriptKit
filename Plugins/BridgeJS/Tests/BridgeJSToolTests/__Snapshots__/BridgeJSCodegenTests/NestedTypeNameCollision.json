@@ -1,0 +1,177 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+
+    ],
+    "enums" : [
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "Catalog",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Catalog",
+        "tsFullPath" : "Catalog"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_takeEntry",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "takeEntry",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "entry",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "Entry"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "Entry"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_takeCatalogEntry",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "takeCatalogEntry",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "entry",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "Catalog.Entry"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "Catalog.Entry"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Catalog_Entry_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "title",
+              "name" : "title",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Entry",
+        "namespace" : [
+          "Catalog"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "title",
+            "namespace" : [
+              "Catalog"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Catalog.Entry"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Entry_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "identifier",
+              "name" : "identifier",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Entry",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "identifier",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Entry"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}
