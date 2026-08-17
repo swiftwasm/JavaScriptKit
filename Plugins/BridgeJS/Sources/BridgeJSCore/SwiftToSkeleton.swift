@@ -818,7 +818,7 @@ public final class SwiftToSkeleton {
 
         while let parent = currentNode {
             if let extensionDecl = parent.as(ExtensionDeclSyntax.self) {
-                if let extendedDecl = typeDeclResolver.resolve(extensionDecl.extendedType),
+                if let extendedDecl = typeDeclResolver.resolveExtensionTarget(extensionDecl.extendedType),
                     visitedExtendedTypes.insert(extendedDecl.id).inserted
                 {
                     declarations.append(Syntax(extendedDecl))
@@ -1996,7 +1996,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
     /// Walks extension members under the matching type’s state, returning whether the type was found.
     func resolveExtension(_ ext: ExtensionDeclSyntax) -> Bool {
-        guard let extendedDecl = parent.typeDeclResolver.resolve(ext.extendedType) else {
+        guard let extendedDecl = parent.typeDeclResolver.resolveExtensionTarget(ext.extendedType) else {
             return false
         }
         let swiftCallName = parent.computeSwiftCallName(for: extendedDecl, itemName: extendedDecl.name.text)
