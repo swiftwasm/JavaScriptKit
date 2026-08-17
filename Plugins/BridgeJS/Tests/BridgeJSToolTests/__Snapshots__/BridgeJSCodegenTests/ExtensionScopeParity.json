@@ -1,0 +1,151 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_app_Toolbox_Mallet_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Mallet",
+        "namespace" : [
+          "app",
+          "Toolbox"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Toolbox.Mallet"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_app_Toolbox_Hammer_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Hammer",
+        "namespace" : [
+          "app",
+          "Toolbox"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Toolbox.Hammer"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "Toolbox",
+        "namespace" : [
+          "app"
+        ],
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Toolbox",
+        "tsFullPath" : "app.Toolbox"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "ready"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Signal",
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Signal",
+        "tsFullPath" : "Signal"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Meta_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "note",
+              "name" : "note",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Meta",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "note",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Signal.Meta"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

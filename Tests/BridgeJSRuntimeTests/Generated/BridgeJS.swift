@@ -4878,6 +4878,9 @@ extension AsyncImportedPayloadResult: _BridgedSwiftAssociatedValueEnum {
     }
 }
 
+extension Workspace.Kind: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+}
+
 @_expose(wasm, "bjs_DefaultArgumentExports_static_testStringDefault")
 @_cdecl("bjs_DefaultArgumentExports_static_testStringDefault")
 public func _bjs_DefaultArgumentExports_static_testStringDefault(_ messageBytes: Int32, _ messageLength: Int32) -> Void {
@@ -5924,6 +5927,67 @@ public func _bjs_NestedStructGroupB_static_roundtripMetadata() -> Void {
 extension NestedTypeHost.Variant: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 }
 
+extension Message: _BridgedSwiftAssociatedValueEnum {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPopPayload(_ caseId: Int32) -> Message {
+        switch caseId {
+        case 0:
+            return .update(Message.Update.bridgeJSStackPop())
+        case 1:
+            return .delete
+        default:
+            fatalError("Unknown Message case ID: \(caseId)")
+        }
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPushPayload() -> Int32 {
+        switch self {
+        case .update(let param0):
+            param0.bridgeJSStackPush()
+            return Int32(0)
+        case .delete:
+            return Int32(1)
+        }
+    }
+}
+
+extension Library.Genre: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
+}
+
+extension Message.Update: _BridgedSwiftCaseEnum {
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
+        return bridgeJSRawValue
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftReturn(_ value: Int32) -> Message.Update {
+        return bridgeJSLiftParameter(value)
+    }
+    @_spi(BridgeJS) @_transparent public static func bridgeJSLiftParameter(_ value: Int32) -> Message.Update {
+        return Message.Update(bridgeJSRawValue: value)!
+    }
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerReturn() -> Int32 {
+        return bridgeJSLowerParameter()
+    }
+
+    @_spi(BridgeJS) @usableFromInline init?(bridgeJSRawValue: Int32) {
+        switch bridgeJSRawValue {
+        case 0:
+            self = .flip
+        case 1:
+            self = .rotate
+        default:
+            return nil
+        }
+    }
+
+    @_spi(BridgeJS) @usableFromInline var bridgeJSRawValue: Int32 {
+        switch self {
+        case .flip:
+            return 0
+        case .rotate:
+            return 1
+        }
+    }
+}
+
 extension LightColor: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return bridgeJSRawValue
@@ -6842,6 +6906,142 @@ public func _bjs_NestedTypeHost_Label_static_maxLength_get() -> Int32 {
 public func _bjs_NestedTypeHost_Label_static_untitled() -> Void {
     #if arch(wasm32)
     let ret = NestedTypeHost.Label.untitled()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension Library.Shelf: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Library.Shelf {
+        let label = String.bridgeJSStackPop()
+        return Library.Shelf(label: label)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.label.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_Library_Shelf(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Library_Shelf()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Library_Shelf")
+fileprivate func _bjs_struct_lower_Library_Shelf_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_Library_Shelf_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_Library_Shelf(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Library_Shelf_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Library_Shelf")
+fileprivate func _bjs_struct_lift_Library_Shelf_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_Library_Shelf_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_Library_Shelf() -> Int32 {
+    return _bjs_struct_lift_Library_Shelf_extern()
+}
+
+@_expose(wasm, "bjs_Library_Shelf_init")
+@_cdecl("bjs_Library_Shelf_init")
+public func _bjs_Library_Shelf_init(_ labelBytes: Int32, _ labelLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = Library.Shelf(label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Library_Shelf_static_capacity_get")
+@_cdecl("bjs_Library_Shelf_static_capacity_get")
+public func _bjs_Library_Shelf_static_capacity_get() -> Int32 {
+    #if arch(wasm32)
+    let ret = Library.Shelf.capacity
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Library_Shelf_describeShelf")
+@_cdecl("bjs_Library_Shelf_describeShelf")
+public func _bjs_Library_Shelf_describeShelf() -> Void {
+    #if arch(wasm32)
+    let ret = Library.Shelf.bridgeJSLiftParameter().describeShelf()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension Library.Shelf.Divider: _BridgedSwiftStruct {
+    @_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> Library.Shelf.Divider {
+        let slot = Int.bridgeJSStackPop()
+        return Library.Shelf.Divider(slot: slot)
+    }
+
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSStackPush() {
+        self.slot.bridgeJSStackPush()
+    }
+
+    init(unsafelyCopying jsObject: JSObject) {
+        _bjs_struct_lower_Library_Shelf_Divider(jsObject.bridgeJSLowerParameter())
+        self = Self.bridgeJSStackPop()
+    }
+
+    func toJSObject() -> JSObject {
+        let __bjs_self = self
+        __bjs_self.bridgeJSStackPush()
+        return JSObject(id: UInt32(bitPattern: _bjs_struct_lift_Library_Shelf_Divider()))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lower_Library_Shelf_Divider")
+fileprivate func _bjs_struct_lower_Library_Shelf_Divider_extern(_ objectId: Int32) -> Void
+#else
+fileprivate func _bjs_struct_lower_Library_Shelf_Divider_extern(_ objectId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lower_Library_Shelf_Divider(_ objectId: Int32) -> Void {
+    return _bjs_struct_lower_Library_Shelf_Divider_extern(objectId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "swift_js_struct_lift_Library_Shelf_Divider")
+fileprivate func _bjs_struct_lift_Library_Shelf_Divider_extern() -> Int32
+#else
+fileprivate func _bjs_struct_lift_Library_Shelf_Divider_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_struct_lift_Library_Shelf_Divider() -> Int32 {
+    return _bjs_struct_lift_Library_Shelf_Divider_extern()
+}
+
+@_expose(wasm, "bjs_Library_Shelf_Divider_init")
+@_cdecl("bjs_Library_Shelf_Divider_init")
+public func _bjs_Library_Shelf_Divider_init(_ slot: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = Library.Shelf.Divider(slot: Int.bridgeJSLiftParameter(slot))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -9990,6 +10190,17 @@ public func _bjs_makeAdder(_ base: Int32) -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_roundTripMessage")
+@_cdecl("bjs_roundTripMessage")
+public func _bjs_roundTripMessage(_ message: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = roundTripMessage(_: Message.bridgeJSLiftParameter(message))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_renamedEcho")
 @_cdecl("bjs_renamedEcho")
 public func _bjs_renamedEcho(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
@@ -10757,6 +10968,59 @@ fileprivate func _bjs_ClosureSupportExports_wrap_extern(_ pointer: UnsafeMutable
 #endif
 @inline(never) fileprivate func _bjs_ClosureSupportExports_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
     return _bjs_ClosureSupportExports_wrap_extern(pointer)
+}
+
+@_expose(wasm, "bjs_Workspace_init")
+@_cdecl("bjs_Workspace_init")
+public func _bjs_Workspace_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Workspace(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Workspace_describe")
+@_cdecl("bjs_Workspace_describe")
+public func _bjs_Workspace_describe(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = Workspace.bridgeJSLiftParameter(_self).describe()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Workspace_deinit")
+@_cdecl("bjs_Workspace_deinit")
+public func _bjs_Workspace_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<Workspace>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension Workspace: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Workspace_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Workspace_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Workspace_wrap")
+fileprivate func _bjs_Workspace_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_Workspace_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_Workspace_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Workspace_wrap_extern(pointer)
 }
 
 @_expose(wasm, "bjs_DefaultArgumentConstructorDefaults_init")
@@ -13371,6 +13635,102 @@ fileprivate func _bjs_NestedTypeHost_wrap_extern(_ pointer: UnsafeMutableRawPoin
     return _bjs_NestedTypeHost_wrap_extern(pointer)
 }
 
+@_expose(wasm, "bjs_Library_init")
+@_cdecl("bjs_Library_init")
+public func _bjs_Library_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let ret = Library(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Library_describe")
+@_cdecl("bjs_Library_describe")
+public func _bjs_Library_describe(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = Library.bridgeJSLiftParameter(_self).describe()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Library_rename")
+@_cdecl("bjs_Library_rename")
+public func _bjs_Library_rename(_ _self: UnsafeMutableRawPointer, _ titleBytes: Int32, _ titleLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = Library.bridgeJSLiftParameter(_self).rename(_: String.bridgeJSLiftParameter(titleBytes, titleLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Library_shelf")
+@_cdecl("bjs_Library_shelf")
+public func _bjs_Library_shelf(_ _self: UnsafeMutableRawPointer, _ labelBytes: Int32, _ labelLength: Int32) -> Void {
+    #if arch(wasm32)
+    let ret = Library.bridgeJSLiftParameter(_self).shelf(label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Library_name_get")
+@_cdecl("bjs_Library_name_get")
+public func _bjs_Library_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let ret = Library.bridgeJSLiftParameter(_self).name
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Library_name_set")
+@_cdecl("bjs_Library_name_set")
+public func _bjs_Library_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    Library.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Library_deinit")
+@_cdecl("bjs_Library_deinit")
+public func _bjs_Library_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<Library>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension Library: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_Library_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_Library_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Library_wrap")
+fileprivate func _bjs_Library_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_Library_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_Library_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_Library_wrap_extern(pointer)
+}
+
 @_expose(wasm, "bjs_ImportGenericBox_init")
 @_cdecl("bjs_ImportGenericBox_init")
 public func _bjs_ImportGenericBox_init(_ value: Int32) -> UnsafeMutableRawPointer {
@@ -13863,6 +14223,14 @@ extension NestedTypeHost.Label: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedTypeHost.Label.bridgeJSMakeTypeHandle()
 }
 
+extension Library.Shelf: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Library.Shelf.bridgeJSMakeTypeHandle()
+}
+
+extension Library.Shelf.Divider: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Library.Shelf.Divider.bridgeJSMakeTypeHandle()
+}
+
 extension GenericRTPoint: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeHandle = GenericRTPoint.bridgeJSMakeTypeHandle()
 }
@@ -13987,6 +14355,10 @@ extension AsyncImportedPayloadResult: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeHandle = AsyncImportedPayloadResult.bridgeJSMakeTypeHandle()
 }
 
+extension Workspace.Kind: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Workspace.Kind.bridgeJSMakeTypeHandle()
+}
+
 extension Direction: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeHandle = Direction.bridgeJSMakeTypeHandle()
 }
@@ -14081,6 +14453,18 @@ extension StaticPropertyEnum: BridgedSwiftGenericBridgeable {
 
 extension NestedTypeHost.Variant: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeHandle = NestedTypeHost.Variant.bridgeJSMakeTypeHandle()
+}
+
+extension Message: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Message.bridgeJSMakeTypeHandle()
+}
+
+extension Library.Genre: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Library.Genre.bridgeJSMakeTypeHandle()
+}
+
+extension Message.Update: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = Message.Update.bridgeJSMakeTypeHandle()
 }
 
 extension LightColor: BridgedSwiftGenericBridgeable {
@@ -19051,6 +19435,8 @@ public func _bjs_BridgeJSRuntimeTests_register_type_handles() {
         NestedStructGroupA.Metadata.bridgeJSTypeID,
         NestedStructGroupB.Metadata.bridgeJSTypeID,
         NestedTypeHost.Label.bridgeJSTypeID,
+        Library.Shelf.bridgeJSTypeID,
+        Library.Shelf.Divider.bridgeJSTypeID,
         GenericRTPoint.bridgeJSTypeID,
         GenericRTNamespace.Metadata.bridgeJSTypeID,
         Point.bridgeJSTypeID,
@@ -19082,6 +19468,7 @@ public func _bjs_BridgeJSRuntimeTests_register_type_handles() {
         Shape.bridgeJSTypeID,
         InnerTag.bridgeJSTypeID,
         AsyncImportedPayloadResult.bridgeJSTypeID,
+        Workspace.Kind.bridgeJSTypeID,
         Direction.bridgeJSTypeID,
         Status.bridgeJSTypeID,
         Theme.bridgeJSTypeID,
@@ -19106,6 +19493,9 @@ public func _bjs_BridgeJSRuntimeTests_register_type_handles() {
         StaticCalculator.bridgeJSTypeID,
         StaticPropertyEnum.bridgeJSTypeID,
         NestedTypeHost.Variant.bridgeJSTypeID,
+        Message.bridgeJSTypeID,
+        Library.Genre.bridgeJSTypeID,
+        Message.Update.bridgeJSTypeID,
         LightColor.bridgeJSTypeID,
         ImportedPayloadSignal.bridgeJSTypeID,
         GenericRTColor.bridgeJSTypeID,

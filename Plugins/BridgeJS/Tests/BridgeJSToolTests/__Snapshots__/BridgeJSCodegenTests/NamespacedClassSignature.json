@@ -1,0 +1,133 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Workshop_Bench_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Bench",
+        "namespace" : [
+          "Workshop"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Workshop.Bench"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "Workshop",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Workshop",
+        "tsFullPath" : "Workshop"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_makeBench",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeBench",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "Workshop.Bench"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_refitBench",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "refitBench",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "bench",
+            "type" : {
+              "swiftHeapObject" : {
+                "_0" : "Workshop.Bench"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "transform",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModule8Workshop5BenchC_8Workshop5BenchC",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "swiftHeapObject" : {
+                        "_0" : "Workshop.Bench"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "swiftHeapObject" : {
+                      "_0" : "Workshop.Bench"
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "swiftHeapObject" : {
+            "_0" : "Workshop.Bench"
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

@@ -743,6 +743,29 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.equal(exports.NestedTypeHost.Label.untitled().text, "untitled");
     nestedHost.release();
 
+    const library = new exports.Library("Central");
+    assert.equal(library.describe(), "Central");
+    assert.equal(library.rename("Annex"), "Annex");
+    assert.equal(exports.Library.Genre.Fiction, "fiction");
+    assert.equal(exports.Library.Genre.Reference, "reference");
+    const shelf = exports.Library.Shelf.init("History");
+    assert.equal(shelf.label, "History");
+    assert.equal(exports.Library.Shelf.capacity, 32);
+    assert.equal(library.shelf("Science").label, "Science");
+    assert.equal(shelf.describeShelf(), "Shelf: History");
+    assert.equal(exports.Library.Shelf.Divider.init(5).slot, 5);
+    const updateMessage = { tag: exports.Message.Tag.Update, param0: exports.Update.Flip };
+    assert.deepEqual(exports.roundTripMessage(updateMessage), updateMessage);
+    const deleteMessage = { tag: exports.Message.Tag.Delete };
+    assert.deepEqual(exports.roundTripMessage(deleteMessage), deleteMessage);
+    library.release();
+
+    const workspace = new exports.Workspace("Docs");
+    assert.equal(workspace.describe(), "Docs");
+    assert.equal(exports.Workspace.Kind.Personal, "personal");
+    assert.equal(exports.Workspace.Kind.Shared, "shared");
+    workspace.release();
+
     const s1 = { tag: exports.APIResult.Tag.Success, param0: "Cześć 🙋‍♂️" };
     const f1 = { tag: exports.APIResult.Tag.Failure, param0: 42 };
     const i1 = { tag: APIResultValues.Tag.Info };

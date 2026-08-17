@@ -139,6 +139,39 @@ public final class SwiftToSkeleton {
         sourceFiles.append((sourceFile, inputFilePath))
     }
 
+    private func resolveDeferredExtensions(_ exportCollectors: [ExportSwiftAPICollector]) {
+        var pendingExtensions = exportCollectors.flatMap { collector in
+            collector.deferredExtensions.map { (owner: collector, declaration: $0) }
+        }
+        var previousCount: Int
+        // An extended type might be defined in another extension, so keep resolving until no more progress is made.
+        repeat {
+            previousCount = pendingExtensions.count
+            var nextPendingExtensions: [(owner: ExportSwiftAPICollector, declaration: ExtensionDeclSyntax)] = []
+            for pending in pendingExtensions {
+                if !resolveExtension(pending.declaration, in: exportCollectors) {
+                    nextPendingExtensions.append(pending)
+                }
+            }
+            pendingExtensions = nextPendingExtensions
+        } while pendingExtensions.count < previousCount
+        for pending in pendingExtensions {
+            pending.owner.diagnoseUnresolvedExtension(pending.declaration)
+        }
+    }
+
+    private func resolveExtension(
+        _ declaration: ExtensionDeclSyntax,
+        in exportCollectors: [ExportSwiftAPICollector]
+    ) -> Bool {
+        for collector in exportCollectors {
+            if collector.resolveExtension(declaration) {
+                return true
+            }
+        }
+        return false
+    }
+
     public func finalize() throws -> BridgeJSSkeleton {
         var perSourceErrors: [(inputFilePath: String, errors: [DiagnosticError])] = []
         var importedFiles: [ImportedFileSkeleton] = []
@@ -244,9 +277,7 @@ public final class SwiftToSkeleton {
         }
 
         // Resolve extensions against all collectors. This needs to happen at this point so we can resolve both same file and cross file extensions.
-        for source in exportCollectors {
-            source.resolveDeferredExtensions(against: exportCollectors)
-        }
+        resolveDeferredExtensions(exportCollectors)
 
         // We have to collect diagnostics after all deferred extensions are resolved, since they could generate some.
         for ((_, inputFilePath), exportCollector) in zip(sourceFiles, exportCollectors) {
@@ -536,12 +567,12 @@ public final class SwiftToSkeleton {
 
         if let typeDecl = typeDeclResolver.resolve(type) {
             if typeDecl.is(ProtocolDeclSyntax.self) {
-                let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
+                let swiftCallName = computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
                 return .swiftProtocol(swiftCallName)
             }
 
             if let enumDecl = typeDecl.as(EnumDeclSyntax.self) {
-                let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: enumDecl, itemName: enumDecl.name.text)
+                let swiftCallName = computeSwiftCallName(for: enumDecl, itemName: enumDecl.name.text)
                 if let jsAttribute = enumDecl.attributes.firstJSAttribute,
                     let aliasTarget = extractAliasTarget(from: jsAttribute)
                 {
@@ -580,7 +611,7 @@ public final class SwiftToSkeleton {
             }
 
             if let structDecl = typeDecl.as(StructDeclSyntax.self) {
-                let swiftCallName = SwiftToSkeleton.computeSwiftCallName(
+                let swiftCallName = computeSwiftCallName(
                     for: structDecl,
                     itemName: structDecl.name.text
                 )
@@ -598,7 +629,7 @@ public final class SwiftToSkeleton {
             guard typeDecl.is(ClassDeclSyntax.self) || typeDecl.is(ActorDeclSyntax.self) else {
                 return nil
             }
-            let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
+            let swiftCallName = computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
 
             // A type annotated with @JSClass is a JavaScript object wrapper (imported),
             // even if it is declared as a Swift class.
@@ -638,7 +669,7 @@ public final class SwiftToSkeleton {
     private func resolveExternal(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {
         guard
             !externalModuleIndex.isEmpty,
-            var components = typeDeclResolver.qualifiedComponents(from: type)
+            var components = type.qualifiedComponents
         else {
             return nil
         }
@@ -777,27 +808,50 @@ public final class SwiftToSkeleton {
         return nil
     }
 
-    /// Computes the full Swift call name by walking up the AST hierarchy to find all parent enums
-    /// This generates the qualified name needed for Swift code generation (e.g., "Networking.API.HTTPServer")
-    fileprivate static func computeSwiftCallName(for node: some SyntaxProtocol, itemName: String) -> String {
-        var swiftPath: [String] = []
-        var currentNode: Syntax? = node.parent
+    /// This currently doesn’t work correctly for extensions on types defined in other modules,
+    /// which is fine for now since we don’t support extending @JS types from other modules.
+    /// This will need updating when we do.
+    fileprivate func enclosingDeclarations(of node: some SyntaxProtocol) -> [Syntax] {
+        var declarations: [Syntax] = []
+        var visitedExtendedTypes: Set<SyntaxIdentifier> = []
+        var currentNode: Syntax? = Syntax(node).parent
 
         while let parent = currentNode {
-            if let enumDecl = parent.as(EnumDeclSyntax.self),
+            if let extensionDecl = parent.as(ExtensionDeclSyntax.self) {
+                if let extendedDecl = typeDeclResolver.resolve(extensionDecl.extendedType),
+                    visitedExtendedTypes.insert(extendedDecl.id).inserted
+                {
+                    declarations.append(Syntax(extendedDecl))
+                    currentNode = Syntax(extendedDecl).parent
+                } else {
+                    currentNode = parent.parent
+                }
+            } else {
+                declarations.append(parent)
+                currentNode = parent.parent
+            }
+        }
+        return declarations
+    }
+
+    /// This generates the qualified name needed for Swift code generation (e.g., "Networking.API.HTTPServer")
+    fileprivate func computeSwiftCallName(for node: some SyntaxProtocol, itemName: String) -> String {
+        var swiftPath: [String] = []
+
+        for declaration in enclosingDeclarations(of: node) {
+            if let enumDecl = declaration.as(EnumDeclSyntax.self),
                 enumDecl.attributes.hasJSAttribute()
             {
                 swiftPath.insert(enumDecl.name.text, at: 0)
-            } else if let structDecl = parent.as(StructDeclSyntax.self),
+            } else if let structDecl = declaration.as(StructDeclSyntax.self),
                 structDecl.attributes.hasJSAttribute()
             {
                 swiftPath.insert(structDecl.name.text, at: 0)
-            } else if let classDecl = parent.as(ClassDeclSyntax.self),
+            } else if let classDecl = declaration.as(ClassDeclSyntax.self),
                 classDecl.attributes.hasJSAttribute()
             {
                 swiftPath.insert(classDecl.name.text, at: 0)
             }
-            currentNode = parent.parent
         }
 
         if swiftPath.isEmpty {
@@ -1883,7 +1937,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             resolvedNamespace: namespaceResult.namespace,
             parentTypeNamespace: computeParentTypeNamespace(for: node)
         )
-        let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: node, itemName: name)
+        let swiftCallName = parent.computeSwiftCallName(for: node, itemName: name)
         let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
             for: node,
             message: "Class visibility must be at least internal"
@@ -1923,23 +1977,15 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         return .skipChildren
     }
 
-    func resolveDeferredExtensions(against collectors: [ExportSwiftAPICollector]) {
-        for ext in deferredExtensions {
-            var resolved = false
-            for collector in collectors {
-                if collector.resolveExtension(ext) {
-                    resolved = true
-                    break
-                }
-            }
-            if !resolved, containsJSAnnotatedDeclaration(ext.memberBlock.members) {
-                diagnose(
-                    node: ext.extendedType,
-                    message: "Unsupported type '\(ext.extendedType.trimmedDescription)'.",
-                    hint: "You can only extend `@JS` annotated types defined in the same module"
-                )
-            }
+    func diagnoseUnresolvedExtension(_ ext: ExtensionDeclSyntax) {
+        guard containsJSAnnotatedDeclaration(ext.memberBlock.members) else {
+            return
         }
+        diagnose(
+            node: ext.extendedType,
+            message: "Unsupported type '\(ext.extendedType.trimmedDescription)'.",
+            hint: "You can only extend `@JS` annotated types defined in the same module"
+        )
     }
 
     private func containsJSAnnotatedDeclaration(_ members: MemberBlockItemListSyntax) -> Bool {
@@ -1949,25 +1995,23 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     }
 
     /// Walks extension members under the matching type’s state, returning whether the type was found.
-    ///
-    /// Note: The lookup scans dictionaries keyed by `makeKey(name:namespace:)`, matching only by
-    /// plain name. If two types share a name but differ by namespace, `.first(where:)` picks
-    /// whichever comes first. This is acceptable today since namespace collisions are unlikely,
-    /// but may need refinement if namespace-qualified extension resolution is added.
     func resolveExtension(_ ext: ExtensionDeclSyntax) -> Bool {
-        let name = ext.extendedType.trimmedDescription
+        guard let extendedDecl = parent.typeDeclResolver.resolve(ext.extendedType) else {
+            return false
+        }
+        let swiftCallName = parent.computeSwiftCallName(for: extendedDecl, itemName: extendedDecl.name.text)
         let state: State
-        if let entry = exportedClassByName.first(where: { $0.value.name == name }) {
-            state = .classBody(name: name, key: entry.key)
-        } else if let entry = exportedStructByName.first(where: { $0.value.name == name }) {
-            state = .structBody(name: name, key: entry.key)
-        } else if let entry = exportedEnumByName.first(where: { $0.value.name == name }) {
-            state = .enumBody(name: name, key: entry.key)
-        } else if exportedProtocolByName.values.contains(where: { $0.name == name }) {
+        if let entry = exportedClassByName.first(where: { $0.value.swiftCallName == swiftCallName }) {
+            state = .classBody(name: entry.value.name, key: entry.key)
+        } else if let entry = exportedStructByName.first(where: { $0.value.swiftCallName == swiftCallName }) {
+            state = .structBody(name: entry.value.name, key: entry.key)
+        } else if let entry = exportedEnumByName.first(where: { $0.value.swiftCallName == swiftCallName }) {
+            state = .enumBody(name: entry.value.name, key: entry.key)
+        } else if exportedProtocolByName.values.contains(where: { $0.name == swiftCallName }) {
             diagnose(
                 node: ext.extendedType,
                 message: "Protocol extensions are not supported by BridgeJS.",
-                hint: "You cannot extend `@JS` protocol '\(name)' with additional members"
+                hint: "You cannot extend `@JS` protocol '\(swiftCallName)' with additional members"
             )
             return true
         } else {
@@ -1986,7 +2030,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         jsAttribute: AttributeSyntax,
         aliasTarget: TypeSyntax
     ) {
-        let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: node, itemName: node.name.text)
+        let swiftCallName = parent.computeSwiftCallName(for: node, itemName: node.name.text)
         if extractNamespace(from: jsAttribute) != nil {
             errors.append(
                 DiagnosticError(
@@ -2051,7 +2095,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             parentTypeNamespace: computeParentTypeNamespace(for: node)
         )
         let emitStyle = extractEnumStyle(from: jsAttribute) ?? .const
-        let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: node, itemName: name)
+        let swiftCallName = parent.computeSwiftCallName(for: node, itemName: name)
         let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
             for: node,
             message: "Enum visibility must be at least internal"
@@ -2237,7 +2281,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             resolvedNamespace: namespaceResult.namespace,
             parentTypeNamespace: computeParentTypeNamespace(for: node)
         )
-        let swiftCallName = SwiftToSkeleton.computeSwiftCallName(for: node, itemName: name)
+        let swiftCallName = parent.computeSwiftCallName(for: node, itemName: name)
         let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
             for: node,
             message: "Struct visibility must be at least internal"
@@ -2552,10 +2596,9 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     /// Method allows for explicit namespace for top level enum, it will be used as base namespace and will concat enum name
     private func computeNamespace(for node: some SyntaxProtocol) -> [String]? {
         var namespace: [String] = []
-        var currentNode: Syntax? = node.parent
 
-        while let parent = currentNode {
-            if let enumDecl = parent.as(EnumDeclSyntax.self),
+        for declaration in parent.enclosingDeclarations(of: node) {
+            if let enumDecl = declaration.as(EnumDeclSyntax.self),
                 enumDecl.attributes.hasJSAttribute()
             {
                 let isNamespaceEnum = !enumDecl.memberBlock.members.contains { member in
@@ -2572,7 +2615,6 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                     }
                 }
             }
-            currentNode = parent.parent
         }
 
         return namespace.isEmpty ? nil : namespace
@@ -2580,19 +2622,17 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
     private func computeParentTypeNamespace(for node: some SyntaxProtocol) -> [String]? {
         var path: [String] = []
-        var currentNode: Syntax? = node.parent
 
-        while let parent = currentNode {
-            if let structDecl = parent.as(StructDeclSyntax.self),
+        for declaration in parent.enclosingDeclarations(of: node) {
+            if let structDecl = declaration.as(StructDeclSyntax.self),
                 structDecl.attributes.hasJSAttribute()
             {
                 path.insert(structDecl.name.text, at: 0)
-            } else if let classDecl = parent.as(ClassDeclSyntax.self),
+            } else if let classDecl = declaration.as(ClassDeclSyntax.self),
                 classDecl.attributes.hasJSAttribute()
             {
                 path.insert(classDecl.name.text, at: 0)
             }
-            currentNode = parent.parent
         }
 
         return path.isEmpty ? nil : path

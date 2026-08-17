@@ -1,0 +1,100 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Workspace_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Workspace_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Workspace",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Workspace"
+      }
+    ],
+    "enums" : [
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "personal"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "shared"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Kind",
+        "namespace" : [
+          "Workspace"
+        ],
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Workspace.Kind",
+        "tsFullPath" : "Workspace.Kind"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

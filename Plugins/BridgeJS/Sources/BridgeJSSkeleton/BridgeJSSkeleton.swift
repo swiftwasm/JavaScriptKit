@@ -14,6 +14,14 @@ extension NamespacedExportedType {
         }
         return name
     }
+
+    public var tsPathComponents: [String] {
+        (namespace ?? []) + [name]
+    }
+
+    public var tsFullPath: String {
+        tsPathComponents.joined(separator: ".")
+    }
 }
 
 // MARK: - ABI Name Generation
@@ -1979,11 +1987,11 @@ extension BridgeType {
         case .void: return "y"
         case .jsObject(let name):
             let typeName = name ?? "JSObject"
-            return "\(typeName.count)\(typeName)C"
+            return "\(Self.mangleQualifiedName(typeName))C"
         case .jsValue:
             return "7JSValueV"
         case .swiftHeapObject(let name):
-            return "\(name.count)\(name)C"
+            return "\(Self.mangleQualifiedName(name))C"
         case .unsafePointer(let ptr):
             func sanitize(_ s: String) -> String {
                 s.filter { $0.isNumber || $0.isLetter }
@@ -2008,11 +2016,11 @@ extension BridgeType {
             .rawValueEnum(let name, _),
             .associatedValueEnum(let name),
             .namespaceEnum(let name):
-            return "\(name.count)\(name)O"
+            return "\(Self.mangleQualifiedName(name))O"
         case .swiftProtocol(let name):
-            return "\(name.count)\(name)P"
+            return "\(Self.mangleQualifiedName(name))P"
         case .swiftStruct(let name):
-            return "\(name.count)\(name)V"
+            return "\(Self.mangleQualifiedName(name))V"
         case .closure(let signature, let useJSTypedClosure):
             let params =
                 signature.parameters.isEmpty
@@ -2029,10 +2037,16 @@ extension BridgeType {
         case .alias(let name, _):
             // `name` is the namespace-qualified swiftCallName (unique), so the underlying
             // representation isn't mangled in - aliases bridge via their JS type's ABI.
-            return "Al\(name.count)\(name)"
+            return "Al\(Self.mangleQualifiedName(name))"
         case .generic(let name):
             return "\(name.count)\(name)T"
         }
+    }
+
+    /// Transforms a namespace-qualified name into a valid identifier by removing
+    /// each dot and prefixing each component with length (e.g. `Workshop.Bench` -> `8Workshop5Bench`).
+    private static func mangleQualifiedName(_ name: String) -> String {
+        name.split(separator: ".").map { "\($0.count)\($0)" }.joined()
     }
 
     /// Determines if an optional type requires side-channel communication for protocol property returns

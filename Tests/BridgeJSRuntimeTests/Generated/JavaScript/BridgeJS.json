@@ -833,6 +833,51 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_Workspace_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Workspace_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Workspace",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Workspace"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_DefaultArgumentConstructorDefaults_init",
           "effects" : {
             "isAsync" : false,
@@ -4846,6 +4891,110 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_Library_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Library_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Library_rename",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "rename",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "title",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_Library_shelf",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "shelf",
+            "parameters" : [
+              {
+                "label" : "label",
+                "name" : "label",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Library.Shelf"
+              }
+            }
+          }
+        ],
+        "name" : "Library",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Library"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_ImportGenericBox_init",
           "effects" : {
             "isAsync" : false,
@@ -7507,6 +7656,36 @@
         ],
         "swiftCallName" : "AsyncImportedPayloadResult",
         "tsFullPath" : "AsyncImportedPayloadResult"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "personal"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "shared"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Kind",
+        "namespace" : [
+          "Workspace"
+        ],
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Workspace.Kind",
+        "tsFullPath" : "Workspace.Kind"
       },
       {
         "cases" : [
@@ -10328,6 +10507,94 @@
         ],
         "swiftCallName" : "NestedTypeHost.Variant",
         "tsFullPath" : "NestedTypeHost.Variant"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "caseEnum" : {
+                    "_0" : "Message.Update"
+                  }
+                }
+              }
+            ],
+            "name" : "update"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "delete"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Message",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Message",
+        "tsFullPath" : "Message"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "fiction"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "reference"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Genre",
+        "namespace" : [
+          "Library"
+        ],
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Library.Genre",
+        "tsFullPath" : "Library.Genre"
+      },
+      {
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "flip"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "rotate"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Update",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Message.Update",
+        "tsFullPath" : "Update"
       },
       {
         "cases" : [
@@ -17146,6 +17413,31 @@
         }
       },
       {
+        "abiName" : "bjs_roundTripMessage",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "roundTripMessage",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "message",
+            "type" : {
+              "associatedValueEnum" : {
+                "_0" : "Message"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "associatedValueEnum" : {
+            "_0" : "Message"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_renamedEcho",
         "effects" : {
           "isAsync" : false,
@@ -18678,6 +18970,136 @@
           }
         ],
         "swiftCallName" : "NestedTypeHost.Label"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Library_Shelf_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "label",
+              "name" : "label",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Library_Shelf_describeShelf",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describeShelf",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "Shelf",
+        "namespace" : [
+          "Library"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "namespace" : [
+              "Library"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "capacity",
+            "staticContext" : {
+              "structName" : {
+                "_0" : "Library_Shelf"
+              }
+            },
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Library.Shelf"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Library_Shelf_Divider_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "slot",
+              "name" : "slot",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Divider",
+        "namespace" : [
+          "Library",
+          "Shelf"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "slot",
+            "namespace" : [
+              "Library",
+              "Shelf"
+            ],
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Library.Shelf.Divider"
       },
       {
         "methods" : [
