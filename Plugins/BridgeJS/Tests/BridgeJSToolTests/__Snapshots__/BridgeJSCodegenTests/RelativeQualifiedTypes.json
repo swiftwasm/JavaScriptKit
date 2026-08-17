@@ -1,0 +1,239 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_Library_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Library_divider",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "divider",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "swiftStruct" : {
+                    "_0" : "Library.Shelf.Divider"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Library.Shelf.Divider"
+              }
+            }
+          }
+        ],
+        "name" : "Library",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Library"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Outer_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Outer",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Outer"
+      }
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+      {
+        "methods" : [
+
+        ],
+        "name" : "Shelf",
+        "namespace" : [
+          "Library"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Library.Shelf"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Library_Shelf_Divider_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "slot",
+              "name" : "slot",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Divider",
+        "namespace" : [
+          "Library",
+          "Shelf"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "slot",
+            "namespace" : [
+              "Library",
+              "Shelf"
+            ],
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Library.Shelf.Divider"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Outer_Inner_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_Outer_Inner_marker",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "marker",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "Inner",
+        "namespace" : [
+          "Outer"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Outer.Inner"
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "Outer",
+        "namespace" : [
+          "Outer",
+          "Inner"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Outer.Inner.Outer"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Outer_Inner_Outer_Inner_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Inner",
+        "namespace" : [
+          "Outer",
+          "Inner",
+          "Outer"
+        ],
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Outer.Inner.Outer.Inner"
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

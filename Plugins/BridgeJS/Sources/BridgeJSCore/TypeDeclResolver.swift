@@ -92,7 +92,7 @@ class TypeDeclResolver {
     }
 
     /// Builds the type name scope for a given type usage
-    private func buildScope(type: IdentifierTypeSyntax) -> QualifiedName {
+    private func buildScope(type: TypeSyntax) -> QualifiedName {
         var innerToOuter: [String] = []
         var context: SyntaxProtocol = type
         while let parent = context.parent {
@@ -108,25 +108,29 @@ class TypeDeclResolver {
         return innerToOuter.reversed()
     }
 
-    /// Looks up a qualified name of a type declaration by its unqualified type usage
+    /// Looks up a qualified name of a type declaration relative to its lexical scope
     /// Returns the qualified name hierarchy of the type declaration
-    /// If the type declaration is not found, returns the unqualified name
-    private func tryQualify(type: IdentifierTypeSyntax) -> QualifiedName {
-        let name = type.name.text
+    /// If the type declaration is not found, returns the original qualified name
+    private func tryQualify(type: TypeSyntax) -> QualifiedName? {
+        guard let components = type.qualifiedComponents else {
+            return nil
+        }
         let scope = buildScope(type: type)
         /// Search for the type declaration from the innermost scope to the outermost scope
         for i in (0...scope.count).reversed() {
-            let qualifiedName = Array(scope[0..<i] + [name])
+            let qualifiedName = Array(scope.prefix(i)) + components
             if typeDeclByQualifiedName[qualifiedName] != nil || typeAliasByQualifiedName[qualifiedName] != nil {
                 return qualifiedName
             }
         }
-        return [name]
+        return components
     }
 
     /// Looks up a type declaration by its unqualified type usage
     func lookupType(for type: IdentifierTypeSyntax) -> TypeDecl? {
-        let qualifiedName = tryQualify(type: type)
+        guard let qualifiedName = tryQualify(type: TypeSyntax(type)) else {
+            return nil
+        }
         return typeDeclByQualifiedName[qualifiedName]
     }
 
@@ -139,22 +143,25 @@ class TypeDeclResolver {
     ///
     /// Supported inputs:
     /// - IdentifierTypeSyntax (e.g. `Method`) — resolved relative to the lexical scope, preferring the innermost enclosing type.
-    /// - MemberTypeSyntax (e.g. `Networking.API.Method`) — resolved by recursively building the fully qualified name.
+    /// - MemberTypeSyntax (e.g. `Networking.API.Method`) — resolved relative to the lexical scope before falling back to the fully qualified name.
     ///
     /// Resolution strategy:
-    /// 1. If the node is IdentifierTypeSyntax, call `lookupType(for:)` which attempts scope-aware qualification via `tryQualify`.
-    /// 2. Otherwise, attempt to build a fully qualified name with `qualifiedComponents` and look it up with `lookupType(fullyQualified:)`.
+    /// Build the qualified name with `qualifiedComponents`, then attempt scope-aware qualification via `tryQualify`.
     ///
     /// - Parameter type: The SwiftSyntax node representing a type appearance in source code.
     /// - Returns: The nominal declaration (enum/class/actor/struct) if found, otherwise nil.
     func resolve(_ type: TypeSyntax) -> TypeDecl? {
-        if let id = type.as(IdentifierTypeSyntax.self) {
-            return lookupType(for: id)
-        }
-        if let components = type.qualifiedComponents {
-            return lookupType(fullyQualified: components)
+        if let qualifiedName = tryQualify(type: type) {
+            return lookupType(fullyQualified: qualifiedName)
         }
         return nil
+    }
+
+    func resolveExtensionTarget(_ type: TypeSyntax) -> TypeDecl? {
+        guard let qualifiedName = type.qualifiedComponents else {
+            return nil
+        }
+        return lookupType(fullyQualified: qualifiedName)
     }
 
     /// Resolves a type usage node to a type alias declaration
@@ -162,12 +169,8 @@ class TypeDeclResolver {
     /// - Parameter type: The SwiftSyntax node representing a type appearance in source code.
     /// - Returns: The type alias declaration if found, otherwise nil.
     func resolveTypeAlias(_ type: TypeSyntax) -> TypeAliasDeclSyntax? {
-        if let id = type.as(IdentifierTypeSyntax.self) {
-            let qualifiedName = tryQualify(type: id)
+        if let qualifiedName = tryQualify(type: type) {
             return typeAliasByQualifiedName[qualifiedName]
-        }
-        if let components = type.qualifiedComponents {
-            return typeAliasByQualifiedName[components]
         }
         return nil
     }
