@@ -8,7 +8,17 @@
 @preconcurrency import struct Foundation.CocoaError
 @preconcurrency import func Foundation.fputs
 @preconcurrency import func Foundation.exit
-@preconcurrency import var Foundation.stderr
+
+#if canImport(Darwin)
+@preconcurrency import var Darwin.stderr
+#elseif canImport(Glibc)
+@preconcurrency import var Glibc.stderr
+#elseif canImport(Musl)
+@preconcurrency import var Musl.stderr
+#elseif canImport(Android)
+@preconcurrency import var Android.stderr
+#endif
+
 import PackagePlugin
 
 /// The main entry point for the PackageToJS plugin.
