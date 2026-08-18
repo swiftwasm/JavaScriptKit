@@ -110,7 +110,7 @@ import ArgumentParser
             let skeletonData = try readData(from: skeletonFile)
             skeletons.append(try JSONDecoder().decode(BridgeJSSkeleton.self, from: skeletonData))
         }
-        let link = BridgeJSLink(skeletons: skeletons, sharedMemory: false)
+        let link = BridgeJSLink(skeletons: skeletons)
         return try link.link()
     }
 

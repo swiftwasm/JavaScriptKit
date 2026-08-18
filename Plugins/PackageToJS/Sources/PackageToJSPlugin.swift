@@ -799,7 +799,7 @@ extension PackagingPlanner {
         wasmFilename: String
     ) {
         let outputBaseName = outputDir.lastPathComponent
-        let (configuration, triple) = PackageToJS.deriveBuildConfiguration(wasmProductArtifact: wasmProductArtifact)
+        let configuration = PackageToJS.deriveBuildConfiguration(wasmProductArtifact: wasmProductArtifact)
         let system = DefaultPackagingSystem(printWarning: printStderr, which: which(_:))
         self.init(
             options: options,
@@ -813,7 +813,6 @@ extension PackagingPlanner {
             wasmProductArtifact: BuildPath(absolute: wasmProductArtifact.path),
             wasmFilename: wasmFilename,
             configuration: configuration,
-            triple: triple,
             system: system
         )
     }

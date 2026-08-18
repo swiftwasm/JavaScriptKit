@@ -69,15 +69,31 @@ struct PackageToJS {
         var packageOptions: PackageOptions
     }
 
-    static func deriveBuildConfiguration(wasmProductArtifact: URL) -> (configuration: String, triple: String) {
+    /// Derives the build configuration from the path of the wasm product artifact.
+    /// Returns "debug" or "release"
+    static func deriveBuildConfiguration(wasmProductArtifact: URL) -> String {
+        // For "--build-system swiftbuild"
+        // e.g. path/to/.build/out/Products/Debug-webassembly-wasm32/Basic.wasm
+        // ref: https://github.com/swiftlang/swift-build/blob/48498f5450c85da3f8c09808168f0286d207329b/Sources/SWBCore/Core.swift#L631-L643
+        //
+        // For "--build-system native"
         // e.g. path/to/.build/wasm32-unknown-wasi/debug/Basic.wasm -> ("debug", "wasm32-unknown-wasi")
 
         // First, resolve symlink to get the actual path as SwiftPM 6.0 and earlier returns unresolved
         // symlink path for product artifact.
         let wasmProductArtifact = wasmProductArtifact.resolvingSymlinksInPath()
-        let buildConfiguration = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
-        let triple = wasmProductArtifact.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent
-        return (buildConfiguration, triple)
+        let swiftBuildSuffix = "-webassembly-wasm32"
+        let parentDirName = wasmProductArtifact.deletingLastPathComponent().lastPathComponent
+        if parentDirName.hasSuffix(swiftBuildSuffix) {
+            // This is SwiftBuild backend mode
+            let swiftBuildConfig = String(parentDirName.dropLast(swiftBuildSuffix.count))
+            guard let mappedConfig = ["Debug": "debug", "Release": "release"][swiftBuildConfig] else {
+                fatalError("Unknown SwiftPM build configuration: \(swiftBuildConfig)")
+            }
+            return mappedConfig
+        }
+        // This is native backend mode, the parent directory name is the build configuration
+        return parentDirName
     }
 
     static func runTest(testRunner: URL, currentDirectoryURL: URL, outputDir: URL, testOptions: TestOptions) throws {
@@ -426,8 +442,6 @@ struct PackagingPlanner {
     let wasmProductArtifact: BuildPath
     /// The build configuration
     let configuration: String
-    /// The target triple
-    let triple: String
     /// The system interface to use
     let system: any PackagingSystem
 
@@ -441,7 +455,6 @@ struct PackagingPlanner {
         wasmProductArtifact: BuildPath,
         wasmFilename: String,
         configuration: String,
-        triple: String,
         // NOTE: We should use `ProcessInfo.processInfo.arguments[0]` instead of `CommandLine.arguments[0]`
         // because the latter may not always be the full executable path (e.g. when invoked through PATH lookup).
         // https://github.com/swiftlang/swift-foundation/blob/f5143f96d01cdb6d280665de8221b75fc8631d95/Sources/FoundationEssentials/ProcessInfo/ProcessInfo.swift#L47
@@ -458,7 +471,6 @@ struct PackagingPlanner {
         self.selfPath = selfPath
         self.wasmProductArtifact = wasmProductArtifact
         self.configuration = configuration
-        self.triple = triple
         self.system = system
     }
 
@@ -469,7 +481,7 @@ struct PackagingPlanner {
         make: inout MiniMake,
         buildOptions: PackageToJS.BuildOptions
     ) throws -> MiniMake.TaskKey {
-        let (allTasks, _, _, _) = try planBuildInternal(
+        let (allTasks, _, _, _, _) = try planBuildInternal(
             make: &make,
             noOptimize: buildOptions.noOptimize,
             debugInfoFormat: buildOptions.debugInfoFormat
@@ -489,7 +501,8 @@ struct PackagingPlanner {
         allTasks: [MiniMake.TaskKey],
         outputDirTask: MiniMake.TaskKey,
         intermediatesDirTask: MiniMake.TaskKey,
-        packageJsonTask: MiniMake.TaskKey
+        packageJsonTask: MiniMake.TaskKey,
+        wasmImportsTask: MiniMake.TaskKey
     ) {
         // Prepare output directory
         let outputDirTask = make.addTask(
@@ -575,19 +588,29 @@ struct PackagingPlanner {
         }
         packageInputs.append(wasm)
 
-        let wasmImportsPath = intermediatesDir.appending(path: "wasm-imports.json")
+        // NOTE: The imports are parsed from the product artifact instead of the final .wasm
+        // file because wasm-opt removes unreferenced imports, and the presence of an import
+        // decides how the JavaScript glue code is generated.
+        let wasmImportsPath = self.wasmImportsPath
         let wasmImportsTask = make.addTask(
-            inputFiles: [selfPath, finalWasmPath],
-            inputTasks: [outputDirTask, intermediatesDirTask, wasm],
+            inputFiles: [selfPath, wasmProductArtifact],
+            inputTasks: [intermediatesDirTask],
             output: wasmImportsPath
         ) {
             let metadata = try parseImports(
-                moduleBytes: try Data(contentsOf: URL(fileURLWithPath: $1.resolve(path: finalWasmPath).path))
+                moduleBytes: try Data(contentsOf: URL(fileURLWithPath: $1.resolve(path: wasmProductArtifact).path))
             )
             let jsonEncoder = JSONEncoder()
             jsonEncoder.outputFormatting = .prettyPrinted
             let jsonData = try jsonEncoder.encode(metadata)
-            try system.writeFile(atPath: $1.resolve(path: $0.output).path, content: jsonData)
+            let outputPath = $1.resolve(path: $0.output)
+            // Every task consuming the imports depends on this file, so leave it untouched
+            // when the imports are unchanged. Rewriting it would give it a newer timestamp
+            // and re-run them (including `npm install`) for unrelated Swift source changes.
+            if let lastImports = try? Data(contentsOf: outputPath), lastImports == jsonData {
+                return
+            }
+            try system.writeFile(atPath: outputPath.path, content: jsonData)
         }
 
         packageInputs.append(wasmImportsTask)
@@ -606,6 +629,7 @@ struct PackagingPlanner {
             file: "Plugins/PackageToJS/Templates/package.json",
             output: "package.json",
             outputDirTask: outputDirTask,
+            wasmImportsTask: wasmImportsTask,
             inputFiles: [],
             inputTasks: []
         )
@@ -618,8 +642,13 @@ struct PackagingPlanner {
             let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
             let bridgeModules = outputDir.appending(path: "bridge-js-modules")
             packageInputs.append(
-                make.addTask(inputFiles: skeletonFiles + [selfPath], output: bridgeJs) { _, scope in
-                    let output = try bridge.link.link()
+                make.addTask(
+                    inputFiles: skeletonFiles + [selfPath, wasmImportsPath],
+                    inputTasks: [outputDirTask, wasmImportsTask],
+                    output: bridgeJs
+                ) { _, scope in
+                    let features = try Self.loadWasmFeatures(at: scope.resolve(path: wasmImportsPath))
+                    let output = try bridge.link.link(sharedMemory: features.sharedMemory)
                     try system.writeFile(
                         atPath: scope.resolve(path: bridgeJs).path,
                         content: Data(output.outputJs.utf8)
@@ -678,22 +707,20 @@ struct PackagingPlanner {
                     file: file,
                     output: output,
                     outputDirTask: outputDirTask,
-                    inputFiles: [wasmImportsPath],
-                    inputTasks: [platformsDirTask, wasmImportsTask],
-                    wasmImportsPath: wasmImportsPath
+                    wasmImportsTask: wasmImportsTask,
+                    inputFiles: [],
+                    inputTasks: [platformsDirTask]
                 )
             )
         }
-        return (packageInputs, outputDirTask, intermediatesDirTask, packageJsonTask)
+        return (packageInputs, outputDirTask, intermediatesDirTask, packageJsonTask, wasmImportsTask)
     }
 
     private func loadBridgeJS() throws -> (
         link: BridgeJSLink,
         modules: [JavaScriptModuleInput]
     ) {
-        var link = BridgeJSLink(
-            sharedMemory: Self.isSharedMemoryEnabled(triple: triple)
-        )
+        var link = BridgeJSLink()
         var moduleSources: [String: BuildPath] = [:]
 
         for input in skeletons {
@@ -735,7 +762,7 @@ struct PackagingPlanner {
     func planTestBuild(
         make: inout MiniMake
     ) throws -> (rootTask: MiniMake.TaskKey, binDir: BuildPath) {
-        var (allTasks, outputDirTask, intermediatesDirTask, packageJsonTask) = try planBuildInternal(
+        var (allTasks, outputDirTask, intermediatesDirTask, packageJsonTask, wasmImportsTask) = try planBuildInternal(
             make: &make,
             noOptimize: false,
             debugInfoFormat: .dwarf
@@ -779,6 +806,7 @@ struct PackagingPlanner {
                     file: file,
                     output: output,
                     outputDirTask: outputDirTask,
+                    wasmImportsTask: wasmImportsTask,
                     inputFiles: [],
                     inputTasks: [binDirTask]
                 )
@@ -797,9 +825,9 @@ struct PackagingPlanner {
         file: String,
         output: String,
         outputDirTask: MiniMake.TaskKey,
+        wasmImportsTask: MiniMake.TaskKey,
         inputFiles: [BuildPath],
-        inputTasks: [MiniMake.TaskKey],
-        wasmImportsPath: BuildPath? = nil
+        inputTasks: [MiniMake.TaskKey]
     ) -> MiniMake.TaskKey {
 
         struct Salt: Encodable {
@@ -808,9 +836,10 @@ struct PackagingPlanner {
         }
 
         let inputPath = selfPackageDir.appending(path: file)
-        let conditions: [String: Bool] = [
-            "USE_SHARED_MEMORY": Self.isSharedMemoryEnabled(triple: triple),
-            "IS_WASI": triple.hasPrefix("wasm32-unknown-wasi"),
+        // NOTE: The conditions derived from the .wasm binary are not part of the salt because
+        // they are not known until the imports are parsed. The imports file is an input of
+        // this task instead, so a change in them still re-runs the preprocessing.
+        let staticConditions: [String: Bool] = [
             "USE_WASI_CDN": options.useCDN,
             "HAS_BRIDGE": skeletons.count > 0,
             "HAS_IMPORTS": skeletons.count > 0,
@@ -821,30 +850,26 @@ struct PackagingPlanner {
             "PACKAGE_TO_JS_MODULE_PATH": wasmFilename,
             "PACKAGE_TO_JS_PACKAGE_NAME": options.packageName ?? packageId.lowercased(),
         ]
-        let salt = Salt(conditions: conditions, substitutions: constantSubstitutions)
+        let salt = Salt(conditions: staticConditions, substitutions: constantSubstitutions)
+        let wasmImportsPath = self.wasmImportsPath
 
         return make.addTask(
-            inputFiles: [selfPath, inputPath] + inputFiles,
-            inputTasks: [outputDirTask] + inputTasks,
+            inputFiles: [selfPath, inputPath, wasmImportsPath] + inputFiles,
+            inputTasks: [outputDirTask, wasmImportsTask] + inputTasks,
             output: outputDir.appending(path: output),
             salt: salt
         ) {
             var substitutions = constantSubstitutions
+            let features = try Self.loadWasmFeatures(at: $1.resolve(path: wasmImportsPath))
 
-            if let wasmImportsPath = wasmImportsPath {
-                let wasmImportsPath = $1.resolve(path: wasmImportsPath)
-                let importEntries = try JSONDecoder().decode(
-                    [ImportEntry].self,
-                    from: Data(contentsOf: wasmImportsPath)
-                )
-                let memoryImport = importEntries.first {
-                    $0.module == "env" && $0.name == "memory"
-                }
-                if case .memory(let type) = memoryImport?.kind {
-                    substitutions["PACKAGE_TO_JS_MEMORY_INITIAL"] = type.minimum.description
-                    substitutions["PACKAGE_TO_JS_MEMORY_MAXIMUM"] = (type.maximum ?? type.minimum).description
-                    substitutions["PACKAGE_TO_JS_MEMORY_SHARED"] = type.shared.description
-                }
+            var conditions = staticConditions
+            conditions["USE_SHARED_MEMORY"] = features.sharedMemory
+            conditions["IS_WASI"] = features.isWASI
+
+            if let memory = features.importedMemory {
+                substitutions["PACKAGE_TO_JS_MEMORY_INITIAL"] = memory.minimum.description
+                substitutions["PACKAGE_TO_JS_MEMORY_MAXIMUM"] = (memory.maximum ?? memory.minimum).description
+                substitutions["PACKAGE_TO_JS_MEMORY_SHARED"] = memory.shared.description
             }
 
             let inputPath = $1.resolve(path: inputPath)
@@ -855,8 +880,38 @@ struct PackagingPlanner {
         }
     }
 
-    private static func isSharedMemoryEnabled(triple: String) -> Bool {
-        return triple == "wasm32-unknown-wasip1-threads"
+    /// The path to the JSON file describing the imports of the product .wasm file
+    var wasmImportsPath: BuildPath {
+        intermediatesDir.appending(path: "wasm-imports.json")
+    }
+
+    static func loadWasmFeatures(at wasmImportsPath: URL) throws -> WasmFeatures {
+        let importEntries = try JSONDecoder().decode(
+            [ImportEntry].self,
+            from: Data(contentsOf: wasmImportsPath)
+        )
+        return WasmFeatures(imports: importEntries)
+    }
+}
+
+/// The traits of a .wasm binary that affect the JavaScript code generated for it
+struct WasmFeatures {
+    /// Whether the module requires a WASI implementation to be instantiated
+    let isWASI: Bool
+    /// Whether the module uses shared memory
+    let sharedMemory: Bool
+    /// The type of the memory imported by the module if any
+    let importedMemory: MemoryType?
+
+    init(imports: [ImportEntry]) {
+        self.isWASI = imports.contains { $0.module == "wasi_snapshot_preview1" }
+        let memoryImport = imports.first { $0.module == "env" && $0.name == "memory" }
+        if case .memory(let type) = memoryImport?.kind {
+            self.importedMemory = type
+        } else {
+            self.importedMemory = nil
+        }
+        self.sharedMemory = self.importedMemory?.shared ?? false
     }
 }
 

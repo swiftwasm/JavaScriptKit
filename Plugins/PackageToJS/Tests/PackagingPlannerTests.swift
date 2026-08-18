@@ -76,7 +76,6 @@ import Testing
             wasmProductArtifact: BuildPath(prefix: "WASM_PRODUCT_ARTIFACT"),
             wasmFilename: "main.wasm",
             configuration: configuration,
-            triple: "wasm32-unknown-wasi",
             selfPath: BuildPath(prefix: "PLANNER_SOURCE_PATH"),
             system: system
         )
@@ -106,7 +105,6 @@ import Testing
             wasmProductArtifact: BuildPath(prefix: "WASM_PRODUCT_ARTIFACT"),
             wasmFilename: "main.wasm",
             configuration: "debug",
-            triple: "wasm32-unknown-wasi",
             selfPath: BuildPath(prefix: "PLANNER_SOURCE_PATH"),
             system: system
         )
@@ -172,7 +170,6 @@ import Testing
                 wasmProductArtifact: BuildPath(absolute: wasm.path),
                 wasmFilename: "main.wasm",
                 configuration: "debug",
-                triple: "wasm32-unknown-wasi",
                 selfPath: BuildPath(absolute: plannerSource.path),
                 system: system
             )
@@ -266,7 +263,6 @@ import Testing
                 wasmProductArtifact: BuildPath(absolute: wasm.path),
                 wasmFilename: "main.wasm",
                 configuration: "debug",
-                triple: "wasm32-unknown-wasi",
                 selfPath: BuildPath(absolute: plannerSource.path),
                 system: system
             )
@@ -345,7 +341,6 @@ import Testing
                 wasmProductArtifact: BuildPath(absolute: wasm.path),
                 wasmFilename: "main.wasm",
                 configuration: "debug",
-                triple: "wasm32-unknown-wasi",
                 selfPath: BuildPath(absolute: plannerSource.path),
                 system: system
             )
@@ -368,5 +363,59 @@ import Testing
             )
             #expect(generated.contains("from \"node:path\""))
         }
+    }
+}
+
+@Suite struct WasmFeaturesTests {
+    private func memoryImport(shared: Bool) -> ImportEntry {
+        ImportEntry(
+            module: "env",
+            name: "memory",
+            kind: .memory(type: MemoryType(minimum: 17, maximum: 65536, shared: shared, index: .i32))
+        )
+    }
+
+    @Test func noImports() {
+        let features = WasmFeatures(imports: [])
+        #expect(features.isWASI == false)
+        #expect(features.sharedMemory == false)
+        #expect(features.importedMemory == nil)
+    }
+
+    @Test func wasiImport() {
+        let features = WasmFeatures(imports: [
+            ImportEntry(module: "wasi_snapshot_preview1", name: "proc_exit", kind: .function)
+        ])
+        #expect(features.isWASI == true)
+        #expect(features.sharedMemory == false)
+    }
+
+    @Test func unsharedMemoryImport() {
+        let features = WasmFeatures(imports: [memoryImport(shared: false)])
+        #expect(features.sharedMemory == false)
+        #expect(features.importedMemory?.minimum == 17)
+    }
+
+    @Test func sharedMemoryImport() {
+        let features = WasmFeatures(imports: [
+            memoryImport(shared: true),
+            ImportEntry(module: "wasi", name: "thread-spawn", kind: .function),
+        ])
+        #expect(features.sharedMemory == true)
+        #expect(features.isWASI == false)
+    }
+
+    /// Only the memory imported as "env.memory" is the one instantiated by the generated
+    /// JavaScript, so a memory imported under another name must not be picked up.
+    @Test func otherMemoryImport() {
+        let features = WasmFeatures(imports: [
+            ImportEntry(
+                module: "other",
+                name: "memory",
+                kind: .memory(type: MemoryType(minimum: 1, maximum: nil, shared: true, index: .i32))
+            )
+        ])
+        #expect(features.sharedMemory == false)
+        #expect(features.importedMemory == nil)
     }
 }

@@ -35,7 +35,7 @@ import Testing
     }
 
     private func importLines(_ skeletons: [BridgeJSSkeleton]) throws -> [String] {
-        var link = BridgeJSLink(sharedMemory: false)
+        var link = BridgeJSLink()
         let encoder = JSONEncoder()
         for skeleton in skeletons {
             _ = try link.addSkeletonFile(data: try encoder.encode(skeleton))
