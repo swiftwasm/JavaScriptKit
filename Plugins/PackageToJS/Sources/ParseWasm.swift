@@ -186,27 +186,29 @@ func parseImports(moduleBytes: Data) throws -> [ImportEntry] {
                 let name = try parseState.readName()
                 let type = try parseState.readByte()
 
+                let kind: ImportEntry.ImportKind
                 switch type {
                 case 0x00:  // Function
                     let index = try parseState.readUnsignedLEB128()
                     guard index < UInt32(types.count) else {
                         throw ParseError.unexpectedEndOfData
                     }
+                    kind = .function
 
                 case 0x01:  // Table
                     _ = try parseTableType(parseState)
+                    kind = .table
 
                 case 0x02:  // Memory
-                    let limits = try parseLimits(parseState)
-                    imports.append(
-                        ImportEntry(module: module, name: name, kind: .memory(type: limits))
-                    )
+                    kind = .memory(type: try parseLimits(parseState))
 
                 case 0x03:  // Global
                     _ = try parseGlobalType(parseState)
+                    kind = .global
                 default:
                     throw ParseError.unknownImportDescriptorType(type)
                 }
+                imports.append(ImportEntry(module: module, name: name, kind: kind))
             }
             // Skip the rest of the module
             return imports
