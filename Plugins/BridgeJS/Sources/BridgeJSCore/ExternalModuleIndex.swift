@@ -79,6 +79,12 @@ public struct ExternalModuleIndex {
 
     public var isEmpty: Bool { byModuleAndPath.isEmpty }
 
+    /// All (dotPath, bridgeType) entries of a dependency module.
+    public func entries(module moduleName: String) -> [(dotPath: String, bridgeType: BridgeType)] {
+        (byModuleAndPath[moduleName] ?? [:]).map { (dotPath: $0.key, bridgeType: $0.value.bridgeType) }
+            .sorted { $0.dotPath < $1.dotPath }
+    }
+
     public func isKnownModule(_ name: String) -> Bool {
         byModuleAndPath[name] != nil
     }

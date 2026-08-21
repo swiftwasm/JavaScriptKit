@@ -715,31 +715,17 @@ export async function createInstantiator(options, swift) {
                     return optResult;
                 },
                 setFeatureFlag: function bjs_setFeatureFlag(flag) {
-                    const flagBytes = textEncoder.encode(flag);
-                    const flagId = swift.memory.retain(flagBytes);
-                    instance.exports.bjs_setFeatureFlag(flagId, flagBytes.length);
+                    instance.exports.bjs_setFeatureFlag(flag);
                 },
                 getFeatureFlag: function bjs_getFeatureFlag() {
-                    instance.exports.bjs_getFeatureFlag();
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
-                    return ret;
+                    const ret = instance.exports.bjs_getFeatureFlag();
+                    return ret !== 0;
                 },
                 roundTripOptionalFeatureFlag: function bjs_roundTripOptionalFeatureFlag(input) {
                     const isSome = input != null;
-                    let result, result1;
-                    if (isSome) {
-                        const inputBytes = textEncoder.encode(input);
-                        const inputId = swift.memory.retain(inputBytes);
-                        result = inputId;
-                        result1 = inputBytes.length;
-                    } else {
-                        result = 0;
-                        result1 = 0;
-                    }
-                    instance.exports.bjs_roundTripOptionalFeatureFlag(+isSome, result, result1);
-                    const optResult = tmpRetString;
-                    tmpRetString = undefined;
+                    instance.exports.bjs_roundTripOptionalFeatureFlag(+isSome, isSome ? input ? 1 : 0 : 0);
+                    const optResult = tmpRetOptionalBool;
+                    tmpRetOptionalBool = undefined;
                     return optResult;
                 },
                 setHttpStatus: function bjs_setHttpStatus(status) {

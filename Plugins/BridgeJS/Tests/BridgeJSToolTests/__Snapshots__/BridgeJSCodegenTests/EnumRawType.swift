@@ -100,9 +100,9 @@ public func _bjs_roundTripOptionalTSTheme(_ inputIsSome: Int32, _ inputBytes: In
 
 @_expose(wasm, "bjs_setFeatureFlag")
 @_cdecl("bjs_setFeatureFlag")
-public func _bjs_setFeatureFlag(_ flagBytes: Int32, _ flagLength: Int32) -> Void {
+public func _bjs_setFeatureFlag(_ flag: Int32) -> Void {
     #if arch(wasm32)
-    setFeatureFlag(_: FeatureFlag.bridgeJSLiftParameter(flagBytes, flagLength))
+    setFeatureFlag(_: FeatureFlag.bridgeJSLiftParameter(flag))
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -110,7 +110,7 @@ public func _bjs_setFeatureFlag(_ flagBytes: Int32, _ flagLength: Int32) -> Void
 
 @_expose(wasm, "bjs_getFeatureFlag")
 @_cdecl("bjs_getFeatureFlag")
-public func _bjs_getFeatureFlag() -> Void {
+public func _bjs_getFeatureFlag() -> Int32 {
     #if arch(wasm32)
     let ret = getFeatureFlag()
     return ret.bridgeJSLowerReturn()
@@ -121,9 +121,9 @@ public func _bjs_getFeatureFlag() -> Void {
 
 @_expose(wasm, "bjs_roundTripOptionalFeatureFlag")
 @_cdecl("bjs_roundTripOptionalFeatureFlag")
-public func _bjs_roundTripOptionalFeatureFlag(_ inputIsSome: Int32, _ inputBytes: Int32, _ inputLength: Int32) -> Void {
+public func _bjs_roundTripOptionalFeatureFlag(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalFeatureFlag(_: Optional<FeatureFlag>.bridgeJSLiftParameter(inputIsSome, inputBytes, inputLength))
+    let ret = roundTripOptionalFeatureFlag(_: Optional<FeatureFlag>.bridgeJSLiftParameter(inputIsSome, inputValue))
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -511,7 +511,7 @@ fileprivate func bjs_takesFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: I
     return bjs_takesFeatureFlag_extern(flagBytes, flagLength)
 }
 
-func _$takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void {
+func _$takesFeatureFlag(_ flag: ImportedFlag) throws(JSException) -> Void {
     flag.bridgeJSWithLoweredParameter { (flagBytes, flagLength) in
         bjs_takesFeatureFlag(flagBytes, flagLength)
     }
@@ -532,12 +532,12 @@ fileprivate func bjs_returnsFeatureFlag_extern() -> Int32 {
     return bjs_returnsFeatureFlag_extern()
 }
 
-func _$returnsFeatureFlag() throws(JSException) -> FeatureFlag {
+func _$returnsFeatureFlag() throws(JSException) -> ImportedFlag {
     let ret = bjs_returnsFeatureFlag()
     if let error = _swift_js_take_exception() {
         throw error
     }
-    return FeatureFlag.bridgeJSLiftReturn(ret)
+    return ImportedFlag.bridgeJSLiftReturn(ret)
 }
 
 #if arch(wasm32)

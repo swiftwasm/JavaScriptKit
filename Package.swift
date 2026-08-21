@@ -48,7 +48,8 @@ let package = Package(
     ],
     traits: [tracingTrait],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"604.0.0")
+        // SwiftExtract (BridgeJSTool's analysis layer) requires swift-syntax 603+.
+        .package(url: "https://github.com/swiftlang/swift-syntax", "603.0.0"..<"604.0.0")
     ],
     targets: [
         .target(
@@ -179,9 +180,31 @@ let package = Package(
             dependencies: ["BridgeJSTool"],
             path: "Plugins/BridgeJS/Sources/BridgeJSCommandPlugin"
         ),
+        .target(
+            name: "SwiftExtractConfigurationShared"
+        ),
+        .target(
+            name: "SwiftExtract",
+            dependencies: [
+                "SwiftExtractConfigurationShared",
+                .product(name: "SwiftBasicFormat", package: "swift-syntax"),
+                .product(name: "SwiftIfConfig", package: "swift-syntax"),
+                .product(name: "SwiftLexicalLookup", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+            ],
+            resources: [
+                .process("Resources")
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v5)
+            ]
+        ),
         .executableTarget(
             name: "BridgeJSTool",
             dependencies: [
+                "SwiftExtract",
                 .product(name: "SwiftParser", package: "swift-syntax"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftBasicFormat", package: "swift-syntax"),

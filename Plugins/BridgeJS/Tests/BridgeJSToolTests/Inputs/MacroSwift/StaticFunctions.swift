@@ -33,7 +33,7 @@ enum APIResult {
 
 @JS enum Utils {
     @JS enum String {
-        @JS static func uppercase(_ text: String) -> String {
+        @JS static func uppercase(_ text: Swift.String) -> Swift.String {
             return text.uppercased()
         }
     }

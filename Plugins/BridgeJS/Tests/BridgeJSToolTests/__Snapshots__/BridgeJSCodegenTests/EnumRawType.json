@@ -640,7 +640,7 @@
             "type" : {
               "rawValueEnum" : {
                 "_0" : "FeatureFlag",
-                "_1" : "String"
+                "_1" : "Bool"
               }
             }
           }
@@ -665,7 +665,7 @@
         "returnType" : {
           "rawValueEnum" : {
             "_0" : "FeatureFlag",
-            "_1" : "String"
+            "_1" : "Bool"
           }
         }
       },
@@ -686,7 +686,7 @@
                 "_0" : {
                   "rawValueEnum" : {
                     "_0" : "FeatureFlag",
-                    "_1" : "String"
+                    "_1" : "Bool"
                   }
                 },
                 "_1" : "null"
@@ -699,7 +699,7 @@
             "_0" : {
               "rawValueEnum" : {
                 "_0" : "FeatureFlag",
-                "_1" : "String"
+                "_1" : "Bool"
               }
             },
             "_1" : "null"
@@ -1541,7 +1541,7 @@
                 "name" : "flag",
                 "type" : {
                   "rawValueEnum" : {
-                    "_0" : "FeatureFlag",
+                    "_0" : "ImportedFlag",
                     "_1" : "String"
                   }
                 }
@@ -1566,7 +1566,7 @@
             ],
             "returnType" : {
               "rawValueEnum" : {
-                "_0" : "FeatureFlag",
+                "_0" : "ImportedFlag",
                 "_1" : "String"
               }
             }
