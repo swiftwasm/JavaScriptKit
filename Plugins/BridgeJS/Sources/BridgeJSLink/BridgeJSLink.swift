@@ -351,7 +351,11 @@ public struct BridgeJSLink {
             for skeleton in skeletons {
                 guard skeleton.typeRegistrationEntries != nil else { continue }
                 let name = ABINameGenerator.typeRegistrationFunctionName(moduleName: skeleton.moduleName)
-                declarations.append("    \(JSGlueVariableScope.reservedInstance).exports[\"\(name)\"]();")
+                // The glue may describe more modules than the instance links in: `js test`
+                // generates it from every test target's skeletons, while the SwiftBuild
+                // build system produces one binary per test target. A module that isn't
+                // linked in can't have its types used either, so skip its registration.
+                declarations.append("    \(JSGlueVariableScope.reservedInstance).exports[\"\(name)\"]?.();")
             }
             declarations.append("}")
             declarations.append(contentsOf: GenericJSCodegen.runtimeHelperDeclarations())

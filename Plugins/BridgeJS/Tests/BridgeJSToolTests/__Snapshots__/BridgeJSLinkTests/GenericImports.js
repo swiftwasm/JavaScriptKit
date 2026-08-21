@@ -52,7 +52,7 @@ export async function createInstantiator(options, swift) {
         }
         __bjs_typeHandlesRegistered = true;
         instance.exports["bjs_core_register_type_handles"]();
-        instance.exports["bjs_TestModule_register_type_handles"]();
+        instance.exports["bjs_TestModule_register_type_handles"]?.();
     }
     function __bjs_codecForTypeId(typeId) {
         __bjs_registerTypeHandles();
