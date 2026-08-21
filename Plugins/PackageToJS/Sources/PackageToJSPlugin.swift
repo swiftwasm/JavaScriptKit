@@ -373,13 +373,15 @@ struct PackageToJSPlugin: CommandPlugin {
             // BridgeJS emits an aggregated `bridge-js.js` (generated from every test
             // target's skeletons, so identical across runners). Test preludes import it from
             // the base output directory, so surface a copy there when packaging into a
-            // per-runner subdirectory.
+            // per-runner subdirectory. The glue imports the JavaScript modules it was linked
+            // against by a path relative to itself, so carry those over as well.
             if outputDir != baseOutputDir {
-                let runnerBridge = outputDir.appending(path: "bridge-js.js")
-                if FileManager.default.fileExists(atPath: runnerBridge.path) {
-                    let baseBridge = baseOutputDir.appending(path: "bridge-js.js")
-                    try? FileManager.default.removeItem(at: baseBridge)
-                    try FileManager.default.copyItem(at: runnerBridge, to: baseBridge)
+                for entry in ["bridge-js.js", "bridge-js-modules"] {
+                    let packaged = outputDir.appending(path: entry)
+                    guard FileManager.default.fileExists(atPath: packaged.path) else { continue }
+                    let shared = baseOutputDir.appending(path: entry)
+                    try? FileManager.default.removeItem(at: shared)
+                    try FileManager.default.copyItem(at: packaged, to: shared)
                 }
             }
 
