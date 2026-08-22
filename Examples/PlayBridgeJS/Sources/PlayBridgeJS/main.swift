@@ -70,7 +70,7 @@ import class Foundation.JSONDecoder
             let importTS = ImportTS(progress: .silent, moduleName: moduleName, skeleton: $0)
             return try importTS.finalize()
         }
-        let linker = BridgeJSLink(skeletons: [skeleton], sharedMemory: false)
+        let linker = BridgeJSLink(skeletons: [skeleton])
         let linked = try linker.link()
 
         return PlayBridgeJSOutput(

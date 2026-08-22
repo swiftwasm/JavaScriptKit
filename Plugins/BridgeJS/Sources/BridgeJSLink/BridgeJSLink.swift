@@ -9,7 +9,6 @@ import BridgeJSUtilities
 
 public struct BridgeJSLink {
     var skeletons: [BridgeJSSkeleton] = []
-    let sharedMemory: Bool
     /// Whether to track the lifetime of Swift objects.
     ///
     /// This is useful for debugging memory issues.
@@ -19,11 +18,9 @@ public struct BridgeJSLink {
     private let importedModuleRegistry = ImportedJSModuleRegistry()
 
     public init(
-        skeletons: [BridgeJSSkeleton] = [],
-        sharedMemory: Bool = false
+        skeletons: [BridgeJSSkeleton] = []
     ) {
         self.skeletons = skeletons
-        self.sharedMemory = sharedMemory
     }
 
     /// The identity mode from the config file, resolved from skeletons.
@@ -270,7 +267,9 @@ public struct BridgeJSLink {
                     try renderImportedFunction(importObjectBuilder: importObjectBuilder, function: function)
                 }
                 for type in fileSkeleton.types {
-                    if type.constructor != nil, type.from == nil {
+                    // Matches the condition rendering the type into the `getImports` result
+                    // type: both its constructor and its static methods are looked up there.
+                    if type.from == nil, type.constructor != nil || !type.staticMethods.isEmpty {
                         data.needsImportsObject = true
                     }
                     try renderImportedType(importObjectBuilder: importObjectBuilder, type: type)
@@ -1173,7 +1172,7 @@ public struct BridgeJSLink {
     }
 
     /// Generates JavaScript output using CodeFragmentPrinter for better maintainability
-    private func generateJavaScript(data: LinkData) throws -> String {
+    private func generateJavaScript(data: LinkData, sharedMemory: Bool) throws -> String {
         let header = """
             // NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
             // DO NOT EDIT.
@@ -1346,7 +1345,7 @@ public struct BridgeJSLink {
         return printer.lines.joined(separator: "\n")
     }
 
-    public func link() throws -> (outputJs: String, outputDts: String) {
+    public func link(sharedMemory: Bool = false) throws -> (outputJs: String, outputDts: String) {
         intrinsicRegistry.reset()
         importedModuleRegistry.configure(skeletons: skeletons)
         intrinsicRegistry.classNamespaces = skeletons.reduce(into: [:]) { result, unified in
@@ -1359,7 +1358,7 @@ public struct BridgeJSLink {
         }
         intrinsicRegistry.typeOwnerModules = collectTypeOwnerModules()
         let data = try collectLinkData()
-        let outputJs = try generateJavaScript(data: data)
+        let outputJs = try generateJavaScript(data: data, sharedMemory: sharedMemory)
         let outputDts = generateTypeScript(data: data)
         return (outputJs, outputDts)
     }

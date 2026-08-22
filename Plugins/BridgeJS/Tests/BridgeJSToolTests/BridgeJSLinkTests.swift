@@ -70,7 +70,7 @@ import Testing
         )
         importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).swift")
         let importResult = try importSwift.finalize()
-        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
+        var bridgeJSLink = BridgeJSLink()
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let unifiedData = try encoder.encode(importResult)
@@ -99,8 +99,7 @@ import Testing
         let bridgeJSLink: BridgeJSLink = BridgeJSLink(
             skeletons: [
                 outputSkeleton
-            ],
-            sharedMemory: false
+            ]
         )
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Global")
     }
@@ -133,8 +132,7 @@ import Testing
             skeletons: [
                 globalSkeleton,
                 privateSkeleton,
-            ],
-            sharedMemory: false
+            ]
         )
         try snapshot(bridgeJSLink: bridgeJSLink, name: "MixedModules")
     }
@@ -151,7 +149,7 @@ import Testing
         )
         importSwift.addSourceFile(sourceFile, inputFilePath: "\(name).swift")
         let importResult = try importSwift.finalize()
-        var bridgeJSLink = BridgeJSLink(sharedMemory: false)
+        var bridgeJSLink = BridgeJSLink()
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let unifiedData = try encoder.encode(importResult)
@@ -182,7 +180,7 @@ import Testing
         #expect(explicitlyUncachedClass?.identityMode == false)
 
         // Verify generated JS via snapshot
-        let bridgeJSLink = BridgeJSLink(skeletons: [outputSkeleton], sharedMemory: false)
+        let bridgeJSLink = BridgeJSLink(skeletons: [outputSkeleton])
         try snapshot(bridgeJSLink: bridgeJSLink, name: "IdentityModeClass.PerClass")
     }
 
@@ -206,7 +204,7 @@ import Testing
         #expect(explicitlyUncachedClass?.identityMode == false)
 
         // Verify generated JS via snapshot
-        let bridgeJSLink = BridgeJSLink(skeletons: [outputSkeleton], sharedMemory: false)
+        let bridgeJSLink = BridgeJSLink(skeletons: [outputSkeleton])
         try snapshot(bridgeJSLink: bridgeJSLink, name: "IdentityModeClass.ConfigPointer")
     }
 }

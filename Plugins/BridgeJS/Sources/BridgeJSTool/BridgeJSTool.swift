@@ -2,7 +2,6 @@
 @preconcurrency import func Foundation.fputs
 @preconcurrency import func Foundation.open
 @preconcurrency import func Foundation.strerror
-@preconcurrency import var Foundation.stderr
 @preconcurrency import var Foundation.errno
 @preconcurrency import var Foundation.O_WRONLY
 @preconcurrency import var Foundation.O_CREAT
@@ -15,6 +14,17 @@
 @preconcurrency import class Foundation.FileManager
 @preconcurrency import class Foundation.JSONDecoder
 @preconcurrency import class Foundation.ProcessInfo
+
+#if canImport(Darwin)
+@preconcurrency import var Darwin.stderr
+#elseif canImport(Glibc)
+@preconcurrency import var Glibc.stderr
+#elseif canImport(Musl)
+@preconcurrency import var Musl.stderr
+#elseif canImport(Android)
+@preconcurrency import var Android.stderr
+#endif
+
 import SwiftParser
 import SwiftSyntax
 

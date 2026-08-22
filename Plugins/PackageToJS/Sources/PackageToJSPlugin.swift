@@ -8,7 +8,17 @@
 @preconcurrency import struct Foundation.CocoaError
 @preconcurrency import func Foundation.fputs
 @preconcurrency import func Foundation.exit
-@preconcurrency import var Foundation.stderr
+
+#if canImport(Darwin)
+@preconcurrency import var Darwin.stderr
+#elseif canImport(Glibc)
+@preconcurrency import var Glibc.stderr
+#elseif canImport(Musl)
+@preconcurrency import var Musl.stderr
+#elseif canImport(Android)
+@preconcurrency import var Android.stderr
+#endif
+
 import PackagePlugin
 
 /// The main entry point for the PackageToJS plugin.
@@ -264,69 +274,202 @@ struct PackageToJSPlugin: CommandPlugin {
         let skeletonCollector = SkeletonCollector(context: context)
         let skeletons = skeletonCollector.collectFromTests()
 
-        // NOTE: Find the product artifact from the default build directory
+        // NOTE: Find the product artifact(s) from the default build directory
         //       because PackageManager.BuildResult doesn't include the
         //       product artifact for tests.
         //       This doesn't work when `--scratch-path` is used but
         //       we don't have a way to guess the correct path. (we can find
         //       the path by building a dummy executable product but it's
         //       not worth the overhead)
-        var productArtifact: URL?
-        for fileExtension in ["wasm", "xctest"] {
-            let packageDir = context.package.directoryURL
-            let path = packageDir.appending(path: ".build/debug/\(productName).\(fileExtension)").path
-            if FileManager.default.fileExists(atPath: path) {
-                productArtifact = URL(fileURLWithPath: path)
-                break
-            }
-        }
-        guard let productArtifact = productArtifact else {
-            throw PackageToJSError(
-                "Failed to find '\(productName).wasm' or '\(productName).xctest'"
-            )
-        }
-        let outputDir =
+        let productArtifacts = try findTestProductArtifacts(
+            productName: productName,
+            context: context,
+            options: testOptions.packageOptions
+        )
+
+        let baseOutputDir =
             if let outputPath = testOptions.packageOptions.outputPath {
                 URL(fileURLWithPath: outputPath)
             } else {
                 context.pluginWorkDirectoryURL.appending(path: "PackageTests")
             }
-        var make = MiniMake(
-            explain: testOptions.packageOptions.explain,
-            printProgress: self.printProgress
-        )
-        let planner = PackagingPlanner(
-            options: testOptions.packageOptions,
-            context: context,
-            selfPackage: selfPackage,
-            skeletons: skeletons,
-            outputDir: outputDir,
-            wasmProductArtifact: productArtifact,
-            // If the product artifact doesn't have a .wasm extension, add it
-            // to deliver it with the correct MIME type when serving the test
-            // files for browser tests.
-            wasmFilename: productArtifact.lastPathComponent.hasSuffix(".wasm")
-                ? productArtifact.lastPathComponent
-                : productArtifact.lastPathComponent + ".wasm"
-        )
-        let (rootTask, binDir) = try planner.planTestBuild(
-            make: &make
-        )
-        cleanIfBuildGraphChanged(root: rootTask, make: make, context: context)
-        print("Packaging tests...")
-        let scope = MiniMake.VariableScope(variables: [:])
-        try make.build(output: rootTask, scope: scope)
-        print("Packaging tests finished")
 
-        if !testOptions.buildOnly {
-            let testRunner = scope.resolve(path: binDir.appending(path: "test.js"))
-            try PackageToJS.runTest(
-                testRunner: testRunner,
-                currentDirectoryURL: context.pluginWorkDirectoryURL,
-                outputDir: outputDir,
-                testOptions: testOptions
+        // With multiple runners, package what they share into the base directory once: the
+        // test harness's npm dependencies, and the glue describing every test target that
+        // preludes import by a fixed path. Each runner is packaged into a subdirectory of
+        // it.
+        let hasSharedArtifacts = productArtifacts.count > 1
+        if hasSharedArtifacts, let firstArtifact = productArtifacts.first {
+            var make = MiniMake(
+                explain: testOptions.packageOptions.explain,
+                printProgress: self.printProgress
             )
+            let planner = PackagingPlanner(
+                options: testOptions.packageOptions,
+                context: context,
+                selfPackage: selfPackage,
+                skeletons: skeletons,
+                outputDir: baseOutputDir,
+                wasmProductArtifact: firstArtifact,
+                wasmFilename: firstArtifact.lastPathComponent.hasSuffix(".wasm")
+                    ? firstArtifact.lastPathComponent
+                    : firstArtifact.lastPathComponent + ".wasm"
+            )
+            let rootTask = try planner.planSharedTestArtifacts(make: &make)
+            print("Packaging shared test artifacts...")
+            try make.build(output: rootTask, scope: MiniMake.VariableScope(variables: [:]))
         }
+
+        // The native build system links every test target into a single combined
+        // `<Package>PackageTests` binary, but SwiftBuild produces one runner per test
+        // target. Package and run each artifact. When there is more than one, give each its
+        // own output subdirectory and build fingerprint so their harnesses don't clobber one
+        // another, and keep going after a failure so every target's results are reported.
+        var anyTestFailed = false
+        for productArtifact in productArtifacts {
+            let runnerName = productArtifact.deletingPathExtension().lastPathComponent
+            let outputDir =
+                productArtifacts.count == 1
+                ? baseOutputDir
+                : baseOutputDir.appending(path: runnerName)
+
+            var make = MiniMake(
+                explain: testOptions.packageOptions.explain,
+                printProgress: self.printProgress
+            )
+            let planner = PackagingPlanner(
+                options: testOptions.packageOptions,
+                context: context,
+                selfPackage: selfPackage,
+                // Generate the glue from what this binary actually links in: the combined
+                // binary holds every test target, while a per-target runner holds one.
+                skeletons: runnerSkeletons(
+                    runnerName: runnerName,
+                    isCombinedBinary: !hasSharedArtifacts,
+                    context: context,
+                    aggregated: skeletons
+                ),
+                outputDir: outputDir,
+                wasmProductArtifact: productArtifact,
+                // If the product artifact doesn't have a .wasm extension, add it
+                // to deliver it with the correct MIME type when serving the test
+                // files for browser tests.
+                wasmFilename: productArtifact.lastPathComponent.hasSuffix(".wasm")
+                    ? productArtifact.lastPathComponent
+                    : productArtifact.lastPathComponent + ".wasm"
+            )
+            let (rootTask, binDir) = try planner.planTestBuild(
+                make: &make,
+                installNodeModules: !hasSharedArtifacts
+            )
+            cleanIfBuildGraphChanged(
+                root: rootTask,
+                make: make,
+                context: context,
+                fingerprintName: productArtifacts.count == 1 ? "minimake.json" : "minimake-\(runnerName).json"
+            )
+            if productArtifacts.count == 1 {
+                print("Packaging tests...")
+            } else {
+                print("Packaging tests for '\(runnerName)'...")
+            }
+            let scope = MiniMake.VariableScope(variables: [:])
+            try make.build(output: rootTask, scope: scope)
+            print("Packaging tests finished")
+
+            if !testOptions.buildOnly {
+                let testRunner = scope.resolve(path: binDir.appending(path: "test.js"))
+                do {
+                    try PackageToJS.runTest(
+                        testRunner: testRunner,
+                        currentDirectoryURL: context.pluginWorkDirectoryURL,
+                        outputDir: outputDir,
+                        testOptions: testOptions
+                    )
+                } catch {
+                    // Keep running the remaining test runners, but remember the failure so
+                    // the overall command still exits non-zero.
+                    printStderr("\(runnerName): \(error)")
+                    anyTestFailed = true
+                }
+            }
+        }
+
+        if anyTestFailed {
+            exit(1)
+        }
+    }
+
+    /// The skeletons describing the API a single test binary exposes.
+    ///
+    /// The native build system links every test target into one binary, so it gets the
+    /// skeletons of all of them. SwiftBuild produces a `<TestTarget>-test-runner` per test
+    /// target, which only exposes that target and its dependencies.
+    private func runnerSkeletons(
+        runnerName: String,
+        isCombinedBinary: Bool,
+        context: PluginContext,
+        aggregated: [BridgeJSSkeletonInput]
+    ) -> [BridgeJSSkeletonInput] {
+        let testRunnerSuffix = "-test-runner"
+        guard !isCombinedBinary, runnerName.hasSuffix(testRunnerSuffix) else {
+            return aggregated
+        }
+        let targetName = String(runnerName.dropLast(testRunnerSuffix.count))
+        return SkeletonCollector(context: context).collectFromTest(targetName: targetName)
+    }
+
+    /// Locate the test product artifact(s) to run.
+    ///
+    /// The native build system links all test targets into a single combined
+    /// `<Package>PackageTests` binary. SwiftBuild instead emits one
+    /// `<TestTarget>-test-runner.wasm` per test target and only an aggregate
+    /// orchestration product, so fall back to discovering those runners.
+    private func findTestProductArtifacts(
+        productName: String,
+        context: PluginContext,
+        options: PackageToJS.PackageOptions
+    ) throws -> [URL] {
+        let fileManager = FileManager.default
+        let packageDir = context.package.directoryURL
+        let configuration = (options.configuration ?? "debug").lowercased()
+
+        // Native combined test binary.
+        for fileExtension in ["wasm", "xctest"] {
+            let path = packageDir.appending(path: ".build/\(configuration)/\(productName).\(fileExtension)").path
+            if fileManager.fileExists(atPath: path) {
+                return [URL(fileURLWithPath: path)]
+            }
+        }
+
+        // SwiftBuild per-test-target runners:
+        //   .build/out/Products/<Config>-webassembly-wasm32/<TestTarget>-test-runner.wasm
+        let productsDir = packageDir.appending(path: ".build/out/Products")
+        if let configDirs = try? fileManager.contentsOfDirectory(
+            at: productsDir,
+            includingPropertiesForKeys: nil
+        ) {
+            let wasmConfigDirs = configDirs.filter { $0.lastPathComponent.hasSuffix("-webassembly-wasm32") }
+            let chosenDir =
+                wasmConfigDirs.first { $0.lastPathComponent.lowercased().hasPrefix(configuration) }
+                ?? wasmConfigDirs.first
+            if let chosenDir,
+                let entries = try? fileManager.contentsOfDirectory(at: chosenDir, includingPropertiesForKeys: nil)
+            {
+                let runners =
+                    entries
+                    .filter { $0.lastPathComponent.hasSuffix("-test-runner.wasm") }
+                    .sorted { $0.lastPathComponent < $1.lastPathComponent }
+                if !runners.isEmpty {
+                    return runners
+                }
+            }
+        }
+
+        throw PackageToJSError(
+            "Failed to find '\(productName).wasm' or '\(productName).xctest' (native build system), "
+                + "or any '*-test-runner.wasm' under .build/out/Products (swiftbuild build system)"
+        )
     }
 
     private func buildWasm(
@@ -414,9 +557,10 @@ struct PackageToJSPlugin: CommandPlugin {
     private func cleanIfBuildGraphChanged(
         root: MiniMake.TaskKey,
         make: MiniMake,
-        context: PluginContext
+        context: PluginContext,
+        fingerprintName: String = "minimake.json"
     ) {
-        let buildFingerprint = context.pluginWorkDirectoryURL.appending(path: "minimake.json")
+        let buildFingerprint = context.pluginWorkDirectoryURL.appending(path: fingerprintName)
         let lastBuildFingerprint = try? Data(contentsOf: buildFingerprint)
         let currentBuildFingerprint = try? make.computeFingerprint(root: root)
         if lastBuildFingerprint != currentBuildFingerprint {
@@ -721,14 +865,26 @@ class SkeletonCollector {
     }
 
     func collectFromTests() -> [BridgeJSSkeletonInput] {
-        let tests = context.package.targets.filter {
-            guard let target = $0 as? SwiftSourceModuleTarget else { return false }
-            return target.kind == .test
-        }
-        for test in tests {
+        for test in testTargets {
             visit(target: test, package: context.package)
         }
         return skeletons
+    }
+
+    /// Collect the skeletons of a single test target and everything it links in.
+    func collectFromTest(targetName: String) -> [BridgeJSSkeletonInput] {
+        guard let test = testTargets.first(where: { $0.name == targetName }) else {
+            return []
+        }
+        visit(target: test, package: context.package)
+        return skeletons
+    }
+
+    private var testTargets: [Target] {
+        context.package.targets.filter {
+            guard let target = $0 as? SwiftSourceModuleTarget else { return false }
+            return target.kind == .test
+        }
     }
 
     private func visit(product: Product, package: Package) {
@@ -799,7 +955,7 @@ extension PackagingPlanner {
         wasmFilename: String
     ) {
         let outputBaseName = outputDir.lastPathComponent
-        let (configuration, triple) = PackageToJS.deriveBuildConfiguration(wasmProductArtifact: wasmProductArtifact)
+        let configuration = PackageToJS.deriveBuildConfiguration(wasmProductArtifact: wasmProductArtifact)
         let system = DefaultPackagingSystem(printWarning: printStderr, which: which(_:))
         self.init(
             options: options,
@@ -813,7 +969,6 @@ extension PackagingPlanner {
             wasmProductArtifact: BuildPath(absolute: wasmProductArtifact.path),
             wasmFilename: wasmFilename,
             configuration: configuration,
-            triple: triple,
             system: system
         )
     }

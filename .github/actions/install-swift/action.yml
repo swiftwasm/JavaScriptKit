@@ -32,6 +32,12 @@ runs:
         zlib1g-dev
         curl
 
+    # Keep the toolchain's `<root>/usr/bin` layout intact. Flattening it into
+    # /usr/local breaks toolchain discovery in the swiftbuild build system,
+    # which derives the toolchain root by stripping `usr/bin` from `swiftc`.
     - name: Install Swift
       shell: bash
-      run: curl -fL ${{ inputs.download-url }} | sudo tar xfz - --strip-components=2 -C /usr/local
+      run: |
+        sudo mkdir -p /opt/swift
+        curl -fL ${{ inputs.download-url }} | sudo tar xfz - --strip-components=1 -C /opt/swift
+        echo "/opt/swift/usr/bin" >> "$GITHUB_PATH"
