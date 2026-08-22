@@ -294,12 +294,12 @@ struct PackageToJSPlugin: CommandPlugin {
                 context.pluginWorkDirectoryURL.appending(path: "PackageTests")
             }
 
-        // With multiple runners, install the test harness's npm dependencies once into the
-        // shared base directory. Each runner is packaged into a subdirectory of it, and Node
-        // resolves `node_modules` by walking up the directory tree, so one install serves
-        // them all instead of one per test target.
-        let sharesNodeModules = productArtifacts.count > 1
-        if sharesNodeModules, let firstArtifact = productArtifacts.first {
+        // With multiple runners, package what they share into the base directory once: the
+        // test harness's npm dependencies, and the glue describing every test target that
+        // preludes import by a fixed path. Each runner is packaged into a subdirectory of
+        // it.
+        let hasSharedArtifacts = productArtifacts.count > 1
+        if hasSharedArtifacts, let firstArtifact = productArtifacts.first {
             var make = MiniMake(
                 explain: testOptions.packageOptions.explain,
                 printProgress: self.printProgress
@@ -315,8 +315,8 @@ struct PackageToJSPlugin: CommandPlugin {
                     ? firstArtifact.lastPathComponent
                     : firstArtifact.lastPathComponent + ".wasm"
             )
-            let rootTask = try planner.planSharedNodeModules(make: &make)
-            print("Installing shared test dependencies...")
+            let rootTask = try planner.planSharedTestArtifacts(make: &make)
+            print("Packaging shared test artifacts...")
             try make.build(output: rootTask, scope: MiniMake.VariableScope(variables: [:]))
         }
 
@@ -341,7 +341,14 @@ struct PackageToJSPlugin: CommandPlugin {
                 options: testOptions.packageOptions,
                 context: context,
                 selfPackage: selfPackage,
-                skeletons: skeletons,
+                // Generate the glue from what this binary actually links in: the combined
+                // binary holds every test target, while a per-target runner holds one.
+                skeletons: runnerSkeletons(
+                    runnerName: runnerName,
+                    isCombinedBinary: !hasSharedArtifacts,
+                    context: context,
+                    aggregated: skeletons
+                ),
                 outputDir: outputDir,
                 wasmProductArtifact: productArtifact,
                 // If the product artifact doesn't have a .wasm extension, add it
@@ -353,7 +360,7 @@ struct PackageToJSPlugin: CommandPlugin {
             )
             let (rootTask, binDir) = try planner.planTestBuild(
                 make: &make,
-                installNodeModules: !sharesNodeModules
+                installNodeModules: !hasSharedArtifacts
             )
             cleanIfBuildGraphChanged(
                 root: rootTask,
@@ -369,21 +376,6 @@ struct PackageToJSPlugin: CommandPlugin {
             let scope = MiniMake.VariableScope(variables: [:])
             try make.build(output: rootTask, scope: scope)
             print("Packaging tests finished")
-
-            // BridgeJS emits an aggregated `bridge-js.js` (generated from every test
-            // target's skeletons, so identical across runners). Test preludes import it from
-            // the base output directory, so surface a copy there when packaging into a
-            // per-runner subdirectory. The glue imports the JavaScript modules it was linked
-            // against by a path relative to itself, so carry those over as well.
-            if outputDir != baseOutputDir {
-                for entry in ["bridge-js.js", "bridge-js-modules"] {
-                    let packaged = outputDir.appending(path: entry)
-                    guard FileManager.default.fileExists(atPath: packaged.path) else { continue }
-                    let shared = baseOutputDir.appending(path: entry)
-                    try? FileManager.default.removeItem(at: shared)
-                    try FileManager.default.copyItem(at: packaged, to: shared)
-                }
-            }
 
             if !testOptions.buildOnly {
                 let testRunner = scope.resolve(path: binDir.appending(path: "test.js"))
@@ -406,6 +398,25 @@ struct PackageToJSPlugin: CommandPlugin {
         if anyTestFailed {
             exit(1)
         }
+    }
+
+    /// The skeletons describing the API a single test binary exposes.
+    ///
+    /// The native build system links every test target into one binary, so it gets the
+    /// skeletons of all of them. SwiftBuild produces a `<TestTarget>-test-runner` per test
+    /// target, which only exposes that target and its dependencies.
+    private func runnerSkeletons(
+        runnerName: String,
+        isCombinedBinary: Bool,
+        context: PluginContext,
+        aggregated: [BridgeJSSkeletonInput]
+    ) -> [BridgeJSSkeletonInput] {
+        let testRunnerSuffix = "-test-runner"
+        guard !isCombinedBinary, runnerName.hasSuffix(testRunnerSuffix) else {
+            return aggregated
+        }
+        let targetName = String(runnerName.dropLast(testRunnerSuffix.count))
+        return SkeletonCollector(context: context).collectFromTest(targetName: targetName)
     }
 
     /// Locate the test product artifact(s) to run.
@@ -854,14 +865,26 @@ class SkeletonCollector {
     }
 
     func collectFromTests() -> [BridgeJSSkeletonInput] {
-        let tests = context.package.targets.filter {
-            guard let target = $0 as? SwiftSourceModuleTarget else { return false }
-            return target.kind == .test
-        }
-        for test in tests {
+        for test in testTargets {
             visit(target: test, package: context.package)
         }
         return skeletons
+    }
+
+    /// Collect the skeletons of a single test target and everything it links in.
+    func collectFromTest(targetName: String) -> [BridgeJSSkeletonInput] {
+        guard let test = testTargets.first(where: { $0.name == targetName }) else {
+            return []
+        }
+        visit(target: test, package: context.package)
+        return skeletons
+    }
+
+    private var testTargets: [Target] {
+        context.package.targets.filter {
+            guard let target = $0 as? SwiftSourceModuleTarget else { return false }
+            return target.kind == .test
+        }
     }
 
     private func visit(product: Product, package: Package) {

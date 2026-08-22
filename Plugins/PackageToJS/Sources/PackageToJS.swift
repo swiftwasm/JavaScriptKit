@@ -614,54 +614,13 @@ struct PackagingPlanner {
         packageInputs.append(packageJsonTask)
 
         if !skeletons.isEmpty {
-            let bridge = try loadBridgeJS()
-            let skeletonFiles = skeletons.map { BuildPath(absolute: $0.source.path) }
-            let bridgeJs = outputDir.appending(path: "bridge-js.js")
-            let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
-            let bridgeModules = outputDir.appending(path: "bridge-js-modules")
             packageInputs.append(
-                make.addTask(
-                    inputFiles: skeletonFiles + [selfPath, wasmImportsPath],
-                    inputTasks: [outputDirTask, wasmImportsTask],
-                    output: bridgeJs
-                ) { _, scope in
-                    let features = try Self.loadWasmFeatures(at: scope.resolve(path: wasmImportsPath))
-                    let output = try bridge.link.link(sharedMemory: features.sharedMemory)
-                    try system.writeFile(
-                        atPath: scope.resolve(path: bridgeJs).path,
-                        content: Data(output.outputJs.utf8)
-                    )
-                    try system.writeFile(
-                        atPath: scope.resolve(path: bridgeDts).path,
-                        content: Data(output.outputDts.utf8)
-                    )
-                }
-            )
-            let bridgeModulesStamp = intermediatesDir.appending(path: "bridge-js-modules.stamp")
-            packageInputs.append(
-                make.addTask(
-                    inputFiles: skeletonFiles + bridge.modules.map(\.source) + [selfPath],
-                    inputTasks: [outputDirTask, intermediatesDirTask],
-                    output: bridgeModulesStamp
-                ) { _, scope in
-                    let modulesDirectory = scope.resolve(path: bridgeModules)
-                    try system.removeItemIfExists(atPath: modulesDirectory.path)
-                    if !bridge.modules.isEmpty {
-                        try system.createDirectory(atPath: modulesDirectory.path)
-                    }
-                    for module in bridge.modules {
-                        let destination = scope.resolve(path: outputDir.appending(path: module.relativeOutputPath))
-                        try system.createDirectory(atPath: destination.deletingLastPathComponent().path)
-                        try system.syncFile(
-                            from: scope.resolve(path: module.source).path,
-                            to: destination.path
-                        )
-                    }
-                    try system.writeFile(
-                        atPath: scope.resolve(path: bridgeModulesStamp).path,
-                        content: Data()
-                    )
-                }
+                contentsOf: try planBridgeJS(
+                    make: &make,
+                    outputDirTask: outputDirTask,
+                    intermediatesDirTask: intermediatesDirTask,
+                    wasmImportsTask: wasmImportsTask
+                )
             )
         }
 
@@ -736,11 +695,15 @@ struct PackagingPlanner {
         )
     }
 
-    /// Plan the shared npm install for a directory that hosts several per-runner test
-    /// bundles as subdirectories. Node resolves `node_modules` by walking up the directory
-    /// tree, so a single install here serves every runner underneath, avoiding one install
-    /// per test target.
-    func planSharedNodeModules(make: inout MiniMake) throws -> MiniMake.TaskKey {
+    /// Plan the artifacts that several per-runner test bundles packaged as subdirectories
+    /// share.
+    ///
+    /// Node resolves `node_modules` by walking up the directory tree, so a single install
+    /// here serves every runner underneath, avoiding one install per test target. The glue
+    /// generated here describes every test target rather than the one target a runner links
+    /// in, so that test preludes - which are loaded for every runner and import it by a
+    /// fixed path - see the whole package's API.
+    func planSharedTestArtifacts(make: inout MiniMake) throws -> MiniMake.TaskKey {
         let outputDirTask = make.addTask(
             inputFiles: [selfPath],
             output: outputDir,
@@ -765,11 +728,85 @@ struct PackagingPlanner {
             inputFiles: [],
             inputTasks: []
         )
-        return planNpmInstall(
-            make: &make,
-            intermediatesDirTask: intermediatesDirTask,
-            packageJsonTask: packageJsonTask
+        var tasks = [
+            planNpmInstall(
+                make: &make,
+                intermediatesDirTask: intermediatesDirTask,
+                packageJsonTask: packageJsonTask
+            )
+        ]
+        if !skeletons.isEmpty {
+            tasks.append(
+                contentsOf: try planBridgeJS(
+                    make: &make,
+                    outputDirTask: outputDirTask,
+                    intermediatesDirTask: intermediatesDirTask,
+                    wasmImportsTask: wasmImportsTask
+                )
+            )
+        }
+        return make.addTask(
+            inputTasks: tasks,
+            output: BuildPath(phony: "shared-test-artifacts"),
+            attributes: [.phony, .silent]
         )
+    }
+
+    /// Plan the tasks generating the BridgeJS glue and syncing the JavaScript modules it
+    /// imports into the output directory
+    private func planBridgeJS(
+        make: inout MiniMake,
+        outputDirTask: MiniMake.TaskKey,
+        intermediatesDirTask: MiniMake.TaskKey,
+        wasmImportsTask: MiniMake.TaskKey
+    ) throws -> [MiniMake.TaskKey] {
+        let bridge = try loadBridgeJS()
+        let skeletonFiles = skeletons.map { BuildPath(absolute: $0.source.path) }
+        let wasmImportsPath = self.wasmImportsPath
+        let bridgeJs = outputDir.appending(path: "bridge-js.js")
+        let bridgeDts = outputDir.appending(path: "bridge-js.d.ts")
+        let bridgeModules = outputDir.appending(path: "bridge-js-modules")
+        let bridgeJsTask = make.addTask(
+            inputFiles: skeletonFiles + [selfPath, wasmImportsPath],
+            inputTasks: [outputDirTask, wasmImportsTask],
+            output: bridgeJs
+        ) { _, scope in
+            let features = try Self.loadWasmFeatures(at: scope.resolve(path: wasmImportsPath))
+            let output = try bridge.link.link(sharedMemory: features.sharedMemory)
+            try system.writeFile(
+                atPath: scope.resolve(path: bridgeJs).path,
+                content: Data(output.outputJs.utf8)
+            )
+            try system.writeFile(
+                atPath: scope.resolve(path: bridgeDts).path,
+                content: Data(output.outputDts.utf8)
+            )
+        }
+        let bridgeModulesStamp = intermediatesDir.appending(path: "bridge-js-modules.stamp")
+        let bridgeModulesTask = make.addTask(
+            inputFiles: skeletonFiles + bridge.modules.map(\.source) + [selfPath],
+            inputTasks: [outputDirTask, intermediatesDirTask],
+            output: bridgeModulesStamp
+        ) { _, scope in
+            let modulesDirectory = scope.resolve(path: bridgeModules)
+            try system.removeItemIfExists(atPath: modulesDirectory.path)
+            if !bridge.modules.isEmpty {
+                try system.createDirectory(atPath: modulesDirectory.path)
+            }
+            for module in bridge.modules {
+                let destination = scope.resolve(path: outputDir.appending(path: module.relativeOutputPath))
+                try system.createDirectory(atPath: destination.deletingLastPathComponent().path)
+                try system.syncFile(
+                    from: scope.resolve(path: module.source).path,
+                    to: destination.path
+                )
+            }
+            try system.writeFile(
+                atPath: scope.resolve(path: bridgeModulesStamp).path,
+                content: Data()
+            )
+        }
+        return [bridgeJsTask, bridgeModulesTask]
     }
 
     /// Plan the task parsing the imports of the product .wasm file
