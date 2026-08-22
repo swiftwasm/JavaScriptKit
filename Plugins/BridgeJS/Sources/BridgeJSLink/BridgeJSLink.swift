@@ -267,7 +267,9 @@ public struct BridgeJSLink {
                     try renderImportedFunction(importObjectBuilder: importObjectBuilder, function: function)
                 }
                 for type in fileSkeleton.types {
-                    if type.constructor != nil, type.from == nil {
+                    // Matches the condition rendering the type into the `getImports` result
+                    // type: both its constructor and its static methods are looked up there.
+                    if type.from == nil, type.constructor != nil || !type.staticMethods.isEmpty {
                         data.needsImportsObject = true
                     }
                     try renderImportedType(importObjectBuilder: importObjectBuilder, type: type)
@@ -351,11 +353,7 @@ public struct BridgeJSLink {
             for skeleton in skeletons {
                 guard skeleton.typeRegistrationEntries != nil else { continue }
                 let name = ABINameGenerator.typeRegistrationFunctionName(moduleName: skeleton.moduleName)
-                // The glue may describe more modules than the instance links in: `js test`
-                // generates it from every test target's skeletons, while the SwiftBuild
-                // build system produces one binary per test target. A module that isn't
-                // linked in can't have its types used either, so skip its registration.
-                declarations.append("    \(JSGlueVariableScope.reservedInstance).exports[\"\(name)\"]?.();")
+                declarations.append("    \(JSGlueVariableScope.reservedInstance).exports[\"\(name)\"]();")
             }
             declarations.append("}")
             declarations.append(contentsOf: GenericJSCodegen.runtimeHelperDeclarations())
