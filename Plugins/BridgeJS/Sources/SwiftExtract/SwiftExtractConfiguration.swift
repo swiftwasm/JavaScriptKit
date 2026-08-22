@@ -1,0 +1,1 @@
+../../../../../swift-java/Sources/SwiftExtract/SwiftExtractConfiguration.swift

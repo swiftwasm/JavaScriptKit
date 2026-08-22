@@ -1,3 +1,4 @@
+import SwiftExtract
 import SwiftSyntax
 import SwiftSyntaxBuilder
 #if canImport(BridgeJSUtilities)
@@ -7,80 +8,13 @@ import BridgeJSUtilities
 import BridgeJSSkeleton
 #endif
 
-/// Outcome of attempting to resolve a type as a reference to a generic parameter.
-enum GenericParameterResolution {
-    case resolved(BridgeType)
-    /// A non-nil message is a hard diagnostic; `nil` means the type isn't generic
-    /// and the caller should fall back to normal type resolution.
-    case rejected(String?)
-}
-
-func resolveGenericTypeReference(
-    for type: TypeSyntax,
-    genericParameterNames: [String]
-) -> GenericParameterResolution {
-    if let identifier = type.as(IdentifierTypeSyntax.self),
-        identifier.genericArgumentClause == nil,
-        genericParameterNames.contains(identifier.name.text)
-    {
-        return .resolved(.generic(identifier.name.text))
-    }
-    if let wrapped = wrappedGenericBridgeType(for: type, genericParameterNames: genericParameterNames) {
-        return .resolved(wrapped)
-    }
-    if !genericParameterNames.isEmpty,
-        let wrapped = wrappedGenericParameter(in: type, genericParameterNames: genericParameterNames)
-    {
-        return .rejected(
-            "Generic parameter '\(wrapped)' may only be used as a bare type; wrapping it beyond 'T?', '[T]' and '[String: T]' is not supported."
-        )
-    }
-    return .rejected(nil)
-}
-
-private func wrappedGenericParameter(
-    in type: TypeSyntax,
-    genericParameterNames: [String]
-) -> String? {
-    for token in type.tokens(viewMode: .sourceAccurate) {
-        if case .identifier(let text) = token.tokenKind, genericParameterNames.contains(text) {
-            return text
-        }
-    }
-    return nil
-}
-
-private func wrappedGenericBridgeType(
-    for type: TypeSyntax,
-    genericParameterNames: [String]
-) -> BridgeType? {
-    func bareGenericName(_ inner: TypeSyntax) -> String? {
-        guard let identifier = inner.as(IdentifierTypeSyntax.self),
-            identifier.genericArgumentClause == nil,
-            genericParameterNames.contains(identifier.name.text)
-        else {
-            return nil
-        }
-        return identifier.name.text
-    }
-    if let arrayType = type.as(ArrayTypeSyntax.self), let name = bareGenericName(arrayType.element) {
-        return .array(.generic(name))
-    }
-    if let optionalType = type.as(OptionalTypeSyntax.self), let name = bareGenericName(optionalType.wrappedType) {
-        return .nullable(.generic(name), .null)
-    }
-    if let dictType = type.as(DictionaryTypeSyntax.self),
-        let keyIdentifier = dictType.key.as(IdentifierTypeSyntax.self),
-        keyIdentifier.genericArgumentClause == nil,
-        keyIdentifier.name.text == "String",
-        let name = bareGenericName(dictType.value)
-    {
-        return .dictionary(.generic(name))
-    }
-    return nil
-}
-
-/// Builds BridgeJS skeletons from Swift source files using SwiftSyntax walk for API collection.
+/// Builds BridgeJS skeletons from Swift source files.
+///
+/// Declaration extraction and name resolution are delegated to swift-java's
+/// language-neutral `SwiftExtract` analysis layer (`SwiftAnalyzer`); this type
+/// lowers the resulting `AnalysisResult` into BridgeJS's skeleton model,
+/// applying all JavaScript-specific semantics (the `BridgeType` universe,
+/// `@JS` attribute arguments, namespaces, ESM origins, ABI names, …).
 ///
 /// This is a shared entry point for producing:
 /// - exported skeletons from `@JS` declarations
@@ -91,13 +25,10 @@ public final class SwiftToSkeleton {
     public let exposeToGlobal: Bool
     public let identityMode: String?
 
-    let typeDeclResolver: TypeDeclResolver
     let externalModuleIndex: ExternalModuleIndex
 
     private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
-    private var usedExternalModules = Set<String>()
     private let javaScriptModuleExists: (String) throws -> Bool
-    private var validatedJavaScriptModulePaths = Set<String>()
 
     /// Non-fatal diagnostics collected during `finalize()`. These do not fail the build.
     public private(set) var warnings: [(file: String, diagnostic: DiagnosticError)] = []
@@ -115,66 +46,174 @@ public final class SwiftToSkeleton {
         self.exposeToGlobal = exposeToGlobal
         self.identityMode = identityMode
         self.javaScriptModuleExists = javaScriptModuleExists
-        self.typeDeclResolver = TypeDeclResolver()
         self.externalModuleIndex = externalModuleIndex
-
-        // Index known types provided by JavaScriptKit
-        self.typeDeclResolver.addSourceFile(
-            """
-            @JSClass struct JSPromise {}
-            @JSClass struct JSInt8Array {}
-            @JSClass struct JSUint8Array {}
-            @JSClass struct JSInt16Array {}
-            @JSClass struct JSUint16Array {}
-            @JSClass struct JSInt32Array {}
-            @JSClass struct JSUint32Array {}
-            @JSClass struct JSFloat32Array {}
-            @JSClass struct JSFloat64Array {}
-            """
-        )
     }
 
     public func addSourceFile(_ sourceFile: SourceFileSyntax, inputFilePath: String) {
-        self.typeDeclResolver.addSourceFile(sourceFile)
         sourceFiles.append((sourceFile, inputFilePath))
     }
 
-    private func resolveDeferredExtensions(_ exportCollectors: [ExportSwiftAPICollector]) {
-        var pendingExtensions = exportCollectors.flatMap { collector in
-            collector.deferredExtensions.map { (owner: collector, declaration: $0) }
+    // MARK: - Analysis
+
+    /// Swift declaration stubs for the JavaScriptKit types that BridgeJS
+    /// declarations may reference. Parsed by SwiftExtract as a synthetic
+    /// `JavaScriptKit` module so references resolve without the real sources.
+    /// Kinds, generic arity, and typealias targets must match the real
+    /// declarations in `Sources/JavaScriptKit` — enforced by
+    /// `StubFidelityTests`.
+    static let javaScriptKitModuleStubs: [String] = [
+        "public class JSObject {}",
+        "public struct JSValue {}",
+        "public struct JSException: Error {}",
+        "public class JSPromise {}",
+        "public class JSTypedArray<Traits> {}",
+        "public typealias JSInt8Array = JSTypedArray<Int8>",
+        "public typealias JSUint8Array = JSTypedArray<UInt8>",
+        "public typealias JSInt16Array = JSTypedArray<Int16>",
+        "public typealias JSUint16Array = JSTypedArray<UInt16>",
+        "public typealias JSInt32Array = JSTypedArray<Int32>",
+        "public typealias JSUint32Array = JSTypedArray<UInt32>",
+        "public typealias JSFloat32Array = JSTypedArray<Float32>",
+        "public typealias JSFloat64Array = JSTypedArray<Float64>",
+        "public struct JSTypedClosure<Signature> {}",
+        "public enum JSUndefinedOr<Wrapped> {}",
+        "public protocol BridgedSwiftGenericBridgeable {}",
+        "public protocol _BridgedSwiftEnumNoPayload {}",
+    ]
+
+    private struct Configuration: SwiftExtractConfiguration {
+        var swiftModule: String?
+        var staticBuildConfigurationFile: String? { nil }
+        var swiftFilterInclude: [String]? { nil }
+        var swiftFilterExclude: [String]? { nil }
+        var importedModuleStubs: [String: [String]]? {
+            ["JavaScriptKit": SwiftToSkeleton.javaScriptKitModuleStubs]
         }
-        var previousCount: Int
-        // An extended type might be defined in another extension, so keep resolving until no more progress is made.
-        repeat {
-            previousCount = pendingExtensions.count
-            var nextPendingExtensions: [(owner: ExportSwiftAPICollector, declaration: ExtensionDeclSyntax)] = []
-            for pending in pendingExtensions {
-                if !resolveExtension(pending.declaration, in: exportCollectors) {
-                    nextPendingExtensions.append(pending)
-                }
+        var externalTypeDeclarations: [String: [ExternalTypeDeclaration]]?
+        var effectiveMinimumInputAccessLevelMode: AccessLevelMode { .internal }
+        var logLevel: LogLevel? { .error }
+        // Keep declarations whose types don't resolve; bridgeability is judged
+        // during lowering, where precise source anchors are available.
+        var allowUnresolvedTypeReferences: Bool { true }
+    }
+
+    private final class SkeletonDiagnosticsSink: SwiftExtractDiagnosticsSink {
+        var errors: [(file: String, diagnostic: DiagnosticError)] = []
+
+        func emit(_ diagnostic: SwiftExtractDiagnostic) {
+            // A skipped extension is only an error when it contains
+            // declarations the user marked for export.
+            if let extensionDecl = diagnostic.node.as(ExtensionDeclSyntax.self) {
+                let finder = JSAttributeFinder(viewMode: .sourceAccurate)
+                finder.walk(extensionDecl.memberBlock.members)
+                guard finder.found else { return }
+                errors.append(
+                    (
+                        file: diagnostic.sourceFilePath,
+                        diagnostic: DiagnosticError(
+                            node: extensionDecl.extendedType,
+                            message: "Unsupported type '\(extensionDecl.extendedType.trimmedDescription)'.",
+                            hint: "You can only extend `@JS` annotated types defined in the same module"
+                        )
+                    )
+                )
+                return
             }
-            pendingExtensions = nextPendingExtensions
-        } while pendingExtensions.count < previousCount
-        for pending in pendingExtensions {
-            pending.owner.diagnoseUnresolvedExtension(pending.declaration)
+            errors.append(
+                (
+                    file: diagnostic.sourceFilePath,
+                    diagnostic: DiagnosticError(
+                        node: diagnostic.node,
+                        message: diagnostic.message
+                    )
+                )
+            )
         }
     }
 
-    private func resolveExtension(
-        _ declaration: ExtensionDeclSyntax,
-        in exportCollectors: [ExportSwiftAPICollector]
-    ) -> Bool {
-        for collector in exportCollectors {
-            if collector.resolveExtension(declaration) {
+    static let jsAttributeNames: Set<String> = [
+        "JS", "JSFunction", "JSClass", "JSGetter", "JSSetter",
+    ]
+
+    /// BridgeJS's opt-in extraction policy: a declaration participates when it
+    /// carries a `@JS`-family attribute, is a requirement of an extracted
+    /// protocol, or is an instance field of a `@JS` struct.
+    private struct Decider: ExtractDecider {
+        func shouldExtract(decl: DeclSyntax, in parent: ExtractedNominalType?) -> Bool {
+            // Every requirement of an extracted protocol is exported.
+            if let parent, parent.swiftNominal.kind == .protocol {
                 return true
             }
+            if let attributed = decl.asProtocol((any WithAttributesSyntax).self),
+                attributed.attributes.hasJSFamilyAttribute()
+            {
+                return true
+            }
+            // Instance fields of a `@JS` struct don't need their own `@JS`.
+            if let parent, parent.swiftNominal.kind == .struct,
+                parent.swiftNominal.syntax.attributes.firstJSAttribute != nil,
+                let varDecl = decl.as(VariableDeclSyntax.self),
+                !varDecl.modifiers.containsStaticOrClass
+            {
+                return true
+            }
+            return false
         }
-        return false
     }
 
+    // MARK: - Finalize
+
     public func finalize() throws -> BridgeJSSkeleton {
-        var perSourceErrors: [(inputFilePath: String, errors: [DiagnosticError])] = []
-        var importedFiles: [ImportedFileSkeleton] = []
+        let sink = SkeletonDiagnosticsSink()
+        let externalDeclarations = Self.externalTypeDeclarations(from: externalModuleIndex)
+        let analyzer = SwiftAnalyzer(
+            config: Configuration(
+                swiftModule: moduleName,
+                externalTypeDeclarations: externalDeclarations.isEmpty ? nil : externalDeclarations
+            ),
+            moduleName: moduleName,
+            extractDecider: Decider(),
+            diagnosticsSink: sink
+        )
+        var fileOrder: [String: Int] = [:]
+        for (index, (sourceFile, inputFilePath)) in sourceFiles.enumerated() {
+            progress.print("Processing \(inputFilePath)")
+            fileOrder[inputFilePath] = index
+            analyzer.add(filePath: inputFilePath, text: sourceFile.description)
+        }
+        try analyzer.analyze()
+        let analysis = analyzer.result
+
+        let context = LoweringContext(
+            moduleName: moduleName,
+            analyzer: analyzer,
+            externalModuleIndex: externalModuleIndex,
+            fileOrder: fileOrder
+        )
+
+        // Order types by their position in the input: file order first, then
+        // source position of the type declaration. Types declared inside an
+        // extension sort after directly-declared ones, matching the previous
+        // collector's deferred extension resolution.
+        func isDeclaredInExtension(_ type: ExtractedNominalType) -> Bool {
+            var ancestor = Syntax(type.swiftNominal.syntax).parent
+            while let current = ancestor {
+                if current.is(ExtensionDeclSyntax.self) { return true }
+                ancestor = current.parent
+            }
+            return false
+        }
+        let orderedTypes = analysis.extractedTypes.values.sorted { lhs, rhs in
+            let lhsExtension = isDeclaredInExtension(lhs)
+            let rhsExtension = isDeclaredInExtension(rhs)
+            if lhsExtension != rhsExtension { return !lhsExtension }
+            let lhsFile = fileOrder[lhs.sourceFilePath] ?? Int.max
+            let rhsFile = fileOrder[rhs.sourceFilePath] ?? Int.max
+            if lhsFile != rhsFile { return lhsFile < rhsFile }
+            return lhs.swiftNominal.syntax.position < rhs.swiftNominal.syntax.position
+        }
+
+        let exportLowering = ExportLowering(context: context)
         var exported = ExportedSkeleton(
             functions: [],
             classes: [],
@@ -182,128 +221,61 @@ public final class SwiftToSkeleton {
             exposeToGlobal: exposeToGlobal,
             identityMode: identityMode
         )
-        var exportCollectors: [ExportSwiftAPICollector] = []
-
-        for (sourceFile, inputFilePath) in sourceFiles {
-            progress.print("Processing \(inputFilePath)")
-
-            let exportCollector = ExportSwiftAPICollector(parent: self)
-            exportCollector.walk(sourceFile)
-            exportCollectors.append(exportCollector)
-
-            let typeNameCollector = ImportSwiftMacrosJSImportTypeNameCollector(viewMode: .sourceAccurate)
-            typeNameCollector.walk(sourceFile)
-            let importCollector = ImportSwiftMacrosAPICollector(
-                inputFilePath: inputFilePath,
-                knownJSClassNames: typeNameCollector.typeNames,
-                parent: self
-            )
-            importCollector.walk(sourceFile)
-
-            let importOrigins =
-                importCollector.importedFunctions.compactMap(\.from)
-                + importCollector.importedTypes.compactMap(\.from)
-                + importCollector.importedGlobalGetters.compactMap(\.from)
-            // Only snippet paths are validated here. Bare module specifiers are resolved
-            // by the JavaScript host (a bundler, an import map, or Node's `node_modules`
-            // lookup), so there is nothing we can check without rejecting setups that
-            // legitimately work.
-            let snippetPaths = Set(importOrigins.compactMap(\.snippetPath))
-            for path in snippetPaths.sorted() {
-                if validatedJavaScriptModulePaths.contains(path) {
-                    continue
-                }
-                let pathNode = importCollector.importedModulePathNodes[path] ?? Syntax(sourceFile)
-                guard path.hasPrefix("/") else {
-                    importCollector.errors.append(
-                        DiagnosticError(
-                            node: pathNode,
-                            message: "JavaScript snippet paths must start with '/' to indicate the Swift target root: "
-                                + "'\(path)'. For an external module, use 'from: .module(\"\(path)\")' instead."
-                        )
-                    )
-                    continue
-                }
-                guard !path.split(separator: "/").contains("..") else {
-                    importCollector.errors.append(
-                        DiagnosticError(
-                            node: pathNode,
-                            message: "JavaScript snippet paths must not contain '..': '\(path)'."
-                        )
-                    )
-                    continue
-                }
-                let lowercasedPath = path.lowercased()
-                guard lowercasedPath.hasSuffix(".js") || lowercasedPath.hasSuffix(".mjs") else {
-                    importCollector.errors.append(
-                        DiagnosticError(
-                            node: pathNode,
-                            message: "JavaScript snippets must use a '.js' or '.mjs' extension: '\(path)'."
-                        )
-                    )
-                    continue
-                }
-                guard try javaScriptModuleExists(path) else {
-                    importCollector.errors.append(
-                        DiagnosticError(
-                            node: pathNode,
-                            message: "JavaScript snippet file was not found at '\(path)'."
-                        )
-                    )
-                    continue
-                }
-                validatedJavaScriptModulePaths.insert(path)
-            }
-
-            let importErrorsFatal = importCollector.errors.filter {
-                $0.severity == .error && !$0.message.contains("Unsupported type '")
-            }
-            let fileWarnings = importCollector.errors.filter { $0.severity == .warning }
-            warnings.append(contentsOf: fileWarnings.map { (file: inputFilePath, diagnostic: $0) })
-            if !importErrorsFatal.isEmpty {
-                perSourceErrors.append(
-                    (inputFilePath: inputFilePath, errors: importErrorsFatal)
-                )
-            }
-
-            let importedFile = ImportedFileSkeleton(
-                functions: importCollector.importedFunctions,
-                types: importCollector.importedTypes,
-                globalGetters: importCollector.importedGlobalGetters
-            )
-            if !importedFile.isEmpty {
-                importedFiles.append(importedFile)
-            }
+        for function in analysis.extractedGlobalFuncs
+        where function.declAttributeList?.firstJSAttribute != nil {
+            exportLowering.lowerGlobalFunction(function, into: &exported)
+        }
+        for variable in analysis.extractedGlobalVariables
+        where variable.declAttributeList?.firstJSAttribute != nil {
+            exportLowering.diagnoseGlobalExportedVariable(variable)
+        }
+        for type in orderedTypes {
+            exportLowering.lower(type, into: &exported)
         }
 
-        // Resolve extensions against all collectors. This needs to happen at this point so we can resolve both same file and cross file extensions.
-        resolveDeferredExtensions(exportCollectors)
+        let importLowering = ImportLowering(context: context)
+        let importedFiles = importLowering.lower(
+            analysis: analysis,
+            orderedTypes: orderedTypes,
+            filePaths: sourceFiles.map(\.inputFilePath)
+        )
 
-        // We have to collect diagnostics after all deferred extensions are resolved, since they could generate some.
-        for ((_, inputFilePath), exportCollector) in zip(sourceFiles, exportCollectors) {
-            let exportErrors = exportCollector.errors.filter { $0.severity == .error }
-            let fileWarnings = exportCollector.errors.filter { $0.severity == .warning }
-            warnings.append(contentsOf: fileWarnings.map { (file: inputFilePath, diagnostic: $0) })
-            if !exportErrors.isEmpty {
-                perSourceErrors.append(
-                    (inputFilePath: inputFilePath, errors: exportErrors)
-                )
+        validateSnippetPaths(importLowering: importLowering)
+
+        // Aggregate errors: SwiftExtract-dropped declarations first, then
+        // lowering diagnostics, grouped per file in input order.
+        var perFileErrors: [String: [DiagnosticError]] = [:]
+        func record(_ entries: [(file: String, diagnostic: DiagnosticError)]) {
+            for entry in entries {
+                if entry.diagnostic.severity == .warning {
+                    warnings.append(entry)
+                } else {
+                    perFileErrors[entry.file, default: []].append(entry.diagnostic)
+                }
             }
         }
+        record(sink.errors)
+        // Imported-declaration "Unsupported type" errors are non-fatal: the
+        // declaration is skipped, matching the previous collector behavior.
+        record(
+            importLowering.errors.filter {
+                !($0.diagnostic.severity == .error && $0.diagnostic.message.contains("Unsupported type '"))
+            }
+        )
+        record(exportLowering.errors)
 
-        for collector in exportCollectors {
-            collector.finalize(&exported)
-        }
-
-        if !perSourceErrors.isEmpty {
-            let diagnostics = perSourceErrors.flatMap { inputFilePath, errors in
-                errors.map { (file: inputFilePath, diagnostic: $0) }
+        if !perFileErrors.isEmpty {
+            let diagnostics = perFileErrors.sorted { lhs, rhs in
+                (fileOrder[lhs.key] ?? Int.max) < (fileOrder[rhs.key] ?? Int.max)
+            }.flatMap { file, errors in
+                errors.map { (file: file, diagnostic: $0) }
             }
             throw BridgeJSCoreDiagnosticError(diagnostics: diagnostics)
         }
+
         let importedSkeleton: ImportedModuleSkeleton? = {
             let module = ImportedModuleSkeleton(children: importedFiles)
-            if module.children.allSatisfy({ $0.functions.isEmpty && $0.types.isEmpty && $0.globalGetters.isEmpty }) {
+            if module.children.allSatisfy(\.isEmpty) {
                 return nil
             }
             return module
@@ -314,550 +286,79 @@ public final class SwiftToSkeleton {
             moduleName: moduleName,
             exported: exportedSkeleton,
             imported: importedSkeleton,
-            usedExternalModules: usedExternalModules.sorted()
+            usedExternalModules: context.usedExternalModules.sorted()
         )
     }
 
-    private static let jsTypedArrayTypealiasNames: [String: String] = [
-        "Int8": "JSInt8Array",
-        "UInt8": "JSUint8Array",
-        "Int16": "JSInt16Array",
-        "UInt16": "JSUint16Array",
-        "Int32": "JSInt32Array",
-        "UInt32": "JSUint32Array",
-        "Float": "JSFloat32Array",
-        "Float32": "JSFloat32Array",
-        "Double": "JSFloat64Array",
-        "Float64": "JSFloat64Array",
-    ]
-
-    func lookupType(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {
-        if let attributedType = type.as(AttributedTypeSyntax.self) {
-            return lookupType(for: attributedType.baseType, errors: &errors)
-        }
-
-        // JSTypedArray<T>
-        if let identifierType = type.as(IdentifierTypeSyntax.self),
-            identifierType.name.text == "JSTypedArray",
-            let genericArgs = identifierType.genericArgumentClause?.arguments,
-            genericArgs.count == 1,
-            let elementName = genericArgs.first?.argument.as(IdentifierTypeSyntax.self)?.name.text,
-            let typealiasName = Self.jsTypedArrayTypealiasNames[elementName]
-        {
-            return .jsObject(typealiasName)
-        }
-
-        if let identifierType = type.as(IdentifierTypeSyntax.self),
-            identifierType.name.text == "JSTypedClosure",
-            let genericArgs = identifierType.genericArgumentClause?.arguments,
-            genericArgs.count == 1,
-            let argument = genericArgs.firstAsTypeSyntax,
-            let signatureType = lookupType(for: argument, errors: &errors),
-            case .closure(let signature, false) = signatureType
-        {
-            return .closure(signature, useJSTypedClosure: true)
-        }
-
-        // (T1, T2, ...) -> R
-        if let functionType = type.as(FunctionTypeSyntax.self) {
-            var parameters: [BridgeType] = []
-            for param in functionType.parameters {
-                guard let paramType = lookupType(for: param.type, errors: &errors) else {
-                    return nil
+    /// Describe the `@JS` types of dependency modules to SwiftExtract so
+    /// references to them resolve during analysis. The `BridgeType` mapping
+    /// stays in `ExternalModuleIndex`; these entries only carry shapes.
+    static func externalTypeDeclarations(
+        from index: ExternalModuleIndex
+    ) -> [String: [ExternalTypeDeclaration]] {
+        var result: [String: [ExternalTypeDeclaration]] = [:]
+        for moduleName in index.moduleNames {
+            var declarations: [ExternalTypeDeclaration] = []
+            for (dotPath, bridgeType) in index.entries(module: moduleName) {
+                let qualifiedName = dotPath.split(separator: ".").map(String.init)
+                let kind: ExternalTypeDeclaration.Kind
+                switch bridgeType.unaliased {
+                case .swiftHeapObject: kind = .class
+                case .swiftStruct: kind = .struct
+                case .caseEnum, .rawValueEnum, .associatedValueEnum, .namespaceEnum: kind = .enum
+                case .swiftProtocol: kind = .protocol
+                default: kind = .struct
                 }
-                parameters.append(paramType)
+                declarations.append(ExternalTypeDeclaration(qualifiedName: qualifiedName, kind: kind))
             }
+            result[moduleName] = declarations
+        }
+        return result
+    }
 
-            guard let returnType = lookupType(for: functionType.returnClause.type, errors: &errors) else {
-                return nil
+    private func validateSnippetPaths(importLowering: ImportLowering) {
+        var validatedJavaScriptModulePaths = Set<String>()
+        let snippetPaths = Set(importLowering.importOrigins.compactMap(\.snippetPath))
+        for path in snippetPaths.sorted() {
+            if validatedJavaScriptModulePaths.contains(path) {
+                continue
             }
-
-            let isAsync = functionType.effectSpecifiers?.asyncSpecifier != nil
-
-            if isAsync, !returnType.isAsyncResolvable {
-                errors.append(
-                    DiagnosticError(
-                        node: functionType,
-                        message:
-                            "Returning '\(returnType.swiftType)' from an async closure is not yet supported",
-                        hint:
-                            "Return a type lowerable through the async resolve ABI "
-                            + "(String/Int/Bool/Double/Float/raw-value or case-only enum/@JS struct/JSObject/Optional/Array/Dictionary), "
-                            + "or make the closure non-async."
-                    )
+            guard let pathNode = importLowering.importedModulePathNodes[path] else { continue }
+            guard path.hasPrefix("/") else {
+                importLowering.diagnose(
+                    node: pathNode,
+                    file: importLowering.importedModulePathFiles[path] ?? "",
+                    message: "JavaScript snippet paths must start with '/' to indicate the Swift target root: "
+                        + "'\(path)'. For an external module, use 'from: .module(\"\(path)\")' instead."
                 )
-                return nil
+                continue
             }
-
-            var isThrows = false
-            if let throwsClause = functionType.effectSpecifiers?.throwsClause {
-                guard let thrownType = throwsClause.type,
-                    thrownType.trimmedDescription == "JSException"
-                else {
-                    errors.append(
-                        DiagnosticError(
-                            node: throwsClause,
-                            message:
-                                "Only JSException is supported for thrown type of Swift closures, "
-                                + "got \(throwsClause.type?.trimmedDescription ?? "unspecified")",
-                            hint: "Annotate the closure as `throws(JSException)`"
-                        )
-                    )
-                    return nil
-                }
-                isThrows = true
-            }
-
-            return .closure(
-                ClosureSignature(
-                    parameters: parameters,
-                    returnType: returnType,
-                    moduleName: moduleName,
-                    isAsync: isAsync,
-                    isThrows: isThrows
-                ),
-                useJSTypedClosure: false
-            )
-        }
-
-        // T?
-        if let optionalType = type.as(OptionalTypeSyntax.self) {
-            let wrappedType = optionalType.wrappedType
-            if let baseType = lookupType(for: wrappedType, errors: &errors) {
-                return .nullable(baseType, .null)
-            }
-        }
-        // JSUndefinedOr<T>
-        if let identifierType = type.as(IdentifierTypeSyntax.self),
-            identifierType.name.text == "JSUndefinedOr",
-            let genericArgs = identifierType.genericArgumentClause?.arguments,
-            genericArgs.count == 1,
-            let argType = TypeSyntax(genericArgs.first?.argument)
-        {
-            if let baseType = lookupType(for: argType, errors: &errors) {
-                return .nullable(baseType, .undefined)
-            }
-        }
-        // JavaScriptKit.JSUndefinedOr<T>
-        if let memberType = type.as(MemberTypeSyntax.self),
-            let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
-            baseType.name.text == "JavaScriptKit",
-            memberType.name.text == "JSUndefinedOr",
-            let genericArgs = memberType.genericArgumentClause?.arguments,
-            genericArgs.count == 1,
-            let argType = TypeSyntax(genericArgs.first?.argument)
-        {
-            if let wrappedType = lookupType(for: argType, errors: &errors) {
-                return .nullable(wrappedType, .undefined)
-            }
-        }
-        // Optional<T>
-        if let identifierType = type.as(IdentifierTypeSyntax.self),
-            identifierType.name.text == "Optional",
-            let genericArgs = identifierType.genericArgumentClause?.arguments,
-            genericArgs.count == 1,
-            let argType = TypeSyntax(genericArgs.first?.argument)
-        {
-            if let baseType = lookupType(for: argType, errors: &errors) {
-                return .nullable(baseType, .null)
-            }
-        }
-        // Swift.Optional<T>
-        if let memberType = type.as(MemberTypeSyntax.self),
-            let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
-            baseType.name.text == "Swift",
-            memberType.name.text == "Optional",
-            let genericArgs = memberType.genericArgumentClause?.arguments,
-            genericArgs.count == 1,
-            let argType = TypeSyntax(genericArgs.first?.argument)
-        {
-            if let wrappedType = lookupType(for: argType, errors: &errors) {
-                return .nullable(wrappedType, .null)
-            }
-        }
-        // [T]
-        if let arrayType = type.as(ArrayTypeSyntax.self) {
-            if let elementType = lookupType(for: arrayType.element, errors: &errors) {
-                return .array(elementType)
-            }
-        }
-        // Array<T>
-        if let identifierType = type.as(IdentifierTypeSyntax.self),
-            identifierType.name.text == "Array",
-            let genericArgs = identifierType.genericArgumentClause?.arguments,
-            genericArgs.count == 1,
-            let argType = TypeSyntax(genericArgs.first?.argument)
-        {
-            if let elementType = lookupType(for: argType, errors: &errors) {
-                return .array(elementType)
-            }
-        }
-        // Swift.Array<T>
-        if let memberType = type.as(MemberTypeSyntax.self),
-            let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
-            baseType.name.text == "Swift",
-            memberType.name.text == "Array",
-            let genericArgs = memberType.genericArgumentClause?.arguments,
-            genericArgs.count == 1,
-            let argType = TypeSyntax(genericArgs.first?.argument)
-        {
-            if let elementType = lookupType(for: argType, errors: &errors) {
-                return .array(elementType)
-            }
-        }
-        // [String: T]
-        if let dictType = type.as(DictionaryTypeSyntax.self) {
-            if let keyType = lookupType(for: dictType.key, errors: &errors),
-                keyType == .string,
-                let valueType = lookupType(for: dictType.value, errors: &errors)
-            {
-                return .dictionary(valueType)
-            }
-        }
-        // Dictionary<String, T>
-        if let identifierType = type.as(IdentifierTypeSyntax.self),
-            identifierType.name.text == "Dictionary",
-            let genericArgs = identifierType.genericArgumentClause?.arguments,
-            genericArgs.count == 2,
-            let keyArg = TypeSyntax(genericArgs.first?.argument),
-            let valueArg = TypeSyntax(genericArgs.last?.argument),
-            let keyType = lookupType(for: keyArg, errors: &errors),
-            keyType == .string
-        {
-            if let valueType = lookupType(for: valueArg, errors: &errors) {
-                return .dictionary(valueType)
-            }
-        }
-        // Swift.Dictionary<String, T>
-        if let memberType = type.as(MemberTypeSyntax.self),
-            let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
-            baseType.name.text == "Swift",
-            memberType.name.text == "Dictionary",
-            let genericArgs = memberType.genericArgumentClause?.arguments,
-            genericArgs.count == 2,
-            let keyArg = TypeSyntax(genericArgs.first?.argument),
-            let valueArg = TypeSyntax(genericArgs.last?.argument),
-            let keyType = lookupType(for: keyArg, errors: &errors),
-            keyType == .string
-        {
-            if let valueType = lookupType(for: valueArg, errors: &errors) {
-                return .dictionary(valueType)
-            }
-        }
-        if let aliasDecl = typeDeclResolver.resolveTypeAlias(type) {
-            if let resolvedType = lookupType(for: aliasDecl.initializer.value, errors: &errors) {
-                return resolvedType
-            }
-        }
-
-        // UnsafePointer family
-        if let unsafePointerType = Self.parseUnsafePointerType(type) {
-            return .unsafePointer(unsafePointerType)
-        }
-
-        let typeName: String
-        if let identifier = type.as(IdentifierTypeSyntax.self) {
-            typeName = Self.normalizeIdentifier(identifier.name.text)
-        } else {
-            typeName = type.trimmedDescription
-        }
-        if let primitiveType = BridgeType(swiftType: typeName) {
-            return primitiveType
-        }
-
-        if let typeDecl = typeDeclResolver.resolve(type) {
-            if typeDecl.is(ProtocolDeclSyntax.self) {
-                let swiftCallName = computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
-                return .swiftProtocol(swiftCallName)
-            }
-
-            if let enumDecl = typeDecl.as(EnumDeclSyntax.self) {
-                let swiftCallName = computeSwiftCallName(for: enumDecl, itemName: enumDecl.name.text)
-                if let jsAttribute = enumDecl.attributes.firstJSAttribute,
-                    let aliasTarget = extractAliasTarget(from: jsAttribute)
-                {
-                    return aliasType(target: aliasTarget, swiftCallName: swiftCallName, errors: &errors)
-                }
-                let rawTypeString = enumDecl.inheritanceClause?.inheritedTypes.first { inheritedType in
-                    let typeName = inheritedType.type.trimmedDescription
-                    return ExportSwiftConstants.supportedRawTypes.contains(typeName)
-                }?.type.trimmedDescription
-
-                if let rawType = SwiftEnumRawType(rawTypeString) {
-                    return .rawValueEnum(swiftCallName, rawType)
-                } else {
-                    let hasAnyCases = enumDecl.memberBlock.members.contains { member in
-                        member.decl.is(EnumCaseDeclSyntax.self)
-                    }
-                    if !hasAnyCases {
-                        return .namespaceEnum(swiftCallName)
-                    }
-                    let hasAssociatedValues =
-                        enumDecl.memberBlock.members.contains { member in
-                            guard let caseDecl = member.decl.as(EnumCaseDeclSyntax.self) else { return false }
-                            return caseDecl.elements.contains { element in
-                                if let params = element.parameterClause?.parameters {
-                                    return !params.isEmpty
-                                }
-                                return false
-                            }
-                        }
-                    if hasAssociatedValues {
-                        return .associatedValueEnum(swiftCallName)
-                    } else {
-                        return .caseEnum(swiftCallName)
-                    }
-                }
-            }
-
-            if let structDecl = typeDecl.as(StructDeclSyntax.self) {
-                let swiftCallName = computeSwiftCallName(
-                    for: structDecl,
-                    itemName: structDecl.name.text
+            guard !path.split(separator: "/").contains("..") else {
+                importLowering.diagnose(
+                    node: pathNode,
+                    file: importLowering.importedModulePathFiles[path] ?? "",
+                    message: "JavaScript snippet paths must not contain '..': '\(path)'."
                 )
-                if structDecl.attributes.hasAttribute(name: "JSClass") {
-                    return .jsObject(swiftCallName)
-                }
-                if let jsAttribute = structDecl.attributes.firstJSAttribute,
-                    let aliasTarget = extractAliasTarget(from: jsAttribute)
-                {
-                    return aliasType(target: aliasTarget, swiftCallName: swiftCallName, errors: &errors)
-                }
-                return .swiftStruct(swiftCallName)
+                continue
             }
-
-            guard typeDecl.is(ClassDeclSyntax.self) || typeDecl.is(ActorDeclSyntax.self) else {
-                return nil
-            }
-            let swiftCallName = computeSwiftCallName(for: typeDecl, itemName: typeDecl.name.text)
-
-            // A type annotated with @JSClass is a JavaScript object wrapper (imported),
-            // even if it is declared as a Swift class.
-            if let classDecl = typeDecl.as(ClassDeclSyntax.self), classDecl.attributes.hasAttribute(name: "JSClass") {
-                return .jsObject(swiftCallName)
-            }
-            if let actorDecl = typeDecl.as(ActorDeclSyntax.self), actorDecl.attributes.hasAttribute(name: "JSClass") {
-                return .jsObject(swiftCallName)
-            }
-
-            if let classDecl = typeDecl.as(ClassDeclSyntax.self),
-                let jsAttribute = classDecl.attributes.firstJSAttribute,
-                let aliasTarget = extractAliasTarget(from: jsAttribute)
-            {
-                return aliasType(target: aliasTarget, swiftCallName: swiftCallName, errors: &errors)
-            }
-
-            return .swiftHeapObject(swiftCallName)
-        }
-
-        if let externalType = resolveExternal(for: type, errors: &errors) {
-            return externalType
-        }
-
-        errors.append(
-            DiagnosticError(
-                node: type,
-                message: "Unsupported type '\(type.trimmedDescription)'.",
-                hint:
-                    "Only primitive types, types defined in the same module, and "
-                    + "`@JS` types from dependency targets that apply the BridgeJS plugin are allowed"
-            )
-        )
-        return nil
-    }
-
-    private func resolveExternal(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {
-        guard
-            !externalModuleIndex.isEmpty,
-            var components = type.qualifiedComponents
-        else {
-            return nil
-        }
-
-        var scopedModule: String? = nil
-        if components.count >= 2, externalModuleIndex.isKnownModule(components[0]) {
-            scopedModule = components[0]
-            components.removeFirst()
-        }
-
-        let dotPath = components.joined(separator: ".")
-        let lookupResult: ExternalModuleIndex.LookupResult?
-        if let moduleName = scopedModule {
-            lookupResult = externalModuleIndex.lookup(dotPath: dotPath, module: moduleName)
-        } else {
-            lookupResult = externalModuleIndex.lookup(dotPath: dotPath)
-        }
-
-        guard let lookupResult else { return nil }
-        switch lookupResult {
-        case .unique(let externalType):
-            usedExternalModules.insert(externalType.moduleName)
-            return externalType.bridgeType
-        case .ambiguous(let candidates):
-            let moduleNames = candidates.map(\.moduleName).sorted().joined(separator: ", ")
-            errors.append(
-                DiagnosticError(
-                    node: type,
-                    message: "ambiguous use of '\(type.trimmedDescription)'",
-                    hint:
-                        "'\(dotPath)' is exported by multiple dependency modules: \(moduleNames). "
-                        + "Qualify with a module name (e.g. '<Module>.\(dotPath)') to disambiguate."
+            let lowercasedPath = path.lowercased()
+            guard lowercasedPath.hasSuffix(".js") || lowercasedPath.hasSuffix(".mjs") else {
+                importLowering.diagnose(
+                    node: pathNode,
+                    file: importLowering.importedModulePathFiles[path] ?? "",
+                    message: "JavaScript snippets must use a '.js' or '.mjs' extension: '\(path)'."
                 )
-            )
-            return nil
-        }
-    }
-
-    fileprivate func extractAliasTarget(from jsAttribute: AttributeSyntax) -> TypeSyntax? {
-        guard
-            let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
-            let asArg = arguments.first(where: { $0.label?.text == "as" }),
-            let memberAccess = asArg.expression.as(MemberAccessExprSyntax.self),
-            memberAccess.declName.baseName.text == "self",
-            let base = memberAccess.base
-        else {
-            return nil
-        }
-        return TypeSyntax(stringLiteral: base.trimmedDescription)
-    }
-
-    fileprivate func aliasType(
-        target aliasTarget: TypeSyntax,
-        swiftCallName: String,
-        errors: inout [DiagnosticError]
-    ) -> BridgeType? {
-        func diagnoseChainedAlias() -> BridgeType? {
-            errors.append(
-                DiagnosticError(
-                    node: aliasTarget,
-                    message: "`@JS(as:)` target must be a `@JS` type, not another `@JS(as:)` type",
-                    hint: "Use the underlying `@JS` type directly"
+                continue
+            }
+            guard (try? javaScriptModuleExists(path)) == true else {
+                importLowering.diagnose(
+                    node: pathNode,
+                    file: importLowering.importedModulePathFiles[path] ?? "",
+                    message: "JavaScript snippet file was not found at '\(path)'."
                 )
-            )
-            return nil
-        }
-        if let targetDecl = typeDeclResolver.resolve(aliasTarget),
-            let targetJSAttribute = targetDecl.attributes.firstJSAttribute,
-            extractAliasTarget(from: targetJSAttribute) != nil
-        {
-            return diagnoseChainedAlias()
-        }
-        guard let targetType = lookupType(for: aliasTarget, errors: &errors) else { return nil }
-        if case .alias = targetType {
-            // Alias declared in another module.
-            return diagnoseChainedAlias()
-        }
-        if case .swiftProtocol = targetType {
-            errors.append(
-                DiagnosticError(
-                    node: aliasTarget,
-                    message: "`@JS(as:)` cannot target a `@JS protocol`"
-                )
-            )
-            return nil
-        }
-        return .alias(name: swiftCallName, underlying: targetType)
-    }
-
-    fileprivate static func parseUnsafePointerType(_ type: TypeSyntax) -> UnsafePointerType? {
-        func parse(baseName: String, genericArg: TypeSyntax?) -> UnsafePointerType? {
-            let pointee = genericArg?.trimmedDescription
-            switch baseName {
-            case "UnsafePointer":
-                return .init(kind: .unsafePointer, pointee: pointee)
-            case "UnsafeMutablePointer":
-                return .init(kind: .unsafeMutablePointer, pointee: pointee)
-            case "UnsafeRawPointer":
-                return .init(kind: .unsafeRawPointer)
-            case "UnsafeMutableRawPointer":
-                return .init(kind: .unsafeMutableRawPointer)
-            case "OpaquePointer":
-                return .init(kind: .opaquePointer)
-            default:
-                return nil
+                continue
             }
-        }
-
-        if let identifier = type.as(IdentifierTypeSyntax.self) {
-            let baseName = identifier.name.text
-            if (baseName == "UnsafePointer" || baseName == "UnsafeMutablePointer"),
-                let genericArgs = identifier.genericArgumentClause?.arguments,
-                genericArgs.count == 1,
-                let argType = TypeSyntax(genericArgs.first?.argument)
-            {
-                return parse(baseName: baseName, genericArg: argType)
-            }
-            return parse(baseName: baseName, genericArg: nil)
-        }
-
-        if let member = type.as(MemberTypeSyntax.self),
-            let base = member.baseType.as(IdentifierTypeSyntax.self),
-            base.name.text == "Swift"
-        {
-            let baseName = member.name.text
-            if (baseName == "UnsafePointer" || baseName == "UnsafeMutablePointer"),
-                let genericArgs = member.genericArgumentClause?.arguments,
-                genericArgs.count == 1,
-                let argType = TypeSyntax(genericArgs.first?.argument)
-            {
-                return parse(baseName: baseName, genericArg: argType)
-            }
-            return parse(baseName: baseName, genericArg: nil)
-        }
-
-        return nil
-    }
-
-    /// This currently doesn’t work correctly for extensions on types defined in other modules,
-    /// which is fine for now since we don’t support extending @JS types from other modules.
-    /// This will need updating when we do.
-    fileprivate func enclosingDeclarations(of node: some SyntaxProtocol) -> [Syntax] {
-        var declarations: [Syntax] = []
-        var visitedExtendedTypes: Set<SyntaxIdentifier> = []
-        var currentNode: Syntax? = Syntax(node).parent
-
-        while let parent = currentNode {
-            if let extensionDecl = parent.as(ExtensionDeclSyntax.self) {
-                if let extendedDecl = typeDeclResolver.resolveExtensionTarget(extensionDecl.extendedType),
-                    visitedExtendedTypes.insert(extendedDecl.id).inserted
-                {
-                    declarations.append(Syntax(extendedDecl))
-                    currentNode = Syntax(extendedDecl).parent
-                } else {
-                    currentNode = parent.parent
-                }
-            } else {
-                declarations.append(parent)
-                currentNode = parent.parent
-            }
-        }
-        return declarations
-    }
-
-    /// This generates the qualified name needed for Swift code generation (e.g., "Networking.API.HTTPServer")
-    fileprivate func computeSwiftCallName(for node: some SyntaxProtocol, itemName: String) -> String {
-        var swiftPath: [String] = []
-
-        for declaration in enclosingDeclarations(of: node) {
-            if let enumDecl = declaration.as(EnumDeclSyntax.self),
-                enumDecl.attributes.hasJSAttribute()
-            {
-                swiftPath.insert(enumDecl.name.text, at: 0)
-            } else if let structDecl = declaration.as(StructDeclSyntax.self),
-                structDecl.attributes.hasJSAttribute()
-            {
-                swiftPath.insert(structDecl.name.text, at: 0)
-            } else if let classDecl = declaration.as(ClassDeclSyntax.self),
-                classDecl.attributes.hasJSAttribute()
-            {
-                swiftPath.insert(classDecl.name.text, at: 0)
-            }
-        }
-
-        if swiftPath.isEmpty {
-            return itemName
-        } else {
-            return swiftPath.joined(separator: ".") + "." + itemName
+            validatedJavaScriptModulePaths.insert(path)
         }
     }
 
@@ -869,7 +370,7 @@ public final class SwiftToSkeleton {
         return String(name.dropFirst().dropLast())
     }
 
-    fileprivate static func isValidJSIdentifier(_ name: String) -> Bool {
+    static func isValidJSIdentifier(_ name: String) -> Bool {
         func isIdentifierPart(_ scalar: Unicode.Scalar, isStart: Bool) -> Bool {
             switch scalar {
             case "a"..."z", "A"..."Z", "_", "$":
@@ -885,45 +386,566 @@ public final class SwiftToSkeleton {
         }
         return name.unicodeScalars.dropFirst().allSatisfy { isIdentifierPart($0, isStart: false) }
     }
-
-    fileprivate static func isBridgeableGenericConstraint(_ constraint: String?) -> Bool {
-        constraint == "BridgedSwiftGenericBridgeable"
-            || constraint == "JavaScriptKit.BridgedSwiftGenericBridgeable"
-    }
-
 }
 
-private enum ExportSwiftConstants {
-    static let supportedRawTypes = SwiftEnumRawType.supportedTypeNames
-}
+// MARK: - Lowering context
 
-extension AttributeSyntax {
-    /// The attribute name as text when it is a simple identifier (e.g. "JS", "JSFunction").
-    /// Prefer this over `attributeName.trimmedDescription` for name checks to avoid unnecessary string work.
-    fileprivate var attributeNameText: String? {
-        attributeName.as(IdentifierTypeSyntax.self)?.name.text
+/// State shared by the export and import lowering passes: the analyzer (for
+/// ad-hoc type resolution of attribute arguments), the external module index,
+/// and the `SwiftType` → `BridgeType` mapping.
+final class LoweringContext {
+    let moduleName: String
+    let analyzer: SwiftAnalyzer
+    let externalModuleIndex: ExternalModuleIndex
+    let fileOrder: [String: Int]
+    var usedExternalModules = Set<String>()
+
+    init(
+        moduleName: String,
+        analyzer: SwiftAnalyzer,
+        externalModuleIndex: ExternalModuleIndex,
+        fileOrder: [String: Int]
+    ) {
+        self.moduleName = moduleName
+        self.analyzer = analyzer
+        self.externalModuleIndex = externalModuleIndex
+        self.fileOrder = fileOrder
     }
-}
 
-extension AttributeListSyntax {
-    func hasJSAttribute() -> Bool {
-        firstJSAttribute != nil
+    // MARK: Names
+
+    /// The qualified name used to call into Swift (e.g. "Networking.API.HTTPServer"):
+    /// the type name prefixed by its `@JS`-annotated ancestors.
+    func swiftCallName(for nominal: SwiftNominalTypeDeclaration) -> String {
+        var path = [nominal.name]
+        var ancestor = nominal.parent
+        while let current = ancestor {
+            if current.syntax.attributes.firstJSAttribute != nil {
+                path.insert(current.name, at: 0)
+            }
+            ancestor = current.parent
+        }
+        return path.joined(separator: ".")
     }
 
-    var firstJSAttribute: AttributeSyntax? {
-        first(where: { $0.as(AttributeSyntax.self)?.attributeNameText == "JS" })?.as(AttributeSyntax.self)
+    /// Computes the namespace contributed by enclosing `@JS` namespace enums
+    /// (enums without cases). The innermost enclosing namespace enum with an
+    /// explicit `namespace:` argument prepends it and stops the walk.
+    func namespaceFromEnclosingNamespaceEnums(of nominal: SwiftNominalTypeDeclaration?) -> [String]? {
+        var namespace: [String] = []
+        var ancestor = nominal
+        while let current = ancestor {
+            defer { ancestor = current.parent }
+            guard current.kind == .enum,
+                let jsAttribute = current.syntax.attributes.firstJSAttribute
+            else { continue }
+            let hasCases = current.syntax.memberBlock.members.contains { member in
+                member.decl.is(EnumCaseDeclSyntax.self)
+            }
+            guard !hasCases else { continue }
+            namespace.insert(current.name, at: 0)
+            if let explicitNamespace = SwiftToSkeleton.extractNamespace(from: jsAttribute) {
+                namespace = explicitNamespace + namespace
+                break
+            }
+        }
+        return namespace.isEmpty ? nil : namespace
     }
 
-    /// Returns true if any attribute has the given name (e.g. "JSClass").
-    func hasAttribute(name: String) -> Bool {
-        contains { attribute in
-            guard let syntax = attribute.as(AttributeSyntax.self) else { return false }
-            return syntax.attributeNameText == name
+    /// The path contributed by enclosing `@JS` structs/classes.
+    func namespaceFromEnclosingTypes(of nominal: SwiftNominalTypeDeclaration?) -> [String]? {
+        var path: [String] = []
+        var ancestor = nominal
+        while let current = ancestor {
+            defer { ancestor = current.parent }
+            guard current.kind == .struct || current.kind == .class,
+                current.syntax.attributes.firstJSAttribute != nil
+            else { continue }
+            path.insert(current.name, at: 0)
+        }
+        return path.isEmpty ? nil : path
+    }
+
+    // MARK: SwiftType → BridgeType
+
+    private static let jsTypedArrayNamesByElement: [String: String] = [
+        "Int8": "JSInt8Array",
+        "UInt8": "JSUint8Array",
+        "Int16": "JSInt16Array",
+        "UInt16": "JSUint16Array",
+        "Int32": "JSInt32Array",
+        "UInt32": "JSUint32Array",
+        "Float": "JSFloat32Array",
+        "Float32": "JSFloat32Array",
+        "Double": "JSFloat64Array",
+        "Float64": "JSFloat64Array",
+    ]
+
+    func bridgeType(
+        for type: SwiftType,
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        switch type {
+        case .nominal(let nominal):
+            return bridgeType(forNominal: nominal, anchor: anchor, errors: &errors)
+
+        case .genericParameter(let parameter):
+            return .generic(parameter.name)
+
+        case .function(let functionType):
+            return bridgeType(forFunction: functionType, anchor: anchor, errors: &errors)
+
+        case .tuple(let elements) where elements.isEmpty:
+            return .void
+
+        case .tuple, .metatype, .existential, .opaque, .composite, .inlineArray:
+            return unsupported(type: type, anchor: anchor, errors: &errors)
         }
     }
+
+    private func bridgeType(
+        forNominal nominal: SwiftNominalType,
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        let decl = nominal.nominalTypeDecl
+
+        if decl.isUnresolvedTypePlaceholder {
+            return unsupported(
+                name: unresolvedSpelling(of: decl.name, in: anchor),
+                anchor: anchor,
+                errors: &errors
+            )
+        }
+
+        if let known = decl.knownTypeKind {
+            return bridgeType(
+                forKnown: known,
+                genericArguments: nominal.genericArguments,
+                anchor: anchor,
+                errors: &errors
+            )
+        }
+
+        if decl.moduleName == "JavaScriptKit" {
+            return bridgeType(
+                forJavaScriptKit: decl.name,
+                genericArguments: nominal.genericArguments,
+                anchor: anchor,
+                errors: &errors
+            )
+        }
+
+        if decl.moduleName == moduleName {
+            return bridgeType(forLocal: decl, anchor: anchor, errors: &errors)
+        }
+
+        return bridgeType(forExternal: decl, anchor: anchor, errors: &errors)
+    }
+
+    private func bridgeType(
+        forKnown known: SwiftKnownTypeDeclKind,
+        genericArguments: [SwiftType],
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        switch known {
+        case .bool: return .bool
+        case .int: return .integer(.int)
+        case .uint: return .integer(.uint)
+        case .int8: return .integer(.int8)
+        case .uint8: return .integer(.uint8)
+        case .int16: return .integer(.int16)
+        case .uint16: return .integer(.uint16)
+        case .int32: return .integer(.int32)
+        case .uint32: return .integer(.uint32)
+        case .int64: return .integer(.int64)
+        case .uint64: return .integer(.uint64)
+        case .float: return .float
+        case .double: return .double
+        case .string: return .string
+        case .void: return .void
+
+        case .optional:
+            guard let wrapped = genericArguments.first,
+                let wrappedType = bridgeType(for: wrapped, anchor: anchor, errors: &errors)
+            else { return nil }
+            return .nullable(wrappedType, .null)
+
+        case .array:
+            guard let element = genericArguments.first,
+                let elementType = bridgeType(for: element, anchor: anchor, errors: &errors)
+            else { return nil }
+            return .array(elementType)
+
+        case .dictionary:
+            guard genericArguments.count == 2 else {
+                return unsupportedSpelling(anchor: anchor, errors: &errors)
+            }
+            guard let keyType = bridgeType(for: genericArguments[0], anchor: anchor, errors: &errors),
+                keyType == .string
+            else {
+                return unsupportedSpelling(anchor: anchor, errors: &errors)
+            }
+            guard let valueType = bridgeType(for: genericArguments[1], anchor: anchor, errors: &errors) else {
+                return nil
+            }
+            return .dictionary(valueType)
+
+        case .unsafeRawPointer:
+            return .unsafePointer(.init(kind: .unsafeRawPointer))
+        case .unsafeMutableRawPointer:
+            return .unsafePointer(.init(kind: .unsafeMutableRawPointer))
+        case .opaquePointer:
+            return .unsafePointer(.init(kind: .opaquePointer))
+        case .unsafePointer:
+            return .unsafePointer(.init(kind: .unsafePointer, pointee: genericArguments.first?.description))
+        case .unsafeMutablePointer:
+            return .unsafePointer(.init(kind: .unsafeMutablePointer, pointee: genericArguments.first?.description))
+
+        case .unsafeRawBufferPointer, .unsafeMutableRawBufferPointer,
+            .unsafeBufferPointer, .unsafeMutableBufferPointer,
+            .set,
+            .foundationDataProtocol, .essentialsDataProtocol,
+            .foundationData, .essentialsData,
+            .foundationDate, .essentialsDate,
+            .foundationUUID, .essentialsUUID,
+            .foundationURL, .essentialsURL:
+            return unsupportedSpelling(anchor: anchor, errors: &errors)
+        }
+    }
+
+    private func bridgeType(
+        forJavaScriptKit name: String,
+        genericArguments: [SwiftType],
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        switch name {
+        case "JSObject":
+            return .jsObject(nil)
+        case "JSValue":
+            return .jsValue
+        case "JSPromise":
+            return .jsObject(name)
+        case "JSUndefinedOr":
+            guard let wrapped = genericArguments.first,
+                let wrappedType = bridgeType(for: wrapped, anchor: anchor, errors: &errors)
+            else { return nil }
+            return .nullable(wrappedType, .undefined)
+        case "JSTypedArray":
+            guard let element = genericArguments.first?.asNominalTypeDeclaration,
+                let typedArrayName = Self.jsTypedArrayNamesByElement[element.name]
+            else {
+                return unsupportedSpelling(anchor: anchor, errors: &errors)
+            }
+            return .jsObject(typedArrayName)
+        case "JSTypedClosure":
+            guard let signatureArgument = genericArguments.first,
+                case .function = signatureArgument,
+                let signatureType = bridgeType(for: signatureArgument, anchor: anchor, errors: &errors),
+                case .closure(let signature, false) = signatureType
+            else {
+                return unsupportedSpelling(anchor: anchor, errors: &errors)
+            }
+            return .closure(signature, useJSTypedClosure: true)
+        default:
+            return unsupported(name: name, anchor: anchor, errors: &errors)
+        }
+    }
+
+    private func bridgeType(
+        forFunction functionType: SwiftFunctionType,
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        var parameters: [BridgeType] = []
+        for parameter in functionType.parameters {
+            guard let parameterType = bridgeType(for: parameter.type, anchor: anchor, errors: &errors) else {
+                return nil
+            }
+            parameters.append(parameterType)
+        }
+        guard let returnType = bridgeType(for: functionType.resultType, anchor: anchor, errors: &errors) else {
+            return nil
+        }
+
+        let isAsync = functionType.isAsync
+        if isAsync, !returnType.isAsyncResolvable {
+            errors.append(
+                DiagnosticError(
+                    node: anchor,
+                    message:
+                        "Returning '\(returnType.swiftType)' from an async closure is not yet supported",
+                    hint:
+                        "Return a type lowerable through the async resolve ABI "
+                        + "(String/Int/Bool/Double/Float/raw-value or case-only enum/@JS struct/JSObject/Optional/Array/Dictionary), "
+                        + "or make the closure non-async."
+                )
+            )
+            return nil
+        }
+
+        var isThrows = false
+        if functionType.isThrowing {
+            guard let thrownType = functionType.thrownTypedError,
+                thrownType.asNominalTypeDeclaration?.name == "JSException"
+            else {
+                let spelled = functionType.thrownTypedError.map { "\($0)" } ?? "unspecified"
+                errors.append(
+                    DiagnosticError(
+                        node: anchor,
+                        message:
+                            "Only JSException is supported for thrown type of Swift closures, "
+                            + "got \(spelled)",
+                        hint: "Annotate the closure as `throws(JSException)`"
+                    )
+                )
+                return nil
+            }
+            isThrows = true
+        }
+
+        return .closure(
+            ClosureSignature(
+                parameters: parameters,
+                returnType: returnType,
+                moduleName: moduleName,
+                isAsync: isAsync,
+                isThrows: isThrows
+            ),
+            useJSTypedClosure: false
+        )
+    }
+
+    private func bridgeType(
+        forLocal decl: SwiftNominalTypeDeclaration,
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        let callName = swiftCallName(for: decl)
+        let attributes = decl.syntax.attributes
+
+        if attributes.hasAttribute(name: "JSClass") {
+            return .jsObject(callName)
+        }
+
+        switch decl.kind {
+        case .protocol:
+            return .swiftProtocol(callName)
+
+        case .enum:
+            guard let enumDecl = decl.syntax.as(EnumDeclSyntax.self) else {
+                return unsupported(name: decl.name, anchor: anchor, errors: &errors)
+            }
+            if let jsAttribute = attributes.firstJSAttribute,
+                let aliasTarget = SwiftToSkeleton.extractAliasTarget(from: jsAttribute)
+            {
+                return aliasType(target: aliasTarget, swiftCallName: callName, anchor: anchor, errors: &errors)
+            }
+            let rawTypeString = enumDecl.inheritanceClause?.inheritedTypes.first { inheritedType in
+                SwiftEnumRawType.supportedTypeNames.contains(inheritedType.type.trimmedDescription)
+            }?.type.trimmedDescription
+            if let rawType = SwiftEnumRawType(rawTypeString) {
+                return .rawValueEnum(callName, rawType)
+            }
+            let caseDecls = enumDecl.memberBlock.members.compactMap {
+                $0.decl.as(EnumCaseDeclSyntax.self)
+            }
+            if caseDecls.isEmpty {
+                return .namespaceEnum(callName)
+            }
+            let hasAssociatedValues = caseDecls.contains { caseDecl in
+                caseDecl.elements.contains { element in
+                    !(element.parameterClause?.parameters.isEmpty ?? true)
+                }
+            }
+            return hasAssociatedValues ? .associatedValueEnum(callName) : .caseEnum(callName)
+
+        case .struct:
+            if let jsAttribute = attributes.firstJSAttribute,
+                let aliasTarget = SwiftToSkeleton.extractAliasTarget(from: jsAttribute)
+            {
+                return aliasType(target: aliasTarget, swiftCallName: callName, anchor: anchor, errors: &errors)
+            }
+            return .swiftStruct(callName)
+
+        case .class, .actor:
+            if let jsAttribute = attributes.firstJSAttribute,
+                let aliasTarget = SwiftToSkeleton.extractAliasTarget(from: jsAttribute)
+            {
+                return aliasType(target: aliasTarget, swiftCallName: callName, anchor: anchor, errors: &errors)
+            }
+            return .swiftHeapObject(callName)
+        }
+    }
+
+    private func bridgeType(
+        forExternal decl: SwiftNominalTypeDeclaration,
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        var path = [decl.name]
+        var ancestor = decl.parent
+        while let current = ancestor {
+            path.insert(current.name, at: 0)
+            ancestor = current.parent
+        }
+        let dotPath = path.joined(separator: ".")
+
+        // Preserve the ambiguity diagnostic for unqualified references to a
+        // name exported by several dependency modules. The source spelling
+        // decides: a module-qualified reference is unambiguous.
+        let spelling = anchorSpelling(anchor)
+        let isQualifiedSpelling =
+            spelling.hasPrefix("\(decl.moduleName).") || spelling.contains(".\(decl.moduleName).")
+
+        let lookupResult: ExternalModuleIndex.LookupResult?
+        if isQualifiedSpelling {
+            lookupResult = externalModuleIndex.lookup(dotPath: dotPath, module: decl.moduleName)
+        } else {
+            lookupResult = externalModuleIndex.lookup(dotPath: dotPath)
+        }
+
+        guard let lookupResult else {
+            return unsupported(name: decl.name, anchor: anchor, errors: &errors)
+        }
+        switch lookupResult {
+        case .unique(let externalType):
+            usedExternalModules.insert(externalType.moduleName)
+            return externalType.bridgeType
+        case .ambiguous(let candidates):
+            let moduleNames = candidates.map(\.moduleName).sorted().joined(separator: ", ")
+            errors.append(
+                DiagnosticError(
+                    node: anchor,
+                    message: "ambiguous use of '\(spelling)'",
+                    hint:
+                        "'\(dotPath)' is exported by multiple dependency modules: \(moduleNames). "
+                        + "Qualify with a module name (e.g. '<Module>.\(dotPath)') to disambiguate."
+                )
+            )
+            return nil
+        }
+    }
+
+    func aliasType(
+        target aliasTarget: TypeSyntax,
+        swiftCallName: String,
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        func diagnoseChainedAlias() -> BridgeType? {
+            errors.append(
+                DiagnosticError(
+                    node: anchor,
+                    message: "`@JS(as:)` target must be a `@JS` type, not another `@JS(as:)` type",
+                    hint: "Use the underlying `@JS` type directly"
+                )
+            )
+            return nil
+        }
+        guard let targetSwiftType = try? analyzer.resolveType(aliasTarget),
+            !targetSwiftType.isUnresolvedTypePlaceholder
+        else {
+            return unsupported(name: aliasTarget.trimmedDescription, anchor: anchor, errors: &errors)
+        }
+        if let targetDecl = targetSwiftType.asNominalTypeDeclaration,
+            let targetJSAttribute = targetDecl.syntax.attributes.firstJSAttribute,
+            SwiftToSkeleton.extractAliasTarget(from: targetJSAttribute) != nil
+        {
+            return diagnoseChainedAlias()
+        }
+        guard let targetType = bridgeType(for: targetSwiftType, anchor: anchor, errors: &errors) else {
+            return nil
+        }
+        if case .alias = targetType {
+            // Alias declared in another module.
+            return diagnoseChainedAlias()
+        }
+        if case .swiftProtocol = targetType {
+            errors.append(
+                DiagnosticError(
+                    node: anchor,
+                    message: "`@JS(as:)` cannot target a `@JS protocol`"
+                )
+            )
+            return nil
+        }
+        return .alias(name: swiftCallName, underlying: targetType)
+    }
+
+    // MARK: Diagnostics helpers
+
+    private func anchorSpelling(_ anchor: some SyntaxProtocol) -> String {
+        anchor.trimmedDescription
+    }
+
+    /// Recovers the source spelling of an unresolved name from the anchoring
+    /// type syntax, so `Foundation.URL` is reported as written rather than as
+    /// the bare `URL` recorded on the placeholder.
+    private func unresolvedSpelling(of name: String, in anchor: some SyntaxProtocol) -> String {
+        if let memberType = Syntax(anchor).as(MemberTypeSyntax.self), memberType.name.text == name {
+            return memberType.trimmedDescription
+        }
+        let finder = MemberTypeSpellingFinder(name: name)
+        finder.walk(Syntax(anchor))
+        return finder.spelling ?? name
+    }
+
+    private func unsupported(
+        type: SwiftType,
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        unsupported(name: "\(type)", anchor: anchor, errors: &errors)
+    }
+
+    private func unsupportedSpelling(
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        unsupported(name: anchorSpelling(anchor), anchor: anchor, errors: &errors)
+    }
+
+    func unsupported(
+        name: String,
+        anchor: some SyntaxProtocol,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        errors.append(
+            DiagnosticError(
+                node: anchor,
+                message: "Unsupported type '\(name)'.",
+                hint:
+                    "Only primitive types, types defined in the same module, and "
+                    + "`@JS` types from dependency targets that apply the BridgeJS plugin are allowed"
+            )
+        )
+        return nil
+    }
 }
 
-private final class JSAttributeFinder: SyntaxVisitor {
+private final class MemberTypeSpellingFinder: SyntaxAnyVisitor {
+    let name: String
+    var spelling: String?
+
+    init(name: String) {
+        self.name = name
+        super.init(viewMode: .sourceAccurate)
+    }
+
+    override func visit(_ node: MemberTypeSyntax) -> SyntaxVisitorContinueKind {
+        if spelling == nil, node.name.text == name {
+            spelling = node.trimmedDescription
+            return .skipChildren
+        }
+        return .visitChildren
+    }
+}
+
+final class JSAttributeFinder: SyntaxVisitor {
     private(set) var found = false
 
     override func visit(_ node: AttributeSyntax) -> SyntaxVisitorContinueKind {
@@ -934,653 +956,129 @@ private final class JSAttributeFinder: SyntaxVisitor {
     }
 }
 
-private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
-    var exportedFunctions: [ExportedFunction] = []
-    /// The names of the exported classes, in the order they were written in the source file
-    var exportedClassNames: [String] = []
-    var exportedClassByName: [String: ExportedClass] = [:]
-    /// The names of the exported enums, in the order they were written in the source file
-    var exportedEnumNames: [String] = []
-    var exportedEnumByName: [String: ExportedEnum] = [:]
-    /// The names of the exported protocols, in the order they were written in the source file
-    var exportedProtocolNames: [String] = []
-    var exportedProtocolByName: [String: ExportedProtocol] = [:]
-    /// The names of the exported structs, in the order they were written in the source file
-    var exportedStructNames: [String] = []
-    var exportedStructByName: [String: ExportedStruct] = [:]
-    var exportedAliases: [ExportedAlias] = []
-    var errors: [DiagnosticError] = []
-    /// Extensions collected during the walk, to be resolved after all files have been walked
-    var deferredExtensions: [ExtensionDeclSyntax] = []
+// MARK: - Attribute helpers
 
-    func finalize(_ result: inout ExportedSkeleton) {
-        result.functions.append(contentsOf: exportedFunctions)
-        result.classes.append(contentsOf: exportedClassNames.map { exportedClassByName[$0]! })
-        result.enums.append(contentsOf: exportedEnumNames.map { exportedEnumByName[$0]! })
-        result.structs.append(contentsOf: exportedStructNames.map { exportedStructByName[$0]! })
-        result.protocols.append(contentsOf: exportedProtocolNames.map { exportedProtocolByName[$0]! })
-        result.aliases.append(contentsOf: exportedAliases)
+extension AttributeSyntax {
+    /// The attribute name as text when it is a simple identifier (e.g. "JS", "JSFunction").
+    var attributeNameText: String? {
+        attributeName.as(IdentifierTypeSyntax.self)?.name.text
+    }
+}
+
+extension AttributeListSyntax {
+    func hasJSAttribute() -> Bool {
+        firstJSAttribute != nil
     }
 
-    /// Creates a unique key by combining name and namespace
-    private func makeKey(name: String, namespace: [String]?) -> String {
-        if let namespace = namespace, !namespace.isEmpty {
-            return "\(namespace.joined(separator: ".")).\(name)"
-        } else {
-            return name
-        }
+    var firstJSAttribute: AttributeSyntax? {
+        firstAttribute(named: "JS")
     }
 
-    struct NamespaceResolution {
-        let namespace: [String]?
-        let isValid: Bool
+    func firstAttribute(named name: String) -> AttributeSyntax? {
+        first(where: { $0.as(AttributeSyntax.self)?.attributeNameText == name })?.as(AttributeSyntax.self)
     }
 
-    /// Resolves and validates namespace from both @JS attribute and computed (nested) namespace
-    /// Returns the effective namespace and whether validation succeeded
-    private func resolveNamespace(
-        from jsAttribute: AttributeSyntax,
-        for node: some SyntaxProtocol,
-        declarationType: String
-    ) -> NamespaceResolution {
-        let attributeNamespace = extractNamespace(from: jsAttribute)
-        let computedNamespace = computeNamespace(for: node)
-
-        if computedNamespace != nil && attributeNamespace != nil {
-            diagnose(
-                node: jsAttribute,
-                message: "Nested \(declarationType)s cannot specify their own namespace",
-                hint:
-                    "Remove the namespace from @JS attribute - nested \(declarationType)s inherit namespace from parent"
-            )
-            return NamespaceResolution(namespace: nil, isValid: false)
-        }
-
-        return NamespaceResolution(namespace: computedNamespace ?? attributeNamespace, isValid: true)
+    /// Returns true if any attribute has the given name (e.g. "JSClass").
+    func hasAttribute(name: String) -> Bool {
+        firstAttribute(named: name) != nil
     }
 
-    enum State {
-        case topLevel
-        case classBody(name: String, key: String)
-        case enumBody(name: String, key: String)
-        case protocolBody(name: String, key: String)
-        case structBody(name: String, key: String)
-    }
-
-    struct StateStack {
-        private var states: [State]
-        var current: State {
-            return states.last!
-        }
-
-        init(_ initialState: State) {
-            self.states = [initialState]
-        }
-        mutating func push(state: State) {
-            states.append(state)
-        }
-
-        mutating func pop() {
-            _ = states.removeLast()
+    func hasJSFamilyAttribute() -> Bool {
+        contains { element in
+            guard let name = element.as(AttributeSyntax.self)?.attributeNameText else { return false }
+            return SwiftToSkeleton.jsAttributeNames.contains(name)
         }
     }
+}
 
-    var stateStack: StateStack = StateStack(.topLevel)
-    var state: State {
-        return stateStack.current
-    }
-
-    let parent: SwiftToSkeleton
-
-    init(parent: SwiftToSkeleton) {
-        self.parent = parent
-        super.init(viewMode: .sourceAccurate)
-    }
-
-    private func diagnose(node: some SyntaxProtocol, message: String, hint: String? = nil) {
-        errors.append(DiagnosticError(node: node, message: message, hint: hint))
-    }
-
-    private func withLookupErrors<T>(_ body: (inout [DiagnosticError]) -> T) -> T {
-        var errs = self.errors
-        defer { self.errors = errs }
-        return body(&errs)
-    }
-
-    private func diagnoseNestedOptional(node: some SyntaxProtocol, type: String) {
-        diagnose(
-            node: node,
-            message: "Nested optional types are not supported: \(type)",
-            hint: "Use a single optional like String? instead of String?? or Optional<Optional<T>>"
-        )
-    }
-
-    /// Detects whether given expression is supported as default parameter value
-    private func isSupportedDefaultValueExpression(_ initClause: InitializerClauseSyntax) -> Bool {
-        let expression = initClause.value
-
-        // Function calls are checked later in extractDefaultValue (as constructors are allowed)
-        // Array literals are allowed but checked in extractArrayDefaultValue
-        if expression.is(DictionaryExprSyntax.self) { return false }
-        if expression.is(BinaryOperatorExprSyntax.self) { return false }
-        if expression.is(ClosureExprSyntax.self) { return false }
-
-        // Method call chains (e.g., obj.foo())
-        if let memberExpression = expression.as(MemberAccessExprSyntax.self),
-            memberExpression.base?.is(FunctionCallExprSyntax.self) == true
-        {
-            return false
-        }
-
-        return true
-    }
-
-    /// Extract enum case value from member access expression
-    private func extractEnumCaseValue(
-        from memberExpr: MemberAccessExprSyntax,
-        type: BridgeType
-    ) -> DefaultValue? {
-        let caseName = memberExpr.declName.baseName.text
-
-        let enumName: String?
-        switch type {
-        case .caseEnum(let name), .rawValueEnum(let name, _), .associatedValueEnum(let name):
-            enumName = name
-        case .nullable(let wrappedType, _):
-            switch wrappedType {
-            case .caseEnum(let name), .rawValueEnum(let name, _), .associatedValueEnum(let name):
-                enumName = name
-            default:
-                return nil
-            }
-        default:
-            return nil
-        }
-
-        guard let enumName = enumName else { return nil }
-
-        if memberExpr.base == nil {
-            return .enumCase(enumName, caseName)
-        }
-
-        if let baseExpr = memberExpr.base?.as(DeclReferenceExprSyntax.self) {
-            let baseName = baseExpr.baseName.text
-            let lastComponent = enumName.split(separator: ".").last.map(String.init) ?? enumName
-            if baseName == enumName || baseName == lastComponent {
-                return .enumCase(enumName, caseName)
-            }
-        }
-
-        return nil
-    }
-
-    /// Extracts default value from parameter's default value clause
-    private func extractDefaultValue(
-        from defaultClause: InitializerClauseSyntax?,
-        type: BridgeType
-    ) -> DefaultValue? {
-        guard let defaultClause = defaultClause else {
-            return nil
-        }
-
-        if !isSupportedDefaultValueExpression(defaultClause) {
-            diagnose(
-                node: defaultClause,
-                message: "Complex default parameter expressions are not supported",
-                hint: "Use simple literal values (e.g., \"text\", 42, true, nil) or simple constants"
-            )
-            return nil
-        }
-
-        let expr = defaultClause.value
-
-        if expr.is(NilLiteralExprSyntax.self) {
-            guard case .nullable = type else {
-                diagnose(
-                    node: expr,
-                    message: "nil is only valid for optional parameters",
-                    hint: "Make the parameter optional by adding ? to the type"
-                )
-                return nil
-            }
-            return .null
-        }
-
-        if let memberExpr = expr.as(MemberAccessExprSyntax.self),
-            let enumValue = extractEnumCaseValue(from: memberExpr, type: type)
-        {
-            return enumValue
-        }
-
-        if let funcCall = expr.as(FunctionCallExprSyntax.self) {
-            return extractConstructorDefaultValue(from: funcCall, type: type)
-        }
-
-        if let arrayExpr = expr.as(ArrayExprSyntax.self) {
-            return extractArrayDefaultValue(from: arrayExpr, type: type)
-        }
-
-        if let literalValue = extractLiteralValue(from: expr, type: type) {
-            return literalValue
-        }
-
-        diagnose(
-            node: expr,
-            message: "Unsupported default parameter value expression",
-            hint: "Use simple literal values like \"text\", 42, true, false, nil, or enum cases like .caseName"
-        )
-        return nil
-    }
-
-    /// Extracts default value from a constructor call expression
-    private func extractConstructorDefaultValue(
-        from funcCall: FunctionCallExprSyntax,
-        type: BridgeType
-    ) -> DefaultValue? {
-        guard let calledExpr = funcCall.calledExpression.as(DeclReferenceExprSyntax.self) else {
-            diagnose(
-                node: funcCall,
-                message: "Complex constructor expressions are not supported",
-                hint: "Use a simple constructor call like ClassName() or ClassName(arg: value)"
-            )
-            return nil
-        }
-
-        let typeName = calledExpr.baseName.text
-
-        let isStructType: Bool
-        let expectedTypeName: String?
-        switch type {
-        case .swiftStruct(let name), .nullable(.swiftStruct(let name), _):
-            isStructType = true
-            expectedTypeName = name.split(separator: ".").last.map(String.init)
-        case .swiftHeapObject(let name), .nullable(.swiftHeapObject(let name), _):
-            isStructType = false
-            expectedTypeName = name.split(separator: ".").last.map(String.init)
-        default:
-            diagnose(
-                node: funcCall,
-                message: "Constructor calls are only supported for class and struct types",
-                hint: "Parameter type should be a Swift class or struct"
-            )
-            return nil
-        }
-
-        guard let expectedTypeName = expectedTypeName, typeName == expectedTypeName else {
-            diagnose(
-                node: funcCall,
-                message: "Constructor type name '\(typeName)' doesn't match parameter type",
-                hint: "Ensure the constructor matches the parameter type"
-            )
-            return nil
-        }
-
-        if isStructType {
-            // For structs, extract field name/value pairs
-            var fields: [DefaultValueField] = []
-            for argument in funcCall.arguments {
-                guard let fieldName = argument.label?.text else {
-                    diagnose(
-                        node: argument,
-                        message: "Struct initializer arguments must have labels",
-                        hint: "Use labeled arguments like MyStruct(x: 1, y: 2)"
-                    )
-                    return nil
-                }
-                guard let fieldValue = extractLiteralValue(from: argument.expression) else {
-                    diagnose(
-                        node: argument.expression,
-                        message: "Struct field value must be a literal",
-                        hint: "Use simple literals like \"text\", 42, true, false in struct fields"
-                    )
-                    return nil
-                }
-                fields.append(DefaultValueField(name: fieldName, value: fieldValue))
-            }
-            return .structLiteral(typeName, fields)
-        } else {
-            if funcCall.arguments.isEmpty {
-                return .object(typeName)
-            }
-
-            var constructorArgs: [DefaultValue] = []
-            for argument in funcCall.arguments {
-                guard let argValue = extractLiteralValue(from: argument.expression) else {
-                    diagnose(
-                        node: argument.expression,
-                        message: "Constructor argument must be a literal value",
-                        hint: "Use simple literals like \"text\", 42, true, false in constructor arguments"
-                    )
-                    return nil
-                }
-                constructorArgs.append(argValue)
-            }
-            return .objectWithArguments(typeName, constructorArgs)
-        }
-    }
-
-    /// Extracts a literal value from an expression with optional type checking
-    private func extractLiteralValue(from expr: ExprSyntax, type: BridgeType? = nil) -> DefaultValue? {
-        if expr.is(NilLiteralExprSyntax.self) {
-            return .null
-        }
-
-        if let stringLiteral = expr.as(StringLiteralExprSyntax.self),
-            let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self)
-        {
-            let value = DefaultValue.string(segment.content.text)
-            if let type = type, !type.isCompatibleWith(.string) {
-                return nil
-            }
-            return value
-        }
-
-        if let boolLiteral = expr.as(BooleanLiteralExprSyntax.self) {
-            let value = DefaultValue.bool(boolLiteral.literal.text == "true")
-            if let type = type, !type.isCompatibleWith(.bool) {
-                return nil
-            }
-            return value
-        }
-
-        var numericExpr = expr
-        var isNegative = false
-        if let prefixExpr = expr.as(PrefixOperatorExprSyntax.self),
-            prefixExpr.operator.text == "-"
-        {
-            numericExpr = prefixExpr.expression
-            isNegative = true
-        }
-
-        if let intLiteral = numericExpr.as(IntegerLiteralExprSyntax.self),
-            let intValue = Int(intLiteral.literal.text)
-        {
-            let value = DefaultValue.int(isNegative ? -intValue : intValue)
-            if let type = type, !type.isCompatibleWith(.integer(.int)) {
-                return nil
-            }
-            return value
-        }
-
-        if let floatLiteral = numericExpr.as(FloatLiteralExprSyntax.self) {
-            if let floatValue = Float(floatLiteral.literal.text) {
-                let value = DefaultValue.float(isNegative ? -floatValue : floatValue)
-                if type == nil || type?.isCompatibleWith(.float) == true {
-                    return value
-                }
-            }
-            if let doubleValue = Double(floatLiteral.literal.text) {
-                let value = DefaultValue.double(isNegative ? -doubleValue : doubleValue)
-                if type == nil || type?.isCompatibleWith(.double) == true {
-                    return value
-                }
-            }
-        }
-
-        return nil
-    }
-
-    /// Extracts default value from an array literal expression
-    private func extractArrayDefaultValue(
-        from arrayExpr: ArrayExprSyntax,
-        type: BridgeType
-    ) -> DefaultValue? {
-        // Verify the type is an array type
-        let elementType: BridgeType?
-        switch type {
-        case .array(let element):
-            elementType = element
-        case .nullable(.array(let element), _):
-            elementType = element
-        default:
-            diagnose(
-                node: arrayExpr,
-                message: "Array literal is only valid for array parameters",
-                hint: "Parameter type should be an array like [Int] or [String]"
-            )
-            return nil
-        }
-
-        var elements: [DefaultValue] = []
-        for element in arrayExpr.elements {
-            guard let elementValue = extractLiteralValue(from: element.expression, type: elementType) else {
-                diagnose(
-                    node: element.expression,
-                    message: "Array element must be a literal value",
-                    hint: "Use simple literals like \"text\", 42, true, false in array elements"
-                )
-                return nil
-            }
-            elements.append(elementValue)
-        }
-
-        return .array(elements)
-    }
-
-    /// Shared parameter parsing logic used by functions, initializers, and protocol methods
-    private func parseParameters(
-        from parameterClause: FunctionParameterClauseSyntax,
-        allowDefaults: Bool = true
-    ) -> [Parameter] {
-        var parameters: [Parameter] = []
-
-        for param in parameterClause.parameters {
-            let resolvedType = withLookupErrors { self.parent.lookupType(for: param.type, errors: &$0) }
-            guard let type = resolvedType else {
-                continue  // Skip unsupported types
-            }
-            if case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
-                diagnoseNestedOptional(node: param.type, type: param.type.trimmedDescription)
-                continue
-            }
-
-            let name = param.secondName?.text ?? param.firstName.text
-            let label = param.firstName.text
-
-            let defaultValue: DefaultValue?
-            if allowDefaults {
-                defaultValue = extractDefaultValue(from: param.defaultValue, type: type)
-            } else {
-                defaultValue = nil
-            }
-
-            parameters.append(Parameter(label: label, name: name, type: type, defaultValue: defaultValue))
-        }
-
-        return parameters
-    }
-
-    override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard node.attributes.hasJSAttribute() else {
-            return .skipChildren
-        }
-
-        let isStatic = node.modifiers.contains { modifier in
+extension DeclModifierListSyntax {
+    var containsStaticOrClass: Bool {
+        contains { modifier in
             modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
         }
+    }
+}
 
-        switch state {
-        case .topLevel:
-            if isStatic {
-                diagnose(node: node, message: "Top-level functions cannot be static")
-                return .skipChildren
-            }
-            if let exportedFunction = visitFunction(node: node, isStatic: false) {
-                exportedFunctions.append(exportedFunction)
-            }
-            return .skipChildren
-        case .classBody(let className, let classKey):
-            if let exportedFunction = visitFunction(
-                node: node,
-                isStatic: isStatic,
-                className: className,
-                classKey: classKey
-            ) {
-                exportedClassByName[classKey]?.methods.append(exportedFunction)
-            }
-            return .skipChildren
-        case .enumBody(let enumName, let enumKey):
-            if !isStatic {
-                diagnose(node: node, message: "Only static functions are supported in enums")
-                return .skipChildren
-            }
-            if let exportedFunction = visitFunction(node: node, isStatic: isStatic, enumName: enumName) {
-                if var currentEnum = exportedEnumByName[enumKey] {
-                    currentEnum.staticMethods.append(exportedFunction)
-                    exportedEnumByName[enumKey] = currentEnum
-                }
-            }
-            return .skipChildren
-        case .protocolBody(_, _):
-            // Protocol methods are handled in visitProtocolMethod during protocol parsing
-            return .skipChildren
-        case .structBody(let structName, let structKey):
-            if let exportedFunction = visitFunction(node: node, isStatic: isStatic, structName: structName) {
-                if var currentStruct = exportedStructByName[structKey] {
-                    currentStruct.methods.append(exportedFunction)
-                    exportedStructByName[structKey] = currentStruct
-                }
-            }
-            return .skipChildren
-        }
+extension ExtractedFunc {
+    /// The attribute list of the originating declaration, when it has one.
+    var declAttributeList: AttributeListSyntax? {
+        swiftDecl.asProtocol((any WithAttributesSyntax).self)?.attributes
     }
 
-    private func visitFunction(
-        node: FunctionDeclSyntax,
-        isStatic: Bool,
-        className: String? = nil,
-        classKey: String? = nil,
-        enumName: String? = nil,
-        structName: String? = nil
-    ) -> ExportedFunction? {
-        guard let jsAttribute = node.attributes.firstJSAttribute else {
+    var declModifierList: DeclModifierListSyntax? {
+        swiftDecl.asProtocol((any WithModifiersSyntax).self)?.modifiers
+    }
+}
+
+// MARK: - Shared syntax extraction helpers
+
+extension SwiftToSkeleton {
+    static func extractJSNameArgument(from jsAttribute: AttributeSyntax) -> String? {
+        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+            let nameArg = arguments.first,
+            nameArg.label == nil,
+            let stringLiteral = nameArg.expression.as(StringLiteralExprSyntax.self),
+            stringLiteral.segments.count == 1,
+            let name = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
+        else {
             return nil
         }
+        return name
+    }
 
-        if let genericClause = node.genericParameterClause, let firstGenericParam = genericClause.parameters.first {
-            diagnose(
-                node: firstGenericParam,
-                message:
-                    "Generic parameters on exported @JS functions are not supported yet. Generic functions are currently only supported on imported @JSFunction declarations."
-            )
+    static func extractNamespace(from jsAttribute: AttributeSyntax) -> [String]? {
+        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self) else {
             return nil
         }
-
-        let name = node.name.text
-        let jsName = extractValidatedJSName(from: jsAttribute)
-
-        let attributeNamespace = extractNamespace(from: jsAttribute)
-        let computedNamespace = computeNamespace(for: node)
-
-        let finalNamespace: [String]?
-
-        if let computed = computedNamespace, !computed.isEmpty {
-            finalNamespace = computed
-        } else {
-            finalNamespace = attributeNamespace
-        }
-
-        if attributeNamespace != nil, case .classBody = state {
-            diagnose(
-                node: jsAttribute,
-                message: "Namespace is only needed in top-level declaration",
-                hint: "Remove the namespace from @JS attribute or move this function to top-level"
-            )
-        }
-
-        if attributeNamespace != nil, case .enumBody = state {
-            diagnose(
-                node: jsAttribute,
-                message: "Namespace is not supported for enum static functions",
-                hint: "Remove the namespace from @JS attribute - enum functions inherit namespace from enum"
-            )
-        }
-
-        let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
-        let returnType: BridgeType
-        if let returnClause = node.signature.returnClause {
-            let resolvedType = withLookupErrors { self.parent.lookupType(for: returnClause.type, errors: &$0) }
-
-            if let type = resolvedType, case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
-                diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
-                return nil
-            }
-
-            guard let type = resolvedType else { return nil }
-            returnType = type
-        } else {
-            returnType = .void
-        }
-
-        let abiName: String
-        let staticContext: StaticContext?
-
-        switch state {
-        case .topLevel:
-            staticContext = nil
-        case .classBody(_, let classKey):
-            if isStatic {
-                let classAbiName = exportedClassByName[classKey]?.abiName ?? "unknown"
-                staticContext = .className(classAbiName)
-            } else {
-                staticContext = nil
-            }
-        case .enumBody(let enumName, let enumKey):
-            if !isStatic {
-                diagnose(node: node, message: "Only static functions are supported in enums")
-                return nil
-            }
-
-            let isNamespaceEnum = exportedEnumByName[enumKey]?.cases.isEmpty ?? true
-            let swiftCallName = exportedEnumByName[enumKey]?.swiftCallName ?? enumName
-            staticContext = isNamespaceEnum ? .namespaceEnum(swiftCallName) : .enumName(enumName)
-        case .protocolBody(_, _):
-            return nil
-        case .structBody(_, let structKey):
-            if isStatic {
-                let structAbiName = exportedStructByName[structKey]?.abiName ?? "unknown"
-                staticContext = .structName(structAbiName)
-            } else {
-                staticContext = nil
-            }
-        }
-
-        let classNameForABI: String?
-        switch state {
-        case .classBody(_, let classKey):
-            classNameForABI = exportedClassByName[classKey]?.abiName
-        case .structBody(_, let structKey):
-            classNameForABI = exportedStructByName[structKey]?.abiName
-        default:
-            classNameForABI = nil
-        }
-        abiName = ABINameGenerator.generateABIName(
-            baseName: jsName ?? name,
-            namespace: finalNamespace,
-            staticContext: isStatic ? staticContext : nil,
-            className: classNameForABI
-        )
-
-        guard let effects = collectEffects(signature: node.signature, isStatic: isStatic) else {
+        guard let namespaceArg = arguments.first(where: { $0.label?.text == "namespace" }),
+            let stringLiteral = namespaceArg.expression.as(StringLiteralExprSyntax.self),
+            let namespaceString = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
+        else {
             return nil
         }
+        return namespaceString.split(separator: ".").map(String.init)
+    }
 
-        return ExportedFunction(
-            name: name,
-            jsName: jsName,
-            abiName: abiName,
-            parameters: parameters,
-            returnType: returnType,
-            effects: effects,
-            namespace: finalNamespace,
-            staticContext: staticContext,
-            documentation: extractDocumentation(from: node)
-        )
+    static func extractEnumStyle(from jsAttribute: AttributeSyntax) -> EnumEmitStyle? {
+        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+            let styleArg = arguments.first(where: { $0.label?.text == "enumStyle" })
+        else {
+            return nil
+        }
+        let text = styleArg.expression.trimmedDescription
+        if text.contains("tsEnum") {
+            return .tsEnum
+        }
+        if text.contains("const") {
+            return .const
+        }
+        return nil
+    }
+
+    static func extractIdentityMode(from jsAttribute: AttributeSyntax) -> Bool? {
+        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+            let identityArg = arguments.first(where: { $0.label?.text == "identityMode" })
+        else { return nil }
+        let text = identityArg.expression.trimmedDescription
+        return text == "true"
+    }
+
+    static func extractAliasTarget(from jsAttribute: AttributeSyntax) -> TypeSyntax? {
+        guard
+            let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
+            let asArg = arguments.first(where: { $0.label?.text == "as" }),
+            let memberAccess = asArg.expression.as(MemberAccessExprSyntax.self),
+            memberAccess.declName.baseName.text == "self",
+            let base = memberAccess.base
+        else {
+            return nil
+        }
+        return TypeSyntax(stringLiteral: base.trimmedDescription)
     }
 
     /// Returns the doc comment (`///` or `/** */`) attached to a declaration, with
     /// markers stripped and DocC field lists (`- Parameters:`, `- Returns:`) preserved.
-    private func extractDocumentation(from node: some SyntaxProtocol) -> String? {
+    static func extractDocumentation(from node: some SyntaxProtocol) -> String? {
         var run: [String] = []
         for piece in node.leadingTrivia {
             switch piece {
@@ -1607,7 +1105,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         return run.isEmpty ? nil : run.joined(separator: "\n")
     }
 
-    private func stripBlockComment(_ text: String) -> [String] {
+    private static func stripBlockComment(_ text: String) -> [String] {
         var body = Substring(text)
         if body.hasPrefix("/**") { body = body.dropFirst(3) }
         if body.hasSuffix("*/") { body = body.dropLast(2) }
@@ -1622,2116 +1120,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return String(line)
         }
     }
-
-    private func collectEffects(signature: FunctionSignatureSyntax, isStatic: Bool = false) -> Effects? {
-        let isAsync = signature.effectSpecifiers?.asyncSpecifier != nil
-        var isThrows = false
-        if let throwsClause: ThrowsClauseSyntax = signature.effectSpecifiers?.throwsClause {
-            // Limit the thrown type to JSException for now
-            guard let thrownType = throwsClause.type else {
-                diagnose(
-                    node: throwsClause,
-                    message: "Thrown type is not specified, only JSException is supported for now"
-                )
-                return nil
-            }
-            guard thrownType.trimmedDescription == "JSException" else {
-                diagnose(
-                    node: throwsClause,
-                    message: "Only JSException is supported for thrown type, got \(thrownType.trimmedDescription)"
-                )
-                return nil
-            }
-            isThrows = true
-        }
-        return Effects(isAsync: isAsync, isThrows: isThrows, isStatic: isStatic)
-    }
-
-    private func extractJSName(
-        from jsAttribute: AttributeSyntax
-    ) -> String? {
-        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
-            let nameArg = arguments.first,
-            nameArg.label == nil,
-            let stringLiteral = nameArg.expression.as(StringLiteralExprSyntax.self),
-            stringLiteral.segments.count == 1,
-            let name = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
-        else {
-            return nil
-        }
-        return name
-    }
-
-    private func extractValidatedJSName(
-        from jsAttribute: AttributeSyntax
-    ) -> String? {
-        guard let jsName = extractJSName(from: jsAttribute) else { return nil }
-        guard SwiftToSkeleton.isValidJSIdentifier(jsName) else {
-            diagnose(
-                node: jsAttribute,
-                message: "`\(jsName)` is not a valid JavaScript identifier"
-            )
-            return nil
-        }
-        return jsName
-    }
-
-    private func diagnoseUnsupportedJSName(
-        from jsAttribute: AttributeSyntax
-    ) {
-        guard extractJSName(from: jsAttribute) != nil else { return }
-        diagnose(
-            node: jsAttribute,
-            message: "A separate name for JavaScript is not supported here"
-        )
-    }
-
-    private func extractNamespace(
-        from jsAttribute: AttributeSyntax
-    ) -> [String]? {
-        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self) else {
-            return nil
-        }
-
-        guard let namespaceArg = arguments.first(where: { $0.label?.text == "namespace" }),
-            let stringLiteral = namespaceArg.expression.as(StringLiteralExprSyntax.self),
-            let namespaceString = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
-        else {
-            return nil
-        }
-
-        return namespaceString.split(separator: ".").map(String.init)
-    }
-
-    private func extractEnumStyle(
-        from jsAttribute: AttributeSyntax
-    ) -> EnumEmitStyle? {
-        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
-            let styleArg = arguments.first(where: { $0.label?.text == "enumStyle" })
-        else {
-            return nil
-        }
-        let text = styleArg.expression.trimmedDescription
-        if text.contains("tsEnum") {
-            return .tsEnum
-        }
-        if text.contains("const") {
-            return .const
-        }
-        return nil
-    }
-
-    private func extractIdentityMode(from jsAttribute: AttributeSyntax) -> Bool? {
-        guard let arguments = jsAttribute.arguments?.as(LabeledExprListSyntax.self),
-            let identityArg = arguments.first(where: { $0.label?.text == "identityMode" })
-        else { return nil }
-        let text = identityArg.expression.trimmedDescription
-        return text == "true"
-    }
-
-    override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
-
-        diagnoseUnsupportedJSName(from: jsAttribute)
-
-        switch state {
-        case .classBody(_, let classKey):
-            if extractNamespace(from: jsAttribute) != nil {
-                diagnose(
-                    node: jsAttribute,
-                    message: "Namespace is not supported for initializer declarations",
-                    hint: "Remove the namespace from @JS attribute"
-                )
-            }
-
-            let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
-
-            guard let effects = collectEffects(signature: node.signature) else {
-                return .skipChildren
-            }
-
-            let classAbiName = exportedClassByName[classKey]?.abiName ?? "unknown"
-            let constructor = ExportedConstructor(
-                abiName: "bjs_\(classAbiName)_init",
-                parameters: parameters,
-                effects: effects,
-                documentation: extractDocumentation(from: node)
-            )
-            exportedClassByName[classKey]?.constructor = constructor
-
-        case .structBody(_, let structKey):
-            if extractNamespace(from: jsAttribute) != nil {
-                diagnose(
-                    node: jsAttribute,
-                    message: "Namespace is not supported for initializer declarations",
-                    hint: "Remove the namespace from @JS attribute"
-                )
-            }
-
-            let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: true)
-
-            guard let effects = collectEffects(signature: node.signature) else {
-                return .skipChildren
-            }
-
-            let structAbiName = exportedStructByName[structKey]?.abiName ?? "unknown"
-            let constructor = ExportedConstructor(
-                abiName: "bjs_\(structAbiName)_init",
-                parameters: parameters,
-                effects: effects,
-                documentation: extractDocumentation(from: node)
-            )
-            exportedStructByName[structKey]?.constructor = constructor
-
-        case .enumBody(_, _):
-            diagnose(node: node, message: "Initializers are not supported inside enums")
-
-        case .topLevel, .protocolBody(_, _):
-            diagnose(node: node, message: "@JS init must be inside a @JS class or struct")
-        }
-
-        return .skipChildren
-    }
-
-    override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard let jsAttribute = node.attributes.firstJSAttribute else { return .skipChildren }
-
-        let isStatic = node.modifiers.contains { modifier in
-            modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
-        }
-
-        let attributeNamespace = extractNamespace(from: jsAttribute)
-        if attributeNamespace != nil {
-            diagnose(
-                node: jsAttribute,
-                message: "Namespace parameter within @JS attribute is not supported for property declarations",
-                hint:
-                    "Remove the namespace from @JS attribute. If you need dedicated namespace, consider using a nested enum or class instead."
-            )
-        }
-
-        let computedNamespace = computeNamespace(for: node)
-        let finalNamespace: [String]?
-
-        if let computed = computedNamespace, !computed.isEmpty {
-            finalNamespace = computed
-        } else {
-            finalNamespace = nil
-        }
-
-        // Determine static context and validate placement
-        let staticContext: StaticContext?
-
-        switch state {
-        case .classBody(_, let classKey):
-            if isStatic {
-                let classAbiName = exportedClassByName[classKey]?.abiName ?? "unknown"
-                staticContext = .className(classAbiName)
-            } else {
-                staticContext = nil
-            }
-        case .enumBody(let enumName, let enumKey):
-            if !isStatic {
-                diagnose(node: node, message: "Only static properties are supported in enums")
-                return .skipChildren
-            }
-            let isNamespaceEnum = exportedEnumByName[enumKey]?.cases.isEmpty ?? true
-            // Use swiftCallName for the full Swift call path (handles nested enums correctly)
-            let swiftCallName = exportedEnumByName[enumKey]?.swiftCallName ?? enumName
-            staticContext =
-                isStatic ? (isNamespaceEnum ? .namespaceEnum(swiftCallName) : .enumName(swiftCallName)) : nil
-        case .topLevel:
-            diagnose(node: node, message: "@JS var must be inside a @JS class or enum")
-            return .skipChildren
-        case .protocolBody(let protocolName, let protocolKey):
-            return visitProtocolProperty(node: node, protocolName: protocolName, protocolKey: protocolKey)
-        case .structBody(_, let structKey):
-            if isStatic {
-                let structAbiName = exportedStructByName[structKey]?.abiName ?? "unknown"
-                staticContext = .structName(structAbiName)
-            } else {
-                diagnose(node: node, message: "@JS var must be static in structs (instance fields don't need @JS)")
-                return .skipChildren
-            }
-        }
-
-        let jsName = extractValidatedJSName(from: jsAttribute)
-        if jsName != nil, node.bindings.count > 1 {
-            diagnose(
-                node: jsAttribute,
-                message: "Name targets declaration with multiple bindings",
-                hint: "Declare each property with a different JS name separately"
-            )
-        }
-
-        // Process each binding (variable declaration)
-        for binding in node.bindings {
-            guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
-                diagnose(node: binding.pattern, message: "Complex patterns not supported for @JS properties")
-                continue
-            }
-
-            let propertyName = pattern.identifier.text
-
-            guard let typeAnnotation = binding.typeAnnotation else {
-                diagnose(node: binding, message: "@JS property must have explicit type annotation")
-                continue
-            }
-
-            guard let propertyType = withLookupErrors({ self.parent.lookupType(for: typeAnnotation.type, errors: &$0) })
-            else {
-                continue
-            }
-
-            // Check if property is readonly
-            let isLet = node.bindingSpecifier.tokenKind == .keyword(.let)
-            let isGetterOnly = node.bindings.contains(where: { self.hasOnlyGetter($0.accessorBlock) })
-
-            let isReadonly = isLet || isGetterOnly
-
-            let exportedProperty = ExportedProperty(
-                name: propertyName,
-                jsName: jsName,
-                type: propertyType,
-                isReadonly: isReadonly,
-                isStatic: isStatic,
-                namespace: finalNamespace,
-                staticContext: staticContext,
-                documentation: extractDocumentation(from: node)
-            )
-
-            if case .enumBody(_, let key) = state {
-                if var currentEnum = exportedEnumByName[key] {
-                    currentEnum.staticProperties.append(exportedProperty)
-                    exportedEnumByName[key] = currentEnum
-                }
-            } else if case .structBody(_, let key) = state {
-                exportedStructByName[key]?.properties.append(exportedProperty)
-            } else if case .classBody(_, let key) = state {
-                exportedClassByName[key]?.properties.append(exportedProperty)
-            }
-        }
-
-        return .skipChildren
-    }
-
-    override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
-        let name = node.name.text
-
-        guard let jsAttribute = node.attributes.firstJSAttribute else {
-            return .skipChildren
-        }
-
-        diagnoseUnsupportedJSName(from: jsAttribute)
-
-        if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
-            recordAlias(node: node, jsAttribute: jsAttribute, aliasTarget: aliasTarget)
-            return .skipChildren
-        }
-
-        let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "class")
-        guard namespaceResult.isValid else {
-            return .skipChildren
-        }
-        let effectiveNamespace = effectiveNamespace(
-            resolvedNamespace: namespaceResult.namespace,
-            parentTypeNamespace: computeParentTypeNamespace(for: node)
-        )
-        let swiftCallName = parent.computeSwiftCallName(for: node, itemName: name)
-        let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
-            for: node,
-            message: "Class visibility must be at least internal"
-        )
-        let classIdentityMode = extractIdentityMode(from: jsAttribute)
-        let isFinal = node.modifiers.contains { $0.name.tokenKind == .keyword(.final) } ? true : nil
-        let exportedClass = ExportedClass(
-            name: name,
-            swiftCallName: swiftCallName,
-            explicitAccessControl: explicitAccessControl,
-            constructor: nil,
-            methods: [],
-            properties: [],
-            namespace: effectiveNamespace,
-            identityMode: classIdentityMode,
-            documentation: extractDocumentation(from: node),
-            isFinal: isFinal
-        )
-        let uniqueKey = makeKey(name: name, namespace: effectiveNamespace)
-
-        stateStack.push(state: .classBody(name: name, key: uniqueKey))
-        exportedClassByName[uniqueKey] = exportedClass
-        exportedClassNames.append(uniqueKey)
-        return .visitChildren
-    }
-
-    override func visitPost(_ node: ClassDeclSyntax) {
-        // Make sure we pop the state stack only if we're in a class body state (meaning we successfully pushed)
-        if case .classBody(_, _) = stateStack.current {
-            stateStack.pop()
-        }
-    }
-
-    override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
-        // Defer until all type declarations in the module have been collected.
-        deferredExtensions.append(node)
-        return .skipChildren
-    }
-
-    func diagnoseUnresolvedExtension(_ ext: ExtensionDeclSyntax) {
-        guard containsJSAnnotatedDeclaration(ext.memberBlock.members) else {
-            return
-        }
-        diagnose(
-            node: ext.extendedType,
-            message: "Unsupported type '\(ext.extendedType.trimmedDescription)'.",
-            hint: "You can only extend `@JS` annotated types defined in the same module"
-        )
-    }
-
-    private func containsJSAnnotatedDeclaration(_ members: MemberBlockItemListSyntax) -> Bool {
-        let finder = JSAttributeFinder(viewMode: .sourceAccurate)
-        finder.walk(members)
-        return finder.found
-    }
-
-    /// Walks extension members under the matching type’s state, returning whether the type was found.
-    func resolveExtension(_ ext: ExtensionDeclSyntax) -> Bool {
-        guard let extendedDecl = parent.typeDeclResolver.resolveExtensionTarget(ext.extendedType) else {
-            return false
-        }
-        let swiftCallName = parent.computeSwiftCallName(for: extendedDecl, itemName: extendedDecl.name.text)
-        let state: State
-        if let entry = exportedClassByName.first(where: { $0.value.swiftCallName == swiftCallName }) {
-            state = .classBody(name: entry.value.name, key: entry.key)
-        } else if let entry = exportedStructByName.first(where: { $0.value.swiftCallName == swiftCallName }) {
-            state = .structBody(name: entry.value.name, key: entry.key)
-        } else if let entry = exportedEnumByName.first(where: { $0.value.swiftCallName == swiftCallName }) {
-            state = .enumBody(name: entry.value.name, key: entry.key)
-        } else if exportedProtocolByName.values.contains(where: { $0.name == swiftCallName }) {
-            diagnose(
-                node: ext.extendedType,
-                message: "Protocol extensions are not supported by BridgeJS.",
-                hint: "You cannot extend `@JS` protocol '\(swiftCallName)' with additional members"
-            )
-            return true
-        } else {
-            return false
-        }
-        stateStack.push(state: state)
-        for member in ext.memberBlock.members {
-            walk(member)
-        }
-        stateStack.pop()
-        return true
-    }
-
-    private func recordAlias(
-        node: some SyntaxProtocol & NamedDeclSyntax,
-        jsAttribute: AttributeSyntax,
-        aliasTarget: TypeSyntax
-    ) {
-        let swiftCallName = parent.computeSwiftCallName(for: node, itemName: node.name.text)
-        if extractNamespace(from: jsAttribute) != nil {
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "`namespace` is not supported on `@JS(as:)` types",
-                    hint: "Remove the `namespace:` argument; an alias adopts its target's representation"
-                )
-            )
-            return
-        }
-        var lookupErrors: [DiagnosticError] = []
-        guard
-            let aliasBridgeType = parent.aliasType(
-                target: aliasTarget,
-                swiftCallName: swiftCallName,
-                errors: &lookupErrors
-            ),
-            case .alias(_, let underlying) = aliasBridgeType
-        else {
-            errors.append(contentsOf: lookupErrors)
-            return
-        }
-        guard underlying.aliasConformanceProtocols != nil else {
-            errors.append(
-                DiagnosticError(
-                    node: aliasTarget,
-                    message: "Representation \(underlying.swiftType) is not supported"
-                )
-            )
-            return
-        }
-        exportedAliases.append(
-            ExportedAlias(swiftCallName: swiftCallName, underlying: underlying)
-        )
-    }
-
-    override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard let jsAttribute = node.attributes.firstJSAttribute else {
-            return .skipChildren
-        }
-
-        diagnoseUnsupportedJSName(from: jsAttribute)
-
-        if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
-            recordAlias(node: node, jsAttribute: jsAttribute, aliasTarget: aliasTarget)
-            return .skipChildren
-        }
-
-        let name = node.name.text
-
-        let rawType: String? = node.inheritanceClause?.inheritedTypes.first { inheritedType in
-            let typeName = inheritedType.type.trimmedDescription
-            return ExportSwiftConstants.supportedRawTypes.contains(typeName)
-        }?.type.trimmedDescription
-
-        let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "enum")
-        guard namespaceResult.isValid else {
-            return .skipChildren
-        }
-        let effectiveNamespace = effectiveNamespace(
-            resolvedNamespace: namespaceResult.namespace,
-            parentTypeNamespace: computeParentTypeNamespace(for: node)
-        )
-        let emitStyle = extractEnumStyle(from: jsAttribute) ?? .const
-        let swiftCallName = parent.computeSwiftCallName(for: node, itemName: name)
-        let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
-            for: node,
-            message: "Enum visibility must be at least internal"
-        )
-
-        let tsFullPath: String
-        if let namespace = effectiveNamespace, !namespace.isEmpty {
-            tsFullPath = namespace.joined(separator: ".") + "." + name
-        } else {
-            tsFullPath = name
-        }
-
-        // Create enum directly in dictionary
-        let exportedEnum = ExportedEnum(
-            name: name,
-            swiftCallName: swiftCallName,
-            tsFullPath: tsFullPath,
-            explicitAccessControl: explicitAccessControl,
-            cases: [],  // Will be populated in visit(EnumCaseDeclSyntax)
-            rawType: SwiftEnumRawType(rawType),
-            namespace: effectiveNamespace,
-            emitStyle: emitStyle,
-            staticMethods: [],
-            staticProperties: [],
-            documentation: extractDocumentation(from: node)
-        )
-
-        let enumUniqueKey = makeKey(name: name, namespace: effectiveNamespace)
-        exportedEnumByName[enumUniqueKey] = exportedEnum
-        exportedEnumNames.append(enumUniqueKey)
-
-        stateStack.push(state: .enumBody(name: name, key: enumUniqueKey))
-
-        return .visitChildren
-    }
-
-    override func visitPost(_ node: EnumDeclSyntax) {
-        guard let jsAttribute = node.attributes.firstJSAttribute else {
-            // Only pop if we have a valid enum that was processed
-            if case .enumBody(_, _) = stateStack.current {
-                stateStack.pop()
-            }
-            return
-        }
-
-        guard case .enumBody(_, let enumKey) = stateStack.current else {
-            return
-        }
-
-        guard let exportedEnum = exportedEnumByName[enumKey] else {
-            stateStack.pop()
-            return
-        }
-
-        let emitStyle = exportedEnum.emitStyle
-
-        if case .tsEnum = emitStyle {
-            if exportedEnum.rawType == .bool {
-                diagnose(
-                    node: jsAttribute,
-                    message: "TypeScript enum style is not supported for Bool raw-value enums",
-                    hint: "Use enumStyle: .const or change the raw type to String or a numeric type"
-                )
-            }
-            if !exportedEnum.staticMethods.isEmpty {
-                diagnose(
-                    node: jsAttribute,
-                    message: "TypeScript enum style does not support static functions",
-                    hint: "Use enumStyle: .const to generate a const object that supports static functions"
-                )
-            }
-        }
-
-        if exportedEnum.cases.contains(where: { !$0.associatedValues.isEmpty }) {
-            if case .tsEnum = emitStyle {
-                diagnose(
-                    node: jsAttribute,
-                    message: "TypeScript enum style is not supported for associated value enums",
-                    hint: "Use enumStyle: .const in order to map associated-value enums"
-                )
-            }
-            for enumCase in exportedEnum.cases {
-                for associatedValue in enumCase.associatedValues {
-                    if !associatedValue.type.isSupportedAsAssociatedValue() {
-                        diagnose(
-                            node: node,
-                            message: "Unsupported associated value type: \(associatedValue.type.swiftType)",
-                            hint:
-                                "Only primitive types, enums, structs, classes, JSObject, arrays, and their optionals are supported in associated-value enums"
-                        )
-                    }
-                }
-            }
-        }
-
-        stateStack.pop()
-    }
-
-    override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard let jsAttribute = node.attributes.firstJSAttribute else {
-            return .skipChildren
-        }
-
-        diagnoseUnsupportedJSName(from: jsAttribute)
-
-        let name = node.name.text
-
-        let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "protocol")
-        guard namespaceResult.isValid else {
-            return .skipChildren
-        }
-        let effectiveNamespace = effectiveNamespace(
-            resolvedNamespace: namespaceResult.namespace,
-            parentTypeNamespace: computeParentTypeNamespace(for: node)
-        )
-        _ = computeExplicitAtLeastInternalAccessControl(
-            for: node,
-            message: "Protocol visibility must be at least internal"
-        )
-
-        let protocolUniqueKey = makeKey(name: name, namespace: effectiveNamespace)
-
-        exportedProtocolByName[protocolUniqueKey] = ExportedProtocol(
-            name: name,
-            methods: [],
-            properties: [],
-            namespace: effectiveNamespace,
-            documentation: extractDocumentation(from: node)
-        )
-
-        stateStack.push(state: .protocolBody(name: name, key: protocolUniqueKey))
-
-        var methods: [ExportedFunction] = []
-        for member in node.memberBlock.members {
-            if let funcDecl = member.decl.as(FunctionDeclSyntax.self) {
-                if let exportedFunction = visitProtocolMethod(
-                    node: funcDecl,
-                    protocolName: name,
-                    namespace: effectiveNamespace
-                ) {
-                    methods.append(exportedFunction)
-                }
-            } else if let varDecl = member.decl.as(VariableDeclSyntax.self) {
-                _ = visitProtocolProperty(node: varDecl, protocolName: name, protocolKey: protocolUniqueKey)
-            }
-        }
-
-        let exportedProtocol = ExportedProtocol(
-            name: name,
-            methods: methods,
-            properties: exportedProtocolByName[protocolUniqueKey]?.properties ?? [],
-            namespace: effectiveNamespace,
-            documentation: extractDocumentation(from: node)
-        )
-
-        exportedProtocolByName[protocolUniqueKey] = exportedProtocol
-        exportedProtocolNames.append(protocolUniqueKey)
-
-        stateStack.pop()
-
-        return .skipChildren
-    }
-
-    override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard let jsAttribute = node.attributes.firstJSAttribute else {
-            return .skipChildren
-        }
-
-        diagnoseUnsupportedJSName(from: jsAttribute)
-
-        if let aliasTarget = parent.extractAliasTarget(from: jsAttribute) {
-            recordAlias(node: node, jsAttribute: jsAttribute, aliasTarget: aliasTarget)
-            return .skipChildren
-        }
-
-        let name = node.name.text
-
-        let namespaceResult = resolveNamespace(from: jsAttribute, for: node, declarationType: "struct")
-        guard namespaceResult.isValid else {
-            return .skipChildren
-        }
-        let effectiveNamespace = effectiveNamespace(
-            resolvedNamespace: namespaceResult.namespace,
-            parentTypeNamespace: computeParentTypeNamespace(for: node)
-        )
-        let swiftCallName = parent.computeSwiftCallName(for: node, itemName: name)
-        let explicitAccessControl = computeExplicitAtLeastInternalAccessControl(
-            for: node,
-            message: "Struct visibility must be at least internal"
-        )
-
-        var properties: [ExportedProperty] = []
-
-        // Process all variables in struct as readonly (value semantics) and don't require @JS
-        for member in node.memberBlock.members {
-            if let varDecl = member.decl.as(VariableDeclSyntax.self) {
-                let isStatic = varDecl.modifiers.contains { modifier in
-                    modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
-                }
-
-                // Handled with error in visitVariable
-                if varDecl.attributes.hasJSAttribute() {
-                    continue
-                }
-                // Skips static non-@JS properties
-                if isStatic {
-                    continue
-                }
-
-                for binding in varDecl.bindings {
-                    guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
-                        continue
-                    }
-
-                    let fieldName = pattern.identifier.text
-
-                    guard let typeAnnotation = binding.typeAnnotation else {
-                        diagnose(node: binding, message: "Struct field must have explicit type annotation")
-                        continue
-                    }
-
-                    guard
-                        let fieldType = withLookupErrors({
-                            self.parent.lookupType(for: typeAnnotation.type, errors: &$0)
-                        })
-                    else {
-                        continue
-                    }
-
-                    let property = ExportedProperty(
-                        name: fieldName,
-                        type: fieldType,
-                        isReadonly: true,
-                        isStatic: false,
-                        namespace: effectiveNamespace,
-                        staticContext: nil,
-                        documentation: extractDocumentation(from: varDecl)
-                    )
-                    properties.append(property)
-                }
-            }
-        }
-
-        let structUniqueKey = makeKey(name: name, namespace: effectiveNamespace)
-        let exportedStruct = ExportedStruct(
-            name: name,
-            swiftCallName: swiftCallName,
-            explicitAccessControl: explicitAccessControl,
-            properties: properties,
-            methods: [],
-            namespace: effectiveNamespace,
-            documentation: extractDocumentation(from: node)
-        )
-
-        exportedStructByName[structUniqueKey] = exportedStruct
-        exportedStructNames.append(structUniqueKey)
-
-        stateStack.push(state: .structBody(name: name, key: structUniqueKey))
-
-        return .visitChildren
-    }
-
-    override func visitPost(_ node: StructDeclSyntax) {
-        if case .structBody(_, let structKey) = stateStack.current {
-            stateStack.pop()
-            validateStructInitOrder(node: node, structKey: structKey)
-        }
-    }
-
-    private func validateStructInitOrder(node: StructDeclSyntax, structKey: String) {
-        guard let exportedStruct = exportedStructByName[structKey],
-            let constructor = exportedStruct.constructor
-        else {
-            // No explicit @JS init — synthesized memberwise init is assumed,
-            // which always matches declaration order.
-            return
-        }
-
-        let instanceProps = exportedStruct.properties.filter { !$0.isStatic }
-        let expectedLabels = instanceProps.map(\.name)
-        let actualLabels = constructor.parameters.compactMap(\.label)
-
-        guard expectedLabels != actualLabels else { return }
-
-        // Find the @JS init node so we can point the diagnostic at it.
-        let initNode: (any SyntaxProtocol) =
-            node.memberBlock.members
-            .compactMap { $0.decl.as(InitializerDeclSyntax.self) }
-            .first(where: { $0.attributes.hasJSAttribute() })
-            ?? node
-
-        let expectedOrder = expectedLabels.joined(separator: ", ")
-        let actualOrder = actualLabels.joined(separator: ", ")
-
-        diagnose(
-            node: initNode,
-            message:
-                "@JS struct initializer parameters must match stored properties in declaration order. Expected (\(expectedOrder)), got (\(actualOrder))",
-            hint:
-                "Reorder the initializer parameters to match the property declaration order, or remove the @JS init to use the synthesized memberwise initializer"
-        )
-    }
-
-    private func visitProtocolMethod(
-        node: FunctionDeclSyntax,
-        protocolName: String,
-        namespace: [String]?
-    ) -> ExportedFunction? {
-        if let jsAttribute = node.attributes.firstJSAttribute {
-            diagnoseUnsupportedJSName(from: jsAttribute)
-        }
-
-        let name = node.name.text
-
-        let parameters = parseParameters(from: node.signature.parameterClause, allowDefaults: false)
-
-        let returnType: BridgeType
-        if let returnClause = node.signature.returnClause {
-            let resolvedType = withLookupErrors { self.parent.lookupType(for: returnClause.type, errors: &$0) }
-
-            if let type = resolvedType, case .nullable(let wrappedType, _) = type, wrappedType.isOptional {
-                diagnoseNestedOptional(node: returnClause.type, type: returnClause.type.trimmedDescription)
-                return nil
-            }
-
-            guard let type = resolvedType else { return nil }
-            returnType = type
-        } else {
-            returnType = .void
-        }
-
-        let abiName = ABINameGenerator.generateABIName(
-            baseName: name,
-            namespace: namespace,
-            className: protocolName
-        )
-
-        guard let effects = collectEffects(signature: node.signature) else {
-            return nil
-        }
-
-        return ExportedFunction(
-            name: name,
-            abiName: abiName,
-            parameters: parameters,
-            returnType: returnType,
-            effects: effects,
-            namespace: namespace,
-            staticContext: nil,
-            documentation: extractDocumentation(from: node)
-        )
-    }
-
-    private func visitProtocolProperty(
-        node: VariableDeclSyntax,
-        protocolName: String,
-        protocolKey: String
-    ) -> SyntaxVisitorContinueKind {
-        if let jsAttribute = node.attributes.firstJSAttribute {
-            diagnoseUnsupportedJSName(from: jsAttribute)
-        }
-
-        for binding in node.bindings {
-            guard let pattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
-                diagnose(node: binding.pattern, message: "Complex patterns not supported for protocol properties")
-                continue
-            }
-
-            let propertyName = pattern.identifier.text
-
-            guard let typeAnnotation = binding.typeAnnotation else {
-                diagnose(node: binding, message: "Protocol property must have explicit type annotation")
-                continue
-            }
-
-            guard let propertyType = withLookupErrors({ self.parent.lookupType(for: typeAnnotation.type, errors: &$0) })
-            else {
-                continue
-            }
-
-            guard let accessorBlock = binding.accessorBlock else {
-                diagnose(
-                    node: binding,
-                    message: "Protocol property must specify { get } or { get set }",
-                    hint: "Add { get } for readonly or { get set } for readwrite property"
-                )
-                continue
-            }
-
-            let isReadonly = hasOnlyGetter(accessorBlock)
-
-            let exportedProperty = ExportedProtocolProperty(
-                name: propertyName,
-                type: propertyType,
-                isReadonly: isReadonly,
-                documentation: extractDocumentation(from: node)
-            )
-
-            if var currentProtocol = exportedProtocolByName[protocolKey] {
-                var properties = currentProtocol.properties
-                properties.append(exportedProperty)
-
-                currentProtocol = ExportedProtocol(
-                    name: currentProtocol.name,
-                    methods: currentProtocol.methods,
-                    properties: properties,
-                    namespace: currentProtocol.namespace,
-                    documentation: currentProtocol.documentation
-                )
-                exportedProtocolByName[protocolKey] = currentProtocol
-            }
-        }
-
-        return .skipChildren
-    }
-
-    private func hasOnlyGetter(_ accessorBlock: AccessorBlockSyntax?) -> Bool {
-        switch accessorBlock?.accessors {
-        case .accessors(let accessors):
-            // Has accessors - check if it only has a getter (no setter, willSet, or didSet)
-            return !accessors.contains(where: { accessor in
-                let tokenKind = accessor.accessorSpecifier.tokenKind
-                return tokenKind == .keyword(.set) || tokenKind == .keyword(.willSet)
-                    || tokenKind == .keyword(.didSet)
-            })
-        case .getter:
-            // Has only a getter block
-            return true
-        case nil:
-            // No accessor block - this is a stored property, not readonly
-            return false
-        }
-    }
-
-    override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard case .enumBody(_, let enumKey) = stateStack.current else {
-            return .visitChildren
-        }
-
-        for element in node.elements {
-            let caseName = element.name.text
-            let rawValue: String?
-            var associatedValues: [AssociatedValue] = []
-
-            if exportedEnumByName[enumKey]?.rawType != nil {
-                if let stringLiteral = element.rawValue?.value.as(StringLiteralExprSyntax.self) {
-                    rawValue = stringLiteral.segments.first?.as(StringSegmentSyntax.self)?.content.text
-                } else if let boolLiteral = element.rawValue?.value.as(BooleanLiteralExprSyntax.self) {
-                    rawValue = boolLiteral.literal.text
-                } else {
-                    var numericExpr = element.rawValue?.value
-                    var isNegative = false
-
-                    // Check for prefix operator (for negative numbers)
-                    if let prefixExpr = numericExpr?.as(PrefixOperatorExprSyntax.self),
-                        prefixExpr.operator.text == "-"
-                    {
-                        numericExpr = prefixExpr.expression
-                        isNegative = true
-                    }
-
-                    if let intLiteral = numericExpr?.as(IntegerLiteralExprSyntax.self) {
-                        rawValue = isNegative ? "-\(intLiteral.literal.text)" : intLiteral.literal.text
-                    } else if let floatLiteral = numericExpr?.as(FloatLiteralExprSyntax.self) {
-                        rawValue = isNegative ? "-\(floatLiteral.literal.text)" : floatLiteral.literal.text
-                    } else {
-                        rawValue = nil
-                    }
-                }
-            } else {
-                rawValue = nil
-            }
-            if let parameterClause = element.parameterClause {
-                for param in parameterClause.parameters {
-                    guard let bridgeType = withLookupErrors({ parent.lookupType(for: param.type, errors: &$0) }) else {
-                        continue
-                    }
-
-                    let label = param.firstName?.text
-                    associatedValues.append(AssociatedValue(label: label, type: bridgeType))
-                }
-            }
-            let enumCase = EnumCase(
-                name: caseName,
-                rawValue: rawValue,
-                associatedValues: associatedValues
-            )
-            exportedEnumByName[enumKey]?.cases.append(enumCase)
-        }
-
-        return .visitChildren
-    }
-
-    /// Computes namespace by walking up the AST hierarchy to find parent namespace enums
-    /// If parent enum is a namespace enum (no cases) then it will be used as part of namespace for given node
-    ///
-    ///
-    /// Method allows for explicit namespace for top level enum, it will be used as base namespace and will concat enum name
-    private func computeNamespace(for node: some SyntaxProtocol) -> [String]? {
-        var namespace: [String] = []
-
-        for declaration in parent.enclosingDeclarations(of: node) {
-            if let enumDecl = declaration.as(EnumDeclSyntax.self),
-                enumDecl.attributes.hasJSAttribute()
-            {
-                let isNamespaceEnum = !enumDecl.memberBlock.members.contains { member in
-                    member.decl.is(EnumCaseDeclSyntax.self)
-                }
-                if isNamespaceEnum {
-                    namespace.insert(enumDecl.name.text, at: 0)
-
-                    if let jsAttribute = enumDecl.attributes.firstJSAttribute,
-                        let explicitNamespace = extractNamespace(from: jsAttribute)
-                    {
-                        namespace = explicitNamespace + namespace
-                        break
-                    }
-                }
-            }
-        }
-
-        return namespace.isEmpty ? nil : namespace
-    }
-
-    private func computeParentTypeNamespace(for node: some SyntaxProtocol) -> [String]? {
-        var path: [String] = []
-
-        for declaration in parent.enclosingDeclarations(of: node) {
-            if let structDecl = declaration.as(StructDeclSyntax.self),
-                structDecl.attributes.hasJSAttribute()
-            {
-                path.insert(structDecl.name.text, at: 0)
-            } else if let classDecl = declaration.as(ClassDeclSyntax.self),
-                classDecl.attributes.hasJSAttribute()
-            {
-                path.insert(classDecl.name.text, at: 0)
-            }
-        }
-
-        return path.isEmpty ? nil : path
-    }
-
-    private func effectiveNamespace(
-        resolvedNamespace: [String]?,
-        parentTypeNamespace: [String]?
-    ) -> [String]? {
-        let combined = (parentTypeNamespace ?? []) + (resolvedNamespace ?? [])
-        return combined.isEmpty ? nil : combined
-    }
-
-    /// Requires the node to have at least internal access control.
-    private func computeExplicitAtLeastInternalAccessControl(
-        for node: some WithModifiersSyntax,
-        message: String
-    ) -> String? {
-        guard let accessControl = node.explicitAccessControl else {
-            return nil
-        }
-        guard accessControl.isAtLeastInternal else {
-            diagnose(
-                node: accessControl,
-                message: message,
-                hint: "Use `internal`, `package` or `public` access control"
-            )
-            return nil
-        }
-        return accessControl.name.text
-    }
 }
 
-fileprivate extension BridgeType {
-    /// Returns true if a value of `expectedType` can be assigned to this type.
-    func isCompatibleWith(_ expectedType: BridgeType) -> Bool {
-        switch (self, expectedType) {
-        case let (lhs, rhs) where lhs == rhs:
-            return true
-        case (.nullable(let wrapped, _), expectedType):
-            return wrapped == expectedType
-        default:
-            return false
-        }
-    }
-}
-
-import SwiftSyntax
-#if canImport(BridgeJSSkeleton)
-import BridgeJSSkeleton
-#endif
-#if canImport(BridgeJSUtilities)
-import BridgeJSUtilities
-#endif
-
-private final class ImportSwiftMacrosJSImportTypeNameCollector: SyntaxAnyVisitor {
-    var typeNames: Set<String> = []
-
-    private func visitTypeDecl(_ attributes: AttributeListSyntax?, _ name: String) -> SyntaxVisitorContinueKind {
-        if ImportSwiftMacrosAPICollector.AttributeChecker.hasJSClassAttribute(attributes) {
-            typeNames.insert(name)
-        }
-        return .visitChildren
-    }
-
-    override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
-        visitTypeDecl(node.attributes, node.name.text)
-    }
-
-    override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
-        visitTypeDecl(node.attributes, node.name.text)
-    }
-}
-
-private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
-    var importedFunctions: [ImportedFunctionSkeleton] = []
-    var importedTypes: [ImportedTypeSkeleton] = []
-    var importedGlobalGetters: [ImportedGetterSkeleton] = []
-    var importedModulePathNodes: [String: Syntax] = [:]
-    var errors: [DiagnosticError] = []
-
-    private let inputFilePath: String
-    private var jsClassNames: Set<String>
-    private let parent: SwiftToSkeleton
-    // MARK: - State Management
-
-    enum State {
-        case topLevel
-        case jsClassBody(name: String)
-    }
-
-    private var stateStack: [State] = [.topLevel]
-    var state: State {
-        return stateStack.last!
-    }
-
-    // Current type being collected (when in jsClassBody state)
-    private struct CurrentType {
-        let name: String
-        let jsName: String?
-        let from: JSImportFrom?
-        let accessLevel: BridgeJSAccessLevel
-        var constructor: ImportedConstructorSkeleton?
-        var methods: [ImportedFunctionSkeleton]
-        var staticMethods: [ImportedFunctionSkeleton]
-        var getters: [ImportedGetterSkeleton]
-        var setters: [ImportedSetterSkeleton]
-    }
-    private var currentType: CurrentType?
-
-    // MARK: - Attribute Checking
-
-    /// Helper struct for checking and extracting attributes
-    fileprivate struct AttributeChecker {
-        static func hasJSFunctionAttribute(_ attributes: AttributeListSyntax?) -> Bool {
-            hasAttribute(attributes, name: "JSFunction")
-        }
-
-        static func firstJSFunctionAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
-            firstAttribute(attributes, named: "JSFunction")
-        }
-
-        static func hasJSGetterAttribute(_ attributes: AttributeListSyntax?) -> Bool {
-            hasAttribute(attributes, name: "JSGetter")
-        }
-
-        static func firstJSGetterAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
-            firstAttribute(attributes, named: "JSGetter")
-        }
-
-        static func hasJSSetterAttribute(_ attributes: AttributeListSyntax?) -> Bool {
-            hasAttribute(attributes, name: "JSSetter")
-        }
-
-        static func firstJSSetterAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
-            firstAttribute(attributes, named: "JSSetter")
-        }
-
-        static func hasJSClassAttribute(_ attributes: AttributeListSyntax?) -> Bool {
-            hasAttribute(attributes, name: "JSClass")
-        }
-
-        static func firstJSClassAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
-            firstAttribute(attributes, named: "JSClass")
-        }
-
-        static func firstAttribute(_ attributes: AttributeListSyntax?, named name: String) -> AttributeSyntax? {
-            attributes?.first { $0.as(AttributeSyntax.self)?.attributeNameText == name }?.as(AttributeSyntax.self)
-        }
-
-        static func hasAttribute(_ attributes: AttributeListSyntax?, name: String) -> Bool {
-            guard let attributes else { return false }
-            return attributes.contains { attribute in
-                guard let syntax = attribute.as(AttributeSyntax.self) else { return false }
-                return syntax.attributeNameText == name
-            }
-        }
-
-    }
-
-    /// The result of reading a `jsName:` argument.
-    struct ExtractedJSName {
-        /// The JavaScript member name to look up.
-        ///
-        /// `.default` normalizes to `"default"`: in ECMAScript a module's default
-        /// export *is* its `default` named export, so no separate representation
-        /// is needed downstream.
-        let memberName: String
-        /// True when the source spelled `.default` rather than a string literal.
-        let isDefaultExportSpelling: Bool
-    }
-
-    /// Extracts the `jsName` argument value from an attribute, if present.
-    private func extractJSName(from attribute: AttributeSyntax) -> ExtractedJSName? {
-        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self),
-            let argument = arguments.first(where: { $0.label?.text == "jsName" })
-        else {
-            return nil
-        }
-
-        if let stringLiteral = argument.expression.as(StringLiteralExprSyntax.self),
-            let value = stringLiteral.representedLiteralValue
-        {
-            return ExtractedJSName(memberName: value, isDefaultExportSpelling: false)
-        }
-
-        // An explicit `jsName: nil` means the same as omitting the argument.
-        if argument.expression.is(NilLiteralExprSyntax.self) {
-            return nil
-        }
-
-        // Accept the explicit `.name("...")` spelling of a plain member name.
-        if let call = argument.expression.as(FunctionCallExprSyntax.self),
-            call.calledExpression.trimmedDescription.split(separator: ".").last == "name"
-        {
-            guard call.arguments.count == 1,
-                let literal = call.arguments.first?.expression.as(StringLiteralExprSyntax.self),
-                let value = literal.representedLiteralValue
-            else {
-                errors.append(
-                    DiagnosticError(
-                        node: call.arguments.first?.expression ?? argument.expression,
-                        message: "jsName must be a string literal or '.default'."
-                    )
-                )
-                return nil
-            }
-            return ExtractedJSName(memberName: value, isDefaultExportSpelling: false)
-        }
-
-        // Accept `.default`, `JSName.default`, and the backticked spellings.
-        let description = argument.expression.trimmedDescription
-        let caseName = description.split(separator: ".").last.map(String.init) ?? description
-        if caseName == "default" || caseName == "`default`" {
-            return ExtractedJSName(memberName: "default", isDefaultExportSpelling: true)
-        }
-
-        errors.append(
-            DiagnosticError(
-                node: argument.expression,
-                message: "jsName must be a string literal or '.default'."
-            )
-        )
-        return nil
-    }
-
-    /// Validates that a `jsName: .default` spelling appears somewhere it can mean something.
-    ///
-    /// `.default` names the default export of an ECMAScript module, so it only makes
-    /// sense on a top-level declaration that has a `from: .module(...)` origin.
-    private func validateDefaultExportUsage(
-        _ extracted: ExtractedJSName?,
-        from: JSImportFrom?,
-        node: some SyntaxProtocol,
-        isSetter: Bool = false
-    ) {
-        guard let extracted, extracted.isDefaultExportSpelling else { return }
-
-        if isSetter {
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "'jsName: .default' is not supported on @JSSetter; "
-                        + "ECMAScript module bindings are read-only."
-                )
-            )
-            return
-        }
-        if case .jsClassBody = state {
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "'jsName: .default' is not supported on a class member; "
-                        + "members have no module origin. Did you mean jsName: \"default\"?"
-                )
-            )
-            return
-        }
-        switch from {
-        case .module, .snippet:
-            return
-        case .global:
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "'jsName: .default' requires 'from: .module(...)' or 'from: .snippet(...)'; "
-                        + "globalThis has no default export."
-                )
-            )
-        case nil:
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "'jsName: .default' requires 'from: .module(...)' or 'from: .snippet(...)'."
-                )
-            )
-        }
-    }
-
-    private func extractJSImportFrom(from attribute: AttributeSyntax) -> JSImportFrom? {
-        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self),
-            let argument = arguments.first(where: { $0.label?.text == "from" })
-        else {
-            return nil
-        }
-
-        if let call = argument.expression.as(FunctionCallExprSyntax.self),
-            let caseName = call.calledExpression.trimmedDescription.split(separator: ".").last,
-            caseName == "module" || caseName == "snippet"
-        {
-            let isSnippet = caseName == "snippet"
-            guard call.arguments.count == 1,
-                let pathExpression = call.arguments.first?.expression,
-                let literal = pathExpression.as(StringLiteralExprSyntax.self),
-                let path = literal.representedLiteralValue
-            else {
-                errors.append(
-                    DiagnosticError(
-                        node: call.arguments.first?.expression ?? argument.expression,
-                        message: isSnippet
-                            ? "JavaScript snippet path must be a string literal."
-                            : "JavaScript module specifier must be a string literal."
-                    )
-                )
-                return nil
-            }
-            guard !path.isEmpty else {
-                errors.append(
-                    DiagnosticError(
-                        node: literal,
-                        message: isSnippet
-                            ? "JavaScript snippet path must not be empty."
-                            : "JavaScript module specifier must not be empty."
-                    )
-                )
-                return nil
-            }
-            if isSnippet {
-                // Full validation of the path happens in `finalize()`, where the file
-                // can also be checked for existence.
-                if importedModulePathNodes[path] == nil {
-                    importedModulePathNodes[path] = Syntax(literal)
-                }
-                return .snippet(path)
-            }
-            guard !path.hasPrefix("/") else {
-                errors.append(
-                    DiagnosticError(
-                        node: literal,
-                        message: "'\(path)' looks like a file in this target. "
-                            + "Use 'from: .snippet(\"\(path)\")' for a JavaScript file you ship with the target, "
-                            + "and 'from: .module(...)' for an external module (e.g. 'node:path')."
-                    )
-                )
-                return nil
-            }
-            guard !path.hasPrefix("./"), !path.hasPrefix("../"), path != ".", path != ".." else {
-                errors.append(
-                    DiagnosticError(
-                        node: literal,
-                        message: "Relative JavaScript module specifiers are not supported: '\(path)'. "
-                            + "Use 'from: .snippet(\"/path/to/file.js\")' for a file in this target, "
-                            + "or a bare specifier for an external module (e.g. 'node:path')."
-                    )
-                )
-                return nil
-            }
-            return .module(path)
-        }
-
-        // Accept `.global`, `JSImportFrom.global`, etc.
-        let description = argument.expression.trimmedDescription
-        let caseName = description.split(separator: ".").last.map(String.init) ?? description
-        return caseName == "global" ? .global : nil
-    }
-
-    // MARK: - Validation Helpers
-
-    /// Common validation result for setter functions
-    private struct SetterValidationResult {
-        let effects: Effects
-        let jsName: String?
-        let firstParam: FunctionParameterSyntax
-        let valueType: BridgeType
-    }
-
-    /// Validates effects (throws required, async only supported for @JSFunction)
-    private func validateEffects(
-        _ effects: FunctionEffectSpecifiersSyntax?,
-        node: some SyntaxProtocol,
-        attributeName: String
-    ) -> Effects? {
-        guard let effects = parseEffects(effects) else {
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "@\(attributeName) declarations must be throws.",
-                    hint: "Declare the function as 'throws(JSException)'."
-                )
-            )
-            return nil
-        }
-        if effects.isAsync && attributeName != "JSFunction" {
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "@\(attributeName) declarations do not support async yet."
-                )
-            )
-            return nil
-        }
-        return effects
-    }
-
-    /// Validates a setter function and extracts common information
-    private func validateSetter(_ node: FunctionDeclSyntax, jsSetter: AttributeSyntax) -> SetterValidationResult? {
-        guard let effects = validateEffects(node.signature.effectSpecifiers, node: node, attributeName: "JSSetter")
-        else {
-            return nil
-        }
-
-        let extractedJSName = extractJSName(from: jsSetter)
-        validateDefaultExportUsage(extractedJSName, from: nil, node: node, isSetter: true)
-        let jsName = extractedJSName?.memberName
-        let parameters = node.signature.parameterClause.parameters
-
-        guard let firstParam = parameters.first else {
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "@JSSetter function must have at least one parameter."
-                )
-            )
-            return nil
-        }
-
-        if firstParam.type.is(MissingTypeSyntax.self) {
-            errors.append(
-                DiagnosticError(
-                    node: firstParam,
-                    message: "All @JSSetter parameters must have explicit types."
-                )
-            )
-            return nil
-        }
-
-        guard let valueType = withLookupErrors({ parent.lookupType(for: firstParam.type, errors: &$0) }) else {
-            return nil
-        }
-
-        return SetterValidationResult(
-            effects: effects,
-            jsName: jsName,
-            firstParam: firstParam,
-            valueType: valueType
-        )
-    }
-
-    // MARK: - Property Name Resolution
-
-    /// Helper for resolving property names from setter function names.
-    private struct PropertyNameResolver {
-        /// Resolves property name and function base name from a setter function.
-        /// - Returns: (propertyName, functionBaseName) where `propertyName` is derived from the setter name,
-        ///   and `functionBaseName` has lowercase first char for ABI generation.
-        static func resolve(
-            functionName: String,
-            normalizeIdentifier: (String) -> String
-        ) -> (propertyName: String, functionBaseName: String)? {
-            let rawFunctionName =
-                functionName.hasPrefix("`") && functionName.hasSuffix("`") && functionName.count > 2
-                ? String(functionName.dropFirst().dropLast())
-                : functionName
-
-            guard rawFunctionName.hasPrefix("set"), rawFunctionName.count > 3 else {
-                return nil
-            }
-
-            let derivedPropertyName = String(rawFunctionName.dropFirst(3))
-            let normalized = normalizeIdentifier(derivedPropertyName)
-            let propertyName = normalized.prefix(1).lowercased() + normalized.dropFirst()
-            return (propertyName: propertyName, functionBaseName: propertyName)
-        }
-    }
-
-    init(inputFilePath: String, knownJSClassNames: Set<String>, parent: SwiftToSkeleton) {
-        self.inputFilePath = inputFilePath
-        self.jsClassNames = knownJSClassNames
-        self.parent = parent
-        super.init(viewMode: .sourceAccurate)
-    }
-
-    private func withLookupErrors<T>(_ body: (inout [DiagnosticError]) -> T) -> T {
-        var errs = self.errors
-        defer { self.errors = errs }
-        return body(&errs)
-    }
-
-    private func enterJSClass(_ typeName: String) {
-        stateStack.append(.jsClassBody(name: typeName))
-        currentType = CurrentType(
-            name: typeName,
-            jsName: nil,
-            from: nil,
-            accessLevel: .internal,
-            constructor: nil,
-            methods: [],
-            staticMethods: [],
-            getters: [],
-            setters: []
-        )
-    }
-
-    private func enterJSClass(
-        _ typeName: String,
-        jsName: String?,
-        from: JSImportFrom?,
-        accessLevel: BridgeJSAccessLevel
-    ) {
-        stateStack.append(.jsClassBody(name: typeName))
-        currentType = CurrentType(
-            name: typeName,
-            jsName: jsName,
-            from: from,
-            accessLevel: accessLevel,
-            constructor: nil,
-            methods: [],
-            staticMethods: [],
-            getters: [],
-            setters: []
-        )
-    }
-
-    private func exitJSClass() {
-        if case .jsClassBody(let typeName) = state, let type = currentType, type.name == typeName {
-            importedTypes.append(
-                ImportedTypeSkeleton(
-                    name: type.name,
-                    jsName: type.jsName,
-                    from: type.from,
-                    constructor: type.constructor,
-                    methods: type.methods,
-                    staticMethods: type.staticMethods,
-                    getters: type.getters,
-                    setters: type.setters,
-                    documentation: nil,
-                    accessLevel: type.accessLevel
-                )
-            )
-            currentType = nil
-        }
-        stateStack.removeLast()
-    }
-
-    override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
-        if AttributeChecker.hasJSClassAttribute(node.attributes) {
-            let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
-            let extractedJSName = attribute.flatMap { extractJSName(from: $0) }
-            let from = attribute.flatMap { extractJSImportFrom(from: $0) }
-            validateDefaultExportUsage(extractedJSName, from: from, node: node)
-            let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
-            enterJSClass(
-                node.name.text,
-                jsName: extractedJSName?.memberName,
-                from: from,
-                accessLevel: accessLevel
-            )
-        }
-        return .visitChildren
-    }
-
-    override func visitPost(_ node: StructDeclSyntax) {
-        if AttributeChecker.hasJSClassAttribute(node.attributes) {
-            exitJSClass()
-        }
-    }
-
-    override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
-        if AttributeChecker.hasJSClassAttribute(node.attributes) {
-            let attribute = AttributeChecker.firstJSClassAttribute(node.attributes)
-            let extractedJSName = attribute.flatMap { extractJSName(from: $0) }
-            let from = attribute.flatMap { extractJSImportFrom(from: $0) }
-            validateDefaultExportUsage(extractedJSName, from: from, node: node)
-            let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
-            enterJSClass(
-                node.name.text,
-                jsName: extractedJSName?.memberName,
-                from: from,
-                accessLevel: accessLevel
-            )
-        }
-        return .visitChildren
-    }
-
-    override func visitPost(_ node: ClassDeclSyntax) {
-        if AttributeChecker.hasJSClassAttribute(node.attributes) {
-            exitJSClass()
-        }
-    }
-
-    // MARK: - Visitor Methods
-
-    override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
-        switch state {
-        case .topLevel:
-            return handleTopLevelFunction(node)
-
-        case .jsClassBody(let typeName):
-            guard var type = currentType, type.name == typeName else {
-                return .skipChildren
-            }
-            let isStaticMember = isStatic(node.modifiers)
-            let handled = handleClassFunction(node, typeName: typeName, isStaticMember: isStaticMember, type: &type)
-            if handled {
-                currentType = type
-            }
-            return .skipChildren
-        }
-    }
-
-    private func handleTopLevelFunction(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
-        if let jsFunction = AttributeChecker.firstJSFunctionAttribute(node.attributes),
-            let function = parseFunction(jsFunction, node)
-        {
-            importedFunctions.append(function)
-            return .skipChildren
-        }
-        // Top-level setters are not supported
-        if AttributeChecker.hasJSSetterAttribute(node.attributes) {
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "@JSSetter is not supported at top-level. Use it only in @JSClass types."
-                )
-            )
-            return .skipChildren
-        }
-        return .visitChildren
-    }
-
-    private func handleClassFunction(
-        _ node: FunctionDeclSyntax,
-        typeName: String,
-        isStaticMember: Bool,
-        type: inout CurrentType
-    ) -> Bool {
-        if let jsFunction = AttributeChecker.firstJSFunctionAttribute(node.attributes) {
-            if let method = parseFunction(jsFunction, node) {
-                if isStaticMember {
-                    type.staticMethods.append(method)
-                } else {
-                    type.methods.append(method)
-                }
-            }
-            return true
-        }
-
-        if AttributeChecker.hasJSSetterAttribute(node.attributes) {
-            if isStaticMember {
-                errors.append(
-                    DiagnosticError(
-                        node: node,
-                        message:
-                            "@JSSetter is not supported for static members. Use it only for instance members in @JSClass types."
-                    )
-                )
-            } else if let jsSetter = AttributeChecker.firstJSSetterAttribute(node.attributes),
-                let setter = parseSetterSkeleton(jsSetter, node)
-            {
-                type.setters.append(setter)
-            }
-            return true
-        }
-
-        return false
-    }
-
-    override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard AttributeChecker.hasJSGetterAttribute(node.attributes) else {
-            return .visitChildren
-        }
-        guard let jsGetter = AttributeChecker.firstJSGetterAttribute(node.attributes) else {
-            return .skipChildren
-        }
-
-        switch state {
-        case .topLevel:
-            if let getter = parseGetterSkeleton(jsGetter, node) {
-                importedGlobalGetters.append(getter)
-            }
-            return .skipChildren
-
-        case .jsClassBody(let typeName):
-            guard var type = currentType, type.name == typeName else {
-                return .skipChildren
-            }
-            if isStatic(node.modifiers) {
-                errors.append(
-                    DiagnosticError(
-                        node: node,
-                        message:
-                            "@JSGetter is not supported for static members. Use it only for instance members in @JSClass types."
-                    )
-                )
-            } else if let getter = parseGetterSkeleton(jsGetter, node) {
-                type.getters.append(getter)
-                currentType = type
-            }
-            return .skipChildren
-        }
-    }
-
-    override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
-        guard AttributeChecker.hasJSFunctionAttribute(node.attributes) else {
-            return .visitChildren
-        }
-
-        switch state {
-        case .topLevel:
-            return .visitChildren
-
-        case .jsClassBody(let typeName):
-            guard var type = currentType, type.name == typeName else {
-                return .skipChildren
-            }
-            if type.constructor != nil {
-                errors.append(
-                    DiagnosticError(
-                        node: node,
-                        message: "Only one @JSFunction initializer is supported in @JSClass types."
-                    )
-                )
-                return .skipChildren
-            }
-            if let parsed = parseConstructor(node, typeName: typeName) {
-                type.constructor = parsed
-                currentType = type
-            }
-            return .skipChildren
-        }
-    }
-
-    // MARK: - Parsing Methods
-
-    /// Validates and collects the generic parameter names of an imported
-    /// `@JSFunction` declaration (function, method or initializer).
-    ///
-    /// Returns `nil` when a diagnostic was emitted; an empty array when the
-    /// declaration is not generic.
-    private func parseGenericParameterNames(
-        genericParameterClause: GenericParameterClauseSyntax?,
-        genericWhereClause: GenericWhereClauseSyntax?,
-        node: Syntax
-    ) -> [String]? {
-        var genericParameterNames: [String] = []
-        if let genericParameterClause {
-            for genericParam in genericParameterClause.parameters {
-                let paramName = genericParam.name.text
-                let constraintText = genericParam.inheritedType?.trimmedDescription
-                guard SwiftToSkeleton.isBridgeableGenericConstraint(constraintText) else {
-                    errors.append(
-                        DiagnosticError(
-                            node: Syntax(genericParam),
-                            message:
-                                "Generic parameter '\(paramName)' must be constrained to 'BridgedSwiftGenericBridgeable' to be used with @JSFunction."
-                        )
-                    )
-                    return nil
-                }
-                genericParameterNames.append(paramName)
-            }
-        }
-        if genericWhereClause != nil {
-            errors.append(
-                DiagnosticError(
-                    node: node,
-                    message: "'where' clauses are not supported on @JSFunction declarations."
-                )
-            )
-            return nil
-        }
-        return genericParameterNames
-    }
-
-    private func parseConstructor(
-        _ initializer: InitializerDeclSyntax,
-        typeName: String
-    ) -> ImportedConstructorSkeleton? {
-        guard
-            let effects = validateEffects(
-                initializer.signature.effectSpecifiers,
-                node: initializer,
-                attributeName: "JSFunction"
-            )
-        else {
-            return nil
-        }
-        guard
-            let genericParameterNames = parseGenericParameterNames(
-                genericParameterClause: initializer.genericParameterClause,
-                genericWhereClause: initializer.genericWhereClause,
-                node: Syntax(initializer)
-            )
-        else {
-            return nil
-        }
-        if !genericParameterNames.isEmpty && effects.isAsync {
-            errors.append(
-                DiagnosticError(
-                    node: Syntax(initializer),
-                    message: "Generic @JSFunction declarations cannot be 'async' yet."
-                )
-            )
-            return nil
-        }
-        let parameters = parseParameters(
-            from: initializer.signature.parameterClause,
-            genericParameterNames: genericParameterNames
-        )
-        for genericName in genericParameterNames
-        where !parameters.contains(where: { $0.type.referencedGenericName == genericName }) {
-            errors.append(
-                DiagnosticError(
-                    node: Syntax(initializer),
-                    message:
-                        "The generic parameter '\(genericName)' must be used in a parameter of a generic @JSFunction initializer."
-                )
-            )
-            return nil
-        }
-        // Initializers without an explicit modifier inherit access from the
-        // enclosing `@JSClass` (the user's example pattern: `public init(...)`
-        // inside `public struct JSDocument`).
-        let parentLevel = currentType?.accessLevel ?? .internal
-        let accessLevel = Self.bridgeAccessLevel(from: initializer.modifiers, default: parentLevel)
-        return ImportedConstructorSkeleton(
-            parameters: parameters,
-            accessLevel: accessLevel,
-            genericParameters: genericParameterNames.isEmpty ? nil : genericParameterNames
-        )
-    }
-
-    private func parseFunction(
-        _ jsFunction: AttributeSyntax,
-        _ node: FunctionDeclSyntax,
-    ) -> ImportedFunctionSkeleton? {
-        guard
-            let effects = validateEffects(
-                node.signature.effectSpecifiers,
-                node: node,
-                attributeName: "JSFunction"
-            )
-        else {
-            return nil
-        }
-
-        guard
-            let genericParameterNames = parseGenericParameterNames(
-                genericParameterClause: node.genericParameterClause,
-                genericWhereClause: node.genericWhereClause,
-                node: Syntax(node)
-            )
-        else {
-            return nil
-        }
-
-        let baseName = SwiftToSkeleton.normalizeIdentifier(node.name.text)
-        let extractedJSName = extractJSName(from: jsFunction)
-        let from = extractJSImportFrom(from: jsFunction)
-        validateDefaultExportUsage(extractedJSName, from: from, node: node)
-        let jsName = extractedJSName?.memberName
-        let name = baseName
-
-        let parameters = parseParameters(
-            from: node.signature.parameterClause,
-            genericParameterNames: genericParameterNames
-        )
-        let returnType: BridgeType
-        if let returnTypeSyntax = node.signature.returnClause?.type {
-            guard
-                let resolved = lookupTypeWithGenerics(
-                    for: returnTypeSyntax,
-                    genericParameterNames: genericParameterNames
-                )
-            else {
-                return nil
-            }
-            returnType = resolved
-        } else {
-            returnType = .void
-        }
-
-        if !genericParameterNames.isEmpty {
-            if effects.isAsync {
-                errors.append(
-                    DiagnosticError(
-                        node: node,
-                        message: "Generic @JSFunction declarations cannot be 'async' yet."
-                    )
-                )
-                return nil
-            }
-            for genericName in genericParameterNames {
-                let usedInParameter = parameters.contains { $0.type.referencedGenericName == genericName }
-                let usedInReturn = returnType.referencedGenericName == genericName
-                if !usedInParameter && !usedInReturn {
-                    errors.append(
-                        DiagnosticError(
-                            node: node,
-                            message:
-                                "The generic parameter '\(genericName)' must be used in a parameter or return type of a generic @JSFunction declaration."
-                        )
-                    )
-                    return nil
-                }
-            }
-        }
-
-        let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
-        return ImportedFunctionSkeleton(
-            name: name,
-            jsName: jsName,
-            from: from,
-            parameters: parameters,
-            returnType: returnType,
-            effects: effects,
-            documentation: nil,
-            accessLevel: accessLevel,
-            genericParameters: genericParameterNames.isEmpty ? nil : genericParameterNames
-        )
-    }
-
-    /// Extracts property info from a VariableDeclSyntax (binding, identifier, type)
-    private func extractPropertyInfo(
-        _ node: VariableDeclSyntax,
-        errorMessage: String = "@JSGetter must declare a single stored property with an explicit type."
-    ) -> (identifier: IdentifierPatternSyntax, type: TypeSyntax)? {
-        guard let binding = node.bindings.first,
-            let identifier = binding.pattern.as(IdentifierPatternSyntax.self),
-            let typeAnnotation = binding.typeAnnotation
-        else {
-            errors.append(DiagnosticError(node: node, message: errorMessage))
-            return nil
-        }
-        return (identifier, typeAnnotation.type)
-    }
-
-    private func parseGetterSkeleton(
-        _ jsGetter: AttributeSyntax,
-        _ node: VariableDeclSyntax
-    ) -> ImportedGetterSkeleton? {
-        guard let (identifier, type) = extractPropertyInfo(node) else {
-            return nil
-        }
-        guard let propertyType = withLookupErrors({ parent.lookupType(for: type, errors: &$0) }) else {
-            return nil
-        }
-        let propertyName = SwiftToSkeleton.normalizeIdentifier(identifier.identifier.text)
-        let extractedJSName = extractJSName(from: jsGetter)
-        let from = extractJSImportFrom(from: jsGetter)
-        validateDefaultExportUsage(extractedJSName, from: from, node: node)
-        let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
-        return ImportedGetterSkeleton(
-            name: propertyName,
-            jsName: extractedJSName?.memberName,
-            from: from,
-            type: propertyType,
-            documentation: nil,
-            functionName: nil,
-            accessLevel: accessLevel
-        )
-    }
-
-    /// Parses a setter as part of a type's property system (for instance setters)
-    private func parseSetterSkeleton(
-        _ jsSetter: AttributeSyntax,
-        _ node: FunctionDeclSyntax
-    ) -> ImportedSetterSkeleton? {
-        guard let validation = validateSetter(node, jsSetter: jsSetter) else {
-            return nil
-        }
-
-        let functionName = node.name.text
-        guard
-            let (propertyName, functionBaseName) = PropertyNameResolver.resolve(
-                functionName: functionName,
-                normalizeIdentifier: SwiftToSkeleton.normalizeIdentifier
-            )
-        else {
-            return nil
-        }
-
-        let accessLevel = Self.bridgeAccessLevel(from: node.modifiers)
-        return ImportedSetterSkeleton(
-            name: propertyName,
-            jsName: validation.jsName,
-            type: validation.valueType,
-            documentation: nil,
-            functionName: "\(functionBaseName)_set",
-            accessLevel: accessLevel
-        )
-    }
-
-    // MARK: - Type and Parameter Parsing
-
-    private func lookupTypeWithGenerics(
-        for type: TypeSyntax,
-        genericParameterNames: [String]
-    ) -> BridgeType? {
-        switch resolveGenericTypeReference(for: type, genericParameterNames: genericParameterNames) {
-        case .resolved(let bridgeType):
-            return bridgeType
-        case .rejected(let message):
-            if let message {
-                errors.append(DiagnosticError(node: Syntax(type), message: message))
-                return nil
-            }
-            return withLookupErrors { parent.lookupType(for: type, errors: &$0) }
-        }
-    }
-
-    private func parseParameters(
-        from clause: FunctionParameterClauseSyntax,
-        genericParameterNames: [String] = []
-    ) -> [Parameter] {
-        clause.parameters.compactMap { param in
-            let type = param.type
-            if type.is(MissingTypeSyntax.self) {
-                errors.append(
-                    DiagnosticError(
-                        node: param,
-                        message: "All @JSFunction parameters must have explicit types."
-                    )
-                )
-                return nil
-            }
-            guard let bridgeType = lookupTypeWithGenerics(for: type, genericParameterNames: genericParameterNames)
-            else {
-                return nil
-            }
-            let nameToken = param.secondName ?? param.firstName
-            let name = SwiftToSkeleton.normalizeIdentifier(nameToken.text)
-            let labelToken = param.secondName == nil ? nil : param.firstName
-            let label = labelToken?.text == "_" ? nil : labelToken?.text
-            return Parameter(label: label, name: name, type: bridgeType)
-        }
-    }
-
-    // MARK: - Helper Methods
-
-    private func parseEffects(_ effects: FunctionEffectSpecifiersSyntax?) -> Effects? {
-        let isThrows = effects?.throwsClause != nil
-        let isAsync = effects?.asyncSpecifier != nil
-        guard isThrows else {
-            return nil
-        }
-        return Effects(isAsync: isAsync, isThrows: isThrows)
-    }
-
-    private func isStatic(_ modifiers: DeclModifierListSyntax?) -> Bool {
-        guard let modifiers else { return false }
-        return modifiers.contains { modifier in
-            modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
-        }
-    }
-
-    /// Maps Swift's declaration modifiers to a `BridgeJSAccessLevel` for
-    /// recording on imported skeleton entries. Falls back to `default` when no
-    /// access modifier is present (typically `.internal`, but the caller may
-    /// override — e.g. an `init` inheriting from its enclosing `@JSClass`).
-    /// `private`/`fileprivate` are mapped to the fallback because the macros
-    /// already reject those access levels for `@JS*` declarations.
-    fileprivate static func bridgeAccessLevel(
-        from modifiers: DeclModifierListSyntax,
-        default fallback: BridgeJSAccessLevel = .internal
-    ) -> BridgeJSAccessLevel {
-        for modifier in modifiers {
-            switch modifier.name.tokenKind {
-            case .keyword(.public), .keyword(.open):
-                return .public
-            case .keyword(.package):
-                return .package
-            case .keyword(.internal):
-                return .internal
-            default:
-                continue
-            }
-        }
-        return fallback
-    }
-}
-
-extension BridgeType {
-    fileprivate func isSupportedAsAssociatedValue(allowNullable: Bool = true) -> Bool {
-        switch self {
-        case .string, .integer, .float, .double, .bool, .caseEnum, .rawValueEnum,
-            .swiftStruct, .swiftHeapObject, .jsObject, .associatedValueEnum, .array:
-            return true
-        case .alias(_, let underlying):
-            return underlying.isSupportedAsAssociatedValue(allowNullable: false)
-        case .nullable(let wrapped, _) where allowNullable:
-            return wrapped.isSupportedAsAssociatedValue(allowNullable: false)
-        default:
-            return false
-        }
-    }
-}
-
-extension GenericArgumentListSyntax {
-    /// Compatibility helper for accessing the first argument as a TypeSyntax
-    ///
-    /// Note: SwiftSyntax 601 and later support InlineArrayTypeSyntax and
-    /// ``GenericArgumentSyntax/argument`` is now a ``TypeSyntax`` or ``ExprSyntax``.
-    fileprivate var firstAsTypeSyntax: TypeSyntax? {
-        guard let first = self.first else { return nil }
-        #if canImport(SwiftSyntax601)
-        return first.argument.as(TypeSyntax.self)
-        #else
-        return TypeSyntax(first.argument)
-        #endif
-    }
+private enum ExportSwiftConstants {
+    static let supportedRawTypes = SwiftEnumRawType.supportedTypeNames
 }

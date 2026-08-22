@@ -125,12 +125,12 @@
 @JS func convertPriority(_ status: HttpStatus) -> Priority
 @JS func validateSession(_ session: SessionId) -> Theme
 
-enum FeatureFlag: String {
+enum ImportedFlag: String {
     case foo = "foo"
     case bar = "bar"
 }
-extension FeatureFlag: _BridgedSwiftEnumNoPayload {}
+extension ImportedFlag: _BridgedSwiftEnumNoPayload {}
 
-@JSFunction func takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void
+@JSFunction func takesFeatureFlag(_ flag: ImportedFlag) throws(JSException) -> Void
 
-@JSFunction func returnsFeatureFlag() throws(JSException) -> FeatureFlag
+@JSFunction func returnsFeatureFlag() throws(JSException) -> ImportedFlag

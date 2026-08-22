@@ -161,8 +161,8 @@ export type Exports = {
     Ratio: RatioObject
 }
 export type Imports = {
-    takesFeatureFlag(flag: FeatureFlagTag): void;
-    returnsFeatureFlag(): FeatureFlagTag;
+    takesFeatureFlag(flag: ImportedFlagTag): void;
+    returnsFeatureFlag(): ImportedFlagTag;
 }
 export function createInstantiator(options: {
     imports: Imports;
