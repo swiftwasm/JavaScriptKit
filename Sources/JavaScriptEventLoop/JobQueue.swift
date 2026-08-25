@@ -42,6 +42,15 @@ extension JavaScriptEventLoop {
 
     func runAllJobs() {
         assert(queueState.isSpinning)
+        // `defer`, so the latch is released even if a job throws.
+        //
+        // `runSynchronously` can unwind — a Swift runtime trap, or (under
+        // JavaScriptKit specifically) a JS exception crossing back into wasm.
+        // Clearing `isSpinning` only by falling off the end of the loop leaves
+        // it latched `true` on that path, and `insertJobQueue` then never
+        // schedules another drain: the executor is dead for the lifetime of the
+        // process, silently.
+        defer { queueState.isSpinning = false }
 
         while let job = self.claimNextFromQueue() {
             #if compiler(>=5.9)
@@ -50,8 +59,6 @@ extension JavaScriptEventLoop {
             job._runSynchronously(on: self.asUnownedSerialExecutor())
             #endif
         }
-
-        queueState.isSpinning = false
     }
 
     func claimNextFromQueue() -> UnownedJob? {
