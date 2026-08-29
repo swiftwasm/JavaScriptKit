@@ -42,15 +42,19 @@ extension JavaScriptEventLoop {
 
     func runAllJobs() {
         assert(queueState.isSpinning)
-        // `defer`, so the latch is released even if a job throws.
+        // Release the latch BEFORE running any job, so `isSpinning` means "a
+        // drain microtask is pending" rather than "a drain is in progress".
         //
-        // `runSynchronously` can unwind — a Swift runtime trap, or (under
-        // JavaScriptKit specifically) a JS exception crossing back into wasm.
-        // Clearing `isSpinning` only by falling off the end of the loop leaves
-        // it latched `true` on that path, and `insertJobQueue` then never
-        // schedules another drain: the executor is dead for the lifetime of the
-        // process, silently.
-        defer { queueState.isSpinning = false }
+        // `runSynchronously` can unwind without running Swift cleanup — a
+        // runtime trap lowers to `unreachable`, and a JS exception crossing
+        // back into wasm unwinds the frames outright. Neither runs a `defer`.
+        // Clearing the latch only after the loop therefore leaves it stuck at
+        // `true` on those paths, and `insertJobQueue` never schedules another
+        // drain: the executor is dead for the lifetime of the process,
+        // silently. Clearing it up front costs one extra drain microtask per
+        // batch that enqueues, and an unwinding job leaves the queue merely
+        // undrained rather than unreachable — the next enqueue picks it up.
+        queueState.isSpinning = false
 
         while let job = self.claimNextFromQueue() {
             #if compiler(>=5.9)
