@@ -759,7 +759,12 @@ class SwiftRuntime {
             swjs_load_typed_array: (ref, buffer) => {
                 const memory = this.memory;
                 const typedArray = memory.getObject(ref);
-                const bytes = new Uint8Array(typedArray.buffer);
+                // Copy only the window the view describes. `typedArray.buffer`
+                // is the whole backing `ArrayBuffer`, which may be larger than
+                // the view and may start before it; the guest sizes the
+                // destination from the view's own length, so viewing the entire
+                // buffer would both shift the bytes and overrun the destination.
+                const bytes = new Uint8Array(typedArray.buffer, typedArray.byteOffset, typedArray.byteLength);
                 this.getUint8Array().set(bytes, buffer >>> 0);
             },
             swjs_release: (ref) => {
