@@ -4,7 +4,7 @@ import { MODULE_PATH /* #if USE_SHARED_MEMORY */, MEMORY_TYPE /* #endif */} from
 /* #if USE_UWASI */
 /* #if USE_WASI_CDN */
 // @ts-ignore
-import { WASI, MemoryFileSystem, useAll, lineBuffered } from 'https://cdn.jsdelivr.net/npm/uwasi@1.6.0/+esm';
+import { WASI, MemoryFileSystem, useAll, lineBuffered } from 'https://cdn.jsdelivr.net/npm/uwasi@1.5.2/+esm';
 /* #else */
 import { WASI, MemoryFileSystem, useAll, lineBuffered } from 'uwasi';
 /* #endif */

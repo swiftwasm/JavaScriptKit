@@ -45,7 +45,7 @@
     "rollup-plugin-dts": "^6.2.1",
     "tslib": "^2.8.1",
     "typescript": "^5.8.2",
-    "uwasi": "git+https://github.com/PassiveLogic/uwasi.git#ddd111bd2cbd03189de184e5dd27e7cb02802d3f",
+    "uwasi": "1.5.2",
     "vitest": "^4.0.18"
   }
 }

@@ -53,7 +53,8 @@ test("PackageToJS UWASI adapter preserves its host contracts", () => {
     );
 });
 
-test("PackageToJS forwards the host sleep policy", () => {
+test("PackageToJS forwards the host sleep policy", (t) => {
+    t.mock.method(performance, "now", () => 0);
     const { wasi } = createUwasi(
         {
             WASI,

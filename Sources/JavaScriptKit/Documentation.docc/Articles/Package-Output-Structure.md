@@ -156,7 +156,7 @@ With `--wasi-runtime uwasi`, the generated dependency is instead:
 
 ```json
 "dependencies": {
-    "uwasi": "1.6.0"
+    "uwasi": "1.5.2"
 }
 ```
 
