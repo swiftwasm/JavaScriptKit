@@ -791,4 +791,96 @@ import Testing
         // No line 3 in source, so output must not show a "  3 |" context line after the pointer
         #expect(!description.contains("  3 |"))
     }
+
+    @Test(arguments: [
+        "struct MyImpl: P { func ok() -> Int { 42 } }",
+        "class MyImpl: P { func ok() -> Int { 42 } }",
+        "struct MyImpl {}\nextension MyImpl: P { func ok() -> Int { 42 } }",
+    ])
+    func unsupportedProtocolConformer(conformer: String) {
+        expectDiagnostic(
+            source: """
+                @JS protocol P { func ok() -> Int }
+                \(conformer)
+                @JS func get() -> P { MyImpl() }
+                """,
+            contains: "'MyImpl' is not a '@JS class'"
+        )
+    }
+
+    @Test(arguments: [
+        "@JS func get() -> [P] { fatalError() }",
+        "@JS func get() -> P? { fatalError() }",
+        "@JS func get() -> [String: P] { fatalError() }",
+        "@JS func subscribe(_ callback: (P) -> Void) {}",
+        "@JS class Holder { @JS var value: P = MyImpl() }",
+        "@JS protocol Sink { func consume(_ value: P) }",
+        "@JS class Holder { @JS var callback: (P) -> Void = { _ in } }",
+        "@JS struct Holder { let callback: (P) -> Void }",
+        "@JS enum Holder { @JS static var callback: (P) -> Void = { _ in } }",
+        "@JS protocol Holder { var callback: (P) -> Void { get set } }",
+        "@JS protocol Holder { var callback: (P) -> Void { get } }",
+    ])
+    func loweredProtocolConformer(declaration: String) {
+        expectDiagnostic(
+            source: """
+                @JS protocol P { func ok() -> Int }
+                struct MyImpl: P { func ok() -> Int { 42 } }
+                \(declaration)
+                """,
+            contains: "'MyImpl' conforms to 'P'"
+        )
+    }
+
+    @Test(arguments: [
+        "@JS func take(_ value: P) -> Int { value.ok() }",
+        "@JS class Holder { @JS let callback: (P) -> Void = { _ in } }",
+    ])
+    func protocolConformerWithoutLowering(declaration: String) throws {
+        _ = try makeSkeleton(
+            """
+            @JS protocol P { func ok() -> Int }
+            struct MyImpl: P { func ok() -> Int { 42 } }
+            \(declaration)
+            """
+        )
+    }
+
+    @Test func exportedProtocolConformer() throws {
+        _ = try makeSkeleton(
+            """
+            @JS protocol P { func ok() -> Int }
+            @JS class MyImpl: P {
+                @JS init() {}
+                @JS func ok() -> Int { 42 }
+            }
+            @JS func get() -> P { MyImpl() }
+            """
+        )
+    }
+
+    @Test func unusedJSProtocolConformer() throws {
+        _ = try makeSkeleton(
+            """
+            @JS protocol P { var id: String { get } }
+            @JS struct Building: P { var id: String }
+            @JS func describe(_ building: Building) -> String { building.id }
+            """
+        )
+    }
+
+    @Test func protocolRefinementIsNotAConcreteConformance() throws {
+        _ = try makeSkeleton(
+            """
+            @JS protocol Base { func ok() -> Int }
+            @JS protocol Refined: Base { func extra() -> Int }
+            @JS class MyImpl: Refined {
+                @JS init() {}
+                @JS func ok() -> Int { 1 }
+                @JS func extra() -> Int { 2 }
+            }
+            @JS func get() -> Base { MyImpl() }
+            """
+        )
+    }
 }

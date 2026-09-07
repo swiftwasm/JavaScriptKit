@@ -133,7 +133,7 @@ public func _bjs_roundtripTags() -> Void {
 @_cdecl("bjs_describeUser")
 public func _bjs_describeUser(_ owner: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = describeUser(_: AnyHasOptionalUserId.bridgeJSLiftParameter(owner)) as! _BridgedSwiftProtocolExportable
+    let ret = _bridgeJSUnwrapProtocolExportable(describeUser(_: AnyHasOptionalUserId.bridgeJSLiftParameter(owner)), "HasOptionalUserId")
     return ret.bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")

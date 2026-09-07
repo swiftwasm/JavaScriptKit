@@ -1145,6 +1145,23 @@ extension _BridgedSwiftProtocolExportable where Self: _BridgedSwiftProtocolWrapp
     }
 }
 
+#if !hasFeature(Embedded)
+/// Checks that a protocol value can be lowered to JavaScript.
+@_spi(BridgeJS) public func _bridgeJSUnwrapProtocolExportable(
+    _ value: Any,
+    _ protocolName: StaticString
+) -> any _BridgedSwiftProtocolExportable {
+    guard let exportable = value as? any _BridgedSwiftProtocolExportable else {
+        fatalError(
+            "BridgeJS: cannot bridge a value of type '\(type(of: value))' to JavaScript as "
+                + "'any \(protocolName)': the concrete type is not exported with @JS. Only '@JS class' "
+                + "types and JavaScript-provided implementations can cross the bridge as protocol values."
+        )
+    }
+    return exportable
+}
+#endif
+
 /// A protocol that Swift enum types that do not have a payload can conform to.
 ///
 /// The conformance is automatically synthesized by the BridgeJS code generator.

@@ -487,6 +487,27 @@ import Testing
         }
     }
 
+    @Test func exportedClassConformanceInAnotherModule() throws {
+        let core = try makeSkeleton(
+            """
+            @JS public class MyImpl {
+                @JS public init() {}
+                @JS public func ok() -> Int { 42 }
+            }
+            """,
+            moduleName: "Core"
+        )
+        _ = try makeSkeleton(
+            """
+            import Core
+            @JS protocol P { func ok() -> Int }
+            extension MyImpl: P {}
+            @JS func get() -> P { MyImpl() }
+            """,
+            dependencies: [(moduleName: "Core", skeleton: core)]
+        )
+    }
+
     // MARK: - Utillites
 
     private func resolveApp(

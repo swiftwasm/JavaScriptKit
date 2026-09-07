@@ -188,12 +188,12 @@ public struct ImportTS {
                         }
                     )
                 )
-            } else if case .nullable(.swiftProtocol, _) = param.type, context == .exportSwift {
+            } else if case .nullable(.swiftProtocol(let protocolName), _) = param.type, context == .exportSwift {
                 body.write("let \(pattern): (Int32, Int32)")
                 body.write("if let \(param.name) {")
                 body.indent {
                     body.write(
-                        "\(pattern) = (1, (\(param.name) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
+                        "\(pattern) = (1, _bridgeJSUnwrapProtocolExportable(\(param.name), \"\(protocolName)\").bridgeJSLowerAsProtocolReturn())"
                     )
                 }
                 body.write("} else {")
@@ -203,9 +203,9 @@ public struct ImportTS {
                 body.write("}")
             } else {
                 let initializerExpr: ExprSyntax
-                if case .swiftProtocol = param.type, context == .exportSwift {
+                if case .swiftProtocol(let protocolName) = param.type, context == .exportSwift {
                     initializerExpr = ExprSyntax(
-                        "(\(raw: param.name) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()"
+                        "_bridgeJSUnwrapProtocolExportable(\(raw: param.name), \"\(raw: protocolName)\").bridgeJSLowerAsProtocolReturn()"
                     )
                 } else {
                     initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
