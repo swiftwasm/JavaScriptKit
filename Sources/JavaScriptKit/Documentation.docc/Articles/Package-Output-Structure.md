@@ -22,7 +22,8 @@ The output package has the following structure:
     ├── browser.js            # Browser-specific platform setup
     ├── browser.d.ts          # TypeScript definitions for browser.js
     ├── node.js               # Node.js-specific platform setup
-    └── node.d.ts             # TypeScript definitions for node.js
+    ├── node.d.ts             # TypeScript definitions for node.js
+    └── uwasi.js              # Shared uwasi adapter, when selected
 ```
 
 ## Using the Package
@@ -123,6 +124,14 @@ The `platforms/` directory contains platform-specific setup functions:
 - `platforms/browser.js` - Provides `defaultBrowserSetup()` for browser environments
 - `platforms/node.js` - Provides `defaultNodeSetup()` for Node.js environments
 
+PackageToJS uses `@bjorn3/browser_wasi_shim` for WASI packages by default. Pass
+`--wasi-runtime uwasi` to generate both platform wrappers against `uwasi`; this also
+adds `platforms/uwasi.js` to the package.
+
+The browser main-thread setup rejects blocking `poll_oneoff` clock waits instead of
+freezing the page. Run guests that require blocking waits in a worker. Node and browser
+workers use `uwasi`'s blocking implementation.
+
 ## Package Metadata (`package.json`)
 
 The generated `package.json` includes:
@@ -143,6 +152,14 @@ The generated `package.json` includes:
 }
 ```
 
+With `--wasi-runtime uwasi`, the generated dependency is instead:
+
+```json
+"dependencies": {
+    "uwasi": "1.5.2"
+}
+```
+
 The `exports` field allows importing the package as an npm dependency:
 
 ```javascript
@@ -152,4 +169,3 @@ import { init } from '.build/plugins/PackageToJS/outputs/Package';
 ## TypeScript Support
 
 All JavaScript files have corresponding `.d.ts` TypeScript definition files, providing full type safety when using the package in TypeScript projects.
-

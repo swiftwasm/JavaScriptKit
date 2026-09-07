@@ -599,6 +599,19 @@ extension ArgumentExtractor {
         }
         return platform
     }
+
+    mutating func extractWASIRuntimeOption(named name: String) throws -> PackageToJS.PackageOptions.WASIRuntime {
+        guard let stringValue = self.extractOption(named: name).last else {
+            return .browserWASIShim
+        }
+
+        guard let runtime = PackageToJS.PackageOptions.WASIRuntime(rawValue: stringValue) else {
+            throw PackageToJSError(
+                "Invalid WASI runtime: \(stringValue), expected one of \(PackageToJS.PackageOptions.WASIRuntime.allCases.map(\.rawValue).joined(separator: ", "))"
+            )
+        }
+        return runtime
+    }
 }
 
 extension PackageToJS.PackageOptions {
@@ -608,6 +621,7 @@ extension PackageToJS.PackageOptions {
             (extractor.extractOption(named: "configuration") + extractor.extractSingleDashOption(named: "c")).last
         let packageName = extractor.extractOption(named: "package-name").last
         let defaultPlatform = try extractor.extractPlatformOption(named: "default-platform")
+        let wasiRuntime = try extractor.extractWASIRuntimeOption(named: "wasi-runtime")
         let explain = extractor.extractFlag(named: "explain")
         let useCDN = extractor.extractFlag(named: "use-cdn")
         let verbose = extractor.extractFlag(named: "verbose")
@@ -617,6 +631,7 @@ extension PackageToJS.PackageOptions {
             configuration: configuration,
             packageName: packageName,
             defaultPlatform: defaultPlatform,
+            wasiRuntime: wasiRuntime,
             explain: explain != 0,
             verbose: verbose != 0,
             useCDN: useCDN != 0,
@@ -629,7 +644,8 @@ extension PackageToJS.PackageOptions {
               --output <path>            Path to the output directory (default: .build/plugins/PackageToJS/outputs/Package)
               -c, --configuration <name> The build configuration to use (values: debug, release; default: debug)
               --package-name <name>      Name of the package (default: lowercased Package.swift name)
-              --platform <name>          Target platform for generated JavaScript (values: \(PackageToJS.PackageOptions.Platform.allCases.map(\.rawValue).joined(separator: ", ")); default: \(PackageToJS.PackageOptions.Platform.browser))
+              --default-platform <name>  Target platform for generated JavaScript (values: \(PackageToJS.PackageOptions.Platform.allCases.map(\.rawValue).joined(separator: ", ")); default: \(PackageToJS.PackageOptions.Platform.browser))
+              --wasi-runtime <name>      WASI runtime for generated JavaScript (values: \(PackageToJS.PackageOptions.WASIRuntime.allCases.map(\.rawValue).joined(separator: ", ")); default: \(PackageToJS.PackageOptions.WASIRuntime.browserWASIShim.rawValue))
               --use-cdn                  Whether to use CDN for dependency packages
               --enable-code-coverage     Whether to enable code coverage collection
               --explain                  Whether to explain the build plan

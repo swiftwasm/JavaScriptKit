@@ -1,12 +1,22 @@
 // @ts-check
 import { MODULE_PATH /* #if USE_SHARED_MEMORY */, MEMORY_TYPE /* #endif */} from "../instantiate.js"
 /* #if IS_WASI */
+/* #if USE_UWASI */
+/* #if USE_WASI_CDN */
+// @ts-ignore
+import { WASI, MemoryFileSystem, useAll, lineBuffered } from 'https://cdn.jsdelivr.net/npm/uwasi@1.5.2/+esm';
+/* #else */
+import { WASI, MemoryFileSystem, useAll, lineBuffered } from 'uwasi';
+/* #endif */
+import { browserMainThreadSleep, createUwasi } from './uwasi.js';
+/* #else */
 /* #if USE_WASI_CDN */
 // @ts-ignore
 import { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory } from 'https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.4.1/+esm';
 /* #else */
 // @ts-ignore
 import { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory } from '@bjorn3/browser_wasi_shim';
+/* #endif */
 /* #endif */
 /* #endif */
 
@@ -27,6 +37,12 @@ export async function defaultBrowserThreadSetup() {
     }
 
 /* #if IS_WASI */
+/* #if USE_UWASI */
+    const { wasi } = createUwasi(
+        { WASI, MemoryFileSystem, useAll, lineBuffered },
+        { modulePath: MODULE_PATH }
+    )
+/* #else */
     const wasi = new WASI(/* args */[MODULE_PATH], /* env */[], /* fd */[
         new OpenFile(new File([])), // stdin
         ConsoleStdout.lineBuffered((stdout) => {
@@ -38,13 +54,18 @@ export async function defaultBrowserThreadSetup() {
         new PreopenDirectory("/", new Map()),
     ], { debug: false })
 /* #endif */
+/* #endif */
     return {
 /* #if IS_WASI */
+/* #if USE_UWASI */
+        wasi,
+/* #else */
         wasi: Object.assign(wasi, {
             setInstance(instance) {
                 wasi.inst = instance;
             }
         }),
+/* #endif */
 /* #endif */
         threadChannel,
     }
@@ -105,6 +126,18 @@ export async function defaultBrowserSetup(options) {
     const args = options.args ?? []
     const onStdoutLine = options.onStdoutLine ?? ((line) => console.log(line))
     const onStderrLine = options.onStderrLine ?? ((line) => console.error(line))
+/* #if USE_UWASI */
+    const { wasi } = createUwasi(
+        { WASI, MemoryFileSystem, useAll, lineBuffered },
+        {
+            modulePath: MODULE_PATH,
+            args,
+            onStdoutLine,
+            onStderrLine,
+            sleep: browserMainThreadSleep(),
+        }
+    )
+/* #else */
     const wasi = new WASI(/* args */[MODULE_PATH, ...args], /* env */[], /* fd */[
         new OpenFile(new File([])), // stdin
         ConsoleStdout.lineBuffered((stdout) => {
@@ -115,6 +148,7 @@ export async function defaultBrowserSetup(options) {
         }),
         new PreopenDirectory("/", new Map()),
     ], { debug: false })
+/* #endif */
 /* #endif */
 /* #if USE_SHARED_MEMORY */
     const memory = new WebAssembly.Memory(MEMORY_TYPE);
@@ -127,11 +161,15 @@ export async function defaultBrowserSetup(options) {
         getImports() { return options.getImports() },
 /* #endif */
 /* #if IS_WASI */
+/* #if USE_UWASI */
+        wasi,
+/* #else */
         wasi: Object.assign(wasi, {
             setInstance(instance) {
                 wasi.inst = instance;
             }
         }),
+/* #endif */
 /* #endif */
 /* #if USE_SHARED_MEMORY */
         memory, threadChannel,

@@ -10,6 +10,11 @@ struct PackageToJS {
             case node
         }
 
+        enum WASIRuntime: String, CaseIterable {
+            case browserWASIShim = "browser-wasi-shim"
+            case uwasi
+        }
+
         /// Path to the output directory
         var outputPath: String?
         /// The build configuration to use (default: debug)
@@ -18,6 +23,8 @@ struct PackageToJS {
         var packageName: String?
         /// Target platform for the generated JavaScript (default: browser)
         var defaultPlatform: Platform = .browser
+        /// WASI runtime used by generated JavaScript (default: browser-wasi-shim)
+        var wasiRuntime: WASIRuntime = .browserWASIShim
         /// Whether to explain the build plan (default: false)
         var explain: Bool = false
         /// Whether to print verbose output
@@ -625,7 +632,7 @@ struct PackagingPlanner {
         }
 
         // Copy the template files
-        for (file, output) in [
+        var templateFiles = [
             ("Plugins/PackageToJS/Templates/index.js", "index.js"),
             ("Plugins/PackageToJS/Templates/index.d.ts", "index.d.ts"),
             ("Plugins/PackageToJS/Templates/instantiate.js", "instantiate.js"),
@@ -637,7 +644,13 @@ struct PackagingPlanner {
             ("Plugins/PackageToJS/Templates/platforms/node.d.ts", "platforms/node.d.ts"),
             ("Sources/JavaScriptKit/Runtime/index.mjs", "runtime.js"),
             ("Sources/JavaScriptKit/Runtime/index.d.ts", "runtime.d.ts"),
-        ] {
+        ]
+        if options.wasiRuntime == .uwasi {
+            templateFiles.append(
+                ("Plugins/PackageToJS/Templates/platforms/uwasi.js", "platforms/uwasi.js")
+            )
+        }
+        for (file, output) in templateFiles {
             packageInputs.append(
                 planCopyTemplateFile(
                     make: &make,
@@ -943,6 +956,7 @@ struct PackagingPlanner {
         // this task instead, so a change in them still re-runs the preprocessing.
         let staticConditions: [String: Bool] = [
             "USE_WASI_CDN": options.useCDN,
+            "USE_UWASI": options.wasiRuntime == .uwasi,
             "HAS_BRIDGE": skeletons.count > 0,
             "HAS_IMPORTS": skeletons.count > 0,
             "TARGET_DEFAULT_PLATFORM_NODE": options.defaultPlatform == .node,

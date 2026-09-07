@@ -3,7 +3,12 @@ import { fileURLToPath } from "node:url";
 import { Worker, parentPort } from "node:worker_threads";
 import { MODULE_PATH /* #if USE_SHARED_MEMORY */, MEMORY_TYPE /* #endif */} from "../instantiate.js"
 /* #if IS_WASI */
+/* #if USE_UWASI */
+import { WASI, MemoryFileSystem, useAll, lineBuffered } from 'uwasi';
+import { createUwasi } from './uwasi.js';
+/* #else */
 import { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory, Directory, Inode } from '@bjorn3/browser_wasi_shim';
+/* #endif */
 /* #endif */
 
 /* #if USE_SHARED_MEMORY */
@@ -22,6 +27,12 @@ export async function defaultNodeThreadSetup() {
         }
     }
 
+/* #if USE_UWASI */
+    const { wasi } = createUwasi(
+        { WASI, MemoryFileSystem, useAll, lineBuffered },
+        { modulePath: MODULE_PATH }
+    )
+/* #else */
     const wasi = new WASI(/* args */[MODULE_PATH], /* env */[], /* fd */[
         new OpenFile(new File([])), // stdin
         ConsoleStdout.lineBuffered((stdout) => {
@@ -32,13 +43,18 @@ export async function defaultNodeThreadSetup() {
         }),
         new PreopenDirectory("/", new Map()),
     ], { debug: false })
+/* #endif */
 
     return {
+/* #if USE_UWASI */
+        wasi,
+/* #else */
         wasi: Object.assign(wasi, {
             setInstance(instance) {
                 wasi.inst = instance;
             }
         }),
+/* #endif */
         threadChannel,
     }
 }
@@ -119,6 +135,16 @@ export async function defaultNodeSetup(options = {}) {
     const { readFile } = await import("node:fs/promises")
 
     const args = options.args ?? process.argv.slice(2)
+/* #if USE_UWASI */
+    const { wasi } = createUwasi(
+        { WASI, MemoryFileSystem, useAll, lineBuffered },
+        {
+            modulePath: MODULE_PATH,
+            args,
+            withExtractFile: true,
+        }
+    )
+/* #else */
     const rootFs = new Map();
     const wasi = new WASI(/* args */[MODULE_PATH, ...args], /* env */[], /* fd */[
         new OpenFile(new File([])), // stdin
@@ -130,6 +156,7 @@ export async function defaultNodeSetup(options = {}) {
         }),
         new PreopenDirectory("/", rootFs),
     ], { debug: false })
+/* #endif */
     const pkgDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
     const module = await WebAssembly.compile(new Uint8Array(await readFile(path.join(pkgDir, MODULE_PATH))))
 /* #if USE_SHARED_MEMORY */
@@ -143,6 +170,9 @@ export async function defaultNodeSetup(options = {}) {
         getImports() { return {} },
 /* #endif */
 /* #if IS_WASI */
+/* #if USE_UWASI */
+        wasi,
+/* #else */
         wasi: Object.assign(wasi, {
             setInstance(instance) {
                 wasi.inst = instance;
@@ -184,6 +214,7 @@ export async function defaultNodeSetup(options = {}) {
                 return undefined;
             }
         }),
+/* #endif */
         addToCoreImports(importObject) {
             importObject["wasi_snapshot_preview1"]["proc_exit"] = (code) => {
                 if (options.onExit) {

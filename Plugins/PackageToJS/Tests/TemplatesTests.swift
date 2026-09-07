@@ -15,9 +15,14 @@ import Foundation
         .appendingPathComponent("TemporaryDirectory")
 
     /// `npx tsc -p Templates/tsconfig.json`
-    /// Test both node and browser platform variants
-    @Test(arguments: ["node", "browser"])
-    func tscCheck(platform: String) throws {
+    /// Test both WASI runtimes in node and browser platform variants.
+    @Test(arguments: [
+        (platform: "node", runtime: "browser-wasi-shim", sharedMemory: false),
+        (platform: "browser", runtime: "browser-wasi-shim", sharedMemory: false),
+        (platform: "node", runtime: "uwasi", sharedMemory: false),
+        (platform: "browser", runtime: "uwasi", sharedMemory: true),
+    ])
+    func tscCheck(platform: String, runtime: String, sharedMemory: Bool) throws {
         // Use a local temporary directory to place instantiated templates so that
         // they can reference repo-root node_modules packages like @types/node.
         try FileManager.default.createDirectory(
@@ -32,9 +37,10 @@ import Foundation
 
             // Setup preprocessing conditions
             let conditions: [String: Bool] = [
-                "USE_SHARED_MEMORY": false,
+                "USE_SHARED_MEMORY": sharedMemory,
                 "IS_WASI": true,
                 "USE_WASI_CDN": false,
+                "USE_UWASI": runtime == "uwasi",
                 "HAS_BRIDGE": false,
                 "HAS_IMPORTS": false,
                 "TARGET_DEFAULT_PLATFORM_NODE": platform == "node",
@@ -47,6 +53,7 @@ import Foundation
             while let fileURL = enumerator?.nextObject() as? URL {
                 guard !fileURL.hasDirectoryPath,
                     fileURL.pathExtension == "js" || fileURL.pathExtension == "ts"
+                        || fileURL.pathExtension == "json"
                 else {
                     continue
                 }
@@ -63,6 +70,36 @@ import Foundation
             try tsc.run()
             tsc.waitUntilExit()
             #expect(tsc.terminationStatus == 0)
+
+            let platformSource = try String(
+                contentsOf: destination.appending(path: "platforms/")
+                    .appending(path: "\(platform).js"),
+                encoding: .utf8
+            )
+            let expectedImport = runtime == "uwasi" ? "from 'uwasi'" : "from '@bjorn3/browser_wasi_shim'"
+            #expect(platformSource.contains(expectedImport))
+
+            let manifestData = try Data(contentsOf: destination.appending(path: "package.json"))
+            let manifest = try #require(
+                JSONSerialization.jsonObject(with: manifestData) as? [String: Any]
+            )
+            let dependencies = try #require(manifest["dependencies"] as? [String: String])
+            let expectedDependency = runtime == "uwasi" ? "uwasi" : "@bjorn3/browser_wasi_shim"
+            #expect(dependencies.keys.sorted() == [expectedDependency])
         }
+    }
+
+    @Test func uwasiAdapterBehavior() throws {
+        let node = Process()
+        node.executableURL = try which("node")
+        node.arguments = [
+            "--test",
+            Self.pluginPackagePath
+                .appending(path: "Tests/Inputs/UWASIAdapterTests.mjs")
+                .path,
+        ]
+        try node.run()
+        node.waitUntilExit()
+        #expect(node.terminationStatus == 0)
     }
 }

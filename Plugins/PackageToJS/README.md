@@ -11,6 +11,20 @@ PackageToJS is a command plugin for Swift Package Manager that simplifies the pr
 - Build WebAssembly file and generate JavaScript wrappers
 - Test driver for Swift Testing and XCTest
 - Generated JS files can be consumed by JS bundler tools like Vite
+- Select `@bjorn3/browser_wasi_shim` or `uwasi` for generated WASI packages
+
+## WASI Runtime
+
+PackageToJS uses `@bjorn3/browser_wasi_shim` by default. Pass `--wasi-runtime uwasi`
+to generate browser and Node platform wrappers backed by `uwasi` instead:
+
+```bash
+swift package --swift-sdk wasm32-unknown-wasi js --wasi-runtime uwasi
+```
+
+The generated browser main-thread setup rejects blocking WASI waits. Run guests that
+require `poll_oneoff` clock waits in a worker. Node and browser workers use `uwasi`'s
+blocking implementation.
 
 ## Requirements
 
@@ -42,4 +56,3 @@ Please define the following environment variables when you want to run E2E tests
 
 - `SWIFT_SDK_ID`: Specifies the Swift SDK identifier to use
 - `SWIFT_BIN_PATH`: Specifies the `bin` path to the Swift toolchain to use
-

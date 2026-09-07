@@ -47,24 +47,43 @@ import Testing
     }
 
     typealias DebugInfoFormat = PackageToJS.DebugInfoFormat
+    typealias WASIRuntime = PackageToJS.PackageOptions.WASIRuntime
 
     @Test(arguments: [
-        (variant: "debug", configuration: "debug", noOptimize: false, debugInfoFormat: DebugInfoFormat.none),
-        (variant: "release", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.none),
+        (
+            variant: "debug", configuration: "debug", noOptimize: false,
+            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.browserWASIShim
+        ),
+        (
+            variant: "debug_uwasi", configuration: "debug", noOptimize: false,
+            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.uwasi
+        ),
+        (
+            variant: "release", configuration: "release", noOptimize: false,
+            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.browserWASIShim
+        ),
         (
             variant: "release_no_optimize", configuration: "release", noOptimize: true,
-            debugInfoFormat: DebugInfoFormat.none
+            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.browserWASIShim
         ),
-        (variant: "release_dwarf", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.dwarf),
-        (variant: "release_name", configuration: "release", noOptimize: false, debugInfoFormat: DebugInfoFormat.name),
+        (
+            variant: "release_dwarf", configuration: "release", noOptimize: false,
+            debugInfoFormat: DebugInfoFormat.dwarf, wasiRuntime: WASIRuntime.browserWASIShim
+        ),
+        (
+            variant: "release_name", configuration: "release", noOptimize: false,
+            debugInfoFormat: DebugInfoFormat.name, wasiRuntime: WASIRuntime.browserWASIShim
+        ),
     ])
     func planBuild(
         variant: String,
         configuration: String,
         noOptimize: Bool,
-        debugInfoFormat: PackageToJS.DebugInfoFormat
+        debugInfoFormat: PackageToJS.DebugInfoFormat,
+        wasiRuntime: WASIRuntime
     ) throws {
-        let options = PackageToJS.PackageOptions()
+        var options = PackageToJS.PackageOptions()
+        options.wasiRuntime = wasiRuntime
         let system = TestPackagingSystem()
         let planner = PackagingPlanner(
             options: options,
