@@ -9,6 +9,7 @@ class TypeDeclResolver {
     typealias QualifiedName = [String]
     private var typeDeclByQualifiedName: [QualifiedName: TypeDecl] = [:]
     private var typeAliasByQualifiedName: [QualifiedName: TypeAliasDeclSyntax] = [:]
+    private(set) var declarationsWithInheritance: [any DeclGroupSyntax] = []
 
     enum Error: Swift.Error {
         case typeNotFound(QualifiedName)
@@ -24,6 +25,9 @@ class TypeDeclResolver {
         }
 
         func visitNominalDecl(_ node: TypeDecl) -> SyntaxVisitorContinueKind {
+            if node.inheritanceClause != nil {
+                resolver.declarationsWithInheritance.append(node)
+            }
             let name = node.name.text
             let qualifiedName = scope + [name]
             resolver.typeDeclByQualifiedName[qualifiedName] = node
@@ -74,6 +78,9 @@ class TypeDeclResolver {
         }
 
         override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
+            if node.inheritanceClause != nil {
+                resolver.declarationsWithInheritance.append(node)
+            }
             guard let components = node.memberScopeComponents else {
                 return .skipChildren
             }

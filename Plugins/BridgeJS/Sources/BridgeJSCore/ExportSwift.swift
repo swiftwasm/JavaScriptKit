@@ -262,8 +262,8 @@ public class ExportSwift {
 
         private func protocolCastSuffix(for returnType: BridgeType) -> (prefix: String, suffix: String) {
             switch returnType {
-            case .swiftProtocol:
-                return ("", " as! _BridgedSwiftProtocolExportable")
+            case .swiftProtocol(let name):
+                return ("_bridgeJSUnwrapProtocolExportable(", ", \"\(name)\")")
             default:
                 return ("", "")
             }
@@ -424,11 +424,11 @@ public class ExportSwift {
                 }
             case .swiftProtocol:
                 append("return ret.bridgeJSLowerAsProtocolReturn()")
-            case .nullable(.swiftProtocol, _):
+            case .nullable(.swiftProtocol(let protocolName), _):
                 append(
                     """
                     if let ret {
-                        _swift_js_return_optional_object(1, (ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+                        _swift_js_return_optional_object(1, _bridgeJSUnwrapProtocolExportable(ret, "\(raw: protocolName)").bridgeJSLowerAsProtocolReturn())
                     } else {
                         _swift_js_return_optional_object(0, 0)
                     }
@@ -993,9 +993,9 @@ struct StackCodegen {
             return ["\(raw: accessor).bridgeJSStackPush()"]
         case .jsObject(_?):
             return ["\(raw: accessor).jsObject.bridgeJSStackPush()"]
-        case .swiftProtocol:
+        case .swiftProtocol(let protocolName):
             return [
-                "_swift_js_push_i32((\(raw: accessor) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
+                "_swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(\(raw: accessor), \"\(raw: protocolName)\").bridgeJSLowerAsProtocolReturn())"
             ]
         case .void, .namespaceEnum:
             return []
@@ -1016,8 +1016,8 @@ struct StackCodegen {
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
         switch elementType {
-        case .swiftProtocol:
-            return lowerProtocolArrayStatements(accessor: accessor, varPrefix: varPrefix)
+        case .swiftProtocol(let protocolName):
+            return lowerProtocolArrayStatements(protocolName: protocolName, accessor: accessor, varPrefix: varPrefix)
         case .void, .namespaceEnum:
             fatalError("Invalid array element type: \(elementType)")
         default:
@@ -1026,6 +1026,7 @@ struct StackCodegen {
     }
 
     private func lowerProtocolArrayStatements(
+        protocolName: String,
         accessor: String,
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
@@ -1033,7 +1034,7 @@ struct StackCodegen {
         return [
             """
             for \(raw: elemVar) in \(raw: accessor) {
-                _swift_js_push_i32((\(raw: elemVar) as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+                _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(\(raw: elemVar), "\(raw: protocolName)").bridgeJSLowerAsProtocolReturn())
             }
             """,
             "_swift_js_push_i32(Int32(\(raw: accessor).count))",
@@ -1048,8 +1049,12 @@ struct StackCodegen {
         switch valueType {
         case .jsObject(let className?) where className != "JSObject":
             return ["\(raw: accessor).mapValues { $0.jsObject }.bridgeJSStackPush()"]
-        case .swiftProtocol:
-            return lowerProtocolDictionaryStatements(accessor: accessor, varPrefix: varPrefix)
+        case .swiftProtocol(let protocolName):
+            return lowerProtocolDictionaryStatements(
+                protocolName: protocolName,
+                accessor: accessor,
+                varPrefix: varPrefix
+            )
         case .nullable, .closure:
             return lowerDictionaryStatementsInline(
                 valueType: valueType,
@@ -1107,6 +1112,7 @@ struct StackCodegen {
     }
 
     private func lowerProtocolDictionaryStatements(
+        protocolName: String,
         accessor: String,
         varPrefix: String
     ) -> [CodeBlockItemSyntax] {
@@ -1115,7 +1121,7 @@ struct StackCodegen {
             """
             for \(raw: pairVar) in \(raw: accessor) {
                 \(raw: pairVar).key.bridgeJSStackPush()
-                _swift_js_push_i32((\(raw: pairVar).value as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+                _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(\(raw: pairVar).value, "\(raw: protocolName)").bridgeJSLowerAsProtocolReturn())
             }
             """,
             "_swift_js_push_i32(Int32(\(raw: accessor).count))",

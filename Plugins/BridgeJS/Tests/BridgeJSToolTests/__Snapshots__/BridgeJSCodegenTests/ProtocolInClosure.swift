@@ -27,7 +27,7 @@ private enum _BJS_Closure_10TestModule10RenderableP_10RenderableP {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let param0ObjectId = (param0 as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()
+            let param0ObjectId = _bridgeJSUnwrapProtocolExportable(param0, "Renderable").bridgeJSLowerAsProtocolReturn()
             let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModule10RenderableP_10RenderableP(callbackValue, param0ObjectId)
             return AnyRenderable.bridgeJSLiftReturn(ret)
@@ -55,7 +55,7 @@ public func _invoke_swift_closure_TestModule_10TestModule10RenderableP_10Rendera
     #if arch(wasm32)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(any Renderable) -> any Renderable>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     let result = closure(AnyRenderable.bridgeJSLiftParameter(param0))
-    return (result as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()
+    return _bridgeJSUnwrapProtocolExportable(result, "Renderable").bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -90,7 +90,7 @@ private enum _BJS_Closure_10TestModule10RenderableP_SS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let param0ObjectId = (param0 as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()
+            let param0ObjectId = _bridgeJSUnwrapProtocolExportable(param0, "Renderable").bridgeJSLowerAsProtocolReturn()
             let callbackValue = callback.bridgeJSLowerParameter()
             let ret = invoke_js_callback_TestModule_10TestModule10RenderableP_SS(callbackValue, param0ObjectId)
             return String.bridgeJSLiftReturn(ret)
@@ -155,7 +155,7 @@ private enum _BJS_Closure_10TestModuleSq10RenderableP_SS {
             #if arch(wasm32)
             let (param0IsSome, param0ObjectId): (Int32, Int32)
             if let param0 {
-                (param0IsSome, param0ObjectId) = (1, (param0 as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+                (param0IsSome, param0ObjectId) = (1, _bridgeJSUnwrapProtocolExportable(param0, "Renderable").bridgeJSLowerAsProtocolReturn())
             } else {
                 (param0IsSome, param0ObjectId) = (0, 0)
             }
@@ -248,7 +248,7 @@ public func _invoke_swift_closure_TestModule_10TestModuley_10RenderableP(_ boxPt
     #if arch(wasm32)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<() -> any Renderable>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     let result = closure()
-    return (result as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()
+    return _bridgeJSUnwrapProtocolExportable(result, "Renderable").bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif

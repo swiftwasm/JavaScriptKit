@@ -698,7 +698,7 @@ public func _bjs_processDelegates() -> Void {
     #if arch(wasm32)
     let ret = processDelegates(_: [AnyMyViewControllerDelegate].bridgeJSStackPop())
     for __bjs_elem_ret in ret {
-        _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+        _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(__bjs_elem_ret, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -713,7 +713,7 @@ public func _bjs_processDelegatesByName() -> Void {
     let ret = processDelegatesByName(_: [String: AnyMyViewControllerDelegate].bridgeJSLiftParameter())
     for __bjs_kv_ret in ret {
         __bjs_kv_ret.key.bridgeJSStackPush()
-        _swift_js_push_i32((__bjs_kv_ret.value as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+        _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(__bjs_kv_ret.value, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -871,7 +871,7 @@ public func _bjs_MyViewController_sendHelper(_ _self: UnsafeMutableRawPointer, _
 @_cdecl("bjs_MyViewController_delegate_get")
 public func _bjs_MyViewController_delegate_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = MyViewController.bridgeJSLiftParameter(_self).delegate as! _BridgedSwiftProtocolExportable
+    let ret = _bridgeJSUnwrapProtocolExportable(MyViewController.bridgeJSLiftParameter(_self).delegate, "MyViewControllerDelegate")
     return ret.bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -894,7 +894,7 @@ public func _bjs_MyViewController_secondDelegate_get(_ _self: UnsafeMutableRawPo
     #if arch(wasm32)
     let ret = MyViewController.bridgeJSLiftParameter(_self).secondDelegate
     if let ret {
-        _swift_js_return_optional_object(1, (ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+        _swift_js_return_optional_object(1, _bridgeJSUnwrapProtocolExportable(ret, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
     } else {
         _swift_js_return_optional_object(0, 0)
     }
@@ -971,7 +971,7 @@ public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer)
     #if arch(wasm32)
     let ret = DelegateManager.bridgeJSLiftParameter(_self).delegates
     for __bjs_elem_ret in ret {
-        _swift_js_push_i32((__bjs_elem_ret as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+        _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(__bjs_elem_ret, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
     }
     _swift_js_push_i32(Int32(ret.count))
     #else
@@ -996,7 +996,7 @@ public func _bjs_DelegateManager_delegatesByName_get(_ _self: UnsafeMutableRawPo
     let ret = DelegateManager.bridgeJSLiftParameter(_self).delegatesByName
     for __bjs_kv_ret in ret {
         __bjs_kv_ret.key.bridgeJSStackPush()
-        _swift_js_push_i32((__bjs_kv_ret.value as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())
+        _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(__bjs_kv_ret.value, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
     }
     _swift_js_push_i32(Int32(ret.count))
     #else

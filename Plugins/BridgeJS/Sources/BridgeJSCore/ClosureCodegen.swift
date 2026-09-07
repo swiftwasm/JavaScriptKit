@@ -182,15 +182,15 @@ public struct ClosureCodegen {
             } else {
                 printer.write("let result = \(closureCallExpr)")
                 switch signature.returnType {
-                case .swiftProtocol:
+                case .swiftProtocol(let protocolName):
                     printer.write(
-                        "return (result as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn()"
+                        "return _bridgeJSUnwrapProtocolExportable(result, \"\(protocolName)\").bridgeJSLowerAsProtocolReturn()"
                     )
-                case .nullable(.swiftProtocol, _):
+                case .nullable(.swiftProtocol(let protocolName), _):
                     printer.write("if let result {")
                     printer.indent {
                         printer.write(
-                            "_swift_js_return_optional_object(1, (result as! _BridgedSwiftProtocolExportable).bridgeJSLowerAsProtocolReturn())"
+                            "_swift_js_return_optional_object(1, _bridgeJSUnwrapProtocolExportable(result, \"\(protocolName)\").bridgeJSLowerAsProtocolReturn())"
                         )
                     }
                     printer.write("} else {")

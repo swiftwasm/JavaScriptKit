@@ -295,6 +295,8 @@ public final class SwiftToSkeleton {
             collector.finalize(&exported)
         }
 
+        perSourceErrors.append(contentsOf: diagnoseProtocolConformances(in: exported))
+
         if !perSourceErrors.isEmpty {
             let diagnostics = perSourceErrors.flatMap { inputFilePath, errors in
                 errors.map { (file: inputFilePath, diagnostic: $0) }
@@ -316,6 +318,99 @@ public final class SwiftToSkeleton {
             imported: importedSkeleton,
             usedExternalModules: usedExternalModules.sorted()
         )
+    }
+
+    private func diagnoseProtocolConformances(
+        in exported: ExportedSkeleton
+    ) -> [(inputFilePath: String, errors: [DiagnosticError])] {
+        var loweredProtocols: Set<String> = []
+        func collect(_ type: BridgeType, loweredBySwift: Bool) {
+            switch type {
+            case .swiftProtocol(let name):
+                if loweredBySwift { loweredProtocols.insert(name) }
+            case .array(let element), .dictionary(let element), .nullable(let element, _), .alias(_, let element):
+                collect(element, loweredBySwift: loweredBySwift)
+            case .closure(let signature, _):
+                for parameter in signature.parameters {
+                    collect(parameter, loweredBySwift: !loweredBySwift)
+                }
+                collect(signature.returnType, loweredBySwift: loweredBySwift)
+            default:
+                break
+            }
+        }
+        func collect(_ function: ExportedFunction, loweredReturn: Bool = true) {
+            for parameter in function.parameters { collect(parameter.type, loweredBySwift: !loweredReturn) }
+            collect(function.returnType, loweredBySwift: loweredReturn)
+        }
+
+        for function in exported.functions + exported.classes.flatMap(\.methods)
+            + exported.structs.flatMap(\.methods) + exported.enums.flatMap(\.staticMethods)
+        {
+            collect(function)
+        }
+        for constructor in exported.classes.compactMap(\.constructor) + exported.structs.compactMap(\.constructor) {
+            for parameter in constructor.parameters { collect(parameter.type, loweredBySwift: false) }
+        }
+        for property in exported.classes.flatMap(\.properties) + exported.enums.flatMap(\.staticProperties) {
+            collect(property.type, loweredBySwift: true)
+            if !property.isReadonly { collect(property.type, loweredBySwift: false) }
+        }
+        for property in exported.structs.flatMap(\.properties) {
+            collect(property.type, loweredBySwift: true)
+            if !property.isStatic || !property.isReadonly { collect(property.type, loweredBySwift: false) }
+        }
+        for value in exported.enums.flatMap(\.cases).flatMap(\.associatedValues) {
+            collect(value.type, loweredBySwift: true)
+        }
+        for protocolDef in exported.protocols {
+            for method in protocolDef.methods { collect(method, loweredReturn: false) }
+            for property in protocolDef.properties {
+                collect(property.type, loweredBySwift: false)
+                if !property.isReadonly { collect(property.type, loweredBySwift: true) }
+            }
+        }
+
+        guard !loweredProtocols.isEmpty else { return [] }
+        var diagnostics: [(inputFilePath: String, errors: [DiagnosticError])] = []
+        for declaration in typeDeclResolver.declarationsWithInheritance where !declaration.is(ProtocolDeclSyntax.self) {
+            let extendedType = declaration.as(ExtensionDeclSyntax.self)?.extendedType
+            let target = extendedType.flatMap { typeDeclResolver.resolveExtensionTarget($0) }
+            let classDecl = declaration.as(ClassDeclSyntax.self) ?? target?.as(ClassDeclSyntax.self)
+            if classDecl?.attributes.hasJSAttribute() == true { continue }
+            if let extendedType, target == nil {
+                var errors: [DiagnosticError] = []
+                if case .swiftHeapObject = resolveExternal(for: extendedType, errors: &errors) { continue }
+            }
+            guard
+                let name = declaration.asProtocol(NamedDeclSyntax.self)?.name.text ?? extendedType?.trimmedDescription,
+                let inputFilePath = sourceFiles.first(where: { $0.sourceFile.id == declaration.root.id })?.inputFilePath
+            else { continue }
+            for inherited in declaration.inheritanceClause?.inheritedTypes ?? [] {
+                guard let protocolDecl = typeDeclResolver.resolve(inherited.type)?.as(ProtocolDeclSyntax.self),
+                    protocolDecl.attributes.hasJSAttribute(), loweredProtocols.contains(protocolDecl.name.text)
+                else { continue }
+                let protocolName = protocolDecl.name.text
+                diagnostics.append(
+                    (
+                        inputFilePath,
+                        [
+                            DiagnosticError(
+                                node: declaration,
+                                message:
+                                    "'\(name)' conforms to '\(protocolName)', a @JS protocol that exported APIs "
+                                    + "bridge to JavaScript, but '\(name)' is not a '@JS class'. Passing it to "
+                                    + "JavaScript as 'any \(protocolName)' would trap at runtime.",
+                                hint:
+                                    "Mark '\(name)' as a '@JS class' so it can cross the bridge, or avoid using "
+                                    + "'\(protocolName)' as an existential in exported APIs."
+                            )
+                        ]
+                    )
+                )
+            }
+        }
+        return diagnostics
     }
 
     private static let jsTypedArrayTypealiasNames: [String: String] = [
