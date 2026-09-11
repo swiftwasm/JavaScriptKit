@@ -48,7 +48,8 @@ fileprivate func _bjs_struct_lift_Archive_Record_extern() -> Int32 {
 @_cdecl("bjs_Archive_Record_init")
 public func _bjs_Archive_Record_init(_ labelBytes: Int32, _ labelLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Archive.Record(label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    let label = String.bridgeJSLiftParameter(labelBytes, labelLength)
+    let ret = Archive.Record(label: label)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -59,7 +60,8 @@ public func _bjs_Archive_Record_init(_ labelBytes: Int32, _ labelLength: Int32) 
 @_cdecl("bjs_Archive_Record_describeRecord")
 public func _bjs_Archive_Record_describeRecord() -> Void {
     #if arch(wasm32)
-    let ret = Archive.Record.bridgeJSLiftParameter().describeRecord()
+    let _self = Archive.Record.bridgeJSLiftParameter()
+    let ret = _self.describeRecord()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

@@ -48,7 +48,8 @@ public func _bjs_PropertyEnum_static_enumProperty_get() -> Void {
 @_cdecl("bjs_PropertyEnum_static_enumProperty_set")
 public func _bjs_PropertyEnum_static_enumProperty_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    PropertyEnum.enumProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    PropertyEnum.enumProperty = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -80,7 +81,8 @@ public func _bjs_PropertyEnum_static_computedEnum_get() -> Void {
 @_cdecl("bjs_PropertyEnum_static_computedEnum_set")
 public func _bjs_PropertyEnum_static_computedEnum_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    PropertyEnum.computedEnum = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    PropertyEnum.computedEnum = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -101,7 +103,8 @@ public func _bjs_PropertyNamespace_static_namespaceProperty_get() -> Void {
 @_cdecl("bjs_PropertyNamespace_static_namespaceProperty_set")
 public func _bjs_PropertyNamespace_static_namespaceProperty_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    PropertyNamespace.namespaceProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    PropertyNamespace.namespaceProperty = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -133,7 +136,8 @@ public func _bjs_PropertyNamespace_Nested_static_nestedProperty_get() -> Int32 {
 @_cdecl("bjs_PropertyNamespace_Nested_static_nestedProperty_set")
 public func _bjs_PropertyNamespace_Nested_static_nestedProperty_set(_ value: Int32) -> Void {
     #if arch(wasm32)
-    PropertyNamespace.Nested.nestedProperty = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    PropertyNamespace.Nested.nestedProperty = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -165,7 +169,8 @@ public func _bjs_PropertyNamespace_Nested_static_nestedDouble_get() -> Float64 {
 @_cdecl("bjs_PropertyNamespace_Nested_static_nestedDouble_set")
 public func _bjs_PropertyNamespace_Nested_static_nestedDouble_set(_ value: Float64) -> Void {
     #if arch(wasm32)
-    PropertyNamespace.Nested.nestedDouble = Double.bridgeJSLiftParameter(value)
+    let value = Double.bridgeJSLiftParameter(value)
+    PropertyNamespace.Nested.nestedDouble = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -208,7 +213,8 @@ public func _bjs_PropertyClass_static_staticVariable_get() -> Int32 {
 @_cdecl("bjs_PropertyClass_static_staticVariable_set")
 public func _bjs_PropertyClass_static_staticVariable_set(_ value: Int32) -> Void {
     #if arch(wasm32)
-    PropertyClass.staticVariable = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    PropertyClass.staticVariable = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -229,7 +235,8 @@ public func _bjs_PropertyClass_static_jsObjectProperty_get() -> Int32 {
 @_cdecl("bjs_PropertyClass_static_jsObjectProperty_set")
 public func _bjs_PropertyClass_static_jsObjectProperty_set(_ value: Int32) -> Void {
     #if arch(wasm32)
-    PropertyClass.jsObjectProperty = JSObject.bridgeJSLiftParameter(value)
+    let value = JSObject.bridgeJSLiftParameter(value)
+    PropertyClass.jsObjectProperty = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -250,7 +257,8 @@ public func _bjs_PropertyClass_static_classVariable_get() -> Void {
 @_cdecl("bjs_PropertyClass_static_classVariable_set")
 public func _bjs_PropertyClass_static_classVariable_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    PropertyClass.classVariable = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    PropertyClass.classVariable = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -271,7 +279,8 @@ public func _bjs_PropertyClass_static_computedProperty_get() -> Void {
 @_cdecl("bjs_PropertyClass_static_computedProperty_set")
 public func _bjs_PropertyClass_static_computedProperty_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    PropertyClass.computedProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    PropertyClass.computedProperty = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -303,7 +312,8 @@ public func _bjs_PropertyClass_static_optionalProperty_get() -> Void {
 @_cdecl("bjs_PropertyClass_static_optionalProperty_set")
 public func _bjs_PropertyClass_static_optionalProperty_set(_ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    PropertyClass.optionalProperty = Optional<String>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength)
+    let value = Optional<String>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength)
+    PropertyClass.optionalProperty = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

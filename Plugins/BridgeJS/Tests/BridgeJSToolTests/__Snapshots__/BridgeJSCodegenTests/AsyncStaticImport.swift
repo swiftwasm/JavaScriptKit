@@ -38,8 +38,8 @@ private enum _BJS_Closure_10TestModules7JSValueV_y {
 }
 
 extension JSTypedClosure where Signature == (sending JSValue) -> Void {
-    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending JSValue) -> Void) {
-        self.init(
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending JSValue) -> Void) -> Self {
+        Self(
             makeClosure: make_swift_closure_TestModule_10TestModules7JSValueV_y,
             body: body,
             fileID: fileID,
@@ -52,8 +52,9 @@ extension JSTypedClosure where Signature == (sending JSValue) -> Void {
 @_cdecl("invoke_swift_closure_TestModule_10TestModules7JSValueV_y")
 public func _invoke_swift_closure_TestModule_10TestModules7JSValueV_y(_ boxPtr: UnsafeMutableRawPointer, _ param0Kind: Int32, _ param0Payload1: Int32, _ param0Payload2: Float64) -> Void {
     #if arch(wasm32)
+    let param0 = JSValue.bridgeJSLiftParameter(param0Kind, param0Payload1, param0Payload2)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending JSValue) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    closure(JSValue.bridgeJSLiftParameter(param0Kind, param0Payload1, param0Payload2))
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -99,8 +100,8 @@ private enum _BJS_Closure_10TestModulesSd_y {
 }
 
 extension JSTypedClosure where Signature == (sending Double) -> Void {
-    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending Double) -> Void) {
-        self.init(
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending Double) -> Void) -> Self {
+        Self(
             makeClosure: make_swift_closure_TestModule_10TestModulesSd_y,
             body: body,
             fileID: fileID,
@@ -113,8 +114,9 @@ extension JSTypedClosure where Signature == (sending Double) -> Void {
 @_cdecl("invoke_swift_closure_TestModule_10TestModulesSd_y")
 public func _invoke_swift_closure_TestModule_10TestModulesSd_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Float64) -> Void {
     #if arch(wasm32)
+    let param0 = Double.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending Double) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    closure(Double.bridgeJSLiftParameter(param0))
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -206,9 +208,9 @@ fileprivate func bjs_AsyncBox_asyncStaticVoid_static_extern(_ resolveRef: Int32,
 
 func _$AsyncBox_asyncStaticRoundTrip(_ v: Double) async throws(JSException) -> Double {
     let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
-            JSTypedClosure<(sending Double) -> Void>($0)
+            JSTypedClosure<(sending Double) -> Void>.sending($0)
         }, makeRejectClosure: {
-            JSTypedClosure<(sending JSValue) -> Void>($0)
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
         }) { resolveRef, rejectRef in
         let vValue = v.bridgeJSLowerParameter()
         bjs_AsyncBox_asyncStaticRoundTrip_static(resolveRef, rejectRef, vValue)
@@ -220,7 +222,7 @@ func _$AsyncBox_asyncStaticVoid() async throws(JSException) -> Void {
     try await _bjs_awaitPromise(makeResolveClosure: {
             JSTypedClosure<() -> Void>($0)
         }, makeRejectClosure: {
-            JSTypedClosure<(sending JSValue) -> Void>($0)
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
         }) { resolveRef, rejectRef in
         bjs_AsyncBox_asyncStaticVoid_static(resolveRef, rejectRef)
     }

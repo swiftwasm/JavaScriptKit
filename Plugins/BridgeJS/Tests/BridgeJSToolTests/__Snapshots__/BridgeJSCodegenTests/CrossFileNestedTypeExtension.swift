@@ -5,7 +5,8 @@ extension Workspace.Kind: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum 
 @_cdecl("bjs_Workspace_init")
 public func _bjs_Workspace_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Workspace(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Workspace(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -16,7 +17,8 @@ public func _bjs_Workspace_init(_ nameBytes: Int32, _ nameLength: Int32) -> Unsa
 @_cdecl("bjs_Workspace_describe")
 public func _bjs_Workspace_describe(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Workspace.bridgeJSLiftParameter(_self).describe()
+    let _self = Workspace.bridgeJSLiftParameter(_self)
+    let ret = _self.describe()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

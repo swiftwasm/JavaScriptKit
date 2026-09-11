@@ -53,9 +53,10 @@ extension JSTypedClosure where Signature == (Workshop.Bench) -> Workshop.Bench {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule8Workshop5BenchC_8Workshop5BenchC")
 public func _invoke_swift_closure_TestModule_10TestModule8Workshop5BenchC_8Workshop5BenchC(_ boxPtr: UnsafeMutableRawPointer, _ param0: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
+    let param0 = Workshop.Bench.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Workshop.Bench) -> Workshop.Bench>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Workshop.Bench.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -76,7 +77,9 @@ public func _bjs_makeBench() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_refitBench")
 public func _bjs_refitBench(_ bench: UnsafeMutableRawPointer, _ transform: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = refitBench(_: Workshop.Bench.bridgeJSLiftParameter(bench), _: _BJS_Closure_10TestModule8Workshop5BenchC_8Workshop5BenchC.bridgeJSLift(transform))
+    let transform = _BJS_Closure_10TestModule8Workshop5BenchC_8Workshop5BenchC.bridgeJSLift(transform)
+    let bench = Workshop.Bench.bridgeJSLiftParameter(bench)
+    let ret = refitBench(_: bench, _: transform)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

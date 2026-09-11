@@ -399,7 +399,9 @@ public func _bjs_EnumRoundtrip_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_EnumRoundtrip_take")
 public func _bjs_EnumRoundtrip_take(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    EnumRoundtrip.bridgeJSLiftParameter(_self).take(_: APIResult.bridgeJSLiftParameter(value))
+    let value = APIResult.bridgeJSLiftParameter(value)
+    let _self = EnumRoundtrip.bridgeJSLiftParameter(_self)
+    _self.take(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -409,7 +411,8 @@ public func _bjs_EnumRoundtrip_take(_ _self: UnsafeMutableRawPointer, _ value: I
 @_cdecl("bjs_EnumRoundtrip_makeSuccess")
 public func _bjs_EnumRoundtrip_makeSuccess(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeSuccess()
+    let _self = EnumRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeSuccess()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -420,7 +423,8 @@ public func _bjs_EnumRoundtrip_makeSuccess(_ _self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_EnumRoundtrip_makeFailure")
 public func _bjs_EnumRoundtrip_makeFailure(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeFailure()
+    let _self = EnumRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeFailure()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -431,7 +435,8 @@ public func _bjs_EnumRoundtrip_makeFailure(_ _self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_EnumRoundtrip_makeFlag")
 public func _bjs_EnumRoundtrip_makeFlag(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeFlag()
+    let _self = EnumRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeFlag()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -442,7 +447,8 @@ public func _bjs_EnumRoundtrip_makeFlag(_ _self: UnsafeMutableRawPointer) -> Voi
 @_cdecl("bjs_EnumRoundtrip_makeRate")
 public func _bjs_EnumRoundtrip_makeRate(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeRate()
+    let _self = EnumRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeRate()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -453,7 +459,8 @@ public func _bjs_EnumRoundtrip_makeRate(_ _self: UnsafeMutableRawPointer) -> Voi
 @_cdecl("bjs_EnumRoundtrip_makePrecise")
 public func _bjs_EnumRoundtrip_makePrecise(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makePrecise()
+    let _self = EnumRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makePrecise()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -464,7 +471,8 @@ public func _bjs_EnumRoundtrip_makePrecise(_ _self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_EnumRoundtrip_makeInfo")
 public func _bjs_EnumRoundtrip_makeInfo(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).makeInfo()
+    let _self = EnumRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeInfo()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -475,7 +483,9 @@ public func _bjs_EnumRoundtrip_makeInfo(_ _self: UnsafeMutableRawPointer) -> Voi
 @_cdecl("bjs_EnumRoundtrip_roundtrip")
 public func _bjs_EnumRoundtrip_roundtrip(_ _self: UnsafeMutableRawPointer, _ result: Int32) -> Void {
     #if arch(wasm32)
-    let ret = EnumRoundtrip.bridgeJSLiftParameter(_self).roundtrip(_: APIResult.bridgeJSLiftParameter(result))
+    let result = APIResult.bridgeJSLiftParameter(result)
+    let _self = EnumRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtrip(_: result)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -528,7 +538,9 @@ public func _bjs_ComplexResultRoundtrip_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_ComplexResultRoundtrip_take")
 public func _bjs_ComplexResultRoundtrip_take(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    ComplexResultRoundtrip.bridgeJSLiftParameter(_self).take(_: ComplexResult.bridgeJSLiftParameter(value))
+    let value = ComplexResult.bridgeJSLiftParameter(value)
+    let _self = ComplexResultRoundtrip.bridgeJSLiftParameter(_self)
+    _self.take(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -538,7 +550,8 @@ public func _bjs_ComplexResultRoundtrip_take(_ _self: UnsafeMutableRawPointer, _
 @_cdecl("bjs_ComplexResultRoundtrip_makeSuccess")
 public func _bjs_ComplexResultRoundtrip_makeSuccess(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeSuccess()
+    let _self = ComplexResultRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeSuccess()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -549,7 +562,8 @@ public func _bjs_ComplexResultRoundtrip_makeSuccess(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_ComplexResultRoundtrip_makeError")
 public func _bjs_ComplexResultRoundtrip_makeError(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeError()
+    let _self = ComplexResultRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeError()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -560,7 +574,8 @@ public func _bjs_ComplexResultRoundtrip_makeError(_ _self: UnsafeMutableRawPoint
 @_cdecl("bjs_ComplexResultRoundtrip_makeLocation")
 public func _bjs_ComplexResultRoundtrip_makeLocation(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeLocation()
+    let _self = ComplexResultRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeLocation()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -571,7 +586,8 @@ public func _bjs_ComplexResultRoundtrip_makeLocation(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ComplexResultRoundtrip_makeStatus")
 public func _bjs_ComplexResultRoundtrip_makeStatus(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeStatus()
+    let _self = ComplexResultRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeStatus()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -582,7 +598,8 @@ public func _bjs_ComplexResultRoundtrip_makeStatus(_ _self: UnsafeMutableRawPoin
 @_cdecl("bjs_ComplexResultRoundtrip_makeCoordinates")
 public func _bjs_ComplexResultRoundtrip_makeCoordinates(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeCoordinates()
+    let _self = ComplexResultRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeCoordinates()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -593,7 +610,8 @@ public func _bjs_ComplexResultRoundtrip_makeCoordinates(_ _self: UnsafeMutableRa
 @_cdecl("bjs_ComplexResultRoundtrip_makeComprehensive")
 public func _bjs_ComplexResultRoundtrip_makeComprehensive(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeComprehensive()
+    let _self = ComplexResultRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeComprehensive()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -604,7 +622,8 @@ public func _bjs_ComplexResultRoundtrip_makeComprehensive(_ _self: UnsafeMutable
 @_cdecl("bjs_ComplexResultRoundtrip_makeInfo")
 public func _bjs_ComplexResultRoundtrip_makeInfo(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).makeInfo()
+    let _self = ComplexResultRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeInfo()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -615,7 +634,9 @@ public func _bjs_ComplexResultRoundtrip_makeInfo(_ _self: UnsafeMutableRawPointe
 @_cdecl("bjs_ComplexResultRoundtrip_roundtrip")
 public func _bjs_ComplexResultRoundtrip_roundtrip(_ _self: UnsafeMutableRawPointer, _ result: Int32) -> Void {
     #if arch(wasm32)
-    let ret = ComplexResultRoundtrip.bridgeJSLiftParameter(_self).roundtrip(_: ComplexResult.bridgeJSLiftParameter(result))
+    let result = ComplexResult.bridgeJSLiftParameter(result)
+    let _self = ComplexResultRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtrip(_: result)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -668,7 +689,9 @@ public func _bjs_StringRoundtrip_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_StringRoundtrip_take")
 public func _bjs_StringRoundtrip_take(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    StringRoundtrip.bridgeJSLiftParameter(_self).take(_: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = StringRoundtrip.bridgeJSLiftParameter(_self)
+    _self.take(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -678,7 +701,8 @@ public func _bjs_StringRoundtrip_take(_ _self: UnsafeMutableRawPointer, _ valueB
 @_cdecl("bjs_StringRoundtrip_make")
 public func _bjs_StringRoundtrip_make(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = StringRoundtrip.bridgeJSLiftParameter(_self).make()
+    let _self = StringRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.make()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -731,7 +755,8 @@ public func _bjs_OptionalReturnRoundtrip_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_OptionalReturnRoundtrip_makeIntSome")
 public func _bjs_OptionalReturnRoundtrip_makeIntSome(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeIntSome()
+    let _self = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeIntSome()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -742,7 +767,8 @@ public func _bjs_OptionalReturnRoundtrip_makeIntSome(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_OptionalReturnRoundtrip_makeIntNone")
 public func _bjs_OptionalReturnRoundtrip_makeIntNone(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeIntNone()
+    let _self = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeIntNone()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -753,7 +779,8 @@ public func _bjs_OptionalReturnRoundtrip_makeIntNone(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_OptionalReturnRoundtrip_makeBoolSome")
 public func _bjs_OptionalReturnRoundtrip_makeBoolSome(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeBoolSome()
+    let _self = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeBoolSome()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -764,7 +791,8 @@ public func _bjs_OptionalReturnRoundtrip_makeBoolSome(_ _self: UnsafeMutableRawP
 @_cdecl("bjs_OptionalReturnRoundtrip_makeBoolNone")
 public func _bjs_OptionalReturnRoundtrip_makeBoolNone(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeBoolNone()
+    let _self = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeBoolNone()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -775,7 +803,8 @@ public func _bjs_OptionalReturnRoundtrip_makeBoolNone(_ _self: UnsafeMutableRawP
 @_cdecl("bjs_OptionalReturnRoundtrip_makeDoubleSome")
 public func _bjs_OptionalReturnRoundtrip_makeDoubleSome(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeDoubleSome()
+    let _self = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeDoubleSome()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -786,7 +815,8 @@ public func _bjs_OptionalReturnRoundtrip_makeDoubleSome(_ _self: UnsafeMutableRa
 @_cdecl("bjs_OptionalReturnRoundtrip_makeDoubleNone")
 public func _bjs_OptionalReturnRoundtrip_makeDoubleNone(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeDoubleNone()
+    let _self = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeDoubleNone()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -797,7 +827,8 @@ public func _bjs_OptionalReturnRoundtrip_makeDoubleNone(_ _self: UnsafeMutableRa
 @_cdecl("bjs_OptionalReturnRoundtrip_makeStringSome")
 public func _bjs_OptionalReturnRoundtrip_makeStringSome(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeStringSome()
+    let _self = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeStringSome()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -808,7 +839,8 @@ public func _bjs_OptionalReturnRoundtrip_makeStringSome(_ _self: UnsafeMutableRa
 @_cdecl("bjs_OptionalReturnRoundtrip_makeStringNone")
 public func _bjs_OptionalReturnRoundtrip_makeStringNone(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self).makeStringNone()
+    let _self = OptionalReturnRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeStringNone()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -861,7 +893,9 @@ public func _bjs_StructRoundtrip_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_StructRoundtrip_takeSimple")
 public func _bjs_StructRoundtrip_takeSimple(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    StructRoundtrip.bridgeJSLiftParameter(_self).takeSimple(_: SimpleStruct.bridgeJSLiftParameter())
+    let value = SimpleStruct.bridgeJSLiftParameter()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeSimple(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -871,7 +905,8 @@ public func _bjs_StructRoundtrip_takeSimple(_ _self: UnsafeMutableRawPointer) ->
 @_cdecl("bjs_StructRoundtrip_makeSimple")
 public func _bjs_StructRoundtrip_makeSimple(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makeSimple()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeSimple()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -882,7 +917,9 @@ public func _bjs_StructRoundtrip_makeSimple(_ _self: UnsafeMutableRawPointer) ->
 @_cdecl("bjs_StructRoundtrip_roundtripSimple")
 public func _bjs_StructRoundtrip_roundtripSimple(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripSimple(_: SimpleStruct.bridgeJSLiftParameter())
+    let value = SimpleStruct.bridgeJSLiftParameter()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripSimple(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -893,7 +930,9 @@ public func _bjs_StructRoundtrip_roundtripSimple(_ _self: UnsafeMutableRawPointe
 @_cdecl("bjs_StructRoundtrip_takeAddress")
 public func _bjs_StructRoundtrip_takeAddress(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    StructRoundtrip.bridgeJSLiftParameter(_self).takeAddress(_: Address.bridgeJSLiftParameter())
+    let value = Address.bridgeJSLiftParameter()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeAddress(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -903,7 +942,8 @@ public func _bjs_StructRoundtrip_takeAddress(_ _self: UnsafeMutableRawPointer) -
 @_cdecl("bjs_StructRoundtrip_makeAddress")
 public func _bjs_StructRoundtrip_makeAddress(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makeAddress()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeAddress()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -914,7 +954,9 @@ public func _bjs_StructRoundtrip_makeAddress(_ _self: UnsafeMutableRawPointer) -
 @_cdecl("bjs_StructRoundtrip_roundtripAddress")
 public func _bjs_StructRoundtrip_roundtripAddress(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripAddress(_: Address.bridgeJSLiftParameter())
+    let value = Address.bridgeJSLiftParameter()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripAddress(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -925,7 +967,9 @@ public func _bjs_StructRoundtrip_roundtripAddress(_ _self: UnsafeMutableRawPoint
 @_cdecl("bjs_StructRoundtrip_takePerson")
 public func _bjs_StructRoundtrip_takePerson(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    StructRoundtrip.bridgeJSLiftParameter(_self).takePerson(_: Person.bridgeJSLiftParameter())
+    let value = Person.bridgeJSLiftParameter()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takePerson(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -935,7 +979,8 @@ public func _bjs_StructRoundtrip_takePerson(_ _self: UnsafeMutableRawPointer) ->
 @_cdecl("bjs_StructRoundtrip_makePerson")
 public func _bjs_StructRoundtrip_makePerson(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makePerson()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makePerson()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -946,7 +991,9 @@ public func _bjs_StructRoundtrip_makePerson(_ _self: UnsafeMutableRawPointer) ->
 @_cdecl("bjs_StructRoundtrip_roundtripPerson")
 public func _bjs_StructRoundtrip_roundtripPerson(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripPerson(_: Person.bridgeJSLiftParameter())
+    let value = Person.bridgeJSLiftParameter()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripPerson(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -957,7 +1004,9 @@ public func _bjs_StructRoundtrip_roundtripPerson(_ _self: UnsafeMutableRawPointe
 @_cdecl("bjs_StructRoundtrip_takeComplex")
 public func _bjs_StructRoundtrip_takeComplex(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    StructRoundtrip.bridgeJSLiftParameter(_self).takeComplex(_: ComplexStruct.bridgeJSLiftParameter())
+    let value = ComplexStruct.bridgeJSLiftParameter()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeComplex(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -967,7 +1016,8 @@ public func _bjs_StructRoundtrip_takeComplex(_ _self: UnsafeMutableRawPointer) -
 @_cdecl("bjs_StructRoundtrip_makeComplex")
 public func _bjs_StructRoundtrip_makeComplex(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).makeComplex()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeComplex()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -978,7 +1028,9 @@ public func _bjs_StructRoundtrip_makeComplex(_ _self: UnsafeMutableRawPointer) -
 @_cdecl("bjs_StructRoundtrip_roundtripComplex")
 public func _bjs_StructRoundtrip_roundtripComplex(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = StructRoundtrip.bridgeJSLiftParameter(_self).roundtripComplex(_: ComplexStruct.bridgeJSLiftParameter())
+    let value = ComplexStruct.bridgeJSLiftParameter()
+    let _self = StructRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripComplex(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1020,7 +1072,12 @@ fileprivate func _bjs_StructRoundtrip_wrap_extern(_ pointer: UnsafeMutableRawPoi
 @_cdecl("bjs_SimpleClass_init")
 public func _bjs_SimpleClass_init(_ nameBytes: Int32, _ nameLength: Int32, _ count: Int32, _ flag: Int32, _ rate: Float32, _ precise: Float64) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = SimpleClass(name: String.bridgeJSLiftParameter(nameBytes, nameLength), count: Int.bridgeJSLiftParameter(count), flag: Bool.bridgeJSLiftParameter(flag), rate: Float.bridgeJSLiftParameter(rate), precise: Double.bridgeJSLiftParameter(precise))
+    let precise = Double.bridgeJSLiftParameter(precise)
+    let rate = Float.bridgeJSLiftParameter(rate)
+    let flag = Bool.bridgeJSLiftParameter(flag)
+    let count = Int.bridgeJSLiftParameter(count)
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = SimpleClass(name: name, count: count, flag: flag, rate: rate, precise: precise)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1031,7 +1088,8 @@ public func _bjs_SimpleClass_init(_ nameBytes: Int32, _ nameLength: Int32, _ cou
 @_cdecl("bjs_SimpleClass_name_get")
 public func _bjs_SimpleClass_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = SimpleClass.bridgeJSLiftParameter(_self).name
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    let ret = _self.name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1042,7 +1100,9 @@ public func _bjs_SimpleClass_name_get(_ _self: UnsafeMutableRawPointer) -> Void 
 @_cdecl("bjs_SimpleClass_name_set")
 public func _bjs_SimpleClass_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    SimpleClass.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    _self.name = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1052,7 +1112,8 @@ public func _bjs_SimpleClass_name_set(_ _self: UnsafeMutableRawPointer, _ valueB
 @_cdecl("bjs_SimpleClass_count_get")
 public func _bjs_SimpleClass_count_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = SimpleClass.bridgeJSLiftParameter(_self).count
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    let ret = _self.count
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1063,7 +1124,9 @@ public func _bjs_SimpleClass_count_get(_ _self: UnsafeMutableRawPointer) -> Int3
 @_cdecl("bjs_SimpleClass_count_set")
 public func _bjs_SimpleClass_count_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    SimpleClass.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    _self.count = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1073,7 +1136,8 @@ public func _bjs_SimpleClass_count_set(_ _self: UnsafeMutableRawPointer, _ value
 @_cdecl("bjs_SimpleClass_flag_get")
 public func _bjs_SimpleClass_flag_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = SimpleClass.bridgeJSLiftParameter(_self).flag
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    let ret = _self.flag
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1084,7 +1148,9 @@ public func _bjs_SimpleClass_flag_get(_ _self: UnsafeMutableRawPointer) -> Int32
 @_cdecl("bjs_SimpleClass_flag_set")
 public func _bjs_SimpleClass_flag_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    SimpleClass.bridgeJSLiftParameter(_self).flag = Bool.bridgeJSLiftParameter(value)
+    let value = Bool.bridgeJSLiftParameter(value)
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    _self.flag = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1094,7 +1160,8 @@ public func _bjs_SimpleClass_flag_set(_ _self: UnsafeMutableRawPointer, _ value:
 @_cdecl("bjs_SimpleClass_rate_get")
 public func _bjs_SimpleClass_rate_get(_ _self: UnsafeMutableRawPointer) -> Float32 {
     #if arch(wasm32)
-    let ret = SimpleClass.bridgeJSLiftParameter(_self).rate
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    let ret = _self.rate
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1105,7 +1172,9 @@ public func _bjs_SimpleClass_rate_get(_ _self: UnsafeMutableRawPointer) -> Float
 @_cdecl("bjs_SimpleClass_rate_set")
 public func _bjs_SimpleClass_rate_set(_ _self: UnsafeMutableRawPointer, _ value: Float32) -> Void {
     #if arch(wasm32)
-    SimpleClass.bridgeJSLiftParameter(_self).rate = Float.bridgeJSLiftParameter(value)
+    let value = Float.bridgeJSLiftParameter(value)
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    _self.rate = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1115,7 +1184,8 @@ public func _bjs_SimpleClass_rate_set(_ _self: UnsafeMutableRawPointer, _ value:
 @_cdecl("bjs_SimpleClass_precise_get")
 public func _bjs_SimpleClass_precise_get(_ _self: UnsafeMutableRawPointer) -> Float64 {
     #if arch(wasm32)
-    let ret = SimpleClass.bridgeJSLiftParameter(_self).precise
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    let ret = _self.precise
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1126,7 +1196,9 @@ public func _bjs_SimpleClass_precise_get(_ _self: UnsafeMutableRawPointer) -> Fl
 @_cdecl("bjs_SimpleClass_precise_set")
 public func _bjs_SimpleClass_precise_set(_ _self: UnsafeMutableRawPointer, _ value: Float64) -> Void {
     #if arch(wasm32)
-    SimpleClass.bridgeJSLiftParameter(_self).precise = Double.bridgeJSLiftParameter(value)
+    let value = Double.bridgeJSLiftParameter(value)
+    let _self = SimpleClass.bridgeJSLiftParameter(_self)
+    _self.precise = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1167,7 +1239,10 @@ fileprivate func _bjs_SimpleClass_wrap_extern(_ pointer: UnsafeMutableRawPointer
 @_cdecl("bjs_AddressClass_init")
 public func _bjs_AddressClass_init(_ streetBytes: Int32, _ streetLength: Int32, _ cityBytes: Int32, _ cityLength: Int32, _ zipCode: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = AddressClass(street: String.bridgeJSLiftParameter(streetBytes, streetLength), city: String.bridgeJSLiftParameter(cityBytes, cityLength), zipCode: Int.bridgeJSLiftParameter(zipCode))
+    let zipCode = Int.bridgeJSLiftParameter(zipCode)
+    let city = String.bridgeJSLiftParameter(cityBytes, cityLength)
+    let street = String.bridgeJSLiftParameter(streetBytes, streetLength)
+    let ret = AddressClass(street: street, city: city, zipCode: zipCode)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1178,7 +1253,8 @@ public func _bjs_AddressClass_init(_ streetBytes: Int32, _ streetLength: Int32, 
 @_cdecl("bjs_AddressClass_street_get")
 public func _bjs_AddressClass_street_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = AddressClass.bridgeJSLiftParameter(_self).street
+    let _self = AddressClass.bridgeJSLiftParameter(_self)
+    let ret = _self.street
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1189,7 +1265,9 @@ public func _bjs_AddressClass_street_get(_ _self: UnsafeMutableRawPointer) -> Vo
 @_cdecl("bjs_AddressClass_street_set")
 public func _bjs_AddressClass_street_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    AddressClass.bridgeJSLiftParameter(_self).street = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = AddressClass.bridgeJSLiftParameter(_self)
+    _self.street = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1199,7 +1277,8 @@ public func _bjs_AddressClass_street_set(_ _self: UnsafeMutableRawPointer, _ val
 @_cdecl("bjs_AddressClass_city_get")
 public func _bjs_AddressClass_city_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = AddressClass.bridgeJSLiftParameter(_self).city
+    let _self = AddressClass.bridgeJSLiftParameter(_self)
+    let ret = _self.city
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1210,7 +1289,9 @@ public func _bjs_AddressClass_city_get(_ _self: UnsafeMutableRawPointer) -> Void
 @_cdecl("bjs_AddressClass_city_set")
 public func _bjs_AddressClass_city_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    AddressClass.bridgeJSLiftParameter(_self).city = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = AddressClass.bridgeJSLiftParameter(_self)
+    _self.city = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1220,7 +1301,8 @@ public func _bjs_AddressClass_city_set(_ _self: UnsafeMutableRawPointer, _ value
 @_cdecl("bjs_AddressClass_zipCode_get")
 public func _bjs_AddressClass_zipCode_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = AddressClass.bridgeJSLiftParameter(_self).zipCode
+    let _self = AddressClass.bridgeJSLiftParameter(_self)
+    let ret = _self.zipCode
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1231,7 +1313,9 @@ public func _bjs_AddressClass_zipCode_get(_ _self: UnsafeMutableRawPointer) -> I
 @_cdecl("bjs_AddressClass_zipCode_set")
 public func _bjs_AddressClass_zipCode_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    AddressClass.bridgeJSLiftParameter(_self).zipCode = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = AddressClass.bridgeJSLiftParameter(_self)
+    _self.zipCode = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1283,7 +1367,9 @@ public func _bjs_ClassRoundtrip_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_ClassRoundtrip_takeSimpleClass")
 public func _bjs_ClassRoundtrip_takeSimpleClass(_ _self: UnsafeMutableRawPointer, _ value: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ClassRoundtrip.bridgeJSLiftParameter(_self).takeSimpleClass(_: SimpleClass.bridgeJSLiftParameter(value))
+    let value = SimpleClass.bridgeJSLiftParameter(value)
+    let _self = ClassRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeSimpleClass(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1293,7 +1379,8 @@ public func _bjs_ClassRoundtrip_takeSimpleClass(_ _self: UnsafeMutableRawPointer
 @_cdecl("bjs_ClassRoundtrip_makeSimpleClass")
 public func _bjs_ClassRoundtrip_makeSimpleClass(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).makeSimpleClass()
+    let _self = ClassRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeSimpleClass()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1304,7 +1391,9 @@ public func _bjs_ClassRoundtrip_makeSimpleClass(_ _self: UnsafeMutableRawPointer
 @_cdecl("bjs_ClassRoundtrip_roundtripSimpleClass")
 public func _bjs_ClassRoundtrip_roundtripSimpleClass(_ _self: UnsafeMutableRawPointer, _ value: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).roundtripSimpleClass(_: SimpleClass.bridgeJSLiftParameter(value))
+    let value = SimpleClass.bridgeJSLiftParameter(value)
+    let _self = ClassRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripSimpleClass(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1315,7 +1404,9 @@ public func _bjs_ClassRoundtrip_roundtripSimpleClass(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ClassRoundtrip_takeAddressClass")
 public func _bjs_ClassRoundtrip_takeAddressClass(_ _self: UnsafeMutableRawPointer, _ value: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ClassRoundtrip.bridgeJSLiftParameter(_self).takeAddressClass(_: AddressClass.bridgeJSLiftParameter(value))
+    let value = AddressClass.bridgeJSLiftParameter(value)
+    let _self = ClassRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeAddressClass(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1325,7 +1416,8 @@ public func _bjs_ClassRoundtrip_takeAddressClass(_ _self: UnsafeMutableRawPointe
 @_cdecl("bjs_ClassRoundtrip_makeAddressClass")
 public func _bjs_ClassRoundtrip_makeAddressClass(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).makeAddressClass()
+    let _self = ClassRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeAddressClass()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1336,7 +1428,9 @@ public func _bjs_ClassRoundtrip_makeAddressClass(_ _self: UnsafeMutableRawPointe
 @_cdecl("bjs_ClassRoundtrip_roundtripAddressClass")
 public func _bjs_ClassRoundtrip_roundtripAddressClass(_ _self: UnsafeMutableRawPointer, _ value: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = ClassRoundtrip.bridgeJSLiftParameter(_self).roundtripAddressClass(_: AddressClass.bridgeJSLiftParameter(value))
+    let value = AddressClass.bridgeJSLiftParameter(value)
+    let _self = ClassRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripAddressClass(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1389,7 +1483,9 @@ public func _bjs_ClassArrayRoundtrip_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_ClassArrayRoundtrip_setupPool")
 public func _bjs_ClassArrayRoundtrip_setupPool(_ _self: UnsafeMutableRawPointer, _ count: Int32) -> Void {
     #if arch(wasm32)
-    ClassArrayRoundtrip.bridgeJSLiftParameter(_self).setupPool(_: Int.bridgeJSLiftParameter(count))
+    let count = Int.bridgeJSLiftParameter(count)
+    let _self = ClassArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.setupPool(_: count)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1399,7 +1495,8 @@ public func _bjs_ClassArrayRoundtrip_setupPool(_ _self: UnsafeMutableRawPointer,
 @_cdecl("bjs_ClassArrayRoundtrip_getPool")
 public func _bjs_ClassArrayRoundtrip_getPool(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ClassArrayRoundtrip.bridgeJSLiftParameter(_self).getPool()
+    let _self = ClassArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.getPool()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1410,7 +1507,8 @@ public func _bjs_ClassArrayRoundtrip_getPool(_ _self: UnsafeMutableRawPointer) -
 @_cdecl("bjs_ClassArrayRoundtrip_makeClassArray")
 public func _bjs_ClassArrayRoundtrip_makeClassArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ClassArrayRoundtrip.bridgeJSLiftParameter(_self).makeClassArray()
+    let _self = ClassArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeClassArray()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1421,7 +1519,9 @@ public func _bjs_ClassArrayRoundtrip_makeClassArray(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_ClassArrayRoundtrip_takeClassArray")
 public func _bjs_ClassArrayRoundtrip_takeClassArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ClassArrayRoundtrip.bridgeJSLiftParameter(_self).takeClassArray(_: [SimpleClass].bridgeJSStackPop())
+    let values = [SimpleClass].bridgeJSStackPop()
+    let _self = ClassArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeClassArray(_: values)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1431,7 +1531,9 @@ public func _bjs_ClassArrayRoundtrip_takeClassArray(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_ClassArrayRoundtrip_roundtripClassArray")
 public func _bjs_ClassArrayRoundtrip_roundtripClassArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ClassArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripClassArray(_: [SimpleClass].bridgeJSStackPop())
+    let values = [SimpleClass].bridgeJSStackPop()
+    let _self = ClassArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripClassArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1484,7 +1586,9 @@ public func _bjs_IdentityCacheBenchmark_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_IdentityCacheBenchmark_setupPool")
 public func _bjs_IdentityCacheBenchmark_setupPool(_ _self: UnsafeMutableRawPointer, _ count: Int32) -> Void {
     #if arch(wasm32)
-    IdentityCacheBenchmark.bridgeJSLiftParameter(_self).setupPool(_: Int.bridgeJSLiftParameter(count))
+    let count = Int.bridgeJSLiftParameter(count)
+    let _self = IdentityCacheBenchmark.bridgeJSLiftParameter(_self)
+    _self.setupPool(_: count)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1494,7 +1598,8 @@ public func _bjs_IdentityCacheBenchmark_setupPool(_ _self: UnsafeMutableRawPoint
 @_cdecl("bjs_IdentityCacheBenchmark_getPoolRepeated")
 public func _bjs_IdentityCacheBenchmark_getPoolRepeated(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = IdentityCacheBenchmark.bridgeJSLiftParameter(_self).getPoolRepeated()
+    let _self = IdentityCacheBenchmark.bridgeJSLiftParameter(_self)
+    let ret = _self.getPoolRepeated()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1536,7 +1641,12 @@ fileprivate func _bjs_IdentityCacheBenchmark_wrap_extern(_ pointer: UnsafeMutabl
 @_cdecl("bjs_SimpleClassIdentity_init")
 public func _bjs_SimpleClassIdentity_init(_ nameBytes: Int32, _ nameLength: Int32, _ count: Int32, _ flag: Int32, _ rate: Float32, _ precise: Float64) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = SimpleClassIdentity(name: String.bridgeJSLiftParameter(nameBytes, nameLength), count: Int.bridgeJSLiftParameter(count), flag: Bool.bridgeJSLiftParameter(flag), rate: Float.bridgeJSLiftParameter(rate), precise: Double.bridgeJSLiftParameter(precise))
+    let precise = Double.bridgeJSLiftParameter(precise)
+    let rate = Float.bridgeJSLiftParameter(rate)
+    let flag = Bool.bridgeJSLiftParameter(flag)
+    let count = Int.bridgeJSLiftParameter(count)
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = SimpleClassIdentity(name: name, count: count, flag: flag, rate: rate, precise: precise)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1547,7 +1657,8 @@ public func _bjs_SimpleClassIdentity_init(_ nameBytes: Int32, _ nameLength: Int3
 @_cdecl("bjs_SimpleClassIdentity_name_get")
 public func _bjs_SimpleClassIdentity_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).name
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    let ret = _self.name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1558,7 +1669,9 @@ public func _bjs_SimpleClassIdentity_name_get(_ _self: UnsafeMutableRawPointer) 
 @_cdecl("bjs_SimpleClassIdentity_name_set")
 public func _bjs_SimpleClassIdentity_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    SimpleClassIdentity.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    _self.name = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1568,7 +1681,8 @@ public func _bjs_SimpleClassIdentity_name_set(_ _self: UnsafeMutableRawPointer, 
 @_cdecl("bjs_SimpleClassIdentity_count_get")
 public func _bjs_SimpleClassIdentity_count_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).count
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    let ret = _self.count
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1579,7 +1693,9 @@ public func _bjs_SimpleClassIdentity_count_get(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_SimpleClassIdentity_count_set")
 public func _bjs_SimpleClassIdentity_count_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    SimpleClassIdentity.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    _self.count = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1589,7 +1705,8 @@ public func _bjs_SimpleClassIdentity_count_set(_ _self: UnsafeMutableRawPointer,
 @_cdecl("bjs_SimpleClassIdentity_flag_get")
 public func _bjs_SimpleClassIdentity_flag_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).flag
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    let ret = _self.flag
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1600,7 +1717,9 @@ public func _bjs_SimpleClassIdentity_flag_get(_ _self: UnsafeMutableRawPointer) 
 @_cdecl("bjs_SimpleClassIdentity_flag_set")
 public func _bjs_SimpleClassIdentity_flag_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    SimpleClassIdentity.bridgeJSLiftParameter(_self).flag = Bool.bridgeJSLiftParameter(value)
+    let value = Bool.bridgeJSLiftParameter(value)
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    _self.flag = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1610,7 +1729,8 @@ public func _bjs_SimpleClassIdentity_flag_set(_ _self: UnsafeMutableRawPointer, 
 @_cdecl("bjs_SimpleClassIdentity_rate_get")
 public func _bjs_SimpleClassIdentity_rate_get(_ _self: UnsafeMutableRawPointer) -> Float32 {
     #if arch(wasm32)
-    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).rate
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    let ret = _self.rate
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1621,7 +1741,9 @@ public func _bjs_SimpleClassIdentity_rate_get(_ _self: UnsafeMutableRawPointer) 
 @_cdecl("bjs_SimpleClassIdentity_rate_set")
 public func _bjs_SimpleClassIdentity_rate_set(_ _self: UnsafeMutableRawPointer, _ value: Float32) -> Void {
     #if arch(wasm32)
-    SimpleClassIdentity.bridgeJSLiftParameter(_self).rate = Float.bridgeJSLiftParameter(value)
+    let value = Float.bridgeJSLiftParameter(value)
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    _self.rate = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1631,7 +1753,8 @@ public func _bjs_SimpleClassIdentity_rate_set(_ _self: UnsafeMutableRawPointer, 
 @_cdecl("bjs_SimpleClassIdentity_precise_get")
 public func _bjs_SimpleClassIdentity_precise_get(_ _self: UnsafeMutableRawPointer) -> Float64 {
     #if arch(wasm32)
-    let ret = SimpleClassIdentity.bridgeJSLiftParameter(_self).precise
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    let ret = _self.precise
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1642,7 +1765,9 @@ public func _bjs_SimpleClassIdentity_precise_get(_ _self: UnsafeMutableRawPointe
 @_cdecl("bjs_SimpleClassIdentity_precise_set")
 public func _bjs_SimpleClassIdentity_precise_set(_ _self: UnsafeMutableRawPointer, _ value: Float64) -> Void {
     #if arch(wasm32)
-    SimpleClassIdentity.bridgeJSLiftParameter(_self).precise = Double.bridgeJSLiftParameter(value)
+    let value = Double.bridgeJSLiftParameter(value)
+    let _self = SimpleClassIdentity.bridgeJSLiftParameter(_self)
+    _self.precise = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1694,7 +1819,9 @@ public func _bjs_ClassRoundtripIdentity_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_ClassRoundtripIdentity_roundtripSimpleClassIdentity")
 public func _bjs_ClassRoundtripIdentity_roundtripSimpleClassIdentity(_ _self: UnsafeMutableRawPointer, _ obj: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = ClassRoundtripIdentity.bridgeJSLiftParameter(_self).roundtripSimpleClassIdentity(_: SimpleClassIdentity.bridgeJSLiftParameter(obj))
+    let obj = SimpleClassIdentity.bridgeJSLiftParameter(obj)
+    let _self = ClassRoundtripIdentity.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripSimpleClassIdentity(_: obj)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1705,7 +1832,8 @@ public func _bjs_ClassRoundtripIdentity_roundtripSimpleClassIdentity(_ _self: Un
 @_cdecl("bjs_ClassRoundtripIdentity_makeSimpleClassIdentity")
 public func _bjs_ClassRoundtripIdentity_makeSimpleClassIdentity(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = ClassRoundtripIdentity.bridgeJSLiftParameter(_self).makeSimpleClassIdentity()
+    let _self = ClassRoundtripIdentity.bridgeJSLiftParameter(_self)
+    let ret = _self.makeSimpleClassIdentity()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -1716,7 +1844,9 @@ public func _bjs_ClassRoundtripIdentity_makeSimpleClassIdentity(_ _self: UnsafeM
 @_cdecl("bjs_ClassRoundtripIdentity_takeSimpleClassIdentity")
 public func _bjs_ClassRoundtripIdentity_takeSimpleClassIdentity(_ _self: UnsafeMutableRawPointer, _ obj: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ClassRoundtripIdentity.bridgeJSLiftParameter(_self).takeSimpleClassIdentity(_: SimpleClassIdentity.bridgeJSLiftParameter(obj))
+    let obj = SimpleClassIdentity.bridgeJSLiftParameter(obj)
+    let _self = ClassRoundtripIdentity.bridgeJSLiftParameter(_self)
+    _self.takeSimpleClassIdentity(_: obj)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1768,7 +1898,9 @@ public func _bjs_IdentityCacheBenchmarkIdentity_init() -> UnsafeMutableRawPointe
 @_cdecl("bjs_IdentityCacheBenchmarkIdentity_setupPool")
 public func _bjs_IdentityCacheBenchmarkIdentity_setupPool(_ _self: UnsafeMutableRawPointer, _ count: Int32) -> Void {
     #if arch(wasm32)
-    IdentityCacheBenchmarkIdentity.bridgeJSLiftParameter(_self).setupPool(_: Int.bridgeJSLiftParameter(count))
+    let count = Int.bridgeJSLiftParameter(count)
+    let _self = IdentityCacheBenchmarkIdentity.bridgeJSLiftParameter(_self)
+    _self.setupPool(_: count)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1778,7 +1910,8 @@ public func _bjs_IdentityCacheBenchmarkIdentity_setupPool(_ _self: UnsafeMutable
 @_cdecl("bjs_IdentityCacheBenchmarkIdentity_getPoolRepeated")
 public func _bjs_IdentityCacheBenchmarkIdentity_getPoolRepeated(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = IdentityCacheBenchmarkIdentity.bridgeJSLiftParameter(_self).getPoolRepeated()
+    let _self = IdentityCacheBenchmarkIdentity.bridgeJSLiftParameter(_self)
+    let ret = _self.getPoolRepeated()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1831,7 +1964,9 @@ public func _bjs_ArrayRoundtrip_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_ArrayRoundtrip_takeIntArray")
 public func _bjs_ArrayRoundtrip_takeIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeIntArray(_: [Int].bridgeJSStackPop())
+    let values = [Int].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeIntArray(_: values)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1841,7 +1976,8 @@ public func _bjs_ArrayRoundtrip_takeIntArray(_ _self: UnsafeMutableRawPointer) -
 @_cdecl("bjs_ArrayRoundtrip_makeIntArray")
 public func _bjs_ArrayRoundtrip_makeIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeIntArray()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeIntArray()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1852,7 +1988,9 @@ public func _bjs_ArrayRoundtrip_makeIntArray(_ _self: UnsafeMutableRawPointer) -
 @_cdecl("bjs_ArrayRoundtrip_roundtripIntArray")
 public func _bjs_ArrayRoundtrip_roundtripIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripIntArray(_: [Int].bridgeJSStackPop())
+    let values = [Int].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripIntArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1863,7 +2001,8 @@ public func _bjs_ArrayRoundtrip_roundtripIntArray(_ _self: UnsafeMutableRawPoint
 @_cdecl("bjs_ArrayRoundtrip_makeIntArrayLarge")
 public func _bjs_ArrayRoundtrip_makeIntArrayLarge(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeIntArrayLarge()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeIntArrayLarge()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1874,7 +2013,9 @@ public func _bjs_ArrayRoundtrip_makeIntArrayLarge(_ _self: UnsafeMutableRawPoint
 @_cdecl("bjs_ArrayRoundtrip_takeDoubleArray")
 public func _bjs_ArrayRoundtrip_takeDoubleArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeDoubleArray(_: [Double].bridgeJSStackPop())
+    let values = [Double].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeDoubleArray(_: values)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1884,7 +2025,8 @@ public func _bjs_ArrayRoundtrip_takeDoubleArray(_ _self: UnsafeMutableRawPointer
 @_cdecl("bjs_ArrayRoundtrip_makeDoubleArray")
 public func _bjs_ArrayRoundtrip_makeDoubleArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeDoubleArray()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeDoubleArray()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1895,7 +2037,9 @@ public func _bjs_ArrayRoundtrip_makeDoubleArray(_ _self: UnsafeMutableRawPointer
 @_cdecl("bjs_ArrayRoundtrip_roundtripDoubleArray")
 public func _bjs_ArrayRoundtrip_roundtripDoubleArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripDoubleArray(_: [Double].bridgeJSStackPop())
+    let values = [Double].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripDoubleArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1906,7 +2050,9 @@ public func _bjs_ArrayRoundtrip_roundtripDoubleArray(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ArrayRoundtrip_takeStringArray")
 public func _bjs_ArrayRoundtrip_takeStringArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeStringArray(_: [String].bridgeJSStackPop())
+    let values = [String].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeStringArray(_: values)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1916,7 +2062,8 @@ public func _bjs_ArrayRoundtrip_takeStringArray(_ _self: UnsafeMutableRawPointer
 @_cdecl("bjs_ArrayRoundtrip_makeStringArray")
 public func _bjs_ArrayRoundtrip_makeStringArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeStringArray()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeStringArray()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1927,7 +2074,9 @@ public func _bjs_ArrayRoundtrip_makeStringArray(_ _self: UnsafeMutableRawPointer
 @_cdecl("bjs_ArrayRoundtrip_roundtripStringArray")
 public func _bjs_ArrayRoundtrip_roundtripStringArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripStringArray(_: [String].bridgeJSStackPop())
+    let values = [String].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripStringArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1938,7 +2087,9 @@ public func _bjs_ArrayRoundtrip_roundtripStringArray(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ArrayRoundtrip_takePointArray")
 public func _bjs_ArrayRoundtrip_takePointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takePointArray(_: [Point].bridgeJSStackPop())
+    let points = [Point].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takePointArray(_: points)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1948,7 +2099,8 @@ public func _bjs_ArrayRoundtrip_takePointArray(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_ArrayRoundtrip_makePointArray")
 public func _bjs_ArrayRoundtrip_makePointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makePointArray()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makePointArray()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1959,7 +2111,9 @@ public func _bjs_ArrayRoundtrip_makePointArray(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_ArrayRoundtrip_roundtripPointArray")
 public func _bjs_ArrayRoundtrip_roundtripPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripPointArray(_: [Point].bridgeJSStackPop())
+    let points = [Point].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripPointArray(_: points)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1970,7 +2124,8 @@ public func _bjs_ArrayRoundtrip_roundtripPointArray(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_ArrayRoundtrip_makePointArrayLarge")
 public func _bjs_ArrayRoundtrip_makePointArrayLarge(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makePointArrayLarge()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makePointArrayLarge()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -1981,7 +2136,9 @@ public func _bjs_ArrayRoundtrip_makePointArrayLarge(_ _self: UnsafeMutableRawPoi
 @_cdecl("bjs_ArrayRoundtrip_takeNestedIntArray")
 public func _bjs_ArrayRoundtrip_takeNestedIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeNestedIntArray(_: [[Int]].bridgeJSStackPop())
+    let values = [[Int]].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeNestedIntArray(_: values)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1991,7 +2148,8 @@ public func _bjs_ArrayRoundtrip_takeNestedIntArray(_ _self: UnsafeMutableRawPoin
 @_cdecl("bjs_ArrayRoundtrip_makeNestedIntArray")
 public func _bjs_ArrayRoundtrip_makeNestedIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeNestedIntArray()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeNestedIntArray()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2002,7 +2160,9 @@ public func _bjs_ArrayRoundtrip_makeNestedIntArray(_ _self: UnsafeMutableRawPoin
 @_cdecl("bjs_ArrayRoundtrip_roundtripNestedIntArray")
 public func _bjs_ArrayRoundtrip_roundtripNestedIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripNestedIntArray(_: [[Int]].bridgeJSStackPop())
+    let values = [[Int]].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripNestedIntArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2013,7 +2173,9 @@ public func _bjs_ArrayRoundtrip_roundtripNestedIntArray(_ _self: UnsafeMutableRa
 @_cdecl("bjs_ArrayRoundtrip_takeNestedPointArray")
 public func _bjs_ArrayRoundtrip_takeNestedPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeNestedPointArray(_: [[Point]].bridgeJSStackPop())
+    let points = [[Point]].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeNestedPointArray(_: points)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2023,7 +2185,8 @@ public func _bjs_ArrayRoundtrip_takeNestedPointArray(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ArrayRoundtrip_makeNestedPointArray")
 public func _bjs_ArrayRoundtrip_makeNestedPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeNestedPointArray()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeNestedPointArray()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2034,7 +2197,9 @@ public func _bjs_ArrayRoundtrip_makeNestedPointArray(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ArrayRoundtrip_roundtripNestedPointArray")
 public func _bjs_ArrayRoundtrip_roundtripNestedPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripNestedPointArray(_: [[Point]].bridgeJSStackPop())
+    let points = [[Point]].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripNestedPointArray(_: points)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2045,7 +2210,9 @@ public func _bjs_ArrayRoundtrip_roundtripNestedPointArray(_ _self: UnsafeMutable
 @_cdecl("bjs_ArrayRoundtrip_takeOptionalIntArray")
 public func _bjs_ArrayRoundtrip_takeOptionalIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeOptionalIntArray(_: [Optional<Int>].bridgeJSStackPop())
+    let values = [Optional<Int>].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeOptionalIntArray(_: values)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2055,7 +2222,8 @@ public func _bjs_ArrayRoundtrip_takeOptionalIntArray(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ArrayRoundtrip_makeOptionalIntArray")
 public func _bjs_ArrayRoundtrip_makeOptionalIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalIntArray()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeOptionalIntArray()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2066,7 +2234,9 @@ public func _bjs_ArrayRoundtrip_makeOptionalIntArray(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_ArrayRoundtrip_roundtripOptionalIntArray")
 public func _bjs_ArrayRoundtrip_roundtripOptionalIntArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripOptionalIntArray(_: [Optional<Int>].bridgeJSStackPop())
+    let values = [Optional<Int>].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripOptionalIntArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2077,7 +2247,9 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalIntArray(_ _self: UnsafeMutable
 @_cdecl("bjs_ArrayRoundtrip_takeOptionalPointArray")
 public func _bjs_ArrayRoundtrip_takeOptionalPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeOptionalPointArray(_: [Optional<Point>].bridgeJSStackPop())
+    let points = [Optional<Point>].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeOptionalPointArray(_: points)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2087,7 +2259,8 @@ public func _bjs_ArrayRoundtrip_takeOptionalPointArray(_ _self: UnsafeMutableRaw
 @_cdecl("bjs_ArrayRoundtrip_makeOptionalPointArray")
 public func _bjs_ArrayRoundtrip_makeOptionalPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalPointArray()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeOptionalPointArray()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2098,7 +2271,9 @@ public func _bjs_ArrayRoundtrip_makeOptionalPointArray(_ _self: UnsafeMutableRaw
 @_cdecl("bjs_ArrayRoundtrip_roundtripOptionalPointArray")
 public func _bjs_ArrayRoundtrip_roundtripOptionalPointArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripOptionalPointArray(_: [Optional<Point>].bridgeJSStackPop())
+    let points = [Optional<Point>].bridgeJSStackPop()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripOptionalPointArray(_: points)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2109,7 +2284,9 @@ public func _bjs_ArrayRoundtrip_roundtripOptionalPointArray(_ _self: UnsafeMutab
 @_cdecl("bjs_ArrayRoundtrip_takeOptionalArray")
 public func _bjs_ArrayRoundtrip_takeOptionalArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ArrayRoundtrip.bridgeJSLiftParameter(_self).takeOptionalArray(_: Optional<[Int]>.bridgeJSLiftParameter())
+    let values = Optional<[Int]>.bridgeJSLiftParameter()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    _self.takeOptionalArray(_: values)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2119,7 +2296,8 @@ public func _bjs_ArrayRoundtrip_takeOptionalArray(_ _self: UnsafeMutableRawPoint
 @_cdecl("bjs_ArrayRoundtrip_makeOptionalArraySome")
 public func _bjs_ArrayRoundtrip_makeOptionalArraySome(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalArraySome()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeOptionalArraySome()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2130,7 +2308,8 @@ public func _bjs_ArrayRoundtrip_makeOptionalArraySome(_ _self: UnsafeMutableRawP
 @_cdecl("bjs_ArrayRoundtrip_makeOptionalArrayNone")
 public func _bjs_ArrayRoundtrip_makeOptionalArrayNone(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).makeOptionalArrayNone()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.makeOptionalArrayNone()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -2141,7 +2320,9 @@ public func _bjs_ArrayRoundtrip_makeOptionalArrayNone(_ _self: UnsafeMutableRawP
 @_cdecl("bjs_ArrayRoundtrip_roundtripOptionalArray")
 public func _bjs_ArrayRoundtrip_roundtripOptionalArray(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ArrayRoundtrip.bridgeJSLiftParameter(_self).roundtripOptionalArray(_: Optional<[Int]>.bridgeJSLiftParameter())
+    let values = Optional<[Int]>.bridgeJSLiftParameter()
+    let _self = ArrayRoundtrip.bridgeJSLiftParameter(_self)
+    let ret = _self.roundtripOptionalArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")

@@ -107,7 +107,8 @@ public func _bjs_GlobalStaticPropertyNamespace_static_namespaceProperty_get() ->
 @_cdecl("bjs_GlobalStaticPropertyNamespace_static_namespaceProperty_set")
 public func _bjs_GlobalStaticPropertyNamespace_static_namespaceProperty_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    GlobalStaticPropertyNamespace.namespaceProperty = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    GlobalStaticPropertyNamespace.namespaceProperty = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -139,7 +140,8 @@ public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedPro
 @_cdecl("bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedProperty_set")
 public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedProperty_set(_ value: Int32) -> Void {
     #if arch(wasm32)
-    GlobalStaticPropertyNamespace.NestedProperties.nestedProperty = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    GlobalStaticPropertyNamespace.NestedProperties.nestedProperty = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -171,7 +173,8 @@ public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedDou
 @_cdecl("bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedDouble_set")
 public func _bjs_GlobalStaticPropertyNamespace_NestedProperties_static_nestedDouble_set(_ value: Float64) -> Void {
     #if arch(wasm32)
-    GlobalStaticPropertyNamespace.NestedProperties.nestedDouble = Double.bridgeJSLiftParameter(value)
+    let value = Double.bridgeJSLiftParameter(value)
+    GlobalStaticPropertyNamespace.NestedProperties.nestedDouble = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -192,7 +195,9 @@ public func _bjs_GlobalNetworking_API_TestHTTPServer_init() -> UnsafeMutableRawP
 @_cdecl("bjs_GlobalNetworking_API_TestHTTPServer_call")
 public func _bjs_GlobalNetworking_API_TestHTTPServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
     #if arch(wasm32)
-    GlobalNetworking.API.TestHTTPServer.bridgeJSLiftParameter(_self).call(_: GlobalNetworking.API.CallMethod.bridgeJSLiftParameter(method))
+    let method = GlobalNetworking.API.CallMethod.bridgeJSLiftParameter(method)
+    let _self = GlobalNetworking.API.TestHTTPServer.bridgeJSLiftParameter(_self)
+    _self.call(_: method)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -244,7 +249,9 @@ public func _bjs_GlobalNetworking_APIV2_Internal_TestInternalServer_init() -> Un
 @_cdecl("bjs_GlobalNetworking_APIV2_Internal_TestInternalServer_call")
 public func _bjs_GlobalNetworking_APIV2_Internal_TestInternalServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
     #if arch(wasm32)
-    Internal.TestInternalServer.bridgeJSLiftParameter(_self).call(_: Internal.SupportedServerMethod.bridgeJSLiftParameter(method))
+    let method = Internal.SupportedServerMethod.bridgeJSLiftParameter(method)
+    let _self = Internal.TestInternalServer.bridgeJSLiftParameter(_self)
+    _self.call(_: method)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -296,7 +303,9 @@ public func _bjs_GlobalUtils_PublicConverter_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_GlobalUtils_PublicConverter_toString")
 public func _bjs_GlobalUtils_PublicConverter_toString(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    let ret = GlobalUtils.PublicConverter.bridgeJSLiftParameter(_self).toString(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = GlobalUtils.PublicConverter.bridgeJSLiftParameter(_self)
+    let ret = _self.toString(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -307,7 +316,8 @@ public func _bjs_GlobalUtils_PublicConverter_toString(_ _self: UnsafeMutableRawP
 @_cdecl("bjs_GlobalUtils_PublicConverter_precision_get")
 public func _bjs_GlobalUtils_PublicConverter_precision_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = GlobalUtils.PublicConverter.bridgeJSLiftParameter(_self).precision
+    let _self = GlobalUtils.PublicConverter.bridgeJSLiftParameter(_self)
+    let ret = _self.precision
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -318,7 +328,9 @@ public func _bjs_GlobalUtils_PublicConverter_precision_get(_ _self: UnsafeMutabl
 @_cdecl("bjs_GlobalUtils_PublicConverter_precision_set")
 public func _bjs_GlobalUtils_PublicConverter_precision_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    GlobalUtils.PublicConverter.bridgeJSLiftParameter(_self).precision = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = GlobalUtils.PublicConverter.bridgeJSLiftParameter(_self)
+    _self.precision = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -109,7 +109,8 @@ fileprivate func _bjs_struct_lift_Library_Shelf_extern() -> Int32 {
 @_cdecl("bjs_Library_Shelf_init")
 public func _bjs_Library_Shelf_init(_ labelBytes: Int32, _ labelLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Library.Shelf(label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    let label = String.bridgeJSLiftParameter(labelBytes, labelLength)
+    let ret = Library.Shelf(label: label)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -131,7 +132,8 @@ public func _bjs_Library_Shelf_static_capacity_get() -> Int32 {
 @_cdecl("bjs_Library_Shelf_describeShelf")
 public func _bjs_Library_Shelf_describeShelf() -> Void {
     #if arch(wasm32)
-    let ret = Library.Shelf.bridgeJSLiftParameter().describeShelf()
+    let _self = Library.Shelf.bridgeJSLiftParameter()
+    let ret = _self.describeShelf()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -188,7 +190,8 @@ fileprivate func _bjs_struct_lift_Library_Shelf_Divider_extern() -> Int32 {
 @_cdecl("bjs_Library_Shelf_Divider_init")
 public func _bjs_Library_Shelf_Divider_init(_ slot: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Library.Shelf.Divider(slot: Int.bridgeJSLiftParameter(slot))
+    let slot = Int.bridgeJSLiftParameter(slot)
+    let ret = Library.Shelf.Divider(slot: slot)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -199,7 +202,8 @@ public func _bjs_Library_Shelf_Divider_init(_ slot: Int32) -> Void {
 @_cdecl("bjs_roundTripMessage")
 public func _bjs_roundTripMessage(_ message: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripMessage(_: Message.bridgeJSLiftParameter(message))
+    let message = Message.bridgeJSLiftParameter(message)
+    let ret = roundTripMessage(_: message)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -210,7 +214,8 @@ public func _bjs_roundTripMessage(_ message: Int32) -> Void {
 @_cdecl("bjs_Library_init")
 public func _bjs_Library_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Library(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Library(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -221,7 +226,8 @@ public func _bjs_Library_init(_ nameBytes: Int32, _ nameLength: Int32) -> Unsafe
 @_cdecl("bjs_Library_describe")
 public func _bjs_Library_describe(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Library.bridgeJSLiftParameter(_self).describe()
+    let _self = Library.bridgeJSLiftParameter(_self)
+    let ret = _self.describe()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -232,7 +238,9 @@ public func _bjs_Library_describe(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Library_rename")
 public func _bjs_Library_rename(_ _self: UnsafeMutableRawPointer, _ titleBytes: Int32, _ titleLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Library.bridgeJSLiftParameter(_self).rename(_: String.bridgeJSLiftParameter(titleBytes, titleLength))
+    let title = String.bridgeJSLiftParameter(titleBytes, titleLength)
+    let _self = Library.bridgeJSLiftParameter(_self)
+    let ret = _self.rename(_: title)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -243,7 +251,9 @@ public func _bjs_Library_rename(_ _self: UnsafeMutableRawPointer, _ titleBytes: 
 @_cdecl("bjs_Library_shelf")
 public func _bjs_Library_shelf(_ _self: UnsafeMutableRawPointer, _ labelBytes: Int32, _ labelLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Library.bridgeJSLiftParameter(_self).shelf(label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    let label = String.bridgeJSLiftParameter(labelBytes, labelLength)
+    let _self = Library.bridgeJSLiftParameter(_self)
+    let ret = _self.shelf(label: label)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -254,7 +264,8 @@ public func _bjs_Library_shelf(_ _self: UnsafeMutableRawPointer, _ labelBytes: I
 @_cdecl("bjs_Library_name_get")
 public func _bjs_Library_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Library.bridgeJSLiftParameter(_self).name
+    let _self = Library.bridgeJSLiftParameter(_self)
+    let ret = _self.name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -265,7 +276,9 @@ public func _bjs_Library_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Library_name_set")
 public func _bjs_Library_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    Library.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = Library.bridgeJSLiftParameter(_self)
+    _self.name = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

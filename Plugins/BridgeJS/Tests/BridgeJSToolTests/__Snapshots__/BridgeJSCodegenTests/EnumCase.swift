@@ -158,7 +158,8 @@ extension PublicStatus: _BridgedSwiftCaseEnum {
 @_cdecl("bjs_setDirection")
 public func _bjs_setDirection(_ direction: Int32) -> Void {
     #if arch(wasm32)
-    setDirection(_: Direction.bridgeJSLiftParameter(direction))
+    let direction = Direction.bridgeJSLiftParameter(direction)
+    setDirection(_: direction)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -179,7 +180,8 @@ public func _bjs_getDirection() -> Int32 {
 @_cdecl("bjs_processDirection")
 public func _bjs_processDirection(_ input: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processDirection(_: Direction.bridgeJSLiftParameter(input))
+    let input = Direction.bridgeJSLiftParameter(input)
+    let ret = processDirection(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -190,7 +192,8 @@ public func _bjs_processDirection(_ input: Int32) -> Int32 {
 @_cdecl("bjs_roundTripOptionalDirection")
 public func _bjs_roundTripOptionalDirection(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalDirection(_: Optional<Direction>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<Direction>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalDirection(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -201,7 +204,8 @@ public func _bjs_roundTripOptionalDirection(_ inputIsSome: Int32, _ inputValue: 
 @_cdecl("bjs_setTSDirection")
 public func _bjs_setTSDirection(_ direction: Int32) -> Void {
     #if arch(wasm32)
-    setTSDirection(_: TSDirection.bridgeJSLiftParameter(direction))
+    let direction = TSDirection.bridgeJSLiftParameter(direction)
+    setTSDirection(_: direction)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -222,7 +226,8 @@ public func _bjs_getTSDirection() -> Int32 {
 @_cdecl("bjs_roundTripOptionalTSDirection")
 public func _bjs_roundTripOptionalTSDirection(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalTSDirection(_: Optional<TSDirection>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<TSDirection>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalTSDirection(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

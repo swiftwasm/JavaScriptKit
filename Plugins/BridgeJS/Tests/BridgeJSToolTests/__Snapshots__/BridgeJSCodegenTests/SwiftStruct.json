@@ -703,6 +703,35 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_Vector2D_dot",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "dot",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "components",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
           }
         ],
         "name" : "Vector2D",

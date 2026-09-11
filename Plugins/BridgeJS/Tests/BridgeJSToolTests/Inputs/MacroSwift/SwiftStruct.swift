@@ -78,6 +78,10 @@ extension Vector2D {
     @JS func describe() -> String {
         return "Vector2D(\(dx), \(dy))"
     }
+
+    @JS func dot(_ components: [Double]) -> Double {
+        return zip([dx, dy], components).map(*).reduce(0, +)
+    }
 }
 
 extension DataPoint {

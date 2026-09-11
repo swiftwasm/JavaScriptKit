@@ -98,7 +98,8 @@ fileprivate func _bjs_struct_lift_Player_Stats_extern() -> Int32 {
 @_cdecl("bjs_User_getName")
 public func _bjs_User_getName(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = User.bridgeJSLiftParameter(_self).getName()
+    let _self = User.bridgeJSLiftParameter(_self)
+    let ret = _self.getName()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -140,7 +141,8 @@ fileprivate func _bjs_User_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> In
 @_cdecl("bjs_Player_getTag")
 public func _bjs_Player_getTag(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Player.bridgeJSLiftParameter(_self).getTag()
+    let _self = Player.bridgeJSLiftParameter(_self)
+    let ret = _self.getTag()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

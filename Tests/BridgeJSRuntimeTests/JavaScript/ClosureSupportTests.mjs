@@ -411,4 +411,7 @@ export function runJsClosureSupportTests(exports) {
     const jsStringToString =
         exports.ClosureSupportExports.makeJSStringToString("Hello, ");
     assert.equal(jsStringToString("world!"), "Hello, world!");
+
+    const difference = exports.ClosureSupportExports.makeArrayDifference();
+    assert.equal(difference([1, 2], [10, 20]), -27);
 }

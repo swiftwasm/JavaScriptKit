@@ -51,7 +51,8 @@ fileprivate func _bjs_struct_lift_Meta_extern() -> Int32 {
 @_cdecl("bjs_Meta_init")
 public func _bjs_Meta_init(_ noteBytes: Int32, _ noteLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Signal.Meta(note: String.bridgeJSLiftParameter(noteBytes, noteLength))
+    let note = String.bridgeJSLiftParameter(noteBytes, noteLength)
+    let ret = Signal.Meta(note: note)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

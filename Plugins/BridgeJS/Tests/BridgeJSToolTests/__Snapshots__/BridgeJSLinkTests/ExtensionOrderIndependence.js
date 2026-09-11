@@ -43,10 +43,10 @@ export async function createInstantiator(options, swift) {
             const instance1 = { label: string };
             instance1.describeCrate = function() {
                 structHelpers.M10TestModuleT5DepotT5Crate.lower(this);
-                const ret = instance.exports.bjs_Depot_Crate_describeCrate();
-                const ret1 = tmpRetString;
+                instance.exports.bjs_Depot_Crate_describeCrate();
+                const ret = tmpRetString;
                 tmpRetString = undefined;
-                return ret1;
+                return ret;
             }.bind(instance1);
             return instance1;
         }

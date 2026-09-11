@@ -179,8 +179,11 @@ public func _bjs_PlayBridgeJS_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_PlayBridgeJS_updateDetailed")
 public func _bjs_PlayBridgeJS_updateDetailed(_ _self: UnsafeMutableRawPointer, _ swiftSourceBytes: Int32, _ swiftSourceLength: Int32, _ dtsSourceBytes: Int32, _ dtsSourceLength: Int32) -> Void {
     #if arch(wasm32)
+    let dtsSource = String.bridgeJSLiftParameter(dtsSourceBytes, dtsSourceLength)
+    let swiftSource = String.bridgeJSLiftParameter(swiftSourceBytes, swiftSourceLength)
+    let _self = PlayBridgeJS.bridgeJSLiftParameter(_self)
     do {
-        let ret = try PlayBridgeJS.bridgeJSLiftParameter(_self).updateDetailed(swiftSource: String.bridgeJSLiftParameter(swiftSourceBytes, swiftSourceLength), dtsSource: String.bridgeJSLiftParameter(dtsSourceBytes, dtsSourceLength))
+        let ret = try _self.updateDetailed(swiftSource: swiftSource, dtsSource: dtsSource)
         return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {

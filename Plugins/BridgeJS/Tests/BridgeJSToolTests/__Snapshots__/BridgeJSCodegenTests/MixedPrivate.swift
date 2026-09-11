@@ -24,7 +24,8 @@ public func _bjs_PrivateAPI_PrivateClass_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_PrivateAPI_PrivateClass_greet")
 public func _bjs_PrivateAPI_PrivateClass_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = PrivateClass.bridgeJSLiftParameter(_self).greet()
+    let _self = PrivateClass.bridgeJSLiftParameter(_self)
+    let ret = _self.greet()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

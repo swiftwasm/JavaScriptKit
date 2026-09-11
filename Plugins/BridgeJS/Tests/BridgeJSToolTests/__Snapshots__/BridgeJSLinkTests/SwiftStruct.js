@@ -385,6 +385,7 @@ export async function createInstantiator(options, swift) {
         },
     };
     const __bjs_codec_Optional_JSObject = __bjs_optionalCodec(__bjs_codec_JSObject);
+    const __bjs_codec_Array_Double = __bjs_arrayCodec(__bjs_primitiveCodecs.Double);
 
     const __bjs_createStructHelpers_M10TestModuleT9DataPoint = () => ({
         lower: (value) => {
@@ -515,16 +516,22 @@ export async function createInstantiator(options, swift) {
             }.bind(instance1);
             instance1.scaled = function(factor) {
                 structHelpers.M10TestModuleT8Vector2D.lower(this);
-                const ret1 = instance.exports.bjs_Vector2D_scaled(factor);
+                instance.exports.bjs_Vector2D_scaled(factor);
                 const structValue = structHelpers.M10TestModuleT8Vector2D.lift();
                 return structValue;
             }.bind(instance1);
             instance1.describe = function() {
                 structHelpers.M10TestModuleT8Vector2D.lower(this);
-                const ret2 = instance.exports.bjs_Vector2D_describe();
-                const ret3 = tmpRetString;
+                instance.exports.bjs_Vector2D_describe();
+                const ret = tmpRetString;
                 tmpRetString = undefined;
-                return ret3;
+                return ret;
+            }.bind(instance1);
+            instance1.dot = function(components) {
+                structHelpers.M10TestModuleT8Vector2D.lower(this);
+                __bjs_codec_Array_Double.lower(components);
+                const ret = instance.exports.bjs_Vector2D_dot();
+                return ret;
             }.bind(instance1);
             return instance1;
         }

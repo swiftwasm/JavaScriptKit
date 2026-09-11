@@ -53,9 +53,10 @@ extension JSTypedClosure where Signature == (Polygon) -> Int {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleAl7Polygon_Si")
 public func _invoke_swift_closure_TestModule_10TestModuleAl7Polygon_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
+    let param0 = Polygon.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Polygon) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Polygon.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -116,8 +117,8 @@ extension JSTypedClosure where Signature == () -> Polygon {
 public func _invoke_swift_closure_TestModule_10TestModuley_Al7Polygon(_ boxPtr: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<() -> Polygon>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure()
-    return result.bridgeJSLowerReturn()
+    let ret = closure()
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -149,7 +150,8 @@ public func _bjs_makePolygonInspector() -> Int32 {
 @_cdecl("bjs_PolygonReference_init")
 public func _bjs_PolygonReference_init(_ sides: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = PolygonReference(sides: Int.bridgeJSLiftParameter(sides))
+    let sides = Int.bridgeJSLiftParameter(sides)
+    let ret = PolygonReference(sides: sides)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

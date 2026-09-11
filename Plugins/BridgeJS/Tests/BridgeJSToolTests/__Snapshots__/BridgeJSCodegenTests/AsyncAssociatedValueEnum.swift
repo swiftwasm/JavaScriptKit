@@ -30,9 +30,9 @@ extension AsyncPayloadResult: _BridgedSwiftAssociatedValueEnum {
 @_cdecl("bjs_asyncRoundTripAssociatedValueEnum")
 public func _bjs_asyncRoundTripAssociatedValueEnum(_ value: Int32) -> Int32 {
     #if arch(wasm32)
-    let _tmp_value = AsyncPayloadResult.bridgeJSLiftParameter(value)
+    let value = AsyncPayloadResult.bridgeJSLiftParameter(value)
     return _bjs_makePromise(resolve: Promise_resolve_18AsyncPayloadResultO, reject: Promise_reject) {
-        return await asyncRoundTripAssociatedValueEnum(_: _tmp_value)
+        return await asyncRoundTripAssociatedValueEnum(_: value)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -43,9 +43,9 @@ public func _bjs_asyncRoundTripAssociatedValueEnum(_ value: Int32) -> Int32 {
 @_cdecl("bjs_asyncRoundTripOptionalAssociatedValueEnum")
 public func _bjs_asyncRoundTripOptionalAssociatedValueEnum(_ valueIsSome: Int32, _ valueCaseId: Int32) -> Int32 {
     #if arch(wasm32)
-    let _tmp_value = Optional<AsyncPayloadResult>.bridgeJSLiftParameter(valueIsSome, valueCaseId)
+    let value = Optional<AsyncPayloadResult>.bridgeJSLiftParameter(valueIsSome, valueCaseId)
     return _bjs_makePromise(resolve: Promise_resolve_Sq18AsyncPayloadResultO, reject: Promise_reject) {
-        return await asyncRoundTripOptionalAssociatedValueEnum(_: _tmp_value)
+        return await asyncRoundTripOptionalAssociatedValueEnum(_: value)
     }
     #else
     fatalError("Only available on WebAssembly")

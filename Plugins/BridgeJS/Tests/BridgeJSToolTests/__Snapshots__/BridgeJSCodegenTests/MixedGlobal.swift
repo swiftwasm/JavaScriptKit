@@ -24,7 +24,8 @@ public func _bjs_GlobalAPI_GlobalClass_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_GlobalAPI_GlobalClass_greet")
 public func _bjs_GlobalAPI_GlobalClass_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = GlobalClass.bridgeJSLiftParameter(_self).greet()
+    let _self = GlobalClass.bridgeJSLiftParameter(_self)
+    let ret = _self.greet()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

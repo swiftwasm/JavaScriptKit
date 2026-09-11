@@ -53,7 +53,8 @@ extension InnerTag: _BridgedSwiftAssociatedValueEnum {
 @_cdecl("bjs_roundtripPolygon")
 public func _bjs_roundtripPolygon(_ polygon: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = roundtripPolygon(_: Polygon.bridgeJSLiftParameter(polygon))
+    let polygon = Polygon.bridgeJSLiftParameter(polygon)
+    let ret = roundtripPolygon(_: polygon)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -64,7 +65,8 @@ public func _bjs_roundtripPolygon(_ polygon: UnsafeMutableRawPointer) -> UnsafeM
 @_cdecl("bjs_optionalPolygon")
 public func _bjs_optionalPolygon(_ polygonIsSome: Int32, _ polygonValue: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = optionalPolygon(_: Optional<Polygon>.bridgeJSLiftParameter(polygonIsSome, polygonValue))
+    let polygon = Optional<Polygon>.bridgeJSLiftParameter(polygonIsSome, polygonValue)
+    let ret = optionalPolygon(_: polygon)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -75,7 +77,8 @@ public func _bjs_optionalPolygon(_ polygonIsSome: Int32, _ polygonValue: UnsafeM
 @_cdecl("bjs_polygonArray")
 public func _bjs_polygonArray() -> Void {
     #if arch(wasm32)
-    let ret = polygonArray(_: [Polygon].bridgeJSStackPop())
+    let polygons = [Polygon].bridgeJSStackPop()
+    let ret = polygonArray(_: polygons)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -86,8 +89,9 @@ public func _bjs_polygonArray() -> Void {
 @_cdecl("bjs_validatePolygon")
 public func _bjs_validatePolygon(_ polygon: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
+    let polygon = Polygon.bridgeJSLiftParameter(polygon)
     do {
-        let ret = try validatePolygon(_: Polygon.bridgeJSLiftParameter(polygon))
+        let ret = try validatePolygon(_: polygon)
         return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
@@ -111,7 +115,8 @@ public func _bjs_validatePolygon(_ polygon: UnsafeMutableRawPointer) -> UnsafeMu
 @_cdecl("bjs_makeTag")
 public func _bjs_makeTag(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = makeTag(_: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = makeTag(_: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -122,7 +127,8 @@ public func _bjs_makeTag(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutab
 @_cdecl("bjs_roundtripTags")
 public func _bjs_roundtripTags() -> Void {
     #if arch(wasm32)
-    let ret = roundtripTags(_: [Optional<AliasedTag>].bridgeJSStackPop())
+    let xs = [Optional<AliasedTag>].bridgeJSStackPop()
+    let ret = roundtripTags(_: xs)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -133,7 +139,8 @@ public func _bjs_roundtripTags() -> Void {
 @_cdecl("bjs_describeUser")
 public func _bjs_describeUser(_ owner: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = _bridgeJSUnwrapProtocolExportable(describeUser(_: AnyHasOptionalUserId.bridgeJSLiftParameter(owner)), "HasOptionalUserId")
+    let owner = AnyHasOptionalUserId.bridgeJSLiftParameter(owner)
+    let ret = _bridgeJSUnwrapProtocolExportable(describeUser(_: owner), "HasOptionalUserId")
     return ret.bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -144,7 +151,8 @@ public func _bjs_describeUser(_ owner: Int32) -> Int32 {
 @_cdecl("bjs_PolygonReference_init")
 public func _bjs_PolygonReference_init(_ underlying: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = PolygonReference(underlying: Polygon.bridgeJSLiftParameter(underlying))
+    let underlying = Polygon.bridgeJSLiftParameter(underlying)
+    let ret = PolygonReference(underlying: underlying)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -155,7 +163,8 @@ public func _bjs_PolygonReference_init(_ underlying: UnsafeMutableRawPointer) ->
 @_cdecl("bjs_PolygonReference_snapshot")
 public func _bjs_PolygonReference_snapshot(_ _self: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = PolygonReference.bridgeJSLiftParameter(_self).snapshot()
+    let _self = PolygonReference.bridgeJSLiftParameter(_self)
+    let ret = _self.snapshot()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -166,7 +175,9 @@ public func _bjs_PolygonReference_snapshot(_ _self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_PolygonReference_merge")
 public func _bjs_PolygonReference_merge(_ _self: UnsafeMutableRawPointer, _ other: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = PolygonReference.bridgeJSLiftParameter(_self).merge(_: Polygon.bridgeJSLiftParameter(other))
+    let other = Polygon.bridgeJSLiftParameter(other)
+    let _self = PolygonReference.bridgeJSLiftParameter(_self)
+    let ret = _self.merge(_: other)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -219,7 +230,8 @@ fileprivate func _bjs_PolygonReference_wrap_extern(_ pointer: UnsafeMutableRawPo
 @_cdecl("bjs_TagReference_init")
 public func _bjs_TagReference_init(_ underlying: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = TagReference(underlying: Tag.bridgeJSLiftParameter(underlying))
+    let underlying = Tag.bridgeJSLiftParameter(underlying)
+    let ret = TagReference(underlying: underlying)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

@@ -25,26 +25,26 @@ import JavaScriptKit
         _ value: JSObject,
         _ transform: JSTypedClosure<(JSObject) -> JSObject>
     ) throws(JSException) -> JSObject
-    // @JSFunction static func jsApplyArrayInt(
-    //     _ value: [Int],
-    //     _ transform: JSTypedClosure<([Int]) -> [Int]>
-    // ) throws(JSException) -> [Int]
-    // @JSFunction static func jsApplyArrayDouble(
-    //     _ value: [Double],
-    //     _ transform: JSTypedClosure<([Double]) -> [Double]>
-    // ) throws(JSException) -> [Double]
-    // @JSFunction static func jsApplyArrayString(
-    //     _ value: [String],
-    //     _ transform: JSTypedClosure<([String]) -> [String]>
-    // ) throws(JSException) -> [String]
-    // @JSFunction static func jsApplyArrayJSValue(
-    //     _ value: [JSValue],
-    //     _ transform: JSTypedClosure<([JSValue]) -> [JSValue]>
-    // ) throws(JSException) -> [JSValue]
-    // @JSFunction static func jsApplyArrayJSObject(
-    //     _ value: [JSObject],
-    //     _ transform: JSTypedClosure<([JSObject]) -> [JSObject]>
-    // ) throws(JSException) -> [JSObject]
+    @JSFunction static func jsApplyArrayInt(
+        _ value: [Int],
+        _ transform: JSTypedClosure<([Int]) -> [Int]>
+    ) throws(JSException) -> [Int]
+    @JSFunction static func jsApplyArrayDouble(
+        _ value: [Double],
+        _ transform: JSTypedClosure<([Double]) -> [Double]>
+    ) throws(JSException) -> [Double]
+    @JSFunction static func jsApplyArrayString(
+        _ value: [String],
+        _ transform: JSTypedClosure<([String]) -> [String]>
+    ) throws(JSException) -> [String]
+    @JSFunction static func jsApplyArrayJSValue(
+        _ value: [JSValue],
+        _ transform: JSTypedClosure<([JSValue]) -> [JSValue]>
+    ) throws(JSException) -> [JSValue]
+    @JSFunction static func jsApplyArrayJSObject(
+        _ value: [JSObject],
+        _ transform: JSTypedClosure<([JSObject]) -> [JSObject]>
+    ) throws(JSException) -> [JSObject]
 
     @JSFunction static func jsMakeIntToInt(_ base: Int) throws(JSException) -> (Int) -> Int
     @JSFunction static func jsMakeDoubleToDouble(_ base: Double) throws(JSException) -> (Double) -> Double
@@ -84,6 +84,10 @@ import JavaScriptKit
     }
     @JS static func makeJSStringToString(_ prefix: String) -> JSTypedClosure<(String) -> String> {
         return JSTypedClosure { prefix + $0 }
+    }
+
+    @JS static func makeArrayDifference() -> ([Int], [Int]) -> Int {
+        { first, second in first.reduce(0, +) - second.reduce(0, +) }
     }
 }
 
@@ -148,43 +152,43 @@ final class ClosureSupportTests: XCTestCase {
         XCTAssertEqual(result, obj)
     }
 
-    // func testClosureParameterArrayIntToArrayInt() throws {
-    //     let transform = JSTypedClosure<([Int]) -> [Int]> { $0 }
-    //     defer { transform.release() }
-    //     let result = try ClosureSupportImports.jsApplyArrayInt([1, 2, 3], transform)
-    //     XCTAssertEqual(result, [1, 2, 3])
-    // }
+    func testClosureParameterArrayIntToArrayInt() throws {
+        let transform = JSTypedClosure<([Int]) -> [Int]> { $0 }
+        defer { transform.release() }
+        let result = try ClosureSupportImports.jsApplyArrayInt([1, 2, 3], transform)
+        XCTAssertEqual(result, [1, 2, 3])
+    }
 
-    // func testClosureParameterArrayDoubleToArrayDouble() throws {
-    //     let transform = JSTypedClosure<([Double]) -> [Double]> { $0 }
-    //     defer { transform.release() }
-    //     let result = try ClosureSupportImports.jsApplyArrayDouble([1.0, 2.0, 3.0], transform)
-    //     XCTAssertEqual(result, [1.0, 2.0, 3.0])
-    // }
+    func testClosureParameterArrayDoubleToArrayDouble() throws {
+        let transform = JSTypedClosure<([Double]) -> [Double]> { $0 }
+        defer { transform.release() }
+        let result = try ClosureSupportImports.jsApplyArrayDouble([1.0, 2.0, 3.0], transform)
+        XCTAssertEqual(result, [1.0, 2.0, 3.0])
+    }
 
-    // func testClosureParameterArrayStringToArrayString() throws {
-    //     let transform = JSTypedClosure<([String]) -> [String]> { $0 }
-    //     defer { transform.release() }
-    //     let result = try ClosureSupportImports.jsApplyArrayString(["a", "b", "c"], transform)
-    //     XCTAssertEqual(result, ["a", "b", "c"])
-    // }
+    func testClosureParameterArrayStringToArrayString() throws {
+        let transform = JSTypedClosure<([String]) -> [String]> { $0 }
+        defer { transform.release() }
+        let result = try ClosureSupportImports.jsApplyArrayString(["a", "b", "c"], transform)
+        XCTAssertEqual(result, ["a", "b", "c"])
+    }
 
-    // func testClosureParameterArrayJSValueToArrayJSValue() throws {
-    //     let transform = JSTypedClosure<([JSValue]) -> [JSValue]> { $0 }
-    //     defer { transform.release() }
-    //     let result = try ClosureSupportImports.jsApplyArrayJSValue([.number(1), .number(2), .number(3)], transform)
-    //     XCTAssertEqual(result, [.number(1), .number(2), .number(3)])
-    // }
+    func testClosureParameterArrayJSValueToArrayJSValue() throws {
+        let transform = JSTypedClosure<([JSValue]) -> [JSValue]> { $0 }
+        defer { transform.release() }
+        let result = try ClosureSupportImports.jsApplyArrayJSValue([.number(1), .number(2), .number(3)], transform)
+        XCTAssertEqual(result, [.number(1), .number(2), .number(3)])
+    }
 
-    // func testClosureParameterArrayJSObjectToArrayJSObject() throws {
-    //     let transform = JSTypedClosure<([JSObject]) -> [JSObject]> { $0 }
-    //     defer { transform.release() }
-    //     let obj1 = JSObject()
-    //     let obj2 = JSObject()
-    //     let obj3 = JSObject()
-    //     let result = try ClosureSupportImports.jsApplyArrayJSObject([obj1, obj2, obj3], transform)
-    //     XCTAssertEqual(result, [obj1, obj2, obj3])
-    // }
+    func testClosureParameterArrayJSObjectToArrayJSObject() throws {
+        let transform = JSTypedClosure<([JSObject]) -> [JSObject]> { $0 }
+        defer { transform.release() }
+        let obj1 = JSObject()
+        let obj2 = JSObject()
+        let obj3 = JSObject()
+        let result = try ClosureSupportImports.jsApplyArrayJSObject([obj1, obj2, obj3], transform)
+        XCTAssertEqual(result, [obj1, obj2, obj3])
+    }
 
     func testClosureReturnIntToInt() throws {
         let c = try ClosureSupportImports.jsMakeIntToInt(10)

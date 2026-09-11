@@ -2,7 +2,8 @@
 @_cdecl("bjs_standaloneFunction")
 public func _bjs_standaloneFunction(_ b: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = standaloneFunction(b: FunctionB.bridgeJSLiftParameter(b))
+    let b = FunctionB.bridgeJSLiftParameter(b)
+    let ret = standaloneFunction(b: b)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -13,7 +14,8 @@ public func _bjs_standaloneFunction(_ b: UnsafeMutableRawPointer) -> UnsafeMutab
 @_cdecl("bjs_FunctionB_init")
 public func _bjs_FunctionB_init(_ valueBytes: Int32, _ valueLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = FunctionB(value: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let ret = FunctionB(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -24,7 +26,8 @@ public func _bjs_FunctionB_init(_ valueBytes: Int32, _ valueLength: Int32) -> Un
 @_cdecl("bjs_FunctionB_value_get")
 public func _bjs_FunctionB_value_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = FunctionB.bridgeJSLiftParameter(_self).value
+    let _self = FunctionB.bridgeJSLiftParameter(_self)
+    let ret = _self.value
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -35,7 +38,9 @@ public func _bjs_FunctionB_value_get(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_FunctionB_value_set")
 public func _bjs_FunctionB_value_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    FunctionB.bridgeJSLiftParameter(_self).value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = FunctionB.bridgeJSLiftParameter(_self)
+    _self.value = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -87,7 +92,9 @@ public func _bjs_FunctionA_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_FunctionA_processB")
 public func _bjs_FunctionA_processB(_ _self: UnsafeMutableRawPointer, _ b: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = FunctionA.bridgeJSLiftParameter(_self).processB(b: FunctionB.bridgeJSLiftParameter(b))
+    let b = FunctionB.bridgeJSLiftParameter(b)
+    let _self = FunctionA.bridgeJSLiftParameter(_self)
+    let ret = _self.processB(b: b)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -98,7 +105,9 @@ public func _bjs_FunctionA_processB(_ _self: UnsafeMutableRawPointer, _ b: Unsaf
 @_cdecl("bjs_FunctionA_createB")
 public func _bjs_FunctionA_createB(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = FunctionA.bridgeJSLiftParameter(_self).createB(value: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = FunctionA.bridgeJSLiftParameter(_self)
+    let ret = _self.createB(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

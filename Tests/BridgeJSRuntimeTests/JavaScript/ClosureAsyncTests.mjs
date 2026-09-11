@@ -128,4 +128,13 @@ export async function runJsClosureAsyncTests(exports) {
             concurrent.release();
         }
     }
+
+    const first = exports.roundTripArrayMembers({ ints: [10], optStrings: null });
+    const second = exports.roundTripArrayMembers({ ints: [20], optStrings: null });
+    assert.deepEqual(await Promise.all([first.ownSumAsync(), second.ownSumAsync()]), [10, 20]);
+    assert.deepEqual(await Promise.all([first.sumAsync([1]), second.sumAsync([2])]), [11, 22]);
+
+    const sum = exports.makeAsyncArraySum();
+    assert.deepEqual(await Promise.all([sum([1, 2]), sum([10, 20])]), [3, 30]);
+    assert.equal(await exports.awaitArraySum(async (values) => values.reduce((a, b) => a + b, 0)), 6);
 }

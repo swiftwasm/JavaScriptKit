@@ -76,6 +76,14 @@ enum AsyncRecorderState {
     nonisolated(unsafe) static var lastRecorded: String = ""
 }
 
+@JS func makeAsyncArraySum() -> JSTypedClosure<([Int]) async -> Int> {
+    JSTypedClosure { values in values.reduce(0, +) }
+}
+
+@JS func awaitArraySum(_ sum: ([Int]) async -> Int) async -> Int {
+    await sum([1, 2, 3])
+}
+
 // MARK: - XCTest entry point
 
 final class ClosureAsyncTests: XCTestCase {

@@ -301,6 +301,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     assert.deepEqual(arrayStructRoundTrip.optStrings, ["a", "b"]);
     assert.equal(exports.arrayMembersSum(arrayStruct, [10, 20]), 30);
     assert.equal(exports.arrayMembersFirst(arrayStruct, ["x", "y"]), "x");
+    assert.equal(arrayStructRoundTrip.sumValues([10, 20]), 30);
+    assert.equal(arrayStructRoundTrip.firstString(["x", "y"]), "x");
+    assert.throws(() => arrayStructRoundTrip.requireValues([]), /Values must not be empty/);
+    assert.deepEqual(arrayStructRoundTrip.requireValues([10, 20]), [1, 2, 3, 10, 20]);
     const jsValueArray = [true, 42, "ok", { nested: 1 }, null, undefined];
     assert.deepEqual(exports.roundTripOptionalJSValueArray(jsValueArray), jsValueArray);
     assert.equal(exports.roundTripOptionalJSValueArray(null), null);

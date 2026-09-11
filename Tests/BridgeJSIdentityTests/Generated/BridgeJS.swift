@@ -75,7 +75,8 @@ public func _bjs_resetRetainLeakDeinits() -> Void {
 @_cdecl("bjs_setupArrayPool")
 public func _bjs_setupArrayPool(_ count: Int32) -> Void {
     #if arch(wasm32)
-    setupArrayPool(_: Int.bridgeJSLiftParameter(count))
+    let count = Int.bridgeJSLiftParameter(count)
+    setupArrayPool(_: count)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -96,7 +97,8 @@ public func _bjs_getArrayPool() -> Void {
 @_cdecl("bjs_getArrayPoolElement")
 public func _bjs_getArrayPoolElement(_ index: Int32) -> Void {
     #if arch(wasm32)
-    let ret = getArrayPoolElement(_: Int.bridgeJSLiftParameter(index))
+    let index = Int.bridgeJSLiftParameter(index)
+    let ret = getArrayPoolElement(_: index)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -138,7 +140,8 @@ public func _bjs_clearArrayPool() -> Void {
 @_cdecl("bjs_IdentityTestSubject_init")
 public func _bjs_IdentityTestSubject_init(_ value: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = IdentityTestSubject(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let ret = IdentityTestSubject(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -149,7 +152,8 @@ public func _bjs_IdentityTestSubject_init(_ value: Int32) -> UnsafeMutableRawPoi
 @_cdecl("bjs_IdentityTestSubject_value_get")
 public func _bjs_IdentityTestSubject_value_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = IdentityTestSubject.bridgeJSLiftParameter(_self).value
+    let _self = IdentityTestSubject.bridgeJSLiftParameter(_self)
+    let ret = _self.value
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -160,7 +164,9 @@ public func _bjs_IdentityTestSubject_value_get(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_IdentityTestSubject_value_set")
 public func _bjs_IdentityTestSubject_value_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    IdentityTestSubject.bridgeJSLiftParameter(_self).value = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = IdentityTestSubject.bridgeJSLiftParameter(_self)
+    _self.value = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -170,7 +176,8 @@ public func _bjs_IdentityTestSubject_value_set(_ _self: UnsafeMutableRawPointer,
 @_cdecl("bjs_IdentityTestSubject_currentValue_get")
 public func _bjs_IdentityTestSubject_currentValue_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = IdentityTestSubject.bridgeJSLiftParameter(_self).currentValue
+    let _self = IdentityTestSubject.bridgeJSLiftParameter(_self)
+    let ret = _self.currentValue
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -212,7 +219,8 @@ fileprivate func _bjs_IdentityTestSubject_wrap_extern(_ pointer: UnsafeMutableRa
 @_cdecl("bjs_RetainLeakSubject_init")
 public func _bjs_RetainLeakSubject_init(_ tag: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = RetainLeakSubject(tag: Int.bridgeJSLiftParameter(tag))
+    let tag = Int.bridgeJSLiftParameter(tag)
+    let ret = RetainLeakSubject(tag: tag)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -223,7 +231,8 @@ public func _bjs_RetainLeakSubject_init(_ tag: Int32) -> UnsafeMutableRawPointer
 @_cdecl("bjs_RetainLeakSubject_tag_get")
 public func _bjs_RetainLeakSubject_tag_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = RetainLeakSubject.bridgeJSLiftParameter(_self).tag
+    let _self = RetainLeakSubject.bridgeJSLiftParameter(_self)
+    let ret = _self.tag
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -234,7 +243,9 @@ public func _bjs_RetainLeakSubject_tag_get(_ _self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_RetainLeakSubject_tag_set")
 public func _bjs_RetainLeakSubject_tag_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    RetainLeakSubject.bridgeJSLiftParameter(_self).tag = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = RetainLeakSubject.bridgeJSLiftParameter(_self)
+    _self.tag = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -275,7 +286,8 @@ fileprivate func _bjs_RetainLeakSubject_wrap_extern(_ pointer: UnsafeMutableRawP
 @_cdecl("bjs_ArrayIdentityElement_init")
 public func _bjs_ArrayIdentityElement_init(_ tag: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = ArrayIdentityElement(tag: Int.bridgeJSLiftParameter(tag))
+    let tag = Int.bridgeJSLiftParameter(tag)
+    let ret = ArrayIdentityElement(tag: tag)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -286,7 +298,8 @@ public func _bjs_ArrayIdentityElement_init(_ tag: Int32) -> UnsafeMutableRawPoin
 @_cdecl("bjs_ArrayIdentityElement_tag_get")
 public func _bjs_ArrayIdentityElement_tag_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = ArrayIdentityElement.bridgeJSLiftParameter(_self).tag
+    let _self = ArrayIdentityElement.bridgeJSLiftParameter(_self)
+    let ret = _self.tag
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -297,7 +310,9 @@ public func _bjs_ArrayIdentityElement_tag_get(_ _self: UnsafeMutableRawPointer) 
 @_cdecl("bjs_ArrayIdentityElement_tag_set")
 public func _bjs_ArrayIdentityElement_tag_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    ArrayIdentityElement.bridgeJSLiftParameter(_self).tag = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = ArrayIdentityElement.bridgeJSLiftParameter(_self)
+    _self.tag = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

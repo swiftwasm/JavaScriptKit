@@ -112,7 +112,8 @@ fileprivate func _bjs_struct_lift_GenericPoint_extern() -> Int32 {
 @_cdecl("bjs_GenericImportBox_init")
 public func _bjs_GenericImportBox_init(_ value: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = GenericImportBox(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let ret = GenericImportBox(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -123,7 +124,8 @@ public func _bjs_GenericImportBox_init(_ value: Int32) -> UnsafeMutableRawPointe
 @_cdecl("bjs_GenericImportBox_get")
 public func _bjs_GenericImportBox_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = GenericImportBox.bridgeJSLiftParameter(_self).get()
+    let _self = GenericImportBox.bridgeJSLiftParameter(_self)
+    let ret = _self.get()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -134,7 +136,8 @@ public func _bjs_GenericImportBox_get(_ _self: UnsafeMutableRawPointer) -> Int32
 @_cdecl("bjs_GenericImportBox_value_get")
 public func _bjs_GenericImportBox_value_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = GenericImportBox.bridgeJSLiftParameter(_self).value
+    let _self = GenericImportBox.bridgeJSLiftParameter(_self)
+    let ret = _self.value
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -145,7 +148,9 @@ public func _bjs_GenericImportBox_value_get(_ _self: UnsafeMutableRawPointer) ->
 @_cdecl("bjs_GenericImportBox_value_set")
 public func _bjs_GenericImportBox_value_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    GenericImportBox.bridgeJSLiftParameter(_self).value = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = GenericImportBox.bridgeJSLiftParameter(_self)
+    _self.value = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -56,7 +56,8 @@ fileprivate func _bjs_struct_lift_Counters_extern() -> Int32 {
 @_cdecl("bjs_mirrorDictionary")
 public func _bjs_mirrorDictionary() -> Void {
     #if arch(wasm32)
-    let ret = mirrorDictionary(_: [String: Int].bridgeJSLiftParameter())
+    let values = [String: Int].bridgeJSLiftParameter()
+    let ret = mirrorDictionary(_: values)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -67,7 +68,8 @@ public func _bjs_mirrorDictionary() -> Void {
 @_cdecl("bjs_optionalDictionary")
 public func _bjs_optionalDictionary() -> Void {
     #if arch(wasm32)
-    let ret = optionalDictionary(_: Optional<[String: String]>.bridgeJSLiftParameter())
+    let values = Optional<[String: String]>.bridgeJSLiftParameter()
+    let ret = optionalDictionary(_: values)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -78,7 +80,8 @@ public func _bjs_optionalDictionary() -> Void {
 @_cdecl("bjs_nestedDictionary")
 public func _bjs_nestedDictionary() -> Void {
     #if arch(wasm32)
-    let ret = nestedDictionary(_: [String: [Int]].bridgeJSLiftParameter())
+    let values = [String: [Int]].bridgeJSLiftParameter()
+    let ret = nestedDictionary(_: values)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -89,7 +92,8 @@ public func _bjs_nestedDictionary() -> Void {
 @_cdecl("bjs_boxDictionary")
 public func _bjs_boxDictionary() -> Void {
     #if arch(wasm32)
-    let ret = boxDictionary(_: [String: Box].bridgeJSLiftParameter())
+    let boxes = [String: Box].bridgeJSLiftParameter()
+    let ret = boxDictionary(_: boxes)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -100,7 +104,8 @@ public func _bjs_boxDictionary() -> Void {
 @_cdecl("bjs_optionalBoxDictionary")
 public func _bjs_optionalBoxDictionary() -> Void {
     #if arch(wasm32)
-    let ret = optionalBoxDictionary(_: [String: Optional<Box>].bridgeJSLiftParameter())
+    let boxes = [String: Optional<Box>].bridgeJSLiftParameter()
+    let ret = optionalBoxDictionary(_: boxes)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -111,7 +116,8 @@ public func _bjs_optionalBoxDictionary() -> Void {
 @_cdecl("bjs_roundtripCounters")
 public func _bjs_roundtripCounters() -> Void {
     #if arch(wasm32)
-    let ret = roundtripCounters(_: Counters.bridgeJSLiftParameter())
+    let counters = Counters.bridgeJSLiftParameter()
+    let ret = roundtripCounters(_: counters)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

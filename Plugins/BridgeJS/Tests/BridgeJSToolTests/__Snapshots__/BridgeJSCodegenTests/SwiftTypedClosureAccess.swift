@@ -52,8 +52,9 @@ extension JSTypedClosure where Signature == (JSPublicEvent) -> Void {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule13JSPublicEventC_y")
 public func _invoke_swift_closure_TestModule_10TestModule13JSPublicEventC_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = JSPublicEvent.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(JSPublicEvent) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    closure(JSPublicEvent.bridgeJSLiftParameter(param0))
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -113,8 +114,9 @@ extension JSTypedClosure where Signature == (JSPackageEvent) -> Void {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule14JSPackageEventC_y")
 public func _invoke_swift_closure_TestModule_10TestModule14JSPackageEventC_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = JSPackageEvent.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(JSPackageEvent) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    closure(JSPackageEvent.bridgeJSLiftParameter(param0))
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -174,8 +176,9 @@ extension JSTypedClosure where Signature == (JSInternalEvent) -> Void {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule15JSInternalEventC_y")
 public func _invoke_swift_closure_TestModule_10TestModule15JSInternalEventC_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = JSInternalEvent.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(JSInternalEvent) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    closure(JSInternalEvent.bridgeJSLiftParameter(param0))
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif

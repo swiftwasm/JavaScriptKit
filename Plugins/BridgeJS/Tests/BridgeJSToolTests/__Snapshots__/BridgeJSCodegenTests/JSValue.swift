@@ -2,7 +2,8 @@
 @_cdecl("bjs_roundTripJSValue")
 public func _bjs_roundTripJSValue(_ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
     #if arch(wasm32)
-    let ret = roundTripJSValue(_: JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2))
+    let value = JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2)
+    let ret = roundTripJSValue(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -13,7 +14,8 @@ public func _bjs_roundTripJSValue(_ valueKind: Int32, _ valuePayload1: Int32, _ 
 @_cdecl("bjs_roundTripOptionalJSValue")
 public func _bjs_roundTripOptionalJSValue(_ valueIsSome: Int32, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalJSValue(_: Optional<JSValue>.bridgeJSLiftParameter(valueIsSome, valueKind, valuePayload1, valuePayload2))
+    let value = Optional<JSValue>.bridgeJSLiftParameter(valueIsSome, valueKind, valuePayload1, valuePayload2)
+    let ret = roundTripOptionalJSValue(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -24,7 +26,8 @@ public func _bjs_roundTripOptionalJSValue(_ valueIsSome: Int32, _ valueKind: Int
 @_cdecl("bjs_roundTripJSValueArray")
 public func _bjs_roundTripJSValueArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripJSValueArray(_: [JSValue].bridgeJSStackPop())
+    let values = [JSValue].bridgeJSStackPop()
+    let ret = roundTripJSValueArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -35,7 +38,8 @@ public func _bjs_roundTripJSValueArray() -> Void {
 @_cdecl("bjs_roundTripOptionalJSValueArray")
 public func _bjs_roundTripOptionalJSValueArray() -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalJSValueArray(_: Optional<[JSValue]>.bridgeJSLiftParameter())
+    let values = Optional<[JSValue]>.bridgeJSLiftParameter()
+    let ret = roundTripOptionalJSValueArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -46,7 +50,9 @@ public func _bjs_roundTripOptionalJSValueArray() -> Void {
 @_cdecl("bjs_JSValueHolder_init")
 public func _bjs_JSValueHolder_init(_ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64, _ optionalValueIsSome: Int32, _ optionalValueKind: Int32, _ optionalValuePayload1: Int32, _ optionalValuePayload2: Float64) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = JSValueHolder(value: JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2), optionalValue: Optional<JSValue>.bridgeJSLiftParameter(optionalValueIsSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2))
+    let optionalValue = Optional<JSValue>.bridgeJSLiftParameter(optionalValueIsSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2)
+    let value = JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2)
+    let ret = JSValueHolder(value: value, optionalValue: optionalValue)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -57,7 +63,10 @@ public func _bjs_JSValueHolder_init(_ valueKind: Int32, _ valuePayload1: Int32, 
 @_cdecl("bjs_JSValueHolder_update")
 public func _bjs_JSValueHolder_update(_ _self: UnsafeMutableRawPointer, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64, _ optionalValueIsSome: Int32, _ optionalValueKind: Int32, _ optionalValuePayload1: Int32, _ optionalValuePayload2: Float64) -> Void {
     #if arch(wasm32)
-    JSValueHolder.bridgeJSLiftParameter(_self).update(value: JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2), optionalValue: Optional<JSValue>.bridgeJSLiftParameter(optionalValueIsSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2))
+    let optionalValue = Optional<JSValue>.bridgeJSLiftParameter(optionalValueIsSome, optionalValueKind, optionalValuePayload1, optionalValuePayload2)
+    let value = JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2)
+    let _self = JSValueHolder.bridgeJSLiftParameter(_self)
+    _self.update(value: value, optionalValue: optionalValue)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -67,7 +76,9 @@ public func _bjs_JSValueHolder_update(_ _self: UnsafeMutableRawPointer, _ valueK
 @_cdecl("bjs_JSValueHolder_echo")
 public func _bjs_JSValueHolder_echo(_ _self: UnsafeMutableRawPointer, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
     #if arch(wasm32)
-    let ret = JSValueHolder.bridgeJSLiftParameter(_self).echo(value: JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2))
+    let value = JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2)
+    let _self = JSValueHolder.bridgeJSLiftParameter(_self)
+    let ret = _self.echo(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -78,7 +89,9 @@ public func _bjs_JSValueHolder_echo(_ _self: UnsafeMutableRawPointer, _ valueKin
 @_cdecl("bjs_JSValueHolder_echoOptional")
 public func _bjs_JSValueHolder_echoOptional(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
     #if arch(wasm32)
-    let ret = JSValueHolder.bridgeJSLiftParameter(_self).echoOptional(_: Optional<JSValue>.bridgeJSLiftParameter(valueIsSome, valueKind, valuePayload1, valuePayload2))
+    let value = Optional<JSValue>.bridgeJSLiftParameter(valueIsSome, valueKind, valuePayload1, valuePayload2)
+    let _self = JSValueHolder.bridgeJSLiftParameter(_self)
+    let ret = _self.echoOptional(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -89,7 +102,8 @@ public func _bjs_JSValueHolder_echoOptional(_ _self: UnsafeMutableRawPointer, _ 
 @_cdecl("bjs_JSValueHolder_value_get")
 public func _bjs_JSValueHolder_value_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = JSValueHolder.bridgeJSLiftParameter(_self).value
+    let _self = JSValueHolder.bridgeJSLiftParameter(_self)
+    let ret = _self.value
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -100,7 +114,9 @@ public func _bjs_JSValueHolder_value_get(_ _self: UnsafeMutableRawPointer) -> Vo
 @_cdecl("bjs_JSValueHolder_value_set")
 public func _bjs_JSValueHolder_value_set(_ _self: UnsafeMutableRawPointer, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
     #if arch(wasm32)
-    JSValueHolder.bridgeJSLiftParameter(_self).value = JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2)
+    let value = JSValue.bridgeJSLiftParameter(valueKind, valuePayload1, valuePayload2)
+    let _self = JSValueHolder.bridgeJSLiftParameter(_self)
+    _self.value = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -110,7 +126,8 @@ public func _bjs_JSValueHolder_value_set(_ _self: UnsafeMutableRawPointer, _ val
 @_cdecl("bjs_JSValueHolder_optionalValue_get")
 public func _bjs_JSValueHolder_optionalValue_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = JSValueHolder.bridgeJSLiftParameter(_self).optionalValue
+    let _self = JSValueHolder.bridgeJSLiftParameter(_self)
+    let ret = _self.optionalValue
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -121,7 +138,9 @@ public func _bjs_JSValueHolder_optionalValue_get(_ _self: UnsafeMutableRawPointe
 @_cdecl("bjs_JSValueHolder_optionalValue_set")
 public func _bjs_JSValueHolder_optionalValue_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueKind: Int32, _ valuePayload1: Int32, _ valuePayload2: Float64) -> Void {
     #if arch(wasm32)
-    JSValueHolder.bridgeJSLiftParameter(_self).optionalValue = Optional<JSValue>.bridgeJSLiftParameter(valueIsSome, valueKind, valuePayload1, valuePayload2)
+    let value = Optional<JSValue>.bridgeJSLiftParameter(valueIsSome, valueKind, valuePayload1, valuePayload2)
+    let _self = JSValueHolder.bridgeJSLiftParameter(_self)
+    _self.optionalValue = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

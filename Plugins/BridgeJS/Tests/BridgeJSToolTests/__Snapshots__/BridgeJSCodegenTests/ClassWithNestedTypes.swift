@@ -51,7 +51,8 @@ fileprivate func _bjs_struct_lift_Account_Credentials_extern() -> Int32 {
 @_cdecl("bjs_Account_Credentials_init")
 public func _bjs_Account_Credentials_init(_ tokenBytes: Int32, _ tokenLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Account.Credentials(token: String.bridgeJSLiftParameter(tokenBytes, tokenLength))
+    let token = String.bridgeJSLiftParameter(tokenBytes, tokenLength)
+    let ret = Account.Credentials(token: token)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -84,7 +85,8 @@ public func _bjs_Account_Credentials_static_empty() -> Void {
 @_cdecl("bjs_Account_init")
 public func _bjs_Account_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Account(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Account(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -95,7 +97,8 @@ public func _bjs_Account_init(_ nameBytes: Int32, _ nameLength: Int32) -> Unsafe
 @_cdecl("bjs_Account_describe")
 public func _bjs_Account_describe(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Account.bridgeJSLiftParameter(_self).describe()
+    let _self = Account.bridgeJSLiftParameter(_self)
+    let ret = _self.describe()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -106,7 +109,8 @@ public func _bjs_Account_describe(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Account_name_get")
 public func _bjs_Account_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Account.bridgeJSLiftParameter(_self).name
+    let _self = Account.bridgeJSLiftParameter(_self)
+    let ret = _self.name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -117,7 +121,9 @@ public func _bjs_Account_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Account_name_set")
 public func _bjs_Account_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    Account.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = Account.bridgeJSLiftParameter(_self)
+    _self.name = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -127,7 +133,8 @@ public func _bjs_Account_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes
 @_cdecl("bjs_Account_role_get")
 public func _bjs_Account_role_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Account.bridgeJSLiftParameter(_self).role
+    let _self = Account.bridgeJSLiftParameter(_self)
+    let ret = _self.role
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
