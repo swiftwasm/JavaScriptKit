@@ -405,8 +405,8 @@ export async function createInstantiator(options, swift) {
             }.bind(instance1);
             instance1.multiply = function(a, b) {
                 structHelpers.M10TestModuleT14MathOperations.lower(this);
-                const ret1 = instance.exports.bjs_MathOperations_multiply(a, b);
-                return ret1;
+                const ret = instance.exports.bjs_MathOperations_multiply(a, b);
+                return ret;
             }.bind(instance1);
             return instance1;
         }

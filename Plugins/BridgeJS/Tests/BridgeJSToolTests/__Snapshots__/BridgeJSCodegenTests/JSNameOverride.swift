@@ -59,7 +59,8 @@ public func _bjs_RenamedEnumMembers_static_defaultValue_get() -> Void {
 @_cdecl("bjs_RenamedEnumMembers_static_defaultValue_set")
 public func _bjs_RenamedEnumMembers_static_defaultValue_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    RenamedEnumMembers.defaultValue = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    RenamedEnumMembers.defaultValue = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -69,7 +70,9 @@ public func _bjs_RenamedEnumMembers_static_defaultValue_set(_ valueBytes: Int32,
 @_cdecl("bjs_RenamedNamespaceMembers_static_plus")
 public func _bjs_RenamedNamespaceMembers_static_plus(_ a: Int32, _ b: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = RenamedNamespaceMembers.add(_: Int.bridgeJSLiftParameter(a), _: Int.bridgeJSLiftParameter(b))
+    let b = Int.bridgeJSLiftParameter(b)
+    let a = Int.bridgeJSLiftParameter(a)
+    let ret = RenamedNamespaceMembers.add(_: a, _: b)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -91,7 +94,8 @@ public func _bjs_RenamedNamespaceMembers_static_answer_get() -> Int32 {
 @_cdecl("bjs_RenamedNamespaceMembers_static_answer_set")
 public func _bjs_RenamedNamespaceMembers_static_answer_set(_ value: Int32) -> Void {
     #if arch(wasm32)
-    RenamedNamespaceMembers.answer = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    RenamedNamespaceMembers.answer = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -160,7 +164,8 @@ public func _bjs_RenamedVector_static_origin_get() -> Void {
 @_cdecl("bjs_RenamedVector_magnitude")
 public func _bjs_RenamedVector_magnitude() -> Float64 {
     #if arch(wasm32)
-    let ret = RenamedVector.bridgeJSLiftParameter().length()
+    let _self = RenamedVector.bridgeJSLiftParameter()
+    let ret = _self.length()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -171,7 +176,9 @@ public func _bjs_RenamedVector_magnitude() -> Float64 {
 @_cdecl("bjs_RenamedVector_static_fromPolar")
 public func _bjs_RenamedVector_static_fromPolar(_ radius: Float64, _ angle: Float64) -> Void {
     #if arch(wasm32)
-    let ret = RenamedVector.polar(radius: Double.bridgeJSLiftParameter(radius), angle: Double.bridgeJSLiftParameter(angle))
+    let angle = Double.bridgeJSLiftParameter(angle)
+    let radius = Double.bridgeJSLiftParameter(radius)
+    let ret = RenamedVector.polar(radius: radius, angle: angle)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -182,7 +189,8 @@ public func _bjs_RenamedVector_static_fromPolar(_ radius: Float64, _ angle: Floa
 @_cdecl("bjs_makeGreeting")
 public func _bjs_makeGreeting(_ nameBytes: Int32, _ nameLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = renderGreeting(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = renderGreeting(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -193,7 +201,8 @@ public func _bjs_makeGreeting(_ nameBytes: Int32, _ nameLength: Int32) -> Void {
 @_cdecl("bjs_greetName")
 public func _bjs_greetName(_ nameBytes: Int32, _ nameLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = greet(_: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = greet(_: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -204,7 +213,8 @@ public func _bjs_greetName(_ nameBytes: Int32, _ nameLength: Int32) -> Void {
 @_cdecl("bjs_greetCount")
 public func _bjs_greetCount(_ count: Int32) -> Void {
     #if arch(wasm32)
-    let ret = greet(_: Int.bridgeJSLiftParameter(count))
+    let count = Int.bridgeJSLiftParameter(count)
+    let ret = greet(_: count)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -226,7 +236,9 @@ public func _bjs_Utils_Text_namespacedRenamed() -> Int32 {
 @_cdecl("bjs_RenamedMembers_init")
 public func _bjs_RenamedMembers_init(_ titleBytes: Int32, _ titleLength: Int32, _ count: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = RenamedMembers(title: String.bridgeJSLiftParameter(titleBytes, titleLength), count: Int.bridgeJSLiftParameter(count))
+    let count = Int.bridgeJSLiftParameter(count)
+    let title = String.bridgeJSLiftParameter(titleBytes, titleLength)
+    let ret = RenamedMembers(title: title, count: count)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -237,7 +249,8 @@ public func _bjs_RenamedMembers_init(_ titleBytes: Int32, _ titleLength: Int32, 
 @_cdecl("bjs_RenamedMembers_makeGreeting")
 public func _bjs_RenamedMembers_makeGreeting(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = RenamedMembers.bridgeJSLiftParameter(_self).greet()
+    let _self = RenamedMembers.bridgeJSLiftParameter(_self)
+    let ret = _self.greet()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -259,7 +272,8 @@ public func _bjs_RenamedMembers_static_makeDefault() -> UnsafeMutableRawPointer 
 @_cdecl("bjs_RenamedMembers_title_get")
 public func _bjs_RenamedMembers_title_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = RenamedMembers.bridgeJSLiftParameter(_self).title
+    let _self = RenamedMembers.bridgeJSLiftParameter(_self)
+    let ret = _self.title
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -270,7 +284,9 @@ public func _bjs_RenamedMembers_title_get(_ _self: UnsafeMutableRawPointer) -> V
 @_cdecl("bjs_RenamedMembers_title_set")
 public func _bjs_RenamedMembers_title_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    RenamedMembers.bridgeJSLiftParameter(_self).title = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = RenamedMembers.bridgeJSLiftParameter(_self)
+    _self.title = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -280,7 +296,8 @@ public func _bjs_RenamedMembers_title_set(_ _self: UnsafeMutableRawPointer, _ va
 @_cdecl("bjs_RenamedMembers_count_get")
 public func _bjs_RenamedMembers_count_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = RenamedMembers.bridgeJSLiftParameter(_self).count
+    let _self = RenamedMembers.bridgeJSLiftParameter(_self)
+    let ret = _self.count
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -302,7 +319,8 @@ public func _bjs_RenamedMembers_static_sharedCount_get() -> Int32 {
 @_cdecl("bjs_RenamedMembers_static_sharedCount_set")
 public func _bjs_RenamedMembers_static_sharedCount_set(_ value: Int32) -> Void {
     #if arch(wasm32)
-    RenamedMembers.sharedCount = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    RenamedMembers.sharedCount = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

@@ -696,7 +696,8 @@ extension Priority: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 @_cdecl("bjs_processDelegates")
 public func _bjs_processDelegates() -> Void {
     #if arch(wasm32)
-    let ret = processDelegates(_: [AnyMyViewControllerDelegate].bridgeJSStackPop())
+    let delegates = [AnyMyViewControllerDelegate].bridgeJSStackPop()
+    let ret = processDelegates(_: delegates)
     for __bjs_elem_ret in ret {
         _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(__bjs_elem_ret, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
     }
@@ -710,7 +711,8 @@ public func _bjs_processDelegates() -> Void {
 @_cdecl("bjs_processDelegatesByName")
 public func _bjs_processDelegatesByName() -> Void {
     #if arch(wasm32)
-    let ret = processDelegatesByName(_: [String: AnyMyViewControllerDelegate].bridgeJSLiftParameter())
+    let delegates = [String: AnyMyViewControllerDelegate].bridgeJSLiftParameter()
+    let ret = processDelegatesByName(_: delegates)
     for __bjs_kv_ret in ret {
         __bjs_kv_ret.key.bridgeJSStackPush()
         _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(__bjs_kv_ret.value, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
@@ -725,7 +727,8 @@ public func _bjs_processDelegatesByName() -> Void {
 @_cdecl("bjs_Helper_init")
 public func _bjs_Helper_init(_ value: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Helper(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let ret = Helper(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -736,7 +739,8 @@ public func _bjs_Helper_init(_ value: Int32) -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Helper_increment")
 public func _bjs_Helper_increment(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    Helper.bridgeJSLiftParameter(_self).increment()
+    let _self = Helper.bridgeJSLiftParameter(_self)
+    _self.increment()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -746,7 +750,8 @@ public func _bjs_Helper_increment(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Helper_value_get")
 public func _bjs_Helper_value_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Helper.bridgeJSLiftParameter(_self).value
+    let _self = Helper.bridgeJSLiftParameter(_self)
+    let ret = _self.value
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -757,7 +762,9 @@ public func _bjs_Helper_value_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
 @_cdecl("bjs_Helper_value_set")
 public func _bjs_Helper_value_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    Helper.bridgeJSLiftParameter(_self).value = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = Helper.bridgeJSLiftParameter(_self)
+    _self.value = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -798,7 +805,8 @@ fileprivate func _bjs_Helper_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_MyViewController_init")
 public func _bjs_MyViewController_init(_ delegate: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = MyViewController(delegate: AnyMyViewControllerDelegate.bridgeJSLiftParameter(delegate))
+    let delegate = AnyMyViewControllerDelegate.bridgeJSLiftParameter(delegate)
+    let ret = MyViewController(delegate: delegate)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -809,7 +817,8 @@ public func _bjs_MyViewController_init(_ delegate: Int32) -> UnsafeMutableRawPoi
 @_cdecl("bjs_MyViewController_triggerEvent")
 public func _bjs_MyViewController_triggerEvent(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    MyViewController.bridgeJSLiftParameter(_self).triggerEvent()
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    _self.triggerEvent()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -819,7 +828,9 @@ public func _bjs_MyViewController_triggerEvent(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_MyViewController_updateValue")
 public func _bjs_MyViewController_updateValue(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    MyViewController.bridgeJSLiftParameter(_self).updateValue(_: String.bridgeJSLiftParameter(valueBytes, valueLength))
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    _self.updateValue(_: value)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -829,7 +840,9 @@ public func _bjs_MyViewController_updateValue(_ _self: UnsafeMutableRawPointer, 
 @_cdecl("bjs_MyViewController_updateCount")
 public func _bjs_MyViewController_updateCount(_ _self: UnsafeMutableRawPointer, _ count: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = MyViewController.bridgeJSLiftParameter(_self).updateCount(_: Int.bridgeJSLiftParameter(count))
+    let count = Int.bridgeJSLiftParameter(count)
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    let ret = _self.updateCount(_: count)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -840,7 +853,10 @@ public func _bjs_MyViewController_updateCount(_ _self: UnsafeMutableRawPointer, 
 @_cdecl("bjs_MyViewController_updateLabel")
 public func _bjs_MyViewController_updateLabel(_ _self: UnsafeMutableRawPointer, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
     #if arch(wasm32)
-    MyViewController.bridgeJSLiftParameter(_self).updateLabel(_: String.bridgeJSLiftParameter(prefixBytes, prefixLength), _: String.bridgeJSLiftParameter(suffixBytes, suffixLength))
+    let suffix = String.bridgeJSLiftParameter(suffixBytes, suffixLength)
+    let prefix = String.bridgeJSLiftParameter(prefixBytes, prefixLength)
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    _self.updateLabel(_: prefix, _: suffix)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -850,7 +866,8 @@ public func _bjs_MyViewController_updateLabel(_ _self: UnsafeMutableRawPointer, 
 @_cdecl("bjs_MyViewController_checkEvenCount")
 public func _bjs_MyViewController_checkEvenCount(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = MyViewController.bridgeJSLiftParameter(_self).checkEvenCount()
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    let ret = _self.checkEvenCount()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -861,7 +878,9 @@ public func _bjs_MyViewController_checkEvenCount(_ _self: UnsafeMutableRawPointe
 @_cdecl("bjs_MyViewController_sendHelper")
 public func _bjs_MyViewController_sendHelper(_ _self: UnsafeMutableRawPointer, _ helper: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    MyViewController.bridgeJSLiftParameter(_self).sendHelper(_: Helper.bridgeJSLiftParameter(helper))
+    let helper = Helper.bridgeJSLiftParameter(helper)
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    _self.sendHelper(_: helper)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -871,7 +890,8 @@ public func _bjs_MyViewController_sendHelper(_ _self: UnsafeMutableRawPointer, _
 @_cdecl("bjs_MyViewController_delegate_get")
 public func _bjs_MyViewController_delegate_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = _bridgeJSUnwrapProtocolExportable(MyViewController.bridgeJSLiftParameter(_self).delegate, "MyViewControllerDelegate")
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    let ret = _bridgeJSUnwrapProtocolExportable(_self.delegate, "MyViewControllerDelegate")
     return ret.bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -882,7 +902,9 @@ public func _bjs_MyViewController_delegate_get(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_MyViewController_delegate_set")
 public func _bjs_MyViewController_delegate_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    MyViewController.bridgeJSLiftParameter(_self).delegate = AnyMyViewControllerDelegate.bridgeJSLiftParameter(value)
+    let value = AnyMyViewControllerDelegate.bridgeJSLiftParameter(value)
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    _self.delegate = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -892,7 +914,8 @@ public func _bjs_MyViewController_delegate_set(_ _self: UnsafeMutableRawPointer,
 @_cdecl("bjs_MyViewController_secondDelegate_get")
 public func _bjs_MyViewController_secondDelegate_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = MyViewController.bridgeJSLiftParameter(_self).secondDelegate
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    let ret = _self.secondDelegate
     if let ret {
         _swift_js_return_optional_object(1, _bridgeJSUnwrapProtocolExportable(ret, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
     } else {
@@ -907,7 +930,9 @@ public func _bjs_MyViewController_secondDelegate_get(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_MyViewController_secondDelegate_set")
 public func _bjs_MyViewController_secondDelegate_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
     #if arch(wasm32)
-    MyViewController.bridgeJSLiftParameter(_self).secondDelegate = Optional<AnyMyViewControllerDelegate>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    let value = Optional<AnyMyViewControllerDelegate>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    _self.secondDelegate = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -948,7 +973,8 @@ fileprivate func _bjs_MyViewController_wrap_extern(_ pointer: UnsafeMutableRawPo
 @_cdecl("bjs_DelegateManager_init")
 public func _bjs_DelegateManager_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = DelegateManager(delegates: [AnyMyViewControllerDelegate].bridgeJSStackPop())
+    let delegates = [AnyMyViewControllerDelegate].bridgeJSStackPop()
+    let ret = DelegateManager(delegates: delegates)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -959,7 +985,8 @@ public func _bjs_DelegateManager_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_DelegateManager_notifyAll")
 public func _bjs_DelegateManager_notifyAll(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    DelegateManager.bridgeJSLiftParameter(_self).notifyAll()
+    let _self = DelegateManager.bridgeJSLiftParameter(_self)
+    _self.notifyAll()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -969,7 +996,8 @@ public func _bjs_DelegateManager_notifyAll(_ _self: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_DelegateManager_delegates_get")
 public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = DelegateManager.bridgeJSLiftParameter(_self).delegates
+    let _self = DelegateManager.bridgeJSLiftParameter(_self)
+    let ret = _self.delegates
     for __bjs_elem_ret in ret {
         _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(__bjs_elem_ret, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
     }
@@ -983,7 +1011,9 @@ public func _bjs_DelegateManager_delegates_get(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_DelegateManager_delegates_set")
 public func _bjs_DelegateManager_delegates_set(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    DelegateManager.bridgeJSLiftParameter(_self).delegates = [AnyMyViewControllerDelegate].bridgeJSStackPop()
+    let value = [AnyMyViewControllerDelegate].bridgeJSStackPop()
+    let _self = DelegateManager.bridgeJSLiftParameter(_self)
+    _self.delegates = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -993,7 +1023,8 @@ public func _bjs_DelegateManager_delegates_set(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_DelegateManager_delegatesByName_get")
 public func _bjs_DelegateManager_delegatesByName_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = DelegateManager.bridgeJSLiftParameter(_self).delegatesByName
+    let _self = DelegateManager.bridgeJSLiftParameter(_self)
+    let ret = _self.delegatesByName
     for __bjs_kv_ret in ret {
         __bjs_kv_ret.key.bridgeJSStackPush()
         _swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(__bjs_kv_ret.value, "MyViewControllerDelegate").bridgeJSLowerAsProtocolReturn())
@@ -1008,7 +1039,9 @@ public func _bjs_DelegateManager_delegatesByName_get(_ _self: UnsafeMutableRawPo
 @_cdecl("bjs_DelegateManager_delegatesByName_set")
 public func _bjs_DelegateManager_delegatesByName_set(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    DelegateManager.bridgeJSLiftParameter(_self).delegatesByName = [String: AnyMyViewControllerDelegate].bridgeJSLiftParameter()
+    let value = [String: AnyMyViewControllerDelegate].bridgeJSLiftParameter()
+    let _self = DelegateManager.bridgeJSLiftParameter(_self)
+    _self.delegatesByName = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

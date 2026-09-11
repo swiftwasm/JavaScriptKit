@@ -87,7 +87,8 @@ extension Color: _BridgedSwiftCaseEnum {
 @_cdecl("bjs_Color_static_canonical")
 public func _bjs_Color_static_canonical(_ labelBytes: Int32, _ labelLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Color.canonical(label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    let label = String.bridgeJSLiftParameter(labelBytes, labelLength)
+    let ret = Color.canonical(label: label)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -157,7 +158,9 @@ fileprivate func _bjs_struct_lift_Point_extern() -> Int32 {
 @_cdecl("bjs_greet")
 public func _bjs_greet(_ nameBytes: Int32, _ nameLength: Int32, _ greetingBytes: Int32, _ greetingLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = greet(name: String.bridgeJSLiftParameter(nameBytes, nameLength), greeting: String.bridgeJSLiftParameter(greetingBytes, greetingLength))
+    let greeting = String.bridgeJSLiftParameter(greetingBytes, greetingLength)
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = greet(name: name, greeting: greeting)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -168,7 +171,9 @@ public func _bjs_greet(_ nameBytes: Int32, _ nameLength: Int32, _ greetingBytes:
 @_cdecl("bjs_add")
 public func _bjs_add(_ a: Int32, _ b: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = add(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
+    let b = Int.bridgeJSLiftParameter(b)
+    let a = Int.bridgeJSLiftParameter(a)
+    let ret = add(a: a, b: b)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -199,8 +204,9 @@ public func _bjs_hello() -> Void {
 @_cdecl("bjs_parseInt")
 public func _bjs_parseInt(_ textBytes: Int32, _ textLength: Int32) -> Int32 {
     #if arch(wasm32)
+    let text = String.bridgeJSLiftParameter(textBytes, textLength)
     do {
-        let ret = try parseInt(text: String.bridgeJSLiftParameter(textBytes, textLength))
+        let ret = try parseInt(text: text)
         return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
@@ -224,7 +230,8 @@ public func _bjs_parseInt(_ textBytes: Int32, _ textLength: Int32) -> Int32 {
 @_cdecl("bjs_MathUtils_double")
 public func _bjs_MathUtils_double(_ value: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = double(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let ret = double(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -246,7 +253,8 @@ public func _bjs_terminator() -> Void {
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Greeter(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -257,7 +265,8 @@ public func _bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> Unsafe
 @_cdecl("bjs_Greeter_greet")
 public func _bjs_Greeter_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Greeter.bridgeJSLiftParameter(_self).greet()
+    let _self = Greeter.bridgeJSLiftParameter(_self)
+    let ret = _self.greet()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -268,7 +277,8 @@ public func _bjs_Greeter_greet(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Greeter_name_get")
 public func _bjs_Greeter_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Greeter.bridgeJSLiftParameter(_self).name
+    let _self = Greeter.bridgeJSLiftParameter(_self)
+    let ret = _self.name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -279,7 +289,9 @@ public func _bjs_Greeter_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Greeter_name_set")
 public func _bjs_Greeter_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    Greeter.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = Greeter.bridgeJSLiftParameter(_self)
+    _self.name = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

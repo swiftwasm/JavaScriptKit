@@ -59,7 +59,12 @@ fileprivate func _bjs_struct_lift_DataPoint_extern() -> Int32 {
 @_cdecl("bjs_DataPoint_init")
 public func _bjs_DataPoint_init(_ x: Float64, _ y: Float64, _ labelBytes: Int32, _ labelLength: Int32, _ optCountIsSome: Int32, _ optCountValue: Int32, _ optFlagIsSome: Int32, _ optFlagValue: Int32) -> Void {
     #if arch(wasm32)
-    let ret = DataPoint(x: Double.bridgeJSLiftParameter(x), y: Double.bridgeJSLiftParameter(y), label: String.bridgeJSLiftParameter(labelBytes, labelLength), optCount: Optional<Int>.bridgeJSLiftParameter(optCountIsSome, optCountValue), optFlag: Optional<Bool>.bridgeJSLiftParameter(optFlagIsSome, optFlagValue))
+    let optFlag = Optional<Bool>.bridgeJSLiftParameter(optFlagIsSome, optFlagValue)
+    let optCount = Optional<Int>.bridgeJSLiftParameter(optCountIsSome, optCountValue)
+    let label = String.bridgeJSLiftParameter(labelBytes, labelLength)
+    let y = Double.bridgeJSLiftParameter(y)
+    let x = Double.bridgeJSLiftParameter(x)
+    let ret = DataPoint(x: x, y: y, label: label, optCount: optCount, optFlag: optFlag)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -358,7 +363,8 @@ public func _bjs_ConfigStruct_static_defaultConfig_get() -> Void {
 @_cdecl("bjs_ConfigStruct_static_defaultConfig_set")
 public func _bjs_ConfigStruct_static_defaultConfig_set(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    ConfigStruct.defaultConfig = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    ConfigStruct.defaultConfig = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -379,7 +385,8 @@ public func _bjs_ConfigStruct_static_timeout_get() -> Float64 {
 @_cdecl("bjs_ConfigStruct_static_timeout_set")
 public func _bjs_ConfigStruct_static_timeout_set(_ value: Float64) -> Void {
     #if arch(wasm32)
-    ConfigStruct.timeout = Double.bridgeJSLiftParameter(value)
+    let value = Double.bridgeJSLiftParameter(value)
+    ConfigStruct.timeout = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -400,7 +407,8 @@ public func _bjs_ConfigStruct_static_computedSetting_get() -> Void {
 @_cdecl("bjs_ConfigStruct_static_update")
 public func _bjs_ConfigStruct_static_update(_ timeout: Float64) -> Float64 {
     #if arch(wasm32)
-    let ret = ConfigStruct.update(_: Double.bridgeJSLiftParameter(timeout))
+    let timeout = Double.bridgeJSLiftParameter(timeout)
+    let ret = ConfigStruct.update(_: timeout)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -507,7 +515,8 @@ fileprivate func _bjs_struct_lift_Vector2D_extern() -> Int32 {
 @_cdecl("bjs_Vector2D_magnitude")
 public func _bjs_Vector2D_magnitude() -> Float64 {
     #if arch(wasm32)
-    let ret = Vector2D.bridgeJSLiftParameter().magnitude()
+    let _self = Vector2D.bridgeJSLiftParameter()
+    let ret = _self.magnitude()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -518,7 +527,9 @@ public func _bjs_Vector2D_magnitude() -> Float64 {
 @_cdecl("bjs_Vector2D_scaled")
 public func _bjs_Vector2D_scaled(_ factor: Float64) -> Void {
     #if arch(wasm32)
-    let ret = Vector2D.bridgeJSLiftParameter().scaled(by: Double.bridgeJSLiftParameter(factor))
+    let factor = Double.bridgeJSLiftParameter(factor)
+    let _self = Vector2D.bridgeJSLiftParameter()
+    let ret = _self.scaled(by: factor)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -529,7 +540,21 @@ public func _bjs_Vector2D_scaled(_ factor: Float64) -> Void {
 @_cdecl("bjs_Vector2D_describe")
 public func _bjs_Vector2D_describe() -> Void {
     #if arch(wasm32)
-    let ret = Vector2D.bridgeJSLiftParameter().describe()
+    let _self = Vector2D.bridgeJSLiftParameter()
+    let ret = _self.describe()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_Vector2D_dot")
+@_cdecl("bjs_Vector2D_dot")
+public func _bjs_Vector2D_dot() -> Float64 {
+    #if arch(wasm32)
+    let components = [Double].bridgeJSStackPop()
+    let _self = Vector2D.bridgeJSLiftParameter()
+    let ret = _self.dot(_: components)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -540,7 +565,8 @@ public func _bjs_Vector2D_describe() -> Void {
 @_cdecl("bjs_roundtrip")
 public func _bjs_roundtrip() -> Void {
     #if arch(wasm32)
-    let ret = roundtrip(_: Person.bridgeJSLiftParameter())
+    let session = Person.bridgeJSLiftParameter()
+    let ret = roundtrip(_: session)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -551,7 +577,8 @@ public func _bjs_roundtrip() -> Void {
 @_cdecl("bjs_roundtripContainer")
 public func _bjs_roundtripContainer() -> Void {
     #if arch(wasm32)
-    let ret = roundtripContainer(_: Container.bridgeJSLiftParameter())
+    let container = Container.bridgeJSLiftParameter()
+    let ret = roundtripContainer(_: container)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -562,7 +589,8 @@ public func _bjs_roundtripContainer() -> Void {
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Greeter(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -573,7 +601,8 @@ public func _bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> Unsafe
 @_cdecl("bjs_Greeter_greet")
 public func _bjs_Greeter_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Greeter.bridgeJSLiftParameter(_self).greet()
+    let _self = Greeter.bridgeJSLiftParameter(_self)
+    let ret = _self.greet()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -584,7 +613,8 @@ public func _bjs_Greeter_greet(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Greeter_name_get")
 public func _bjs_Greeter_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Greeter.bridgeJSLiftParameter(_self).name
+    let _self = Greeter.bridgeJSLiftParameter(_self)
+    let ret = _self.name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -595,7 +625,9 @@ public func _bjs_Greeter_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Greeter_name_set")
 public func _bjs_Greeter_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    Greeter.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = Greeter.bridgeJSLiftParameter(_self)
+    _self.name = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

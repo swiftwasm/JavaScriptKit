@@ -48,7 +48,8 @@ fileprivate func _bjs_struct_lift_Catalog_Entry_extern() -> Int32 {
 @_cdecl("bjs_Catalog_Entry_init")
 public func _bjs_Catalog_Entry_init(_ titleBytes: Int32, _ titleLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Catalog.Entry(title: String.bridgeJSLiftParameter(titleBytes, titleLength))
+    let title = String.bridgeJSLiftParameter(titleBytes, titleLength)
+    let ret = Catalog.Entry(title: title)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -105,7 +106,8 @@ fileprivate func _bjs_struct_lift_Entry_extern() -> Int32 {
 @_cdecl("bjs_Entry_init")
 public func _bjs_Entry_init(_ identifier: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Entry(identifier: Int.bridgeJSLiftParameter(identifier))
+    let identifier = Int.bridgeJSLiftParameter(identifier)
+    let ret = Entry(identifier: identifier)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -116,7 +118,8 @@ public func _bjs_Entry_init(_ identifier: Int32) -> Void {
 @_cdecl("bjs_takeEntry")
 public func _bjs_takeEntry() -> Void {
     #if arch(wasm32)
-    let ret = takeEntry(_: Entry.bridgeJSLiftParameter())
+    let entry = Entry.bridgeJSLiftParameter()
+    let ret = takeEntry(_: entry)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -127,7 +130,8 @@ public func _bjs_takeEntry() -> Void {
 @_cdecl("bjs_takeCatalogEntry")
 public func _bjs_takeCatalogEntry() -> Void {
     #if arch(wasm32)
-    let ret = takeCatalogEntry(_: Catalog.Entry.bridgeJSLiftParameter())
+    let entry = Catalog.Entry.bridgeJSLiftParameter()
+    let ret = takeCatalogEntry(_: entry)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

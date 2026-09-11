@@ -57,7 +57,8 @@ fileprivate func _bjs_struct_lift_Shape_extern() -> Int32 {
 @_cdecl("bjs_Shape_init")
 public func _bjs_Shape_init(_ labelBytes: Int32, _ labelLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Shape(label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    let label = String.bridgeJSLiftParameter(labelBytes, labelLength)
+    let ret = Shape(label: label)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -114,7 +115,8 @@ fileprivate func _bjs_struct_lift_Widget_extern() -> Int32 {
 @_cdecl("bjs_Widget_init")
 public func _bjs_Widget_init(_ nameBytes: Int32, _ nameLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Widget(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Widget(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -219,7 +221,9 @@ fileprivate func _bjs_struct_lift_Widget_Bounds_extern() -> Int32 {
 @_cdecl("bjs_Widget_Bounds_init")
 public func _bjs_Widget_Bounds_init(_ width: Int32, _ height: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Widget.Bounds(width: Int.bridgeJSLiftParameter(width), height: Int.bridgeJSLiftParameter(height))
+    let height = Int.bridgeJSLiftParameter(height)
+    let width = Int.bridgeJSLiftParameter(width)
+    let ret = Widget.Bounds(width: width, height: height)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

@@ -327,6 +327,21 @@ extension Vector2D {
     @JS func firstString(_ values: [String]) -> String? {
         values.first
     }
+
+    @JS func ownSumAsync() async -> Int {
+        ints.reduce(0, +)
+    }
+
+    @JS func sumAsync(_ values: [Int]) async -> Int {
+        ints.reduce(0, +) + values.reduce(0, +)
+    }
+
+    @JS func requireValues(_ values: [Int]) throws(JSException) -> [Int] {
+        guard !values.isEmpty else {
+            throw JSException(JSError(message: "Values must not be empty").jsValue)
+        }
+        return ints + values
+    }
 }
 
 @JS func roundTripArrayMembers(_ value: ArrayMembers) -> ArrayMembers {

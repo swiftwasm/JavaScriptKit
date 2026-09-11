@@ -53,9 +53,10 @@ extension JSTypedClosure where Signature == (HttpStatus) -> HttpStatus {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO")
 public func _invoke_swift_closure_TestModule_10TestModule10HttpStatusO_10HttpStatusO(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = HttpStatus.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(HttpStatus) -> HttpStatus>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(HttpStatus.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -119,9 +120,10 @@ extension JSTypedClosure where Signature == (Theme) -> Theme {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO")
 public func _invoke_swift_closure_TestModule_10TestModule5ThemeO_5ThemeO(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = Theme.bridgeJSLiftParameter(param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Theme) -> Theme>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Theme.bridgeJSLiftParameter(param0Bytes, param0Length))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -182,9 +184,10 @@ extension JSTypedClosure where Signature == (Animal) -> Animal {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV")
 public func _invoke_swift_closure_TestModule_10TestModule6AnimalV_6AnimalV(_ boxPtr: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
+    let param0 = Animal.bridgeJSLiftParameter()
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Animal) -> Animal>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Animal.bridgeJSLiftParameter())
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -245,9 +248,10 @@ extension JSTypedClosure where Signature == (Person) -> Person {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule6PersonC_6PersonC")
 public func _invoke_swift_closure_TestModule_10TestModule6PersonC_6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ param0: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
+    let param0 = Person.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Person) -> Person>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Person.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -308,9 +312,10 @@ extension JSTypedClosure where Signature == (APIResult) -> APIResult {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO")
 public func _invoke_swift_closure_TestModule_10TestModule9APIResultO_9APIResultO(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = APIResult.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(APIResult) -> APIResult>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(APIResult.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -371,9 +376,10 @@ extension JSTypedClosure where Signature == (Direction) -> Direction {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO")
 public func _invoke_swift_closure_TestModule_10TestModule9DirectionO_9DirectionO(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = Direction.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Direction) -> Direction>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Direction.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -440,10 +446,11 @@ extension JSTypedClosure where Signature == (String) throws(JSException) -> Bool
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleKSS_Sb")
 public func _invoke_swift_closure_TestModule_10TestModuleKSS_Sb(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = String.bridgeJSLiftParameter(param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(String) throws(JSException) -> Bool>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     do {
-        let result = try closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
-        return result.bridgeJSLowerReturn()
+        let ret = try closure(param0)
+        return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -523,10 +530,11 @@ extension JSTypedClosure where Signature == (String) throws(JSException) -> Int 
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleKSS_Si")
 public func _invoke_swift_closure_TestModule_10TestModuleKSS_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = String.bridgeJSLiftParameter(param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(String) throws(JSException) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     do {
-        let result = try closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
-        return result.bridgeJSLowerReturn()
+        let ret = try closure(param0)
+        return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
             withExtendedLifetime(error) {
@@ -603,9 +611,10 @@ extension JSTypedClosure where Signature == (String) -> String {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSS_SS")
 public func _invoke_swift_closure_TestModule_10TestModuleSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = String.bridgeJSLiftParameter(param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(String) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -666,9 +675,10 @@ extension JSTypedClosure where Signature == (Bool) -> Bool {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSb_Sb")
 public func _invoke_swift_closure_TestModule_10TestModuleSb_Sb(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = Bool.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Bool) -> Bool>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Bool.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -729,9 +739,10 @@ extension JSTypedClosure where Signature == (Double) -> Double {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSd_Sd")
 public func _invoke_swift_closure_TestModule_10TestModuleSd_Sd(_ boxPtr: UnsafeMutableRawPointer, _ param0: Float64) -> Float64 {
     #if arch(wasm32)
+    let param0 = Double.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Double) -> Double>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Double.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -792,9 +803,10 @@ extension JSTypedClosure where Signature == (Float) -> Float {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSf_Sf")
 public func _invoke_swift_closure_TestModule_10TestModuleSf_Sf(_ boxPtr: UnsafeMutableRawPointer, _ param0: Float32) -> Float32 {
     #if arch(wasm32)
+    let param0 = Float.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Float) -> Float>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Float.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -855,9 +867,10 @@ extension JSTypedClosure where Signature == (Int) -> Int {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSi_Si")
 public func _invoke_swift_closure_TestModule_10TestModuleSi_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = Int.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Int) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Int.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -918,9 +931,10 @@ extension JSTypedClosure where Signature == (Optional<HttpStatus>) -> Optional<H
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO")
 public func _invoke_swift_closure_TestModule_10TestModuleSq10HttpStatusO_Sq10HttpStatusO(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<HttpStatus>.bridgeJSLiftParameter(param0IsSome, param0Value)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<HttpStatus>) -> Optional<HttpStatus>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<HttpStatus>.bridgeJSLiftParameter(param0IsSome, param0Value))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -982,9 +996,10 @@ extension JSTypedClosure where Signature == (Optional<Theme>) -> Optional<Theme>
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO")
 public func _invoke_swift_closure_TestModule_10TestModuleSq5ThemeO_Sq5ThemeO(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<Theme>.bridgeJSLiftParameter(param0IsSome, param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Theme>) -> Optional<Theme>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<Theme>.bridgeJSLiftParameter(param0IsSome, param0Bytes, param0Length))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1045,9 +1060,10 @@ extension JSTypedClosure where Signature == (Optional<Animal>) -> Optional<Anima
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV")
 public func _invoke_swift_closure_TestModule_10TestModuleSq6AnimalV_Sq6AnimalV(_ boxPtr: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<Animal>.bridgeJSLiftParameter()
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Animal>) -> Optional<Animal>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<Animal>.bridgeJSLiftParameter())
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1108,9 +1124,10 @@ extension JSTypedClosure where Signature == (Optional<Person>) -> Optional<Perso
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC")
 public func _invoke_swift_closure_TestModule_10TestModuleSq6PersonC_Sq6PersonC(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<Person>.bridgeJSLiftParameter(param0IsSome, param0Value)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Person>) -> Optional<Person>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<Person>.bridgeJSLiftParameter(param0IsSome, param0Value))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1171,9 +1188,10 @@ extension JSTypedClosure where Signature == (Optional<APIResult>) -> Optional<AP
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO")
 public func _invoke_swift_closure_TestModule_10TestModuleSq9APIResultO_Sq9APIResultO(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<APIResult>.bridgeJSLiftParameter(param0IsSome, param0CaseId)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<APIResult>) -> Optional<APIResult>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<APIResult>.bridgeJSLiftParameter(param0IsSome, param0CaseId))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1234,9 +1252,10 @@ extension JSTypedClosure where Signature == (Optional<Direction>) -> Optional<Di
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO")
 public func _invoke_swift_closure_TestModule_10TestModuleSq9DirectionO_Sq9DirectionO(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<Direction>.bridgeJSLiftParameter(param0IsSome, param0Value)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Direction>) -> Optional<Direction>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<Direction>.bridgeJSLiftParameter(param0IsSome, param0Value))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1298,9 +1317,10 @@ extension JSTypedClosure where Signature == (Optional<String>) -> Optional<Strin
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSqSS_SqSS")
 public func _invoke_swift_closure_TestModule_10TestModuleSqSS_SqSS(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<String>.bridgeJSLiftParameter(param0IsSome, param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<String>) -> Optional<String>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<String>.bridgeJSLiftParameter(param0IsSome, param0Bytes, param0Length))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1361,9 +1381,10 @@ extension JSTypedClosure where Signature == (Optional<Bool>) -> Optional<Bool> {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSqSb_SqSb")
 public func _invoke_swift_closure_TestModule_10TestModuleSqSb_SqSb(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<Bool>.bridgeJSLiftParameter(param0IsSome, param0Value)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Bool>) -> Optional<Bool>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<Bool>.bridgeJSLiftParameter(param0IsSome, param0Value))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1424,9 +1445,10 @@ extension JSTypedClosure where Signature == (Optional<Double>) -> Optional<Doubl
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSqSd_SqSd")
 public func _invoke_swift_closure_TestModule_10TestModuleSqSd_SqSd(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Float64) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<Double>.bridgeJSLiftParameter(param0IsSome, param0Value)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Double>) -> Optional<Double>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<Double>.bridgeJSLiftParameter(param0IsSome, param0Value))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1487,9 +1509,10 @@ extension JSTypedClosure where Signature == (Optional<Float>) -> Optional<Float>
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSqSf_SqSf")
 public func _invoke_swift_closure_TestModule_10TestModuleSqSf_SqSf(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Float32) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<Float>.bridgeJSLiftParameter(param0IsSome, param0Value)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Float>) -> Optional<Float>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<Float>.bridgeJSLiftParameter(param0IsSome, param0Value))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1550,9 +1573,10 @@ extension JSTypedClosure where Signature == (Optional<Int>) -> Optional<Int> {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSqSi_SqSi")
 public func _invoke_swift_closure_TestModule_10TestModuleSqSi_SqSi(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<Int>.bridgeJSLiftParameter(param0IsSome, param0Value)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<Int>) -> Optional<Int>>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<Int>.bridgeJSLiftParameter(param0IsSome, param0Value))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1588,9 +1612,9 @@ private enum _BJS_Closure_10TestModuleYaKSS_SS {
         return { [callback] (param0: String) async throws(JSException) -> String in
             #if arch(wasm32)
             let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
-                    JSTypedClosure<(sending String) -> Void>($0)
+                    JSTypedClosure<(sending String) -> Void>.sending($0)
                 }, makeRejectClosure: {
-                    JSTypedClosure<(sending JSValue) -> Void>($0)
+                    JSTypedClosure<(sending JSValue) -> Void>.sending($0)
                 }) { resolveRef, rejectRef in
                 param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
                     let callbackValue = callback.bridgeJSLowerParameter()
@@ -1620,9 +1644,10 @@ extension JSTypedClosure where Signature == (String) async throws(JSException) -
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleYaKSS_SS")
 public func _invoke_swift_closure_TestModule_10TestModuleYaKSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = String.bridgeJSLiftParameter(param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(String) async throws(JSException) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     return _bjs_makePromise(resolve: Promise_resolve_SS, reject: Promise_reject) { () async throws(JSException) -> String in
-        return try await closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
+        return try await closure(param0)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -1659,9 +1684,9 @@ private enum _BJS_Closure_10TestModuleYaKSb_9APIResultO {
         return { [callback] (param0: Bool) async throws(JSException) -> APIResult in
             #if arch(wasm32)
             let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
-                    JSTypedClosure<(sending APIResult) -> Void>($0)
+                    JSTypedClosure<(sending APIResult) -> Void>.sending($0)
                 }, makeRejectClosure: {
-                    JSTypedClosure<(sending JSValue) -> Void>($0)
+                    JSTypedClosure<(sending JSValue) -> Void>.sending($0)
                 }) { resolveRef, rejectRef in
                 let param0Value = param0.bridgeJSLowerParameter()
                 let callbackValue = callback.bridgeJSLowerParameter()
@@ -1690,9 +1715,10 @@ extension JSTypedClosure where Signature == (Bool) async throws(JSException) -> 
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleYaKSb_9APIResultO")
 public func _invoke_swift_closure_TestModule_10TestModuleYaKSb_9APIResultO(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = Bool.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Bool) async throws(JSException) -> APIResult>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     return _bjs_makePromise(resolve: Promise_resolve_9APIResultO, reject: Promise_reject) { () async throws(JSException) -> APIResult in
-        return try await closure(Bool.bridgeJSLiftParameter(param0))
+        return try await closure(param0)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -1729,9 +1755,9 @@ private enum _BJS_Closure_10TestModuleYaSS_6AnimalV {
         return { [callback] (param0: String) async -> Animal in
             #if arch(wasm32)
             let resolved = try! await _bjs_awaitPromise(makeResolveClosure: {
-                    JSTypedClosure<(sending Animal) -> Void>($0)
+                    JSTypedClosure<(sending Animal) -> Void>.sending($0)
                 }, makeRejectClosure: {
-                    JSTypedClosure<(sending JSValue) -> Void>($0)
+                    JSTypedClosure<(sending JSValue) -> Void>.sending($0)
                 }) { resolveRef, rejectRef in
                 param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
                     let callbackValue = callback.bridgeJSLowerParameter()
@@ -1761,9 +1787,10 @@ extension JSTypedClosure where Signature == (String) async -> Animal {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleYaSS_6AnimalV")
 public func _invoke_swift_closure_TestModule_10TestModuleYaSS_6AnimalV(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = String.bridgeJSLiftParameter(param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(String) async -> Animal>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     return _bjs_makePromise(resolve: Promise_resolve_6AnimalV, reject: Promise_reject) {
-        return await closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
+        return await closure(param0)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -1800,9 +1827,9 @@ private enum _BJS_Closure_10TestModuleYaSS_SS {
         return { [callback] (param0: String) async -> String in
             #if arch(wasm32)
             let resolved = try! await _bjs_awaitPromise(makeResolveClosure: {
-                    JSTypedClosure<(sending String) -> Void>($0)
+                    JSTypedClosure<(sending String) -> Void>.sending($0)
                 }, makeRejectClosure: {
-                    JSTypedClosure<(sending JSValue) -> Void>($0)
+                    JSTypedClosure<(sending JSValue) -> Void>.sending($0)
                 }) { resolveRef, rejectRef in
                 param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
                     let callbackValue = callback.bridgeJSLowerParameter()
@@ -1832,9 +1859,10 @@ extension JSTypedClosure where Signature == (String) async -> String {
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleYaSS_SS")
 public func _invoke_swift_closure_TestModule_10TestModuleYaSS_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = String.bridgeJSLiftParameter(param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(String) async -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     return _bjs_makePromise(resolve: Promise_resolve_SS, reject: Promise_reject) {
-        return await closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
+        return await closure(param0)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -1881,8 +1909,8 @@ private enum _BJS_Closure_10TestModules6AnimalV_y {
 }
 
 extension JSTypedClosure where Signature == (sending Animal) -> Void {
-    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending Animal) -> Void) {
-        self.init(
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending Animal) -> Void) -> Self {
+        Self(
             makeClosure: make_swift_closure_TestModule_10TestModules6AnimalV_y,
             body: body,
             fileID: fileID,
@@ -1895,8 +1923,9 @@ extension JSTypedClosure where Signature == (sending Animal) -> Void {
 @_cdecl("invoke_swift_closure_TestModule_10TestModules6AnimalV_y")
 public func _invoke_swift_closure_TestModule_10TestModules6AnimalV_y(_ boxPtr: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
+    let param0 = Animal.bridgeJSLiftParameter()
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending Animal) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    closure(Animal.bridgeJSLiftParameter())
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -1942,8 +1971,8 @@ private enum _BJS_Closure_10TestModules7JSValueV_y {
 }
 
 extension JSTypedClosure where Signature == (sending JSValue) -> Void {
-    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending JSValue) -> Void) {
-        self.init(
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending JSValue) -> Void) -> Self {
+        Self(
             makeClosure: make_swift_closure_TestModule_10TestModules7JSValueV_y,
             body: body,
             fileID: fileID,
@@ -1956,8 +1985,9 @@ extension JSTypedClosure where Signature == (sending JSValue) -> Void {
 @_cdecl("invoke_swift_closure_TestModule_10TestModules7JSValueV_y")
 public func _invoke_swift_closure_TestModule_10TestModules7JSValueV_y(_ boxPtr: UnsafeMutableRawPointer, _ param0Kind: Int32, _ param0Payload1: Int32, _ param0Payload2: Float64) -> Void {
     #if arch(wasm32)
+    let param0 = JSValue.bridgeJSLiftParameter(param0Kind, param0Payload1, param0Payload2)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending JSValue) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    closure(JSValue.bridgeJSLiftParameter(param0Kind, param0Payload1, param0Payload2))
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2003,8 +2033,8 @@ private enum _BJS_Closure_10TestModules9APIResultO_y {
 }
 
 extension JSTypedClosure where Signature == (sending APIResult) -> Void {
-    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending APIResult) -> Void) {
-        self.init(
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending APIResult) -> Void) -> Self {
+        Self(
             makeClosure: make_swift_closure_TestModule_10TestModules9APIResultO_y,
             body: body,
             fileID: fileID,
@@ -2017,8 +2047,9 @@ extension JSTypedClosure where Signature == (sending APIResult) -> Void {
 @_cdecl("invoke_swift_closure_TestModule_10TestModules9APIResultO_y")
 public func _invoke_swift_closure_TestModule_10TestModules9APIResultO_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = APIResult.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending APIResult) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    closure(APIResult.bridgeJSLiftParameter(param0))
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2065,8 +2096,8 @@ private enum _BJS_Closure_10TestModulesSS_y {
 }
 
 extension JSTypedClosure where Signature == (sending String) -> Void {
-    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending String) -> Void) {
-        self.init(
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending String) -> Void) -> Self {
+        Self(
             makeClosure: make_swift_closure_TestModule_10TestModulesSS_y,
             body: body,
             fileID: fileID,
@@ -2079,8 +2110,9 @@ extension JSTypedClosure where Signature == (sending String) -> Void {
 @_cdecl("invoke_swift_closure_TestModule_10TestModulesSS_y")
 public func _invoke_swift_closure_TestModule_10TestModulesSS_y(_ boxPtr: UnsafeMutableRawPointer, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = String.bridgeJSLiftParameter(param0Bytes, param0Length)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending String) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    closure(String.bridgeJSLiftParameter(param0Bytes, param0Length))
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2228,7 +2260,8 @@ fileprivate func _bjs_struct_lift_Animal_extern() -> Int32 {
 @_cdecl("bjs_Animal_init")
 public func _bjs_Animal_init(_ typeBytes: Int32, _ typeLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Animal(type: String.bridgeJSLiftParameter(typeBytes, typeLength))
+    let type = String.bridgeJSLiftParameter(typeBytes, typeLength)
+    let ret = Animal(type: type)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2239,7 +2272,8 @@ public func _bjs_Animal_init(_ typeBytes: Int32, _ typeLength: Int32) -> Void {
 @_cdecl("bjs_roundtripAnimal")
 public func _bjs_roundtripAnimal(_ animalClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripAnimal(_: _BJS_Closure_10TestModule6AnimalV_6AnimalV.bridgeJSLift(animalClosure))
+    let animalClosure = _BJS_Closure_10TestModule6AnimalV_6AnimalV.bridgeJSLift(animalClosure)
+    let ret = roundtripAnimal(_: animalClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2250,7 +2284,8 @@ public func _bjs_roundtripAnimal(_ animalClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalAnimal")
 public func _bjs_roundtripOptionalAnimal(_ animalClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalAnimal(_: _BJS_Closure_10TestModuleSq6AnimalV_Sq6AnimalV.bridgeJSLift(animalClosure))
+    let animalClosure = _BJS_Closure_10TestModuleSq6AnimalV_Sq6AnimalV.bridgeJSLift(animalClosure)
+    let ret = roundtripOptionalAnimal(_: animalClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2261,7 +2296,8 @@ public func _bjs_roundtripOptionalAnimal(_ animalClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripString")
 public func _bjs_roundtripString(_ stringClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripString(_: _BJS_Closure_10TestModuleSS_SS.bridgeJSLift(stringClosure))
+    let stringClosure = _BJS_Closure_10TestModuleSS_SS.bridgeJSLift(stringClosure)
+    let ret = roundtripString(_: stringClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2272,7 +2308,8 @@ public func _bjs_roundtripString(_ stringClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripInt")
 public func _bjs_roundtripInt(_ intClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripInt(_: _BJS_Closure_10TestModuleSi_Si.bridgeJSLift(intClosure))
+    let intClosure = _BJS_Closure_10TestModuleSi_Si.bridgeJSLift(intClosure)
+    let ret = roundtripInt(_: intClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2283,7 +2320,8 @@ public func _bjs_roundtripInt(_ intClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripBool")
 public func _bjs_roundtripBool(_ boolClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripBool(_: _BJS_Closure_10TestModuleSb_Sb.bridgeJSLift(boolClosure))
+    let boolClosure = _BJS_Closure_10TestModuleSb_Sb.bridgeJSLift(boolClosure)
+    let ret = roundtripBool(_: boolClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2294,7 +2332,8 @@ public func _bjs_roundtripBool(_ boolClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripFloat")
 public func _bjs_roundtripFloat(_ floatClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripFloat(_: _BJS_Closure_10TestModuleSf_Sf.bridgeJSLift(floatClosure))
+    let floatClosure = _BJS_Closure_10TestModuleSf_Sf.bridgeJSLift(floatClosure)
+    let ret = roundtripFloat(_: floatClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2305,7 +2344,8 @@ public func _bjs_roundtripFloat(_ floatClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripDouble")
 public func _bjs_roundtripDouble(_ doubleClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripDouble(_: _BJS_Closure_10TestModuleSd_Sd.bridgeJSLift(doubleClosure))
+    let doubleClosure = _BJS_Closure_10TestModuleSd_Sd.bridgeJSLift(doubleClosure)
+    let ret = roundtripDouble(_: doubleClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2316,7 +2356,8 @@ public func _bjs_roundtripDouble(_ doubleClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalString")
 public func _bjs_roundtripOptionalString(_ stringClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalString(_: _BJS_Closure_10TestModuleSqSS_SqSS.bridgeJSLift(stringClosure))
+    let stringClosure = _BJS_Closure_10TestModuleSqSS_SqSS.bridgeJSLift(stringClosure)
+    let ret = roundtripOptionalString(_: stringClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2327,7 +2368,8 @@ public func _bjs_roundtripOptionalString(_ stringClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalInt")
 public func _bjs_roundtripOptionalInt(_ intClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalInt(_: _BJS_Closure_10TestModuleSqSi_SqSi.bridgeJSLift(intClosure))
+    let intClosure = _BJS_Closure_10TestModuleSqSi_SqSi.bridgeJSLift(intClosure)
+    let ret = roundtripOptionalInt(_: intClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2338,7 +2380,8 @@ public func _bjs_roundtripOptionalInt(_ intClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalBool")
 public func _bjs_roundtripOptionalBool(_ boolClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalBool(_: _BJS_Closure_10TestModuleSqSb_SqSb.bridgeJSLift(boolClosure))
+    let boolClosure = _BJS_Closure_10TestModuleSqSb_SqSb.bridgeJSLift(boolClosure)
+    let ret = roundtripOptionalBool(_: boolClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2349,7 +2392,8 @@ public func _bjs_roundtripOptionalBool(_ boolClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalFloat")
 public func _bjs_roundtripOptionalFloat(_ floatClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalFloat(_: _BJS_Closure_10TestModuleSqSf_SqSf.bridgeJSLift(floatClosure))
+    let floatClosure = _BJS_Closure_10TestModuleSqSf_SqSf.bridgeJSLift(floatClosure)
+    let ret = roundtripOptionalFloat(_: floatClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2360,7 +2404,8 @@ public func _bjs_roundtripOptionalFloat(_ floatClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalDouble")
 public func _bjs_roundtripOptionalDouble(_ doubleClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalDouble(_: _BJS_Closure_10TestModuleSqSd_SqSd.bridgeJSLift(doubleClosure))
+    let doubleClosure = _BJS_Closure_10TestModuleSqSd_SqSd.bridgeJSLift(doubleClosure)
+    let ret = roundtripOptionalDouble(_: doubleClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2371,7 +2416,8 @@ public func _bjs_roundtripOptionalDouble(_ doubleClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripPerson")
 public func _bjs_roundtripPerson(_ personClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripPerson(_: _BJS_Closure_10TestModule6PersonC_6PersonC.bridgeJSLift(personClosure))
+    let personClosure = _BJS_Closure_10TestModule6PersonC_6PersonC.bridgeJSLift(personClosure)
+    let ret = roundtripPerson(_: personClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2382,7 +2428,8 @@ public func _bjs_roundtripPerson(_ personClosure: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalPerson")
 public func _bjs_roundtripOptionalPerson(_ personClosure: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalPerson(_: _BJS_Closure_10TestModuleSq6PersonC_Sq6PersonC.bridgeJSLift(personClosure))
+    let personClosure = _BJS_Closure_10TestModuleSq6PersonC_Sq6PersonC.bridgeJSLift(personClosure)
+    let ret = roundtripOptionalPerson(_: personClosure)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2404,7 +2451,8 @@ public func _bjs_makeThrowingParser() -> Int32 {
 @_cdecl("bjs_validateWith")
 public func _bjs_validateWith(_ validate: Int32) -> Void {
     #if arch(wasm32)
-    validateWith(_: _BJS_Closure_10TestModuleKSS_Sb.bridgeJSLift(validate))
+    let validate = _BJS_Closure_10TestModuleKSS_Sb.bridgeJSLift(validate)
+    validateWith(_: validate)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -2458,7 +2506,8 @@ public func _bjs_makeResultLoader() -> Int32 {
 @_cdecl("bjs_roundtripDirection")
 public func _bjs_roundtripDirection(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripDirection(_: _BJS_Closure_10TestModule9DirectionO_9DirectionO.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModule9DirectionO_9DirectionO.bridgeJSLift(callback)
+    let ret = roundtripDirection(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2469,7 +2518,8 @@ public func _bjs_roundtripDirection(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_roundtripTheme")
 public func _bjs_roundtripTheme(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripTheme(_: _BJS_Closure_10TestModule5ThemeO_5ThemeO.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModule5ThemeO_5ThemeO.bridgeJSLift(callback)
+    let ret = roundtripTheme(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2480,7 +2530,8 @@ public func _bjs_roundtripTheme(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_roundtripHttpStatus")
 public func _bjs_roundtripHttpStatus(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripHttpStatus(_: _BJS_Closure_10TestModule10HttpStatusO_10HttpStatusO.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModule10HttpStatusO_10HttpStatusO.bridgeJSLift(callback)
+    let ret = roundtripHttpStatus(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2491,7 +2542,8 @@ public func _bjs_roundtripHttpStatus(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_roundtripAPIResult")
 public func _bjs_roundtripAPIResult(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripAPIResult(_: _BJS_Closure_10TestModule9APIResultO_9APIResultO.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModule9APIResultO_9APIResultO.bridgeJSLift(callback)
+    let ret = roundtripAPIResult(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2502,7 +2554,8 @@ public func _bjs_roundtripAPIResult(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalDirection")
 public func _bjs_roundtripOptionalDirection(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalDirection(_: _BJS_Closure_10TestModuleSq9DirectionO_Sq9DirectionO.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModuleSq9DirectionO_Sq9DirectionO.bridgeJSLift(callback)
+    let ret = roundtripOptionalDirection(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2513,7 +2566,8 @@ public func _bjs_roundtripOptionalDirection(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalTheme")
 public func _bjs_roundtripOptionalTheme(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalTheme(_: _BJS_Closure_10TestModuleSq5ThemeO_Sq5ThemeO.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModuleSq5ThemeO_Sq5ThemeO.bridgeJSLift(callback)
+    let ret = roundtripOptionalTheme(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2524,7 +2578,8 @@ public func _bjs_roundtripOptionalTheme(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalHttpStatus")
 public func _bjs_roundtripOptionalHttpStatus(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalHttpStatus(_: _BJS_Closure_10TestModuleSq10HttpStatusO_Sq10HttpStatusO.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModuleSq10HttpStatusO_Sq10HttpStatusO.bridgeJSLift(callback)
+    let ret = roundtripOptionalHttpStatus(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2535,7 +2590,8 @@ public func _bjs_roundtripOptionalHttpStatus(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalAPIResult")
 public func _bjs_roundtripOptionalAPIResult(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalAPIResult(_: _BJS_Closure_10TestModuleSq9APIResultO_Sq9APIResultO.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModuleSq9APIResultO_Sq9APIResultO.bridgeJSLift(callback)
+    let ret = roundtripOptionalAPIResult(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2546,7 +2602,8 @@ public func _bjs_roundtripOptionalAPIResult(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_roundtripOptionalDirection")
 public func _bjs_roundtripOptionalDirection(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripOptionalDirection(_: _BJS_Closure_10TestModuleSq9DirectionO_Sq9DirectionO.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModuleSq9DirectionO_Sq9DirectionO.bridgeJSLift(callback)
+    let ret = roundtripOptionalDirection(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2557,7 +2614,8 @@ public func _bjs_roundtripOptionalDirection(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_Person_init")
 public func _bjs_Person_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Person(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Person(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -2599,7 +2657,8 @@ fileprivate func _bjs_Person_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> 
 @_cdecl("bjs_TestProcessor_init")
 public func _bjs_TestProcessor_init(_ transform: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = TestProcessor(transform: _BJS_Closure_10TestModuleSS_SS.bridgeJSLift(transform))
+    let transform = _BJS_Closure_10TestModuleSS_SS.bridgeJSLift(transform)
+    let ret = TestProcessor(transform: transform)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

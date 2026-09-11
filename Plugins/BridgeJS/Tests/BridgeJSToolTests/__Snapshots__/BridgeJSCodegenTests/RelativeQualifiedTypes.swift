@@ -92,7 +92,8 @@ fileprivate func _bjs_struct_lift_Library_Shelf_Divider_extern() -> Int32 {
 @_cdecl("bjs_Library_Shelf_Divider_init")
 public func _bjs_Library_Shelf_Divider_init(_ slot: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Library.Shelf.Divider(slot: Int.bridgeJSLiftParameter(slot))
+    let slot = Int.bridgeJSLiftParameter(slot)
+    let ret = Library.Shelf.Divider(slot: slot)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -158,7 +159,8 @@ public func _bjs_Outer_Inner_init() -> Void {
 @_cdecl("bjs_Outer_Inner_marker")
 public func _bjs_Outer_Inner_marker() -> Int32 {
     #if arch(wasm32)
-    let ret = Outer.Inner.bridgeJSLiftParameter().marker()
+    let _self = Outer.Inner.bridgeJSLiftParameter()
+    let ret = _self.marker()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -279,7 +281,9 @@ public func _bjs_Library_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Library_divider")
 public func _bjs_Library_divider(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Library.bridgeJSLiftParameter(_self).divider(_: Library.Shelf.Divider.bridgeJSLiftParameter())
+    let value = Library.Shelf.Divider.bridgeJSLiftParameter()
+    let _self = Library.bridgeJSLiftParameter(_self)
+    let ret = _self.divider(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

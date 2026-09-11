@@ -37,7 +37,8 @@ extension Calculator: _BridgedSwiftCaseEnum {
 @_cdecl("bjs_Calculator_static_square")
 public func _bjs_Calculator_static_square(_ value: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = Calculator.square(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let ret = Calculator.square(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -48,7 +49,8 @@ public func _bjs_Calculator_static_square(_ value: Int32) -> Int32 {
 @_cdecl("bjs_Calculator_static_cube")
 public func _bjs_Calculator_static_cube(_ value: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = Calculator.cube(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let ret = Calculator.cube(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -94,7 +96,8 @@ extension APIResult: _BridgedSwiftAssociatedValueEnum {
 @_cdecl("bjs_APIResult_static_roundtrip")
 public func _bjs_APIResult_static_roundtrip(_ value: Int32) -> Void {
     #if arch(wasm32)
-    let ret = APIResult.roundtrip(value: APIResult.bridgeJSLiftParameter(value))
+    let value = APIResult.bridgeJSLiftParameter(value)
+    let ret = APIResult.roundtrip(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -105,7 +108,8 @@ public func _bjs_APIResult_static_roundtrip(_ value: Int32) -> Void {
 @_cdecl("bjs_Utils_String_static_uppercase")
 public func _bjs_Utils_String_static_uppercase(_ textBytes: Int32, _ textLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Utils.String.uppercase(_: String.bridgeJSLiftParameter(textBytes, textLength))
+    let text = String.bridgeJSLiftParameter(textBytes, textLength)
+    let ret = Utils.String.uppercase(_: text)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -127,7 +131,9 @@ public func _bjs_MathUtils_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_MathUtils_static_subtract")
 public func _bjs_MathUtils_static_subtract(_ a: Int32, _ b: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = MathUtils.subtract(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
+    let b = Int.bridgeJSLiftParameter(b)
+    let a = Int.bridgeJSLiftParameter(a)
+    let ret = MathUtils.subtract(a: a, b: b)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -138,7 +144,9 @@ public func _bjs_MathUtils_static_subtract(_ a: Int32, _ b: Int32) -> Int32 {
 @_cdecl("bjs_MathUtils_static_add")
 public func _bjs_MathUtils_static_add(_ a: Int32, _ b: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = MathUtils.add(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
+    let b = Int.bridgeJSLiftParameter(b)
+    let a = Int.bridgeJSLiftParameter(a)
+    let ret = MathUtils.add(a: a, b: b)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -149,7 +157,10 @@ public func _bjs_MathUtils_static_add(_ a: Int32, _ b: Int32) -> Int32 {
 @_cdecl("bjs_MathUtils_multiply")
 public func _bjs_MathUtils_multiply(_ _self: UnsafeMutableRawPointer, _ x: Int32, _ y: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = MathUtils.bridgeJSLiftParameter(_self).multiply(x: Int.bridgeJSLiftParameter(x), y: Int.bridgeJSLiftParameter(y))
+    let y = Int.bridgeJSLiftParameter(y)
+    let x = Int.bridgeJSLiftParameter(x)
+    let _self = MathUtils.bridgeJSLiftParameter(_self)
+    let ret = _self.multiply(x: x, y: y)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -160,7 +171,9 @@ public func _bjs_MathUtils_multiply(_ _self: UnsafeMutableRawPointer, _ x: Int32
 @_cdecl("bjs_MathUtils_static_divide")
 public func _bjs_MathUtils_static_divide(_ a: Int32, _ b: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = MathUtils.divide(a: Int.bridgeJSLiftParameter(a), b: Int.bridgeJSLiftParameter(b))
+    let b = Int.bridgeJSLiftParameter(b)
+    let a = Int.bridgeJSLiftParameter(a)
+    let ret = MathUtils.divide(a: a, b: b)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

@@ -24,7 +24,8 @@ public func _bjs_MyModule_Utils_namespacedFunction() -> Void {
 @_cdecl("bjs___Swift_Foundation_Greeter_init")
 public func _bjs___Swift_Foundation_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Greeter(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -35,7 +36,8 @@ public func _bjs___Swift_Foundation_Greeter_init(_ nameBytes: Int32, _ nameLengt
 @_cdecl("bjs___Swift_Foundation_Greeter_greet")
 public func _bjs___Swift_Foundation_Greeter_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Greeter.bridgeJSLiftParameter(_self).greet()
+    let _self = Greeter.bridgeJSLiftParameter(_self)
+    let ret = _self.greet()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -110,7 +112,9 @@ public func _bjs_Utils_Converters_Converter_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Utils_Converters_Converter_toString")
 public func _bjs_Utils_Converters_Converter_toString(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Converter.bridgeJSLiftParameter(_self).toString(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = Converter.bridgeJSLiftParameter(_self)
+    let ret = _self.toString(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -152,7 +156,8 @@ fileprivate func _bjs_Utils_Converters_Converter_wrap_extern(_ pointer: UnsafeMu
 @_cdecl("bjs___Swift_Foundation_UUID_uuidString")
 public func _bjs___Swift_Foundation_UUID_uuidString(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = UUID.bridgeJSLiftParameter(_self).uuidString()
+    let _self = UUID.bridgeJSLiftParameter(_self)
+    let ret = _self.uuidString()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -205,7 +210,8 @@ public func _bjs_Collections_Container_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Collections_Container_getItems")
 public func _bjs_Collections_Container_getItems(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Container.bridgeJSLiftParameter(_self).getItems()
+    let _self = Container.bridgeJSLiftParameter(_self)
+    let ret = _self.getItems()
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -216,7 +222,9 @@ public func _bjs_Collections_Container_getItems(_ _self: UnsafeMutableRawPointer
 @_cdecl("bjs_Collections_Container_addItem")
 public func _bjs_Collections_Container_addItem(_ _self: UnsafeMutableRawPointer, _ item: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    Container.bridgeJSLiftParameter(_self).addItem(_: Greeter.bridgeJSLiftParameter(item))
+    let item = Greeter.bridgeJSLiftParameter(item)
+    let _self = Container.bridgeJSLiftParameter(_self)
+    _self.addItem(_: item)
     #else
     fatalError("Only available on WebAssembly")
     #endif

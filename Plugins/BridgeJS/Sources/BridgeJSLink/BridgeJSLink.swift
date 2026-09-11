@@ -1574,6 +1574,13 @@ public struct BridgeJSLink {
             )
         }
 
+        init(effects: Effects, context: IntrinsicJSFragment.PrintCodeContext) {
+            self.effects = effects
+            self.scope = context.scope.makeChildScope()
+            self.body = CodeFragmentPrinter()
+            self.context = context.with(\.scope, scope).with(\.printer, body)
+        }
+
         func lowerParameter(param: Parameter) throws {
             let loweringFragment = try IntrinsicJSFragment.lowerParameter(type: param.type)
             assert(

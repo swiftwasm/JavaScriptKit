@@ -100,8 +100,9 @@ public func _bjs_asyncReturnVoid() -> Int32 {
 @_cdecl("bjs_asyncRoundTripInt")
 public func _bjs_asyncRoundTripInt(_ v: Int32) -> Int32 {
     #if arch(wasm32)
+    let v = Int.bridgeJSLiftParameter(v)
     return _bjs_makePromise(resolve: Promise_resolve_Si, reject: Promise_reject) {
-        return await asyncRoundTripInt(_: Int.bridgeJSLiftParameter(v))
+        return await asyncRoundTripInt(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -112,8 +113,9 @@ public func _bjs_asyncRoundTripInt(_ v: Int32) -> Int32 {
 @_cdecl("bjs_asyncRoundTripString")
 public func _bjs_asyncRoundTripString(_ vBytes: Int32, _ vLength: Int32) -> Int32 {
     #if arch(wasm32)
+    let v = String.bridgeJSLiftParameter(vBytes, vLength)
     return _bjs_makePromise(resolve: Promise_resolve_SS, reject: Promise_reject) {
-        return await asyncRoundTripString(_: String.bridgeJSLiftParameter(vBytes, vLength))
+        return await asyncRoundTripString(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -124,8 +126,9 @@ public func _bjs_asyncRoundTripString(_ vBytes: Int32, _ vLength: Int32) -> Int3
 @_cdecl("bjs_asyncRoundTripBool")
 public func _bjs_asyncRoundTripBool(_ v: Int32) -> Int32 {
     #if arch(wasm32)
+    let v = Bool.bridgeJSLiftParameter(v)
     return _bjs_makePromise(resolve: Promise_resolve_Sb, reject: Promise_reject) {
-        return await asyncRoundTripBool(_: Bool.bridgeJSLiftParameter(v))
+        return await asyncRoundTripBool(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -136,8 +139,9 @@ public func _bjs_asyncRoundTripBool(_ v: Int32) -> Int32 {
 @_cdecl("bjs_asyncRoundTripFloat")
 public func _bjs_asyncRoundTripFloat(_ v: Float32) -> Int32 {
     #if arch(wasm32)
+    let v = Float.bridgeJSLiftParameter(v)
     return _bjs_makePromise(resolve: Promise_resolve_Sf, reject: Promise_reject) {
-        return await asyncRoundTripFloat(_: Float.bridgeJSLiftParameter(v))
+        return await asyncRoundTripFloat(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -148,8 +152,9 @@ public func _bjs_asyncRoundTripFloat(_ v: Float32) -> Int32 {
 @_cdecl("bjs_asyncRoundTripDouble")
 public func _bjs_asyncRoundTripDouble(_ v: Float64) -> Int32 {
     #if arch(wasm32)
+    let v = Double.bridgeJSLiftParameter(v)
     return _bjs_makePromise(resolve: Promise_resolve_Sd, reject: Promise_reject) {
-        return await asyncRoundTripDouble(_: Double.bridgeJSLiftParameter(v))
+        return await asyncRoundTripDouble(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -160,8 +165,9 @@ public func _bjs_asyncRoundTripDouble(_ v: Float64) -> Int32 {
 @_cdecl("bjs_asyncRoundTripJSObject")
 public func _bjs_asyncRoundTripJSObject(_ v: Int32) -> Int32 {
     #if arch(wasm32)
+    let v = JSObject.bridgeJSLiftParameter(v)
     return _bjs_makePromise(resolve: Promise_resolve_8JSObjectC, reject: Promise_reject) {
-        return await asyncRoundTripJSObject(_: JSObject.bridgeJSLiftParameter(v))
+        return await asyncRoundTripJSObject(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -172,9 +178,9 @@ public func _bjs_asyncRoundTripJSObject(_ v: Int32) -> Int32 {
 @_cdecl("bjs_asyncRoundTripStruct")
 public func _bjs_asyncRoundTripStruct() -> Int32 {
     #if arch(wasm32)
-    let _tmp_v = AsyncPoint.bridgeJSLiftParameter()
+    let v = AsyncPoint.bridgeJSLiftParameter()
     return _bjs_makePromise(resolve: Promise_resolve_10AsyncPointV, reject: Promise_reject) {
-        return await asyncRoundTripStruct(_: _tmp_v)
+        return await asyncRoundTripStruct(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -185,9 +191,9 @@ public func _bjs_asyncRoundTripStruct() -> Int32 {
 @_cdecl("bjs_asyncRoundTripStructThrows")
 public func _bjs_asyncRoundTripStructThrows() -> Int32 {
     #if arch(wasm32)
-    let _tmp_v = AsyncPoint.bridgeJSLiftParameter()
+    let v = AsyncPoint.bridgeJSLiftParameter()
     return _bjs_makePromise(resolve: Promise_resolve_10AsyncPointV, reject: Promise_reject) { () async throws(JSException) -> AsyncPoint in
-        return try await asyncRoundTripStructThrows(_: _tmp_v)
+        return try await asyncRoundTripStructThrows(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -212,10 +218,10 @@ public func _bjs_asyncThrowsZeroArg() -> Int32 {
 @_cdecl("bjs_asyncCombineStructs")
 public func _bjs_asyncCombineStructs() -> Int32 {
     #if arch(wasm32)
-    let _tmp_b = AsyncPoint.bridgeJSLiftParameter()
-    let _tmp_a = AsyncPoint.bridgeJSLiftParameter()
+    let b = AsyncPoint.bridgeJSLiftParameter()
+    let a = AsyncPoint.bridgeJSLiftParameter()
     return _bjs_makePromise(resolve: Promise_resolve_10AsyncPointV, reject: Promise_reject) {
-        return await asyncCombineStructs(_: _tmp_a, _: _tmp_b)
+        return await asyncCombineStructs(_: a, _: b)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -226,8 +232,9 @@ public func _bjs_asyncCombineStructs() -> Int32 {
 @_cdecl("bjs_asyncRoundTripEnum")
 public func _bjs_asyncRoundTripEnum(_ v: Int32) -> Int32 {
     #if arch(wasm32)
+    let v = AsyncDirection.bridgeJSLiftParameter(v)
     return _bjs_makePromise(resolve: Promise_resolve_14AsyncDirectionO, reject: Promise_reject) {
-        return await asyncRoundTripEnum(_: AsyncDirection.bridgeJSLiftParameter(v))
+        return await asyncRoundTripEnum(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -238,8 +245,9 @@ public func _bjs_asyncRoundTripEnum(_ v: Int32) -> Int32 {
 @_cdecl("bjs_asyncRoundTripRawEnum")
 public func _bjs_asyncRoundTripRawEnum(_ vBytes: Int32, _ vLength: Int32) -> Int32 {
     #if arch(wasm32)
+    let v = AsyncTheme.bridgeJSLiftParameter(vBytes, vLength)
     return _bjs_makePromise(resolve: Promise_resolve_10AsyncThemeO, reject: Promise_reject) {
-        return await asyncRoundTripRawEnum(_: AsyncTheme.bridgeJSLiftParameter(vBytes, vLength))
+        return await asyncRoundTripRawEnum(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -250,8 +258,9 @@ public func _bjs_asyncRoundTripRawEnum(_ vBytes: Int32, _ vLength: Int32) -> Int
 @_cdecl("bjs_asyncRoundTripOptionalEnum")
 public func _bjs_asyncRoundTripOptionalEnum(_ vIsSome: Int32, _ vValue: Int32) -> Int32 {
     #if arch(wasm32)
+    let v = Optional<AsyncDirection>.bridgeJSLiftParameter(vIsSome, vValue)
     return _bjs_makePromise(resolve: Promise_resolve_Sq14AsyncDirectionO, reject: Promise_reject) {
-        return await asyncRoundTripOptionalEnum(_: Optional<AsyncDirection>.bridgeJSLiftParameter(vIsSome, vValue))
+        return await asyncRoundTripOptionalEnum(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -262,8 +271,9 @@ public func _bjs_asyncRoundTripOptionalEnum(_ vIsSome: Int32, _ vValue: Int32) -
 @_cdecl("bjs_asyncRoundTripOptionalRawEnum")
 public func _bjs_asyncRoundTripOptionalRawEnum(_ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Int32 {
     #if arch(wasm32)
+    let v = Optional<AsyncTheme>.bridgeJSLiftParameter(vIsSome, vBytes, vLength)
     return _bjs_makePromise(resolve: Promise_resolve_Sq10AsyncThemeO, reject: Promise_reject) {
-        return await asyncRoundTripOptionalRawEnum(_: Optional<AsyncTheme>.bridgeJSLiftParameter(vIsSome, vBytes, vLength))
+        return await asyncRoundTripOptionalRawEnum(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -274,9 +284,9 @@ public func _bjs_asyncRoundTripOptionalRawEnum(_ vIsSome: Int32, _ vBytes: Int32
 @_cdecl("bjs_asyncRoundTripOptionalStruct")
 public func _bjs_asyncRoundTripOptionalStruct() -> Int32 {
     #if arch(wasm32)
-    let _tmp_v = Optional<AsyncPoint>.bridgeJSLiftParameter()
+    let v = Optional<AsyncPoint>.bridgeJSLiftParameter()
     return _bjs_makePromise(resolve: Promise_resolve_Sq10AsyncPointV, reject: Promise_reject) {
-        return await asyncRoundTripOptionalStruct(_: _tmp_v)
+        return await asyncRoundTripOptionalStruct(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -287,9 +297,9 @@ public func _bjs_asyncRoundTripOptionalStruct() -> Int32 {
 @_cdecl("bjs_asyncRoundTripStructArray")
 public func _bjs_asyncRoundTripStructArray() -> Int32 {
     #if arch(wasm32)
-    let _tmp_v = [AsyncPoint].bridgeJSStackPop()
+    let v = [AsyncPoint].bridgeJSStackPop()
     return _bjs_makePromise(resolve: Promise_resolve_Sa10AsyncPointV, reject: Promise_reject) {
-        return await asyncRoundTripStructArray(_: _tmp_v)
+        return await asyncRoundTripStructArray(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -300,9 +310,9 @@ public func _bjs_asyncRoundTripStructArray() -> Int32 {
 @_cdecl("bjs_asyncRoundTripEnumArray")
 public func _bjs_asyncRoundTripEnumArray() -> Int32 {
     #if arch(wasm32)
-    let _tmp_v = [AsyncDirection].bridgeJSStackPop()
+    let v = [AsyncDirection].bridgeJSStackPop()
     return _bjs_makePromise(resolve: Promise_resolve_Sa14AsyncDirectionO, reject: Promise_reject) {
-        return await asyncRoundTripEnumArray(_: _tmp_v)
+        return await asyncRoundTripEnumArray(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -313,9 +323,9 @@ public func _bjs_asyncRoundTripEnumArray() -> Int32 {
 @_cdecl("bjs_asyncRoundTripStructDictionary")
 public func _bjs_asyncRoundTripStructDictionary() -> Int32 {
     #if arch(wasm32)
-    let _tmp_v = [String: AsyncPoint].bridgeJSLiftParameter()
+    let v = [String: AsyncPoint].bridgeJSLiftParameter()
     return _bjs_makePromise(resolve: Promise_resolve_SD10AsyncPointV, reject: Promise_reject) {
-        return await asyncRoundTripStructDictionary(_: _tmp_v)
+        return await asyncRoundTripStructDictionary(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")
@@ -326,9 +336,9 @@ public func _bjs_asyncRoundTripStructDictionary() -> Int32 {
 @_cdecl("bjs_asyncRoundTripEnumDictionary")
 public func _bjs_asyncRoundTripEnumDictionary() -> Int32 {
     #if arch(wasm32)
-    let _tmp_v = [String: AsyncDirection].bridgeJSLiftParameter()
+    let v = [String: AsyncDirection].bridgeJSLiftParameter()
     return _bjs_makePromise(resolve: Promise_resolve_SD14AsyncDirectionO, reject: Promise_reject) {
-        return await asyncRoundTripEnumDictionary(_: _tmp_v)
+        return await asyncRoundTripEnumDictionary(_: v)
     }
     #else
     fatalError("Only available on WebAssembly")

@@ -2,7 +2,8 @@
 @_cdecl("bjs_ClassA_linkedB_get")
 public func _bjs_ClassA_linkedB_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = ClassA.bridgeJSLiftParameter(_self).linkedB
+    let _self = ClassA.bridgeJSLiftParameter(_self)
+    let ret = _self.linkedB
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -13,7 +14,9 @@ public func _bjs_ClassA_linkedB_get(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_ClassA_linkedB_set")
 public func _bjs_ClassA_linkedB_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueValue: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    ClassA.bridgeJSLiftParameter(_self).linkedB = Optional<ClassB>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    let value = Optional<ClassB>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    let _self = ClassA.bridgeJSLiftParameter(_self)
+    _self.linkedB = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

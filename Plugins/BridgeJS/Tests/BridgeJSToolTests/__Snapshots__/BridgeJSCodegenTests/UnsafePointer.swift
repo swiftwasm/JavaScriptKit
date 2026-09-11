@@ -56,7 +56,12 @@ fileprivate func _bjs_struct_lift_PointerFields_extern() -> Int32 {
 @_cdecl("bjs_PointerFields_init")
 public func _bjs_PointerFields_init(_ raw: UnsafeMutableRawPointer, _ mutRaw: UnsafeMutableRawPointer, _ opaque: UnsafeMutableRawPointer, _ ptr: UnsafeMutableRawPointer, _ mutPtr: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = PointerFields(raw: UnsafeRawPointer.bridgeJSLiftParameter(raw), mutRaw: UnsafeMutableRawPointer.bridgeJSLiftParameter(mutRaw), opaque: OpaquePointer.bridgeJSLiftParameter(opaque), ptr: UnsafePointer<UInt8>.bridgeJSLiftParameter(ptr), mutPtr: UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(mutPtr))
+    let mutPtr = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(mutPtr)
+    let ptr = UnsafePointer<UInt8>.bridgeJSLiftParameter(ptr)
+    let opaque = OpaquePointer.bridgeJSLiftParameter(opaque)
+    let mutRaw = UnsafeMutableRawPointer.bridgeJSLiftParameter(mutRaw)
+    let raw = UnsafeRawPointer.bridgeJSLiftParameter(raw)
+    let ret = PointerFields(raw: raw, mutRaw: mutRaw, opaque: opaque, ptr: ptr, mutPtr: mutPtr)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -67,7 +72,8 @@ public func _bjs_PointerFields_init(_ raw: UnsafeMutableRawPointer, _ mutRaw: Un
 @_cdecl("bjs_takeUnsafeRawPointer")
 public func _bjs_takeUnsafeRawPointer(_ p: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    takeUnsafeRawPointer(_: UnsafeRawPointer.bridgeJSLiftParameter(p))
+    let p = UnsafeRawPointer.bridgeJSLiftParameter(p)
+    takeUnsafeRawPointer(_: p)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -77,7 +83,8 @@ public func _bjs_takeUnsafeRawPointer(_ p: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_takeUnsafeMutableRawPointer")
 public func _bjs_takeUnsafeMutableRawPointer(_ p: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    takeUnsafeMutableRawPointer(_: UnsafeMutableRawPointer.bridgeJSLiftParameter(p))
+    let p = UnsafeMutableRawPointer.bridgeJSLiftParameter(p)
+    takeUnsafeMutableRawPointer(_: p)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -87,7 +94,8 @@ public func _bjs_takeUnsafeMutableRawPointer(_ p: UnsafeMutableRawPointer) -> Vo
 @_cdecl("bjs_takeOpaquePointer")
 public func _bjs_takeOpaquePointer(_ p: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    takeOpaquePointer(_: OpaquePointer.bridgeJSLiftParameter(p))
+    let p = OpaquePointer.bridgeJSLiftParameter(p)
+    takeOpaquePointer(_: p)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -97,7 +105,8 @@ public func _bjs_takeOpaquePointer(_ p: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_takeUnsafePointer")
 public func _bjs_takeUnsafePointer(_ p: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    takeUnsafePointer(_: UnsafePointer<UInt8>.bridgeJSLiftParameter(p))
+    let p = UnsafePointer<UInt8>.bridgeJSLiftParameter(p)
+    takeUnsafePointer(_: p)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -107,7 +116,8 @@ public func _bjs_takeUnsafePointer(_ p: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_takeUnsafeMutablePointer")
 public func _bjs_takeUnsafeMutablePointer(_ p: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    takeUnsafeMutablePointer(_: UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(p))
+    let p = UnsafeMutablePointer<UInt8>.bridgeJSLiftParameter(p)
+    takeUnsafeMutablePointer(_: p)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -172,7 +182,8 @@ public func _bjs_returnUnsafeMutablePointer() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_roundTripPointerFields")
 public func _bjs_roundTripPointerFields() -> Void {
     #if arch(wasm32)
-    let ret = roundTripPointerFields(_: PointerFields.bridgeJSLiftParameter())
+    let value = PointerFields.bridgeJSLiftParameter()
+    let ret = roundTripPointerFields(_: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

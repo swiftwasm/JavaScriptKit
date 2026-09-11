@@ -2,7 +2,8 @@
 @_cdecl("bjs_Greeter_init")
 public func _bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Greeter(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Greeter(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -13,7 +14,8 @@ public func _bjs_Greeter_init(_ nameBytes: Int32, _ nameLength: Int32) -> Unsafe
 @_cdecl("bjs_Greeter_greet")
 public func _bjs_Greeter_greet(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Greeter.bridgeJSLiftParameter(_self).greet()
+    let _self = Greeter.bridgeJSLiftParameter(_self)
+    let ret = _self.greet()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -24,7 +26,8 @@ public func _bjs_Greeter_greet(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Greeter_greetFormally")
 public func _bjs_Greeter_greetFormally(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Greeter.bridgeJSLiftParameter(_self).greetFormally()
+    let _self = Greeter.bridgeJSLiftParameter(_self)
+    let ret = _self.greetFormally()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

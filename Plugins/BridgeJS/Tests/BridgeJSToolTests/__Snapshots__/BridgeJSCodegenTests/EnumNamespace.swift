@@ -86,7 +86,8 @@ extension Internal.SupportedMethod: _BridgedSwiftCaseEnum {
 @_cdecl("bjs_Services_Graph_GraphOperations_static_createGraph")
 public func _bjs_Services_Graph_GraphOperations_static_createGraph(_ rootId: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = GraphOperations.createGraph(rootId: Int.bridgeJSLiftParameter(rootId))
+    let rootId = Int.bridgeJSLiftParameter(rootId)
+    let ret = GraphOperations.createGraph(rootId: rootId)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -97,7 +98,8 @@ public func _bjs_Services_Graph_GraphOperations_static_createGraph(_ rootId: Int
 @_cdecl("bjs_Services_Graph_GraphOperations_static_nodeCount")
 public func _bjs_Services_Graph_GraphOperations_static_nodeCount(_ graphId: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = GraphOperations.nodeCount(graphId: Int.bridgeJSLiftParameter(graphId))
+    let graphId = Int.bridgeJSLiftParameter(graphId)
+    let ret = GraphOperations.nodeCount(graphId: graphId)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -108,8 +110,9 @@ public func _bjs_Services_Graph_GraphOperations_static_nodeCount(_ graphId: Int3
 @_cdecl("bjs_Services_Graph_GraphOperations_static_validate")
 public func _bjs_Services_Graph_GraphOperations_static_validate(_ graphId: Int32) -> Int32 {
     #if arch(wasm32)
+    let graphId = Int.bridgeJSLiftParameter(graphId)
     do {
-        let ret = try GraphOperations.validate(graphId: Int.bridgeJSLiftParameter(graphId))
+        let ret = try GraphOperations.validate(graphId: graphId)
         return ret.bridgeJSLowerReturn()
     } catch let error {
         if let error = error.thrownValue.object {
@@ -144,7 +147,9 @@ public func _bjs_Utils_Converter_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Utils_Converter_toString")
 public func _bjs_Utils_Converter_toString(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Utils.Converter.bridgeJSLiftParameter(_self).toString(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = Utils.Converter.bridgeJSLiftParameter(_self)
+    let ret = _self.toString(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -155,7 +160,8 @@ public func _bjs_Utils_Converter_toString(_ _self: UnsafeMutableRawPointer, _ va
 @_cdecl("bjs_Utils_Converter_precision_get")
 public func _bjs_Utils_Converter_precision_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = Utils.Converter.bridgeJSLiftParameter(_self).precision
+    let _self = Utils.Converter.bridgeJSLiftParameter(_self)
+    let ret = _self.precision
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -166,7 +172,9 @@ public func _bjs_Utils_Converter_precision_get(_ _self: UnsafeMutableRawPointer)
 @_cdecl("bjs_Utils_Converter_precision_set")
 public func _bjs_Utils_Converter_precision_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    Utils.Converter.bridgeJSLiftParameter(_self).precision = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = Utils.Converter.bridgeJSLiftParameter(_self)
+    _self.precision = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -218,7 +226,9 @@ public func _bjs_Networking_API_HTTPServer_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Networking_API_HTTPServer_call")
 public func _bjs_Networking_API_HTTPServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
     #if arch(wasm32)
-    Networking.API.HTTPServer.bridgeJSLiftParameter(_self).call(_: Networking.API.Method.bridgeJSLiftParameter(method))
+    let method = Networking.API.Method.bridgeJSLiftParameter(method)
+    let _self = Networking.API.HTTPServer.bridgeJSLiftParameter(_self)
+    _self.call(_: method)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -270,7 +280,9 @@ public func _bjs_Networking_APIV2_Internal_TestServer_init() -> UnsafeMutableRaw
 @_cdecl("bjs_Networking_APIV2_Internal_TestServer_call")
 public func _bjs_Networking_APIV2_Internal_TestServer_call(_ _self: UnsafeMutableRawPointer, _ method: Int32) -> Void {
     #if arch(wasm32)
-    Internal.TestServer.bridgeJSLiftParameter(_self).call(_: Internal.SupportedMethod.bridgeJSLiftParameter(method))
+    let method = Internal.SupportedMethod.bridgeJSLiftParameter(method)
+    let _self = Internal.TestServer.bridgeJSLiftParameter(_self)
+    _self.call(_: method)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -322,7 +334,9 @@ public func _bjs_Formatting_Converter_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_Formatting_Converter_format")
 public func _bjs_Formatting_Converter_format(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Formatting.Converter.bridgeJSLiftParameter(_self).format(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = Formatting.Converter.bridgeJSLiftParameter(_self)
+    let ret = _self.format(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

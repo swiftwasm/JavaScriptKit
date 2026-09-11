@@ -2,7 +2,8 @@
 @_cdecl("bjs_processBytes")
 public func _bjs_processBytes(_ data: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processBytes(_: JSUint8Array.bridgeJSLiftParameter(data))
+    let data = JSUint8Array.bridgeJSLiftParameter(data)
+    let ret = processBytes(_: data)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -13,7 +14,8 @@ public func _bjs_processBytes(_ data: Int32) -> Int32 {
 @_cdecl("bjs_processFloats")
 public func _bjs_processFloats(_ data: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processFloats(_: JSFloat32Array.bridgeJSLiftParameter(data))
+    let data = JSFloat32Array.bridgeJSLiftParameter(data)
+    let ret = processFloats(_: data)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -24,7 +26,8 @@ public func _bjs_processFloats(_ data: Int32) -> Int32 {
 @_cdecl("bjs_processGenericDoubles")
 public func _bjs_processGenericDoubles(_ data: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processGenericDoubles(_: JSFloat64Array.bridgeJSLiftParameter(data))
+    let data = JSFloat64Array.bridgeJSLiftParameter(data)
+    let ret = processGenericDoubles(_: data)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -35,7 +38,8 @@ public func _bjs_processGenericDoubles(_ data: Int32) -> Int32 {
 @_cdecl("bjs_processGenericInts")
 public func _bjs_processGenericInts(_ data: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processGenericInts(_: JSInt32Array.bridgeJSLiftParameter(data))
+    let data = JSInt32Array.bridgeJSLiftParameter(data)
+    let ret = processGenericInts(_: data)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

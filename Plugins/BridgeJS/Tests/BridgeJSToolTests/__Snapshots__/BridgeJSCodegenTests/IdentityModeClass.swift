@@ -2,7 +2,8 @@
 @_cdecl("bjs_CachedModel_init")
 public func _bjs_CachedModel_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = CachedModel(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = CachedModel(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -13,7 +14,8 @@ public func _bjs_CachedModel_init(_ nameBytes: Int32, _ nameLength: Int32) -> Un
 @_cdecl("bjs_CachedModel_name_get")
 public func _bjs_CachedModel_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = CachedModel.bridgeJSLiftParameter(_self).name
+    let _self = CachedModel.bridgeJSLiftParameter(_self)
+    let ret = _self.name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -24,7 +26,9 @@ public func _bjs_CachedModel_name_get(_ _self: UnsafeMutableRawPointer) -> Void 
 @_cdecl("bjs_CachedModel_name_set")
 public func _bjs_CachedModel_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    CachedModel.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = CachedModel.bridgeJSLiftParameter(_self)
+    _self.name = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -65,7 +69,8 @@ fileprivate func _bjs_CachedModel_wrap_extern(_ pointer: UnsafeMutableRawPointer
 @_cdecl("bjs_UncachedModel_init")
 public func _bjs_UncachedModel_init(_ value: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = UncachedModel(value: Int.bridgeJSLiftParameter(value))
+    let value = Int.bridgeJSLiftParameter(value)
+    let ret = UncachedModel(value: value)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -76,7 +81,8 @@ public func _bjs_UncachedModel_init(_ value: Int32) -> UnsafeMutableRawPointer {
 @_cdecl("bjs_UncachedModel_value_get")
 public func _bjs_UncachedModel_value_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = UncachedModel.bridgeJSLiftParameter(_self).value
+    let _self = UncachedModel.bridgeJSLiftParameter(_self)
+    let ret = _self.value
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -87,7 +93,9 @@ public func _bjs_UncachedModel_value_get(_ _self: UnsafeMutableRawPointer) -> In
 @_cdecl("bjs_UncachedModel_value_set")
 public func _bjs_UncachedModel_value_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    UncachedModel.bridgeJSLiftParameter(_self).value = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = UncachedModel.bridgeJSLiftParameter(_self)
+    _self.value = value
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -128,7 +136,8 @@ fileprivate func _bjs_UncachedModel_wrap_extern(_ pointer: UnsafeMutableRawPoint
 @_cdecl("bjs_ExplicitlyUncachedModel_init")
 public func _bjs_ExplicitlyUncachedModel_init(_ count: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = ExplicitlyUncachedModel(count: Int.bridgeJSLiftParameter(count))
+    let count = Int.bridgeJSLiftParameter(count)
+    let ret = ExplicitlyUncachedModel(count: count)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -139,7 +148,8 @@ public func _bjs_ExplicitlyUncachedModel_init(_ count: Int32) -> UnsafeMutableRa
 @_cdecl("bjs_ExplicitlyUncachedModel_count_get")
 public func _bjs_ExplicitlyUncachedModel_count_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
-    let ret = ExplicitlyUncachedModel.bridgeJSLiftParameter(_self).count
+    let _self = ExplicitlyUncachedModel.bridgeJSLiftParameter(_self)
+    let ret = _self.count
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -150,7 +160,9 @@ public func _bjs_ExplicitlyUncachedModel_count_get(_ _self: UnsafeMutableRawPoin
 @_cdecl("bjs_ExplicitlyUncachedModel_count_set")
 public func _bjs_ExplicitlyUncachedModel_count_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
     #if arch(wasm32)
-    ExplicitlyUncachedModel.bridgeJSLiftParameter(_self).count = Int.bridgeJSLiftParameter(value)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = ExplicitlyUncachedModel.bridgeJSLiftParameter(_self)
+    _self.count = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

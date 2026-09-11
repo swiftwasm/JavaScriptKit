@@ -75,7 +75,8 @@ public func _bjs_makeFoo() -> Int32 {
 @_cdecl("bjs_processFooArray")
 public func _bjs_processFooArray() -> Void {
     #if arch(wasm32)
-    let ret = processFooArray(_: [Foo].bridgeJSStackPop())
+    let foos = [Foo].bridgeJSStackPop()
+    let ret = processFooArray(_: foos)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -86,7 +87,8 @@ public func _bjs_processFooArray() -> Void {
 @_cdecl("bjs_processOptionalFooArray")
 public func _bjs_processOptionalFooArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalFooArray(_: [Optional<Foo>].bridgeJSStackPop())
+    let foos = [Optional<Foo>].bridgeJSStackPop()
+    let ret = processOptionalFooArray(_: foos)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -97,7 +99,8 @@ public func _bjs_processOptionalFooArray() -> Void {
 @_cdecl("bjs_roundtripFooContainer")
 public func _bjs_roundtripFooContainer() -> Void {
     #if arch(wasm32)
-    let ret = roundtripFooContainer(_: FooContainer.bridgeJSLiftParameter())
+    let container = FooContainer.bridgeJSLiftParameter()
+    let ret = roundtripFooContainer(_: container)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

@@ -96,7 +96,8 @@ fileprivate func _bjs_struct_lift_Point_extern() -> Int32 {
 @_cdecl("bjs_processIntArray")
 public func _bjs_processIntArray() -> Void {
     #if arch(wasm32)
-    let ret = processIntArray(_: [Int].bridgeJSStackPop())
+    let values = [Int].bridgeJSStackPop()
+    let ret = processIntArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -107,7 +108,8 @@ public func _bjs_processIntArray() -> Void {
 @_cdecl("bjs_processStringArray")
 public func _bjs_processStringArray() -> Void {
     #if arch(wasm32)
-    let ret = processStringArray(_: [String].bridgeJSStackPop())
+    let values = [String].bridgeJSStackPop()
+    let ret = processStringArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -118,7 +120,8 @@ public func _bjs_processStringArray() -> Void {
 @_cdecl("bjs_processDoubleArray")
 public func _bjs_processDoubleArray() -> Void {
     #if arch(wasm32)
-    let ret = processDoubleArray(_: [Double].bridgeJSStackPop())
+    let values = [Double].bridgeJSStackPop()
+    let ret = processDoubleArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -129,7 +132,8 @@ public func _bjs_processDoubleArray() -> Void {
 @_cdecl("bjs_processBoolArray")
 public func _bjs_processBoolArray() -> Void {
     #if arch(wasm32)
-    let ret = processBoolArray(_: [Bool].bridgeJSStackPop())
+    let values = [Bool].bridgeJSStackPop()
+    let ret = processBoolArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -140,7 +144,8 @@ public func _bjs_processBoolArray() -> Void {
 @_cdecl("bjs_processPointArray")
 public func _bjs_processPointArray() -> Void {
     #if arch(wasm32)
-    let ret = processPointArray(_: [Point].bridgeJSStackPop())
+    let points = [Point].bridgeJSStackPop()
+    let ret = processPointArray(_: points)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -151,7 +156,8 @@ public func _bjs_processPointArray() -> Void {
 @_cdecl("bjs_processDirectionArray")
 public func _bjs_processDirectionArray() -> Void {
     #if arch(wasm32)
-    let ret = processDirectionArray(_: [Direction].bridgeJSStackPop())
+    let directions = [Direction].bridgeJSStackPop()
+    let ret = processDirectionArray(_: directions)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -162,7 +168,8 @@ public func _bjs_processDirectionArray() -> Void {
 @_cdecl("bjs_processStatusArray")
 public func _bjs_processStatusArray() -> Void {
     #if arch(wasm32)
-    let ret = processStatusArray(_: [Status].bridgeJSStackPop())
+    let statuses = [Status].bridgeJSStackPop()
+    let ret = processStatusArray(_: statuses)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -173,7 +180,8 @@ public func _bjs_processStatusArray() -> Void {
 @_cdecl("bjs_sumIntArray")
 public func _bjs_sumIntArray() -> Int32 {
     #if arch(wasm32)
-    let ret = sumIntArray(_: [Int].bridgeJSStackPop())
+    let values = [Int].bridgeJSStackPop()
+    let ret = sumIntArray(_: values)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -184,7 +192,9 @@ public func _bjs_sumIntArray() -> Int32 {
 @_cdecl("bjs_findFirstPoint")
 public func _bjs_findFirstPoint(_ matchingBytes: Int32, _ matchingLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = findFirstPoint(_: [Point].bridgeJSStackPop(), matching: String.bridgeJSLiftParameter(matchingBytes, matchingLength))
+    let matching = String.bridgeJSLiftParameter(matchingBytes, matchingLength)
+    let points = [Point].bridgeJSStackPop()
+    let ret = findFirstPoint(_: points, matching: matching)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -195,7 +205,8 @@ public func _bjs_findFirstPoint(_ matchingBytes: Int32, _ matchingLength: Int32)
 @_cdecl("bjs_processUnsafeRawPointerArray")
 public func _bjs_processUnsafeRawPointerArray() -> Void {
     #if arch(wasm32)
-    let ret = processUnsafeRawPointerArray(_: [UnsafeRawPointer].bridgeJSStackPop())
+    let values = [UnsafeRawPointer].bridgeJSStackPop()
+    let ret = processUnsafeRawPointerArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -206,7 +217,8 @@ public func _bjs_processUnsafeRawPointerArray() -> Void {
 @_cdecl("bjs_processUnsafeMutableRawPointerArray")
 public func _bjs_processUnsafeMutableRawPointerArray() -> Void {
     #if arch(wasm32)
-    let ret = processUnsafeMutableRawPointerArray(_: [UnsafeMutableRawPointer].bridgeJSStackPop())
+    let values = [UnsafeMutableRawPointer].bridgeJSStackPop()
+    let ret = processUnsafeMutableRawPointerArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -217,7 +229,8 @@ public func _bjs_processUnsafeMutableRawPointerArray() -> Void {
 @_cdecl("bjs_processOpaquePointerArray")
 public func _bjs_processOpaquePointerArray() -> Void {
     #if arch(wasm32)
-    let ret = processOpaquePointerArray(_: [OpaquePointer].bridgeJSStackPop())
+    let values = [OpaquePointer].bridgeJSStackPop()
+    let ret = processOpaquePointerArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -228,7 +241,8 @@ public func _bjs_processOpaquePointerArray() -> Void {
 @_cdecl("bjs_processOptionalIntArray")
 public func _bjs_processOptionalIntArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalIntArray(_: [Optional<Int>].bridgeJSStackPop())
+    let values = [Optional<Int>].bridgeJSStackPop()
+    let ret = processOptionalIntArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -239,7 +253,8 @@ public func _bjs_processOptionalIntArray() -> Void {
 @_cdecl("bjs_processOptionalStringArray")
 public func _bjs_processOptionalStringArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalStringArray(_: [Optional<String>].bridgeJSStackPop())
+    let values = [Optional<String>].bridgeJSStackPop()
+    let ret = processOptionalStringArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -250,7 +265,8 @@ public func _bjs_processOptionalStringArray() -> Void {
 @_cdecl("bjs_processOptionalArray")
 public func _bjs_processOptionalArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalArray(_: Optional<[Int]>.bridgeJSLiftParameter())
+    let values = Optional<[Int]>.bridgeJSLiftParameter()
+    let ret = processOptionalArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -261,7 +277,8 @@ public func _bjs_processOptionalArray() -> Void {
 @_cdecl("bjs_processOptionalPointArray")
 public func _bjs_processOptionalPointArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalPointArray(_: [Optional<Point>].bridgeJSStackPop())
+    let points = [Optional<Point>].bridgeJSStackPop()
+    let ret = processOptionalPointArray(_: points)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -272,7 +289,8 @@ public func _bjs_processOptionalPointArray() -> Void {
 @_cdecl("bjs_processOptionalDirectionArray")
 public func _bjs_processOptionalDirectionArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalDirectionArray(_: [Optional<Direction>].bridgeJSStackPop())
+    let directions = [Optional<Direction>].bridgeJSStackPop()
+    let ret = processOptionalDirectionArray(_: directions)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -283,7 +301,8 @@ public func _bjs_processOptionalDirectionArray() -> Void {
 @_cdecl("bjs_processOptionalStatusArray")
 public func _bjs_processOptionalStatusArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalStatusArray(_: [Optional<Status>].bridgeJSStackPop())
+    let statuses = [Optional<Status>].bridgeJSStackPop()
+    let ret = processOptionalStatusArray(_: statuses)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -294,7 +313,8 @@ public func _bjs_processOptionalStatusArray() -> Void {
 @_cdecl("bjs_processNestedIntArray")
 public func _bjs_processNestedIntArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedIntArray(_: [[Int]].bridgeJSStackPop())
+    let values = [[Int]].bridgeJSStackPop()
+    let ret = processNestedIntArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -305,7 +325,8 @@ public func _bjs_processNestedIntArray() -> Void {
 @_cdecl("bjs_processNestedStringArray")
 public func _bjs_processNestedStringArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedStringArray(_: [[String]].bridgeJSStackPop())
+    let values = [[String]].bridgeJSStackPop()
+    let ret = processNestedStringArray(_: values)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -316,7 +337,8 @@ public func _bjs_processNestedStringArray() -> Void {
 @_cdecl("bjs_processNestedPointArray")
 public func _bjs_processNestedPointArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedPointArray(_: [[Point]].bridgeJSStackPop())
+    let points = [[Point]].bridgeJSStackPop()
+    let ret = processNestedPointArray(_: points)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -327,7 +349,8 @@ public func _bjs_processNestedPointArray() -> Void {
 @_cdecl("bjs_processItemArray")
 public func _bjs_processItemArray() -> Void {
     #if arch(wasm32)
-    let ret = processItemArray(_: [Item].bridgeJSStackPop())
+    let items = [Item].bridgeJSStackPop()
+    let ret = processItemArray(_: items)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -338,7 +361,8 @@ public func _bjs_processItemArray() -> Void {
 @_cdecl("bjs_processNestedItemArray")
 public func _bjs_processNestedItemArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedItemArray(_: [[Item]].bridgeJSStackPop())
+    let items = [[Item]].bridgeJSStackPop()
+    let ret = processNestedItemArray(_: items)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -349,7 +373,8 @@ public func _bjs_processNestedItemArray() -> Void {
 @_cdecl("bjs_processJSObjectArray")
 public func _bjs_processJSObjectArray() -> Void {
     #if arch(wasm32)
-    let ret = processJSObjectArray(_: [JSObject].bridgeJSStackPop())
+    let objects = [JSObject].bridgeJSStackPop()
+    let ret = processJSObjectArray(_: objects)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -360,7 +385,8 @@ public func _bjs_processJSObjectArray() -> Void {
 @_cdecl("bjs_processOptionalJSObjectArray")
 public func _bjs_processOptionalJSObjectArray() -> Void {
     #if arch(wasm32)
-    let ret = processOptionalJSObjectArray(_: [Optional<JSObject>].bridgeJSStackPop())
+    let objects = [Optional<JSObject>].bridgeJSStackPop()
+    let ret = processOptionalJSObjectArray(_: objects)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -371,7 +397,8 @@ public func _bjs_processOptionalJSObjectArray() -> Void {
 @_cdecl("bjs_processNestedJSObjectArray")
 public func _bjs_processNestedJSObjectArray() -> Void {
     #if arch(wasm32)
-    let ret = processNestedJSObjectArray(_: [[JSObject]].bridgeJSStackPop())
+    let objects = [[JSObject]].bridgeJSStackPop()
+    let ret = processNestedJSObjectArray(_: objects)
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -382,9 +409,9 @@ public func _bjs_processNestedJSObjectArray() -> Void {
 @_cdecl("bjs_multiArrayParams")
 public func _bjs_multiArrayParams() -> Int32 {
     #if arch(wasm32)
-    let _tmp_strs = [String].bridgeJSStackPop()
-    let _tmp_nums = [Int].bridgeJSStackPop()
-    let ret = multiArrayParams(nums: _tmp_nums, strs: _tmp_strs)
+    let strs = [String].bridgeJSStackPop()
+    let nums = [Int].bridgeJSStackPop()
+    let ret = multiArrayParams(nums: nums, strs: strs)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -395,9 +422,9 @@ public func _bjs_multiArrayParams() -> Int32 {
 @_cdecl("bjs_multiOptionalArrayParams")
 public func _bjs_multiOptionalArrayParams() -> Int32 {
     #if arch(wasm32)
-    let _tmp_b = Optional<[String]>.bridgeJSLiftParameter()
-    let _tmp_a = Optional<[Int]>.bridgeJSLiftParameter()
-    let ret = multiOptionalArrayParams(a: _tmp_a, b: _tmp_b)
+    let b = Optional<[String]>.bridgeJSLiftParameter()
+    let a = Optional<[Int]>.bridgeJSLiftParameter()
+    let ret = multiOptionalArrayParams(a: a, b: b)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -439,9 +466,9 @@ fileprivate func _bjs_Item_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> In
 @_cdecl("bjs_MultiArrayContainer_init")
 public func _bjs_MultiArrayContainer_init() -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let _tmp_strs = [String].bridgeJSStackPop()
-    let _tmp_nums = [Int].bridgeJSStackPop()
-    let ret = MultiArrayContainer(nums: _tmp_nums, strs: _tmp_strs)
+    let strs = [String].bridgeJSStackPop()
+    let nums = [Int].bridgeJSStackPop()
+    let ret = MultiArrayContainer(nums: nums, strs: strs)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -452,7 +479,8 @@ public func _bjs_MultiArrayContainer_init() -> UnsafeMutableRawPointer {
 @_cdecl("bjs_MultiArrayContainer_numbers_get")
 public func _bjs_MultiArrayContainer_numbers_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = MultiArrayContainer.bridgeJSLiftParameter(_self).numbers
+    let _self = MultiArrayContainer.bridgeJSLiftParameter(_self)
+    let ret = _self.numbers
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")
@@ -463,7 +491,8 @@ public func _bjs_MultiArrayContainer_numbers_get(_ _self: UnsafeMutableRawPointe
 @_cdecl("bjs_MultiArrayContainer_strings_get")
 public func _bjs_MultiArrayContainer_strings_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = MultiArrayContainer.bridgeJSLiftParameter(_self).strings
+    let _self = MultiArrayContainer.bridgeJSLiftParameter(_self)
+    let ret = _self.strings
     ret.bridgeJSStackPush()
     #else
     fatalError("Only available on WebAssembly")

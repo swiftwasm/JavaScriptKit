@@ -53,9 +53,10 @@ extension JSTypedClosure where Signature == (any Renderable) -> any Renderable {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule10RenderableP_10RenderableP")
 public func _invoke_swift_closure_TestModule_10TestModule10RenderableP_10RenderableP(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
     #if arch(wasm32)
+    let param0 = AnyRenderable.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(any Renderable) -> any Renderable>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(AnyRenderable.bridgeJSLiftParameter(param0))
-    return _bridgeJSUnwrapProtocolExportable(result, "Renderable").bridgeJSLowerAsProtocolReturn()
+    let ret = _bridgeJSUnwrapProtocolExportable(closure(param0), "Renderable")
+    return ret.bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -116,9 +117,10 @@ extension JSTypedClosure where Signature == (any Renderable) -> String {
 @_cdecl("invoke_swift_closure_TestModule_10TestModule10RenderableP_SS")
 public func _invoke_swift_closure_TestModule_10TestModule10RenderableP_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = AnyRenderable.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(any Renderable) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(AnyRenderable.bridgeJSLiftParameter(param0))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -184,9 +186,10 @@ extension JSTypedClosure where Signature == (Optional<any Renderable>) -> String
 @_cdecl("invoke_swift_closure_TestModule_10TestModuleSq10RenderableP_SS")
 public func _invoke_swift_closure_TestModule_10TestModuleSq10RenderableP_SS(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
     #if arch(wasm32)
+    let param0 = Optional<AnyRenderable>.bridgeJSLiftParameter(param0IsSome, param0Value)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<any Renderable>) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure(Optional<AnyRenderable>.bridgeJSLiftParameter(param0IsSome, param0Value))
-    return result.bridgeJSLowerReturn()
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -247,8 +250,8 @@ extension JSTypedClosure where Signature == () -> any Renderable {
 public func _invoke_swift_closure_TestModule_10TestModuley_10RenderableP(_ boxPtr: UnsafeMutableRawPointer) -> Int32 {
     #if arch(wasm32)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<() -> any Renderable>>.fromOpaque(boxPtr).takeUnretainedValue().closure
-    let result = closure()
-    return _bridgeJSUnwrapProtocolExportable(result, "Renderable").bridgeJSLowerAsProtocolReturn()
+    let ret = _bridgeJSUnwrapProtocolExportable(closure(), "Renderable")
+    return ret.bridgeJSLowerAsProtocolReturn()
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -284,7 +287,9 @@ fileprivate func _extern_render_extern(_ jsObject: Int32) -> Int32 {
 @_cdecl("bjs_processRenderable")
 public func _bjs_processRenderable(_ item: Int32, _ transform: Int32) -> Void {
     #if arch(wasm32)
-    let ret = processRenderable(_: AnyRenderable.bridgeJSLiftParameter(item), transform: _BJS_Closure_10TestModule10RenderableP_SS.bridgeJSLift(transform))
+    let transform = _BJS_Closure_10TestModule10RenderableP_SS.bridgeJSLift(transform)
+    let item = AnyRenderable.bridgeJSLiftParameter(item)
+    let ret = processRenderable(_: item, transform: transform)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -295,7 +300,8 @@ public func _bjs_processRenderable(_ item: Int32, _ transform: Int32) -> Void {
 @_cdecl("bjs_makeRenderableFactory")
 public func _bjs_makeRenderableFactory(_ defaultNameBytes: Int32, _ defaultNameLength: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = makeRenderableFactory(defaultName: String.bridgeJSLiftParameter(defaultNameBytes, defaultNameLength))
+    let defaultName = String.bridgeJSLiftParameter(defaultNameBytes, defaultNameLength)
+    let ret = makeRenderableFactory(defaultName: defaultName)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -306,7 +312,8 @@ public func _bjs_makeRenderableFactory(_ defaultNameBytes: Int32, _ defaultNameL
 @_cdecl("bjs_roundtripRenderable")
 public func _bjs_roundtripRenderable(_ callback: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundtripRenderable(_: _BJS_Closure_10TestModule10RenderableP_10RenderableP.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModule10RenderableP_10RenderableP.bridgeJSLift(callback)
+    let ret = roundtripRenderable(_: callback)
     return JSTypedClosure(ret).bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -317,7 +324,8 @@ public func _bjs_roundtripRenderable(_ callback: Int32) -> Int32 {
 @_cdecl("bjs_processOptionalRenderable")
 public func _bjs_processOptionalRenderable(_ callback: Int32) -> Void {
     #if arch(wasm32)
-    let ret = processOptionalRenderable(_: _BJS_Closure_10TestModuleSq10RenderableP_SS.bridgeJSLift(callback))
+    let callback = _BJS_Closure_10TestModuleSq10RenderableP_SS.bridgeJSLift(callback)
+    let ret = processOptionalRenderable(_: callback)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -328,7 +336,8 @@ public func _bjs_processOptionalRenderable(_ callback: Int32) -> Void {
 @_cdecl("bjs_Widget_init")
 public func _bjs_Widget_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeMutableRawPointer {
     #if arch(wasm32)
-    let ret = Widget(name: String.bridgeJSLiftParameter(nameBytes, nameLength))
+    let name = String.bridgeJSLiftParameter(nameBytes, nameLength)
+    let ret = Widget(name: name)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -339,7 +348,8 @@ public func _bjs_Widget_init(_ nameBytes: Int32, _ nameLength: Int32) -> UnsafeM
 @_cdecl("bjs_Widget_name_get")
 public func _bjs_Widget_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
     #if arch(wasm32)
-    let ret = Widget.bridgeJSLiftParameter(_self).name
+    let _self = Widget.bridgeJSLiftParameter(_self)
+    let ret = _self.name
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -350,7 +360,9 @@ public func _bjs_Widget_name_get(_ _self: UnsafeMutableRawPointer) -> Void {
 @_cdecl("bjs_Widget_name_set")
 public func _bjs_Widget_name_set(_ _self: UnsafeMutableRawPointer, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     #if arch(wasm32)
-    Widget.bridgeJSLiftParameter(_self).name = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let _self = Widget.bridgeJSLiftParameter(_self)
+    _self.name = value
     #else
     fatalError("Only available on WebAssembly")
     #endif

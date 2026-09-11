@@ -823,6 +823,69 @@
                 "_0" : "ClosureSupportExports"
               }
             }
+          },
+          {
+            "abiName" : "bjs_ClosureSupportExports_static_makeArrayDifference",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "makeArrayDifference",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSaSiSaSi_Si",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "array" : {
+                        "_0" : {
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "array" : {
+                        "_0" : {
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ClosureSupportExports"
+              }
+            }
           }
         ],
         "name" : "ClosureSupportExports",
@@ -14154,6 +14217,109 @@
         }
       },
       {
+        "abiName" : "bjs_makeAsyncArraySum",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeAsyncArraySum",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : true,
+              "isThrows" : false,
+              "mangleName" : "20BridgeJSRuntimeTestsYaSaSi_Si",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "array" : {
+                    "_0" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "returnType" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_awaitArraySum",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "awaitArraySum",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "sum",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : true,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsYaSaSi_Si",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "array" : {
+                        "_0" : {
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
         "abiName" : "bjs_makeThrowingParser",
         "effects" : {
           "isAsync" : false,
@@ -20754,6 +20920,100 @@
                 "_1" : "null"
               }
             }
+          },
+          {
+            "abiName" : "bjs_ArrayMembers_ownSumAsync",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "ownSumAsync",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayMembers_sumAsync",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "sumAsync",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ArrayMembers_requireValues",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "requireValues",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "values",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            }
           }
         ],
         "name" : "ArrayMembers",
@@ -22541,6 +22801,353 @@
                 "returnType" : {
                   "jsObject" : {
 
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsApplyArrayInt",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : true,
+                              "width" : "word"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "transform",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSaSi_SaSi",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "array" : {
+                                "_0" : {
+                                  "integer" : {
+                                    "_0" : {
+                                      "isSigned" : true,
+                                      "width" : "word"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "array" : {
+                              "_0" : {
+                                "integer" : {
+                                  "_0" : {
+                                    "isSigned" : true,
+                                    "width" : "word"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsApplyArrayDouble",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "double" : {
+
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "transform",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSaSd_SaSd",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "array" : {
+                                "_0" : {
+                                  "double" : {
+
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "array" : {
+                              "_0" : {
+                                "double" : {
+
+                                }
+                              }
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsApplyArrayString",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "transform",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSaSS_SaSS",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "array" : {
+                                "_0" : {
+                                  "string" : {
+
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "array" : {
+                              "_0" : {
+                                "string" : {
+
+                                }
+                              }
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsApplyArrayJSValue",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "jsValue" : {
+
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "transform",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSa7JSValueV_Sa7JSValueV",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "array" : {
+                                "_0" : {
+                                  "jsValue" : {
+
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "array" : {
+                              "_0" : {
+                                "jsValue" : {
+
+                                }
+                              }
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "jsValue" : {
+
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsApplyArrayJSObject",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "jsObject" : {
+
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "transform",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSa8JSObjectC_Sa8JSObjectC",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "array" : {
+                                "_0" : {
+                                  "jsObject" : {
+
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "array" : {
+                              "_0" : {
+                                "jsObject" : {
+
+                                }
+                              }
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "jsObject" : {
+
+                      }
+                    }
                   }
                 }
               },

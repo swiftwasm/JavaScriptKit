@@ -2570,29 +2570,18 @@ struct IntrinsicJSFragment: Sendable {
                     "\(instanceVar).\(method.resolvedJSName) = function(\(paramList)) {"
                 )
                 try printer.indent {
-                    printer.write(
+                    let builder = BridgeJSLink.ExportedThunkBuilder(
+                        effects: method.effects,
+                        context: context
+                    )
+                    builder.body.write(
                         "\(JSGlueVariableScope.reservedStructHelpers).\(context.scope.helperKey(forTypeNamed: structDef.swiftCallName)).lower(this);"
                     )
-
-                    var paramForwardings: [String] = []
                     for param in method.parameters {
-                        let fragment = try IntrinsicJSFragment.lowerParameter(type: param.type)
-                        let loweredValues = try fragment.printCode([param.name], context)
-                        paramForwardings.append(contentsOf: loweredValues)
+                        try builder.lowerParameter(param: param)
                     }
-
-                    let callExpr = "instance.exports.\(method.abiName)(\(paramForwardings.joined(separator: ", ")))"
-                    if method.returnType == .void {
-                        printer.write("\(callExpr);")
-                    } else {
-                        let liftFragment = try IntrinsicJSFragment.liftReturn(type: method.returnType)
-                        let returnVariable = context.scope.variable("ret")
-                        printer.write("const \(returnVariable) = \(callExpr);")
-                        let lifted = try liftFragment.printCode([returnVariable], context)
-                        if let liftedValue = lifted.first {
-                            printer.write("return \(liftedValue);")
-                        }
-                    }
+                    let returnExpr = try builder.call(abiName: method.abiName, returnType: method.returnType)
+                    builder.renderFunctionBody(into: printer, returnExpr: returnExpr)
                 }
                 printer.write("}.bind(\(instanceVar));")
             }

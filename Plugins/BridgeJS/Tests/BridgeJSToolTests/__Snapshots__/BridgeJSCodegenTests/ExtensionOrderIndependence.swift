@@ -48,7 +48,8 @@ fileprivate func _bjs_struct_lift_Depot_Crate_extern() -> Int32 {
 @_cdecl("bjs_Depot_Crate_init")
 public func _bjs_Depot_Crate_init(_ labelBytes: Int32, _ labelLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = Depot.Crate(label: String.bridgeJSLiftParameter(labelBytes, labelLength))
+    let label = String.bridgeJSLiftParameter(labelBytes, labelLength)
+    let ret = Depot.Crate(label: label)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -59,7 +60,8 @@ public func _bjs_Depot_Crate_init(_ labelBytes: Int32, _ labelLength: Int32) -> 
 @_cdecl("bjs_Depot_Crate_describeCrate")
 public func _bjs_Depot_Crate_describeCrate() -> Void {
     #if arch(wasm32)
-    let ret = Depot.Crate.bridgeJSLiftParameter().describeCrate()
+    let _self = Depot.Crate.bridgeJSLiftParameter()
+    let ret = _self.describeCrate()
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

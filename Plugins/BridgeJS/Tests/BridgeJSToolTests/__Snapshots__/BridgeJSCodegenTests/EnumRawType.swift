@@ -38,7 +38,8 @@ extension Ratio: _BridgedSwiftEnumNoPayload, _BridgedSwiftRawValueEnum {
 @_cdecl("bjs_setTheme")
 public func _bjs_setTheme(_ themeBytes: Int32, _ themeLength: Int32) -> Void {
     #if arch(wasm32)
-    setTheme(_: Theme.bridgeJSLiftParameter(themeBytes, themeLength))
+    let theme = Theme.bridgeJSLiftParameter(themeBytes, themeLength)
+    setTheme(_: theme)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -59,7 +60,8 @@ public func _bjs_getTheme() -> Void {
 @_cdecl("bjs_roundTripOptionalTheme")
 public func _bjs_roundTripOptionalTheme(_ inputIsSome: Int32, _ inputBytes: Int32, _ inputLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalTheme(_: Optional<Theme>.bridgeJSLiftParameter(inputIsSome, inputBytes, inputLength))
+    let input = Optional<Theme>.bridgeJSLiftParameter(inputIsSome, inputBytes, inputLength)
+    let ret = roundTripOptionalTheme(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -70,7 +72,8 @@ public func _bjs_roundTripOptionalTheme(_ inputIsSome: Int32, _ inputBytes: Int3
 @_cdecl("bjs_setTSTheme")
 public func _bjs_setTSTheme(_ themeBytes: Int32, _ themeLength: Int32) -> Void {
     #if arch(wasm32)
-    setTSTheme(_: TSTheme.bridgeJSLiftParameter(themeBytes, themeLength))
+    let theme = TSTheme.bridgeJSLiftParameter(themeBytes, themeLength)
+    setTSTheme(_: theme)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -91,7 +94,8 @@ public func _bjs_getTSTheme() -> Void {
 @_cdecl("bjs_roundTripOptionalTSTheme")
 public func _bjs_roundTripOptionalTSTheme(_ inputIsSome: Int32, _ inputBytes: Int32, _ inputLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalTSTheme(_: Optional<TSTheme>.bridgeJSLiftParameter(inputIsSome, inputBytes, inputLength))
+    let input = Optional<TSTheme>.bridgeJSLiftParameter(inputIsSome, inputBytes, inputLength)
+    let ret = roundTripOptionalTSTheme(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -102,7 +106,8 @@ public func _bjs_roundTripOptionalTSTheme(_ inputIsSome: Int32, _ inputBytes: In
 @_cdecl("bjs_setFeatureFlag")
 public func _bjs_setFeatureFlag(_ flagBytes: Int32, _ flagLength: Int32) -> Void {
     #if arch(wasm32)
-    setFeatureFlag(_: FeatureFlag.bridgeJSLiftParameter(flagBytes, flagLength))
+    let flag = FeatureFlag.bridgeJSLiftParameter(flagBytes, flagLength)
+    setFeatureFlag(_: flag)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -123,7 +128,8 @@ public func _bjs_getFeatureFlag() -> Void {
 @_cdecl("bjs_roundTripOptionalFeatureFlag")
 public func _bjs_roundTripOptionalFeatureFlag(_ inputIsSome: Int32, _ inputBytes: Int32, _ inputLength: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalFeatureFlag(_: Optional<FeatureFlag>.bridgeJSLiftParameter(inputIsSome, inputBytes, inputLength))
+    let input = Optional<FeatureFlag>.bridgeJSLiftParameter(inputIsSome, inputBytes, inputLength)
+    let ret = roundTripOptionalFeatureFlag(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -134,7 +140,8 @@ public func _bjs_roundTripOptionalFeatureFlag(_ inputIsSome: Int32, _ inputBytes
 @_cdecl("bjs_setHttpStatus")
 public func _bjs_setHttpStatus(_ status: Int32) -> Void {
     #if arch(wasm32)
-    setHttpStatus(_: HttpStatus.bridgeJSLiftParameter(status))
+    let status = HttpStatus.bridgeJSLiftParameter(status)
+    setHttpStatus(_: status)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -155,7 +162,8 @@ public func _bjs_getHttpStatus() -> Int32 {
 @_cdecl("bjs_roundTripOptionalHttpStatus")
 public func _bjs_roundTripOptionalHttpStatus(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalHttpStatus(_: Optional<HttpStatus>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<HttpStatus>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalHttpStatus(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -166,7 +174,8 @@ public func _bjs_roundTripOptionalHttpStatus(_ inputIsSome: Int32, _ inputValue:
 @_cdecl("bjs_setTSHttpStatus")
 public func _bjs_setTSHttpStatus(_ status: Int32) -> Void {
     #if arch(wasm32)
-    setTSHttpStatus(_: TSHttpStatus.bridgeJSLiftParameter(status))
+    let status = TSHttpStatus.bridgeJSLiftParameter(status)
+    setTSHttpStatus(_: status)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -187,7 +196,8 @@ public func _bjs_getTSHttpStatus() -> Int32 {
 @_cdecl("bjs_roundTripOptionalHttpStatus")
 public func _bjs_roundTripOptionalHttpStatus(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalHttpStatus(_: Optional<TSHttpStatus>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<TSHttpStatus>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalHttpStatus(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -198,7 +208,8 @@ public func _bjs_roundTripOptionalHttpStatus(_ inputIsSome: Int32, _ inputValue:
 @_cdecl("bjs_setPriority")
 public func _bjs_setPriority(_ priority: Int32) -> Void {
     #if arch(wasm32)
-    setPriority(_: Priority.bridgeJSLiftParameter(priority))
+    let priority = Priority.bridgeJSLiftParameter(priority)
+    setPriority(_: priority)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -219,7 +230,8 @@ public func _bjs_getPriority() -> Int32 {
 @_cdecl("bjs_roundTripOptionalPriority")
 public func _bjs_roundTripOptionalPriority(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalPriority(_: Optional<Priority>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<Priority>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalPriority(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -230,7 +242,8 @@ public func _bjs_roundTripOptionalPriority(_ inputIsSome: Int32, _ inputValue: I
 @_cdecl("bjs_setFileSize")
 public func _bjs_setFileSize(_ size: Int64) -> Void {
     #if arch(wasm32)
-    setFileSize(_: FileSize.bridgeJSLiftParameter(size))
+    let size = FileSize.bridgeJSLiftParameter(size)
+    setFileSize(_: size)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -251,7 +264,8 @@ public func _bjs_getFileSize() -> Int64 {
 @_cdecl("bjs_roundTripOptionalFileSize")
 public func _bjs_roundTripOptionalFileSize(_ inputIsSome: Int32, _ inputValue: Int64) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalFileSize(_: Optional<FileSize>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<FileSize>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalFileSize(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -262,7 +276,8 @@ public func _bjs_roundTripOptionalFileSize(_ inputIsSome: Int32, _ inputValue: I
 @_cdecl("bjs_setUserId")
 public func _bjs_setUserId(_ id: Int32) -> Void {
     #if arch(wasm32)
-    setUserId(_: UserId.bridgeJSLiftParameter(id))
+    let id = UserId.bridgeJSLiftParameter(id)
+    setUserId(_: id)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -283,7 +298,8 @@ public func _bjs_getUserId() -> Int32 {
 @_cdecl("bjs_roundTripOptionalUserId")
 public func _bjs_roundTripOptionalUserId(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalUserId(_: Optional<UserId>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<UserId>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalUserId(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -294,7 +310,8 @@ public func _bjs_roundTripOptionalUserId(_ inputIsSome: Int32, _ inputValue: Int
 @_cdecl("bjs_setTokenId")
 public func _bjs_setTokenId(_ token: Int32) -> Void {
     #if arch(wasm32)
-    setTokenId(_: TokenId.bridgeJSLiftParameter(token))
+    let token = TokenId.bridgeJSLiftParameter(token)
+    setTokenId(_: token)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -315,7 +332,8 @@ public func _bjs_getTokenId() -> Int32 {
 @_cdecl("bjs_roundTripOptionalTokenId")
 public func _bjs_roundTripOptionalTokenId(_ inputIsSome: Int32, _ inputValue: Int32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalTokenId(_: Optional<TokenId>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<TokenId>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalTokenId(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -326,7 +344,8 @@ public func _bjs_roundTripOptionalTokenId(_ inputIsSome: Int32, _ inputValue: In
 @_cdecl("bjs_setSessionId")
 public func _bjs_setSessionId(_ session: Int64) -> Void {
     #if arch(wasm32)
-    setSessionId(_: SessionId.bridgeJSLiftParameter(session))
+    let session = SessionId.bridgeJSLiftParameter(session)
+    setSessionId(_: session)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -347,7 +366,8 @@ public func _bjs_getSessionId() -> Int64 {
 @_cdecl("bjs_roundTripOptionalSessionId")
 public func _bjs_roundTripOptionalSessionId(_ inputIsSome: Int32, _ inputValue: Int64) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalSessionId(_: Optional<SessionId>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<SessionId>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalSessionId(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -358,7 +378,8 @@ public func _bjs_roundTripOptionalSessionId(_ inputIsSome: Int32, _ inputValue: 
 @_cdecl("bjs_setPrecision")
 public func _bjs_setPrecision(_ precision: Float32) -> Void {
     #if arch(wasm32)
-    setPrecision(_: Precision.bridgeJSLiftParameter(precision))
+    let precision = Precision.bridgeJSLiftParameter(precision)
+    setPrecision(_: precision)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -379,7 +400,8 @@ public func _bjs_getPrecision() -> Float32 {
 @_cdecl("bjs_roundTripOptionalPrecision")
 public func _bjs_roundTripOptionalPrecision(_ inputIsSome: Int32, _ inputValue: Float32) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalPrecision(_: Optional<Precision>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<Precision>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalPrecision(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -390,7 +412,8 @@ public func _bjs_roundTripOptionalPrecision(_ inputIsSome: Int32, _ inputValue: 
 @_cdecl("bjs_setRatio")
 public func _bjs_setRatio(_ ratio: Float64) -> Void {
     #if arch(wasm32)
-    setRatio(_: Ratio.bridgeJSLiftParameter(ratio))
+    let ratio = Ratio.bridgeJSLiftParameter(ratio)
+    setRatio(_: ratio)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -411,7 +434,8 @@ public func _bjs_getRatio() -> Float64 {
 @_cdecl("bjs_roundTripOptionalRatio")
 public func _bjs_roundTripOptionalRatio(_ inputIsSome: Int32, _ inputValue: Float64) -> Void {
     #if arch(wasm32)
-    let ret = roundTripOptionalRatio(_: Optional<Ratio>.bridgeJSLiftParameter(inputIsSome, inputValue))
+    let input = Optional<Ratio>.bridgeJSLiftParameter(inputIsSome, inputValue)
+    let ret = roundTripOptionalRatio(_: input)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -422,7 +446,8 @@ public func _bjs_roundTripOptionalRatio(_ inputIsSome: Int32, _ inputValue: Floa
 @_cdecl("bjs_processTheme")
 public func _bjs_processTheme(_ themeBytes: Int32, _ themeLength: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = processTheme(_: Theme.bridgeJSLiftParameter(themeBytes, themeLength))
+    let theme = Theme.bridgeJSLiftParameter(themeBytes, themeLength)
+    let ret = processTheme(_: theme)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -433,7 +458,8 @@ public func _bjs_processTheme(_ themeBytes: Int32, _ themeLength: Int32) -> Int3
 @_cdecl("bjs_convertPriority")
 public func _bjs_convertPriority(_ status: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = convertPriority(_: HttpStatus.bridgeJSLiftParameter(status))
+    let status = HttpStatus.bridgeJSLiftParameter(status)
+    let ret = convertPriority(_: status)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -444,7 +470,8 @@ public func _bjs_convertPriority(_ status: Int32) -> Int32 {
 @_cdecl("bjs_validateSession")
 public func _bjs_validateSession(_ session: Int64) -> Void {
     #if arch(wasm32)
-    let ret = validateSession(_: SessionId.bridgeJSLiftParameter(session))
+    let session = SessionId.bridgeJSLiftParameter(session)
+    let ret = validateSession(_: session)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")

@@ -2,7 +2,8 @@
 @_cdecl("bjs_roundTripInt8")
 public func _bjs_roundTripInt8(_ v: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundTripInt8(_: Int8.bridgeJSLiftParameter(v))
+    let v = Int8.bridgeJSLiftParameter(v)
+    let ret = roundTripInt8(_: v)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -13,7 +14,8 @@ public func _bjs_roundTripInt8(_ v: Int32) -> Int32 {
 @_cdecl("bjs_roundTripUInt8")
 public func _bjs_roundTripUInt8(_ v: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundTripUInt8(_: UInt8.bridgeJSLiftParameter(v))
+    let v = UInt8.bridgeJSLiftParameter(v)
+    let ret = roundTripUInt8(_: v)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -24,7 +26,8 @@ public func _bjs_roundTripUInt8(_ v: Int32) -> Int32 {
 @_cdecl("bjs_roundTripInt16")
 public func _bjs_roundTripInt16(_ v: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundTripInt16(_: Int16.bridgeJSLiftParameter(v))
+    let v = Int16.bridgeJSLiftParameter(v)
+    let ret = roundTripInt16(_: v)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -35,7 +38,8 @@ public func _bjs_roundTripInt16(_ v: Int32) -> Int32 {
 @_cdecl("bjs_roundTripUInt16")
 public func _bjs_roundTripUInt16(_ v: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundTripUInt16(_: UInt16.bridgeJSLiftParameter(v))
+    let v = UInt16.bridgeJSLiftParameter(v)
+    let ret = roundTripUInt16(_: v)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -46,7 +50,8 @@ public func _bjs_roundTripUInt16(_ v: Int32) -> Int32 {
 @_cdecl("bjs_roundTripInt32")
 public func _bjs_roundTripInt32(_ v: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundTripInt32(_: Int32.bridgeJSLiftParameter(v))
+    let v = Int32.bridgeJSLiftParameter(v)
+    let ret = roundTripInt32(_: v)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -57,7 +62,8 @@ public func _bjs_roundTripInt32(_ v: Int32) -> Int32 {
 @_cdecl("bjs_roundTripUInt32")
 public func _bjs_roundTripUInt32(_ v: Int32) -> Int32 {
     #if arch(wasm32)
-    let ret = roundTripUInt32(_: UInt32.bridgeJSLiftParameter(v))
+    let v = UInt32.bridgeJSLiftParameter(v)
+    let ret = roundTripUInt32(_: v)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -68,7 +74,8 @@ public func _bjs_roundTripUInt32(_ v: Int32) -> Int32 {
 @_cdecl("bjs_roundTripInt64")
 public func _bjs_roundTripInt64(_ v: Int64) -> Int64 {
     #if arch(wasm32)
-    let ret = roundTripInt64(_: Int64.bridgeJSLiftParameter(v))
+    let v = Int64.bridgeJSLiftParameter(v)
+    let ret = roundTripInt64(_: v)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -79,7 +86,8 @@ public func _bjs_roundTripInt64(_ v: Int64) -> Int64 {
 @_cdecl("bjs_roundTripUInt64")
 public func _bjs_roundTripUInt64(_ v: Int64) -> Int64 {
     #if arch(wasm32)
-    let ret = roundTripUInt64(_: UInt64.bridgeJSLiftParameter(v))
+    let v = UInt64.bridgeJSLiftParameter(v)
+    let ret = roundTripUInt64(_: v)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
