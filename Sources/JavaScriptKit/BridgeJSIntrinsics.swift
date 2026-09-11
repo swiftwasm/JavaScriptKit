@@ -2591,13 +2591,13 @@ where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Val
 ///
 /// The closure factories are dependency-injected because this library cannot
 /// reference per-module generated `make_swift_closure_*` externs. The generated
-/// code passes `{ JSTypedClosure<(T) -> Void>($0) }` which uses the per-module
-/// convenience init.
+/// code passes `{ JSTypedClosure<(sending T) -> Void>.sending($0) }` using the
+/// per-module callback factory.
 ///
 /// - Parameters:
-///   - makeResolveClosure: A factory that wraps a `(T) -> Void` Swift closure
+///   - makeResolveClosure: A factory that wraps a `(sending T) -> Void` Swift closure
 ///     into a typed `JSTypedClosure`, creating the corresponding JS function.
-///   - makeRejectClosure: A factory that wraps a `(JSValue) -> Void` Swift closure
+///   - makeRejectClosure: A factory that wraps a `(sending JSValue) -> Void` Swift closure
 ///     into a `JSTypedClosure`, for the rejection path.
 ///   - body: A closure that receives the resolve and reject JS object refs
 ///     (as `Int32`) and should pass them to the appropriate JS extern function.

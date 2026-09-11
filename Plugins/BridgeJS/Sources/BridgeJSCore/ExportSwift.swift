@@ -179,7 +179,6 @@ public class ExportSwift {
 
     class ExportedThunkBuilder {
         var body: [CodeBlockItemSyntax] = []
-        var liftedParameterExprs: [ExprSyntax] = []
         var parameters: [Parameter] = []
         var abiParameterSignatures: [(name: String, type: WasmCoreType)] = []
         var abiReturnType: WasmCoreType?
@@ -190,8 +189,7 @@ public class ExportSwift {
         /// helper. Set for every `async` thunk.
         var asyncResolveReturnType: BridgeType?
 
-        /// Stack-using parameter lifts hoisted ahead of the deferred async closure.
-        var asyncHoistedBindings: [CodeBlockItemSyntax] = []
+        var parameterBindings: [CodeBlockItemSyntax] = []
 
         init(effects: Effects, returnType: BridgeType) throws {
             self.effects = effects
@@ -254,7 +252,7 @@ public class ExportSwift {
                 )
             }
 
-            liftedParameterExprs.append(liftingExpr)
+            parameterBindings.insert("let \(raw: param.name) = \(liftingExpr)", at: 0)
             for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
                 abiParameterSignatures.append((name, type))
             }
@@ -269,15 +267,16 @@ public class ExportSwift {
             }
         }
 
-        private func removeFirstLiftedParameter() -> (parameter: Parameter, expr: ExprSyntax) {
-            let parameter = parameters.removeFirst()
-            let expr = liftedParameterExprs.removeFirst()
-            return (parameter, expr)
+        private func removeFirstLiftedParameter() -> String {
+            return parameters.removeFirst().name
         }
 
         private func renderCallStatement(callee: ExprSyntax, returnType: BridgeType) -> CodeBlockItemSyntax {
-            let labeledParams = zip(parameters, liftedParameterExprs).map { param, expr in
-                LabeledExprSyntax(label: param.label, expression: expr)
+            let labeledParams = parameters.map { param in
+                LabeledExprSyntax(
+                    label: param.label,
+                    expression: DeclReferenceExprSyntax(baseName: .identifier(param.name))
+                )
             }
             var callExpr: ExprSyntax =
                 "\(raw: callee)(\(raw: labeledParams.map { $0.description }.joined(separator: ", ")))"
@@ -310,7 +309,6 @@ public class ExportSwift {
         }
 
         func call(name: String, returnType: BridgeType) {
-            generateParameterLifting()
             let item = renderCallStatement(callee: "\(raw: name)", returnType: returnType)
             append(item)
         }
@@ -325,8 +323,7 @@ public class ExportSwift {
         }
 
         func callMethod(methodName: String, returnType: BridgeType) {
-            let (_, selfExpr) = removeFirstLiftedParameter()
-            generateParameterLifting()
+            let selfExpr = removeFirstLiftedParameter()
             let item = renderCallStatement(
                 callee: "\(raw: selfExpr).\(raw: methodName)",
                 returnType: returnType
@@ -334,42 +331,8 @@ public class ExportSwift {
             append(item)
         }
 
-        /// Generates intermediate variables for stack-using parameters if needed for LIFO compatibility
-        private func generateParameterLifting() {
-            let stackParamIndices = parameters.enumerated().compactMap { index, param -> Int? in
-                param.type.isStackUsingParameter ? index : nil
-            }
-
-            if effects.isAsync {
-                // Drain stack parameters before the deferred `Task` or the shared stack is corrupted.
-                for index in stackParamIndices.reversed() {
-                    let param = parameters[index]
-                    let expr = liftedParameterExprs[index]
-                    let varName = "_tmp_\(param.name)"
-                    var binding: CodeBlockItemSyntax = "let \(raw: varName) = \(expr)"
-                    if !asyncHoistedBindings.isEmpty {
-                        binding = binding.with(\.leadingTrivia, .newline)
-                    }
-                    asyncHoistedBindings.append(binding)
-                    liftedParameterExprs[index] = ExprSyntax(DeclReferenceExprSyntax(baseName: .identifier(varName)))
-                }
-                return
-            }
-
-            guard stackParamIndices.count > 1 else { return }
-
-            for index in stackParamIndices.reversed() {
-                let param = parameters[index]
-                let expr = liftedParameterExprs[index]
-                let varName = "_tmp_\(param.name)"
-
-                append("let \(raw: varName) = \(expr)")
-                liftedParameterExprs[index] = ExprSyntax(DeclReferenceExprSyntax(baseName: .identifier(varName)))
-            }
-        }
-
         func callPropertyGetter(propertyName: String, returnType: BridgeType) {
-            let (_, selfExpr) = removeFirstLiftedParameter()
+            let selfExpr = removeFirstLiftedParameter()
             if returnType == .void {
                 append("\(raw: selfExpr).\(raw: propertyName)")
             } else {
@@ -379,13 +342,13 @@ public class ExportSwift {
         }
 
         func callPropertySetter(propertyName: String) {
-            let (_, selfExpr) = removeFirstLiftedParameter()
-            let (_, newValueExpr) = removeFirstLiftedParameter()
+            let selfExpr = removeFirstLiftedParameter()
+            let newValueExpr = removeFirstLiftedParameter()
             append("\(raw: selfExpr).\(raw: propertyName) = \(raw: newValueExpr)")
         }
 
         func callStaticPropertySetter(klassName: String, propertyName: String) {
-            let (_, newValueExpr) = removeFirstLiftedParameter()
+            let newValueExpr = removeFirstLiftedParameter()
             append("\(raw: klassName).\(raw: propertyName) = \(raw: newValueExpr)")
         }
 
@@ -456,10 +419,11 @@ public class ExportSwift {
         /// so the body must also read the captured value.
         /// See: https://github.com/swiftlang/swift/issues/89320
         private var asyncThrowsBodyForcesCapture: Bool {
-            effects.isThrows && abiParameterSignatures.isEmpty && asyncHoistedBindings.isEmpty
+            effects.isThrows && parameterBindings.isEmpty
         }
 
         func render(abiName: String) -> DeclSyntax {
+            var bindings = parameterBindings
             let body: CodeBlockItemListSyntax
             if effects.isAsync, let resolveType = asyncResolveReturnType {
                 let resolveName = "Promise_resolve_\(resolveType.mangleTypeName)"
@@ -468,17 +432,15 @@ public class ExportSwift {
                     returnSpelling: resolveType.swiftType,
                     forcesCapture: forcesCapture
                 )
-                var hoistedBindings = asyncHoistedBindings
                 var bodyItems = self.body
                 if forcesCapture {
-                    hoistedBindings.append("let __bjs_capture = 0")
+                    bindings.append("let __bjs_capture = 0")
                     if !bodyItems.isEmpty {
                         bodyItems[0] = bodyItems[0].with(\.leadingTrivia, .newline)
                     }
                     bodyItems.insert("_ = __bjs_capture", at: 0)
                 }
                 body = """
-                    \(CodeBlockItemListSyntax(hoistedBindings))
                     return _bjs_makePromise(resolve: \(raw: resolveName), reject: Promise_reject) {\(raw: closureHead)
                         \(CodeBlockItemListSyntax(bodyItems))
                     }
@@ -504,6 +466,10 @@ public class ExportSwift {
             } else {
                 body = CodeBlockItemListSyntax(self.body)
             }
+            let preparedBody: CodeBlockItemListSyntax = """
+                \(CodeBlockItemListSyntax(bindings.map { $0.with(\.leadingTrivia, .newline) }))
+                \(body)
+                """
             // Build function signature using SwiftSignatureBuilder
             let signature = SwiftSignatureBuilder.buildABIFunctionSignature(
                 abiParameters: abiParameterSignatures,
@@ -515,7 +481,7 @@ public class ExportSwift {
                 abiName: abiName,
                 signature: signature
             ) { printer in
-                printer.write(multilineString: body.description)
+                printer.write(multilineString: preparedBody.description)
             }
 
             return DeclSyntax(funcDecl)
@@ -1742,19 +1708,6 @@ extension BridgeType {
     var isClosureType: Bool {
         if case .closure = self { return true }
         return false
-    }
-
-    var isStackUsingParameter: Bool {
-        switch self {
-        case .swiftStruct, .array, .dictionary, .associatedValueEnum:
-            return true
-        case .nullable(let wrapped, _):
-            return wrapped.isStackUsingParameter
-        case .alias(_, let underlying):
-            return underlying.isStackUsingParameter
-        default:
-            return false
-        }
     }
 
     struct LiftingIntrinsicInfo: Sendable {
