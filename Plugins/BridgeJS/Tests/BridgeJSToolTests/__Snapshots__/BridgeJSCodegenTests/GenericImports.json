@@ -172,7 +172,69 @@
 
     ],
     "protocols" : [
+      {
+        "isGenericBridgeable" : true,
+        "methods" : [
+          {
+            "abiName" : "bjs_GenericReadable_read",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "read",
+            "parameters" : [
 
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "GenericReadable",
+        "properties" : [
+
+        ]
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "GenericWritable",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "name" : "value",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "inheritedJSProtocols" : [
+          "GenericReadable",
+          "GenericWritable"
+        ],
+        "isGenericBridgeable" : true,
+        "methods" : [
+
+        ],
+        "name" : "GenericNode",
+        "properties" : [
+
+        ]
+      }
     ],
     "structs" : [
       {
@@ -224,7 +286,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "genericRoundTrip",
             "parameters" : [
@@ -251,7 +315,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "genericParse",
             "parameters" : [
@@ -278,8 +344,12 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T",
-              "U"
+              {
+                "name" : "T"
+              },
+              {
+                "name" : "U"
+              }
             ],
             "name" : "importGenericCombine",
             "parameters" : [
@@ -314,8 +384,12 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T",
-              "t"
+              {
+                "name" : "T"
+              },
+              {
+                "name" : "t"
+              }
             ],
             "name" : "importGenericCaseDistinct",
             "parameters" : [
@@ -350,7 +424,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "importGenericArray",
             "parameters" : [
@@ -385,7 +461,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "importGenericOptional",
             "parameters" : [
@@ -422,7 +500,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "importGenericDictionary",
             "parameters" : [
@@ -457,7 +537,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "importGenericAfterOptionalArray",
             "parameters" : [
@@ -495,6 +577,70 @@
                 "_0" : "T"
               }
             }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              {
+                "constraints" : [
+                  "GenericNode"
+                ],
+                "name" : "T"
+              }
+            ],
+            "name" : "constrainedRoundTrip",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              {
+                "constraints" : [
+                  "GenericWritable"
+                ],
+                "name" : "T"
+              }
+            ],
+            "name" : "constrainedComposition",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
           }
         ],
         "types" : [
@@ -503,8 +649,12 @@
             "constructor" : {
               "accessLevel" : "internal",
               "genericParameters" : [
-                "T",
-                "U"
+                {
+                  "name" : "T"
+                },
+                {
+                  "name" : "U"
+                }
               ],
               "parameters" : [
                 {
@@ -552,7 +702,9 @@
             "constructor" : {
               "accessLevel" : "internal",
               "genericParameters" : [
-                "T"
+                {
+                  "name" : "T"
+                }
               ],
               "parameters" : [
                 {
@@ -577,7 +729,9 @@
                   "isThrows" : true
                 },
                 "genericParameters" : [
-                  "T"
+                  {
+                    "name" : "T"
+                  }
                 ],
                 "name" : "accept",
                 "parameters" : [
@@ -604,7 +758,9 @@
                   "isThrows" : true
                 },
                 "genericParameters" : [
-                  "T"
+                  {
+                    "name" : "T"
+                  }
                 ],
                 "name" : "identity",
                 "parameters" : [
@@ -637,9 +793,110 @@
                   "isThrows" : true
                 },
                 "genericParameters" : [
-                  "T"
+                  {
+                    "name" : "T"
+                  }
                 ],
                 "name" : "box",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "genericParameters" : [
+                {
+                  "constraints" : [
+                    "GenericNode"
+                  ],
+                  "name" : "T"
+                }
+              ],
+              "parameters" : [
+                {
+                  "name" : "value",
+                  "type" : {
+                    "generic" : {
+                      "_0" : "T"
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "genericParameters" : [
+                  {
+                    "constraints" : [
+                      "GenericNode"
+                    ],
+                    "name" : "T"
+                  }
+                ],
+                "name" : "accept",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "name" : "ConstrainedConsumer",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "genericParameters" : [
+                  {
+                    "constraints" : [
+                      "GenericNode"
+                    ],
+                    "name" : "T"
+                  }
+                ],
+                "name" : "identity",
                 "parameters" : [
                   {
                     "name" : "value",

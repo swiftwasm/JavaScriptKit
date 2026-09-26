@@ -72,3 +72,25 @@ struct GenericPoint {
     @JSFunction func identity<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
     @JSFunction static func box<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSException) -> T
 }
+
+@JS protocol GenericReadable: BridgedSwiftGenericBridgeable {
+    func read() -> Int
+}
+
+@JS protocol GenericWritable {
+    var value: Int { get set }
+}
+
+@JS protocol GenericNode: GenericReadable, GenericWritable {}
+
+@JSFunction func constrainedRoundTrip<T: GenericNode>(_ value: T) throws(JSException) -> T
+
+@JSFunction func constrainedComposition<T: BridgedSwiftGenericBridgeable & GenericWritable>(
+    _ value: T
+) throws(JSException) -> T
+
+@JSClass struct ConstrainedConsumer {
+    @JSFunction init<T: GenericNode>(_ value: T) throws(JSException)
+    @JSFunction func accept<T: GenericNode>(_ value: T) throws(JSException) -> T
+    @JSFunction static func identity<T: GenericNode>(_ value: T) throws(JSException) -> T
+}

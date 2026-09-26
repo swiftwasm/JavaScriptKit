@@ -7,6 +7,7 @@ public struct ExternalModuleIndex {
     public struct ExternalType: Equatable {
         public let moduleName: String
         public let bridgeType: BridgeType
+        public var isGenericBridgeableProtocol = false
     }
 
     public enum LookupResult: Equatable {
@@ -31,8 +32,12 @@ public struct ExternalModuleIndex {
             guard let exported = skeleton.exported else { continue }
             var moduleEntries = entriesByModule[moduleName] ?? [:]
 
-            func register(dotPath: String, bridgeType: BridgeType) {
-                let externalType = ExternalType(moduleName: moduleName, bridgeType: bridgeType)
+            func register(dotPath: String, bridgeType: BridgeType, isGenericBridgeableProtocol: Bool = false) {
+                let externalType = ExternalType(
+                    moduleName: moduleName,
+                    bridgeType: bridgeType,
+                    isGenericBridgeableProtocol: isGenericBridgeableProtocol
+                )
                 if moduleEntries[dotPath] == nil {
                     moduleEntries[dotPath] = externalType
                     entriesByDotPath[dotPath, default: []].append(externalType)
@@ -61,7 +66,11 @@ public struct ExternalModuleIndex {
                 register(dotPath: enumDef.swiftCallName, bridgeType: bridgeType)
             }
             for proto in exported.protocols {
-                register(dotPath: proto.name, bridgeType: .swiftProtocol(proto.name))
+                register(
+                    dotPath: proto.name,
+                    bridgeType: .swiftProtocol(proto.name),
+                    isGenericBridgeableProtocol: proto.isGenericBridgeable == true
+                )
             }
             for alias in exported.aliases {
                 register(

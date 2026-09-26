@@ -4,6 +4,17 @@
 // To update this file, just rebuild your project or run
 // `swift package bridge-js`.
 
+export interface GenericReadable {
+    read(): number;
+}
+
+export interface GenericWritable {
+    value: number;
+}
+
+export interface GenericNode extends GenericReadable, GenericWritable {
+}
+
 export const GenericColorValues: {
     readonly Red: 0;
     readonly Green: 1;
@@ -53,6 +64,9 @@ export interface GenericConsumer {
     accept<T>(value: T): void;
     identity<T>(value: T): T;
 }
+export interface ConstrainedConsumer {
+    accept<T extends GenericNode>(value: T): T;
+}
 export type Exports = {
     GenericColor: GenericColorObject
     GenericMode: GenericModeObject
@@ -70,12 +84,18 @@ export type Imports = {
     importGenericOptional<T>(value: T | null): T | null;
     importGenericDictionary<T>(values: Record<string, T>): Record<string, T>;
     importGenericAfterOptionalArray<T>(values: number[] | null, value: T): T;
+    constrainedRoundTrip<T extends GenericNode>(value: T): T;
+    constrainedComposition<T extends GenericWritable>(value: T): T;
     GenericPairFactory: {
         new<T, U>(tag: string, first: T, second: U): GenericPairFactory;
     }
     GenericConsumer: {
         new<T>(value: T): GenericConsumer;
         box<T>(value: T): T;
+    }
+    ConstrainedConsumer: {
+        new<T extends GenericNode>(value: T): ConstrainedConsumer;
+        identity<T extends GenericNode>(value: T): T;
     }
 }
 export function createInstantiator(options: {

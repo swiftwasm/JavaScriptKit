@@ -257,14 +257,16 @@ public func _invoke_swift_closure_TestModule_10TestModuley_10RenderableP(_ boxPt
     #endif
 }
 
-struct AnyRenderable: Renderable, _BridgedSwiftProtocolWrapper {
-    let jsObject: JSObject
-
+extension Renderable where Self: _BridgedSwiftProtocolWrapper {
     func render() -> String {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_render(jsObjectValue)
+        let ret = bjs_Renderable_render(jsObjectValue)
         return String.bridgeJSLiftReturn(ret)
     }
+}
+
+struct AnyRenderable: Renderable, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyRenderable(jsObject: JSObject(id: UInt32(bitPattern: value)))
@@ -273,14 +275,14 @@ struct AnyRenderable: Renderable, _BridgedSwiftProtocolWrapper {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Renderable_render")
-fileprivate func _extern_render_extern(_ jsObject: Int32) -> Int32
+fileprivate func bjs_Renderable_render_extern(_ jsObject: Int32) -> Int32
 #else
-fileprivate func _extern_render_extern(_ jsObject: Int32) -> Int32 {
+fileprivate func bjs_Renderable_render_extern(_ jsObject: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_render(_ jsObject: Int32) -> Int32 {
-    return _extern_render_extern(jsObject)
+@inline(never) fileprivate func bjs_Renderable_render(_ jsObject: Int32) -> Int32 {
+    return bjs_Renderable_render_extern(jsObject)
 }
 
 @_expose(wasm, "bjs_processRenderable")

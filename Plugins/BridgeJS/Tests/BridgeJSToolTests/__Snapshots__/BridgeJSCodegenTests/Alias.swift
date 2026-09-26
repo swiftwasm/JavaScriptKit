@@ -1,6 +1,4 @@
-struct AnyHasOptionalUserId: HasOptionalUserId, _BridgedSwiftProtocolWrapper {
-    let jsObject: JSObject
-
+extension HasOptionalUserId where Self: _BridgedSwiftProtocolWrapper {
     var userId: Optional<UserId> {
         get {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
@@ -8,6 +6,10 @@ struct AnyHasOptionalUserId: HasOptionalUserId, _BridgedSwiftProtocolWrapper {
             return Optional<UserId>.bridgeJSLiftReturnFromSideChannel()
         }
     }
+}
+
+struct AnyHasOptionalUserId: HasOptionalUserId, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyHasOptionalUserId(jsObject: JSObject(id: UInt32(bitPattern: value)))

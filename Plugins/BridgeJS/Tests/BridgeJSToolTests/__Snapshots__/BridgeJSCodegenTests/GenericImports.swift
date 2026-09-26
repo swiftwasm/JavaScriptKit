@@ -1,3 +1,86 @@
+extension GenericReadable where Self: _BridgedSwiftProtocolWrapper {
+    func read() -> Int {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let ret = bjs_GenericReadable_read(jsObjectValue)
+        return Int.bridgeJSLiftReturn(ret)
+    }
+}
+
+struct AnyGenericReadable: GenericReadable, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyGenericReadable(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_GenericReadable_read")
+fileprivate func bjs_GenericReadable_read_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_GenericReadable_read_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_GenericReadable_read(_ jsObject: Int32) -> Int32 {
+    return bjs_GenericReadable_read_extern(jsObject)
+}
+
+extension GenericWritable where Self: _BridgedSwiftProtocolWrapper {
+    var value: Int {
+        get {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_GenericWritable_value_get(jsObjectValue)
+            return Int.bridgeJSLiftReturn(ret)
+        }
+        set {
+            let newValueValue = newValue.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            bjs_GenericWritable_value_set(jsObjectValue, newValueValue)
+        }
+    }
+}
+
+struct AnyGenericWritable: GenericWritable, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyGenericWritable(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_GenericWritable_value_get")
+fileprivate func bjs_GenericWritable_value_get_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_GenericWritable_value_get_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_GenericWritable_value_get(_ jsObject: Int32) -> Int32 {
+    return bjs_GenericWritable_value_get_extern(jsObject)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_GenericWritable_value_set")
+fileprivate func bjs_GenericWritable_value_set_extern(_ jsObject: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_GenericWritable_value_set_extern(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_GenericWritable_value_set(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    return bjs_GenericWritable_value_set_extern(jsObject, newValue)
+}
+
+struct AnyGenericNode: GenericNode, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyGenericNode(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
 extension GenericColor: _BridgedSwiftCaseEnum {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> Int32 {
         return bridgeJSRawValue
@@ -207,6 +290,14 @@ extension GenericTagged: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeHandle = GenericTagged.bridgeJSMakeTypeHandle()
 }
 
+extension AnyGenericReadable: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AnyGenericReadable.bridgeJSMakeTypeHandle()
+}
+
+extension AnyGenericNode: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AnyGenericNode.bridgeJSMakeTypeHandle()
+}
+
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_genericRoundTrip")
 fileprivate func bjs_genericRoundTrip_extern(_ _generic0TypeId: Int32) -> Void
@@ -380,6 +471,48 @@ func _$importGenericAfterOptionalArray<T: BridgedSwiftGenericBridgeable>(_ value
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_constrainedRoundTrip")
+fileprivate func bjs_constrainedRoundTrip_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_constrainedRoundTrip_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_constrainedRoundTrip(_ _generic0TypeId: Int32) -> Void {
+    return bjs_constrainedRoundTrip_extern(_generic0TypeId)
+}
+
+func _$constrainedRoundTrip<T: BridgedSwiftGenericBridgeable & GenericNode>(_ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    bjs_constrainedRoundTrip(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_constrainedComposition")
+fileprivate func bjs_constrainedComposition_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_constrainedComposition_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_constrainedComposition(_ _generic0TypeId: Int32) -> Void {
+    return bjs_constrainedComposition_extern(_generic0TypeId)
+}
+
+func _$constrainedComposition<T: BridgedSwiftGenericBridgeable & GenericWritable>(_ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    bjs_constrainedComposition(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_GenericPairFactory_init")
 fileprivate func bjs_GenericPairFactory_init_extern(_ tagBytes: Int32, _ tagLength: Int32, _ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Int32
 #else
@@ -491,6 +624,70 @@ func _$GenericConsumer_identity<T: BridgedSwiftGenericBridgeable>(_ self: JSObje
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_ConstrainedConsumer_init")
+fileprivate func bjs_ConstrainedConsumer_init_extern(_ _generic0TypeId: Int32) -> Int32
+#else
+fileprivate func bjs_ConstrainedConsumer_init_extern(_ _generic0TypeId: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ConstrainedConsumer_init(_ _generic0TypeId: Int32) -> Int32 {
+    return bjs_ConstrainedConsumer_init_extern(_generic0TypeId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_ConstrainedConsumer_identity_static")
+fileprivate func bjs_ConstrainedConsumer_identity_static_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_ConstrainedConsumer_identity_static_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ConstrainedConsumer_identity_static(_ _generic0TypeId: Int32) -> Void {
+    return bjs_ConstrainedConsumer_identity_static_extern(_generic0TypeId)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "TestModule", name: "bjs_ConstrainedConsumer_accept")
+fileprivate func bjs_ConstrainedConsumer_accept_extern(_ self: Int32, _ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_ConstrainedConsumer_accept_extern(_ self: Int32, _ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ConstrainedConsumer_accept(_ self: Int32, _ _generic0TypeId: Int32) -> Void {
+    return bjs_ConstrainedConsumer_accept_extern(self, _generic0TypeId)
+}
+
+func _$ConstrainedConsumer_init<T: BridgedSwiftGenericBridgeable & GenericNode>(_ value: T) throws(JSException) -> JSObject {
+    value.bridgeJSStackPush()
+    let ret = bjs_ConstrainedConsumer_init(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$ConstrainedConsumer_identity<T: BridgedSwiftGenericBridgeable & GenericNode>(_ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    bjs_ConstrainedConsumer_identity_static(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+func _$ConstrainedConsumer_accept<T: BridgedSwiftGenericBridgeable & GenericNode>(_ self: JSObject, _ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_ConstrainedConsumer_accept(selfValue, T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "bjs_TestModule_register_type_handles")
 fileprivate func _bjs_TestModule_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
 
@@ -502,6 +699,8 @@ public func _bjs_TestModule_register_type_handles() {
         GenericColor.bridgeJSTypeID,
         GenericMode.bridgeJSTypeID,
         GenericTagged.bridgeJSTypeID,
+        AnyGenericReadable.bridgeJSTypeID,
+        AnyGenericNode.bridgeJSTypeID,
     ]
     typeIds.withUnsafeBufferPointer { buffer in
         _bjs_TestModule_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))

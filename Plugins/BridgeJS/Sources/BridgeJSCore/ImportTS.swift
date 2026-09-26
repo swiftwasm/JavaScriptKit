@@ -381,7 +381,7 @@ public struct ImportTS {
             parameters: [Parameter],
             returnType: BridgeType,
             effects: Effects,
-            genericParameters: [String] = []
+            genericParameters: [GenericParameter] = []
         ) -> DeclSyntax {
             let printer = CodeFragmentPrinter()
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
@@ -393,7 +393,13 @@ public struct ImportTS {
             let genericClause =
                 genericParameters.isEmpty
                 ? ""
-                : "<" + genericParameters.map { "\($0): BridgedSwiftGenericBridgeable" }.joined(separator: ", ")
+                : "<"
+                    + genericParameters.map { genericParameter in
+                        let constraints =
+                            ["BridgedSwiftGenericBridgeable"]
+                            + (genericParameter.swiftConstraints ?? genericParameter.constraints)
+                        return "\(genericParameter.name): \(constraints.joined(separator: " & "))"
+                    }.joined(separator: ", ")
                     + ">"
             printer.write("func \(name.backtickIfNeeded())\(genericClause)\(signature) {")
             printer.indent {
@@ -465,7 +471,7 @@ public struct ImportTS {
                 parameters: function.parameters,
                 returnType: function.returnType,
                 effects: function.effects,
-                genericParameters: function.genericParameterNames
+                genericParameters: function.genericParameters ?? []
             )
             .with(\.leadingTrivia, Self.renderDocumentation(documentation: function.documentation))
         ]
@@ -496,7 +502,7 @@ public struct ImportTS {
                     parameters: [selfParameter] + method.parameters,
                     returnType: method.returnType,
                     effects: method.effects,
-                    genericParameters: method.genericParameterNames
+                    genericParameters: method.genericParameters ?? []
                 )
             ]
         }
@@ -522,7 +528,7 @@ public struct ImportTS {
                     parameters: method.parameters,
                     returnType: method.returnType,
                     effects: method.effects,
-                    genericParameters: method.genericParameterNames
+                    genericParameters: method.genericParameters ?? []
                 )
             ]
         }
@@ -548,7 +554,7 @@ public struct ImportTS {
                     parameters: constructor.parameters,
                     returnType: .jsObject(nil),
                     effects: effects,
-                    genericParameters: constructor.genericParameterNames
+                    genericParameters: constructor.genericParameters ?? []
                 )
             ]
         }

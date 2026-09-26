@@ -89,6 +89,17 @@ let user: User = try parse(jsonString)   // T inferred from the call site
 
 `T` can be any supported primitive, `String`, `JSValue`, or a `@JS` struct, `@JS` enum, or `final @JS class` (see <doc:Supported-Types>), used bare or wrapped as `[T]`, `T?`, or `[String: T]`. A function may declare multiple type parameters, and a return-only generic (`func make<T>() -> T`) works too. Generic initializers, methods, and static methods on `@JSClass` types are supported the same way. `async` generic functions and `where` clauses are not supported.
 
+Generic imports can also constrain `T` to `@JS` protocols, as in `T: BridgedSwiftGenericBridgeable & P & Q`. If `P` inherits `BridgedSwiftGenericBridgeable`, use `T: P`:
+
+```swift
+import JavaScriptKit
+
+@JS protocol Named: BridgedSwiftGenericBridgeable { var name: String { get } }
+@JSFunction func display<T: Named>(_ value: T) throws(JSException)
+```
+
+Constraints may use `@JS` protocols from dependency modules, including qualified names such as `T: BridgedSwiftGenericBridgeable & Models.Named`. Concrete conformers must expose the required members to JavaScript too, including marking methods with `@JS`. This does not enable existential compositions such as `any P & Q`; the generic-import limitations above still apply.
+
 ## Supported features
 
 | Feature | Status |
@@ -96,4 +107,5 @@ let user: User = try parse(jsonString)   // T inferred from the call site
 | Primitive parameter/result types (e.g. `Double`, `Bool`) | ✅ |
 | `String` parameter/result type | ✅ |
 | Generic parameter/result types (constrained to `BridgedSwiftGenericBridgeable`) | ✅ |
+| `@JS` protocol constraints on generic imports | ✅ |
 | Async function | ❌ |

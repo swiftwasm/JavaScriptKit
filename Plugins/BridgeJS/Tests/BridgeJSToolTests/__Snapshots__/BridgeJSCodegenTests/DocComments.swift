@@ -1,10 +1,8 @@
-struct AnyListener: Listener, _BridgedSwiftProtocolWrapper {
-    let jsObject: JSObject
-
+extension Listener where Self: _BridgedSwiftProtocolWrapper {
     func onEvent(id: Int) -> Void {
         let idValue = id.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _extern_onEvent(jsObjectValue, idValue)
+        bjs_Listener_onEvent(jsObjectValue, idValue)
     }
 
     var name: String {
@@ -14,6 +12,10 @@ struct AnyListener: Listener, _BridgedSwiftProtocolWrapper {
             return String.bridgeJSLiftReturn(ret)
         }
     }
+}
+
+struct AnyListener: Listener, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyListener(jsObject: JSObject(id: UInt32(bitPattern: value)))
@@ -22,14 +24,14 @@ struct AnyListener: Listener, _BridgedSwiftProtocolWrapper {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_Listener_onEvent")
-fileprivate func _extern_onEvent_extern(_ jsObject: Int32, _ id: Int32) -> Void
+fileprivate func bjs_Listener_onEvent_extern(_ jsObject: Int32, _ id: Int32) -> Void
 #else
-fileprivate func _extern_onEvent_extern(_ jsObject: Int32, _ id: Int32) -> Void {
+fileprivate func bjs_Listener_onEvent_extern(_ jsObject: Int32, _ id: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_onEvent(_ jsObject: Int32, _ id: Int32) -> Void {
-    return _extern_onEvent_extern(jsObject, id)
+@inline(never) fileprivate func bjs_Listener_onEvent(_ jsObject: Int32, _ id: Int32) -> Void {
+    return bjs_Listener_onEvent_extern(jsObject, id)
 }
 
 #if arch(wasm32)

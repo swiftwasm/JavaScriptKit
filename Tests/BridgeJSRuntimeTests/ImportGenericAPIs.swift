@@ -79,7 +79,34 @@ import JavaScriptKit
     @JSFunction func unwrap<T: BridgedSwiftGenericBridgeable>() throws(JSException) -> T
 }
 
+@JS protocol GenericRTPosition: BridgedSwiftGenericBridgeable {
+    var x: Int { get }
+    func sum() -> Int
+}
+
+@JS protocol GenericRTNode: GenericRTPosition {
+    var y: Int { get }
+}
+
+extension GenericRTPoint: GenericRTNode {
+    @JS func sum() -> Int { x + y }
+}
+
+@JSFunction func jsGenericNodeRoundTrip<T: GenericRTNode>(_ value: T) throws(JSException) -> T
+@JSFunction func jsGenericMakeNode<T: BridgedSwiftGenericBridgeable & GenericRTPosition & GenericRTNode>()
+    throws(JSException) -> T
+
 @Suite struct ImportGenericAPITests {
+    @Test func constrainedProtocolRoundTrip() throws {
+        let point = try jsGenericNodeRoundTrip(GenericRTPoint(x: 1, y: 2))
+        #expect(point.sum() == 3)
+        let node: AnyGenericRTNode = try jsGenericMakeNode()
+        #expect(node.x == 3)
+        #expect(node.y == 4)
+        #expect(node.sum() == 7)
+        #expect(try jsGenericNodeRoundTrip(node).jsObject == node.jsObject)
+    }
+
     @Test func genericRoundTripScalars() throws {
         #expect(try jsGenericRoundTrip(42) == 42)
         #expect(try jsGenericRoundTrip(-7) == -7)
@@ -277,4 +304,31 @@ import JavaScriptKit
         let color = try ImportGenericConsumer.box(GenericRTColor.green)
         #expect(color == .green)
     }
+}
+
+@JS protocol RefineIdentified {
+    var id: String { get }
+    var score: Int { get set }
+}
+
+@JS protocol RefineNamed {
+    var name: String { get }
+    func label() -> String
+}
+
+@JS protocol RefineEntity: RefineIdentified, RefineNamed {
+    var id: String { get }
+    func label() -> String
+}
+
+@JS func describeRefinedEntity(_ entity: RefineEntity) -> String {
+    var identified: any RefineIdentified = entity
+    identified.score = entity.score + 1
+    return "\(entity.id):\(entity.name):\(entity.label()):\(identified.score)"
+}
+
+@JS protocol RefineTagged: RefineEntity {}
+
+@JS func describeTaggedEntity(_ entity: RefineTagged) -> String {
+    "\(entity.id)/\(entity.name)/\(entity.score)"
 }

@@ -15,6 +15,8 @@ When you mark a protocol with `@JS`, BridgeJS generates:
 
 Use `@JS("PublicName")` on a protocol to rename its TypeScript interface and generated type references. Swift still uses the original protocol name for conformances and signatures. JavaScript objects still satisfy the interface structurally; renaming does not create a protocol constructor or change how callbacks and protocol values cross the boundary. Unlike `@JS(as: Other.self)`, it does not change the representation, and combining the two options is not supported.
 
+An `@JS` protocol can refine other `@JS` protocols declared in the same module. Its generated TypeScript interface and Swift wrapper expose inherited methods and properties. Cross-module protocol refinement is not supported.
+
 ## Example: Counter Protocol
 
 Mark a Swift protocol with `@JS` to expose it:
@@ -220,8 +222,10 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
 | Optional properties | ✅ |
 | Optional protocol methods | ❌ |
 | Associated types | ❌ |
-| Protocol inheritance | ❌ |
-| Protocol composition: `Protocol1 & Protocol2` | ❌ |
-| Generics | ❌ |
+| Same-module `@JS` protocol inheritance | ✅ |
+| Cross-module protocol inheritance | ❌ |
+| Existential protocol composition: `any Protocol1 & Protocol2` | ❌ |
+| Generic requirements | ❌ |
+| Protocol-valued properties, parameters, or results in requirements | ❌ |
 
-> Note: Protocol type support matches that of regular `@JS func` and `@JS class` exports. See <doc:Exporting-Swift-Function>, <doc:Exporting-Swift-Optional>, and <doc:Exporting-Swift-Enum> for more information.
+> Note: For supported requirement types, see <doc:Exporting-Swift-Function>, <doc:Exporting-Swift-Optional>, and <doc:Exporting-Swift-Enum>.

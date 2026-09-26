@@ -178,6 +178,11 @@ export async function setupOptions(options, context) {
                 jsGenericOptionalRoundTrip: (v) => v,
                 jsGenericDictRoundTrip: (v) => v,
                 jsGenericAfterOptionalArray: (a, b) => `${JSON.stringify(a)}|${JSON.stringify(b)}`,
+                jsGenericNodeRoundTrip: (value) => {
+                    if (value.sum() !== value.x + value.y) throw new Error("Invalid protocol method result");
+                    return value;
+                },
+                jsGenericMakeNode: () => ({ x: 3, y: 4, sum() { return this.x + this.y; } }),
                 ImportGenericConsumer: class {
                     identity(value) {
                         return value;
@@ -296,6 +301,10 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     const optDict = { hello: "world" };
     assert.deepEqual(exports.roundTripOptionalDictionaryExport(optDict), optDict);
     assert.equal(exports.roundTripOptionalDictionaryExport(null), null);
+    const entity = { id: "e1", name: "Main", score: 10, label() { return "L" + this.score; } };
+    assert.equal(exports.describeRefinedEntity(entity), "e1:Main:L11:11");
+    assert.equal(entity.score, 11);
+    assert.equal(exports.describeTaggedEntity(entity), "e1/Main/11");
     const arrayStruct = { ints: [1, 2, 3], optStrings: ["a", "b"] };
     const arrayStructRoundTrip = exports.roundTripArrayMembers(arrayStruct);
     assert.deepEqual(arrayStructRoundTrip.ints, [1, 2, 3]);

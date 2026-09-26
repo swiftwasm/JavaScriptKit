@@ -4247,9 +4247,7 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsy_y
     #endif
 }
 
-struct AnyArrayElementProtocol: ArrayElementProtocol, _BridgedSwiftProtocolWrapper {
-    let jsObject: JSObject
-
+extension ArrayElementProtocol where Self: _BridgedSwiftProtocolWrapper {
     var value: Int {
         get {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
@@ -4262,6 +4260,10 @@ struct AnyArrayElementProtocol: ArrayElementProtocol, _BridgedSwiftProtocolWrapp
             bjs_ArrayElementProtocol_value_set(jsObjectValue, newValueValue)
         }
     }
+}
+
+struct AnyArrayElementProtocol: ArrayElementProtocol, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyArrayElementProtocol(jsObject: JSObject(id: UInt32(bitPattern: value)))
@@ -4292,18 +4294,16 @@ fileprivate func bjs_ArrayElementProtocol_value_set_extern(_ jsObject: Int32, _ 
     return bjs_ArrayElementProtocol_value_set_extern(jsObject, newValue)
 }
 
-struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
-    let jsObject: JSObject
-
+extension DataProcessor where Self: _BridgedSwiftProtocolWrapper {
     func increment(by amount: Int) -> Void {
         let amountValue = amount.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _extern_increment(jsObjectValue, amountValue)
+        bjs_DataProcessor_increment(jsObjectValue, amountValue)
     }
 
     func getValue() -> Int {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_getValue(jsObjectValue)
+        let ret = bjs_DataProcessor_getValue(jsObjectValue)
         return Int.bridgeJSLiftReturn(ret)
     }
 
@@ -4311,58 +4311,58 @@ struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
         labelPrefix.bridgeJSWithLoweredParameter { (labelPrefixBytes, labelPrefixLength) in
             labelSuffix.bridgeJSWithLoweredParameter { (labelSuffixBytes, labelSuffixLength) in
                 let jsObjectValue = jsObject.bridgeJSLowerParameter()
-                _extern_setLabelElements(jsObjectValue, labelPrefixBytes, labelPrefixLength, labelSuffixBytes, labelSuffixLength)
+                bjs_DataProcessor_setLabelElements(jsObjectValue, labelPrefixBytes, labelPrefixLength, labelSuffixBytes, labelSuffixLength)
             }
         }
     }
 
     func getLabel() -> String {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_getLabel(jsObjectValue)
+        let ret = bjs_DataProcessor_getLabel(jsObjectValue)
         return String.bridgeJSLiftReturn(ret)
     }
 
     func isEven() -> Bool {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_isEven(jsObjectValue)
+        let ret = bjs_DataProcessor_isEven(jsObjectValue)
         return Bool.bridgeJSLiftReturn(ret)
     }
 
     func processGreeter(_ greeter: Greeter) -> String {
         let greeterPointer = greeter.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_processGreeter(jsObjectValue, greeterPointer)
+        let ret = bjs_DataProcessor_processGreeter(jsObjectValue, greeterPointer)
         return String.bridgeJSLiftReturn(ret)
     }
 
     func createGreeter() -> Greeter {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_createGreeter(jsObjectValue)
+        let ret = bjs_DataProcessor_createGreeter(jsObjectValue)
         return Greeter.bridgeJSLiftReturn(ret)
     }
 
     func processOptionalGreeter(_ greeter: Optional<Greeter>) -> String {
         let (greeterIsSome, greeterPointer) = greeter.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_processOptionalGreeter(jsObjectValue, greeterIsSome, greeterPointer)
+        let ret = bjs_DataProcessor_processOptionalGreeter(jsObjectValue, greeterIsSome, greeterPointer)
         return String.bridgeJSLiftReturn(ret)
     }
 
     func createOptionalGreeter() -> Optional<Greeter> {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_createOptionalGreeter(jsObjectValue)
+        let ret = bjs_DataProcessor_createOptionalGreeter(jsObjectValue)
         return Optional<Greeter>.bridgeJSLiftReturn(ret)
     }
 
     func handleAPIResult(_ result: Optional<APIResult>) -> Void {
         let (resultIsSome, resultCaseId) = result.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _extern_handleAPIResult(jsObjectValue, resultIsSome, resultCaseId)
+        bjs_DataProcessor_handleAPIResult(jsObjectValue, resultIsSome, resultCaseId)
     }
 
     func getAPIResult() -> Optional<APIResult> {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_getAPIResult(jsObjectValue)
+        let ret = bjs_DataProcessor_getAPIResult(jsObjectValue)
         return Optional<APIResult>.bridgeJSLiftReturn(ret)
     }
 
@@ -4492,6 +4492,10 @@ struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
             bjs_DataProcessor_optionalHelper_set(jsObjectValue, newValueIsSome, newValuePointer)
         }
     }
+}
+
+struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyDataProcessor(jsObject: JSObject(id: UInt32(bitPattern: value)))
@@ -4500,134 +4504,134 @@ struct AnyDataProcessor: DataProcessor, _BridgedSwiftProtocolWrapper {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_increment")
-fileprivate func _extern_increment_extern(_ jsObject: Int32, _ amount: Int32) -> Void
+fileprivate func bjs_DataProcessor_increment_extern(_ jsObject: Int32, _ amount: Int32) -> Void
 #else
-fileprivate func _extern_increment_extern(_ jsObject: Int32, _ amount: Int32) -> Void {
+fileprivate func bjs_DataProcessor_increment_extern(_ jsObject: Int32, _ amount: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_increment(_ jsObject: Int32, _ amount: Int32) -> Void {
-    return _extern_increment_extern(jsObject, amount)
+@inline(never) fileprivate func bjs_DataProcessor_increment(_ jsObject: Int32, _ amount: Int32) -> Void {
+    return bjs_DataProcessor_increment_extern(jsObject, amount)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getValue")
-fileprivate func _extern_getValue_extern(_ jsObject: Int32) -> Int32
+fileprivate func bjs_DataProcessor_getValue_extern(_ jsObject: Int32) -> Int32
 #else
-fileprivate func _extern_getValue_extern(_ jsObject: Int32) -> Int32 {
+fileprivate func bjs_DataProcessor_getValue_extern(_ jsObject: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_getValue(_ jsObject: Int32) -> Int32 {
-    return _extern_getValue_extern(jsObject)
+@inline(never) fileprivate func bjs_DataProcessor_getValue(_ jsObject: Int32) -> Int32 {
+    return bjs_DataProcessor_getValue_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_setLabelElements")
-fileprivate func _extern_setLabelElements_extern(_ jsObject: Int32, _ labelPrefixBytes: Int32, _ labelPrefixLength: Int32, _ labelSuffixBytes: Int32, _ labelSuffixLength: Int32) -> Void
+fileprivate func bjs_DataProcessor_setLabelElements_extern(_ jsObject: Int32, _ labelPrefixBytes: Int32, _ labelPrefixLength: Int32, _ labelSuffixBytes: Int32, _ labelSuffixLength: Int32) -> Void
 #else
-fileprivate func _extern_setLabelElements_extern(_ jsObject: Int32, _ labelPrefixBytes: Int32, _ labelPrefixLength: Int32, _ labelSuffixBytes: Int32, _ labelSuffixLength: Int32) -> Void {
+fileprivate func bjs_DataProcessor_setLabelElements_extern(_ jsObject: Int32, _ labelPrefixBytes: Int32, _ labelPrefixLength: Int32, _ labelSuffixBytes: Int32, _ labelSuffixLength: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_setLabelElements(_ jsObject: Int32, _ labelPrefixBytes: Int32, _ labelPrefixLength: Int32, _ labelSuffixBytes: Int32, _ labelSuffixLength: Int32) -> Void {
-    return _extern_setLabelElements_extern(jsObject, labelPrefixBytes, labelPrefixLength, labelSuffixBytes, labelSuffixLength)
+@inline(never) fileprivate func bjs_DataProcessor_setLabelElements(_ jsObject: Int32, _ labelPrefixBytes: Int32, _ labelPrefixLength: Int32, _ labelSuffixBytes: Int32, _ labelSuffixLength: Int32) -> Void {
+    return bjs_DataProcessor_setLabelElements_extern(jsObject, labelPrefixBytes, labelPrefixLength, labelSuffixBytes, labelSuffixLength)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getLabel")
-fileprivate func _extern_getLabel_extern(_ jsObject: Int32) -> Int32
+fileprivate func bjs_DataProcessor_getLabel_extern(_ jsObject: Int32) -> Int32
 #else
-fileprivate func _extern_getLabel_extern(_ jsObject: Int32) -> Int32 {
+fileprivate func bjs_DataProcessor_getLabel_extern(_ jsObject: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_getLabel(_ jsObject: Int32) -> Int32 {
-    return _extern_getLabel_extern(jsObject)
+@inline(never) fileprivate func bjs_DataProcessor_getLabel(_ jsObject: Int32) -> Int32 {
+    return bjs_DataProcessor_getLabel_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_isEven")
-fileprivate func _extern_isEven_extern(_ jsObject: Int32) -> Int32
+fileprivate func bjs_DataProcessor_isEven_extern(_ jsObject: Int32) -> Int32
 #else
-fileprivate func _extern_isEven_extern(_ jsObject: Int32) -> Int32 {
+fileprivate func bjs_DataProcessor_isEven_extern(_ jsObject: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_isEven(_ jsObject: Int32) -> Int32 {
-    return _extern_isEven_extern(jsObject)
+@inline(never) fileprivate func bjs_DataProcessor_isEven(_ jsObject: Int32) -> Int32 {
+    return bjs_DataProcessor_isEven_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_processGreeter")
-fileprivate func _extern_processGreeter_extern(_ jsObject: Int32, _ greeter: UnsafeMutableRawPointer) -> Int32
+fileprivate func bjs_DataProcessor_processGreeter_extern(_ jsObject: Int32, _ greeter: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _extern_processGreeter_extern(_ jsObject: Int32, _ greeter: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func bjs_DataProcessor_processGreeter_extern(_ jsObject: Int32, _ greeter: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_processGreeter(_ jsObject: Int32, _ greeter: UnsafeMutableRawPointer) -> Int32 {
-    return _extern_processGreeter_extern(jsObject, greeter)
+@inline(never) fileprivate func bjs_DataProcessor_processGreeter(_ jsObject: Int32, _ greeter: UnsafeMutableRawPointer) -> Int32 {
+    return bjs_DataProcessor_processGreeter_extern(jsObject, greeter)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_createGreeter")
-fileprivate func _extern_createGreeter_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer
+fileprivate func bjs_DataProcessor_createGreeter_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer
 #else
-fileprivate func _extern_createGreeter_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+fileprivate func bjs_DataProcessor_createGreeter_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_createGreeter(_ jsObject: Int32) -> UnsafeMutableRawPointer {
-    return _extern_createGreeter_extern(jsObject)
+@inline(never) fileprivate func bjs_DataProcessor_createGreeter(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    return bjs_DataProcessor_createGreeter_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_processOptionalGreeter")
-fileprivate func _extern_processOptionalGreeter_extern(_ jsObject: Int32, _ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> Int32
+fileprivate func bjs_DataProcessor_processOptionalGreeter_extern(_ jsObject: Int32, _ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> Int32
 #else
-fileprivate func _extern_processOptionalGreeter_extern(_ jsObject: Int32, _ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> Int32 {
+fileprivate func bjs_DataProcessor_processOptionalGreeter_extern(_ jsObject: Int32, _ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_processOptionalGreeter(_ jsObject: Int32, _ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> Int32 {
-    return _extern_processOptionalGreeter_extern(jsObject, greeterIsSome, greeterPointer)
+@inline(never) fileprivate func bjs_DataProcessor_processOptionalGreeter(_ jsObject: Int32, _ greeterIsSome: Int32, _ greeterPointer: UnsafeMutableRawPointer) -> Int32 {
+    return bjs_DataProcessor_processOptionalGreeter_extern(jsObject, greeterIsSome, greeterPointer)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_createOptionalGreeter")
-fileprivate func _extern_createOptionalGreeter_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer
+fileprivate func bjs_DataProcessor_createOptionalGreeter_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer
 #else
-fileprivate func _extern_createOptionalGreeter_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+fileprivate func bjs_DataProcessor_createOptionalGreeter_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_createOptionalGreeter(_ jsObject: Int32) -> UnsafeMutableRawPointer {
-    return _extern_createOptionalGreeter_extern(jsObject)
+@inline(never) fileprivate func bjs_DataProcessor_createOptionalGreeter(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    return bjs_DataProcessor_createOptionalGreeter_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_handleAPIResult")
-fileprivate func _extern_handleAPIResult_extern(_ jsObject: Int32, _ resultIsSome: Int32, _ resultCaseId: Int32) -> Void
+fileprivate func bjs_DataProcessor_handleAPIResult_extern(_ jsObject: Int32, _ resultIsSome: Int32, _ resultCaseId: Int32) -> Void
 #else
-fileprivate func _extern_handleAPIResult_extern(_ jsObject: Int32, _ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
+fileprivate func bjs_DataProcessor_handleAPIResult_extern(_ jsObject: Int32, _ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_handleAPIResult(_ jsObject: Int32, _ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
-    return _extern_handleAPIResult_extern(jsObject, resultIsSome, resultCaseId)
+@inline(never) fileprivate func bjs_DataProcessor_handleAPIResult(_ jsObject: Int32, _ resultIsSome: Int32, _ resultCaseId: Int32) -> Void {
+    return bjs_DataProcessor_handleAPIResult_extern(jsObject, resultIsSome, resultCaseId)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_getAPIResult")
-fileprivate func _extern_getAPIResult_extern(_ jsObject: Int32) -> Int32
+fileprivate func bjs_DataProcessor_getAPIResult_extern(_ jsObject: Int32) -> Int32
 #else
-fileprivate func _extern_getAPIResult_extern(_ jsObject: Int32) -> Int32 {
+fileprivate func bjs_DataProcessor_getAPIResult_extern(_ jsObject: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_getAPIResult(_ jsObject: Int32) -> Int32 {
-    return _extern_getAPIResult_extern(jsObject)
+@inline(never) fileprivate func bjs_DataProcessor_getAPIResult(_ jsObject: Int32) -> Int32 {
+    return bjs_DataProcessor_getAPIResult_extern(jsObject)
 }
 
 #if arch(wasm32)
@@ -4858,15 +4862,266 @@ fileprivate func bjs_DataProcessor_optionalHelper_set_extern(_ jsObject: Int32, 
     return bjs_DataProcessor_optionalHelper_set_extern(jsObject, newValueIsSome, newValuePointer)
 }
 
-struct AnyJSNameTransformer: JSNameTransformer, _BridgedSwiftProtocolWrapper {
+extension GenericRTPosition where Self: _BridgedSwiftProtocolWrapper {
+    func sum() -> Int {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let ret = bjs_GenericRTPosition_sum(jsObjectValue)
+        return Int.bridgeJSLiftReturn(ret)
+    }
+
+    var x: Int {
+        get {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_GenericRTPosition_x_get(jsObjectValue)
+            return Int.bridgeJSLiftReturn(ret)
+        }
+    }
+}
+
+struct AnyGenericRTPosition: GenericRTPosition, _BridgedSwiftProtocolWrapper {
     let jsObject: JSObject
 
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyGenericRTPosition(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_GenericRTPosition_sum")
+fileprivate func bjs_GenericRTPosition_sum_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_GenericRTPosition_sum_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_GenericRTPosition_sum(_ jsObject: Int32) -> Int32 {
+    return bjs_GenericRTPosition_sum_extern(jsObject)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_GenericRTPosition_x_get")
+fileprivate func bjs_GenericRTPosition_x_get_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_GenericRTPosition_x_get_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_GenericRTPosition_x_get(_ jsObject: Int32) -> Int32 {
+    return bjs_GenericRTPosition_x_get_extern(jsObject)
+}
+
+extension GenericRTNode where Self: _BridgedSwiftProtocolWrapper {
+    var y: Int {
+        get {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_GenericRTNode_y_get(jsObjectValue)
+            return Int.bridgeJSLiftReturn(ret)
+        }
+    }
+}
+
+struct AnyGenericRTNode: GenericRTNode, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyGenericRTNode(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_GenericRTNode_y_get")
+fileprivate func bjs_GenericRTNode_y_get_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_GenericRTNode_y_get_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_GenericRTNode_y_get(_ jsObject: Int32) -> Int32 {
+    return bjs_GenericRTNode_y_get_extern(jsObject)
+}
+
+extension RefineIdentified where Self: _BridgedSwiftProtocolWrapper {
+    var id: String {
+        get {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_RefineIdentified_id_get(jsObjectValue)
+            return String.bridgeJSLiftReturn(ret)
+        }
+    }
+
+    var score: Int {
+        get {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_RefineIdentified_score_get(jsObjectValue)
+            return Int.bridgeJSLiftReturn(ret)
+        }
+        set {
+            let newValueValue = newValue.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            bjs_RefineIdentified_score_set(jsObjectValue, newValueValue)
+        }
+    }
+}
+
+struct AnyRefineIdentified: RefineIdentified, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyRefineIdentified(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_RefineIdentified_id_get")
+fileprivate func bjs_RefineIdentified_id_get_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_RefineIdentified_id_get_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_RefineIdentified_id_get(_ jsObject: Int32) -> Int32 {
+    return bjs_RefineIdentified_id_get_extern(jsObject)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_RefineIdentified_score_get")
+fileprivate func bjs_RefineIdentified_score_get_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_RefineIdentified_score_get_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_RefineIdentified_score_get(_ jsObject: Int32) -> Int32 {
+    return bjs_RefineIdentified_score_get_extern(jsObject)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_RefineIdentified_score_set")
+fileprivate func bjs_RefineIdentified_score_set_extern(_ jsObject: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_RefineIdentified_score_set_extern(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_RefineIdentified_score_set(_ jsObject: Int32, _ newValue: Int32) -> Void {
+    return bjs_RefineIdentified_score_set_extern(jsObject, newValue)
+}
+
+extension RefineNamed where Self: _BridgedSwiftProtocolWrapper {
+    func label() -> String {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let ret = bjs_RefineNamed_label(jsObjectValue)
+        return String.bridgeJSLiftReturn(ret)
+    }
+
+    var name: String {
+        get {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_RefineNamed_name_get(jsObjectValue)
+            return String.bridgeJSLiftReturn(ret)
+        }
+    }
+}
+
+struct AnyRefineNamed: RefineNamed, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyRefineNamed(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_RefineNamed_label")
+fileprivate func bjs_RefineNamed_label_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_RefineNamed_label_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_RefineNamed_label(_ jsObject: Int32) -> Int32 {
+    return bjs_RefineNamed_label_extern(jsObject)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_RefineNamed_name_get")
+fileprivate func bjs_RefineNamed_name_get_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_RefineNamed_name_get_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_RefineNamed_name_get(_ jsObject: Int32) -> Int32 {
+    return bjs_RefineNamed_name_get_extern(jsObject)
+}
+
+extension RefineEntity where Self: _BridgedSwiftProtocolWrapper {
+    func label() -> String {
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let ret = bjs_RefineEntity_label(jsObjectValue)
+        return String.bridgeJSLiftReturn(ret)
+    }
+
+    var id: String {
+        get {
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_RefineEntity_id_get(jsObjectValue)
+            return String.bridgeJSLiftReturn(ret)
+        }
+    }
+}
+
+struct AnyRefineEntity: RefineEntity, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyRefineEntity(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_RefineEntity_label")
+fileprivate func bjs_RefineEntity_label_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_RefineEntity_label_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_RefineEntity_label(_ jsObject: Int32) -> Int32 {
+    return bjs_RefineEntity_label_extern(jsObject)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_RefineEntity_id_get")
+fileprivate func bjs_RefineEntity_id_get_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_RefineEntity_id_get_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_RefineEntity_id_get(_ jsObject: Int32) -> Int32 {
+    return bjs_RefineEntity_id_get_extern(jsObject)
+}
+
+struct AnyRefineTagged: RefineTagged, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyRefineTagged(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+extension JSNameTransformer where Self: _BridgedSwiftProtocolWrapper {
     func apply(_ value: Int) -> Int {
         let valueValue = value.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_apply(jsObjectValue, valueValue)
+        let ret = bjs_JSNameTransformer_apply(jsObjectValue, valueValue)
         return Int.bridgeJSLiftReturn(ret)
     }
+}
+
+struct AnyJSNameTransformer: JSNameTransformer, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyJSNameTransformer(jsObject: JSObject(id: UInt32(bitPattern: value)))
@@ -4875,14 +5130,14 @@ struct AnyJSNameTransformer: JSNameTransformer, _BridgedSwiftProtocolWrapper {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JSNameTransformer_apply")
-fileprivate func _extern_apply_extern(_ jsObject: Int32, _ value: Int32) -> Int32
+fileprivate func bjs_JSNameTransformer_apply_extern(_ jsObject: Int32, _ value: Int32) -> Int32
 #else
-fileprivate func _extern_apply_extern(_ jsObject: Int32, _ value: Int32) -> Int32 {
+fileprivate func bjs_JSNameTransformer_apply_extern(_ jsObject: Int32, _ value: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_apply(_ jsObject: Int32, _ value: Int32) -> Int32 {
-    return _extern_apply_extern(jsObject, value)
+@inline(never) fileprivate func bjs_JSNameTransformer_apply(_ jsObject: Int32, _ value: Int32) -> Int32 {
+    return bjs_JSNameTransformer_apply_extern(jsObject, value)
 }
 
 extension Severity: _BridgedSwiftCaseEnum {
@@ -7839,6 +8094,18 @@ fileprivate func _bjs_struct_lift_GenericRTPoint_extern() -> Int32 {
 #endif
 @inline(never) fileprivate func _bjs_struct_lift_GenericRTPoint() -> Int32 {
     return _bjs_struct_lift_GenericRTPoint_extern()
+}
+
+@_expose(wasm, "bjs_GenericRTPoint_sum")
+@_cdecl("bjs_GenericRTPoint_sum")
+public func _bjs_GenericRTPoint_sum() -> Int32 {
+    #if arch(wasm32)
+    let _self = GenericRTPoint.bridgeJSLiftParameter()
+    let ret = _self.sum()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension GenericRTNamespace.Metadata: _BridgedSwiftStruct {
@@ -11248,6 +11515,30 @@ public func _bjs_roundTripMessage(_ message: Int32) -> Void {
     #if arch(wasm32)
     let message = Message.bridgeJSLiftParameter(message)
     let ret = roundTripMessage(_: message)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_describeRefinedEntity")
+@_cdecl("bjs_describeRefinedEntity")
+public func _bjs_describeRefinedEntity(_ entity: Int32) -> Void {
+    #if arch(wasm32)
+    let entity = AnyRefineEntity.bridgeJSLiftParameter(entity)
+    let ret = describeRefinedEntity(_: entity)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_describeTaggedEntity")
+@_cdecl("bjs_describeTaggedEntity")
+public func _bjs_describeTaggedEntity(_ entity: Int32) -> Void {
+    #if arch(wasm32)
+    let entity = AnyRefineTagged.bridgeJSLiftParameter(entity)
+    let ret = describeTaggedEntity(_: entity)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -15910,6 +16201,14 @@ extension APIOptionalResult: BridgedSwiftGenericBridgeable {
     @_spi(BridgeJS) public static let bridgeJSTypeHandle = APIOptionalResult.bridgeJSMakeTypeHandle()
 }
 
+extension AnyGenericRTPosition: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AnyGenericRTPosition.bridgeJSMakeTypeHandle()
+}
+
+extension AnyGenericRTNode: BridgedSwiftGenericBridgeable {
+    @_spi(BridgeJS) public static let bridgeJSTypeHandle = AnyGenericRTNode.bridgeJSMakeTypeHandle()
+}
+
 @JSFunction func Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
 
 #if arch(wasm32)
@@ -19465,6 +19764,47 @@ func _$jsGenericThrowOrRoundTrip<T: BridgedSwiftGenericBridgeable>(_ shouldThrow
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericNodeRoundTrip")
+fileprivate func bjs_jsGenericNodeRoundTrip_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsGenericNodeRoundTrip_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericNodeRoundTrip(_ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericNodeRoundTrip_extern(_generic0TypeId)
+}
+
+func _$jsGenericNodeRoundTrip<T: BridgedSwiftGenericBridgeable & GenericRTNode>(_ value: T) throws(JSException) -> T {
+    value.bridgeJSStackPush()
+    bjs_jsGenericNodeRoundTrip(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericMakeNode")
+fileprivate func bjs_jsGenericMakeNode_extern(_ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_jsGenericMakeNode_extern(_ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsGenericMakeNode(_ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericMakeNode_extern(_generic0TypeId)
+}
+
+func _$jsGenericMakeNode<T: BridgedSwiftGenericBridgeable & GenericRTPosition & GenericRTNode>() throws(JSException) -> T {
+    bjs_jsGenericMakeNode(T.bridgeJSTypeID)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ImportGenericConsumer_init")
 fileprivate func bjs_ImportGenericConsumer_init_extern() -> Int32
 #else
@@ -21026,6 +21366,8 @@ public func _bjs_BridgeJSRuntimeTests_register_type_handles() {
         GenericRTOutcome.bridgeJSTypeID,
         OptionalAllTypesResult.bridgeJSTypeID,
         APIOptionalResult.bridgeJSTypeID,
+        AnyGenericRTPosition.bridgeJSTypeID,
+        AnyGenericRTNode.bridgeJSTypeID,
     ]
     typeIds.withUnsafeBufferPointer { buffer in
         _bjs_BridgeJSRuntimeTests_register_type_handles_extern(buffer.baseAddress, Int32(buffer.count))

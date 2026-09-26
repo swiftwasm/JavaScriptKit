@@ -7,6 +7,11 @@ import BridgeJSUtilities
 import BridgeJSSkeleton
 #endif
 
+enum GenericConstraintParseResult {
+    case parsed(GenericParameter)
+    case failed(message: String)
+}
+
 /// Outcome of attempting to resolve a type as a reference to a generic parameter.
 enum GenericParameterResolution {
     case resolved(BridgeType)
@@ -762,6 +767,13 @@ public final class SwiftToSkeleton {
     }
 
     private func resolveExternal(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {
+        resolveExternalType(for: type, errors: &errors)?.bridgeType
+    }
+
+    private func resolveExternalType(
+        for type: TypeSyntax,
+        errors: inout [DiagnosticError]
+    ) -> ExternalModuleIndex.ExternalType? {
         guard
             !externalModuleIndex.isEmpty,
             var components = type.qualifiedComponents
@@ -787,7 +799,7 @@ public final class SwiftToSkeleton {
         switch lookupResult {
         case .unique(let externalType):
             usedExternalModules.insert(externalType.moduleName)
-            return externalType.bridgeType
+            return externalType
         case .ambiguous(let candidates):
             let moduleNames = candidates.map(\.moduleName).sorted().joined(separator: ", ")
             errors.append(
@@ -981,9 +993,92 @@ public final class SwiftToSkeleton {
         return name.unicodeScalars.dropFirst().allSatisfy { isIdentifierPart($0, isStart: false) }
     }
 
-    fileprivate static func isBridgeableGenericConstraint(_ constraint: String?) -> Bool {
+    fileprivate static func isBridgeableGenericConstraint(_ constraint: String) -> Bool {
         constraint == "BridgedSwiftGenericBridgeable"
             || constraint == "JavaScriptKit.BridgedSwiftGenericBridgeable"
+    }
+
+    fileprivate func inheritsGenericBridgeability(for type: TypeSyntax, visited: Set<SyntaxIdentifier> = []) -> Bool {
+        if Self.isBridgeableGenericConstraint(type.trimmedDescription) { return true }
+        if let proto = typeDeclResolver.resolve(type)?.as(ProtocolDeclSyntax.self) {
+            guard !visited.contains(proto.id) else { return false }
+            return (proto.inheritanceClause?.inheritedTypes ?? []).contains {
+                inheritsGenericBridgeability(for: $0.type, visited: visited.union([proto.id]))
+            }
+        }
+        var errors: [DiagnosticError] = []
+        return resolveExternalType(for: type, errors: &errors)?.isGenericBridgeableProtocol == true
+    }
+
+    fileprivate func resolveJSProtocolConstraint(for type: TypeSyntax) -> String? {
+        if let typeDecl = typeDeclResolver.resolve(type) {
+            guard let protocolDecl = typeDecl.as(ProtocolDeclSyntax.self),
+                protocolDecl.attributes.hasJSAttribute()
+            else {
+                return nil
+            }
+            return protocolDecl.name.text
+        }
+        var scratchErrors: [DiagnosticError] = []
+        if let externalType = resolveExternal(for: type, errors: &scratchErrors),
+            case .swiftProtocol(let name) = externalType
+        {
+            return name
+        }
+        return nil
+    }
+
+    fileprivate func parseGenericParameterConstraints(
+        _ genericParam: GenericParameterSyntax,
+        attributeName: String
+    ) -> GenericConstraintParseResult {
+        let paramName = genericParam.name.text
+        guard let inheritedType = genericParam.inheritedType else {
+            return .failed(
+                message:
+                    "Generic parameter '\(paramName)' must be constrained to 'BridgedSwiftGenericBridgeable' to be used with \(attributeName)."
+            )
+        }
+        let elements: [TypeSyntax]
+        if let composition = inheritedType.as(CompositionTypeSyntax.self) {
+            elements = composition.elements.map { TypeSyntax($0.type) }
+        } else {
+            elements = [inheritedType]
+        }
+        var hasBridgeableConstraint = false
+        var constraints: [String] = []
+        var swiftConstraints: [String] = []
+        for element in elements {
+            if SwiftToSkeleton.isBridgeableGenericConstraint(element.trimmedDescription) {
+                hasBridgeableConstraint = true
+                continue
+            }
+            guard let protocolName = resolveJSProtocolConstraint(for: element) else {
+                return .failed(
+                    message:
+                        "Generic parameter '\(paramName)' has unsupported constraint '\(element.trimmedDescription)'. "
+                        + "Constraints on generic \(attributeName) declarations must be 'BridgedSwiftGenericBridgeable', "
+                        + "optionally composed with '@JS' protocols (e.g. '\(paramName): BridgedSwiftGenericBridgeable & MyProtocol')."
+                )
+            }
+            hasBridgeableConstraint = hasBridgeableConstraint || inheritsGenericBridgeability(for: element)
+            if !constraints.contains(protocolName) {
+                constraints.append(protocolName)
+            }
+            let swiftConstraint = element.is(MemberTypeSyntax.self) ? element.trimmedDescription : protocolName
+            if !swiftConstraints.contains(swiftConstraint) {
+                swiftConstraints.append(swiftConstraint)
+            }
+        }
+        guard hasBridgeableConstraint else {
+            let suggested = (["BridgedSwiftGenericBridgeable"] + swiftConstraints).joined(separator: " & ")
+            return .failed(
+                message:
+                    "Generic parameter '\(paramName)' is missing the 'BridgedSwiftGenericBridgeable' constraint. "
+                    + "Write '\(paramName): \(suggested)' to combine it with '@JS' protocol constraints on \(attributeName) declarations."
+            )
+        }
+        return .parsed(GenericParameter(name: paramName, constraints: constraints, swiftConstraints: swiftConstraints))
     }
 
 }
@@ -2321,6 +2416,23 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
 
         let protocolUniqueKey = makeKey(name: name, namespace: effectiveNamespace)
 
+        var inheritedJSProtocols: [String] = []
+        for inherited in node.inheritanceClause?.inheritedTypes ?? [] {
+            guard let baseName = parent.resolveJSProtocolConstraint(for: inherited.type) else { continue }
+            guard parent.typeDeclResolver.resolve(inherited.type)?.is(ProtocolDeclSyntax.self) == true else {
+                diagnose(
+                    node: inherited,
+                    message: "Refining @JS protocol '\(baseName)' from another module is not supported yet.",
+                    hint:
+                        "Declare the inherited requirements on '\(name)' directly, or move the base protocol into this module."
+                )
+                return .skipChildren
+            }
+            if !inheritedJSProtocols.contains(baseName) {
+                inheritedJSProtocols.append(baseName)
+            }
+        }
+
         exportedProtocolByName[protocolUniqueKey] = ExportedProtocol(
             name: name,
             jsName: jsName,
@@ -2355,7 +2467,11 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             properties: exportedProtocolByName[protocolUniqueKey]?.properties ?? [],
             namespace: effectiveNamespace,
             jsNamespace: namespaceResult.jsNamespace,
-            documentation: extractDocumentation(from: node)
+            documentation: extractDocumentation(from: node),
+            inheritedJSProtocols: inheritedJSProtocols.isEmpty ? nil : inheritedJSProtocols,
+            isGenericBridgeable: (node.inheritanceClause?.inheritedTypes ?? []).contains {
+                parent.inheritsGenericBridgeability(for: $0.type)
+            } ? true : nil
         )
 
         exportedProtocolByName[protocolUniqueKey] = exportedProtocol
@@ -3453,27 +3569,21 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
     ///
     /// Returns `nil` when a diagnostic was emitted; an empty array when the
     /// declaration is not generic.
-    private func parseGenericParameterNames(
+    private func parseGenericParameters(
         genericParameterClause: GenericParameterClauseSyntax?,
         genericWhereClause: GenericWhereClauseSyntax?,
         node: Syntax
-    ) -> [String]? {
-        var genericParameterNames: [String] = []
+    ) -> [GenericParameter]? {
+        var genericParameters: [GenericParameter] = []
         if let genericParameterClause {
             for genericParam in genericParameterClause.parameters {
-                let paramName = genericParam.name.text
-                let constraintText = genericParam.inheritedType?.trimmedDescription
-                guard SwiftToSkeleton.isBridgeableGenericConstraint(constraintText) else {
-                    errors.append(
-                        DiagnosticError(
-                            node: Syntax(genericParam),
-                            message:
-                                "Generic parameter '\(paramName)' must be constrained to 'BridgedSwiftGenericBridgeable' to be used with @JSFunction."
-                        )
-                    )
+                switch parent.parseGenericParameterConstraints(genericParam, attributeName: "@JSFunction") {
+                case .failed(let message):
+                    errors.append(DiagnosticError(node: Syntax(genericParam), message: message))
                     return nil
+                case .parsed(let genericParameter):
+                    genericParameters.append(genericParameter)
                 }
-                genericParameterNames.append(paramName)
             }
         }
         if genericWhereClause != nil {
@@ -3485,7 +3595,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             )
             return nil
         }
-        return genericParameterNames
+        return genericParameters
     }
 
     private func parseConstructor(
@@ -3502,7 +3612,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
         guard
-            let genericParameterNames = parseGenericParameterNames(
+            let genericParameters = parseGenericParameters(
                 genericParameterClause: initializer.genericParameterClause,
                 genericWhereClause: initializer.genericWhereClause,
                 node: Syntax(initializer)
@@ -3510,6 +3620,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         else {
             return nil
         }
+        let genericParameterNames = genericParameters.map(\.name)
         if !genericParameterNames.isEmpty && effects.isAsync {
             errors.append(
                 DiagnosticError(
@@ -3542,7 +3653,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         return ImportedConstructorSkeleton(
             parameters: parameters,
             accessLevel: accessLevel,
-            genericParameters: genericParameterNames.isEmpty ? nil : genericParameterNames
+            genericParameters: genericParameters.isEmpty ? nil : genericParameters
         )
     }
 
@@ -3561,7 +3672,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
 
         guard
-            let genericParameterNames = parseGenericParameterNames(
+            let genericParameters = parseGenericParameters(
                 genericParameterClause: node.genericParameterClause,
                 genericWhereClause: node.genericWhereClause,
                 node: Syntax(node)
@@ -3569,6 +3680,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         else {
             return nil
         }
+
+        let genericParameterNames = genericParameters.map(\.name)
 
         let baseName = SwiftToSkeleton.normalizeIdentifier(node.name.text)
         let extractedJSName = extractJSName(from: jsFunction)
@@ -3632,7 +3745,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             effects: effects,
             documentation: nil,
             accessLevel: accessLevel,
-            genericParameters: genericParameterNames.isEmpty ? nil : genericParameterNames
+            genericParameters: genericParameters.isEmpty ? nil : genericParameters
         )
     }
 

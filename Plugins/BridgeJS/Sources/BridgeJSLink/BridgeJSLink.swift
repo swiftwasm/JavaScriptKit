@@ -1021,7 +1021,10 @@ public struct BridgeJSLink {
         for skeleton in exportedSkeletons {
             for proto in skeleton.protocols {
                 printer.write(lines: renderJSDoc(documentation: proto.documentation, parameters: []))
-                printer.write("export interface \(proto.resolvedJSName) {")
+                let extendsClause =
+                    inheritedProtocolTSNames(of: proto, in: exportedSkeletons)
+                    .map { " extends \($0.joined(separator: ", "))" } ?? ""
+                printer.write("export interface \(proto.resolvedJSName)\(extendsClause) {")
                 printer.indent {
                     for method in proto.methods {
                         printer.write(
@@ -1521,7 +1524,7 @@ public struct BridgeJSLink {
                     // Add methods
                     for method in type.methods {
                         let methodName = method.resolvedJSName
-                        let genericClause = renderGenericClause(method.genericParameterNames)
+                        let genericClause = renderGenericClause(method.genericParameters ?? [])
                         let methodSignature =
                             "\(renderTSPropertyName(methodName))\(genericClause)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                         printer.write(methodSignature)
@@ -1681,6 +1684,18 @@ public struct BridgeJSLink {
         }
     }
 
+    private func inheritedProtocolTSNames(of proto: ExportedProtocol, in skeletons: [ExportedSkeleton]) -> [String]? {
+        guard let inherited = proto.inheritedJSProtocols, !inherited.isEmpty else { return nil }
+        return inherited.map { baseName in
+            for skeleton in skeletons {
+                if let base = skeleton.protocols.first(where: { $0.name == baseName }) {
+                    return base.resolvedJSName
+                }
+            }
+            return baseName
+        }
+    }
+
     /// Resolves public TypeScript names without changing the skeleton's Swift type identities.
     private func resolveTypeScriptType(_ type: BridgeType) -> String {
         return Self.resolveTypeScriptType(type, exportedSkeletons: skeletons.compactMap(\.exported))
@@ -1771,8 +1786,15 @@ public struct BridgeJSLink {
         return "(\(parameterSignatures.joined(separator: ", "))): \(returnTypeWithEffect)"
     }
 
-    private func renderGenericClause(_ genericParameterNames: [String]) -> String {
-        genericParameterNames.isEmpty ? "" : "<\(genericParameterNames.joined(separator: ", "))>"
+    private func renderGenericClause(_ genericParameters: [GenericParameter]) -> String {
+        guard !genericParameters.isEmpty else { return "" }
+        let renderedParameters = genericParameters.map { genericParameter in
+            let constraints = genericParameter.constraints.map { resolveTypeScriptType(.swiftProtocol($0)) }
+            return constraints.isEmpty
+                ? genericParameter.name
+                : "\(genericParameter.name) extends \(constraints.joined(separator: " & "))"
+        }
+        return "<\(renderedParameters.joined(separator: ", "))>"
     }
 
     private func renderTSPropertyName(_ name: String) -> String {
@@ -3767,7 +3789,7 @@ extension BridgeJSLink {
         try thunkBuilder.call(calleeExpr: calleeExpr)
         let funcLines = thunkBuilder.renderFunction(name: function.abiName(context: nil))
         if function.from == nil {
-            let genericClause = renderGenericClause(genericParameters)
+            let genericClause = renderGenericClause(function.genericParameters ?? [])
             importObjectBuilder.appendDts(
                 [
                     "\(renderTSPropertyName(jsName))\(genericClause)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
@@ -3861,14 +3883,14 @@ extension BridgeJSLink {
             dtsPrinter.indent {
                 if let constructor = type.constructor {
                     let returnType = BridgeType.jsObject(type.name)
-                    let genericClause = renderGenericClause(constructor.genericParameterNames)
+                    let genericClause = renderGenericClause(constructor.genericParameters ?? [])
                     dtsPrinter.write(
                         "new\(genericClause)\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
                     )
                 }
                 for method in type.staticMethods {
                     let methodName = method.resolvedJSName
-                    let genericClause = renderGenericClause(method.genericParameterNames)
+                    let genericClause = renderGenericClause(method.genericParameters ?? [])
                     let signature =
                         "\(renderTSPropertyName(methodName))\(genericClause)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
                     dtsPrinter.write(signature)

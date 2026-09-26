@@ -1,22 +1,20 @@
-struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProtocolWrapper {
-    let jsObject: JSObject
-
+extension MyViewControllerDelegate where Self: _BridgedSwiftProtocolWrapper {
     func onSomethingHappened() -> Void {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _extern_onSomethingHappened(jsObjectValue)
+        bjs_MyViewControllerDelegate_onSomethingHappened(jsObjectValue)
     }
 
     func onValueChanged(_ value: String) -> Void {
         value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            _extern_onValueChanged(jsObjectValue, valueBytes, valueLength)
+            bjs_MyViewControllerDelegate_onValueChanged(jsObjectValue, valueBytes, valueLength)
         }
     }
 
     func onCountUpdated(count: Int) -> Bool {
         let countValue = count.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_onCountUpdated(jsObjectValue, countValue)
+        let ret = bjs_MyViewControllerDelegate_onCountUpdated(jsObjectValue, countValue)
         return Bool.bridgeJSLiftReturn(ret)
     }
 
@@ -24,56 +22,56 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
         prefix.bridgeJSWithLoweredParameter { (prefixBytes, prefixLength) in
             suffix.bridgeJSWithLoweredParameter { (suffixBytes, suffixLength) in
                 let jsObjectValue = jsObject.bridgeJSLowerParameter()
-                _extern_onLabelUpdated(jsObjectValue, prefixBytes, prefixLength, suffixBytes, suffixLength)
+                bjs_MyViewControllerDelegate_onLabelUpdated(jsObjectValue, prefixBytes, prefixLength, suffixBytes, suffixLength)
             }
         }
     }
 
     func isCountEven() -> Bool {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_isCountEven(jsObjectValue)
+        let ret = bjs_MyViewControllerDelegate_isCountEven(jsObjectValue)
         return Bool.bridgeJSLiftReturn(ret)
     }
 
     func onHelperUpdated(_ helper: Helper) -> Void {
         let helperPointer = helper.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _extern_onHelperUpdated(jsObjectValue, helperPointer)
+        bjs_MyViewControllerDelegate_onHelperUpdated(jsObjectValue, helperPointer)
     }
 
     func createHelper() -> Helper {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_createHelper(jsObjectValue)
+        let ret = bjs_MyViewControllerDelegate_createHelper(jsObjectValue)
         return Helper.bridgeJSLiftReturn(ret)
     }
 
     func onOptionalHelperUpdated(_ helper: Optional<Helper>) -> Void {
         let (helperIsSome, helperPointer) = helper.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _extern_onOptionalHelperUpdated(jsObjectValue, helperIsSome, helperPointer)
+        bjs_MyViewControllerDelegate_onOptionalHelperUpdated(jsObjectValue, helperIsSome, helperPointer)
     }
 
     func createOptionalHelper() -> Optional<Helper> {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_createOptionalHelper(jsObjectValue)
+        let ret = bjs_MyViewControllerDelegate_createOptionalHelper(jsObjectValue)
         return Optional<Helper>.bridgeJSLiftReturn(ret)
     }
 
     func createEnum() -> ExampleEnum {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_createEnum(jsObjectValue)
+        let ret = bjs_MyViewControllerDelegate_createEnum(jsObjectValue)
         return ExampleEnum.bridgeJSLiftReturn(ret)
     }
 
     func handleResult(_ result: Result) -> Void {
         let resultCaseId = result.bridgeJSLowerParameter()
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        _extern_handleResult(jsObjectValue, resultCaseId)
+        bjs_MyViewControllerDelegate_handleResult(jsObjectValue, resultCaseId)
     }
 
     func getResult() -> Result {
         let jsObjectValue = jsObject.bridgeJSLowerParameter()
-        let ret = _extern_getResult(jsObjectValue)
+        let ret = bjs_MyViewControllerDelegate_getResult(jsObjectValue)
         return Result.bridgeJSLiftReturn(ret)
     }
 
@@ -217,6 +215,10 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
             bjs_MyViewControllerDelegate_priorityOptional_set(jsObjectValue, newValueIsSome, newValueValue)
         }
     }
+}
+
+struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
 
     static func bridgeJSLiftParameter(_ value: Int32) -> Self {
         return AnyMyViewControllerDelegate(jsObject: JSObject(id: UInt32(bitPattern: value)))
@@ -225,146 +227,146 @@ struct AnyMyViewControllerDelegate: MyViewControllerDelegate, _BridgedSwiftProto
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onSomethingHappened")
-fileprivate func _extern_onSomethingHappened_extern(_ jsObject: Int32) -> Void
+fileprivate func bjs_MyViewControllerDelegate_onSomethingHappened_extern(_ jsObject: Int32) -> Void
 #else
-fileprivate func _extern_onSomethingHappened_extern(_ jsObject: Int32) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_onSomethingHappened_extern(_ jsObject: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_onSomethingHappened(_ jsObject: Int32) -> Void {
-    return _extern_onSomethingHappened_extern(jsObject)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_onSomethingHappened(_ jsObject: Int32) -> Void {
+    return bjs_MyViewControllerDelegate_onSomethingHappened_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onValueChanged")
-fileprivate func _extern_onValueChanged_extern(_ jsObject: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+fileprivate func bjs_MyViewControllerDelegate_onValueChanged_extern(_ jsObject: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
 #else
-fileprivate func _extern_onValueChanged_extern(_ jsObject: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_onValueChanged_extern(_ jsObject: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_onValueChanged(_ jsObject: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return _extern_onValueChanged_extern(jsObject, valueBytes, valueLength)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_onValueChanged(_ jsObject: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    return bjs_MyViewControllerDelegate_onValueChanged_extern(jsObject, valueBytes, valueLength)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onCountUpdated")
-fileprivate func _extern_onCountUpdated_extern(_ jsObject: Int32, _ count: Int32) -> Int32
+fileprivate func bjs_MyViewControllerDelegate_onCountUpdated_extern(_ jsObject: Int32, _ count: Int32) -> Int32
 #else
-fileprivate func _extern_onCountUpdated_extern(_ jsObject: Int32, _ count: Int32) -> Int32 {
+fileprivate func bjs_MyViewControllerDelegate_onCountUpdated_extern(_ jsObject: Int32, _ count: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_onCountUpdated(_ jsObject: Int32, _ count: Int32) -> Int32 {
-    return _extern_onCountUpdated_extern(jsObject, count)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_onCountUpdated(_ jsObject: Int32, _ count: Int32) -> Int32 {
+    return bjs_MyViewControllerDelegate_onCountUpdated_extern(jsObject, count)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onLabelUpdated")
-fileprivate func _extern_onLabelUpdated_extern(_ jsObject: Int32, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void
+fileprivate func bjs_MyViewControllerDelegate_onLabelUpdated_extern(_ jsObject: Int32, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void
 #else
-fileprivate func _extern_onLabelUpdated_extern(_ jsObject: Int32, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_onLabelUpdated_extern(_ jsObject: Int32, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_onLabelUpdated(_ jsObject: Int32, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
-    return _extern_onLabelUpdated_extern(jsObject, prefixBytes, prefixLength, suffixBytes, suffixLength)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_onLabelUpdated(_ jsObject: Int32, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
+    return bjs_MyViewControllerDelegate_onLabelUpdated_extern(jsObject, prefixBytes, prefixLength, suffixBytes, suffixLength)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_isCountEven")
-fileprivate func _extern_isCountEven_extern(_ jsObject: Int32) -> Int32
+fileprivate func bjs_MyViewControllerDelegate_isCountEven_extern(_ jsObject: Int32) -> Int32
 #else
-fileprivate func _extern_isCountEven_extern(_ jsObject: Int32) -> Int32 {
+fileprivate func bjs_MyViewControllerDelegate_isCountEven_extern(_ jsObject: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_isCountEven(_ jsObject: Int32) -> Int32 {
-    return _extern_isCountEven_extern(jsObject)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_isCountEven(_ jsObject: Int32) -> Int32 {
+    return bjs_MyViewControllerDelegate_isCountEven_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onHelperUpdated")
-fileprivate func _extern_onHelperUpdated_extern(_ jsObject: Int32, _ helper: UnsafeMutableRawPointer) -> Void
+fileprivate func bjs_MyViewControllerDelegate_onHelperUpdated_extern(_ jsObject: Int32, _ helper: UnsafeMutableRawPointer) -> Void
 #else
-fileprivate func _extern_onHelperUpdated_extern(_ jsObject: Int32, _ helper: UnsafeMutableRawPointer) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_onHelperUpdated_extern(_ jsObject: Int32, _ helper: UnsafeMutableRawPointer) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_onHelperUpdated(_ jsObject: Int32, _ helper: UnsafeMutableRawPointer) -> Void {
-    return _extern_onHelperUpdated_extern(jsObject, helper)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_onHelperUpdated(_ jsObject: Int32, _ helper: UnsafeMutableRawPointer) -> Void {
+    return bjs_MyViewControllerDelegate_onHelperUpdated_extern(jsObject, helper)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_createHelper")
-fileprivate func _extern_createHelper_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer
+fileprivate func bjs_MyViewControllerDelegate_createHelper_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer
 #else
-fileprivate func _extern_createHelper_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+fileprivate func bjs_MyViewControllerDelegate_createHelper_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_createHelper(_ jsObject: Int32) -> UnsafeMutableRawPointer {
-    return _extern_createHelper_extern(jsObject)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_createHelper(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    return bjs_MyViewControllerDelegate_createHelper_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onOptionalHelperUpdated")
-fileprivate func _extern_onOptionalHelperUpdated_extern(_ jsObject: Int32, _ helperIsSome: Int32, _ helperPointer: UnsafeMutableRawPointer) -> Void
+fileprivate func bjs_MyViewControllerDelegate_onOptionalHelperUpdated_extern(_ jsObject: Int32, _ helperIsSome: Int32, _ helperPointer: UnsafeMutableRawPointer) -> Void
 #else
-fileprivate func _extern_onOptionalHelperUpdated_extern(_ jsObject: Int32, _ helperIsSome: Int32, _ helperPointer: UnsafeMutableRawPointer) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_onOptionalHelperUpdated_extern(_ jsObject: Int32, _ helperIsSome: Int32, _ helperPointer: UnsafeMutableRawPointer) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_onOptionalHelperUpdated(_ jsObject: Int32, _ helperIsSome: Int32, _ helperPointer: UnsafeMutableRawPointer) -> Void {
-    return _extern_onOptionalHelperUpdated_extern(jsObject, helperIsSome, helperPointer)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_onOptionalHelperUpdated(_ jsObject: Int32, _ helperIsSome: Int32, _ helperPointer: UnsafeMutableRawPointer) -> Void {
+    return bjs_MyViewControllerDelegate_onOptionalHelperUpdated_extern(jsObject, helperIsSome, helperPointer)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_createOptionalHelper")
-fileprivate func _extern_createOptionalHelper_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer
+fileprivate func bjs_MyViewControllerDelegate_createOptionalHelper_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer
 #else
-fileprivate func _extern_createOptionalHelper_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+fileprivate func bjs_MyViewControllerDelegate_createOptionalHelper_extern(_ jsObject: Int32) -> UnsafeMutableRawPointer {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_createOptionalHelper(_ jsObject: Int32) -> UnsafeMutableRawPointer {
-    return _extern_createOptionalHelper_extern(jsObject)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_createOptionalHelper(_ jsObject: Int32) -> UnsafeMutableRawPointer {
+    return bjs_MyViewControllerDelegate_createOptionalHelper_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_createEnum")
-fileprivate func _extern_createEnum_extern(_ jsObject: Int32) -> Int32
+fileprivate func bjs_MyViewControllerDelegate_createEnum_extern(_ jsObject: Int32) -> Int32
 #else
-fileprivate func _extern_createEnum_extern(_ jsObject: Int32) -> Int32 {
+fileprivate func bjs_MyViewControllerDelegate_createEnum_extern(_ jsObject: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_createEnum(_ jsObject: Int32) -> Int32 {
-    return _extern_createEnum_extern(jsObject)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_createEnum(_ jsObject: Int32) -> Int32 {
+    return bjs_MyViewControllerDelegate_createEnum_extern(jsObject)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_handleResult")
-fileprivate func _extern_handleResult_extern(_ jsObject: Int32, _ result: Int32) -> Void
+fileprivate func bjs_MyViewControllerDelegate_handleResult_extern(_ jsObject: Int32, _ result: Int32) -> Void
 #else
-fileprivate func _extern_handleResult_extern(_ jsObject: Int32, _ result: Int32) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_handleResult_extern(_ jsObject: Int32, _ result: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_handleResult(_ jsObject: Int32, _ result: Int32) -> Void {
-    return _extern_handleResult_extern(jsObject, result)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_handleResult(_ jsObject: Int32, _ result: Int32) -> Void {
+    return bjs_MyViewControllerDelegate_handleResult_extern(jsObject, result)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_getResult")
-fileprivate func _extern_getResult_extern(_ jsObject: Int32) -> Int32
+fileprivate func bjs_MyViewControllerDelegate_getResult_extern(_ jsObject: Int32) -> Int32
 #else
-fileprivate func _extern_getResult_extern(_ jsObject: Int32) -> Int32 {
+fileprivate func bjs_MyViewControllerDelegate_getResult_extern(_ jsObject: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func _extern_getResult(_ jsObject: Int32) -> Int32 {
-    return _extern_getResult_extern(jsObject)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_getResult(_ jsObject: Int32) -> Int32 {
+    return bjs_MyViewControllerDelegate_getResult_extern(jsObject)
 }
 
 #if arch(wasm32)

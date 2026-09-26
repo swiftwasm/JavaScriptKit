@@ -428,6 +428,30 @@ export async function createInstantiator(options, swift) {
             return enumValue;
         },
     };
+    const __bjs_codec_M10TestModuleT15GenericReadable = {
+        lower: (v) => {
+            const objId = swift.memory.retain(v);
+            i32Stack.push(objId);
+        },
+        lift: () => {
+            const objId = i32Stack.pop();
+            const obj = swift.memory.getObject(objId);
+            swift.memory.release(objId);
+            return obj;
+        },
+    };
+    const __bjs_codec_M10TestModuleT11GenericNode = {
+        lower: (v) => {
+            const objId = swift.memory.retain(v);
+            i32Stack.push(objId);
+        },
+        lift: () => {
+            const objId = i32Stack.pop();
+            const obj = swift.memory.getObject(objId);
+            swift.memory.release(objId);
+            return obj;
+        },
+    };
 
     const __bjs_createStructHelpers_M10TestModuleT12GenericPoint = () => ({
         lower: (value) => {
@@ -586,6 +610,8 @@ export async function createInstantiator(options, swift) {
                     __bjs_codec_M10TestModuleT12GenericColor,
                     __bjs_stringCodec,
                     __bjs_codec_M10TestModuleT13GenericTagged,
+                    __bjs_codec_M10TestModuleT15GenericReadable,
+                    __bjs_codec_M10TestModuleT11GenericNode,
                 ];
                 const typeIds = new Int32Array(memory.buffer, base >>> 0, count >>> 0);
                 for (let i = 0; i < count; i++) {
@@ -783,6 +809,26 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
+            TestModule["bjs_constrainedRoundTrip"] = function bjs_constrainedRoundTrip(tTypeId) {
+                try {
+                    const codecT = __bjs_codecForTypeId(tTypeId);
+                    const value = codecT.lift();
+                    let ret = imports.constrainedRoundTrip(value);
+                    codecT.lower(ret);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_constrainedComposition"] = function bjs_constrainedComposition(tTypeId) {
+                try {
+                    const codecT = __bjs_codecForTypeId(tTypeId);
+                    const value = codecT.lift();
+                    let ret = imports.constrainedComposition(value);
+                    codecT.lower(ret);
+                } catch (error) {
+                    setException(error);
+                }
+            }
             TestModule["bjs_GenericPairFactory_init"] = function bjs_GenericPairFactory_init(tagBytes, tagCount, tTypeId, uTypeId) {
                 try {
                     const codecT = __bjs_codecForTypeId(tTypeId);
@@ -831,6 +877,61 @@ export async function createInstantiator(options, swift) {
                     const value = codecT.lift();
                     let ret = swift.memory.getObject(self).identity(value);
                     codecT.lower(ret);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_ConstrainedConsumer_init"] = function bjs_ConstrainedConsumer_init(tTypeId) {
+                try {
+                    const codecT = __bjs_codecForTypeId(tTypeId);
+                    const value = codecT.lift();
+                    return swift.memory.retain(new imports.ConstrainedConsumer(value));
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_ConstrainedConsumer_identity_static"] = function bjs_ConstrainedConsumer_identity_static(tTypeId) {
+                try {
+                    const codecT = __bjs_codecForTypeId(tTypeId);
+                    const value = codecT.lift();
+                    let ret = imports.ConstrainedConsumer.identity(value);
+                    codecT.lower(ret);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_ConstrainedConsumer_accept"] = function bjs_ConstrainedConsumer_accept(self, tTypeId) {
+                try {
+                    const codecT = __bjs_codecForTypeId(tTypeId);
+                    const value = codecT.lift();
+                    let ret = swift.memory.getObject(self).accept(value);
+                    codecT.lower(ret);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_GenericReadable_read"] = function bjs_GenericReadable_read(self) {
+                try {
+                    let ret = swift.memory.getObject(self).read();
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_GenericWritable_value_get"] = function bjs_GenericWritable_value_get(self) {
+                try {
+                    let ret = swift.memory.getObject(self).value;
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_GenericWritable_value_set"] = function bjs_GenericWritable_value_set(self, value) {
+                try {
+                    swift.memory.getObject(self).value = value;
                 } catch (error) {
                     setException(error);
                 }

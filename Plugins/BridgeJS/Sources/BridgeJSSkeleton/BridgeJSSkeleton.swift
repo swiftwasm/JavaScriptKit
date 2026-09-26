@@ -382,6 +382,14 @@ extension ExportedSkeleton {
             guard let bridgeType = enumDef.genericBridgeType else { continue }
             entries.append(GenericBridgeableTypeEntry(swiftName: enumDef.swiftCallName, bridgeType: bridgeType))
         }
+        for proto in protocols where proto.isGenericBridgeable == true {
+            entries.append(
+                GenericBridgeableTypeEntry(
+                    swiftName: "Any\(proto.name)",
+                    bridgeType: .swiftProtocol(proto.name)
+                )
+            )
+        }
         return entries
     }
 }
@@ -543,6 +551,44 @@ public struct Parameter: Codable, Equatable, Sendable {
         self.name = name
         self.type = type
         self.defaultValue = defaultValue
+    }
+}
+
+public struct GenericParameter: Codable, Equatable, Hashable, Sendable {
+    public let name: String
+    public let constraints: [String]
+    public let swiftConstraints: [String]?
+
+    public init(name: String, constraints: [String] = [], swiftConstraints: [String]? = nil) {
+        self.name = name
+        self.constraints = constraints
+        self.swiftConstraints = swiftConstraints == constraints ? nil : swiftConstraints
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case name, constraints, swiftConstraints
+    }
+
+    public init(from decoder: any Decoder) throws {
+        if let single = try? decoder.singleValueContainer(), let name = try? single.decode(String.self) {
+            self.name = name
+            self.constraints = []
+            self.swiftConstraints = nil
+            return
+        }
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.constraints = try container.decodeIfPresent([String].self, forKey: .constraints) ?? []
+        self.swiftConstraints = try container.decodeIfPresent([String].self, forKey: .swiftConstraints)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        if !constraints.isEmpty {
+            try container.encode(constraints, forKey: .constraints)
+        }
+        try container.encodeIfPresent(swiftConstraints, forKey: .swiftConstraints)
     }
 }
 
@@ -973,6 +1019,8 @@ public struct ExportedProtocol: Codable, Equatable, NamespacedExportedType {
     public let namespace: [String]?
     public let jsNamespace: [String]?
     public var documentation: String?
+    public var inheritedJSProtocols: [String]?
+    public var isGenericBridgeable: Bool?
 
     public init(
         name: String,
@@ -981,7 +1029,9 @@ public struct ExportedProtocol: Codable, Equatable, NamespacedExportedType {
         properties: [ExportedProtocolProperty] = [],
         namespace: [String]? = nil,
         jsNamespace: [String]? = nil,
-        documentation: String? = nil
+        documentation: String? = nil,
+        inheritedJSProtocols: [String]? = nil,
+        isGenericBridgeable: Bool? = nil
     ) {
         self.name = name
         self.jsName = jsName
@@ -990,6 +1040,8 @@ public struct ExportedProtocol: Codable, Equatable, NamespacedExportedType {
         self.namespace = namespace
         self.jsNamespace = jsNamespace
         self.documentation = documentation
+        self.inheritedJSProtocols = inheritedJSProtocols
+        self.isGenericBridgeable = isGenericBridgeable
     }
 }
 
@@ -1397,8 +1449,8 @@ public struct ImportedFunctionSkeleton: Codable {
     /// determine the access level of bridge-generated helpers (e.g. typed
     /// closure inits) that surface through this function's signature.
     public let accessLevel: BridgeJSAccessLevel
-    public let genericParameters: [String]?
-    public var genericParameterNames: [String] { genericParameters ?? [] }
+    public let genericParameters: [GenericParameter]?
+    public var genericParameterNames: [String] { (genericParameters ?? []).map(\.name) }
     public var isGeneric: Bool { !genericParameterNames.isEmpty }
 
     public var resolvedJSName: String { jsName ?? name }
@@ -1412,7 +1464,7 @@ public struct ImportedFunctionSkeleton: Codable {
         effects: Effects = Effects(isAsync: false, isThrows: true),
         documentation: String? = nil,
         accessLevel: BridgeJSAccessLevel = .internal,
-        genericParameters: [String]? = nil
+        genericParameters: [GenericParameter]? = nil
     ) {
         self.name = name
         self.jsName = jsName
@@ -1439,7 +1491,7 @@ public struct ImportedFunctionSkeleton: Codable {
         self.effects = try container.decode(Effects.self, forKey: .effects)
         self.documentation = try container.decodeIfPresent(String.self, forKey: .documentation)
         self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
-        self.genericParameters = try container.decodeIfPresent([String].self, forKey: .genericParameters)
+        self.genericParameters = try container.decodeIfPresent([GenericParameter].self, forKey: .genericParameters)
     }
 
     public func abiName(context: ImportedTypeSkeleton?) -> String {
@@ -1460,14 +1512,14 @@ public struct ImportedConstructorSkeleton: Codable {
     /// Source access level of the originating Swift `init`. Inherits from the
     /// enclosing `@JSClass` type when not annotated explicitly.
     public let accessLevel: BridgeJSAccessLevel
-    public let genericParameters: [String]?
-    public var genericParameterNames: [String] { genericParameters ?? [] }
+    public let genericParameters: [GenericParameter]?
+    public var genericParameterNames: [String] { (genericParameters ?? []).map(\.name) }
     public var isGeneric: Bool { !genericParameterNames.isEmpty }
 
     public init(
         parameters: [Parameter],
         accessLevel: BridgeJSAccessLevel = .internal,
-        genericParameters: [String]? = nil
+        genericParameters: [GenericParameter]? = nil
     ) {
         self.parameters = parameters
         self.accessLevel = accessLevel
@@ -1482,7 +1534,7 @@ public struct ImportedConstructorSkeleton: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.parameters = try container.decode([Parameter].self, forKey: .parameters)
         self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
-        self.genericParameters = try container.decodeIfPresent([String].self, forKey: .genericParameters)
+        self.genericParameters = try container.decodeIfPresent([GenericParameter].self, forKey: .genericParameters)
     }
 
     public func abiName(context: ImportedTypeSkeleton) -> String {

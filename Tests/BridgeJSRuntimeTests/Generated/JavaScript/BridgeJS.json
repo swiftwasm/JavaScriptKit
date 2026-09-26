@@ -17672,6 +17672,56 @@
         }
       },
       {
+        "abiName" : "bjs_describeRefinedEntity",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "describeRefinedEntity",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "entity",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "RefineEntity"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_describeTaggedEntity",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "describeTaggedEntity",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "entity",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "RefineTagged"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_renamedEcho",
         "effects" : {
           "isAsync" : false,
@@ -18985,6 +19035,181 @@
         ]
       },
       {
+        "isGenericBridgeable" : true,
+        "methods" : [
+          {
+            "abiName" : "bjs_GenericRTPosition_sum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "sum",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "GenericRTPosition",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "name" : "x",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "inheritedJSProtocols" : [
+          "GenericRTPosition"
+        ],
+        "isGenericBridgeable" : true,
+        "methods" : [
+
+        ],
+        "name" : "GenericRTNode",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "name" : "y",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "methods" : [
+
+        ],
+        "name" : "RefineIdentified",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "name" : "id",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "name" : "score",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_RefineNamed_label",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "label",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "RefineNamed",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "name" : "name",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ]
+      },
+      {
+        "inheritedJSProtocols" : [
+          "RefineIdentified",
+          "RefineNamed"
+        ],
+        "methods" : [
+          {
+            "abiName" : "bjs_RefineEntity_label",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "label",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "RefineEntity",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "name" : "id",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ]
+      },
+      {
+        "inheritedJSProtocols" : [
+          "RefineEntity"
+        ],
+        "methods" : [
+
+        ],
+        "name" : "RefineTagged",
+        "properties" : [
+
+        ]
+      },
+      {
         "jsName" : "CounterTransform",
         "methods" : [
           {
@@ -19377,7 +19602,26 @@
       },
       {
         "methods" : [
+          {
+            "abiName" : "bjs_GenericRTPoint_sum",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "sum",
+            "parameters" : [
 
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
         ],
         "name" : "GenericRTPoint",
         "properties" : [
@@ -25257,7 +25501,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsGenericRoundTrip",
             "parameters" : [
@@ -25284,7 +25530,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsGenericRoundTripClass",
             "parameters" : [
@@ -25311,7 +25559,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsGenericParsePoint",
             "parameters" : [
@@ -25338,7 +25588,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsImportPickFirst",
             "parameters" : [
@@ -25373,7 +25625,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsImportMakeInt",
             "parameters" : [
@@ -25393,8 +25647,12 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T",
-              "U"
+              {
+                "name" : "T"
+              },
+              {
+                "name" : "U"
+              }
             ],
             "name" : "jsImportCombineSecond",
             "parameters" : [
@@ -25429,7 +25687,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsGenericArrayRoundTrip",
             "parameters" : [
@@ -25464,7 +25724,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsGenericOptionalRoundTrip",
             "parameters" : [
@@ -25501,7 +25763,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsGenericDictRoundTrip",
             "parameters" : [
@@ -25536,7 +25800,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsGenericAfterOptionalArray",
             "parameters" : [
@@ -25583,7 +25849,9 @@
               "isThrows" : true
             },
             "genericParameters" : [
-              "T"
+              {
+                "name" : "T"
+              }
             ],
             "name" : "jsGenericThrowOrRoundTrip",
             "parameters" : [
@@ -25603,6 +25871,64 @@
                   }
                 }
               }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              {
+                "constraints" : [
+                  "GenericRTNode"
+                ],
+                "name" : "T"
+              }
+            ],
+            "name" : "jsGenericNodeRoundTrip",
+            "parameters" : [
+              {
+                "name" : "value",
+                "type" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "generic" : {
+                "_0" : "T"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "genericParameters" : [
+              {
+                "constraints" : [
+                  "GenericRTPosition",
+                  "GenericRTNode"
+                ],
+                "name" : "T"
+              }
+            ],
+            "name" : "jsGenericMakeNode",
+            "parameters" : [
+
             ],
             "returnType" : {
               "generic" : {
@@ -25632,7 +25958,9 @@
                   "isThrows" : true
                 },
                 "genericParameters" : [
-                  "T"
+                  {
+                    "name" : "T"
+                  }
                 ],
                 "name" : "identity",
                 "parameters" : [
@@ -25665,7 +25993,9 @@
                   "isThrows" : true
                 },
                 "genericParameters" : [
-                  "T"
+                  {
+                    "name" : "T"
+                  }
                 ],
                 "name" : "box",
                 "parameters" : [
@@ -25691,7 +26021,9 @@
             "constructor" : {
               "accessLevel" : "internal",
               "genericParameters" : [
-                "T"
+                {
+                  "name" : "T"
+                }
               ],
               "parameters" : [
                 {
@@ -25716,7 +26048,9 @@
                   "isThrows" : true
                 },
                 "genericParameters" : [
-                  "T"
+                  {
+                    "name" : "T"
+                  }
                 ],
                 "name" : "unwrap",
                 "parameters" : [
