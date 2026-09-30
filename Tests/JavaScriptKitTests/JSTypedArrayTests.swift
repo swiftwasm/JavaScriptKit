@@ -110,6 +110,84 @@ final class JSTypedArrayTests: XCTestCase {
         }
     }
 
+    func testTypedArrayWithByteOffset() {
+        // A view over part of a larger `ArrayBuffer`: `byteOffset` is non-zero and
+        // `byteLength` is smaller than the backing buffer. Copying the whole
+        // buffer instead of the view's window would both shift the bytes and
+        // write past the end of the destination, which is sized from `length`.
+        let backingLength = 32
+        let viewOffset = 8
+        let viewLength = 8
+
+        let arrayBuffer = JSObject.global.ArrayBuffer.function!.new(backingLength)
+        let wholeBuffer = JSTypedArray<UInt8>(
+            unsafelyWrapping: JSObject.global.Uint8Array.function!.new(arrayBuffer)
+        )
+        for i in 0..<backingLength {
+            wholeBuffer[i] = UInt8(0xA0 + i)
+        }
+
+        let view = JSTypedArray<UInt8>(
+            unsafelyWrapping: JSObject.global.Uint8Array.function!.new(
+                arrayBuffer,
+                viewOffset,
+                viewLength
+            )
+        )
+        XCTAssertEqual(view.length, viewLength)
+        XCTAssertEqual(view.lengthInBytes, viewLength)
+
+        let expected = (0..<viewLength).map { UInt8(0xA0 + viewOffset + $0) }
+        XCTAssertEqual(view.withUnsafeBytes { Array($0) }, expected)
+
+        // `copyMemory(to:)` must not write beyond the destination it is given.
+        let sentinel: UInt8 = 0x5A
+        let storage = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: backingLength)
+        defer { storage.deallocate() }
+        storage.initialize(repeating: sentinel)
+        let destination = UnsafeMutableBufferPointer(rebasing: storage[0..<viewLength])
+        view.copyMemory(to: destination)
+
+        XCTAssertEqual(Array(destination), expected)
+        for i in viewLength..<backingLength {
+            XCTAssertEqual(storage[i], sentinel, "copyMemory(to:) wrote past the destination at \(i)")
+        }
+    }
+
+    func testMultiByteTypedArrayWithByteOffset() {
+        // Same, with a multi-byte element type, so the destination is sized in
+        // elements while the overrun would be measured in bytes.
+        let elements: [Int32] = [1, 2, 3, 4, 5, 6, 7, 8]
+        let viewOffsetInBytes = 8
+        let viewLength = 4
+
+        let arrayBuffer = JSTypedArray<Int32>(elements).jsObject.buffer.object!
+        let view = JSTypedArray<Int32>(
+            unsafelyWrapping: JSObject.global.Int32Array.function!.new(
+                arrayBuffer,
+                viewOffsetInBytes,
+                viewLength
+            )
+        )
+        XCTAssertEqual(view.length, viewLength)
+        XCTAssertEqual(view.lengthInBytes, viewLength * MemoryLayout<Int32>.size)
+
+        let expected: [Int32] = [3, 4, 5, 6]
+        XCTAssertEqual(view.withUnsafeBytes { Array($0) }, expected)
+
+        let sentinel: Int32 = -559_038_737  // 0xDEADBEEF
+        let storage = UnsafeMutableBufferPointer<Int32>.allocate(capacity: elements.count)
+        defer { storage.deallocate() }
+        storage.initialize(repeating: sentinel)
+        let destination = UnsafeMutableBufferPointer(rebasing: storage[0..<viewLength])
+        view.copyMemory(to: destination)
+
+        XCTAssertEqual(Array(destination), expected)
+        for i in viewLength..<elements.count {
+            XCTAssertEqual(storage[i], sentinel, "copyMemory(to:) wrote past the destination at \(i)")
+        }
+    }
+
     func testCopyMemory() {
         let array = JSTypedArray<Int>(length: 100)
         for i in 0..<100 {
