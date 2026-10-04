@@ -12,10 +12,14 @@ private func runtimeCopy(_ string: String) -> String {
 @JSClass struct StringABIImports {
     @JSFunction static func jsEcho(_ value: String) throws(JSException) -> String
     @JSFunction static func jsEchoOptional(_ value: String?) throws(JSException) -> String?
+    @JSFunction static func jsEchoArray(_ value: [String]) throws(JSException) -> [String]
     @JSFunction static func runJsStringABITests() throws(JSException)
 }
 
 @JS enum StringABIExports {
+    @JS static func echo(_ value: String) -> String { value }
+    @JS static func echoOptional(_ value: String?) -> String? { value }
+    @JS static func echoArray(_ value: [String]) -> [String] { value }
     @JS static func smallEmpty() -> String { "" }
     @JS static func smallASCII() -> String { "div" }
     @JS static func smallEight() -> String { "abcdefgh" }
@@ -33,6 +37,21 @@ private func runtimeCopy(_ string: String) -> String {
 final class StringABITests: XCTestCase {
     func testRunJsStringABITests() throws {
         try StringABIImports.runJsStringABITests()
+    }
+
+    func testUnicodeAndBOMParametersAndStacks() throws {
+        let samples = [
+            "abcdefé", "abcdefgé", "abcdefghé", "abcdefghié",
+            "abc€", "abcdefg€", "abc😄", "abcdef😄", "abcdefg😄", "a\0b",
+            "\u{FEFF}x", "x\u{FEFF}", "\u{FEFF}\u{FEFF}x",
+            "\u{FEFF}abcdefghijk", "abc\u{FEFF}defghijk", "\u{FEFF}\u{FEFF}abcdefghijk",
+        ]
+        let expected = samples.map { $0.first == "\u{FEFF}" ? String($0.dropFirst()) : $0 }
+        for (input, output) in zip(samples, expected) {
+            try XCTAssertEqual(StringABIImports.jsEcho(input), output)
+            try XCTAssertEqual(StringABIImports.jsEchoOptional(input), output)
+        }
+        try XCTAssertEqual(StringABIImports.jsEchoArray(samples), expected)
     }
 
     func testImportEchoesSmallStrings() throws {

@@ -226,40 +226,177 @@ export async function createInstantiator(options, swift) {
             }
         },
         setInstance: (i) => {
+            if (memory !== i.exports.memory) immortalStrings.clear();
             instance = i;
             memory = instance.exports.memory;
 
             decodeUTF8 = (ptr, len) => { const bytes = new Uint8Array(memory.buffer, ptr >>> 0, len >>> 0); return textDecoder.decode(bytes); }
             decodeString = (() => {
-                const byteAt = (word0, word1, word2, i) => {
-                    if (i < 4) return (word0 >>> (i * 8)) & 0xff;
-                    if (i < 8) return (word1 >>> ((i - 4) * 8)) & 0xff;
-                    if (i === 8) return word2 & 0xff;
-                    return (word2 >>> 16) & 0xff;
-                };
+                const byteAt = (word0, word1, word2, byteIndex) =>
+                    byteIndex < 4
+                        ? (word0 >>> (byteIndex * 8)) & 255
+                        : byteIndex < 8
+                          ? (word1 >>> ((byteIndex - 4) * 8)) & 255
+                          : byteIndex === 8
+                            ? word2 & 255
+                            : (word2 >>> 16) & 255;
+                // Valid small Swift strings need at most ten UTF-16 code units.
                 const decodeSmallUTF8 = (word0, word1, word2, count) => {
-                    let result = "";
-                    let i = 0;
-                    while (i < count) {
-                        const b0 = byteAt(word0, word1, word2, i++);
+                    let byteIndex = 0,
+                        unitCount = 0,
+                        u0 = 0,
+                        u1 = 0,
+                        u2 = 0,
+                        u3 = 0,
+                        u4 = 0,
+                        u5 = 0,
+                        u6 = 0,
+                        u7 = 0,
+                        u8 = 0,
+                        u9 = 0;
+                    while (byteIndex < count) {
+                        const start = byteIndex;
+                        const b0 = byteAt(word0, word1, word2, byteIndex++);
                         let codePoint;
-                        if (b0 < 0x80) {
-                            codePoint = b0;
-                        } else if (b0 < 0xe0) {
-                            codePoint = ((b0 & 0x1f) << 6) | (byteAt(word0, word1, word2, i++) & 0x3f);
-                        } else if (b0 < 0xf0) {
-                            const b1 = byteAt(word0, word1, word2, i++);
-                            const b2 = byteAt(word0, word1, word2, i++);
-                            codePoint = ((b0 & 0x0f) << 12) | ((b1 & 0x3f) << 6) | (b2 & 0x3f);
+                        if (b0 < 128) codePoint = b0;
+                        else if (b0 < 224) codePoint = ((b0 & 31) << 6) | (byteAt(word0, word1, word2, byteIndex++) & 63);
+                        else if (b0 < 240) {
+                            const b1 = byteAt(word0, word1, word2, byteIndex++),
+                                b2 = byteAt(word0, word1, word2, byteIndex++);
+                            codePoint = ((b0 & 15) << 12) | ((b1 & 63) << 6) | (b2 & 63);
                         } else {
-                            const b1 = byteAt(word0, word1, word2, i++);
-                            const b2 = byteAt(word0, word1, word2, i++);
-                            const b3 = byteAt(word0, word1, word2, i++);
-                            codePoint = ((b0 & 0x07) << 18) | ((b1 & 0x3f) << 12) | ((b2 & 0x3f) << 6) | (b3 & 0x3f);
+                            const b1 = byteAt(word0, word1, word2, byteIndex++),
+                                b2 = byteAt(word0, word1, word2, byteIndex++),
+                                b3 = byteAt(word0, word1, word2, byteIndex++);
+                            codePoint = ((b0 & 7) << 18) | ((b1 & 63) << 12) | ((b2 & 63) << 6) | (b3 & 63);
                         }
-                        result += String.fromCodePoint(codePoint);
+                        // Match TextDecoder: consume exactly one leading UTF-8 BOM.
+                        if (start === 0 && codePoint === 0xfeff) continue;
+                        if (codePoint <= 0xffff) {
+                            switch (unitCount++) {
+                                case 0:
+                                    u0 = codePoint;
+                                    break;
+                                case 1:
+                                    u1 = codePoint;
+                                    break;
+                                case 2:
+                                    u2 = codePoint;
+                                    break;
+                                case 3:
+                                    u3 = codePoint;
+                                    break;
+                                case 4:
+                                    u4 = codePoint;
+                                    break;
+                                case 5:
+                                    u5 = codePoint;
+                                    break;
+                                case 6:
+                                    u6 = codePoint;
+                                    break;
+                                case 7:
+                                    u7 = codePoint;
+                                    break;
+                                case 8:
+                                    u8 = codePoint;
+                                    break;
+                                case 9:
+                                    u9 = codePoint;
+                                    break;
+                            }
+                        } else {
+                            codePoint -= 0x10000;
+                            switch (unitCount++) {
+                                case 0:
+                                    u0 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                                case 1:
+                                    u1 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                                case 2:
+                                    u2 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                                case 3:
+                                    u3 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                                case 4:
+                                    u4 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                                case 5:
+                                    u5 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                                case 6:
+                                    u6 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                                case 7:
+                                    u7 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                                case 8:
+                                    u8 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                                case 9:
+                                    u9 = 0xd800 + (codePoint >>> 10);
+                                    break;
+                            }
+                            switch (unitCount++) {
+                                case 0:
+                                    u0 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                                case 1:
+                                    u1 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                                case 2:
+                                    u2 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                                case 3:
+                                    u3 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                                case 4:
+                                    u4 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                                case 5:
+                                    u5 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                                case 6:
+                                    u6 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                                case 7:
+                                    u7 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                                case 8:
+                                    u8 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                                case 9:
+                                    u9 = 0xdc00 + (codePoint & 1023);
+                                    break;
+                            }
+                        }
                     }
-                    return result;
+                    switch (unitCount) {
+                        case 0:
+                            return "";
+                        case 1:
+                            return String.fromCharCode(u0);
+                        case 2:
+                            return String.fromCharCode(u0, u1);
+                        case 3:
+                            return String.fromCharCode(u0, u1, u2);
+                        case 4:
+                            return String.fromCharCode(u0, u1, u2, u3);
+                        case 5:
+                            return String.fromCharCode(u0, u1, u2, u3, u4);
+                        case 6:
+                            return String.fromCharCode(u0, u1, u2, u3, u4, u5);
+                        case 7:
+                            return String.fromCharCode(u0, u1, u2, u3, u4, u5, u6);
+                        case 8:
+                            return String.fromCharCode(u0, u1, u2, u3, u4, u5, u6, u7);
+                        case 9:
+                            return String.fromCharCode(u0, u1, u2, u3, u4, u5, u6, u7, u8);
+                        case 10:
+                            return String.fromCharCode(u0, u1, u2, u3, u4, u5, u6, u7, u8, u9);
+                    }
                 };
                 const decodeSmall = (word0, word1, word2) => {
                     const count = (word2 >>> 8) & 0x0f;

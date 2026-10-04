@@ -8,6 +8,7 @@ import assert from 'node:assert';
 export function getImports(importsContext) {
     return {
         jsEcho: (value) => value,
+        jsEchoArray: (value) => value,
         jsEchoOptional: (value) => value ?? null,
         runJsStringABITests: () => {
             const exports = importsContext.getExports();
@@ -37,4 +38,16 @@ export function runJsStringABITests(rootExports) {
     assert.equal(exports.immortalSubstring(), immortal.slice(10));
     assert.equal(exports.optionalNone(), null);
     assert.equal(exports.optionalSome(), immortal);
+    const expected = samples.map((s) => s.startsWith("\ufeff") ? s.slice(1) : s);
+    for (let i = 0; i < samples.length; i++) {
+        assert.equal(exports.echo(samples[i]), expected[i]);
+        assert.equal(exports.echoOptional(samples[i]), expected[i]);
+    }
+    assert.deepEqual(exports.echoArray(samples), expected);
 }
+
+const samples = [
+    "abcdefé", "abcdefgé", "abcdefghé", "abcdefghié", "abc€", "abcdefg€",
+    "abc😄", "abcdef😄", "abcdefg😄", "a\0b", "\ufeffx", "x\ufeff",
+    "\ufeff\ufeffx", "\ufeffabcdefghijk", "abc\ufeffdefghijk", "\ufeff\ufeffabcdefghijk",
+];

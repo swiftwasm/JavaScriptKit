@@ -7672,6 +7672,42 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
     }
 }
 
+@_expose(wasm, "bjs_StringABIExports_static_echo")
+@_cdecl("bjs_StringABIExports_static_echo")
+public func _bjs_StringABIExports_static_echo(_ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    let value = String.bridgeJSLiftParameter(valueBytes, valueLength)
+    let ret = StringABIExports.echo(_: value)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_echoOptional")
+@_cdecl("bjs_StringABIExports_static_echoOptional")
+public func _bjs_StringABIExports_static_echoOptional(_ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+    #if arch(wasm32)
+    let value = Optional<String>.bridgeJSLiftParameter(valueIsSome, valueBytes, valueLength)
+    let ret = StringABIExports.echoOptional(_: value)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_echoArray")
+@_cdecl("bjs_StringABIExports_static_echoArray")
+public func _bjs_StringABIExports_static_echoArray() -> Void {
+    #if arch(wasm32)
+    let value = [String].bridgeJSStackPop()
+    let ret = StringABIExports.echoArray(_: value)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_StringABIExports_static_smallEmpty")
 @_cdecl("bjs_StringABIExports_static_smallEmpty")
 public func _bjs_StringABIExports_static_smallEmpty() -> Void {
@@ -21320,6 +21356,18 @@ fileprivate func bjs_StringABIImports_jsEchoOptional_static_extern(_ valueIsSome
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StringABIImports_jsEchoArray_static")
+fileprivate func bjs_StringABIImports_jsEchoArray_static_extern() -> Void
+#else
+fileprivate func bjs_StringABIImports_jsEchoArray_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_StringABIImports_jsEchoArray_static() -> Void {
+    return bjs_StringABIImports_jsEchoArray_static_extern()
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StringABIImports_runJsStringABITests_static")
 fileprivate func bjs_StringABIImports_runJsStringABITests_static_extern() -> Void
 #else
@@ -21351,6 +21399,15 @@ func _$StringABIImports_jsEchoOptional(_ value: Optional<String>) throws(JSExcep
         throw error
     }
     return Optional<String>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$StringABIImports_jsEchoArray(_ value: [String]) throws(JSException) -> [String] {
+    let _ = value.bridgeJSLowerParameter()
+    bjs_StringABIImports_jsEchoArray_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return [String].bridgeJSLiftReturn()
 }
 
 func _$StringABIImports_runJsStringABITests() throws(JSException) -> Void {

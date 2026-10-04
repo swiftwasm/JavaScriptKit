@@ -13094,6 +13094,123 @@
         "name" : "StringABIExports",
         "staticMethods" : [
           {
+            "abiName" : "bjs_StringABIExports_static_echo",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "echo",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_echoOptional",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "echoOptional",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_echoArray",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "echoArray",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
             "abiName" : "bjs_StringABIExports_static_smallEmpty",
             "effects" : {
               "isAsync" : false,
@@ -28220,6 +28337,38 @@
                       }
                     },
                     "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsEchoArray",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    }
                   }
                 }
               },
