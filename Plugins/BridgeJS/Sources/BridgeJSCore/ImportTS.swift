@@ -927,7 +927,7 @@ extension BridgeType {
         static let float = LoweringParameterInfo(loweredParameters: [("value", .f32)])
         static let double = LoweringParameterInfo(loweredParameters: [("value", .f64)])
         static let string = LoweringParameterInfo(
-            loweredParameters: [("bytes", .i32), ("length", .i32)],
+            loweredParameters: [("word0", .i32), ("word1", .i32), ("word2", .i32)],
             useBorrowing: true
         )
         static let jsObject = LoweringParameterInfo(loweredParameters: [("value", .i32)])

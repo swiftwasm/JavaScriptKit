@@ -11,6 +11,7 @@ import { getImports as getClosureThrowsImports } from './BridgeJSRuntimeTests/Ja
 import { getImports as getClosureAsyncImports } from './BridgeJSRuntimeTests/JavaScript/ClosureAsyncTests.mjs';
 import { getImports as getSwiftClassSupportImports } from './BridgeJSRuntimeTests/JavaScript/SwiftClassSupportTests.mjs';
 import { getImports as getOptionalSupportImports } from './BridgeJSRuntimeTests/JavaScript/OptionalSupportTests.mjs';
+import { getImports as getStringABIImports } from './BridgeJSRuntimeTests/JavaScript/StringABITests.mjs';
 import { getImports as getArraySupportImports, ArrayElementObject } from './BridgeJSRuntimeTests/JavaScript/ArraySupportTests.mjs';
 import { getImports as getDictionarySupportImports } from './BridgeJSRuntimeTests/JavaScript/DictionarySupportTests.mjs';
 import { getImports as getDefaultArgumentImports } from './BridgeJSRuntimeTests/JavaScript/DefaultArgumentTests.mjs';
@@ -212,6 +213,7 @@ export async function setupOptions(options, context) {
                 ClosureAsyncImports: getClosureAsyncImports(importsContext),
                 SwiftClassSupportImports: getSwiftClassSupportImports(importsContext),
                 OptionalSupportImports: getOptionalSupportImports(importsContext),
+                StringABIImports: getStringABIImports(importsContext),
                 ArraySupportImports: getArraySupportImports(importsContext),
                 DictionarySupportImports: getDictionarySupportImports(importsContext),
                 DefaultArgumentImports: getDefaultArgumentImports(importsContext),
@@ -289,6 +291,12 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
         assert.equal(exports.roundTripBool(v), v);
     }
     for (const v of [
+        "",
+        "div",
+        "abcdefgh",
+        "abcdefghi",
+        "abcdefghij",
+        "é",
         "Hello, world!",
         "😄",
         "こんにちは",

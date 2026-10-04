@@ -423,20 +423,20 @@ func _$Promise_resolve_Si(_ promise: JSObject, _ value: Int) throws(JSException)
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "promise_resolve_TestModule_SS")
-fileprivate func promise_resolve_TestModule_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+fileprivate func promise_resolve_TestModule_SS_extern(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void
 #else
-fileprivate func promise_resolve_TestModule_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+fileprivate func promise_resolve_TestModule_SS_extern(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func promise_resolve_TestModule_SS(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return promise_resolve_TestModule_SS_extern(promise, valueBytes, valueLength)
+@inline(never) fileprivate func promise_resolve_TestModule_SS(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    return promise_resolve_TestModule_SS_extern(promise, valueWord0, valueWord1, valueWord2)
 }
 
 func _$Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException) -> Void {
-    value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+    value.bridgeJSWithLoweredParameter { (valueWord0, valueWord1, valueWord2) in
         let promiseValue = promise.bridgeJSLowerParameter()
-        promise_resolve_TestModule_SS(promiseValue, valueBytes, valueLength)
+        promise_resolve_TestModule_SS(promiseValue, valueWord0, valueWord1, valueWord2)
     }
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -571,20 +571,20 @@ func _$Promise_resolve_14AsyncDirectionO(_ promise: JSObject, _ value: AsyncDire
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "promise_resolve_TestModule_10AsyncThemeO")
-fileprivate func promise_resolve_TestModule_10AsyncThemeO_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+fileprivate func promise_resolve_TestModule_10AsyncThemeO_extern(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void
 #else
-fileprivate func promise_resolve_TestModule_10AsyncThemeO_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+fileprivate func promise_resolve_TestModule_10AsyncThemeO_extern(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func promise_resolve_TestModule_10AsyncThemeO(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return promise_resolve_TestModule_10AsyncThemeO_extern(promise, valueBytes, valueLength)
+@inline(never) fileprivate func promise_resolve_TestModule_10AsyncThemeO(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    return promise_resolve_TestModule_10AsyncThemeO_extern(promise, valueWord0, valueWord1, valueWord2)
 }
 
 func _$Promise_resolve_10AsyncThemeO(_ promise: JSObject, _ value: AsyncTheme) throws(JSException) -> Void {
-    value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+    value.bridgeJSWithLoweredParameter { (valueWord0, valueWord1, valueWord2) in
         let promiseValue = promise.bridgeJSLowerParameter()
-        promise_resolve_TestModule_10AsyncThemeO(promiseValue, valueBytes, valueLength)
+        promise_resolve_TestModule_10AsyncThemeO(promiseValue, valueWord0, valueWord1, valueWord2)
     }
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -614,20 +614,20 @@ func _$Promise_resolve_Sq14AsyncDirectionO(_ promise: JSObject, _ value: Optiona
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "promise_resolve_TestModule_Sq10AsyncThemeO")
-fileprivate func promise_resolve_TestModule_Sq10AsyncThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+fileprivate func promise_resolve_TestModule_Sq10AsyncThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void
 #else
-fileprivate func promise_resolve_TestModule_Sq10AsyncThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+fileprivate func promise_resolve_TestModule_Sq10AsyncThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func promise_resolve_TestModule_Sq10AsyncThemeO(_ promise: Int32, _ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return promise_resolve_TestModule_Sq10AsyncThemeO_extern(promise, valueIsSome, valueBytes, valueLength)
+@inline(never) fileprivate func promise_resolve_TestModule_Sq10AsyncThemeO(_ promise: Int32, _ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    return promise_resolve_TestModule_Sq10AsyncThemeO_extern(promise, valueIsSome, valueWord0, valueWord1, valueWord2)
 }
 
 func _$Promise_resolve_Sq10AsyncThemeO(_ promise: JSObject, _ value: Optional<AsyncTheme>) throws(JSException) -> Void {
-    value.bridgeJSWithLoweredParameter { (valueIsSome, valueBytes, valueLength) in
+    value.bridgeJSWithLoweredParameter { (valueIsSome, valueWord0, valueWord1, valueWord2) in
         let promiseValue = promise.bridgeJSLowerParameter()
-        promise_resolve_TestModule_Sq10AsyncThemeO(promiseValue, valueIsSome, valueBytes, valueLength)
+        promise_resolve_TestModule_Sq10AsyncThemeO(promiseValue, valueIsSome, valueWord0, valueWord1, valueWord2)
     }
     if let error = _swift_js_take_exception() { throw error }
 }

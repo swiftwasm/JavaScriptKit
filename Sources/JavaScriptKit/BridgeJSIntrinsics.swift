@@ -452,7 +452,7 @@ extension _BridgedSwiftAlias where JSRepresentation: _BridgedSwiftAssociatedValu
 
 extension _BridgedSwiftAlias where JSRepresentation == String {
     // MARK: ImportTS
-    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T {
+    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32, Int32) -> T) -> T {
         bridgeToJS().bridgeJSWithLoweredParameter(body)
     }
     @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ bytesCount: Int32) -> Self {
@@ -476,7 +476,7 @@ extension _BridgedSwiftAlias where JSRepresentation == String {
 
 extension _BridgedAsOptional where Wrapped: _BridgedSwiftAlias, Wrapped.JSRepresentation == String {
     @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(
-        _ body: (Int32, Int32, Int32) -> T
+        _ body: (Int32, Int32, Int32, Int32) -> T
     ) -> T {
         asOptional.map { $0.bridgeToJS() }.bridgeJSWithLoweredParameter(body)
     }
@@ -798,12 +798,29 @@ extension Double: _BridgedSwiftTypeLoweredIntoSingleWasmCoreType, _BridgedSwiftS
 extension String: _BridgedSwiftStackType {
     public typealias StackLiftResult = String
 
+    /// Lends the three wasm32 `String` words to `body` for the duration of a synchronous JS call.
+    ///
+    /// The 12-byte layout is a Swift stdlib implementation detail. JS interprets small-string
+    /// flags in `word2` and, for large strings, UTF-8 at `word1 + 20` (`nativeBias` on 32-bit).
+    @inline(__always)
+    fileprivate consuming func withBridgeJSRawWords<Result>(_ body: (Int32, Int32, Int32) -> Result) -> Result {
+        #if arch(wasm32)
+        return withUnsafeBytes(of: self) { bytes in
+            precondition(bytes.count == 12, "BridgeJS expects the 12-byte wasm32 String layout")
+            let word0 = bytes.load(fromByteOffset: 0, as: Int32.self)
+            let word1 = bytes.load(fromByteOffset: 4, as: Int32.self)
+            let word2 = bytes.load(fromByteOffset: 8, as: Int32.self)
+            return body(word0, word1, word2)
+        }
+        #else
+        _onlyAvailableOnWasm()
+        #endif
+    }
+
     // MARK: ImportTS
 
-    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T {
-        return self.withUTF8 { b in
-            body(Int32(bitPattern: UInt32(UInt(bitPattern: b.baseAddress))), Int32(b.count))
-        }
+    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32, Int32) -> T) -> T {
+        withBridgeJSRawWords(body)
     }
 
     @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ bytesCount: Int32) -> String {
@@ -835,14 +852,14 @@ extension String: _BridgedSwiftStackType {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
-        return self.withUTF8 { ptr in
-            _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
+        withBridgeJSRawWords { word0, word1, word2 in
+            _swift_js_return_string(word0, word1, word2)
         }
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
-        self.withUTF8 { ptr in
-            _swift_js_push_string(ptr.baseAddress, Int32(ptr.count))
+        withBridgeJSRawWords { word0, word1, word2 in
+            _swift_js_push_string(word0, word1, word2)
         }
     }
 }
@@ -1290,7 +1307,7 @@ extension _BridgedSwiftStruct {
 
 extension _BridgedSwiftEnumNoPayload where Self: RawRepresentable, RawValue == String {
     // MARK: ImportTS
-    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T {
+    @_spi(BridgeJS) public consuming func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32, Int32) -> T) -> T {
         rawValue.bridgeJSWithLoweredParameter(body)
     }
 
@@ -1348,15 +1365,15 @@ private func _swift_js_init_memory_extern(_ sourceId: Int32, _ ptr: UnsafeMutabl
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_push_string")
-private func _swift_js_push_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+private func _swift_js_push_string_extern(_ word0: Int32, _ word1: Int32, _ word2: Int32)
 #else
-private func _swift_js_push_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+private func _swift_js_push_string_extern(_ word0: Int32, _ word1: Int32, _ word2: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
 
-@_spi(BridgeJS) @inline(never) public func _swift_js_push_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
-    _swift_js_push_string_extern(ptr, len)
+@_spi(BridgeJS) @inline(never) public func _swift_js_push_string(_ word0: Int32, _ word1: Int32, _ word2: Int32) {
+    _swift_js_push_string_extern(word0, word1, word2)
 }
 
 #if arch(wasm32)
@@ -1542,15 +1559,15 @@ extension UInt: _BridgedNumericArray {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_make_js_string")
-private func _swift_js_make_js_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32
+private func _swift_js_make_js_string_extern(_ word0: Int32, _ word1: Int32, _ word2: Int32) -> Int32
 #else
-/// Creates a JavaScript string from UTF-8 data in WebAssembly memory
-private func _swift_js_make_js_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32 {
+/// Creates a JavaScript string from the wasm32 Swift `String` layout words
+private func _swift_js_make_js_string_extern(_ word0: Int32, _ word1: Int32, _ word2: Int32) -> Int32 {
     _onlyAvailableOnWasm()
 }
 #endif
-@inline(never) func _swift_js_make_js_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) -> Int32 {
-    _swift_js_make_js_string_extern(ptr, len)
+@inline(never) func _swift_js_make_js_string(_ word0: Int32, _ word1: Int32, _ word2: Int32) -> Int32 {
+    _swift_js_make_js_string_extern(word0, word1, word2)
 }
 
 #if arch(wasm32)
@@ -1568,15 +1585,15 @@ private func _swift_js_init_memory_with_result_extern(_ ptr: UnsafePointer<UInt8
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_string")
-private func _swift_js_return_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+private func _swift_js_return_string_extern(_ word0: Int32, _ word1: Int32, _ word2: Int32)
 #else
 /// Write a string to reserved string storage to be returned to JavaScript
-private func _swift_js_return_string_extern(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+private func _swift_js_return_string_extern(_ word0: Int32, _ word1: Int32, _ word2: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
-@inline(never) func _swift_js_return_string(_ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
-    _swift_js_return_string_extern(ptr, len)
+@inline(never) func _swift_js_return_string(_ word0: Int32, _ word1: Int32, _ word2: Int32) {
+    _swift_js_return_string_extern(word0, word1, word2)
 }
 
 #if arch(wasm32)
@@ -1657,15 +1674,15 @@ private func _swift_js_get_optional_string_extern() -> Int32 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "swift_js_return_optional_string")
-private func _swift_js_return_optional_string_extern(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32)
+private func _swift_js_return_optional_string_extern(_ isSome: Int32, _ word0: Int32, _ word1: Int32, _ word2: Int32)
 #else
 /// Write an optional string to reserved string storage to be returned to JavaScript
-private func _swift_js_return_optional_string_extern(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
+private func _swift_js_return_optional_string_extern(_ isSome: Int32, _ word0: Int32, _ word1: Int32, _ word2: Int32) {
     _onlyAvailableOnWasm()
 }
 #endif
-@inline(never) func _swift_js_return_optional_string(_ isSome: Int32, _ ptr: UnsafePointer<UInt8>?, _ len: Int32) {
-    _swift_js_return_optional_string_extern(isSome, ptr, len)
+@inline(never) func _swift_js_return_optional_string(_ isSome: Int32, _ word0: Int32, _ word1: Int32, _ word2: Int32) {
+    _swift_js_return_optional_string_extern(isSome, word0, word1, word2)
 }
 
 #if arch(wasm32)
@@ -2156,14 +2173,14 @@ extension _BridgedAsOptional where Wrapped == Bool {
 
 extension _BridgedAsOptional where Wrapped == String {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSWithLoweredParameter<T>(
-        _ body: (Int32, Int32, Int32) -> T
+        _ body: (Int32, Int32, Int32, Int32) -> T
     ) -> T {
         switch asOptional {
         case .none:
-            return body(0, 0, 0)
+            return body(0, 0, 0, 0)
         case .some(let value):
-            return value.bridgeJSWithLoweredParameter { bytes, count in
-                return body(1, bytes, count)
+            return value.bridgeJSWithLoweredParameter { word0, word1, word2 in
+                return body(1, word0, word1, word2)
             }
         }
     }
@@ -2194,10 +2211,10 @@ extension _BridgedAsOptional where Wrapped == String {
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         switch asOptional {
         case .none:
-            _swift_js_return_optional_string(0, nil, 0)
-        case .some(var value):
-            value.withUTF8 { ptr in
-                _swift_js_return_optional_string(1, ptr.baseAddress, Int32(ptr.count))
+            _swift_js_return_optional_string(0, 0, 0, 0)
+        case .some(let value):
+            value.withBridgeJSRawWords { word0, word1, word2 in
+                _swift_js_return_optional_string(1, word0, word1, word2)
             }
         }
     }
@@ -2358,14 +2375,14 @@ extension _BridgedAsOptional where Wrapped: _BridgedSwiftCaseEnum {
 extension _BridgedAsOptional
 where Wrapped: _BridgedSwiftEnumNoPayload, Wrapped: RawRepresentable, Wrapped.RawValue == String {
     @_spi(BridgeJS) @_transparent public consuming func bridgeJSWithLoweredParameter<T>(
-        _ body: (Int32, Int32, Int32) -> T
+        _ body: (Int32, Int32, Int32, Int32) -> T
     ) -> T {
         switch asOptional {
         case .none:
-            return body(0, 0, 0)
+            return body(0, 0, 0, 0)
         case .some(let wrapped):
-            return wrapped.bridgeJSWithLoweredParameter { bytes, count in
-                return body(1, bytes, count)
+            return wrapped.bridgeJSWithLoweredParameter { word0, word1, word2 in
+                return body(1, word0, word1, word2)
             }
         }
     }

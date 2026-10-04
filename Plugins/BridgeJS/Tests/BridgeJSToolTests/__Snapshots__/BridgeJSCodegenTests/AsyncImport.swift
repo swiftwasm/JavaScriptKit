@@ -124,14 +124,14 @@ public func _invoke_swift_closure_TestModule_10TestModules8JSObjectC_y(_ boxPtr:
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_TestModule_10TestModulesSS_y")
-fileprivate func invoke_js_callback_TestModule_10TestModulesSS_y_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void
+fileprivate func invoke_js_callback_TestModule_10TestModulesSS_y_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_TestModule_10TestModulesSS_y_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
+fileprivate func invoke_js_callback_TestModule_10TestModulesSS_y_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModulesSS_y(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
-    return invoke_js_callback_TestModule_10TestModulesSS_y_extern(callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_TestModule_10TestModulesSS_y(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
+    return invoke_js_callback_TestModule_10TestModulesSS_y_extern(callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -151,9 +151,9 @@ private enum _BJS_Closure_10TestModulesSS_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+            param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                invoke_js_callback_TestModule_10TestModulesSS_y(callbackValue, param0Bytes, param0Length)
+                invoke_js_callback_TestModule_10TestModulesSS_y(callbackValue, param0Word0, param0Word1, param0Word2)
             }
             #else
             fatalError("Only available on WebAssembly")
@@ -479,14 +479,14 @@ func _$asyncRoundTripInt(_ v: Int) async throws(JSException) -> Int {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_asyncRoundTripString")
-fileprivate func bjs_asyncRoundTripString_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void
+fileprivate func bjs_asyncRoundTripString_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void
 #else
-fileprivate func bjs_asyncRoundTripString_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+fileprivate func bjs_asyncRoundTripString_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_asyncRoundTripString(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
-    return bjs_asyncRoundTripString_extern(resolveRef, rejectRef, vBytes, vLength)
+@inline(never) fileprivate func bjs_asyncRoundTripString(_ resolveRef: Int32, _ rejectRef: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void {
+    return bjs_asyncRoundTripString_extern(resolveRef, rejectRef, vWord0, vWord1, vWord2)
 }
 
 func _$asyncRoundTripString(_ v: String) async throws(JSException) -> String {
@@ -495,8 +495,8 @@ func _$asyncRoundTripString(_ v: String) async throws(JSException) -> String {
         }, makeRejectClosure: {
             JSTypedClosure<(sending JSValue) -> Void>.sending($0)
         }) { resolveRef, rejectRef in
-        v.bridgeJSWithLoweredParameter { (vBytes, vLength) in
-            bjs_asyncRoundTripString(resolveRef, rejectRef, vBytes, vLength)
+        v.bridgeJSWithLoweredParameter { (vWord0, vWord1, vWord2) in
+            bjs_asyncRoundTripString(resolveRef, rejectRef, vWord0, vWord1, vWord2)
         }
     }
     return resolved

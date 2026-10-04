@@ -202,14 +202,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests13D
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS_extern(callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS_extern(callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -229,9 +229,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests5ThemeO_SS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS(callbackValue, param0Bytes, param0Length)
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS(callbackValue, param0Word0, param0Word1, param0Word2)
                 return ret
             }
             let ret = ret0
@@ -269,14 +269,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5Th
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb_extern(callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb_extern(callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -296,9 +296,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTests5ThemeO_Sb {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb(callbackValue, param0Bytes, param0Length)
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_Sb(callbackValue, param0Word0, param0Word1, param0Word2)
                 return ret
             }
             let ret = ret0
@@ -846,14 +846,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsAl7
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb_extern(callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb_extern(callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -873,9 +873,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsKSS_Sb {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] (param0: String) throws(JSException) -> Bool in
             #if arch(wasm32)
-            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb(callbackValue, param0Bytes, param0Length)
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Sb(callbackValue, param0Word0, param0Word1, param0Word2)
                 return ret
             }
             let ret = ret0
@@ -930,14 +930,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si_extern(callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si_extern(callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -957,9 +957,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsKSS_Si {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] (param0: String) throws(JSException) -> Int in
             #if arch(wasm32)
-            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si(callbackValue, param0Bytes, param0Length)
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS_Si(callbackValue, param0Word0, param0Word1, param0Word2)
                 return ret
             }
             let ret = ret0
@@ -1014,14 +1014,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsKSS
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> UnsafeMutableRawPointer
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> UnsafeMutableRawPointer
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> UnsafeMutableRawPointer {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> UnsafeMutableRawPointer {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> UnsafeMutableRawPointer {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC_extern(callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> UnsafeMutableRawPointer {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC_extern(callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -1041,9 +1041,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_7GreeterC {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC(callbackValue, param0Bytes, param0Length)
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_7GreeterC(callbackValue, param0Word0, param0Word1, param0Word2)
                 return ret
             }
             let ret = ret0
@@ -1081,14 +1081,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS_extern(callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS_extern(callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -1108,9 +1108,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSS_SS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS(callbackValue, param0Bytes, param0Length)
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_SS(callbackValue, param0Word0, param0Word1, param0Word2)
                 return ret
             }
             let ret = ret0
@@ -1726,14 +1726,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSd_
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS_extern(_ callback: Int32, _ param0: Int32, _ param1Bytes: Int32, _ param1Length: Int32, _ param2: Float64) -> Int32
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS_extern(_ callback: Int32, _ param0: Int32, _ param1Word0: Int32, _ param1Word1: Int32, _ param1Word2: Int32, _ param2: Float64) -> Int32
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS_extern(_ callback: Int32, _ param0: Int32, _ param1Bytes: Int32, _ param1Length: Int32, _ param2: Float64) -> Int32 {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS_extern(_ callback: Int32, _ param0: Int32, _ param1Word0: Int32, _ param1Word1: Int32, _ param1Word2: Int32, _ param2: Float64) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS(_ callback: Int32, _ param0: Int32, _ param1Bytes: Int32, _ param1Length: Int32, _ param2: Float64) -> Int32 {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS_extern(callback, param0, param1Bytes, param1Length, param2)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS(_ callback: Int32, _ param0: Int32, _ param1Word0: Int32, _ param1Word1: Int32, _ param1Word2: Int32, _ param2: Float64) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS_extern(callback, param0, param1Word0, param1Word1, param1Word2, param2)
 }
 
 #if arch(wasm32)
@@ -1753,11 +1753,11 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSiSSSd_SS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] (param0, param1, param2) in
             #if arch(wasm32)
-            let ret0 = param1.bridgeJSWithLoweredParameter { (param1Bytes, param1Length) in
+            let ret0 = param1.bridgeJSWithLoweredParameter { (param1Word0, param1Word1, param1Word2) in
                 let param2Value = param2.bridgeJSLowerParameter()
                 let param0Value = param0.bridgeJSLowerParameter()
                 let callbackValue = callback.bridgeJSLowerParameter()
-                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS(callbackValue, param0Value, param1Bytes, param1Length, param2Value)
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSiSSSd_SS(callbackValue, param0Value, param1Word0, param1Word1, param1Word2, param2Value)
                 return ret
             }
             let ret = ret0
@@ -2126,14 +2126,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq1
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(_ callback: Int32, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS_extern(callback, param0IsSome, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(_ callback: Int32, _ param0IsSome: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS_extern(callback, param0IsSome, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -2153,9 +2153,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSq5ThemeO_SS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let ret0 = param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Bytes, param0Length) in
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(callbackValue, param0IsSome, param0Bytes, param0Length)
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq5ThemeO_SS(callbackValue, param0IsSome, param0Word0, param0Word1, param0Word2)
                 return ret
             }
             let ret = ret0
@@ -2449,14 +2449,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq9
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS(_ callback: Int32, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Int32 {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS_extern(callback, param0IsSome, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS(_ callback: Int32, _ param0IsSome: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS_extern(callback, param0IsSome, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -2476,9 +2476,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsSqSS_SS {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            let ret0 = param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Bytes, param0Length) in
+            let ret0 = param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS(callbackValue, param0IsSome, param0Bytes, param0Length)
+                let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqSS_SS(callbackValue, param0IsSome, param0Word0, param0Word1, param0Word2)
                 return ret
             }
             let ret = ret0
@@ -2580,14 +2580,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSqS
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS_extern(resolveRef, rejectRef, callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS_extern(resolveRef, rejectRef, callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -2612,9 +2612,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsYaKSS_SS {
                 }, makeRejectClosure: {
                     JSTypedClosure<(sending JSValue) -> Void>.sending($0)
                 }) { resolveRef, rejectRef in
-                param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                     let callbackValue = callback.bridgeJSLowerParameter()
-                    invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS(resolveRef, rejectRef, callbackValue, param0Bytes, param0Length)
+                    invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_SS(resolveRef, rejectRef, callbackValue, param0Word0, param0Word1, param0Word2)
                 }
             }
             return resolved
@@ -2652,14 +2652,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaK
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y_extern(resolveRef, rejectRef, callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y_extern(resolveRef, rejectRef, callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -2684,9 +2684,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsYaKSS_y {
                 }, makeRejectClosure: {
                     JSTypedClosure<(sending JSValue) -> Void>.sending($0)
                 }) { resolveRef, rejectRef in
-                param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                     let callbackValue = callback.bridgeJSLowerParameter()
-                    invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y(resolveRef, rejectRef, callbackValue, param0Bytes, param0Length)
+                    invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaKSS_y(resolveRef, rejectRef, callbackValue, param0Word0, param0Word1, param0Word2)
                 }
             }
             #else
@@ -2794,14 +2794,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaK
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS_extern(resolveRef, rejectRef, callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS(_ resolveRef: Int32, _ rejectRef: Int32, _ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS_extern(resolveRef, rejectRef, callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -2826,9 +2826,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestsYaSS_SS {
                 }, makeRejectClosure: {
                     JSTypedClosure<(sending JSValue) -> Void>.sending($0)
                 }) { resolveRef, rejectRef in
-                param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+                param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                     let callbackValue = callback.bridgeJSLowerParameter()
-                    invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS(resolveRef, rejectRef, callbackValue, param0Bytes, param0Length)
+                    invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaSS_SS(resolveRef, rejectRef, callbackValue, param0Word0, param0Word1, param0Word2)
                 }
             }
             return resolved
@@ -3008,14 +3008,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsYaS
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y_extern(callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y_extern(callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -3035,9 +3035,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestss11FeatureFlagO_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+            param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y(callbackValue, param0Bytes, param0Length)
+                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11FeatureFlagO_y(callbackValue, param0Word0, param0Word1, param0Word2)
             }
             #else
             fatalError("Only available on WebAssembly")
@@ -3381,14 +3381,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss9D
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y_extern(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y(_ callback: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y_extern(callback, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y_extern(callback, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -3408,9 +3408,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestssSS_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            param0.bridgeJSWithLoweredParameter { (param0Bytes, param0Length) in
+            param0.bridgeJSWithLoweredParameter { (param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y(callbackValue, param0Bytes, param0Length)
+                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS_y(callbackValue, param0Word0, param0Word1, param0Word2)
             }
             #else
             fatalError("Only available on WebAssembly")
@@ -3878,14 +3878,14 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y")
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void
 #else
-fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y(_ callback: Int32, _ param0IsSome: Int32, _ param0Bytes: Int32, _ param0Length: Int32) -> Void {
-    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y_extern(callback, param0IsSome, param0Bytes, param0Length)
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y(_ callback: Int32, _ param0IsSome: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y_extern(callback, param0IsSome, param0Word0, param0Word1, param0Word2)
 }
 
 #if arch(wasm32)
@@ -3905,9 +3905,9 @@ private enum _BJS_Closure_20BridgeJSRuntimeTestssSqSS_y {
         let callback = JSObject.bridgeJSLiftParameter(callbackId)
         return { [callback] param0 in
             #if arch(wasm32)
-            param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Bytes, param0Length) in
+            param0.bridgeJSWithLoweredParameter { (param0IsSome, param0Word0, param0Word1, param0Word2) in
                 let callbackValue = callback.bridgeJSLowerParameter()
-                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y(callbackValue, param0IsSome, param0Bytes, param0Length)
+                invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSS_y(callbackValue, param0IsSome, param0Word0, param0Word1, param0Word2)
             }
             #else
             fatalError("Only available on WebAssembly")
@@ -4308,10 +4308,10 @@ extension DataProcessor where Self: _BridgedSwiftProtocolWrapper {
     }
 
     func setLabelElements(_ labelPrefix: String, _ labelSuffix: String) -> Void {
-        labelPrefix.bridgeJSWithLoweredParameter { (labelPrefixBytes, labelPrefixLength) in
-            labelSuffix.bridgeJSWithLoweredParameter { (labelSuffixBytes, labelSuffixLength) in
+        labelPrefix.bridgeJSWithLoweredParameter { (labelPrefixWord0, labelPrefixWord1, labelPrefixWord2) in
+            labelSuffix.bridgeJSWithLoweredParameter { (labelSuffixWord0, labelSuffixWord1, labelSuffixWord2) in
                 let jsObjectValue = jsObject.bridgeJSLowerParameter()
-                bjs_DataProcessor_setLabelElements(jsObjectValue, labelPrefixBytes, labelPrefixLength, labelSuffixBytes, labelSuffixLength)
+                bjs_DataProcessor_setLabelElements(jsObjectValue, labelPrefixWord0, labelPrefixWord1, labelPrefixWord2, labelSuffixWord0, labelSuffixWord1, labelSuffixWord2)
             }
         }
     }
@@ -4394,9 +4394,9 @@ extension DataProcessor where Self: _BridgedSwiftProtocolWrapper {
             return Optional<String>.bridgeJSLiftReturnFromSideChannel()
         }
         set {
-            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueWord0, newValueWord1, newValueWord2) in
                 let jsObjectValue = jsObject.bridgeJSLowerParameter()
-                bjs_DataProcessor_optionalTag_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
+                bjs_DataProcessor_optionalTag_set(jsObjectValue, newValueIsSome, newValueWord0, newValueWord1, newValueWord2)
             }
         }
     }
@@ -4434,9 +4434,9 @@ extension DataProcessor where Self: _BridgedSwiftProtocolWrapper {
             return Optional<Theme>.bridgeJSLiftReturnFromSideChannel()
         }
         set {
-            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueWord0, newValueWord1, newValueWord2) in
                 let jsObjectValue = jsObject.bridgeJSLowerParameter()
-                bjs_DataProcessor_optionalTheme_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
+                bjs_DataProcessor_optionalTheme_set(jsObjectValue, newValueIsSome, newValueWord0, newValueWord1, newValueWord2)
             }
         }
     }
@@ -4528,14 +4528,14 @@ fileprivate func bjs_DataProcessor_getValue_extern(_ jsObject: Int32) -> Int32 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_setLabelElements")
-fileprivate func bjs_DataProcessor_setLabelElements_extern(_ jsObject: Int32, _ labelPrefixBytes: Int32, _ labelPrefixLength: Int32, _ labelSuffixBytes: Int32, _ labelSuffixLength: Int32) -> Void
+fileprivate func bjs_DataProcessor_setLabelElements_extern(_ jsObject: Int32, _ labelPrefixWord0: Int32, _ labelPrefixWord1: Int32, _ labelPrefixWord2: Int32, _ labelSuffixWord0: Int32, _ labelSuffixWord1: Int32, _ labelSuffixWord2: Int32) -> Void
 #else
-fileprivate func bjs_DataProcessor_setLabelElements_extern(_ jsObject: Int32, _ labelPrefixBytes: Int32, _ labelPrefixLength: Int32, _ labelSuffixBytes: Int32, _ labelSuffixLength: Int32) -> Void {
+fileprivate func bjs_DataProcessor_setLabelElements_extern(_ jsObject: Int32, _ labelPrefixWord0: Int32, _ labelPrefixWord1: Int32, _ labelPrefixWord2: Int32, _ labelSuffixWord0: Int32, _ labelSuffixWord1: Int32, _ labelSuffixWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_DataProcessor_setLabelElements(_ jsObject: Int32, _ labelPrefixBytes: Int32, _ labelPrefixLength: Int32, _ labelSuffixBytes: Int32, _ labelSuffixLength: Int32) -> Void {
-    return bjs_DataProcessor_setLabelElements_extern(jsObject, labelPrefixBytes, labelPrefixLength, labelSuffixBytes, labelSuffixLength)
+@inline(never) fileprivate func bjs_DataProcessor_setLabelElements(_ jsObject: Int32, _ labelPrefixWord0: Int32, _ labelPrefixWord1: Int32, _ labelPrefixWord2: Int32, _ labelSuffixWord0: Int32, _ labelSuffixWord1: Int32, _ labelSuffixWord2: Int32) -> Void {
+    return bjs_DataProcessor_setLabelElements_extern(jsObject, labelPrefixWord0, labelPrefixWord1, labelPrefixWord2, labelSuffixWord0, labelSuffixWord1, labelSuffixWord2)
 }
 
 #if arch(wasm32)
@@ -4684,14 +4684,14 @@ fileprivate func bjs_DataProcessor_optionalTag_get_extern(_ jsObject: Int32) -> 
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalTag_set")
-fileprivate func bjs_DataProcessor_optionalTag_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_DataProcessor_optionalTag_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_DataProcessor_optionalTag_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_DataProcessor_optionalTag_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_DataProcessor_optionalTag_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_DataProcessor_optionalTag_set_extern(jsObject, newValueIsSome, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_DataProcessor_optionalTag_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_DataProcessor_optionalTag_set_extern(jsObject, newValueIsSome, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -4756,14 +4756,14 @@ fileprivate func bjs_DataProcessor_optionalTheme_get_extern(_ jsObject: Int32) -
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_optionalTheme_set")
-fileprivate func bjs_DataProcessor_optionalTheme_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_DataProcessor_optionalTheme_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_DataProcessor_optionalTheme_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_DataProcessor_optionalTheme_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_DataProcessor_optionalTheme_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_DataProcessor_optionalTheme_set_extern(jsObject, newValueIsSome, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_DataProcessor_optionalTheme_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_DataProcessor_optionalTheme_set_extern(jsObject, newValueIsSome, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -7670,6 +7670,138 @@ extension APIOptionalResult: _BridgedSwiftAssociatedValueEnum {
             return Int32(2)
         }
     }
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_smallEmpty")
+@_cdecl("bjs_StringABIExports_static_smallEmpty")
+public func _bjs_StringABIExports_static_smallEmpty() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.smallEmpty()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_smallASCII")
+@_cdecl("bjs_StringABIExports_static_smallASCII")
+public func _bjs_StringABIExports_static_smallASCII() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.smallASCII()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_smallEight")
+@_cdecl("bjs_StringABIExports_static_smallEight")
+public func _bjs_StringABIExports_static_smallEight() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.smallEight()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_smallNine")
+@_cdecl("bjs_StringABIExports_static_smallNine")
+public func _bjs_StringABIExports_static_smallNine() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.smallNine()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_smallTen")
+@_cdecl("bjs_StringABIExports_static_smallTen")
+public func _bjs_StringABIExports_static_smallTen() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.smallTen()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_smallUTF8")
+@_cdecl("bjs_StringABIExports_static_smallUTF8")
+public func _bjs_StringABIExports_static_smallUTF8() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.smallUTF8()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_largeImmortal")
+@_cdecl("bjs_StringABIExports_static_largeImmortal")
+public func _bjs_StringABIExports_static_largeImmortal() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.largeImmortal()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_largeImmortalAgain")
+@_cdecl("bjs_StringABIExports_static_largeImmortalAgain")
+public func _bjs_StringABIExports_static_largeImmortalAgain() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.largeImmortalAgain()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_largeDynamic")
+@_cdecl("bjs_StringABIExports_static_largeDynamic")
+public func _bjs_StringABIExports_static_largeDynamic() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.largeDynamic()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_immortalSubstring")
+@_cdecl("bjs_StringABIExports_static_immortalSubstring")
+public func _bjs_StringABIExports_static_immortalSubstring() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.immortalSubstring()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_optionalNone")
+@_cdecl("bjs_StringABIExports_static_optionalNone")
+public func _bjs_StringABIExports_static_optionalNone() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.optionalNone()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_StringABIExports_static_optionalSome")
+@_cdecl("bjs_StringABIExports_static_optionalSome")
+public func _bjs_StringABIExports_static_optionalSome() -> Void {
+    #if arch(wasm32)
+    let ret = StringABIExports.optionalSome()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
 }
 
 extension JSCoordinate: _BridgedSwiftStruct {
@@ -16234,20 +16366,20 @@ func _$Promise_reject(_ promise: JSObject, _ value: JSValue) throws(JSException)
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_SS")
-fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void
 #else
-fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+fileprivate func promise_resolve_BridgeJSRuntimeTests_SS_extern(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_SS(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return promise_resolve_BridgeJSRuntimeTests_SS_extern(promise, valueBytes, valueLength)
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_SS(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_SS_extern(promise, valueWord0, valueWord1, valueWord2)
 }
 
 func _$Promise_resolve_SS(_ promise: JSObject, _ value: String) throws(JSException) -> Void {
-    value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+    value.bridgeJSWithLoweredParameter { (valueWord0, valueWord1, valueWord2) in
         let promiseValue = promise.bridgeJSLowerParameter()
-        promise_resolve_BridgeJSRuntimeTests_SS(promiseValue, valueBytes, valueLength)
+        promise_resolve_BridgeJSRuntimeTests_SS(promiseValue, valueWord0, valueWord1, valueWord2)
     }
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -16402,20 +16534,20 @@ func _$Promise_resolve_8JSObjectC(_ promise: JSObject, _ value: JSObject) throws
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_5ThemeO")
-fileprivate func promise_resolve_BridgeJSRuntimeTests_5ThemeO_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+fileprivate func promise_resolve_BridgeJSRuntimeTests_5ThemeO_extern(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void
 #else
-fileprivate func promise_resolve_BridgeJSRuntimeTests_5ThemeO_extern(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+fileprivate func promise_resolve_BridgeJSRuntimeTests_5ThemeO_extern(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_5ThemeO(_ promise: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return promise_resolve_BridgeJSRuntimeTests_5ThemeO_extern(promise, valueBytes, valueLength)
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_5ThemeO(_ promise: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_5ThemeO_extern(promise, valueWord0, valueWord1, valueWord2)
 }
 
 func _$Promise_resolve_5ThemeO(_ promise: JSObject, _ value: Theme) throws(JSException) -> Void {
-    value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+    value.bridgeJSWithLoweredParameter { (valueWord0, valueWord1, valueWord2) in
         let promiseValue = promise.bridgeJSLowerParameter()
-        promise_resolve_BridgeJSRuntimeTests_5ThemeO(promiseValue, valueBytes, valueLength)
+        promise_resolve_BridgeJSRuntimeTests_5ThemeO(promiseValue, valueWord0, valueWord1, valueWord2)
     }
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -16445,20 +16577,20 @@ func _$Promise_resolve_9DirectionO(_ promise: JSObject, _ value: Direction) thro
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO")
-fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void
 #else
-fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO_extern(_ promise: Int32, _ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO(_ promise: Int32, _ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO_extern(promise, valueIsSome, valueBytes, valueLength)
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO(_ promise: Int32, _ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO_extern(promise, valueIsSome, valueWord0, valueWord1, valueWord2)
 }
 
 func _$Promise_resolve_Sq5ThemeO(_ promise: JSObject, _ value: Optional<Theme>) throws(JSException) -> Void {
-    value.bridgeJSWithLoweredParameter { (valueIsSome, valueBytes, valueLength) in
+    value.bridgeJSWithLoweredParameter { (valueIsSome, valueWord0, valueWord1, valueWord2) in
         let promiseValue = promise.bridgeJSLowerParameter()
-        promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO(promiseValue, valueIsSome, valueBytes, valueLength)
+        promise_resolve_BridgeJSRuntimeTests_Sq5ThemeO(promiseValue, valueIsSome, valueWord0, valueWord1, valueWord2)
     }
     if let error = _swift_js_take_exception() { throw error }
 }
@@ -16802,14 +16934,14 @@ extension Boxed: _BridgedSwiftAlias, _BridgedSwiftStackType {}
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Surface_init")
-fileprivate func bjs_Surface_init_extern(_ labelBytes: Int32, _ labelLength: Int32) -> Int32
+fileprivate func bjs_Surface_init_extern(_ labelWord0: Int32, _ labelWord1: Int32, _ labelWord2: Int32) -> Int32
 #else
-fileprivate func bjs_Surface_init_extern(_ labelBytes: Int32, _ labelLength: Int32) -> Int32 {
+fileprivate func bjs_Surface_init_extern(_ labelWord0: Int32, _ labelWord1: Int32, _ labelWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_Surface_init(_ labelBytes: Int32, _ labelLength: Int32) -> Int32 {
-    return bjs_Surface_init_extern(labelBytes, labelLength)
+@inline(never) fileprivate func bjs_Surface_init(_ labelWord0: Int32, _ labelWord1: Int32, _ labelWord2: Int32) -> Int32 {
+    return bjs_Surface_init_extern(labelWord0, labelWord1, labelWord2)
 }
 
 #if arch(wasm32)
@@ -16825,8 +16957,8 @@ fileprivate func bjs_Surface_label_get_extern(_ self: Int32) -> Int32 {
 }
 
 func _$Surface_init(_ label: String) throws(JSException) -> JSObject {
-    let ret0 = label.bridgeJSWithLoweredParameter { (labelBytes, labelLength) in
-        let ret = bjs_Surface_init(labelBytes, labelLength)
+    let ret0 = label.bridgeJSWithLoweredParameter { (labelWord0, labelWord1, labelWord2) in
+        let ret = bjs_Surface_init(labelWord0, labelWord1, labelWord2)
         return ret
     }
     let ret = ret0
@@ -16847,38 +16979,38 @@ func _$Surface_label_get(_ self: JSObject) throws(JSException) -> String {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AliasImports_jsRoundTripTagged_static")
-fileprivate func bjs_AliasImports_jsRoundTripTagged_static_extern(_ valueBytes: Int32, _ valueLength: Int32) -> Int32
+fileprivate func bjs_AliasImports_jsRoundTripTagged_static_extern(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32
 #else
-fileprivate func bjs_AliasImports_jsRoundTripTagged_static_extern(_ valueBytes: Int32, _ valueLength: Int32) -> Int32 {
+fileprivate func bjs_AliasImports_jsRoundTripTagged_static_extern(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_AliasImports_jsRoundTripTagged_static(_ valueBytes: Int32, _ valueLength: Int32) -> Int32 {
-    return bjs_AliasImports_jsRoundTripTagged_static_extern(valueBytes, valueLength)
+@inline(never) fileprivate func bjs_AliasImports_jsRoundTripTagged_static(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32 {
+    return bjs_AliasImports_jsRoundTripTagged_static_extern(valueWord0, valueWord1, valueWord2)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AliasImports_jsRoundTripOptionalTagged_static")
-fileprivate func bjs_AliasImports_jsRoundTripOptionalTagged_static_extern(_ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+fileprivate func bjs_AliasImports_jsRoundTripOptionalTagged_static_extern(_ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void
 #else
-fileprivate func bjs_AliasImports_jsRoundTripOptionalTagged_static_extern(_ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+fileprivate func bjs_AliasImports_jsRoundTripOptionalTagged_static_extern(_ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_AliasImports_jsRoundTripOptionalTagged_static(_ valueIsSome: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return bjs_AliasImports_jsRoundTripOptionalTagged_static_extern(valueIsSome, valueBytes, valueLength)
+@inline(never) fileprivate func bjs_AliasImports_jsRoundTripOptionalTagged_static(_ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    return bjs_AliasImports_jsRoundTripOptionalTagged_static_extern(valueIsSome, valueWord0, valueWord1, valueWord2)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AliasImports_jsProduceOptionalCanvas_static")
-fileprivate func bjs_AliasImports_jsProduceOptionalCanvas_static_extern(_ labelIsSome: Int32, _ labelBytes: Int32, _ labelLength: Int32) -> Void
+fileprivate func bjs_AliasImports_jsProduceOptionalCanvas_static_extern(_ labelIsSome: Int32, _ labelWord0: Int32, _ labelWord1: Int32, _ labelWord2: Int32) -> Void
 #else
-fileprivate func bjs_AliasImports_jsProduceOptionalCanvas_static_extern(_ labelIsSome: Int32, _ labelBytes: Int32, _ labelLength: Int32) -> Void {
+fileprivate func bjs_AliasImports_jsProduceOptionalCanvas_static_extern(_ labelIsSome: Int32, _ labelWord0: Int32, _ labelWord1: Int32, _ labelWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_AliasImports_jsProduceOptionalCanvas_static(_ labelIsSome: Int32, _ labelBytes: Int32, _ labelLength: Int32) -> Void {
-    return bjs_AliasImports_jsProduceOptionalCanvas_static_extern(labelIsSome, labelBytes, labelLength)
+@inline(never) fileprivate func bjs_AliasImports_jsProduceOptionalCanvas_static(_ labelIsSome: Int32, _ labelWord0: Int32, _ labelWord1: Int32, _ labelWord2: Int32) -> Void {
+    return bjs_AliasImports_jsProduceOptionalCanvas_static_extern(labelIsSome, labelWord0, labelWord1, labelWord2)
 }
 
 #if arch(wasm32)
@@ -16942,8 +17074,8 @@ fileprivate func bjs_AliasImports_jsRoundTripOptionalUserId_static_extern(_ valu
 }
 
 func _$AliasImports_jsRoundTripTagged(_ value: Tagged) throws(JSException) -> Tagged {
-    let ret0 = value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
-        let ret = bjs_AliasImports_jsRoundTripTagged_static(valueBytes, valueLength)
+    let ret0 = value.bridgeJSWithLoweredParameter { (valueWord0, valueWord1, valueWord2) in
+        let ret = bjs_AliasImports_jsRoundTripTagged_static(valueWord0, valueWord1, valueWord2)
         return ret
     }
     let ret = ret0
@@ -16954,8 +17086,8 @@ func _$AliasImports_jsRoundTripTagged(_ value: Tagged) throws(JSException) -> Ta
 }
 
 func _$AliasImports_jsRoundTripOptionalTagged(_ value: Optional<Tagged>) throws(JSException) -> Optional<Tagged> {
-    value.bridgeJSWithLoweredParameter { (valueIsSome, valueBytes, valueLength) in
-        bjs_AliasImports_jsRoundTripOptionalTagged_static(valueIsSome, valueBytes, valueLength)
+    value.bridgeJSWithLoweredParameter { (valueIsSome, valueWord0, valueWord1, valueWord2) in
+        bjs_AliasImports_jsRoundTripOptionalTagged_static(valueIsSome, valueWord0, valueWord1, valueWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -16964,8 +17096,8 @@ func _$AliasImports_jsRoundTripOptionalTagged(_ value: Optional<Tagged>) throws(
 }
 
 func _$AliasImports_jsProduceOptionalCanvas(_ label: Optional<String>) throws(JSException) -> Optional<Canvas> {
-    label.bridgeJSWithLoweredParameter { (labelIsSome, labelBytes, labelLength) in
-        bjs_AliasImports_jsProduceOptionalCanvas_static(labelIsSome, labelBytes, labelLength)
+    label.bridgeJSWithLoweredParameter { (labelIsSome, labelWord0, labelWord1, labelWord2) in
+        bjs_AliasImports_jsProduceOptionalCanvas_static(labelIsSome, labelWord0, labelWord1, labelWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -17020,14 +17152,14 @@ func _$AliasImports_jsRoundTripOptionalUserId(_ value: Optional<UserId>) throws(
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ArrayElementObject_init")
-fileprivate func bjs_ArrayElementObject_init_extern(_ idBytes: Int32, _ idLength: Int32) -> Int32
+fileprivate func bjs_ArrayElementObject_init_extern(_ idWord0: Int32, _ idWord1: Int32, _ idWord2: Int32) -> Int32
 #else
-fileprivate func bjs_ArrayElementObject_init_extern(_ idBytes: Int32, _ idLength: Int32) -> Int32 {
+fileprivate func bjs_ArrayElementObject_init_extern(_ idWord0: Int32, _ idWord1: Int32, _ idWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_ArrayElementObject_init(_ idBytes: Int32, _ idLength: Int32) -> Int32 {
-    return bjs_ArrayElementObject_init_extern(idBytes, idLength)
+@inline(never) fileprivate func bjs_ArrayElementObject_init(_ idWord0: Int32, _ idWord1: Int32, _ idWord2: Int32) -> Int32 {
+    return bjs_ArrayElementObject_init_extern(idWord0, idWord1, idWord2)
 }
 
 #if arch(wasm32)
@@ -17043,8 +17175,8 @@ fileprivate func bjs_ArrayElementObject_id_get_extern(_ self: Int32) -> Int32 {
 }
 
 func _$ArrayElementObject_init(_ id: String) throws(JSException) -> JSObject {
-    let ret0 = id.bridgeJSWithLoweredParameter { (idBytes, idLength) in
-        let ret = bjs_ArrayElementObject_init(idBytes, idLength)
+    let ret0 = id.bridgeJSWithLoweredParameter { (idWord0, idWord1, idWord2) in
+        let ret = bjs_ArrayElementObject_init(idWord0, idWord1, idWord2)
         return ret
     }
     let ret = ret0
@@ -17455,26 +17587,26 @@ fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripBool_static_extern(_ res
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AsyncImportImports_jsAsyncRoundTripString_static")
-fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripString_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripString_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void
 #else
-fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripString_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripString_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripString_static(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
-    return bjs_AsyncImportImports_jsAsyncRoundTripString_static_extern(resolveRef, rejectRef, vBytes, vLength)
+@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripString_static(_ resolveRef: Int32, _ rejectRef: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void {
+    return bjs_AsyncImportImports_jsAsyncRoundTripString_static_extern(resolveRef, rejectRef, vWord0, vWord1, vWord2)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static")
-fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vIsSome: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void
 #else
-fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vIsSome: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static(_ resolveRef: Int32, _ rejectRef: Int32, _ vIsSome: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
-    return bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static_extern(resolveRef, rejectRef, vIsSome, vBytes, vLength)
+@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static(_ resolveRef: Int32, _ rejectRef: Int32, _ vIsSome: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void {
+    return bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static_extern(resolveRef, rejectRef, vIsSome, vWord0, vWord1, vWord2)
 }
 
 #if arch(wasm32)
@@ -17527,14 +17659,14 @@ fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripStringArray_static_exter
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static")
-fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void
 #else
-fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
+fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static(_ resolveRef: Int32, _ rejectRef: Int32, _ vBytes: Int32, _ vLength: Int32) -> Void {
-    return bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static_extern(resolveRef, rejectRef, vBytes, vLength)
+@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static(_ resolveRef: Int32, _ rejectRef: Int32, _ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Void {
+    return bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static_extern(resolveRef, rejectRef, vWord0, vWord1, vWord2)
 }
 
 #if arch(wasm32)
@@ -17601,8 +17733,8 @@ func _$AsyncImportImports_jsAsyncRoundTripString(_ v: String) async throws(JSExc
         }, makeRejectClosure: {
             JSTypedClosure<(sending JSValue) -> Void>.sending($0)
         }) { resolveRef, rejectRef in
-        v.bridgeJSWithLoweredParameter { (vBytes, vLength) in
-            bjs_AsyncImportImports_jsAsyncRoundTripString_static(resolveRef, rejectRef, vBytes, vLength)
+        v.bridgeJSWithLoweredParameter { (vWord0, vWord1, vWord2) in
+            bjs_AsyncImportImports_jsAsyncRoundTripString_static(resolveRef, rejectRef, vWord0, vWord1, vWord2)
         }
     }
     return resolved
@@ -17614,8 +17746,8 @@ func _$AsyncImportImports_jsAsyncRoundTripOptionalString(_ v: Optional<String>) 
         }, makeRejectClosure: {
             JSTypedClosure<(sending JSValue) -> Void>.sending($0)
         }) { resolveRef, rejectRef in
-        v.bridgeJSWithLoweredParameter { (vIsSome, vBytes, vLength) in
-            bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static(resolveRef, rejectRef, vIsSome, vBytes, vLength)
+        v.bridgeJSWithLoweredParameter { (vIsSome, vWord0, vWord1, vWord2) in
+            bjs_AsyncImportImports_jsAsyncRoundTripOptionalString_static(resolveRef, rejectRef, vIsSome, vWord0, vWord1, vWord2)
         }
     }
     return resolved
@@ -17675,8 +17807,8 @@ func _$AsyncImportImports_jsAsyncRoundTripFeatureFlag(_ v: FeatureFlag) async th
         }, makeRejectClosure: {
             JSTypedClosure<(sending JSValue) -> Void>.sending($0)
         }) { resolveRef, rejectRef in
-        v.bridgeJSWithLoweredParameter { (vBytes, vLength) in
-            bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static(resolveRef, rejectRef, vBytes, vLength)
+        v.bridgeJSWithLoweredParameter { (vWord0, vWord1, vWord2) in
+            bjs_AsyncImportImports_jsAsyncRoundTripFeatureFlag_static(resolveRef, rejectRef, vWord0, vWord1, vWord2)
         }
     }
     return resolved
@@ -17778,14 +17910,14 @@ fileprivate func bjs_ClosureSupportImports_jsApplyDouble_static_extern(_ value: 
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsApplyString_static")
-fileprivate func bjs_ClosureSupportImports_jsApplyString_static_extern(_ valueBytes: Int32, _ valueLength: Int32, _ transform: Int32) -> Int32
+fileprivate func bjs_ClosureSupportImports_jsApplyString_static_extern(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32, _ transform: Int32) -> Int32
 #else
-fileprivate func bjs_ClosureSupportImports_jsApplyString_static_extern(_ valueBytes: Int32, _ valueLength: Int32, _ transform: Int32) -> Int32 {
+fileprivate func bjs_ClosureSupportImports_jsApplyString_static_extern(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32, _ transform: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_ClosureSupportImports_jsApplyString_static(_ valueBytes: Int32, _ valueLength: Int32, _ transform: Int32) -> Int32 {
-    return bjs_ClosureSupportImports_jsApplyString_static_extern(valueBytes, valueLength, transform)
+@inline(never) fileprivate func bjs_ClosureSupportImports_jsApplyString_static(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32, _ transform: Int32) -> Int32 {
+    return bjs_ClosureSupportImports_jsApplyString_static_extern(valueWord0, valueWord1, valueWord2, transform)
 }
 
 #if arch(wasm32)
@@ -17886,14 +18018,14 @@ fileprivate func bjs_ClosureSupportImports_jsMakeDoubleToDouble_static_extern(_ 
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ClosureSupportImports_jsMakeStringToString_static")
-fileprivate func bjs_ClosureSupportImports_jsMakeStringToString_static_extern(_ prefixBytes: Int32, _ prefixLength: Int32) -> Int32
+fileprivate func bjs_ClosureSupportImports_jsMakeStringToString_static_extern(_ prefixWord0: Int32, _ prefixWord1: Int32, _ prefixWord2: Int32) -> Int32
 #else
-fileprivate func bjs_ClosureSupportImports_jsMakeStringToString_static_extern(_ prefixBytes: Int32, _ prefixLength: Int32) -> Int32 {
+fileprivate func bjs_ClosureSupportImports_jsMakeStringToString_static_extern(_ prefixWord0: Int32, _ prefixWord1: Int32, _ prefixWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_ClosureSupportImports_jsMakeStringToString_static(_ prefixBytes: Int32, _ prefixLength: Int32) -> Int32 {
-    return bjs_ClosureSupportImports_jsMakeStringToString_static_extern(prefixBytes, prefixLength)
+@inline(never) fileprivate func bjs_ClosureSupportImports_jsMakeStringToString_static(_ prefixWord0: Int32, _ prefixWord1: Int32, _ prefixWord2: Int32) -> Int32 {
+    return bjs_ClosureSupportImports_jsMakeStringToString_static_extern(prefixWord0, prefixWord1, prefixWord2)
 }
 
 #if arch(wasm32)
@@ -18042,9 +18174,9 @@ func _$ClosureSupportImports_jsApplyDouble(_ value: Double, _ transform: JSTyped
 }
 
 func _$ClosureSupportImports_jsApplyString(_ value: String, _ transform: JSTypedClosure<(String) -> String>) throws(JSException) -> String {
-    let ret0 = value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+    let ret0 = value.bridgeJSWithLoweredParameter { (valueWord0, valueWord1, valueWord2) in
         let transformFuncRef = transform.bridgeJSLowerParameter()
-        let ret = bjs_ClosureSupportImports_jsApplyString_static(valueBytes, valueLength, transformFuncRef)
+        let ret = bjs_ClosureSupportImports_jsApplyString_static(valueWord0, valueWord1, valueWord2, transformFuncRef)
         return ret
     }
     let ret = ret0
@@ -18133,8 +18265,8 @@ func _$ClosureSupportImports_jsMakeDoubleToDouble(_ base: Double) throws(JSExcep
 }
 
 func _$ClosureSupportImports_jsMakeStringToString(_ prefix: String) throws(JSException) -> (String) -> String {
-    let ret0 = prefix.bridgeJSWithLoweredParameter { (prefixBytes, prefixLength) in
-        let ret = bjs_ClosureSupportImports_jsMakeStringToString_static(prefixBytes, prefixLength)
+    let ret0 = prefix.bridgeJSWithLoweredParameter { (prefixWord0, prefixWord1, prefixWord2) in
+        let ret = bjs_ClosureSupportImports_jsMakeStringToString_static(prefixWord0, prefixWord1, prefixWord2)
         return ret
     }
     let ret = ret0
@@ -18386,14 +18518,14 @@ func _$DictionarySupportImports_jsRoundTripDictionaryDoubleArray(_ values: [Stri
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Foo_init")
-fileprivate func bjs_Foo_init_extern(_ valueBytes: Int32, _ valueLength: Int32) -> Int32
+fileprivate func bjs_Foo_init_extern(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32
 #else
-fileprivate func bjs_Foo_init_extern(_ valueBytes: Int32, _ valueLength: Int32) -> Int32 {
+fileprivate func bjs_Foo_init_extern(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_Foo_init(_ valueBytes: Int32, _ valueLength: Int32) -> Int32 {
-    return bjs_Foo_init_extern(valueBytes, valueLength)
+@inline(never) fileprivate func bjs_Foo_init(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32 {
+    return bjs_Foo_init_extern(valueWord0, valueWord1, valueWord2)
 }
 
 #if arch(wasm32)
@@ -18409,8 +18541,8 @@ fileprivate func bjs_Foo_value_get_extern(_ self: Int32) -> Int32 {
 }
 
 func _$Foo_init(_ value: String) throws(JSException) -> JSObject {
-    let ret0 = value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
-        let ret = bjs_Foo_init(valueBytes, valueLength)
+    let ret0 = value.bridgeJSWithLoweredParameter { (valueWord0, valueWord1, valueWord2) in
+        let ret = bjs_Foo_init(valueWord0, valueWord1, valueWord2)
         return ret
     }
     let ret = ret0
@@ -18512,19 +18644,19 @@ func _$jsRoundTripBool(_ v: Bool) throws(JSException) -> Bool {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripString")
-fileprivate func bjs_jsRoundTripString_extern(_ vBytes: Int32, _ vLength: Int32) -> Int32
+fileprivate func bjs_jsRoundTripString_extern(_ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Int32
 #else
-fileprivate func bjs_jsRoundTripString_extern(_ vBytes: Int32, _ vLength: Int32) -> Int32 {
+fileprivate func bjs_jsRoundTripString_extern(_ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsRoundTripString(_ vBytes: Int32, _ vLength: Int32) -> Int32 {
-    return bjs_jsRoundTripString_extern(vBytes, vLength)
+@inline(never) fileprivate func bjs_jsRoundTripString(_ vWord0: Int32, _ vWord1: Int32, _ vWord2: Int32) -> Int32 {
+    return bjs_jsRoundTripString_extern(vWord0, vWord1, vWord2)
 }
 
 func _$jsRoundTripString(_ v: String) throws(JSException) -> String {
-    let ret0 = v.bridgeJSWithLoweredParameter { (vBytes, vLength) in
-        let ret = bjs_jsRoundTripString(vBytes, vLength)
+    let ret0 = v.bridgeJSWithLoweredParameter { (vWord0, vWord1, vWord2) in
+        let ret = bjs_jsRoundTripString(vWord0, vWord1, vWord2)
         return ret
     }
     let ret = ret0
@@ -18640,19 +18772,19 @@ func _$jsThrowOrString(_ shouldThrow: Bool) throws(JSException) -> String {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsRoundTripFeatureFlag")
-fileprivate func bjs_jsRoundTripFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: Int32) -> Int32
+fileprivate func bjs_jsRoundTripFeatureFlag_extern(_ flagWord0: Int32, _ flagWord1: Int32, _ flagWord2: Int32) -> Int32
 #else
-fileprivate func bjs_jsRoundTripFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: Int32) -> Int32 {
+fileprivate func bjs_jsRoundTripFeatureFlag_extern(_ flagWord0: Int32, _ flagWord1: Int32, _ flagWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsRoundTripFeatureFlag(_ flagBytes: Int32, _ flagLength: Int32) -> Int32 {
-    return bjs_jsRoundTripFeatureFlag_extern(flagBytes, flagLength)
+@inline(never) fileprivate func bjs_jsRoundTripFeatureFlag(_ flagWord0: Int32, _ flagWord1: Int32, _ flagWord2: Int32) -> Int32 {
+    return bjs_jsRoundTripFeatureFlag_extern(flagWord0, flagWord1, flagWord2)
 }
 
 func _$jsRoundTripFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> FeatureFlag {
-    let ret0 = flag.bridgeJSWithLoweredParameter { (flagBytes, flagLength) in
-        let ret = bjs_jsRoundTripFeatureFlag(flagBytes, flagLength)
+    let ret0 = flag.bridgeJSWithLoweredParameter { (flagWord0, flagWord1, flagWord2) in
+        let ret = bjs_jsRoundTripFeatureFlag(flagWord0, flagWord1, flagWord2)
         return ret
     }
     let ret = ret0
@@ -18686,14 +18818,14 @@ func _$runAsyncWorks() async throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_fetchWeatherData")
-fileprivate func bjs_fetchWeatherData_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void
+fileprivate func bjs_fetchWeatherData_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ cityWord0: Int32, _ cityWord1: Int32, _ cityWord2: Int32) -> Void
 #else
-fileprivate func bjs_fetchWeatherData_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void {
+fileprivate func bjs_fetchWeatherData_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ cityWord0: Int32, _ cityWord1: Int32, _ cityWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_fetchWeatherData(_ resolveRef: Int32, _ rejectRef: Int32, _ cityBytes: Int32, _ cityLength: Int32) -> Void {
-    return bjs_fetchWeatherData_extern(resolveRef, rejectRef, cityBytes, cityLength)
+@inline(never) fileprivate func bjs_fetchWeatherData(_ resolveRef: Int32, _ rejectRef: Int32, _ cityWord0: Int32, _ cityWord1: Int32, _ cityWord2: Int32) -> Void {
+    return bjs_fetchWeatherData_extern(resolveRef, rejectRef, cityWord0, cityWord1, cityWord2)
 }
 
 func _$fetchWeatherData(_ city: String) async throws(JSException) -> WeatherData {
@@ -18702,8 +18834,8 @@ func _$fetchWeatherData(_ city: String) async throws(JSException) -> WeatherData
         }, makeRejectClosure: {
             JSTypedClosure<(sending JSValue) -> Void>.sending($0)
         }) { resolveRef, rejectRef in
-        city.bridgeJSWithLoweredParameter { (cityBytes, cityLength) in
-            bjs_fetchWeatherData(resolveRef, rejectRef, cityBytes, cityLength)
+        city.bridgeJSWithLoweredParameter { (cityWord0, cityWord1, cityWord2) in
+            bjs_fetchWeatherData(resolveRef, rejectRef, cityWord0, cityWord1, cityWord2)
         }
     }
     return resolved
@@ -18731,19 +18863,19 @@ func _$_jsWeirdFunction() throws(JSException) -> Double {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_parseInt")
-fileprivate func bjs_parseInt_extern(_ stringBytes: Int32, _ stringLength: Int32) -> Float64
+fileprivate func bjs_parseInt_extern(_ stringWord0: Int32, _ stringWord1: Int32, _ stringWord2: Int32) -> Float64
 #else
-fileprivate func bjs_parseInt_extern(_ stringBytes: Int32, _ stringLength: Int32) -> Float64 {
+fileprivate func bjs_parseInt_extern(_ stringWord0: Int32, _ stringWord1: Int32, _ stringWord2: Int32) -> Float64 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_parseInt(_ stringBytes: Int32, _ stringLength: Int32) -> Float64 {
-    return bjs_parseInt_extern(stringBytes, stringLength)
+@inline(never) fileprivate func bjs_parseInt(_ stringWord0: Int32, _ stringWord1: Int32, _ stringWord2: Int32) -> Float64 {
+    return bjs_parseInt_extern(stringWord0, stringWord1, stringWord2)
 }
 
 func _$parseInt(_ string: String) throws(JSException) -> Double {
-    let ret0 = string.bridgeJSWithLoweredParameter { (stringBytes, stringLength) in
-        let ret = bjs_parseInt(stringBytes, stringLength)
+    let ret0 = string.bridgeJSWithLoweredParameter { (stringWord0, stringWord1, stringWord2) in
+        let ret = bjs_parseInt(stringWord0, stringWord1, stringWord2)
         return ret
     }
     let ret = ret0
@@ -18755,14 +18887,14 @@ func _$parseInt(_ string: String) throws(JSException) -> Double {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_init")
-fileprivate func bjs_JsGreeter_init_extern(_ nameBytes: Int32, _ nameLength: Int32, _ prefixBytes: Int32, _ prefixLength: Int32) -> Int32
+fileprivate func bjs_JsGreeter_init_extern(_ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32, _ prefixWord0: Int32, _ prefixWord1: Int32, _ prefixWord2: Int32) -> Int32
 #else
-fileprivate func bjs_JsGreeter_init_extern(_ nameBytes: Int32, _ nameLength: Int32, _ prefixBytes: Int32, _ prefixLength: Int32) -> Int32 {
+fileprivate func bjs_JsGreeter_init_extern(_ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32, _ prefixWord0: Int32, _ prefixWord1: Int32, _ prefixWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_JsGreeter_init(_ nameBytes: Int32, _ nameLength: Int32, _ prefixBytes: Int32, _ prefixLength: Int32) -> Int32 {
-    return bjs_JsGreeter_init_extern(nameBytes, nameLength, prefixBytes, prefixLength)
+@inline(never) fileprivate func bjs_JsGreeter_init(_ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32, _ prefixWord0: Int32, _ prefixWord1: Int32, _ prefixWord2: Int32) -> Int32 {
+    return bjs_JsGreeter_init_extern(nameWord0, nameWord1, nameWord2, prefixWord0, prefixWord1, prefixWord2)
 }
 
 #if arch(wasm32)
@@ -18791,14 +18923,14 @@ fileprivate func bjs_JsGreeter_prefix_get_extern(_ self: Int32) -> Int32 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_name_set")
-fileprivate func bjs_JsGreeter_name_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_JsGreeter_name_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_JsGreeter_name_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_JsGreeter_name_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_JsGreeter_name_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_JsGreeter_name_set_extern(self, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_JsGreeter_name_set(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_JsGreeter_name_set_extern(self, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -18815,20 +18947,20 @@ fileprivate func bjs_JsGreeter_greet_extern(_ self: Int32) -> Int32 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_JsGreeter_changeName")
-fileprivate func bjs_JsGreeter_changeName_extern(_ self: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void
+fileprivate func bjs_JsGreeter_changeName_extern(_ self: Int32, _ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32) -> Void
 #else
-fileprivate func bjs_JsGreeter_changeName_extern(_ self: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
+fileprivate func bjs_JsGreeter_changeName_extern(_ self: Int32, _ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_JsGreeter_changeName(_ self: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
-    return bjs_JsGreeter_changeName_extern(self, nameBytes, nameLength)
+@inline(never) fileprivate func bjs_JsGreeter_changeName(_ self: Int32, _ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32) -> Void {
+    return bjs_JsGreeter_changeName_extern(self, nameWord0, nameWord1, nameWord2)
 }
 
 func _$JsGreeter_init(_ name: String, _ prefix: String) throws(JSException) -> JSObject {
-    let ret0 = name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
-        let ret1 = prefix.bridgeJSWithLoweredParameter { (prefixBytes, prefixLength) in
-            let ret = bjs_JsGreeter_init(nameBytes, nameLength, prefixBytes, prefixLength)
+    let ret0 = name.bridgeJSWithLoweredParameter { (nameWord0, nameWord1, nameWord2) in
+        let ret1 = prefix.bridgeJSWithLoweredParameter { (prefixWord0, prefixWord1, prefixWord2) in
+            let ret = bjs_JsGreeter_init(nameWord0, nameWord1, nameWord2, prefixWord0, prefixWord1, prefixWord2)
             return ret
         }
         return ret1
@@ -18859,9 +18991,9 @@ func _$JsGreeter_prefix_get(_ self: JSObject) throws(JSException) -> String {
 }
 
 func _$JsGreeter_name_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
-    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+    newValue.bridgeJSWithLoweredParameter { (newValueWord0, newValueWord1, newValueWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        bjs_JsGreeter_name_set(selfValue, newValueBytes, newValueLength)
+        bjs_JsGreeter_name_set(selfValue, newValueWord0, newValueWord1, newValueWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -18878,9 +19010,9 @@ func _$JsGreeter_greet(_ self: JSObject) throws(JSException) -> String {
 }
 
 func _$JsGreeter_changeName(_ self: JSObject, _ name: String) throws(JSException) -> Void {
-    name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
+    name.bridgeJSWithLoweredParameter { (nameWord0, nameWord1, nameWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        bjs_JsGreeter_changeName(selfValue, nameBytes, nameLength)
+        bjs_JsGreeter_changeName(selfValue, nameWord0, nameWord1, nameWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -18937,14 +19069,14 @@ fileprivate func bjs_WeatherData_temperature_set_extern(_ self: Int32, _ newValu
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_WeatherData_description_set")
-fileprivate func bjs_WeatherData_description_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_WeatherData_description_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_WeatherData_description_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_WeatherData_description_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_WeatherData_description_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_WeatherData_description_set_extern(self, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_WeatherData_description_set(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_WeatherData_description_set_extern(self, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -18996,9 +19128,9 @@ func _$WeatherData_temperature_set(_ self: JSObject, _ newValue: Double) throws(
 }
 
 func _$WeatherData_description_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
-    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+    newValue.bridgeJSWithLoweredParameter { (newValueWord0, newValueWord1, newValueWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        bjs_WeatherData_description_set(selfValue, newValueBytes, newValueLength)
+        bjs_WeatherData_description_set(selfValue, newValueWord0, newValueWord1, newValueWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -19180,14 +19312,14 @@ func _$StaticBox_value(_ self: JSObject) throws(JSException) -> Double {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_init")
-fileprivate func bjs_Animal_init_extern(_ nameBytes: Int32, _ nameLength: Int32, _ age: Float64, _ isCat: Int32) -> Int32
+fileprivate func bjs_Animal_init_extern(_ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32, _ age: Float64, _ isCat: Int32) -> Int32
 #else
-fileprivate func bjs_Animal_init_extern(_ nameBytes: Int32, _ nameLength: Int32, _ age: Float64, _ isCat: Int32) -> Int32 {
+fileprivate func bjs_Animal_init_extern(_ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32, _ age: Float64, _ isCat: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_Animal_init(_ nameBytes: Int32, _ nameLength: Int32, _ age: Float64, _ isCat: Int32) -> Int32 {
-    return bjs_Animal_init_extern(nameBytes, nameLength, age, isCat)
+@inline(never) fileprivate func bjs_Animal_init(_ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32, _ age: Float64, _ isCat: Int32) -> Int32 {
+    return bjs_Animal_init_extern(nameWord0, nameWord1, nameWord2, age, isCat)
 }
 
 #if arch(wasm32)
@@ -19228,14 +19360,14 @@ fileprivate func bjs_Animal_isCat_get_extern(_ self: Int32) -> Int32 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_Animal_name_set")
-fileprivate func bjs_Animal_name_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_Animal_name_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_Animal_name_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_Animal_name_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_Animal_name_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_Animal_name_set_extern(self, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_Animal_name_set(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_Animal_name_set_extern(self, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -19287,10 +19419,10 @@ fileprivate func bjs_Animal_getIsCat_extern(_ self: Int32) -> Int32 {
 }
 
 func _$Animal_init(_ name: String, _ age: Double, _ isCat: Bool) throws(JSException) -> JSObject {
-    let ret0 = name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
+    let ret0 = name.bridgeJSWithLoweredParameter { (nameWord0, nameWord1, nameWord2) in
         let isCatValue = isCat.bridgeJSLowerParameter()
         let ageValue = age.bridgeJSLowerParameter()
-        let ret = bjs_Animal_init(nameBytes, nameLength, ageValue, isCatValue)
+        let ret = bjs_Animal_init(nameWord0, nameWord1, nameWord2, ageValue, isCatValue)
         return ret
     }
     let ret = ret0
@@ -19328,9 +19460,9 @@ func _$Animal_isCat_get(_ self: JSObject) throws(JSException) -> Bool {
 }
 
 func _$Animal_name_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
-    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+    newValue.bridgeJSWithLoweredParameter { (newValueWord0, newValueWord1, newValueWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        bjs_Animal_name_set(selfValue, newValueBytes, newValueLength)
+        bjs_Animal_name_set(selfValue, newValueWord0, newValueWord1, newValueWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -19504,21 +19636,21 @@ func _$jsJoinEnumThenArray(_ a: ImportedPayloadSignal, _ b: [Int]) throws(JSExce
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsJoinStringThenStackParams")
-fileprivate func bjs_jsJoinStringThenStackParams_extern(_ sBytes: Int32, _ sLength: Int32) -> Int32
+fileprivate func bjs_jsJoinStringThenStackParams_extern(_ sWord0: Int32, _ sWord1: Int32, _ sWord2: Int32) -> Int32
 #else
-fileprivate func bjs_jsJoinStringThenStackParams_extern(_ sBytes: Int32, _ sLength: Int32) -> Int32 {
+fileprivate func bjs_jsJoinStringThenStackParams_extern(_ sWord0: Int32, _ sWord1: Int32, _ sWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsJoinStringThenStackParams(_ sBytes: Int32, _ sLength: Int32) -> Int32 {
-    return bjs_jsJoinStringThenStackParams_extern(sBytes, sLength)
+@inline(never) fileprivate func bjs_jsJoinStringThenStackParams(_ sWord0: Int32, _ sWord1: Int32, _ sWord2: Int32) -> Int32 {
+    return bjs_jsJoinStringThenStackParams_extern(sWord0, sWord1, sWord2)
 }
 
 func _$jsJoinStringThenStackParams(_ s: String, _ a: Optional<[Int]>, _ b: [Int]) throws(JSException) -> String {
-    let ret0 = s.bridgeJSWithLoweredParameter { (sBytes, sLength) in
+    let ret0 = s.bridgeJSWithLoweredParameter { (sWord0, sWord1, sWord2) in
         let _ = b.bridgeJSLowerParameter()
         let _ = a.bridgeJSLowerParameter()
-        let ret = bjs_jsJoinStringThenStackParams(sBytes, sLength)
+        let ret = bjs_jsJoinStringThenStackParams(sWord0, sWord1, sWord2)
         return ret
     }
     let ret = ret0
@@ -19572,19 +19704,19 @@ func _$jsGenericRoundTripClass<T: BridgedSwiftGenericBridgeable>(_ value: T) thr
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsGenericParsePoint")
-fileprivate func bjs_jsGenericParsePoint_extern(_ jsonBytes: Int32, _ jsonLength: Int32, _ _generic0TypeId: Int32) -> Void
+fileprivate func bjs_jsGenericParsePoint_extern(_ jsonWord0: Int32, _ jsonWord1: Int32, _ jsonWord2: Int32, _ _generic0TypeId: Int32) -> Void
 #else
-fileprivate func bjs_jsGenericParsePoint_extern(_ jsonBytes: Int32, _ jsonLength: Int32, _ _generic0TypeId: Int32) -> Void {
+fileprivate func bjs_jsGenericParsePoint_extern(_ jsonWord0: Int32, _ jsonWord1: Int32, _ jsonWord2: Int32, _ _generic0TypeId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_jsGenericParsePoint(_ jsonBytes: Int32, _ jsonLength: Int32, _ _generic0TypeId: Int32) -> Void {
-    return bjs_jsGenericParsePoint_extern(jsonBytes, jsonLength, _generic0TypeId)
+@inline(never) fileprivate func bjs_jsGenericParsePoint(_ jsonWord0: Int32, _ jsonWord1: Int32, _ jsonWord2: Int32, _ _generic0TypeId: Int32) -> Void {
+    return bjs_jsGenericParsePoint_extern(jsonWord0, jsonWord1, jsonWord2, _generic0TypeId)
 }
 
 func _$jsGenericParsePoint<T: BridgedSwiftGenericBridgeable>(_ json: String) throws(JSException) -> T {
-    json.bridgeJSWithLoweredParameter { (jsonBytes, jsonLength) in
-        bjs_jsGenericParsePoint(jsonBytes, jsonLength, T.bridgeJSTypeID)
+    json.bridgeJSWithLoweredParameter { (jsonWord0, jsonWord1, jsonWord2) in
+        bjs_jsGenericParsePoint(jsonWord0, jsonWord1, jsonWord2, T.bridgeJSTypeID)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -20398,19 +20530,19 @@ func _$defaultExport_get() throws(JSException) -> JSObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_nodeBasename")
-fileprivate func bjs_nodeBasename_extern(_ pathBytes: Int32, _ pathLength: Int32) -> Int32
+fileprivate func bjs_nodeBasename_extern(_ pathWord0: Int32, _ pathWord1: Int32, _ pathWord2: Int32) -> Int32
 #else
-fileprivate func bjs_nodeBasename_extern(_ pathBytes: Int32, _ pathLength: Int32) -> Int32 {
+fileprivate func bjs_nodeBasename_extern(_ pathWord0: Int32, _ pathWord1: Int32, _ pathWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_nodeBasename(_ pathBytes: Int32, _ pathLength: Int32) -> Int32 {
-    return bjs_nodeBasename_extern(pathBytes, pathLength)
+@inline(never) fileprivate func bjs_nodeBasename(_ pathWord0: Int32, _ pathWord1: Int32, _ pathWord2: Int32) -> Int32 {
+    return bjs_nodeBasename_extern(pathWord0, pathWord1, pathWord2)
 }
 
 func _$nodeBasename(_ path: String) throws(JSException) -> String {
-    let ret0 = path.bridgeJSWithLoweredParameter { (pathBytes, pathLength) in
-        let ret = bjs_nodeBasename(pathBytes, pathLength)
+    let ret0 = path.bridgeJSWithLoweredParameter { (pathWord0, pathWord1, pathWord2) in
+        let ret = bjs_nodeBasename(pathWord0, pathWord1, pathWord2)
         return ret
     }
     let ret = ret0
@@ -20422,20 +20554,20 @@ func _$nodeBasename(_ path: String) throws(JSException) -> String {
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_nodeJoin")
-fileprivate func bjs_nodeJoin_extern(_ lhsBytes: Int32, _ lhsLength: Int32, _ rhsBytes: Int32, _ rhsLength: Int32) -> Int32
+fileprivate func bjs_nodeJoin_extern(_ lhsWord0: Int32, _ lhsWord1: Int32, _ lhsWord2: Int32, _ rhsWord0: Int32, _ rhsWord1: Int32, _ rhsWord2: Int32) -> Int32
 #else
-fileprivate func bjs_nodeJoin_extern(_ lhsBytes: Int32, _ lhsLength: Int32, _ rhsBytes: Int32, _ rhsLength: Int32) -> Int32 {
+fileprivate func bjs_nodeJoin_extern(_ lhsWord0: Int32, _ lhsWord1: Int32, _ lhsWord2: Int32, _ rhsWord0: Int32, _ rhsWord1: Int32, _ rhsWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_nodeJoin(_ lhsBytes: Int32, _ lhsLength: Int32, _ rhsBytes: Int32, _ rhsLength: Int32) -> Int32 {
-    return bjs_nodeJoin_extern(lhsBytes, lhsLength, rhsBytes, rhsLength)
+@inline(never) fileprivate func bjs_nodeJoin(_ lhsWord0: Int32, _ lhsWord1: Int32, _ lhsWord2: Int32, _ rhsWord0: Int32, _ rhsWord1: Int32, _ rhsWord2: Int32) -> Int32 {
+    return bjs_nodeJoin_extern(lhsWord0, lhsWord1, lhsWord2, rhsWord0, rhsWord1, rhsWord2)
 }
 
 func _$nodeJoin(_ lhs: String, _ rhs: String) throws(JSException) -> String {
-    let ret0 = lhs.bridgeJSWithLoweredParameter { (lhsBytes, lhsLength) in
-        let ret1 = rhs.bridgeJSWithLoweredParameter { (rhsBytes, rhsLength) in
-            let ret = bjs_nodeJoin(lhsBytes, lhsLength, rhsBytes, rhsLength)
+    let ret0 = lhs.bridgeJSWithLoweredParameter { (lhsWord0, lhsWord1, lhsWord2) in
+        let ret1 = rhs.bridgeJSWithLoweredParameter { (rhsWord0, rhsWord1, rhsWord2) in
+            let ret = bjs_nodeJoin(lhsWord0, lhsWord1, lhsWord2, rhsWord0, rhsWord1, rhsWord2)
             return ret
         }
         return ret1
@@ -20979,26 +21111,26 @@ fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalNumberUndefined_s
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static")
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static_extern(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static_extern(_ nameIsSome: Int32, _ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32) -> Void
 #else
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static_extern(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static_extern(_ nameIsSome: Int32, _ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
-    return bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static_extern(nameIsSome, nameBytes, nameLength)
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static(_ nameIsSome: Int32, _ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32) -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static_extern(nameIsSome, nameWord0, nameWord1, nameWord2)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static")
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static_extern(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static_extern(_ nameIsSome: Int32, _ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32) -> Void
 #else
-fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static_extern(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
+fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static_extern(_ nameIsSome: Int32, _ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static(_ nameIsSome: Int32, _ nameBytes: Int32, _ nameLength: Int32) -> Void {
-    return bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static_extern(nameIsSome, nameBytes, nameLength)
+@inline(never) fileprivate func bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static(_ nameIsSome: Int32, _ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32) -> Void {
+    return bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static_extern(nameIsSome, nameWord0, nameWord1, nameWord2)
 }
 
 #if arch(wasm32)
@@ -21092,8 +21224,8 @@ func _$OptionalSupportImports_jsRoundTripOptionalNumberUndefined(_ value: JSUnde
 }
 
 func _$OptionalSupportImports_jsRoundTripOptionalStringNull(_ name: Optional<String>) throws(JSException) -> Optional<String> {
-    name.bridgeJSWithLoweredParameter { (nameIsSome, nameBytes, nameLength) in
-        bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static(nameIsSome, nameBytes, nameLength)
+    name.bridgeJSWithLoweredParameter { (nameIsSome, nameWord0, nameWord1, nameWord2) in
+        bjs_OptionalSupportImports_jsRoundTripOptionalStringNull_static(nameIsSome, nameWord0, nameWord1, nameWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -21102,8 +21234,8 @@ func _$OptionalSupportImports_jsRoundTripOptionalStringNull(_ name: Optional<Str
 }
 
 func _$OptionalSupportImports_jsRoundTripOptionalStringUndefined(_ name: JSUndefinedOr<String>) throws(JSException) -> JSUndefinedOr<String> {
-    name.bridgeJSWithLoweredParameter { (nameIsSome, nameBytes, nameLength) in
-        bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static(nameIsSome, nameBytes, nameLength)
+    name.bridgeJSWithLoweredParameter { (nameIsSome, nameWord0, nameWord1, nameWord2) in
+        bjs_OptionalSupportImports_jsRoundTripOptionalStringUndefined_static(nameIsSome, nameWord0, nameWord1, nameWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -21158,6 +21290,71 @@ func _$OptionalSupportImports_jsRoundTripOptionalJSObjectNull(_ value: Optional<
 
 func _$OptionalSupportImports_runJsOptionalSupportTests() throws(JSException) -> Void {
     bjs_OptionalSupportImports_runJsOptionalSupportTests_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StringABIImports_jsEcho_static")
+fileprivate func bjs_StringABIImports_jsEcho_static_extern(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32
+#else
+fileprivate func bjs_StringABIImports_jsEcho_static_extern(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_StringABIImports_jsEcho_static(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32 {
+    return bjs_StringABIImports_jsEcho_static_extern(valueWord0, valueWord1, valueWord2)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StringABIImports_jsEchoOptional_static")
+fileprivate func bjs_StringABIImports_jsEchoOptional_static_extern(_ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void
+#else
+fileprivate func bjs_StringABIImports_jsEchoOptional_static_extern(_ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_StringABIImports_jsEchoOptional_static(_ valueIsSome: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    return bjs_StringABIImports_jsEchoOptional_static_extern(valueIsSome, valueWord0, valueWord1, valueWord2)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StringABIImports_runJsStringABITests_static")
+fileprivate func bjs_StringABIImports_runJsStringABITests_static_extern() -> Void
+#else
+fileprivate func bjs_StringABIImports_runJsStringABITests_static_extern() -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_StringABIImports_runJsStringABITests_static() -> Void {
+    return bjs_StringABIImports_runJsStringABITests_static_extern()
+}
+
+func _$StringABIImports_jsEcho(_ value: String) throws(JSException) -> String {
+    let ret0 = value.bridgeJSWithLoweredParameter { (valueWord0, valueWord1, valueWord2) in
+        let ret = bjs_StringABIImports_jsEcho_static(valueWord0, valueWord1, valueWord2)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$StringABIImports_jsEchoOptional(_ value: Optional<String>) throws(JSException) -> Optional<String> {
+    value.bridgeJSWithLoweredParameter { (valueIsSome, valueWord0, valueWord1, valueWord2) in
+        bjs_StringABIImports_jsEchoOptional_static(valueIsSome, valueWord0, valueWord1, valueWord2)
+    }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<String>.bridgeJSLiftReturnFromSideChannel()
+}
+
+func _$StringABIImports_runJsStringABITests() throws(JSException) -> Void {
+    bjs_StringABIImports_runJsStringABITests_static()
     if let error = _swift_js_take_exception() {
         throw error
     }

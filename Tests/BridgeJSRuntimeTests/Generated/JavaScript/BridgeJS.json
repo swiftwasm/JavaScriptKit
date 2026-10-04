@@ -13085,6 +13085,330 @@
         ],
         "swiftCallName" : "APIOptionalResult",
         "tsFullPath" : "APIOptionalResult"
+      },
+      {
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "StringABIExports",
+        "staticMethods" : [
+          {
+            "abiName" : "bjs_StringABIExports_static_smallEmpty",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "smallEmpty",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_smallASCII",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "smallASCII",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_smallEight",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "smallEight",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_smallNine",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "smallNine",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_smallTen",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "smallTen",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_smallUTF8",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "smallUTF8",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_largeImmortal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "largeImmortal",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_largeImmortalAgain",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "largeImmortalAgain",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_largeDynamic",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "largeDynamic",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_immortalSubstring",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "immortalSubstring",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_optionalNone",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "optionalNone",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_StringABIExports_static_optionalSome",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "optionalSome",
+            "namespace" : [
+              "StringABIExports"
+            ],
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "nullable" : {
+                "_0" : {
+                  "string" : {
+
+                  }
+                },
+                "_1" : "null"
+              }
+            },
+            "staticContext" : {
+              "namespaceEnum" : {
+                "_0" : "StringABIExports"
+              }
+            }
+          }
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "StringABIExports",
+        "tsFullPath" : "StringABIExports"
       }
     ],
     "exposeToGlobal" : false,
@@ -27810,6 +28134,103 @@
                   "isThrows" : true
                 },
                 "name" : "runJsOptionalSupportTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "StringABIImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsEcho",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsEchoOptional",
+                "parameters" : [
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "string" : {
+
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "string" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "runJsStringABITests",
                 "parameters" : [
 
                 ],

@@ -40,19 +40,19 @@ func _$localDefaultExport_get() throws(JSException) -> JSObject {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_nodeBasename")
-fileprivate func bjs_nodeBasename_extern(_ pathBytes: Int32, _ pathLength: Int32) -> Int32
+fileprivate func bjs_nodeBasename_extern(_ pathWord0: Int32, _ pathWord1: Int32, _ pathWord2: Int32) -> Int32
 #else
-fileprivate func bjs_nodeBasename_extern(_ pathBytes: Int32, _ pathLength: Int32) -> Int32 {
+fileprivate func bjs_nodeBasename_extern(_ pathWord0: Int32, _ pathWord1: Int32, _ pathWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_nodeBasename(_ pathBytes: Int32, _ pathLength: Int32) -> Int32 {
-    return bjs_nodeBasename_extern(pathBytes, pathLength)
+@inline(never) fileprivate func bjs_nodeBasename(_ pathWord0: Int32, _ pathWord1: Int32, _ pathWord2: Int32) -> Int32 {
+    return bjs_nodeBasename_extern(pathWord0, pathWord1, pathWord2)
 }
 
 func _$nodeBasename(_ path: String) throws(JSException) -> String {
-    let ret0 = path.bridgeJSWithLoweredParameter { (pathBytes, pathLength) in
-        let ret = bjs_nodeBasename(pathBytes, pathLength)
+    let ret0 = path.bridgeJSWithLoweredParameter { (pathWord0, pathWord1, pathWord2) in
+        let ret = bjs_nodeBasename(pathWord0, pathWord1, pathWord2)
         return ret
     }
     let ret = ret0
@@ -64,19 +64,19 @@ func _$nodeBasename(_ path: String) throws(JSException) -> String {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_nodeDirname")
-fileprivate func bjs_nodeDirname_extern(_ pathBytes: Int32, _ pathLength: Int32) -> Int32
+fileprivate func bjs_nodeDirname_extern(_ pathWord0: Int32, _ pathWord1: Int32, _ pathWord2: Int32) -> Int32
 #else
-fileprivate func bjs_nodeDirname_extern(_ pathBytes: Int32, _ pathLength: Int32) -> Int32 {
+fileprivate func bjs_nodeDirname_extern(_ pathWord0: Int32, _ pathWord1: Int32, _ pathWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_nodeDirname(_ pathBytes: Int32, _ pathLength: Int32) -> Int32 {
-    return bjs_nodeDirname_extern(pathBytes, pathLength)
+@inline(never) fileprivate func bjs_nodeDirname(_ pathWord0: Int32, _ pathWord1: Int32, _ pathWord2: Int32) -> Int32 {
+    return bjs_nodeDirname_extern(pathWord0, pathWord1, pathWord2)
 }
 
 func _$nodeDirname(_ path: String) throws(JSException) -> String {
-    let ret0 = path.bridgeJSWithLoweredParameter { (pathBytes, pathLength) in
-        let ret = bjs_nodeDirname(pathBytes, pathLength)
+    let ret0 = path.bridgeJSWithLoweredParameter { (pathWord0, pathWord1, pathWord2) in
+        let ret = bjs_nodeDirname(pathWord0, pathWord1, pathWord2)
         return ret
     }
     let ret = ret0

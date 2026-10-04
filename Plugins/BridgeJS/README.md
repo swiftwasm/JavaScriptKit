@@ -139,7 +139,8 @@ The ABI will not be stable, and not meant to be interposed by other tools.
 Parameter passing follows Wasm calling conventions, with custom handling for complex types:
 
 - **Primitives**: Passed directly as Wasm arguments (`i32`, `i64`, `f32`, `f64`)
-- **Strings**: UTF-8 bytes stored in `swift.memory`, ID + length passed as Wasm arguments
+- **Strings (JS → Swift)**: UTF-8 bytes stored in `swift.memory`, ID + length passed as Wasm arguments
+- **Strings (Swift → JS)**: the wasm32 12-byte `String` layout passed as three `i32` words. JS fast-decodes small strings, caches large immortals by a 53-bit `ptr + len` pack when `len < 2**21`, and otherwise reads UTF-8 at `word1 + 20` (`nativeBias`). This layout is a Swift stdlib implementation detail and can change with the toolchain.
 - **Swift Classes**: Raw Swift heap pointer passed as `i32`
 - **JSObjects**: Object stored in `swift.memory.heap`, object ID passed as `i32`
 - **Structs/Arrays**: Fields/elements pushed to type-specific stacks, Swift pops in reverse order
@@ -150,7 +151,7 @@ Parameter passing follows Wasm calling conventions, with custom handling for com
 Return values use direct Wasm returns for primitives, and imported intrinsic functions for complex types:
 
 - **Primitives**: Returned directly via Wasm return value
-- **Strings**: Swift writes UTF-8 bytes to shared memory, JS decodes
+- **Strings**: Swift passes the 12-byte `String` layout; JS decodes (small / immortal-cached / UTF-8)
 - **Swift Classes**: Pointer returned directly, JS wraps in `SwiftHeapObject` with `FinalizationRegistry`
 - **Structs/Arrays**: Swift pushes fields/elements to type-specific stacks, JS reconstructs
 

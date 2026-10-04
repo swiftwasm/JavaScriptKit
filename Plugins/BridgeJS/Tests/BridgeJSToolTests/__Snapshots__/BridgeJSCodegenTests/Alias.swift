@@ -297,19 +297,19 @@ extension UserId: _BridgedSwiftAlias, _BridgedSwiftStackType {}
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_acceptTagged")
-fileprivate func bjs_acceptTagged_extern(_ taggedBytes: Int32, _ taggedLength: Int32) -> Void
+fileprivate func bjs_acceptTagged_extern(_ taggedWord0: Int32, _ taggedWord1: Int32, _ taggedWord2: Int32) -> Void
 #else
-fileprivate func bjs_acceptTagged_extern(_ taggedBytes: Int32, _ taggedLength: Int32) -> Void {
+fileprivate func bjs_acceptTagged_extern(_ taggedWord0: Int32, _ taggedWord1: Int32, _ taggedWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_acceptTagged(_ taggedBytes: Int32, _ taggedLength: Int32) -> Void {
-    return bjs_acceptTagged_extern(taggedBytes, taggedLength)
+@inline(never) fileprivate func bjs_acceptTagged(_ taggedWord0: Int32, _ taggedWord1: Int32, _ taggedWord2: Int32) -> Void {
+    return bjs_acceptTagged_extern(taggedWord0, taggedWord1, taggedWord2)
 }
 
 func _$acceptTagged(_ tagged: Tagged) throws(JSException) -> Void {
-    tagged.bridgeJSWithLoweredParameter { (taggedBytes, taggedLength) in
-        bjs_acceptTagged(taggedBytes, taggedLength)
+    tagged.bridgeJSWithLoweredParameter { (taggedWord0, taggedWord1, taggedWord2) in
+        bjs_acceptTagged(taggedWord0, taggedWord1, taggedWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -318,19 +318,19 @@ func _$acceptTagged(_ tagged: Tagged) throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_acceptOptionalTagged")
-fileprivate func bjs_acceptOptionalTagged_extern(_ taggedIsSome: Int32, _ taggedBytes: Int32, _ taggedLength: Int32) -> Void
+fileprivate func bjs_acceptOptionalTagged_extern(_ taggedIsSome: Int32, _ taggedWord0: Int32, _ taggedWord1: Int32, _ taggedWord2: Int32) -> Void
 #else
-fileprivate func bjs_acceptOptionalTagged_extern(_ taggedIsSome: Int32, _ taggedBytes: Int32, _ taggedLength: Int32) -> Void {
+fileprivate func bjs_acceptOptionalTagged_extern(_ taggedIsSome: Int32, _ taggedWord0: Int32, _ taggedWord1: Int32, _ taggedWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_acceptOptionalTagged(_ taggedIsSome: Int32, _ taggedBytes: Int32, _ taggedLength: Int32) -> Void {
-    return bjs_acceptOptionalTagged_extern(taggedIsSome, taggedBytes, taggedLength)
+@inline(never) fileprivate func bjs_acceptOptionalTagged(_ taggedIsSome: Int32, _ taggedWord0: Int32, _ taggedWord1: Int32, _ taggedWord2: Int32) -> Void {
+    return bjs_acceptOptionalTagged_extern(taggedIsSome, taggedWord0, taggedWord1, taggedWord2)
 }
 
 func _$acceptOptionalTagged(_ tagged: Optional<Tagged>) throws(JSException) -> Void {
-    tagged.bridgeJSWithLoweredParameter { (taggedIsSome, taggedBytes, taggedLength) in
-        bjs_acceptOptionalTagged(taggedIsSome, taggedBytes, taggedLength)
+    tagged.bridgeJSWithLoweredParameter { (taggedIsSome, taggedWord0, taggedWord1, taggedWord2) in
+        bjs_acceptOptionalTagged(taggedIsSome, taggedWord0, taggedWord1, taggedWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -339,19 +339,19 @@ func _$acceptOptionalTagged(_ tagged: Optional<Tagged>) throws(JSException) -> V
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_roundtripTagged")
-fileprivate func bjs_roundtripTagged_extern(_ taggedBytes: Int32, _ taggedLength: Int32) -> Int32
+fileprivate func bjs_roundtripTagged_extern(_ taggedWord0: Int32, _ taggedWord1: Int32, _ taggedWord2: Int32) -> Int32
 #else
-fileprivate func bjs_roundtripTagged_extern(_ taggedBytes: Int32, _ taggedLength: Int32) -> Int32 {
+fileprivate func bjs_roundtripTagged_extern(_ taggedWord0: Int32, _ taggedWord1: Int32, _ taggedWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_roundtripTagged(_ taggedBytes: Int32, _ taggedLength: Int32) -> Int32 {
-    return bjs_roundtripTagged_extern(taggedBytes, taggedLength)
+@inline(never) fileprivate func bjs_roundtripTagged(_ taggedWord0: Int32, _ taggedWord1: Int32, _ taggedWord2: Int32) -> Int32 {
+    return bjs_roundtripTagged_extern(taggedWord0, taggedWord1, taggedWord2)
 }
 
 func _$roundtripTagged(_ tagged: Tagged) throws(JSException) -> Tagged {
-    let ret0 = tagged.bridgeJSWithLoweredParameter { (taggedBytes, taggedLength) in
-        let ret = bjs_roundtripTagged(taggedBytes, taggedLength)
+    let ret0 = tagged.bridgeJSWithLoweredParameter { (taggedWord0, taggedWord1, taggedWord2) in
+        let ret = bjs_roundtripTagged(taggedWord0, taggedWord1, taggedWord2)
         return ret
     }
     let ret = ret0

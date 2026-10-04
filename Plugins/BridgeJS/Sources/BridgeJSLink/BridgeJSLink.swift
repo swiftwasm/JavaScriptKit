@@ -313,12 +313,91 @@ public struct BridgeJSLink {
         return data
     }
 
+    /// Emits `decodeString`, including small-string helpers used only by it.
+    ///
+    /// The wasm32 12-byte Swift `String` layout is a standard-library
+    /// implementation detail, not a stable ABI. Small strings (`word2 & 0x2000`)
+    /// store up to 10 UTF-8 bytes inline. Large strings store the UTF-8 count in
+    /// `word0` and a storage pointer in `word1` already biased by `nativeBias`
+    /// (20), so UTF-8 starts at `word1 + 20`. Immortal large strings
+    /// (`word2 & 0x8000`) are cached by a 53-bit `ptr + len * 2**32` key when
+    /// `len < 2**21`; longer immortals skip the cache.
+    private func emitDecodeString(_ printer: CodeFragmentPrinter) {
+        printer.write(
+            multilineString: """
+                \(JSGlueVariableScope.reservedDecodeString) = (() => {
+                    const byteAt = (word0, word1, word2, i) => {
+                        if (i < 4) return (word0 >>> (i * 8)) & 0xff;
+                        if (i < 8) return (word1 >>> ((i - 4) * 8)) & 0xff;
+                        if (i === 8) return word2 & 0xff;
+                        return (word2 >>> 16) & 0xff;
+                    };
+                    const decodeSmallUTF8 = (word0, word1, word2, count) => {
+                        let result = "";
+                        let i = 0;
+                        while (i < count) {
+                            const b0 = byteAt(word0, word1, word2, i++);
+                            let codePoint;
+                            if (b0 < 0x80) {
+                                codePoint = b0;
+                            } else if (b0 < 0xe0) {
+                                codePoint = ((b0 & 0x1f) << 6) | (byteAt(word0, word1, word2, i++) & 0x3f);
+                            } else if (b0 < 0xf0) {
+                                const b1 = byteAt(word0, word1, word2, i++);
+                                const b2 = byteAt(word0, word1, word2, i++);
+                                codePoint = ((b0 & 0x0f) << 12) | ((b1 & 0x3f) << 6) | (b2 & 0x3f);
+                            } else {
+                                const b1 = byteAt(word0, word1, word2, i++);
+                                const b2 = byteAt(word0, word1, word2, i++);
+                                const b3 = byteAt(word0, word1, word2, i++);
+                                codePoint = ((b0 & 0x07) << 18) | ((b1 & 0x3f) << 12) | ((b2 & 0x3f) << 6) | (b3 & 0x3f);
+                            }
+                            result += String.fromCodePoint(codePoint);
+                        }
+                        return result;
+                    };
+                    const decodeSmall = (word0, word1, word2) => {
+                        const count = (word2 >>> 8) & 0x0f;
+                        if ((word2 & 0x4000 /* ASCII */) === 0) return decodeSmallUTF8(word0, word1, word2, count);
+                        const char = String.fromCharCode;
+                        switch (count) {
+                            case 0: return "";
+                            case 1: return char(word0 & 0xff);
+                            case 2: return char(word0 & 0xff, (word0 >>> 8) & 0xff);
+                            case 3: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff);
+                            case 4: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24);
+                            case 5: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff);
+                            case 6: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff);
+                            case 7: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff);
+                            case 8: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff, word1 >>> 24);
+                            default: return decodeSmallUTF8(word0, word1, word2, count);
+                        }
+                    };
+                    return (word0, word1, word2) => {
+                        if (word2 & 0x2000 /* small */) return decodeSmall(word0, word1, word2);
+                        const ptr = (word1 + 20 /* nativeBias */) >>> 0;
+                        const len = word0 >>> 0;
+                        if ((word2 & 0x8000 /* immortal */) === 0 || len >= 0x200000 /* 2^21 Number key */) return \(JSGlueVariableScope.reservedDecodeUTF8)(ptr, len);
+                        const key = ptr + len * 0x100000000;
+                        const cached = \(JSGlueVariableScope.reservedImmortalStrings).get(key);
+                        if (cached !== undefined) return cached;
+                        const value = \(JSGlueVariableScope.reservedDecodeUTF8)(ptr, len);
+                        \(JSGlueVariableScope.reservedImmortalStrings).set(key, value);
+                        return value;
+                    };
+                })();
+                """
+        )
+    }
+
     private func generateVariableDeclarations() -> [String] {
         var declarations: [String] = [
             "let \(JSGlueVariableScope.reservedInstance);",
             "let \(JSGlueVariableScope.reservedMemory);",
             "let \(JSGlueVariableScope.reservedSetException);",
             "let \(JSGlueVariableScope.reservedDecodeString);",
+            "let \(JSGlueVariableScope.reservedDecodeUTF8);",
+            "const \(JSGlueVariableScope.reservedImmortalStrings) = new Map();",
             "const \(JSGlueVariableScope.reservedTextDecoder) = new TextDecoder(\"utf-8\");",
             "const \(JSGlueVariableScope.reservedTextEncoder) = new TextEncoder(\"utf-8\");",
             "let \(JSGlueVariableScope.reservedStorageToReturnString);",
@@ -495,10 +574,10 @@ public struct BridgeJSLink {
                         "const imports = options.getImports(importsContext);"
                     ])
                 }
-                printer.write("bjs[\"swift_js_return_string\"] = function(ptr, len) {")
+                printer.write("bjs[\"swift_js_return_string\"] = function(word0, word1, word2) {")
                 printer.indent {
                     printer.write(
-                        "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(ptr, len);"
+                        "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2);"
                     )
                 }
                 printer.write("}")
@@ -516,10 +595,10 @@ public struct BridgeJSLink {
                     printer.write("bytes.set(source);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_make_js_string\"] = function(ptr, len) {")
+                printer.write("bjs[\"swift_js_make_js_string\"] = function(word0, word1, word2) {")
                 printer.indent {
                     printer.write(
-                        "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(\(JSGlueVariableScope.reservedDecodeString)(ptr, len));"
+                        "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(\(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2));"
                     )
                 }
                 printer.write("}")
@@ -566,9 +645,11 @@ public struct BridgeJSLink {
                     printer.write("\(JSGlueVariableScope.reservedF64Stack).push(v);")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_push_string\"] = function(ptr, len) {")
+                printer.write("bjs[\"swift_js_push_string\"] = function(word0, word1, word2) {")
                 printer.indent {
-                    printer.write("const value = \(JSGlueVariableScope.reservedDecodeString)(ptr, len);")
+                    printer.write(
+                        "const value = \(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2);"
+                    )
                     printer.write("\(JSGlueVariableScope.reservedStringStack).push(value);")
                 }
                 printer.write("}")
@@ -732,7 +813,7 @@ public struct BridgeJSLink {
                     printer.write("}")
                 }
                 printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_string\"] = function(isSome, ptr, len) {")
+                printer.write("bjs[\"swift_js_return_optional_string\"] = function(isSome, word0, word1, word2) {")
                 printer.indent {
                     printer.write("if (isSome === 0) {")
                     printer.indent {
@@ -741,7 +822,7 @@ public struct BridgeJSLink {
                     printer.write("} else {")
                     printer.indent {
                         printer.write(lines: [
-                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(ptr, len);"
+                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2);"
                         ])
                     }
                     printer.write("}")
@@ -879,7 +960,7 @@ public struct BridgeJSLink {
                                     helperPrinter.write("let length = 0;")
                                     helperPrinter.write("while (bytes[length] !== 0) { length += 1; }")
                                     helperPrinter.write(
-                                        "const fileID = \(JSGlueVariableScope.reservedDecodeString)(state.file, length);"
+                                        "const fileID = \(JSGlueVariableScope.reservedDecodeUTF8)(state.file, length);"
                                     )
                                     helperPrinter.write(
                                         "throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);"
@@ -1295,13 +1376,14 @@ public struct BridgeJSLink {
                 printer.nextLine()
                 if sharedMemory {
                     printer.write(
-                        "\(JSGlueVariableScope.reservedDecodeString) = (ptr, len) => { const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr >>> 0, len >>> 0).slice(); return \(JSGlueVariableScope.reservedTextDecoder).decode(bytes); }"
+                        "\(JSGlueVariableScope.reservedDecodeUTF8) = (ptr, len) => { const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr >>> 0, len >>> 0).slice(); return \(JSGlueVariableScope.reservedTextDecoder).decode(bytes); }"
                     )
                 } else {
                     printer.write(
-                        "\(JSGlueVariableScope.reservedDecodeString) = (ptr, len) => { const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr >>> 0, len >>> 0); return \(JSGlueVariableScope.reservedTextDecoder).decode(bytes); }"
+                        "\(JSGlueVariableScope.reservedDecodeUTF8) = (ptr, len) => { const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr >>> 0, len >>> 0); return \(JSGlueVariableScope.reservedTextDecoder).decode(bytes); }"
                     )
                 }
+                emitDecodeString(printer)
                 printer.nextLine()
                 // Error handling
                 printer.write("\(JSGlueVariableScope.reservedSetException) = (error) => {")

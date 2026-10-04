@@ -321,19 +321,19 @@ func _$genericRoundTrip<T: BridgedSwiftGenericBridgeable>(_ value: T) throws(JSE
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_genericParse")
-fileprivate func bjs_genericParse_extern(_ jsonBytes: Int32, _ jsonLength: Int32, _ _generic0TypeId: Int32) -> Void
+fileprivate func bjs_genericParse_extern(_ jsonWord0: Int32, _ jsonWord1: Int32, _ jsonWord2: Int32, _ _generic0TypeId: Int32) -> Void
 #else
-fileprivate func bjs_genericParse_extern(_ jsonBytes: Int32, _ jsonLength: Int32, _ _generic0TypeId: Int32) -> Void {
+fileprivate func bjs_genericParse_extern(_ jsonWord0: Int32, _ jsonWord1: Int32, _ jsonWord2: Int32, _ _generic0TypeId: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_genericParse(_ jsonBytes: Int32, _ jsonLength: Int32, _ _generic0TypeId: Int32) -> Void {
-    return bjs_genericParse_extern(jsonBytes, jsonLength, _generic0TypeId)
+@inline(never) fileprivate func bjs_genericParse(_ jsonWord0: Int32, _ jsonWord1: Int32, _ jsonWord2: Int32, _ _generic0TypeId: Int32) -> Void {
+    return bjs_genericParse_extern(jsonWord0, jsonWord1, jsonWord2, _generic0TypeId)
 }
 
 func _$genericParse<T: BridgedSwiftGenericBridgeable>(_ json: String) throws(JSException) -> T {
-    json.bridgeJSWithLoweredParameter { (jsonBytes, jsonLength) in
-        bjs_genericParse(jsonBytes, jsonLength, T.bridgeJSTypeID)
+    json.bridgeJSWithLoweredParameter { (jsonWord0, jsonWord1, jsonWord2) in
+        bjs_genericParse(jsonWord0, jsonWord1, jsonWord2, T.bridgeJSTypeID)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -514,21 +514,21 @@ func _$constrainedComposition<T: BridgedSwiftGenericBridgeable & GenericWritable
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_GenericPairFactory_init")
-fileprivate func bjs_GenericPairFactory_init_extern(_ tagBytes: Int32, _ tagLength: Int32, _ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Int32
+fileprivate func bjs_GenericPairFactory_init_extern(_ tagWord0: Int32, _ tagWord1: Int32, _ tagWord2: Int32, _ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Int32
 #else
-fileprivate func bjs_GenericPairFactory_init_extern(_ tagBytes: Int32, _ tagLength: Int32, _ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Int32 {
+fileprivate func bjs_GenericPairFactory_init_extern(_ tagWord0: Int32, _ tagWord1: Int32, _ tagWord2: Int32, _ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_GenericPairFactory_init(_ tagBytes: Int32, _ tagLength: Int32, _ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Int32 {
-    return bjs_GenericPairFactory_init_extern(tagBytes, tagLength, _generic0TypeId, _generic1TypeId)
+@inline(never) fileprivate func bjs_GenericPairFactory_init(_ tagWord0: Int32, _ tagWord1: Int32, _ tagWord2: Int32, _ _generic0TypeId: Int32, _ _generic1TypeId: Int32) -> Int32 {
+    return bjs_GenericPairFactory_init_extern(tagWord0, tagWord1, tagWord2, _generic0TypeId, _generic1TypeId)
 }
 
 func _$GenericPairFactory_init<T: BridgedSwiftGenericBridgeable, U: BridgedSwiftGenericBridgeable>(_ tag: String, _ first: T, _ second: U) throws(JSException) -> JSObject {
-    let ret0 = tag.bridgeJSWithLoweredParameter { (tagBytes, tagLength) in
+    let ret0 = tag.bridgeJSWithLoweredParameter { (tagWord0, tagWord1, tagWord2) in
         second.bridgeJSStackPush()
         first.bridgeJSStackPush()
-        let ret = bjs_GenericPairFactory_init(tagBytes, tagLength, T.bridgeJSTypeID, U.bridgeJSTypeID)
+        let ret = bjs_GenericPairFactory_init(tagWord0, tagWord1, tagWord2, T.bridgeJSTypeID, U.bridgeJSTypeID)
         return ret
     }
     let ret = ret0

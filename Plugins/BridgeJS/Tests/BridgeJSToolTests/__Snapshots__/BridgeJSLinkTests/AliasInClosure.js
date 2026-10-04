@@ -9,6 +9,8 @@ export async function createInstantiator(options, swift) {
     let memory;
     let setException;
     let decodeString;
+    let decodeUTF8;
+    const immortalStrings = new Map();
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder("utf-8");
     let tmpRetString;
@@ -42,7 +44,7 @@ export async function createInstantiator(options, swift) {
                 const bytes = new Uint8Array(memory.buffer, state.file >>> 0);
                 let length = 0;
                 while (bytes[length] !== 0) { length += 1; }
-                const fileID = decodeString(state.file, length);
+                const fileID = decodeUTF8(state.file, length);
                 throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);
             }
             return func(...args);
@@ -64,8 +66,8 @@ export async function createInstantiator(options, swift) {
         addImports: (importObject, importsContext) => {
             bjs = {};
             importObject["bjs"] = bjs;
-            bjs["swift_js_return_string"] = function(ptr, len) {
-                tmpRetString = decodeString(ptr, len);
+            bjs["swift_js_return_string"] = function(word0, word1, word2) {
+                tmpRetString = decodeString(word0, word1, word2);
             }
             bjs["swift_js_init_memory"] = function(sourceId, bytesPtr) {
                 const source = swift.memory.getObject(sourceId);
@@ -73,8 +75,8 @@ export async function createInstantiator(options, swift) {
                 const bytes = new Uint8Array(memory.buffer, bytesPtr >>> 0);
                 bytes.set(source);
             }
-            bjs["swift_js_make_js_string"] = function(ptr, len) {
-                return swift.memory.retain(decodeString(ptr, len));
+            bjs["swift_js_make_js_string"] = function(word0, word1, word2) {
+                return swift.memory.retain(decodeString(word0, word1, word2));
             }
             bjs["swift_js_init_memory_with_result"] = function(ptr, len) {
                 const target = new Uint8Array(memory.buffer, ptr >>> 0, len >>> 0);
@@ -99,8 +101,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_push_f64"] = function(v) {
                 f64Stack.push(v);
             }
-            bjs["swift_js_push_string"] = function(ptr, len) {
-                const value = decodeString(ptr, len);
+            bjs["swift_js_push_string"] = function(word0, word1, word2) {
+                const value = decodeString(word0, word1, word2);
                 strStack.push(value);
             }
             bjs["swift_js_pop_i32"] = function() {
@@ -168,11 +170,11 @@ export async function createInstantiator(options, swift) {
                     tmpRetOptionalDouble = value;
                 }
             }
-            bjs["swift_js_return_optional_string"] = function(isSome, ptr, len) {
+            bjs["swift_js_return_optional_string"] = function(isSome, word0, word1, word2) {
                 if (isSome === 0) {
                     tmpRetString = null;
                 } else {
-                    tmpRetString = decodeString(ptr, len);
+                    tmpRetString = decodeString(word0, word1, word2);
                 }
             }
             bjs["swift_js_return_optional_object"] = function(isSome, objectId) {
@@ -293,7 +295,68 @@ export async function createInstantiator(options, swift) {
             instance = i;
             memory = instance.exports.memory;
 
-            decodeString = (ptr, len) => { const bytes = new Uint8Array(memory.buffer, ptr >>> 0, len >>> 0); return textDecoder.decode(bytes); }
+            decodeUTF8 = (ptr, len) => { const bytes = new Uint8Array(memory.buffer, ptr >>> 0, len >>> 0); return textDecoder.decode(bytes); }
+            decodeString = (() => {
+                const byteAt = (word0, word1, word2, i) => {
+                    if (i < 4) return (word0 >>> (i * 8)) & 0xff;
+                    if (i < 8) return (word1 >>> ((i - 4) * 8)) & 0xff;
+                    if (i === 8) return word2 & 0xff;
+                    return (word2 >>> 16) & 0xff;
+                };
+                const decodeSmallUTF8 = (word0, word1, word2, count) => {
+                    let result = "";
+                    let i = 0;
+                    while (i < count) {
+                        const b0 = byteAt(word0, word1, word2, i++);
+                        let codePoint;
+                        if (b0 < 0x80) {
+                            codePoint = b0;
+                        } else if (b0 < 0xe0) {
+                            codePoint = ((b0 & 0x1f) << 6) | (byteAt(word0, word1, word2, i++) & 0x3f);
+                        } else if (b0 < 0xf0) {
+                            const b1 = byteAt(word0, word1, word2, i++);
+                            const b2 = byteAt(word0, word1, word2, i++);
+                            codePoint = ((b0 & 0x0f) << 12) | ((b1 & 0x3f) << 6) | (b2 & 0x3f);
+                        } else {
+                            const b1 = byteAt(word0, word1, word2, i++);
+                            const b2 = byteAt(word0, word1, word2, i++);
+                            const b3 = byteAt(word0, word1, word2, i++);
+                            codePoint = ((b0 & 0x07) << 18) | ((b1 & 0x3f) << 12) | ((b2 & 0x3f) << 6) | (b3 & 0x3f);
+                        }
+                        result += String.fromCodePoint(codePoint);
+                    }
+                    return result;
+                };
+                const decodeSmall = (word0, word1, word2) => {
+                    const count = (word2 >>> 8) & 0x0f;
+                    if ((word2 & 0x4000 /* ASCII */) === 0) return decodeSmallUTF8(word0, word1, word2, count);
+                    const char = String.fromCharCode;
+                    switch (count) {
+                        case 0: return "";
+                        case 1: return char(word0 & 0xff);
+                        case 2: return char(word0 & 0xff, (word0 >>> 8) & 0xff);
+                        case 3: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff);
+                        case 4: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24);
+                        case 5: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff);
+                        case 6: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff);
+                        case 7: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff);
+                        case 8: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff, word1 >>> 24);
+                        default: return decodeSmallUTF8(word0, word1, word2, count);
+                    }
+                };
+                return (word0, word1, word2) => {
+                    if (word2 & 0x2000 /* small */) return decodeSmall(word0, word1, word2);
+                    const ptr = (word1 + 20 /* nativeBias */) >>> 0;
+                    const len = word0 >>> 0;
+                    if ((word2 & 0x8000 /* immortal */) === 0 || len >= 0x200000 /* 2^21 Number key */) return decodeUTF8(ptr, len);
+                    const key = ptr + len * 0x100000000;
+                    const cached = immortalStrings.get(key);
+                    if (cached !== undefined) return cached;
+                    const value = decodeUTF8(ptr, len);
+                    immortalStrings.set(key, value);
+                    return value;
+                };
+            })();
 
             setException = (error) => {
                 instance.exports._swift_js_exception.value = swift.memory.retain(error)

@@ -40,20 +40,20 @@ func _$kebabCaseFunction() throws(JSException) -> Int {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_joinPaths")
-fileprivate func bjs_joinPaths_extern(_ lhsBytes: Int32, _ lhsLength: Int32, _ rhsBytes: Int32, _ rhsLength: Int32) -> Int32
+fileprivate func bjs_joinPaths_extern(_ lhsWord0: Int32, _ lhsWord1: Int32, _ lhsWord2: Int32, _ rhsWord0: Int32, _ rhsWord1: Int32, _ rhsWord2: Int32) -> Int32
 #else
-fileprivate func bjs_joinPaths_extern(_ lhsBytes: Int32, _ lhsLength: Int32, _ rhsBytes: Int32, _ rhsLength: Int32) -> Int32 {
+fileprivate func bjs_joinPaths_extern(_ lhsWord0: Int32, _ lhsWord1: Int32, _ lhsWord2: Int32, _ rhsWord0: Int32, _ rhsWord1: Int32, _ rhsWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_joinPaths(_ lhsBytes: Int32, _ lhsLength: Int32, _ rhsBytes: Int32, _ rhsLength: Int32) -> Int32 {
-    return bjs_joinPaths_extern(lhsBytes, lhsLength, rhsBytes, rhsLength)
+@inline(never) fileprivate func bjs_joinPaths(_ lhsWord0: Int32, _ lhsWord1: Int32, _ lhsWord2: Int32, _ rhsWord0: Int32, _ rhsWord1: Int32, _ rhsWord2: Int32) -> Int32 {
+    return bjs_joinPaths_extern(lhsWord0, lhsWord1, lhsWord2, rhsWord0, rhsWord1, rhsWord2)
 }
 
 func _$joinPaths(_ lhs: String, _ rhs: String) throws(JSException) -> String {
-    let ret0 = lhs.bridgeJSWithLoweredParameter { (lhsBytes, lhsLength) in
-        let ret1 = rhs.bridgeJSWithLoweredParameter { (rhsBytes, rhsLength) in
-            let ret = bjs_joinPaths(lhsBytes, lhsLength, rhsBytes, rhsLength)
+    let ret0 = lhs.bridgeJSWithLoweredParameter { (lhsWord0, lhsWord1, lhsWord2) in
+        let ret1 = rhs.bridgeJSWithLoweredParameter { (rhsWord0, rhsWord1, rhsWord2) in
+            let ret = bjs_joinPaths(lhsWord0, lhsWord1, lhsWord2, rhsWord0, rhsWord1, rhsWord2)
             return ret
         }
         return ret1
