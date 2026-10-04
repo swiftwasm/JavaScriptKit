@@ -338,103 +338,74 @@ export async function createInstantiator(options, swift) {
                         }
                         // Match TextDecoder: consume exactly one leading UTF-8 BOM.
                         if (start === 0 && codePoint === 0xfeff) continue;
-                        if (codePoint <= 0xffff) {
+                        const supplementary = codePoint > 0xffff;
+                        const codeUnit = supplementary
+                            ? 0xd800 + ((codePoint - 0x10000) >>> 10)
+                            : codePoint;
+                        switch (unitCount++) {
+                            case 0:
+                                u0 = codeUnit;
+                                break;
+                            case 1:
+                                u1 = codeUnit;
+                                break;
+                            case 2:
+                                u2 = codeUnit;
+                                break;
+                            case 3:
+                                u3 = codeUnit;
+                                break;
+                            case 4:
+                                u4 = codeUnit;
+                                break;
+                            case 5:
+                                u5 = codeUnit;
+                                break;
+                            case 6:
+                                u6 = codeUnit;
+                                break;
+                            case 7:
+                                u7 = codeUnit;
+                                break;
+                            case 8:
+                                u8 = codeUnit;
+                                break;
+                            case 9:
+                                u9 = codeUnit;
+                                break;
+                        }
+                        if (supplementary) {
+                            const lowSurrogate = 0xdc00 + ((codePoint - 0x10000) & 1023);
                             switch (unitCount++) {
                                 case 0:
-                                    u0 = codePoint;
+                                    u0 = lowSurrogate;
                                     break;
                                 case 1:
-                                    u1 = codePoint;
+                                    u1 = lowSurrogate;
                                     break;
                                 case 2:
-                                    u2 = codePoint;
+                                    u2 = lowSurrogate;
                                     break;
                                 case 3:
-                                    u3 = codePoint;
+                                    u3 = lowSurrogate;
                                     break;
                                 case 4:
-                                    u4 = codePoint;
+                                    u4 = lowSurrogate;
                                     break;
                                 case 5:
-                                    u5 = codePoint;
+                                    u5 = lowSurrogate;
                                     break;
                                 case 6:
-                                    u6 = codePoint;
+                                    u6 = lowSurrogate;
                                     break;
                                 case 7:
-                                    u7 = codePoint;
+                                    u7 = lowSurrogate;
                                     break;
                                 case 8:
-                                    u8 = codePoint;
+                                    u8 = lowSurrogate;
                                     break;
                                 case 9:
-                                    u9 = codePoint;
-                                    break;
-                            }
-                        } else {
-                            codePoint -= 0x10000;
-                            switch (unitCount++) {
-                                case 0:
-                                    u0 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                                case 1:
-                                    u1 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                                case 2:
-                                    u2 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                                case 3:
-                                    u3 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                                case 4:
-                                    u4 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                                case 5:
-                                    u5 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                                case 6:
-                                    u6 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                                case 7:
-                                    u7 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                                case 8:
-                                    u8 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                                case 9:
-                                    u9 = 0xd800 + (codePoint >>> 10);
-                                    break;
-                            }
-                            switch (unitCount++) {
-                                case 0:
-                                    u0 = 0xdc00 + (codePoint & 1023);
-                                    break;
-                                case 1:
-                                    u1 = 0xdc00 + (codePoint & 1023);
-                                    break;
-                                case 2:
-                                    u2 = 0xdc00 + (codePoint & 1023);
-                                    break;
-                                case 3:
-                                    u3 = 0xdc00 + (codePoint & 1023);
-                                    break;
-                                case 4:
-                                    u4 = 0xdc00 + (codePoint & 1023);
-                                    break;
-                                case 5:
-                                    u5 = 0xdc00 + (codePoint & 1023);
-                                    break;
-                                case 6:
-                                    u6 = 0xdc00 + (codePoint & 1023);
-                                    break;
-                                case 7:
-                                    u7 = 0xdc00 + (codePoint & 1023);
-                                    break;
-                                case 8:
-                                    u8 = 0xdc00 + (codePoint & 1023);
-                                    break;
-                                case 9:
-                                    u9 = 0xdc00 + (codePoint & 1023);
+                                    u9 = lowSurrogate;
                                     break;
                             }
                         }
@@ -478,7 +449,8 @@ export async function createInstantiator(options, swift) {
                         case 6: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff);
                         case 7: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff);
                         case 8: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff, word1 >>> 24);
-                        default: return decodeSmallUTF8(word0, word1, word2, count);
+                        case 9: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff, word1 >>> 24, word2 & 0xff);
+                        case 10: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff, word1 >>> 24, word2 & 0xff, (word2 >>> 16) & 0xff);
                     }
                 };
                 return (word0, word1, word2) => {
