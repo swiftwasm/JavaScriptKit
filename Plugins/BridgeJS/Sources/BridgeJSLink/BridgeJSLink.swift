@@ -317,7 +317,7 @@ public struct BridgeJSLink {
     ///
     /// The wasm32 12-byte Swift `String` layout is a standard-library
     /// implementation detail, not a stable ABI. Small strings (`word2 & 0x2000`)
-    /// store up to 10 UTF-8 bytes inline. Large strings store the UTF-8 count in
+    /// store up to 8 UTF-8 bytes inline. Large strings store the UTF-8 count in
     /// `word0` and a variant/object pointer in `word1`; UTF-8 starts at
     /// `word1 + nativeBias` (20 on 32-bit). Immortal large strings
     /// (`word2 & 0x8000`) are cached by a 53-bit `ptr + len * 2**32` key when
@@ -326,16 +326,15 @@ public struct BridgeJSLink {
         printer.write(
             multilineString: """
                 \(JSGlueVariableScope.reservedDecodeString) = (() => {
-                    const byteAt = (word0, word1, word2, byteIndex) =>
+                    const byteAt = (word0, word1, byteIndex) =>
                         byteIndex < 4
                             ? (word0 >>> (byteIndex * 8)) & 255
-                            : byteIndex < 8
-                              ? (word1 >>> ((byteIndex - 4) * 8)) & 255
-                              : byteIndex === 8
-                                ? word2 & 255
-                                : (word2 >>> 16) & 255;
-                    // Valid small Swift strings need at most ten UTF-16 code units.
-                    const decodeSmallUTF8 = (word0, word1, word2, count) => {
+                            : (word1 >>> ((byteIndex - 4) * 8)) & 255;
+                    // Valid small Swift strings need at most eight UTF-16 code units.
+                    const decodeSmallUTF8 = (word0, word1, count) => {
+                        if (count > 8) {
+                            throw new Error(`Unsupported Swift inline String length: ${count} UTF-8 bytes (maximum 8). The Swift String layout may have changed; update JavaScriptKit and regenerate BridgeJS glue.`);
+                        }
                         let byteIndex = 0,
                             unitCount = 0,
                             u0 = 0,
@@ -345,23 +344,21 @@ public struct BridgeJSLink {
                             u4 = 0,
                             u5 = 0,
                             u6 = 0,
-                            u7 = 0,
-                            u8 = 0,
-                            u9 = 0;
+                            u7 = 0;
                         while (byteIndex < count) {
                             const start = byteIndex;
-                            const b0 = byteAt(word0, word1, word2, byteIndex++);
+                            const b0 = byteAt(word0, word1, byteIndex++);
                             let codePoint;
                             if (b0 < 128) codePoint = b0;
-                            else if (b0 < 224) codePoint = ((b0 & 31) << 6) | (byteAt(word0, word1, word2, byteIndex++) & 63);
+                            else if (b0 < 224) codePoint = ((b0 & 31) << 6) | (byteAt(word0, word1, byteIndex++) & 63);
                             else if (b0 < 240) {
-                                const b1 = byteAt(word0, word1, word2, byteIndex++),
-                                    b2 = byteAt(word0, word1, word2, byteIndex++);
+                                const b1 = byteAt(word0, word1, byteIndex++),
+                                    b2 = byteAt(word0, word1, byteIndex++);
                                 codePoint = ((b0 & 15) << 12) | ((b1 & 63) << 6) | (b2 & 63);
                             } else {
-                                const b1 = byteAt(word0, word1, word2, byteIndex++),
-                                    b2 = byteAt(word0, word1, word2, byteIndex++),
-                                    b3 = byteAt(word0, word1, word2, byteIndex++);
+                                const b1 = byteAt(word0, word1, byteIndex++),
+                                    b2 = byteAt(word0, word1, byteIndex++),
+                                    b3 = byteAt(word0, word1, byteIndex++);
                                 codePoint = ((b0 & 7) << 18) | ((b1 & 63) << 12) | ((b2 & 63) << 6) | (b3 & 63);
                             }
                             // Match TextDecoder: consume exactly one leading UTF-8 BOM.
@@ -395,12 +392,6 @@ public struct BridgeJSLink {
                                 case 7:
                                     u7 = codeUnit;
                                     break;
-                                case 8:
-                                    u8 = codeUnit;
-                                    break;
-                                case 9:
-                                    u9 = codeUnit;
-                                    break;
                             }
                             if (supplementary) {
                                 const lowSurrogate = 0xdc00 + ((codePoint - 0x10000) & 1023);
@@ -429,12 +420,6 @@ public struct BridgeJSLink {
                                     case 7:
                                         u7 = lowSurrogate;
                                         break;
-                                    case 8:
-                                        u8 = lowSurrogate;
-                                        break;
-                                    case 9:
-                                        u9 = lowSurrogate;
-                                        break;
                                 }
                             }
                         }
@@ -457,15 +442,11 @@ public struct BridgeJSLink {
                                 return String.fromCharCode(u0, u1, u2, u3, u4, u5, u6);
                             case 8:
                                 return String.fromCharCode(u0, u1, u2, u3, u4, u5, u6, u7);
-                            case 9:
-                                return String.fromCharCode(u0, u1, u2, u3, u4, u5, u6, u7, u8);
-                            case 10:
-                                return String.fromCharCode(u0, u1, u2, u3, u4, u5, u6, u7, u8, u9);
                         }
                     };
                     const decodeSmall = (word0, word1, word2) => {
                         const count = (word2 >>> 8) & 0x0f;
-                        if ((word2 & 0x4000 /* ASCII */) === 0) return decodeSmallUTF8(word0, word1, word2, count);
+                        if ((word2 & 0x4000 /* ASCII */) === 0) return decodeSmallUTF8(word0, word1, count);
                         const char = String.fromCharCode;
                         switch (count) {
                             case 0: return "";
@@ -477,8 +458,8 @@ public struct BridgeJSLink {
                             case 6: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff);
                             case 7: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff);
                             case 8: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff, word1 >>> 24);
-                            case 9: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff, word1 >>> 24, word2 & 0xff);
-                            case 10: return char(word0 & 0xff, (word0 >>> 8) & 0xff, (word0 >>> 16) & 0xff, word0 >>> 24, word1 & 0xff, (word1 >>> 8) & 0xff, (word1 >>> 16) & 0xff, word1 >>> 24, word2 & 0xff, (word2 >>> 16) & 0xff);
+                            default:
+                                throw new Error(`Unsupported Swift inline String length: ${count} UTF-8 bytes (maximum 8). The Swift String layout may have changed; update JavaScriptKit and regenerate BridgeJS glue.`);
                         }
                     };
                     return (word0, word1, word2) => {

@@ -21,11 +21,9 @@ bridge.setInstance(wasm);
 let exports = bridge.createExports(wasm);
 function small(value) {
     const bytes = encoder.encode(value);
-    assert.ok(bytes.length <= 10);
+    assert.ok(bytes.length <= 8);
     const storage = new Uint8Array(12);
     storage.set(bytes.subarray(0, 8));
-    storage[8] = bytes[8] ?? 0;
-    storage[10] = bytes[9] ?? 0;
     storage[9] = (bytes.every((b) => b < 128) ? 0xe0 : 0xa0) | bytes.length;
     const view = new DataView(storage.buffer);
     return [0, 4, 8].map((offset) => view.getInt32(offset, true));
@@ -41,7 +39,7 @@ const values = ['', 'div', 'abcdefgh', 'abcdefghi', 'abcdefghij', 'abcdefé', 'a
     'abc\ufeffdefghijk', '\ufeff\ufeffabcdefghijk'];
 for (const value of values) {
     const expected = decoder.decode(encoder.encode(value));
-    if (encoder.encode(value).length <= 10) {
+    if (encoder.encode(value).length <= 8) {
         words = small(value);
         assert.equal(exports.checkString(), expected);
     }
@@ -49,16 +47,26 @@ for (const value of values) {
     assert.equal(exports.checkString(), expected);
 }
 // Alternate full and short inputs: bytes outside count must never leak into the result.
-for (const value of ['abcdefghé', 'é', 'abcdef😄', '\ufeff', 'abcdefghij', '', 'x\0', '€', '\ufeff\ufeff']) {
+for (const value of ['abcd😄', 'é', 'abcde€', '\ufeff', 'abcdefgh', '', 'x\0', '€', '\ufeff\ufeff']) {
     words = small(value);
     assert.equal(exports.checkString(), decoder.decode(encoder.encode(value)));
 }
 // Every ASCII byte, including NUL, at every small-string length.
 for (let byte = 0; byte < 128; byte++) {
-    for (let count = 0; count <= 10; count++) {
+    for (let count = 0; count <= 8; count++) {
         const value = String.fromCharCode(byte).repeat(count);
         words = small(value);
         assert.equal(exports.checkString(), value);
+    }
+}
+// Unexpected inline lengths must fail for both ASCII and Unicode discriminators.
+for (const count of [9, 10]) {
+    for (const discriminator of [0xe0, 0xa0]) {
+        words = [0, 0, (discriminator | count) << 8];
+        assert.throws(() => exports.checkString(), {
+            name: 'Error',
+            message: `Unsupported Swift inline String length: ${count} UTF-8 bytes (maximum 8). The Swift String layout may have changed; update JavaScriptKit and regenerate BridgeJS glue.`,
+        });
     }
 }
 words = large('first literal', true);
