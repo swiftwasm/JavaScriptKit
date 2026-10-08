@@ -346,7 +346,6 @@ public struct BridgeJSLink {
                             u6 = 0,
                             u7 = 0;
                         while (byteIndex < count) {
-                            const start = byteIndex;
                             const b0 = byteAt(word0, word1, byteIndex++);
                             let codePoint;
                             if (b0 < 128) codePoint = b0;
@@ -361,8 +360,6 @@ public struct BridgeJSLink {
                                     b3 = byteAt(word0, word1, byteIndex++);
                                 codePoint = ((b0 & 7) << 18) | ((b1 & 63) << 12) | ((b2 & 63) << 6) | (b3 & 63);
                             }
-                            // Match TextDecoder: consume exactly one leading UTF-8 BOM.
-                            if (start === 0 && codePoint === 0xfeff) continue;
                             const supplementary = codePoint > 0xffff;
                             const codeUnit = supplementary
                                 ? 0xd800 + ((codePoint - 0x10000) >>> 10)
@@ -487,7 +484,7 @@ public struct BridgeJSLink {
             "let \(JSGlueVariableScope.reservedDecodeString);",
             "let \(JSGlueVariableScope.reservedDecodeUTF8);",
             "const \(JSGlueVariableScope.reservedImmortalStrings) = new Map();",
-            "const \(JSGlueVariableScope.reservedTextDecoder) = new TextDecoder(\"utf-8\");",
+            "const \(JSGlueVariableScope.reservedTextDecoder) = new TextDecoder(\"utf-8\", { ignoreBOM: true });",
             "const \(JSGlueVariableScope.reservedTextEncoder) = new TextEncoder(\"utf-8\");",
             "let \(JSGlueVariableScope.reservedStorageToReturnString);",
             "let \(JSGlueVariableScope.reservedStorageToReturnBytes);",

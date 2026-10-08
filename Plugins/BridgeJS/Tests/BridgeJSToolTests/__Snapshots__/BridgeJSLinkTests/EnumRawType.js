@@ -86,7 +86,7 @@ export async function createInstantiator(options, swift) {
     let decodeString;
     let decodeUTF8;
     const immortalStrings = new Map();
-    const textDecoder = new TextDecoder("utf-8");
+    const textDecoder = new TextDecoder("utf-8", { ignoreBOM: true });
     const textEncoder = new TextEncoder("utf-8");
     let tmpRetString;
     let tmpRetBytes;
@@ -673,7 +673,6 @@ export async function createInstantiator(options, swift) {
                         u6 = 0,
                         u7 = 0;
                     while (byteIndex < count) {
-                        const start = byteIndex;
                         const b0 = byteAt(word0, word1, byteIndex++);
                         let codePoint;
                         if (b0 < 128) codePoint = b0;
@@ -688,8 +687,6 @@ export async function createInstantiator(options, swift) {
                                 b3 = byteAt(word0, word1, byteIndex++);
                             codePoint = ((b0 & 7) << 18) | ((b1 & 63) << 12) | ((b2 & 63) << 6) | (b3 & 63);
                         }
-                        // Match TextDecoder: consume exactly one leading UTF-8 BOM.
-                        if (start === 0 && codePoint === 0xfeff) continue;
                         const supplementary = codePoint > 0xffff;
                         const codeUnit = supplementary
                             ? 0xd800 + ((codePoint - 0x10000) >>> 10)

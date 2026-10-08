@@ -38,16 +38,15 @@ export function runJsStringABITests(rootExports) {
     assert.equal(exports.immortalSubstring(), immortal.slice(10));
     assert.equal(exports.optionalNone(), null);
     assert.equal(exports.optionalSome(), immortal);
-    const expected = samples.map((s) => s.startsWith("\ufeff") ? s.slice(1) : s);
     for (let i = 0; i < samples.length; i++) {
-        assert.equal(exports.echo(samples[i]), expected[i]);
-        assert.equal(exports.echoOptional(samples[i]), expected[i]);
+        assert.equal(exports.echo(samples[i]), samples[i]);
+        assert.equal(exports.echoOptional(samples[i]), samples[i]);
     }
-    assert.deepEqual(exports.echoArray(samples), expected);
+    assert.deepEqual(exports.echoArray(samples), samples);
 }
 
 const samples = [
     "abcdefé", "abcdefgé", "abcdefghé", "abcdefghié", "abc€", "abcdefg€",
-    "abc😄", "abcdef😄", "abcdefg😄", "a\0b", "\ufeffx", "x\ufeff",
+    "abc😄", "abcdef😄", "abcdefg😄", "a\0b", "\ufeff", "\ufeffx", "\ufeffabcde", "\ufeffabcdef", "x\ufeff",
     "\ufeff\ufeffx", "\ufeffabcdefghijk", "abc\ufeffdefghijk", "\ufeff\ufeffabcdefghijk",
 ];

@@ -43,15 +43,14 @@ final class StringABITests: XCTestCase {
         let samples = [
             "abcdefé", "abcdefgé", "abcdefghé", "abcdefghié",
             "abc€", "abcdefg€", "abc😄", "abcdef😄", "abcdefg😄", "a\0b",
-            "\u{FEFF}x", "x\u{FEFF}", "\u{FEFF}\u{FEFF}x",
+            "\u{FEFF}", "\u{FEFF}x", "\u{FEFF}abcde", "\u{FEFF}abcdef", "x\u{FEFF}", "\u{FEFF}\u{FEFF}x",
             "\u{FEFF}abcdefghijk", "abc\u{FEFF}defghijk", "\u{FEFF}\u{FEFF}abcdefghijk",
         ]
-        let expected = samples.map { $0.first == "\u{FEFF}" ? String($0.dropFirst()) : $0 }
-        for (input, output) in zip(samples, expected) {
-            try XCTAssertEqual(StringABIImports.jsEcho(input), output)
-            try XCTAssertEqual(StringABIImports.jsEchoOptional(input), output)
+        for input in samples {
+            try XCTAssertEqual(StringABIImports.jsEcho(input), input)
+            try XCTAssertEqual(StringABIImports.jsEchoOptional(input), input)
         }
-        try XCTAssertEqual(StringABIImports.jsEchoArray(samples), expected)
+        try XCTAssertEqual(StringABIImports.jsEchoArray(samples), samples)
     }
 
     func testImportEchoesSmallStrings() throws {
