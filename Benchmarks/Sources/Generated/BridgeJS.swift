@@ -2429,20 +2429,20 @@ func _$benchmarkHelperNoopWithNumber(_ n: Double) throws(JSException) -> Void {
 
 #if arch(wasm32)
 @_extern(wasm, module: "Benchmarks", name: "bjs_benchmarkRunner")
-fileprivate func bjs_benchmarkRunner_extern(_ nameBytes: Int32, _ nameLength: Int32, _ body: Int32) -> Void
+fileprivate func bjs_benchmarkRunner_extern(_ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32, _ body: Int32) -> Void
 #else
-fileprivate func bjs_benchmarkRunner_extern(_ nameBytes: Int32, _ nameLength: Int32, _ body: Int32) -> Void {
+fileprivate func bjs_benchmarkRunner_extern(_ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32, _ body: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_benchmarkRunner(_ nameBytes: Int32, _ nameLength: Int32, _ body: Int32) -> Void {
-    return bjs_benchmarkRunner_extern(nameBytes, nameLength, body)
+@inline(never) fileprivate func bjs_benchmarkRunner(_ nameWord0: Int32, _ nameWord1: Int32, _ nameWord2: Int32, _ body: Int32) -> Void {
+    return bjs_benchmarkRunner_extern(nameWord0, nameWord1, nameWord2, body)
 }
 
 func _$benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> Void {
-    name.bridgeJSWithLoweredParameter { (nameBytes, nameLength) in
+    name.bridgeJSWithLoweredParameter { (nameWord0, nameWord1, nameWord2) in
         let bodyValue = body.bridgeJSLowerParameter()
-        bjs_benchmarkRunner(nameBytes, nameLength, bodyValue)
+        bjs_benchmarkRunner(nameWord0, nameWord1, nameWord2, bodyValue)
     }
     if let error = _swift_js_take_exception() {
         throw error

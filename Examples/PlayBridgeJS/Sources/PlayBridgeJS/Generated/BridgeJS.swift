@@ -268,20 +268,20 @@ func _$createTS2Swift() throws(JSException) -> TS2Swift {
 
 #if arch(wasm32)
 @_extern(wasm, module: "PlayBridgeJS", name: "bjs_TS2Swift_convert")
-fileprivate func bjs_TS2Swift_convert_extern(_ self: Int32, _ tsBytes: Int32, _ tsLength: Int32) -> Int32
+fileprivate func bjs_TS2Swift_convert_extern(_ self: Int32, _ tsWord0: Int32, _ tsWord1: Int32, _ tsWord2: Int32) -> Int32
 #else
-fileprivate func bjs_TS2Swift_convert_extern(_ self: Int32, _ tsBytes: Int32, _ tsLength: Int32) -> Int32 {
+fileprivate func bjs_TS2Swift_convert_extern(_ self: Int32, _ tsWord0: Int32, _ tsWord1: Int32, _ tsWord2: Int32) -> Int32 {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_TS2Swift_convert(_ self: Int32, _ tsBytes: Int32, _ tsLength: Int32) -> Int32 {
-    return bjs_TS2Swift_convert_extern(self, tsBytes, tsLength)
+@inline(never) fileprivate func bjs_TS2Swift_convert(_ self: Int32, _ tsWord0: Int32, _ tsWord1: Int32, _ tsWord2: Int32) -> Int32 {
+    return bjs_TS2Swift_convert_extern(self, tsWord0, tsWord1, tsWord2)
 }
 
 func _$TS2Swift_convert(_ self: JSObject, _ ts: String) throws(JSException) -> String {
-    let ret0 = ts.bridgeJSWithLoweredParameter { (tsBytes, tsLength) in
+    let ret0 = ts.bridgeJSWithLoweredParameter { (tsWord0, tsWord1, tsWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        let ret = bjs_TS2Swift_convert(selfValue, tsBytes, tsLength)
+        let ret = bjs_TS2Swift_convert(selfValue, tsWord0, tsWord1, tsWord2)
         return ret
     }
     let ret = ret0

@@ -14,6 +14,8 @@ final class JSGlueVariableScope {
     static let reservedMemory = "memory"
     static let reservedSetException = "setException"
     static let reservedDecodeString = "decodeString"
+    static let reservedDecodeUTF8 = "decodeUTF8"
+    static let reservedImmortalStrings = "immortalStrings"
     static let reservedStorageToReturnString = "tmpRetString"
     static let reservedStorageToReturnBytes = "tmpRetBytes"
     static let reservedStorageToReturnException = "tmpRetException"
@@ -49,6 +51,8 @@ final class JSGlueVariableScope {
         reservedMemory,
         reservedSetException,
         reservedDecodeString,
+        reservedDecodeUTF8,
+        reservedImmortalStrings,
         reservedStorageToReturnString,
         reservedStorageToReturnBytes,
         reservedStorageToReturnException,
@@ -678,14 +682,15 @@ struct IntrinsicJSFragment: Sendable {
         }
     )
     static let stringLiftParameter = IntrinsicJSFragment(
-        parameters: ["bytes", "count"],
+        parameters: ["word0", "word1", "word2"],
         printCode: { arguments, context in
             let (scope, printer) = (context.scope, context.printer)
-            let bytesExpr = arguments[0]
-            let countExpr = arguments[1]
+            let word0Expr = arguments[0]
+            let word1Expr = arguments[1]
+            let word2Expr = arguments[2]
             let stringLabel = scope.variable("string")
             printer.write(
-                "const \(stringLabel) = \(JSGlueVariableScope.reservedDecodeString)(\(bytesExpr), \(countExpr));"
+                "const \(stringLabel) = \(JSGlueVariableScope.reservedDecodeString)(\(word0Expr), \(word1Expr), \(word2Expr));"
             )
             return [stringLabel]
         }

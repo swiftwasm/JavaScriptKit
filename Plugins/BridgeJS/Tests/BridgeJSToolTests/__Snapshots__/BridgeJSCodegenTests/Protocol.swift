@@ -5,9 +5,9 @@ extension MyViewControllerDelegate where Self: _BridgedSwiftProtocolWrapper {
     }
 
     func onValueChanged(_ value: String) -> Void {
-        value.bridgeJSWithLoweredParameter { (valueBytes, valueLength) in
+        value.bridgeJSWithLoweredParameter { (valueWord0, valueWord1, valueWord2) in
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
-            bjs_MyViewControllerDelegate_onValueChanged(jsObjectValue, valueBytes, valueLength)
+            bjs_MyViewControllerDelegate_onValueChanged(jsObjectValue, valueWord0, valueWord1, valueWord2)
         }
     }
 
@@ -19,10 +19,10 @@ extension MyViewControllerDelegate where Self: _BridgedSwiftProtocolWrapper {
     }
 
     func onLabelUpdated(_ prefix: String, _ suffix: String) -> Void {
-        prefix.bridgeJSWithLoweredParameter { (prefixBytes, prefixLength) in
-            suffix.bridgeJSWithLoweredParameter { (suffixBytes, suffixLength) in
+        prefix.bridgeJSWithLoweredParameter { (prefixWord0, prefixWord1, prefixWord2) in
+            suffix.bridgeJSWithLoweredParameter { (suffixWord0, suffixWord1, suffixWord2) in
                 let jsObjectValue = jsObject.bridgeJSLowerParameter()
-                bjs_MyViewControllerDelegate_onLabelUpdated(jsObjectValue, prefixBytes, prefixLength, suffixBytes, suffixLength)
+                bjs_MyViewControllerDelegate_onLabelUpdated(jsObjectValue, prefixWord0, prefixWord1, prefixWord2, suffixWord0, suffixWord1, suffixWord2)
             }
         }
     }
@@ -103,9 +103,9 @@ extension MyViewControllerDelegate where Self: _BridgedSwiftProtocolWrapper {
             return Optional<String>.bridgeJSLiftReturnFromSideChannel()
         }
         set {
-            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueWord0, newValueWord1, newValueWord2) in
                 let jsObjectValue = jsObject.bridgeJSLowerParameter()
-                bjs_MyViewControllerDelegate_optionalName_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
+                bjs_MyViewControllerDelegate_optionalName_set(jsObjectValue, newValueIsSome, newValueWord0, newValueWord1, newValueWord2)
             }
         }
     }
@@ -117,9 +117,9 @@ extension MyViewControllerDelegate where Self: _BridgedSwiftProtocolWrapper {
             return Optional<ExampleEnum>.bridgeJSLiftReturnFromSideChannel()
         }
         set {
-            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueBytes, newValueLength) in
+            newValue.bridgeJSWithLoweredParameter { (newValueIsSome, newValueWord0, newValueWord1, newValueWord2) in
                 let jsObjectValue = jsObject.bridgeJSLowerParameter()
-                bjs_MyViewControllerDelegate_optionalRawEnum_set(jsObjectValue, newValueIsSome, newValueBytes, newValueLength)
+                bjs_MyViewControllerDelegate_optionalRawEnum_set(jsObjectValue, newValueIsSome, newValueWord0, newValueWord1, newValueWord2)
             }
         }
     }
@@ -131,9 +131,9 @@ extension MyViewControllerDelegate where Self: _BridgedSwiftProtocolWrapper {
             return ExampleEnum.bridgeJSLiftReturn(ret)
         }
         set {
-            newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+            newValue.bridgeJSWithLoweredParameter { (newValueWord0, newValueWord1, newValueWord2) in
                 let jsObjectValue = jsObject.bridgeJSLowerParameter()
-                bjs_MyViewControllerDelegate_rawStringEnum_set(jsObjectValue, newValueBytes, newValueLength)
+                bjs_MyViewControllerDelegate_rawStringEnum_set(jsObjectValue, newValueWord0, newValueWord1, newValueWord2)
             }
         }
     }
@@ -239,14 +239,14 @@ fileprivate func bjs_MyViewControllerDelegate_onSomethingHappened_extern(_ jsObj
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onValueChanged")
-fileprivate func bjs_MyViewControllerDelegate_onValueChanged_extern(_ jsObject: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void
+fileprivate func bjs_MyViewControllerDelegate_onValueChanged_extern(_ jsObject: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void
 #else
-fileprivate func bjs_MyViewControllerDelegate_onValueChanged_extern(_ jsObject: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_onValueChanged_extern(_ jsObject: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_MyViewControllerDelegate_onValueChanged(_ jsObject: Int32, _ valueBytes: Int32, _ valueLength: Int32) -> Void {
-    return bjs_MyViewControllerDelegate_onValueChanged_extern(jsObject, valueBytes, valueLength)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_onValueChanged(_ jsObject: Int32, _ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Void {
+    return bjs_MyViewControllerDelegate_onValueChanged_extern(jsObject, valueWord0, valueWord1, valueWord2)
 }
 
 #if arch(wasm32)
@@ -263,14 +263,14 @@ fileprivate func bjs_MyViewControllerDelegate_onCountUpdated_extern(_ jsObject: 
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_onLabelUpdated")
-fileprivate func bjs_MyViewControllerDelegate_onLabelUpdated_extern(_ jsObject: Int32, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void
+fileprivate func bjs_MyViewControllerDelegate_onLabelUpdated_extern(_ jsObject: Int32, _ prefixWord0: Int32, _ prefixWord1: Int32, _ prefixWord2: Int32, _ suffixWord0: Int32, _ suffixWord1: Int32, _ suffixWord2: Int32) -> Void
 #else
-fileprivate func bjs_MyViewControllerDelegate_onLabelUpdated_extern(_ jsObject: Int32, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_onLabelUpdated_extern(_ jsObject: Int32, _ prefixWord0: Int32, _ prefixWord1: Int32, _ prefixWord2: Int32, _ suffixWord0: Int32, _ suffixWord1: Int32, _ suffixWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_MyViewControllerDelegate_onLabelUpdated(_ jsObject: Int32, _ prefixBytes: Int32, _ prefixLength: Int32, _ suffixBytes: Int32, _ suffixLength: Int32) -> Void {
-    return bjs_MyViewControllerDelegate_onLabelUpdated_extern(jsObject, prefixBytes, prefixLength, suffixBytes, suffixLength)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_onLabelUpdated(_ jsObject: Int32, _ prefixWord0: Int32, _ prefixWord1: Int32, _ prefixWord2: Int32, _ suffixWord0: Int32, _ suffixWord1: Int32, _ suffixWord2: Int32) -> Void {
+    return bjs_MyViewControllerDelegate_onLabelUpdated_extern(jsObject, prefixWord0, prefixWord1, prefixWord2, suffixWord0, suffixWord1, suffixWord2)
 }
 
 #if arch(wasm32)
@@ -419,14 +419,14 @@ fileprivate func bjs_MyViewControllerDelegate_optionalName_get_extern(_ jsObject
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalName_set")
-fileprivate func bjs_MyViewControllerDelegate_optionalName_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_MyViewControllerDelegate_optionalName_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_MyViewControllerDelegate_optionalName_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_optionalName_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_MyViewControllerDelegate_optionalName_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_MyViewControllerDelegate_optionalName_set_extern(jsObject, newValueIsSome, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_optionalName_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_MyViewControllerDelegate_optionalName_set_extern(jsObject, newValueIsSome, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -443,14 +443,14 @@ fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_get_extern(_ jsObj
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_optionalRawEnum_set")
-fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_set_extern(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_MyViewControllerDelegate_optionalRawEnum_set_extern(jsObject, newValueIsSome, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_optionalRawEnum_set(_ jsObject: Int32, _ newValueIsSome: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_MyViewControllerDelegate_optionalRawEnum_set_extern(jsObject, newValueIsSome, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -467,14 +467,14 @@ fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_get_extern(_ jsObjec
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_MyViewControllerDelegate_rawStringEnum_set")
-fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_set_extern(_ jsObject: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_set_extern(_ jsObject: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_set_extern(_ jsObject: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_set_extern(_ jsObject: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_set(_ jsObject: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_MyViewControllerDelegate_rawStringEnum_set_extern(jsObject, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_MyViewControllerDelegate_rawStringEnum_set(_ jsObject: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_MyViewControllerDelegate_rawStringEnum_set_extern(jsObject, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)

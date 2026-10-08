@@ -528,19 +528,19 @@ extension Ratio: BridgedSwiftGenericBridgeable {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_takesFeatureFlag")
-fileprivate func bjs_takesFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: Int32) -> Void
+fileprivate func bjs_takesFeatureFlag_extern(_ flagWord0: Int32, _ flagWord1: Int32, _ flagWord2: Int32) -> Void
 #else
-fileprivate func bjs_takesFeatureFlag_extern(_ flagBytes: Int32, _ flagLength: Int32) -> Void {
+fileprivate func bjs_takesFeatureFlag_extern(_ flagWord0: Int32, _ flagWord1: Int32, _ flagWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_takesFeatureFlag(_ flagBytes: Int32, _ flagLength: Int32) -> Void {
-    return bjs_takesFeatureFlag_extern(flagBytes, flagLength)
+@inline(never) fileprivate func bjs_takesFeatureFlag(_ flagWord0: Int32, _ flagWord1: Int32, _ flagWord2: Int32) -> Void {
+    return bjs_takesFeatureFlag_extern(flagWord0, flagWord1, flagWord2)
 }
 
 func _$takesFeatureFlag(_ flag: FeatureFlag) throws(JSException) -> Void {
-    flag.bridgeJSWithLoweredParameter { (flagBytes, flagLength) in
-        bjs_takesFeatureFlag(flagBytes, flagLength)
+    flag.bridgeJSWithLoweredParameter { (flagWord0, flagWord1, flagWord2) in
+        bjs_takesFeatureFlag(flagWord0, flagWord1, flagWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error

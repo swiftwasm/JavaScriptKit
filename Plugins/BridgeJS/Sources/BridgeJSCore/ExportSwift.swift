@@ -744,9 +744,7 @@ public class ExportSwift {
     /// public func _bjs_Greeter_greet(pointer: UnsafeMutableRawPointer) -> Void {
     ///     let _self = Unmanaged<Greeter>.fromOpaque(pointer).takeUnretainedValue()
     ///     var ret = _self.greet()
-    ///     return ret.withUTF8 { ptr in
-    ///         _swift_js_return_string(ptr.baseAddress, Int32(ptr.count))
-    ///     }
+    ///     return ret.bridgeJSLowerReturn()
     /// }
     /// @_expose(wasm, "bjs_Greeter_deinit")
     /// @_cdecl("bjs_Greeter_deinit")

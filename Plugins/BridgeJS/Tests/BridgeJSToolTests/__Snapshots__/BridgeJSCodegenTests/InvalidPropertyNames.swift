@@ -136,14 +136,14 @@ fileprivate func bjs_WeirdNaming_Any_get_extern(_ self: Int32) -> Int32 {
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WeirdNaming_normalProperty_set")
-fileprivate func bjs_WeirdNaming_normalProperty_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_WeirdNaming_normalProperty_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_WeirdNaming_normalProperty_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_WeirdNaming_normalProperty_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_WeirdNaming_normalProperty_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_WeirdNaming_normalProperty_set_extern(self, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_WeirdNaming_normalProperty_set(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_WeirdNaming_normalProperty_set_extern(self, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -172,14 +172,14 @@ fileprivate func bjs_WeirdNaming__123invalidStart_set_extern(_ self: Int32, _ ne
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WeirdNaming_property_with_spaces_set")
-fileprivate func bjs_WeirdNaming_property_with_spaces_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_WeirdNaming_property_with_spaces_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_WeirdNaming_property_with_spaces_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_WeirdNaming_property_with_spaces_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_WeirdNaming_property_with_spaces_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_WeirdNaming_property_with_spaces_set_extern(self, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_WeirdNaming_property_with_spaces_set(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_WeirdNaming_property_with_spaces_set_extern(self, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -196,38 +196,38 @@ fileprivate func bjs_WeirdNaming__specialChar_set_extern(_ self: Int32, _ newVal
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WeirdNaming_constructor_set")
-fileprivate func bjs_WeirdNaming_constructor_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_WeirdNaming_constructor_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_WeirdNaming_constructor_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_WeirdNaming_constructor_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_WeirdNaming_constructor_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_WeirdNaming_constructor_set_extern(self, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_WeirdNaming_constructor_set(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_WeirdNaming_constructor_set_extern(self, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WeirdNaming_for_set")
-fileprivate func bjs_WeirdNaming_for_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_WeirdNaming_for_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_WeirdNaming_for_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_WeirdNaming_for_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_WeirdNaming_for_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_WeirdNaming_for_set_extern(self, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_WeirdNaming_for_set(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_WeirdNaming_for_set_extern(self, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
 @_extern(wasm, module: "TestModule", name: "bjs_WeirdNaming_any_set")
-fileprivate func bjs_WeirdNaming_any_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void
+fileprivate func bjs_WeirdNaming_any_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void
 #else
-fileprivate func bjs_WeirdNaming_any_set_extern(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
+fileprivate func bjs_WeirdNaming_any_set_extern(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
     fatalError("Only available on WebAssembly")
 }
 #endif
-@inline(never) fileprivate func bjs_WeirdNaming_any_set(_ self: Int32, _ newValueBytes: Int32, _ newValueLength: Int32) -> Void {
-    return bjs_WeirdNaming_any_set_extern(self, newValueBytes, newValueLength)
+@inline(never) fileprivate func bjs_WeirdNaming_any_set(_ self: Int32, _ newValueWord0: Int32, _ newValueWord1: Int32, _ newValueWord2: Int32) -> Void {
+    return bjs_WeirdNaming_any_set_extern(self, newValueWord0, newValueWord1, newValueWord2)
 }
 
 #if arch(wasm32)
@@ -327,9 +327,9 @@ func _$WeirdNaming_Any_get(_ self: JSObject) throws(JSException) -> String {
 }
 
 func _$WeirdNaming_normalProperty_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
-    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+    newValue.bridgeJSWithLoweredParameter { (newValueWord0, newValueWord1, newValueWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        bjs_WeirdNaming_normalProperty_set(selfValue, newValueBytes, newValueLength)
+        bjs_WeirdNaming_normalProperty_set(selfValue, newValueWord0, newValueWord1, newValueWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -355,9 +355,9 @@ func _$WeirdNaming__123invalidStart_set(_ self: JSObject, _ newValue: Bool) thro
 }
 
 func _$WeirdNaming_property_with_spaces_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
-    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+    newValue.bridgeJSWithLoweredParameter { (newValueWord0, newValueWord1, newValueWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        bjs_WeirdNaming_property_with_spaces_set(selfValue, newValueBytes, newValueLength)
+        bjs_WeirdNaming_property_with_spaces_set(selfValue, newValueWord0, newValueWord1, newValueWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -374,9 +374,9 @@ func _$WeirdNaming__specialChar_set(_ self: JSObject, _ newValue: Double) throws
 }
 
 func _$WeirdNaming_constructor_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
-    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+    newValue.bridgeJSWithLoweredParameter { (newValueWord0, newValueWord1, newValueWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        bjs_WeirdNaming_constructor_set(selfValue, newValueBytes, newValueLength)
+        bjs_WeirdNaming_constructor_set(selfValue, newValueWord0, newValueWord1, newValueWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -384,9 +384,9 @@ func _$WeirdNaming_constructor_set(_ self: JSObject, _ newValue: String) throws(
 }
 
 func _$WeirdNaming_for_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
-    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+    newValue.bridgeJSWithLoweredParameter { (newValueWord0, newValueWord1, newValueWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        bjs_WeirdNaming_for_set(selfValue, newValueBytes, newValueLength)
+        bjs_WeirdNaming_for_set(selfValue, newValueWord0, newValueWord1, newValueWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
@@ -394,9 +394,9 @@ func _$WeirdNaming_for_set(_ self: JSObject, _ newValue: String) throws(JSExcept
 }
 
 func _$WeirdNaming_any_set(_ self: JSObject, _ newValue: String) throws(JSException) -> Void {
-    newValue.bridgeJSWithLoweredParameter { (newValueBytes, newValueLength) in
+    newValue.bridgeJSWithLoweredParameter { (newValueWord0, newValueWord1, newValueWord2) in
         let selfValue = self.bridgeJSLowerParameter()
-        bjs_WeirdNaming_any_set(selfValue, newValueBytes, newValueLength)
+        bjs_WeirdNaming_any_set(selfValue, newValueWord0, newValueWord1, newValueWord2)
     }
     if let error = _swift_js_take_exception() {
         throw error
