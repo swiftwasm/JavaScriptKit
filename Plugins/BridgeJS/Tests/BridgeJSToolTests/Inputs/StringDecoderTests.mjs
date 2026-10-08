@@ -6,7 +6,6 @@ const source = await readFile(process.argv[2] ?? new URL('../__Snapshots__/Bridg
 const shared = process.argv[3] === 'shared';
 const { createInstantiator } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 const encoder = new TextEncoder();
-const decoder = new TextDecoder();
 const swift = { memory: { heap: [], retain: (value) => value } };
 const bridge = await createInstantiator({ getImports: () => ({}) }, swift);
 const imports = {};
@@ -35,21 +34,27 @@ function large(value, immortal = false, ptr = 64) {
 }
 const values = ['', 'div', 'abcdefgh', 'abcdefghi', 'abcdefghij', 'abcdefé', 'abcdefgé',
     'abcdefghé', 'abcdefghié', 'abc€', 'abcdefg€', 'abc😄', 'abcdef😄', 'abcdefg😄',
-    'a\0b', '\ufeff', '\ufeffx', 'x\ufeff', '\ufeff\ufeffx', '\ufeffabcdefghijk',
-    'abc\ufeffdefghijk', '\ufeff\ufeffabcdefghijk'];
-for (const value of values) {
-    const expected = decoder.decode(encoder.encode(value));
+    '😄😄', 'éééé', 'a\0b', '\ufeff', '\ufeffx', '\ufeffabcde', '\ufeffabcdef',
+    'x\ufeff', '\ufeff\ufeffx', '\ufeffabcdefghijk',
+    'abc\ufeffdefghijk', '\ufeff\ufeffabcdefghijk',
+    // UTF-8 widths, the surrogate gap, and supplementary-plane boundaries.
+    '\u0080', '\u07ff', '\u0800', '\ud7ff', '\ue000', '\uffff', '\u{10000}', '\u{10ffff}'];
+for (const [index, value] of values.entries()) {
     if (encoder.encode(value).length <= 8) {
         words = small(value);
-        assert.equal(exports.checkString(), expected);
+        assert.equal(exports.checkString(), value);
     }
-    words = large(value);
-    assert.equal(exports.checkString(), expected);
+    for (const immortal of [false, true]) {
+        // Distinct locations keep immortal cache entries faithful to Swift literals.
+        words = large(value, immortal, 64 + index * 64);
+        assert.equal(exports.checkString(), value);
+        assert.equal(exports.checkString(), value);
+    }
 }
 // Alternate full and short inputs: bytes outside count must never leak into the result.
 for (const value of ['abcd😄', 'é', 'abcde€', '\ufeff', 'abcdefgh', '', 'x\0', '€', '\ufeff\ufeff']) {
     words = small(value);
-    assert.equal(exports.checkString(), decoder.decode(encoder.encode(value)));
+    assert.equal(exports.checkString(), value);
 }
 // Every ASCII byte, including NUL, at every small-string length.
 for (let byte = 0; byte < 128; byte++) {
