@@ -195,7 +195,7 @@ final class ArraySupportTests: XCTestCase {
     @JS static func roundTripStructArray(_ v: [DataPoint]) -> [DataPoint] { v }
     @JS static func roundTripSwiftClassArray(_ v: [Greeter]) -> [Greeter] { v }
     @JS static func roundTripNamespacedSwiftClassArray(_ v: [Utils.Converter]) -> [Utils.Converter] { v }
-    @JS static func roundTripProtocolArray(_ v: [ArrayElementProtocol]) -> [ArrayElementProtocol] { v }
+    @JS static func roundTripProtocolArray(_ v: [any ArrayElementProtocol]) -> [any ArrayElementProtocol] { v }
     @JS static func roundTripJSClassArray(_ v: [ArrayElementObject]) -> [ArrayElementObject] { v }
 
     @JS static func roundTripOptionalIntArray(_ v: [Int?]) -> [Int?] { v }

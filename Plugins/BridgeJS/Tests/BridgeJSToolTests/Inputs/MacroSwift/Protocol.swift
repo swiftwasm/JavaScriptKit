@@ -66,9 +66,9 @@ import JavaScriptKit
     var delegate: MyViewControllerDelegate
 
     @JS
-    var secondDelegate: MyViewControllerDelegate?
+    var secondDelegate: (any MyViewControllerDelegate)?
 
-    @JS init(delegate: MyViewControllerDelegate) {
+    @JS init(delegate: any MyViewControllerDelegate) {
         self.delegate = delegate
     }
 
@@ -103,7 +103,7 @@ import JavaScriptKit
     var delegates: [MyViewControllerDelegate]
 
     @JS
-    var delegatesByName: [String: MyViewControllerDelegate]
+    var delegatesByName: [String: any MyViewControllerDelegate]
 
     @JS init(delegates: [MyViewControllerDelegate]) {
         self.delegates = delegates
@@ -117,7 +117,7 @@ import JavaScriptKit
     }
 }
 
-@JS func processDelegates(_ delegates: [MyViewControllerDelegate]) -> [MyViewControllerDelegate]
+@JS func processDelegates(_ delegates: [any MyViewControllerDelegate]) -> [any MyViewControllerDelegate]
 
 @JS func processDelegatesByName(
     _ delegates: [String: MyViewControllerDelegate]
