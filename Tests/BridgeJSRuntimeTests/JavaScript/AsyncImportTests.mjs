@@ -44,6 +44,12 @@ export function getImports(importsContext) {
         jsAsyncRoundTripOptionalAssociatedValueEnum: (v) => {
             return Promise.resolve(v);
         },
+        jsAsyncThrowSynchronously: (message) => {
+            throw new Error(message);
+        },
+        jsAsyncReturnNonPromise: (v) => {
+            return v;
+        },
     };
 }
 

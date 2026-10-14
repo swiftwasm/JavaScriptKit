@@ -4366,6 +4366,39 @@ extension DataProcessor where Self: _BridgedSwiftProtocolWrapper {
         return Optional<APIResult>.bridgeJSLiftReturn(ret)
     }
 
+    func validate(_ value: Int) throws(JSException) -> Int {
+        let valueValue = value.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let ret = bjs_DataProcessor_validate(jsObjectValue, valueValue)
+        if let error = _swift_js_take_exception() { throw error }
+        return Int.bridgeJSLiftReturn(ret)
+    }
+
+    func loadLabel(_ key: String) async throws(JSException) -> String {
+        let resolved = try await _bjs_awaitPromise(makeResolveClosure: { JSTypedClosure<(sending String) -> Void>.sending($0) }, makeRejectClosure: { JSTypedClosure<(sending JSValue) -> Void>.sending($0) }) { resolveRef, rejectRef in
+            key.bridgeJSWithLoweredParameter { (keyWord0, keyWord1, keyWord2) in
+                let jsObjectValue = jsObject.bridgeJSLowerParameter()
+                bjs_DataProcessor_loadLabel(resolveRef, rejectRef, jsObjectValue, keyWord0, keyWord1, keyWord2)
+            }
+        }
+        return resolved
+    }
+
+    func reset() async throws(JSException) -> Void {
+        try await _bjs_awaitPromise(makeResolveClosure: { JSTypedClosure<() -> Void>($0) }, makeRejectClosure: { JSTypedClosure<(sending JSValue) -> Void>.sending($0) }) { resolveRef, rejectRef in
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            bjs_DataProcessor_reset(resolveRef, rejectRef, jsObjectValue)
+        }
+    }
+
+    func fetchCount() async -> Int {
+        let resolved = try! await _bjs_awaitPromise(makeResolveClosure: { JSTypedClosure<(sending Int) -> Void>.sending($0) }, makeRejectClosure: { JSTypedClosure<(sending JSValue) -> Void>.sending($0) }) { resolveRef, rejectRef in
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            bjs_DataProcessor_fetchCount(resolveRef, rejectRef, jsObjectValue)
+        }
+        return resolved
+    }
+
     var count: Int {
         get {
             let jsObjectValue = jsObject.bridgeJSLowerParameter()
@@ -4632,6 +4665,54 @@ fileprivate func bjs_DataProcessor_getAPIResult_extern(_ jsObject: Int32) -> Int
 #endif
 @inline(never) fileprivate func bjs_DataProcessor_getAPIResult(_ jsObject: Int32) -> Int32 {
     return bjs_DataProcessor_getAPIResult_extern(jsObject)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_validate")
+fileprivate func bjs_DataProcessor_validate_extern(_ jsObject: Int32, _ value: Int32) -> Int32
+#else
+fileprivate func bjs_DataProcessor_validate_extern(_ jsObject: Int32, _ value: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_DataProcessor_validate(_ jsObject: Int32, _ value: Int32) -> Int32 {
+    return bjs_DataProcessor_validate_extern(jsObject, value)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_loadLabel")
+fileprivate func bjs_DataProcessor_loadLabel_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ jsObject: Int32, _ keyWord0: Int32, _ keyWord1: Int32, _ keyWord2: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_loadLabel_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ jsObject: Int32, _ keyWord0: Int32, _ keyWord1: Int32, _ keyWord2: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_DataProcessor_loadLabel(_ resolveRef: Int32, _ rejectRef: Int32, _ jsObject: Int32, _ keyWord0: Int32, _ keyWord1: Int32, _ keyWord2: Int32) -> Void {
+    return bjs_DataProcessor_loadLabel_extern(resolveRef, rejectRef, jsObject, keyWord0, keyWord1, keyWord2)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_reset")
+fileprivate func bjs_DataProcessor_reset_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ jsObject: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_reset_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_DataProcessor_reset(_ resolveRef: Int32, _ rejectRef: Int32, _ jsObject: Int32) -> Void {
+    return bjs_DataProcessor_reset_extern(resolveRef, rejectRef, jsObject)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_DataProcessor_fetchCount")
+fileprivate func bjs_DataProcessor_fetchCount_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ jsObject: Int32) -> Void
+#else
+fileprivate func bjs_DataProcessor_fetchCount_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ jsObject: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_DataProcessor_fetchCount(_ resolveRef: Int32, _ rejectRef: Int32, _ jsObject: Int32) -> Void {
+    return bjs_DataProcessor_fetchCount_extern(resolveRef, rejectRef, jsObject)
 }
 
 #if arch(wasm32)
@@ -14415,6 +14496,73 @@ public func _bjs_DataProcessorManager_setProcessorAPIResult(_ _self: UnsafeMutab
     #endif
 }
 
+@_expose(wasm, "bjs_DataProcessorManager_validateProcessorValue")
+@_cdecl("bjs_DataProcessorManager_validateProcessorValue")
+public func _bjs_DataProcessorManager_validateProcessorValue(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Int32 {
+    #if arch(wasm32)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = DataProcessorManager.bridgeJSLiftParameter(_self)
+    do {
+        let ret = try _self.validateProcessorValue(_: value)
+        return ret.bridgeJSLowerReturn()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: error.description)
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_loadProcessorLabel")
+@_cdecl("bjs_DataProcessorManager_loadProcessorLabel")
+public func _bjs_DataProcessorManager_loadProcessorLabel(_ _self: UnsafeMutableRawPointer, _ keyBytes: Int32, _ keyLength: Int32) -> Int32 {
+    #if arch(wasm32)
+    let key = String.bridgeJSLiftParameter(keyBytes, keyLength)
+    let _self = DataProcessorManager.bridgeJSLiftParameter(_self)
+    return _bjs_makePromise(resolve: Promise_resolve_SS, reject: Promise_reject) { () async throws(JSException) -> String in
+        return try await _self.loadProcessorLabel(_: key)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_resetProcessor")
+@_cdecl("bjs_DataProcessorManager_resetProcessor")
+public func _bjs_DataProcessorManager_resetProcessor(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let _self = DataProcessorManager.bridgeJSLiftParameter(_self)
+    return _bjs_makePromise(resolve: Promise_resolve_y, reject: Promise_reject) { () async throws(JSException) -> Void in
+        try await _self.resetProcessor()
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_DataProcessorManager_fetchProcessorCount")
+@_cdecl("bjs_DataProcessorManager_fetchProcessorCount")
+public func _bjs_DataProcessorManager_fetchProcessorCount(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let _self = DataProcessorManager.bridgeJSLiftParameter(_self)
+    return _bjs_makePromise(resolve: Promise_resolve_Si, reject: Promise_reject) {
+        return await _self.fetchProcessorCount()
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_DataProcessorManager_processor_get")
 @_cdecl("bjs_DataProcessorManager_processor_get")
 public func _bjs_DataProcessorManager_processor_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
@@ -14639,6 +14787,73 @@ public func _bjs_SwiftDataProcessor_getAPIResult(_ _self: UnsafeMutableRawPointe
     let _self = SwiftDataProcessor.bridgeJSLiftParameter(_self)
     let ret = _self.getAPIResult()
     return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftDataProcessor_validate")
+@_cdecl("bjs_SwiftDataProcessor_validate")
+public func _bjs_SwiftDataProcessor_validate(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Int32 {
+    #if arch(wasm32)
+    let value = Int.bridgeJSLiftParameter(value)
+    let _self = SwiftDataProcessor.bridgeJSLiftParameter(_self)
+    do {
+        let ret = try _self.validate(_: value)
+        return ret.bridgeJSLowerReturn()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: error.description)
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftDataProcessor_loadLabel")
+@_cdecl("bjs_SwiftDataProcessor_loadLabel")
+public func _bjs_SwiftDataProcessor_loadLabel(_ _self: UnsafeMutableRawPointer, _ keyBytes: Int32, _ keyLength: Int32) -> Int32 {
+    #if arch(wasm32)
+    let key = String.bridgeJSLiftParameter(keyBytes, keyLength)
+    let _self = SwiftDataProcessor.bridgeJSLiftParameter(_self)
+    return _bjs_makePromise(resolve: Promise_resolve_SS, reject: Promise_reject) { () async throws(JSException) -> String in
+        return try await _self.loadLabel(_: key)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftDataProcessor_reset")
+@_cdecl("bjs_SwiftDataProcessor_reset")
+public func _bjs_SwiftDataProcessor_reset(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let _self = SwiftDataProcessor.bridgeJSLiftParameter(_self)
+    return _bjs_makePromise(resolve: Promise_resolve_y, reject: Promise_reject) { () async throws(JSException) -> Void in
+        try await _self.reset()
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_SwiftDataProcessor_fetchCount")
+@_cdecl("bjs_SwiftDataProcessor_fetchCount")
+public func _bjs_SwiftDataProcessor_fetchCount(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let _self = SwiftDataProcessor.bridgeJSLiftParameter(_self)
+    return _bjs_makePromise(resolve: Promise_resolve_Si, reject: Promise_reject) {
+        return await _self.fetchCount()
+    }
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -17729,6 +17944,30 @@ fileprivate func bjs_AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueE
     return bjs_AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum_static_extern(resolveRef, rejectRef, vIsSome, vCaseId)
 }
 
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AsyncImportImports_jsAsyncThrowSynchronously_static")
+fileprivate func bjs_AsyncImportImports_jsAsyncThrowSynchronously_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ messageWord0: Int32, _ messageWord1: Int32, _ messageWord2: Int32) -> Void
+#else
+fileprivate func bjs_AsyncImportImports_jsAsyncThrowSynchronously_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ messageWord0: Int32, _ messageWord1: Int32, _ messageWord2: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncThrowSynchronously_static(_ resolveRef: Int32, _ rejectRef: Int32, _ messageWord0: Int32, _ messageWord1: Int32, _ messageWord2: Int32) -> Void {
+    return bjs_AsyncImportImports_jsAsyncThrowSynchronously_static_extern(resolveRef, rejectRef, messageWord0, messageWord1, messageWord2)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_AsyncImportImports_jsAsyncReturnNonPromise_static")
+fileprivate func bjs_AsyncImportImports_jsAsyncReturnNonPromise_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Float64) -> Void
+#else
+fileprivate func bjs_AsyncImportImports_jsAsyncReturnNonPromise_static_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_AsyncImportImports_jsAsyncReturnNonPromise_static(_ resolveRef: Int32, _ rejectRef: Int32, _ v: Float64) -> Void {
+    return bjs_AsyncImportImports_jsAsyncReturnNonPromise_static_extern(resolveRef, rejectRef, v)
+}
+
 func _$AsyncImportImports_jsAsyncRoundTripVoid() async throws(JSException) -> Void {
     try await _bjs_awaitPromise(makeResolveClosure: {
             JSTypedClosure<() -> Void>($0)
@@ -17870,6 +18109,31 @@ func _$AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum(_ v: Optio
         }) { resolveRef, rejectRef in
         let (vIsSome, vCaseId) = v.bridgeJSLowerParameter()
         bjs_AsyncImportImports_jsAsyncRoundTripOptionalAssociatedValueEnum_static(resolveRef, rejectRef, vIsSome, vCaseId)
+    }
+    return resolved
+}
+
+func _$AsyncImportImports_jsAsyncThrowSynchronously(_ message: String) async throws(JSException) -> Double {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(sending Double) -> Void>.sending($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        message.bridgeJSWithLoweredParameter { (messageWord0, messageWord1, messageWord2) in
+            bjs_AsyncImportImports_jsAsyncThrowSynchronously_static(resolveRef, rejectRef, messageWord0, messageWord1, messageWord2)
+        }
+    }
+    return resolved
+}
+
+func _$AsyncImportImports_jsAsyncReturnNonPromise(_ v: Double) async throws(JSException) -> Double {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(sending Double) -> Void>.sending($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        let vValue = v.bridgeJSLowerParameter()
+        bjs_AsyncImportImports_jsAsyncReturnNonPromise_static(resolveRef, rejectRef, vValue)
     }
     return resolved
 }

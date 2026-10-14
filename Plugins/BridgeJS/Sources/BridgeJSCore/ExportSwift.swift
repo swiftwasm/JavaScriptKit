@@ -1439,7 +1439,7 @@ struct ProtocolCodegen {
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
                 parameters: method.parameters,
                 returnType: method.returnType,
-                effects: nil
+                effects: method.effects
             )
 
             // Build extern declaration using helper function

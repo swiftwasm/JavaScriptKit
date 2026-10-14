@@ -59,6 +59,10 @@ import JavaScriptKit
     func createEnum() -> ExampleEnum
     func handleResult(_ result: Result)
     func getResult() -> Result
+    func validate(_ value: Int) throws(JSException) -> Int
+    func loadLabel(_ key: String) async throws(JSException) -> String
+    func reset() async throws(JSException)
+    func fetchCount() async -> Int
 }
 
 @JS class MyViewController {
@@ -94,6 +98,14 @@ import JavaScriptKit
 
     @JS func sendHelper(_ helper: Helper) {
         delegate.onHelperUpdated(helper)
+    }
+
+    @JS func validateValue(_ value: Int) throws(JSException) -> Int {
+        return try delegate.validate(value)
+    }
+
+    @JS func loadLabel(_ key: String) async throws(JSException) -> String {
+        return try await delegate.loadLabel(key)
     }
 }
 

@@ -391,12 +391,20 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_AsyncBox_asyncStaticRoundTrip_static"] = function bjs_AsyncBox_asyncStaticRoundTrip_static(resolveRef, rejectRef, v) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                imports.AsyncBox.asyncStaticRoundTrip(v).then(resolve, reject);
+                try {
+                    Promise.resolve(imports.AsyncBox.asyncStaticRoundTrip(v)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             TestModule["bjs_AsyncBox_asyncStaticVoid_static"] = function bjs_AsyncBox_asyncStaticVoid_static(resolveRef, rejectRef) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                imports.AsyncBox.asyncStaticVoid().then(resolve, reject);
+                try {
+                    Promise.resolve(imports.AsyncBox.asyncStaticVoid()).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
         },
         setInstance: (i) => {

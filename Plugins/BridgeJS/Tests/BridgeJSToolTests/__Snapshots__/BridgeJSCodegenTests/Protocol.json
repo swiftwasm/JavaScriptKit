@@ -230,6 +230,62 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_MyViewController_validateValue",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "validateValue",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewController_loadLabel",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "loadLabel",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "key",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
           }
         ],
         "name" : "MyViewController",
@@ -829,6 +885,99 @@
             "returnType" : {
               "associatedValueEnum" : {
                 "_0" : "Result"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_validate",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "validate",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_loadLabel",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "loadLabel",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "key",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_reset",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "reset",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_MyViewControllerDelegate_fetchCount",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "fetchCount",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }

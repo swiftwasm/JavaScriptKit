@@ -145,6 +145,7 @@ export async function setupOptions(options, context) {
                         throw new Error("No exports!?");
                     }
                     await runAsyncWorksTests(exports);
+                    await testAsyncProtocolSupport(exports);
                     return;
                 },
                 AsyncImportImports: getAsyncImportImports(importsContext),
@@ -1312,6 +1313,102 @@ function setupTestGlobals(global) {
 }
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
+async function testAsyncProtocolSupport(exports) {
+    let processorValue = 3;
+    let shouldRejectReset = false;
+    const jsProcessor = {
+        count: 0,
+        name: "AsyncJSProcessor",
+        optionalTag: null,
+        direction: null,
+        optionalTheme: null,
+        httpStatus: null,
+        apiResult: null,
+        helper: new exports.Greeter("AsyncHelper"),
+        optionalHelper: null,
+        optionalCount: null,
+        increment(amount) { processorValue += amount; },
+        getValue() { return processorValue; },
+        setLabelElements(labelPrefix, labelSuffix) { },
+        getLabel() { return "async"; },
+        isEven() { return processorValue % 2 === 0; },
+        processGreeter(greeter) { return ""; },
+        createGreeter() { return new exports.Greeter("AsyncGreeter"); },
+        processOptionalGreeter(greeter) { return ""; },
+        createOptionalGreeter() { return null; },
+        handleAPIResult(result) { },
+        getAPIResult() { return { tag: exports.APIResult.Tag.Info }; },
+        validate(value) { return value; },
+        loadLabel(key) {
+            if (key === "invalid") {
+                throw new Error("Invalid key thrown synchronously");
+            }
+            return (async () => {
+                await Promise.resolve();
+                if (key === "missing") {
+                    throw new Error(`No label for ${key}`);
+                }
+                return `async:${key}`;
+            })();
+        },
+        async reset() {
+            await Promise.resolve();
+            if (shouldRejectReset) {
+                throw new Error("Reset rejected");
+            }
+            processorValue = 0;
+        },
+        fetchCount() { return Promise.resolve(processorValue); }
+    };
+
+    const jsManager = new exports.DataProcessorManager(jsProcessor);
+
+    assert.equal(await jsManager.loadProcessorLabel("key"), "async:key");
+    await assert.rejects(
+        () => jsManager.loadProcessorLabel("missing"),
+        (error) => error instanceof Error && error.message === "No label for missing"
+    );
+    await assert.rejects(
+        () => jsManager.loadProcessorLabel("invalid"),
+        (error) => error instanceof Error && error.message === "Invalid key thrown synchronously"
+    );
+    const [firstLabel, secondLabel] = await Promise.all([
+        jsManager.loadProcessorLabel("first"),
+        jsManager.loadProcessorLabel("second"),
+    ]);
+    assert.equal(firstLabel, "async:first");
+    assert.equal(secondLabel, "async:second");
+
+    assert.equal(await jsManager.fetchProcessorCount(), 3);
+    await jsManager.resetProcessor();
+    assert.equal(await jsManager.fetchProcessorCount(), 0);
+
+    shouldRejectReset = true;
+    jsManager.incrementByAmount(2);
+    await assert.rejects(
+        () => jsManager.resetProcessor(),
+        (error) => error instanceof Error && error.message === "Reset rejected"
+    );
+    assert.equal(await jsManager.fetchProcessorCount(), 2);
+
+    jsManager.release();
+    jsProcessor.helper.release();
+
+    const swiftProcessor = new exports.SwiftDataProcessor();
+    const swiftManager = new exports.DataProcessorManager(swiftProcessor);
+
+    swiftManager.setProcessorLabel("Swift", "Label");
+    swiftManager.incrementByAmount(4);
+    assert.equal(await swiftManager.loadProcessorLabel("key"), "SwiftLabel:key");
+    assert.equal(await swiftManager.fetchProcessorCount(), 4);
+    await swiftManager.resetProcessor();
+    assert.equal(await swiftManager.fetchProcessorCount(), 0);
+
+    swiftManager.release();
+    swiftProcessor.release();
+}
+
+/** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
 function testProtocolSupport(exports) {
     let processorValue = 0;
     let processorLabel = "";
@@ -1340,7 +1437,16 @@ function testProtocolSupport(exports) {
         },
         createOptionalGreeter() { return new exports.Greeter("JSOptionalGreeter"); },
         handleAPIResult(result) { lastAPIResult = result; },
-        getAPIResult() { return lastAPIResult; }
+        getAPIResult() { return lastAPIResult; },
+        validate(value) {
+            if (value < 0) {
+                throw new Error("JSProcessor rejects negative values");
+            }
+            return value * 2;
+        },
+        async loadLabel(key) { return `${processorLabel}:${key}`; },
+        async reset() { processorValue = 0; },
+        async fetchCount() { return processorValue; }
     };
 
     const successResult = { tag: exports.Utilities.Result.Tag.Success, param0: "Operation completed" };
@@ -1444,6 +1550,13 @@ function testProtocolSupport(exports) {
     jsProcessor.optionalCount = null;
     assert.equal(jsProcessor.optionalCount, null);
 
+    assert.equal(jsManager.validateProcessorValue(21), 42);
+    assert.throws(
+        () => jsManager.validateProcessorValue(-1),
+        (error) => error instanceof Error && error.message === "JSProcessor rejects negative values"
+    );
+    assert.equal(jsManager.validateProcessorValue(5), 10);
+
     newHelper.release();
     optHelper.release();
     jsManager.release();
@@ -1497,6 +1610,9 @@ function testProtocolSupport(exports) {
     swiftManager.setProcessorAPIResult(successResult);
     assert.deepEqual(swiftProcessor.getAPIResult(), successResult);
 
+    assert.equal(swiftManager.validateProcessorValue(7), 7);
+    assert.throws(() => swiftManager.validateProcessorValue(-1), /SwiftDataProcessor rejects negative values/);
+
     swiftManager.release();
     swiftProcessor.release();
 
@@ -1522,7 +1638,11 @@ function testProtocolSupport(exports) {
         processOptionalGreeter(greeter) { return ""; },
         createOptionalGreeter() { return null; },
         handleAPIResult(result) { },
-        getAPIResult() { return { tag: exports.APIResult.Tag.Info }; }
+        getAPIResult() { return { tag: exports.APIResult.Tag.Info }; },
+        validate(value) { return value; },
+        async loadLabel(key) { return ""; },
+        async reset() { },
+        async fetchCount() { return 0; }
     };
 
     let mainValue = 0;
@@ -1547,7 +1667,11 @@ function testProtocolSupport(exports) {
         processOptionalGreeter(greeter) { return ""; },
         createOptionalGreeter() { return null; },
         handleAPIResult(result) { },
-        getAPIResult() { return { tag: exports.APIResult.Tag.Info }; }
+        getAPIResult() { return { tag: exports.APIResult.Tag.Info }; },
+        validate(value) { return value; },
+        async loadLabel(key) { return ""; },
+        async reset() { },
+        async fetchCount() { return 0; }
     };
 
     const managerWithOptional = new exports.DataProcessorManager(mainProcessor);

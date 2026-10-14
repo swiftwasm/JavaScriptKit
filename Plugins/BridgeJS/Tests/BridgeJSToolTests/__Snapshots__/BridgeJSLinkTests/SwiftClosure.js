@@ -1380,9 +1380,13 @@ export async function createInstantiator(options, swift) {
             bjs["invoke_js_callback_TestModule_10TestModuleYaKSS_SS"] = function(resolveRef, rejectRef, callbackId, param0Word0, param0Word1, param0Word2) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                const callback = swift.memory.getObject(callbackId);
-                const string = decodeString(param0Word0, param0Word1, param0Word2);
-                callback(string).then(resolve, reject);
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    const string = decodeString(param0Word0, param0Word1, param0Word2);
+                    Promise.resolve(callback(string)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             bjs["make_swift_closure_TestModule_10TestModuleYaKSS_SS"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleYaKSS_SS = function(param0) {
@@ -1404,8 +1408,12 @@ export async function createInstantiator(options, swift) {
             bjs["invoke_js_callback_TestModule_10TestModuleYaKSb_9APIResultO"] = function(resolveRef, rejectRef, callbackId, param0) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                const callback = swift.memory.getObject(callbackId);
-                callback(param0 !== 0).then(resolve, reject);
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    Promise.resolve(callback(param0 !== 0)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             bjs["make_swift_closure_TestModule_10TestModuleYaKSb_9APIResultO"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleYaKSb_9APIResultO = function(param0) {
@@ -1425,9 +1433,13 @@ export async function createInstantiator(options, swift) {
             bjs["invoke_js_callback_TestModule_10TestModuleYaSS_6AnimalV"] = function(resolveRef, rejectRef, callbackId, param0Word0, param0Word1, param0Word2) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                const callback = swift.memory.getObject(callbackId);
-                const string = decodeString(param0Word0, param0Word1, param0Word2);
-                callback(string).then(resolve, reject);
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    const string = decodeString(param0Word0, param0Word1, param0Word2);
+                    Promise.resolve(callback(string)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             bjs["make_swift_closure_TestModule_10TestModuleYaSS_6AnimalV"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleYaSS_6AnimalV = function(param0) {
@@ -1443,9 +1455,13 @@ export async function createInstantiator(options, swift) {
             bjs["invoke_js_callback_TestModule_10TestModuleYaSS_SS"] = function(resolveRef, rejectRef, callbackId, param0Word0, param0Word1, param0Word2) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                const callback = swift.memory.getObject(callbackId);
-                const string = decodeString(param0Word0, param0Word1, param0Word2);
-                callback(string).then(resolve, reject);
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    const string = decodeString(param0Word0, param0Word1, param0Word2);
+                    Promise.resolve(callback(string)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             bjs["make_swift_closure_TestModule_10TestModuleYaSS_SS"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuleYaSS_SS = function(param0) {

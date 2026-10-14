@@ -474,33 +474,57 @@ export async function createInstantiator(options, swift) {
             TestModule["bjs_asyncReturnVoid"] = function bjs_asyncReturnVoid(resolveRef, rejectRef) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                imports.asyncReturnVoid().then(resolve, reject);
+                try {
+                    Promise.resolve(imports.asyncReturnVoid()).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             TestModule["bjs_asyncRoundTripInt"] = function bjs_asyncRoundTripInt(resolveRef, rejectRef, v) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                imports.asyncRoundTripInt(v).then(resolve, reject);
+                try {
+                    Promise.resolve(imports.asyncRoundTripInt(v)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             TestModule["bjs_asyncRoundTripString"] = function bjs_asyncRoundTripString(resolveRef, rejectRef, vWord0, vWord1, vWord2) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                const string = decodeString(vWord0, vWord1, vWord2);
-                imports.asyncRoundTripString(string).then(resolve, reject);
+                try {
+                    const string = decodeString(vWord0, vWord1, vWord2);
+                    Promise.resolve(imports.asyncRoundTripString(string)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             TestModule["bjs_asyncRoundTripBool"] = function bjs_asyncRoundTripBool(resolveRef, rejectRef, v) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                imports.asyncRoundTripBool(v !== 0).then(resolve, reject);
+                try {
+                    Promise.resolve(imports.asyncRoundTripBool(v !== 0)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             TestModule["bjs_asyncRoundTripDouble"] = function bjs_asyncRoundTripDouble(resolveRef, rejectRef, v) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                imports.asyncRoundTripDouble(v).then(resolve, reject);
+                try {
+                    Promise.resolve(imports.asyncRoundTripDouble(v)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
             TestModule["bjs_asyncRoundTripJSObject"] = function bjs_asyncRoundTripJSObject(resolveRef, rejectRef, v) {
                 const resolve = swift.memory.getObject(resolveRef);
                 const reject = swift.memory.getObject(rejectRef);
-                imports.asyncRoundTripJSObject(swift.memory.getObject(v)).then(resolve, reject);
+                try {
+                    Promise.resolve(imports.asyncRoundTripJSObject(swift.memory.getObject(v))).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
             }
         },
         setInstance: (i) => {

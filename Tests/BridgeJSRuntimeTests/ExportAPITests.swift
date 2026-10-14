@@ -961,6 +961,10 @@ enum GraphOperations {
     func createOptionalGreeter() -> Greeter?
     func handleAPIResult(_ result: APIResult?)
     func getAPIResult() -> APIResult?
+    func validate(_ value: Int) throws(JSException) -> Int
+    func loadLabel(_ key: String) async throws(JSException) -> String
+    func reset() async throws(JSException)
+    func fetchCount() async -> Int
 }
 
 @JS class DataProcessorManager {
@@ -1053,6 +1057,22 @@ enum GraphOperations {
     @JS func setProcessorAPIResult(_ apiResult: APIResult?) {
         processor.handleAPIResult(apiResult)
     }
+
+    @JS func validateProcessorValue(_ value: Int) throws(JSException) -> Int {
+        return try processor.validate(value)
+    }
+
+    @JS func loadProcessorLabel(_ key: String) async throws(JSException) -> String {
+        return try await processor.loadLabel(key)
+    }
+
+    @JS func resetProcessor() async throws(JSException) {
+        try await processor.reset()
+    }
+
+    @JS func fetchProcessorCount() async -> Int {
+        return await processor.fetchCount()
+    }
 }
 
 @JS class SwiftDataProcessor: DataProcessor {
@@ -1116,6 +1136,25 @@ enum GraphOperations {
 
     @JS func getAPIResult() -> APIResult? {
         return apiResult
+    }
+
+    @JS func validate(_ value: Int) throws(JSException) -> Int {
+        guard value >= 0 else {
+            throw JSException(JSError(message: "SwiftDataProcessor rejects negative values").jsValue)
+        }
+        return value
+    }
+
+    @JS func loadLabel(_ key: String) async throws(JSException) -> String {
+        return "\(label):\(key)"
+    }
+
+    @JS func reset() async throws(JSException) {
+        count = 0
+    }
+
+    @JS func fetchCount() async -> Int {
+        return count
     }
 }
 

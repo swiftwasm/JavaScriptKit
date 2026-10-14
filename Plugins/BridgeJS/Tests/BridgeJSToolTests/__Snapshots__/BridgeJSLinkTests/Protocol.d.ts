@@ -17,6 +17,10 @@ export interface MyViewControllerDelegate {
     createEnum(): ExampleEnumTag;
     handleResult(result: ResultTag): void;
     getResult(): ResultTag;
+    validate(value: number): number;
+    loadLabel(key: string): Promise<string>;
+    reset(): Promise<void>;
+    fetchCount(): Promise<number>;
     eventCount: number;
     readonly delegateName: string;
     optionalName: string | null;
@@ -87,6 +91,8 @@ export interface MyViewController extends SwiftHeapObject {
     updateLabel(prefix: string, suffix: string): void;
     checkEvenCount(): boolean;
     sendHelper(helper: Helper): void;
+    validateValue(value: number): number;
+    loadLabel(key: string): Promise<string>;
     delegate: MyViewControllerDelegate;
     secondDelegate: MyViewControllerDelegate | null;
 }

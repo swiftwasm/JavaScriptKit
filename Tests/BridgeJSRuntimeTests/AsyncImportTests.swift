@@ -24,6 +24,8 @@ import JavaScriptKit
     @JSFunction static func jsAsyncRoundTripOptionalAssociatedValueEnum(
         _ v: AsyncImportedPayloadResult?
     ) async throws(JSException) -> AsyncImportedPayloadResult?
+    @JSFunction static func jsAsyncThrowSynchronously(_ message: String) async throws(JSException) -> Double
+    @JSFunction static func jsAsyncReturnNonPromise(_ v: Double) async throws(JSException) -> Double
 }
 
 @Suite struct AsyncImportTests {
@@ -102,6 +104,19 @@ import JavaScriptKit
         for value in values {
             try #expect(await AsyncImportImports.jsAsyncRoundTripOptionalAssociatedValueEnum(value) == value)
         }
+    }
+
+    // MARK: - Non-Promise behavior
+
+    @Test func asyncSynchronousThrowRejects() async throws {
+        let error = await #expect(throws: JSException.self) {
+            try await AsyncImportImports.jsAsyncThrowSynchronously("SyncFailure")
+        }
+        #expect(error?.thrownValue.object?["message"].string == "SyncFailure")
+    }
+
+    @Test func asyncNonPromiseReturnResolves() async throws {
+        try #expect(await AsyncImportImports.jsAsyncReturnNonPromise(42) == 42)
     }
 
     // MARK: - Structured return type
