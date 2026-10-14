@@ -966,9 +966,9 @@ enum GraphOperations {
 @JS class DataProcessorManager {
 
     @JS var processor: DataProcessor
-    @JS var backupProcessor: DataProcessor?
+    @JS var backupProcessor: (any DataProcessor)?
 
-    @JS init(processor: DataProcessor) {
+    @JS init(processor: any DataProcessor) {
         self.processor = processor
         self.backupProcessor = nil
     }
@@ -1124,7 +1124,7 @@ enum GraphOperations {
         return SwiftDataProcessor()
     }
 
-    @JS static func createNativeProcessorOptional() -> DataProcessor? {
+    @JS static func createNativeProcessorOptional() -> (any DataProcessor)? {
         return SwiftDataProcessor()
     }
 
@@ -1132,7 +1132,7 @@ enum GraphOperations {
         return nil
     }
 
-    @JS static func createNativeProcessorArray() -> [DataProcessor] {
+    @JS static func createNativeProcessorArray() -> [any DataProcessor] {
         let p1 = SwiftDataProcessor()
         p1.count = 10
         let p2 = SwiftDataProcessor()
@@ -1140,7 +1140,7 @@ enum GraphOperations {
         return [p1, p2]
     }
 
-    @JS static func createNativeProcessorDictionary() -> [String: DataProcessor] {
+    @JS static func createNativeProcessorDictionary() -> [String: any DataProcessor] {
         let p1 = SwiftDataProcessor()
         p1.count = 10
         let p2 = SwiftDataProcessor()
@@ -1317,12 +1317,12 @@ enum GraphOperations {
     }
 
     @JS func roundtripDataProcessor(
-        _ callback: @escaping (DataProcessor) -> DataProcessor
-    ) -> (DataProcessor) -> DataProcessor {
+        _ callback: @escaping (any DataProcessor) -> any DataProcessor
+    ) -> (any DataProcessor) -> any DataProcessor {
         return callback
     }
 
-    @JS func processOptionalDataProcessor(_ callback: (DataProcessor?) -> String) -> String {
+    @JS func processOptionalDataProcessor(_ callback: ((any DataProcessor)?) -> String) -> String {
         let processor = SwiftDataProcessor()
         processor.increment(by: 7)
         return callback(processor) + " | " + callback(nil)

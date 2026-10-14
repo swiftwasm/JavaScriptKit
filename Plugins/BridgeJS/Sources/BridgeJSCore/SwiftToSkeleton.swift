@@ -436,6 +436,21 @@ public final class SwiftToSkeleton {
             return lookupType(for: attributedType.baseType, errors: &errors)
         }
 
+        // any P
+        if let existentialType = type.as(SomeOrAnyTypeSyntax.self),
+            existentialType.someOrAnySpecifier.tokenKind == .keyword(.any)
+        {
+            return lookupType(for: existentialType.constraint, errors: &errors)
+        }
+
+        // (T)
+        if let tupleType = type.as(TupleTypeSyntax.self),
+            tupleType.elements.count == 1,
+            let element = tupleType.elements.first
+        {
+            return lookupType(for: element.type, errors: &errors)
+        }
+
         // JSTypedArray<T>
         if let identifierType = type.as(IdentifierTypeSyntax.self),
             identifierType.name.text == "JSTypedArray",

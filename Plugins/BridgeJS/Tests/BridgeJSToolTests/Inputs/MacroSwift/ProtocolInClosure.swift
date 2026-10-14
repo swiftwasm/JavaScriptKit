@@ -14,5 +14,5 @@ import JavaScriptKit
 
 @JS func processRenderable(_ item: Renderable, transform: (Renderable) -> String) -> String
 @JS func makeRenderableFactory(defaultName: String) -> () -> Renderable
-@JS func roundtripRenderable(_ callback: (Renderable) -> Renderable) -> (Renderable) -> Renderable
-@JS func processOptionalRenderable(_ callback: (Renderable?) -> String) -> String
+@JS func roundtripRenderable(_ callback: (any Renderable) -> any Renderable) -> (any Renderable) -> any Renderable
+@JS func processOptionalRenderable(_ callback: ((any Renderable)?) -> String) -> String
