@@ -2897,9 +2897,8 @@ extension BridgeJSLink {
 
         /// Renders an async import function with resolve/reject closure refs.
         ///
-        /// The generated function takes `resolveRef` and `rejectRef` as the first parameters,
-        /// looks up the resolve/reject closures from memory, and executes the body which
-        /// chains `.then(resolve, reject)` on the import's returned Promise.
+        /// The generated function takes `resolveRef` and `rejectRef` as the first parameters
+        /// and settles them with the result of the import call.
         private func renderAsyncFunction(name: String?) -> [String] {
             let printer = CodeFragmentPrinter()
             let allParams = ["resolveRef", "rejectRef"] + parameterNames
