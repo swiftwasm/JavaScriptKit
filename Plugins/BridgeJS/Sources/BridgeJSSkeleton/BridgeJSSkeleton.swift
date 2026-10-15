@@ -607,6 +607,7 @@ public protocol BridgeSkeletonVisitor {
         accessLevel: BridgeJSAccessLevel
     )
     mutating func visitImportedFunction(_ function: ImportedFunctionSkeleton)
+    mutating func visitProtocolMethod(_ method: ExportedFunction, accessLevel: BridgeJSAccessLevel)
 }
 
 public extension BridgeSkeletonVisitor {
@@ -616,6 +617,7 @@ public extension BridgeSkeletonVisitor {
         accessLevel: BridgeJSAccessLevel
     ) {}
     mutating func visitImportedFunction(_ function: ImportedFunctionSkeleton) {}
+    mutating func visitProtocolMethod(_ method: ExportedFunction, accessLevel: BridgeJSAccessLevel) {}
 }
 
 public struct BridgeSkeletonWalker<Visitor: BridgeSkeletonVisitor> {
@@ -681,6 +683,7 @@ public struct BridgeSkeletonWalker<Visitor: BridgeSkeletonVisitor> {
         }
         for proto in skeleton.protocols {
             for method in proto.methods {
+                visitor.visitProtocolMethod(method, accessLevel: currentAccessLevel)
                 walk(method)
             }
             for property in proto.properties {
@@ -1868,6 +1871,12 @@ public struct ClosureSignatureCollectorVisitor: BridgeSkeletonVisitor {
             forReturnType: function.returnType,
             accessLevel: function.accessLevel
         )
+    }
+
+    public mutating func visitProtocolMethod(_ method: ExportedFunction, accessLevel: BridgeJSAccessLevel) {
+        guard method.effects.isAsync else { return }
+
+        recordInjectedSignatures(forReturnType: method.returnType, accessLevel: accessLevel)
     }
 
     private mutating func recordInjectedSignatures(

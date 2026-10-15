@@ -2897,9 +2897,8 @@ extension BridgeJSLink {
 
         /// Renders an async import function with resolve/reject closure refs.
         ///
-        /// The generated function takes `resolveRef` and `rejectRef` as the first parameters,
-        /// looks up the resolve/reject closures from memory, and executes the body which
-        /// chains `.then(resolve, reject)` on the import's returned Promise.
+        /// The generated function takes `resolveRef` and `rejectRef` as the first parameters
+        /// and settles them with the result of the import call.
         private func renderAsyncFunction(name: String?) -> [String] {
             let printer = CodeFragmentPrinter()
             let allParams = ["resolveRef", "rejectRef"] + parameterNames
@@ -2908,7 +2907,15 @@ extension BridgeJSLink {
                 let s = JSGlueVariableScope.reservedSwift
                 printer.write("const resolve = \(s).memory.getObject(resolveRef);")
                 printer.write("const reject = \(s).memory.getObject(rejectRef);")
-                printer.write(contentsOf: body)
+                printer.write("try {")
+                printer.indent {
+                    printer.write(contentsOf: body)
+                }
+                printer.write("} catch (error) {")
+                printer.indent {
+                    printer.write("reject(error);")
+                }
+                printer.write("}")
             }
             printer.write("}")
             return printer.lines
@@ -2930,7 +2937,7 @@ extension BridgeJSLink {
 
         private func call(callExpr: String) throws {
             if effects.isAsync {
-                body.write("\(callExpr).then(resolve, reject);")
+                body.write("Promise.resolve(\(callExpr)).then(resolve, reject);")
                 return
             }
             if let name = returnType.referencedGenericName {
@@ -2995,14 +3002,6 @@ extension BridgeJSLink {
             let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
             let calleeExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
             return try call(calleeExpr: calleeExpr)
-        }
-
-        /// Generates an async method call with resolve/reject closure refs.
-        func callAsyncMethod(name: String) {
-            let objectExpr = "\(JSGlueVariableScope.reservedSwift).memory.getObject(self)"
-            let calleeExpr = Self.propertyAccessExpr(objectExpr: objectExpr, propertyName: name)
-            let callExpr = "\(calleeExpr)(\(parameterForwardings.joined(separator: ", ")))"
-            body.write("\(callExpr).then(resolve, reject);")
         }
 
         func callStaticMethod(on objectExpr: String, name: String) throws {
@@ -4235,7 +4234,7 @@ extension BridgeJSLink {
         method: ExportedFunction
     ) throws {
         let thunkBuilder = ImportedThunkBuilder(
-            effects: Effects(isAsync: false, isThrows: false),
+            effects: method.effects,
             returnType: method.returnType,
             context: .exportSwift,
             intrinsicRegistry: intrinsicRegistry

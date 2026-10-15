@@ -217,6 +217,8 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
 | Swift Feature | Status |
 |:--------------|:-------|
 | Method requirements: `func foo(_ param: String?) -> FooClass?` | ✅ |
+| Throwing method requirements: `func foo() throws(JSException)` | ✅ |
+| Async method requirements: `func foo() async throws(JSException) -> Bar` | ✅ |
 | Property requirements: `var property: Type { get }` / `var property: Type { get set }` | ✅ |
 | Optional parameters / return values in methods | ✅ |
 | Optional properties | ✅ |

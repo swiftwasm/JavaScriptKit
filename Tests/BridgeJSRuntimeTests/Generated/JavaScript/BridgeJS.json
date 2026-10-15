@@ -3019,6 +3019,99 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_validateProcessorValue",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "validateProcessorValue",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_loadProcessorLabel",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "loadProcessorLabel",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "key",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_resetProcessor",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "resetProcessor",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessorManager_fetchProcessorCount",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "fetchProcessorCount",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
           }
         ],
         "name" : "DataProcessorManager",
@@ -3323,6 +3416,99 @@
                   }
                 },
                 "_1" : "null"
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_validate",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "validate",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_loadLabel",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "loadLabel",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "key",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_reset",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "reset",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_SwiftDataProcessor_fetchCount",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "fetchCount",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
               }
             }
           }
@@ -19336,6 +19522,99 @@
                 "_1" : "null"
               }
             }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_validate",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "validate",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "value",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_loadLabel",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "loadLabel",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "key",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_reset",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "reset",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_DataProcessor_fetchCount",
+            "effects" : {
+              "isAsync" : true,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "fetchCount",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
           }
         ],
         "name" : "DataProcessor",
@@ -23284,6 +23563,54 @@
                       }
                     },
                     "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncThrowSynchronously",
+                "parameters" : [
+                  {
+                    "name" : "message",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsAsyncReturnNonPromise",
+                "parameters" : [
+                  {
+                    "name" : "v",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
                   }
                 }
               }

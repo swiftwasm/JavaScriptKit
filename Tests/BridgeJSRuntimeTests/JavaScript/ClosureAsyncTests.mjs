@@ -38,6 +38,14 @@ export async function runJsClosureAsyncTests(exports) {
     assert.notEqual(directionAReject, null);
     assert.equal(directionAReject.message, "CallbackRejected");
 
+    await assert.rejects(
+        () => exports.awaitAsyncCallback(() => {
+            throw new Error("CallbackThrewSynchronously");
+        }),
+        (error) => error instanceof Error && error.message === "CallbackThrewSynchronously"
+    );
+    assert.equal(await exports.awaitAsyncCallback((req) => `plain-${req}`), "swift-saw:plain-request");
+
     const parser = exports.makeAsyncParser();
 
     const parsed = parser("42");

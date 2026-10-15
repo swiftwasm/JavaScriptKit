@@ -380,6 +380,31 @@ export async function createInstantiator(options, swift) {
         return jsValue;
     }
 
+    const swiftClosureRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
+        if (state.unregistered) { return; }
+        instance?.exports?.bjs_release_swift_closure(state.pointer);
+    });
+    const makeClosure = (pointer, file, line, func) => {
+        const state = { pointer, file, line, unregistered: false };
+        const real = (...args) => {
+            if (state.unregistered) {
+                const bytes = new Uint8Array(memory.buffer, state.file >>> 0);
+                let length = 0;
+                while (bytes[length] !== 0) { length += 1; }
+                const fileID = decodeUTF8(state.file, length);
+                throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);
+            }
+            return func(...args);
+        };
+        real.__unregister = () => {
+            if (state.unregistered) { return; }
+            state.unregistered = true;
+            swiftClosureRegistry.unregister(state);
+        };
+        swiftClosureRegistry.register(real, state, state);
+        return swift.memory.retain(real);
+    };
+
     const __bjs_codec_M10TestModuleT24MyViewControllerDelegate = {
         lower: (v) => {
             const objId = swift.memory.retain(v);
@@ -512,6 +537,22 @@ export async function createInstantiator(options, swift) {
                 promise[__bjs_promiseSettlers] = { resolve, reject };
                 return swift.memory.retain(promise);
             }
+            bjs["promise_resolve_TestModule_SS"] = function(promise, valueWord0, valueWord1, valueWord2) {
+                try {
+                    const string = decodeString(valueWord0, valueWord1, valueWord2);
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].resolve(string);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["promise_reject_TestModule"] = function(promise, valueKind, valuePayload1, valuePayload2) {
+                try {
+                    const jsValue = __bjs_jsValueLift(valueKind, valuePayload1, valuePayload2);
+                    swift.memory.getObject(promise)[__bjs_promiseSettlers].reject(jsValue);
+                } catch (error) {
+                    setException(error);
+                }
+            }
             bjs["swift_js_return_optional_bool"] = function(isSome, value) {
                 if (isSome === 0) {
                     tmpRetOptionalBool = null;
@@ -602,6 +643,95 @@ export async function createInstantiator(options, swift) {
                 return pointer || 0;
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
+            bjs["swift_js_closure_unregister"] = function(funcRef) {
+                const func = swift.memory.getObject(funcRef);
+                func.__unregister();
+            }
+            bjs["invoke_js_callback_TestModule_10TestModules7JSValueV_y"] = function(callbackId, param0Kind, param0Payload1, param0Payload2) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    const jsValue = __bjs_jsValueLift(param0Kind, param0Payload1, param0Payload2);
+                    callback(jsValue);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["make_swift_closure_TestModule_10TestModules7JSValueV_y"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModules7JSValueV_y = function(param0) {
+                    const [param0Kind, param0Payload1, param0Payload2] = __bjs_jsValueLower(param0);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModules7JSValueV_y(boxPtr, param0Kind, param0Payload1, param0Payload2);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                };
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModules7JSValueV_y);
+            }
+            bjs["invoke_js_callback_TestModule_10TestModulesSS_y"] = function(callbackId, param0Word0, param0Word1, param0Word2) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    const string = decodeString(param0Word0, param0Word1, param0Word2);
+                    callback(string);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["make_swift_closure_TestModule_10TestModulesSS_y"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModulesSS_y = function(param0) {
+                    const param0Bytes = textEncoder.encode(param0);
+                    const param0Id = swift.memory.retain(param0Bytes);
+                    instance.exports.invoke_swift_closure_TestModule_10TestModulesSS_y(boxPtr, param0Id, param0Bytes.length);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                };
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModulesSS_y);
+            }
+            bjs["invoke_js_callback_TestModule_10TestModulesSi_y"] = function(callbackId, param0) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    callback(param0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["make_swift_closure_TestModule_10TestModulesSi_y"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModulesSi_y = function(param0) {
+                    instance.exports.invoke_swift_closure_TestModule_10TestModulesSi_y(boxPtr, param0);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                };
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModulesSi_y);
+            }
+            bjs["invoke_js_callback_TestModule_10TestModuley_y"] = function(callbackId) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    callback();
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["make_swift_closure_TestModule_10TestModuley_y"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModuley_y = function() {
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuley_y(boxPtr);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                };
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuley_y);
+            }
             // Wrapper functions for module: TestModule
             if (!importObject["TestModule"]) {
                 importObject["TestModule"] = {};
@@ -913,6 +1043,43 @@ export async function createInstantiator(options, swift) {
                     setException(error);
                 }
             }
+            TestModule["bjs_MyViewControllerDelegate_validate"] = function bjs_MyViewControllerDelegate_validate(self, value) {
+                try {
+                    let ret = swift.memory.getObject(self).validate(value);
+                    return ret;
+                } catch (error) {
+                    setException(error);
+                    return 0
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_loadLabel"] = function bjs_MyViewControllerDelegate_loadLabel(resolveRef, rejectRef, self, keyWord0, keyWord1, keyWord2) {
+                const resolve = swift.memory.getObject(resolveRef);
+                const reject = swift.memory.getObject(rejectRef);
+                try {
+                    const string = decodeString(keyWord0, keyWord1, keyWord2);
+                    Promise.resolve(swift.memory.getObject(self).loadLabel(string)).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_reset"] = function bjs_MyViewControllerDelegate_reset(resolveRef, rejectRef, self) {
+                const resolve = swift.memory.getObject(resolveRef);
+                const reject = swift.memory.getObject(rejectRef);
+                try {
+                    Promise.resolve(swift.memory.getObject(self).reset()).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
+            }
+            TestModule["bjs_MyViewControllerDelegate_fetchCount"] = function bjs_MyViewControllerDelegate_fetchCount(resolveRef, rejectRef, self) {
+                const resolve = swift.memory.getObject(resolveRef);
+                const reject = swift.memory.getObject(rejectRef);
+                try {
+                    Promise.resolve(swift.memory.getObject(self).fetchCount()).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
+            }
         },
         setInstance: (i) => {
             if (memory !== i.exports.memory) immortalStrings.clear();
@@ -1181,6 +1348,30 @@ export async function createInstantiator(options, swift) {
                 }
                 sendHelper(helper) {
                     instance.exports.bjs_MyViewController_sendHelper(this.pointer, helper.pointer);
+                }
+                validateValue(value) {
+                    const ret = instance.exports.bjs_MyViewController_validateValue(this.pointer, value);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                    return ret;
+                }
+                loadLabel(key) {
+                    const keyBytes = textEncoder.encode(key);
+                    const keyId = swift.memory.retain(keyBytes);
+                    const ret = instance.exports.bjs_MyViewController_loadLabel(this.pointer, keyId, keyBytes.length);
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                    return ret1;
                 }
                 get delegate() {
                     const ret = instance.exports.bjs_MyViewController_delegate_get(this.pointer);
