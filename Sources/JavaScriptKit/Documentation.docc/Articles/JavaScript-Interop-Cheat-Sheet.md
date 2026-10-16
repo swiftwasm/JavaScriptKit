@@ -373,4 +373,5 @@ let swiftPromise = JSPromise.async {
 - Use `JSPromise.async(body:)` (with `Void` or `JSValue` return type) to expose Swift `async/await` work to JavaScript callers.
 - To await JavaScript `Promise` from Swift, import `JavaScriptEventLoop`, call `JavaScriptEventLoop.installGlobalExecutor()` early, and use the `value` property.
 - The `value` property suspends until the promise resolves or rejects, rethrowing rejections as ``JSException``.
+- Long-running async work blocks rendering and input until it completes. Set `JavaScriptEventLoop.shared.yieldInterval` (for example, `.milliseconds(16)`) to yield to the JavaScript event loop between jobs.
 
