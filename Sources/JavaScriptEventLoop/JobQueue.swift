@@ -43,12 +43,26 @@ extension JavaScriptEventLoop {
     func runAllJobs() {
         assert(queueState.isSpinning)
 
+        // The clock is only read while `yieldInterval` is set.
+        var start: DrainInstant? = yieldInterval == nil ? nil : drainClockNow()
         while let job = self.claimNextFromQueue() {
             #if compiler(>=5.9)
             job.runSynchronously(on: self.asUnownedSerialExecutor())
             #else
             job._runSynchronously(on: self.asUnownedSerialExecutor())
             #endif
+
+            if let yieldInterval, queueState.headJob != nil {
+                if let start {
+                    if hasRun(since: start, for: yieldInterval) {
+                        // Keep `isSpinning` set so new jobs wait for the continuation.
+                        queueHostTask { self.runAllJobs() }
+                        return
+                    }
+                } else {
+                    start = drainClockNow()
+                }
+            }
         }
 
         queueState.isSpinning = false

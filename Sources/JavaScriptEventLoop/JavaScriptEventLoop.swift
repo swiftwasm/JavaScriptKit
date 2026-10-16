@@ -48,6 +48,26 @@ public final class JavaScriptEventLoop: SerialExecutor, @unchecked Sendable {
     /// A function that invokes a given closure after a specified number of milliseconds.
     public var setTimeout: (Double, @escaping () -> Void) -> Void
 
+    /// The maximum time to run queued jobs before yielding to the JavaScript event loop.
+    ///
+    /// By default (`nil`), all queued jobs run in a single microtask, so long-running async work
+    /// blocks rendering, input, and other JavaScript tasks until it completes. When set, the
+    /// remaining jobs continue in a new JavaScript task after the interval, at the cost of some
+    /// latency. A single job is never interrupted.
+    ///
+    /// ```swift
+    /// JavaScriptEventLoop.shared.yieldInterval = .milliseconds(16)
+    /// ```
+    public var yieldInterval: Duration?
+
+    /// Continues a drain that stopped at ``yieldInterval``. Created lazily.
+    var hostTaskScheduler: ((@escaping () -> Void) -> Void)?
+
+    #if hasFeature(Embedded)
+    /// Cached `performance.now` used by ``yieldInterval`` in Embedded Swift.
+    var performanceNow: (performance: JSObject, now: JSFunction)?
+    #endif
+
     /// A mutable state to manage internal job queue
     /// Note that this should be guarded atomically when supporting multi-threaded environment.
     var queueState = QueueState()
