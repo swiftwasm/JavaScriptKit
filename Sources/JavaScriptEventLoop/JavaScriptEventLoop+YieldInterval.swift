@@ -20,10 +20,8 @@ extension JavaScriptEventLoop {
         return performanceNow!.now(this: performanceNow!.performance).number!
     }
 
-    func hasRun(since start: DrainInstant, for interval: Duration) -> Bool {
-        let (seconds, attoseconds) = interval.components
-        let intervalMilliseconds = Double(seconds) * 1_000 + Double(attoseconds) / 1_000_000_000_000_000
-        return drainClockNow() - start >= intervalMilliseconds
+    func drainElapsed(since start: DrainInstant) -> Duration {
+        .milliseconds(drainClockNow() - start)
     }
     #else
     typealias DrainInstant = ContinuousClock.Instant
@@ -32,8 +30,8 @@ extension JavaScriptEventLoop {
         ContinuousClock.now
     }
 
-    func hasRun(since start: DrainInstant, for interval: Duration) -> Bool {
-        start.duration(to: .now) >= interval
+    func drainElapsed(since start: DrainInstant) -> Duration {
+        start.duration(to: .now)
     }
     #endif
 

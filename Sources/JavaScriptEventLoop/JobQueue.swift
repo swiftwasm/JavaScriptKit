@@ -45,6 +45,10 @@ extension JavaScriptEventLoop {
 
         // The clock is only read while `yieldInterval` is set.
         var start: DrainInstant? = yieldInterval == nil ? nil : drainClockNow()
+        // A clock read costs more than a small job. Read it every `clockStride` jobs, and double
+        // the stride (up to 256) while the drain is far from the interval.
+        var clockStride = 1
+        var jobsUntilClockRead = 1
         while let job = self.claimNextFromQueue() {
             #if compiler(>=5.9)
             job.runSynchronously(on: self.asUnownedSerialExecutor())
@@ -54,11 +58,18 @@ extension JavaScriptEventLoop {
 
             if let yieldInterval, queueState.headJob != nil {
                 if let start {
-                    if hasRun(since: start, for: yieldInterval) {
+                    jobsUntilClockRead -= 1
+                    if jobsUntilClockRead > 0 { continue }
+                    let elapsed = drainElapsed(since: start)
+                    if elapsed >= yieldInterval {
                         // Keep `isSpinning` set so new jobs wait for the continuation.
                         queueHostTask { self.runAllJobs() }
                         return
                     }
+                    if elapsed * 4 < yieldInterval {
+                        clockStride = min(clockStride * 2, 256)
+                    }
+                    jobsUntilClockRead = clockStride
                 } else {
                     start = drainClockNow()
                 }
