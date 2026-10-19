@@ -22,6 +22,9 @@ func runJsWorks() -> Void
 @JS func roundTripString(v: String) -> String {
     return v
 }
+@JS func describeReservedWordParameters(extension: Int, break: Double, function: Bool, in: String) -> String {
+    return "\(`extension`):\(`break`):\(function):\(`in`)"
+}
 @JS func roundTripSwiftHeapObject(v: Greeter) -> Greeter {
     return v
 }

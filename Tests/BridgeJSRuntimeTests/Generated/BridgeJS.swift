@@ -10324,6 +10324,21 @@ public func _bjs_roundTripString(_ vBytes: Int32, _ vLength: Int32) -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_describeReservedWordParameters")
+@_cdecl("bjs_describeReservedWordParameters")
+public func _bjs_describeReservedWordParameters(_ `extension`: Int32, _ `break`: Float64, _ function: Int32, _ inBytes: Int32, _ inLength: Int32) -> Void {
+    #if arch(wasm32)
+    let `in` = String.bridgeJSLiftParameter(inBytes, inLength)
+    let function = Bool.bridgeJSLiftParameter(function)
+    let `break` = Double.bridgeJSLiftParameter(`break`)
+    let `extension` = Int.bridgeJSLiftParameter(`extension`)
+    let ret = describeReservedWordParameters(extension: `extension`, break: `break`, function: function, in: `in`)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripSwiftHeapObject")
 @_cdecl("bjs_roundTripSwiftHeapObject")
 public func _bjs_roundTripSwiftHeapObject(_ v: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {

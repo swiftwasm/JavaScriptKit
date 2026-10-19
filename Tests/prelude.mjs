@@ -305,6 +305,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     ]) {
         assert.equal(exports.roundTripString(v), v);
     }
+    assert.equal(exports.describeReservedWordParameters(1, 2.5, true, "in"), "1:2.5:true:in");
     const dict = { a: 1, b: 2 };
     assert.deepEqual(exports.roundTripDictionaryExport(dict), dict);
     const optDict = { hello: "world" };

@@ -216,7 +216,7 @@ public class ExportSwift {
             let liftingInfo = try param.type.liftParameterInfo()
             let argumentsToLift: [String]
             if liftingInfo.parameters.count == 1 {
-                argumentsToLift = [param.name]
+                argumentsToLift = [param.escapedSwiftIdentifier]
             } else {
                 argumentsToLift = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
             }
@@ -227,7 +227,9 @@ public class ExportSwift {
             switch param.type {
             case .closure(let signature, _):
                 typeNameForIntrinsic = param.type.swiftType
-                liftingExpr = ExprSyntax("_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.name))")
+                liftingExpr = ExprSyntax(
+                    "_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.escapedSwiftIdentifier))"
+                )
             case .swiftStruct(let structName):
                 typeNameForIntrinsic = structName
                 liftingExpr = ExprSyntax("\(raw: structName).bridgeJSLiftParameter()")
@@ -252,7 +254,7 @@ public class ExportSwift {
                 )
             }
 
-            parameterBindings.insert("let \(raw: param.name) = \(liftingExpr)", at: 0)
+            parameterBindings.insert("let \(raw: param.escapedSwiftIdentifier) = \(liftingExpr)", at: 0)
             for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
                 abiParameterSignatures.append((name, type))
             }
@@ -268,14 +270,14 @@ public class ExportSwift {
         }
 
         private func removeFirstLiftedParameter() -> String {
-            return parameters.removeFirst().name
+            return parameters.removeFirst().escapedSwiftIdentifier
         }
 
         private func renderCallStatement(callee: ExprSyntax, returnType: BridgeType) -> CodeBlockItemSyntax {
             let labeledParams = parameters.map { param in
                 LabeledExprSyntax(
                     label: param.label,
-                    expression: DeclReferenceExprSyntax(baseName: .identifier(param.name))
+                    expression: DeclReferenceExprSyntax(baseName: .identifier(param.escapedSwiftIdentifier))
                 )
             }
             var callExpr: ExprSyntax =
@@ -1590,6 +1592,12 @@ struct ProtocolCodegen {
         printer.write("}")
 
         return externDecls
+    }
+}
+
+extension Parameter {
+    fileprivate var escapedSwiftIdentifier: String {
+        name.backtickIfNeeded()
     }
 }
 

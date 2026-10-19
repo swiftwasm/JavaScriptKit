@@ -1,0 +1,81 @@
+{
+  "exported" : {
+    "aliases" : [
+
+    ],
+    "classes" : [
+
+    ],
+    "enums" : [
+
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_check",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "check",
+        "parameters" : [
+          {
+            "label" : "extension",
+            "name" : "extension",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "break",
+            "name" : "break",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "label" : "function",
+            "name" : "function",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "label" : "in",
+            "name" : "in",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      }
+    ],
+    "protocols" : [
+
+    ],
+    "structs" : [
+
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

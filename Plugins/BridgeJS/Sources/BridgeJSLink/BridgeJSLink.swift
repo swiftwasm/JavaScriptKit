@@ -1758,7 +1758,7 @@ public struct BridgeJSLink {
                 loweringFragment.parameters.count == 1,
                 "Lowering fragment should have exactly one parameter to lower"
             )
-            let paramName = scope.variable(param.name)
+            let paramName = scope.variable(param.escapedJSIdentifier)
             let loweredValues = try loweringFragment.printCode([paramName], context)
             parameterForwardings.append(contentsOf: loweredValues)
         }
@@ -1950,7 +1950,7 @@ public struct BridgeJSLink {
         }
         let parameterSignatures = parameters.map { param in
             let optional = param.hasDefault ? "?" : ""
-            return "\(param.name)\(optional): \(resolveTypeScriptType(param.type))"
+            return "\(param.escapedJSIdentifier)\(optional): \(resolveTypeScriptType(param.type))"
         }
         return "(\(parameterSignatures.joined(separator: ", "))): \(returnTypeWithEffect)"
     }
@@ -2669,7 +2669,7 @@ extension BridgeJSLink {
             if let constructor = klass.constructor {
                 let paramSignatures = constructor.parameters.map { param in
                     let optional = param.hasDefault ? "?" : ""
-                    return "\(param.name)\(optional): \(resolveTypeScriptType(param.type))"
+                    return "\(param.escapedJSIdentifier)\(optional): \(resolveTypeScriptType(param.type))"
                 }
                 printer.write(
                     lines: renderJSDoc(documentation: constructor.documentation, parameters: constructor.parameters)
@@ -4321,9 +4321,9 @@ enum DefaultValueUtils {
         return parameters.map { param in
             if let defaultValue = param.defaultValue {
                 let defaultJs = format(defaultValue, as: .javascript, resolveTypeName: resolveTypeName)
-                return "\(param.name) = \(defaultJs)"
+                return "\(param.escapedJSIdentifier) = \(defaultJs)"
             }
-            return param.name
+            return param.escapedJSIdentifier
         }.joined(separator: ", ")
     }
 }
@@ -4348,11 +4348,11 @@ extension BridgeJSLink {
             }
             switch (docText, defaultValue) {
             case let (.some(text), .some(value)):
-                tagLines.append("@param \(parameter.name) \(text) (default: \(value))")
+                tagLines.append("@param \(parameter.escapedJSIdentifier) \(text) (default: \(value))")
             case let (.some(text), .none):
-                tagLines.append("@param \(parameter.name) \(text)")
+                tagLines.append("@param \(parameter.escapedJSIdentifier) \(text)")
             case let (.none, .some(value)):
-                tagLines.append("@param \(parameter.name) - Optional parameter (default: \(value))")
+                tagLines.append("@param \(parameter.escapedJSIdentifier) - Optional parameter (default: \(value))")
             case (.none, .none):
                 continue
             }
@@ -4475,6 +4475,21 @@ private struct DocCComment {
 
 struct BridgeJSLinkError: Error {
     let message: String
+}
+
+extension Parameter {
+    // From: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#reserved_words
+    private static let javaScriptReservedWords: Set<String> = [
+        "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else",
+        "export", "extends", "false", "finally", "for", "function", "if", "import", "in", "instanceof", "new",
+        "null", "return", "super", "switch", "this", "throw", "true", "try", "typeof", "var", "void", "while",
+        "with", "let", "static", "yield", "await", "enum", "implements", "interface", "package", "private",
+        "protected", "public", "arguments", "eval",
+    ]
+
+    fileprivate var escapedJSIdentifier: String {
+        Self.javaScriptReservedWords.contains(name) ? "_\(name)" : name
+    }
 }
 
 extension ClosureSignature {

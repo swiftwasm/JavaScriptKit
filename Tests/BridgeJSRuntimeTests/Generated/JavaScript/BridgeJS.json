@@ -15215,6 +15215,61 @@
         }
       },
       {
+        "abiName" : "bjs_describeReservedWordParameters",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "describeReservedWordParameters",
+        "parameters" : [
+          {
+            "label" : "extension",
+            "name" : "extension",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "break",
+            "name" : "break",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "label" : "function",
+            "name" : "function",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "label" : "in",
+            "name" : "in",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripSwiftHeapObject",
         "effects" : {
           "isAsync" : false,
