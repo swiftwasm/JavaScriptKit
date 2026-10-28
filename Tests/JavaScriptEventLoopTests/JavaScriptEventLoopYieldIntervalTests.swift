@@ -76,4 +76,31 @@ final class JavaScriptEventLoopYieldIntervalTests: XCTestCase {
         for task in tasks { await task.value }
         XCTAssertEqual(order.value, Array(0..<20))
     }
+
+    func testPriorityOrderAcrossYields() async {
+        JavaScriptEventLoop.shared.yieldInterval = .milliseconds(1)
+        let order = Box([String]())
+        let expectedOrder = ["h0", "h1", "h2", "h3", "h4", "m0", "m1", "m2", "m3", "l0", "l1", "l2", "l3", "l4"]
+        // Tasks are not awaited, so no await raises the priority of a queued task.
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            @Sendable func record(_ name: String) {
+                Self.busyWait(milliseconds: 1)
+                order.value.append(name)
+                if order.value.count == expectedOrder.count { continuation.resume() }
+            }
+            let priorities: [(String, TaskPriority)] = [("l", .low), ("m", .medium), ("h", .high)]
+            for index in 0..<12 {
+                let (prefix, priority) = priorities[index % 3]
+                let name = "\(prefix)\(index / 3)"
+                Task(priority: priority) {
+                    record(name)
+                    if name == "h0" {
+                        Task(priority: .low) { record("l4") }
+                        Task(priority: .high) { record("h4") }
+                    }
+                }
+            }
+        }
+        XCTAssertEqual(order.value, expectedOrder)
+    }
 }
