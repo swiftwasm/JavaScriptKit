@@ -4294,6 +4294,39 @@ fileprivate func bjs_ArrayElementProtocol_value_set_extern(_ jsObject: Int32, _ 
     return bjs_ArrayElementProtocol_value_set_extern(jsObject, newValue)
 }
 
+extension ReservedWordDescriber where Self: _BridgedSwiftProtocolWrapper {
+    func describe(`in`: Int, `for`: String) -> String {
+        let ret0 = `for`.bridgeJSWithLoweredParameter { (forWord0, forWord1, forWord2) in
+            let inValue = `in`.bridgeJSLowerParameter()
+            let jsObjectValue = jsObject.bridgeJSLowerParameter()
+            let ret = bjs_ReservedWordDescriber_describe(jsObjectValue, inValue, forWord0, forWord1, forWord2)
+            return ret
+        }
+        let ret = ret0
+        return String.bridgeJSLiftReturn(ret)
+    }
+}
+
+struct AnyReservedWordDescriber: ReservedWordDescriber, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyReservedWordDescriber(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_ReservedWordDescriber_describe")
+fileprivate func bjs_ReservedWordDescriber_describe_extern(_ jsObject: Int32, _ `in`: Int32, _ forWord0: Int32, _ forWord1: Int32, _ forWord2: Int32) -> Int32
+#else
+fileprivate func bjs_ReservedWordDescriber_describe_extern(_ jsObject: Int32, _ `in`: Int32, _ forWord0: Int32, _ forWord1: Int32, _ forWord2: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ReservedWordDescriber_describe(_ jsObject: Int32, _ `in`: Int32, _ forWord0: Int32, _ forWord1: Int32, _ forWord2: Int32) -> Int32 {
+    return bjs_ReservedWordDescriber_describe_extern(jsObject, `in`, forWord0, forWord1, forWord2)
+}
+
 extension DataProcessor where Self: _BridgedSwiftProtocolWrapper {
     func increment(by amount: Int) -> Void {
         let amountValue = amount.bridgeJSLowerParameter()
@@ -10333,6 +10366,45 @@ public func _bjs_describeReservedWordParameters(_ `extension`: Int32, _ `break`:
     let `break` = Double.bridgeJSLiftParameter(`break`)
     let `extension` = Int.bridgeJSLiftParameter(`extension`)
     let ret = describeReservedWordParameters(extension: `extension`, break: `break`, function: function, in: `in`)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_describeBacktickedParameter")
+@_cdecl("bjs_describeBacktickedParameter")
+public func _bjs_describeBacktickedParameter(_ inBytes: Int32, _ inLength: Int32) -> Void {
+    #if arch(wasm32)
+    let `in` = String.bridgeJSLiftParameter(inBytes, inLength)
+    let ret = describeBacktickedParameter(_: `in`)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_describeCollidingParameters")
+@_cdecl("bjs_describeCollidingParameters")
+public func _bjs_describeCollidingParameters(_ `in`: Int32, _ _in: Int32, _ instance: Int32, _ swiftBytes: Int32, _ swiftLength: Int32) -> Void {
+    #if arch(wasm32)
+    let swift = String.bridgeJSLiftParameter(swiftBytes, swiftLength)
+    let instance = Int.bridgeJSLiftParameter(instance)
+    let _in = Int.bridgeJSLiftParameter(_in)
+    let `in` = Int.bridgeJSLiftParameter(`in`)
+    let ret = describeCollidingParameters(in: `in`, _in: _in, instance: instance, swift: swift)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_describeWithReservedWordDescriber")
+@_cdecl("bjs_describeWithReservedWordDescriber")
+public func _bjs_describeWithReservedWordDescriber(_ describer: Int32) -> Void {
+    #if arch(wasm32)
+    let describer = AnyReservedWordDescriber.bridgeJSLiftParameter(describer)
+    let ret = describeWithReservedWordDescriber(_: describer)
     return ret.bridgeJSLowerReturn()
     #else
     fatalError("Only available on WebAssembly")
@@ -19966,6 +20038,32 @@ func _$jsJoinStringThenStackParams(_ s: String, _ a: Optional<[Int]>, _ b: [Int]
         let _ = b.bridgeJSLowerParameter()
         let _ = a.bridgeJSLowerParameter()
         let ret = bjs_jsJoinStringThenStackParams(sWord0, sWord1, sWord2)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_jsDescribeReservedWordParameters")
+fileprivate func bjs_jsDescribeReservedWordParameters_extern(_ `in`: Int32, _ forWord0: Int32, _ forWord1: Int32, _ forWord2: Int32, _ `default`: Int32) -> Int32
+#else
+fileprivate func bjs_jsDescribeReservedWordParameters_extern(_ `in`: Int32, _ forWord0: Int32, _ forWord1: Int32, _ forWord2: Int32, _ `default`: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_jsDescribeReservedWordParameters(_ `in`: Int32, _ forWord0: Int32, _ forWord1: Int32, _ forWord2: Int32, _ `default`: Int32) -> Int32 {
+    return bjs_jsDescribeReservedWordParameters_extern(`in`, forWord0, forWord1, forWord2, `default`)
+}
+
+func _$jsDescribeReservedWordParameters(_ `in`: Int, _ `for`: String, _ `default`: Bool) throws(JSException) -> String {
+    let ret0 = `for`.bridgeJSWithLoweredParameter { (forWord0, forWord1, forWord2) in
+        let defaultValue = `default`.bridgeJSLowerParameter()
+        let inValue = `in`.bridgeJSLowerParameter()
+        let ret = bjs_jsDescribeReservedWordParameters(inValue, forWord0, forWord1, forWord2, defaultValue)
         return ret
     }
     let ret = ret0

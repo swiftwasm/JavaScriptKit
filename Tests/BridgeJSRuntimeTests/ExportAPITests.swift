@@ -25,6 +25,18 @@ func runJsWorks() -> Void
 @JS func describeReservedWordParameters(extension: Int, break: Double, function: Bool, in: String) -> String {
     return "\(`extension`):\(`break`):\(function):\(`in`)"
 }
+@JS func describeBacktickedParameter(_ `in`: String) -> String {
+    return `in`
+}
+@JS func describeCollidingParameters(in: Int, _in: Int, instance: Int, swift: String) -> String {
+    return "\(`in`):\(_in):\(instance):\(swift)"
+}
+@JS protocol ReservedWordDescriber {
+    func describe(in: Int, for: String) -> String
+}
+@JS func describeWithReservedWordDescriber(_ describer: any ReservedWordDescriber) -> String {
+    return describer.describe(in: 1, for: "for")
+}
 @JS func roundTripSwiftHeapObject(v: Greeter) -> Greeter {
     return v
 }

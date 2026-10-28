@@ -33,6 +33,31 @@ export async function createInstantiator(options, swift) {
 
     let _exports = null;
     let bjs = null;
+    const swiftClosureRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
+        if (state.unregistered) { return; }
+        instance?.exports?.bjs_release_swift_closure(state.pointer);
+    });
+    const makeClosure = (pointer, file, line, func) => {
+        const state = { pointer, file, line, unregistered: false };
+        const real = (...args) => {
+            if (state.unregistered) {
+                const bytes = new Uint8Array(memory.buffer, state.file >>> 0);
+                let length = 0;
+                while (bytes[length] !== 0) { length += 1; }
+                const fileID = decodeUTF8(state.file, length);
+                throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);
+            }
+            return func(...args);
+        };
+        real.__unregister = () => {
+            if (state.unregistered) { return; }
+            state.unregistered = true;
+            swiftClosureRegistry.unregister(state);
+        };
+        swiftClosureRegistry.register(real, state, state);
+        return swift.memory.retain(real);
+    };
+
 
     return {
         /**
@@ -41,6 +66,7 @@ export async function createInstantiator(options, swift) {
         addImports: (importObject, importsContext) => {
             bjs = {};
             importObject["bjs"] = bjs;
+            const imports = options.getImports(importsContext);
             bjs["swift_js_return_string"] = function(word0, word1, word2) {
                 tmpRetString = decodeString(word0, word1, word2);
             }
@@ -206,6 +232,69 @@ export async function createInstantiator(options, swift) {
                 return pointer || 0;
             }
             bjs["swift_js_closure_unregister"] = function(funcRef) {}
+            bjs["swift_js_closure_unregister"] = function(funcRef) {
+                const func = swift.memory.getObject(funcRef);
+                func.__unregister();
+            }
+            bjs["invoke_js_callback_TestModule_10TestModuley_y"] = function(callbackId) {
+                try {
+                    const callback = swift.memory.getObject(callbackId);
+                    callback();
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            bjs["make_swift_closure_TestModule_10TestModuley_y"] = function(boxPtr, file, line) {
+                const lower_closure_TestModule_10TestModuley_y = function() {
+                    instance.exports.invoke_swift_closure_TestModule_10TestModuley_y(boxPtr);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                };
+                return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuley_y);
+            }
+            // Wrapper functions for module: TestModule
+            if (!importObject["TestModule"]) {
+                importObject["TestModule"] = {};
+            }
+            importObject["TestModule"]["bjs_ReservedWordBox_wrap"] = function(pointer) {
+                const obj = _exports['ReservedWordBox'].__construct(pointer);
+                return swift.memory.retain(obj);
+            };
+            const TestModule = importObject["TestModule"] = importObject["TestModule"] || {};
+            TestModule["bjs_importedCheck"] = function bjs_importedCheck(_in, forWord0, forWord1, forWord2, _default) {
+                try {
+                    const string = decodeString(forWord0, forWord1, forWord2);
+                    imports.importedCheck(_in, string, _default !== 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_importedSelfClosure"] = function bjs_importedSelfClosure(self) {
+                try {
+                    imports.importedSelfClosure(swift.memory.getObject(self));
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_ReservedWordDelegate_handle"] = function bjs_ReservedWordDelegate_handle(self, _in, forWord0, forWord1, forWord2, _default) {
+                try {
+                    const string = decodeString(forWord0, forWord1, forWord2);
+                    swift.memory.getObject(self).handle(_in, string, _default !== 0);
+                } catch (error) {
+                    setException(error);
+                }
+            }
+            TestModule["bjs_BacktickedLabelDelegate_handle"] = function bjs_BacktickedLabelDelegate_handle(self, _in) {
+                try {
+                    swift.memory.getObject(self).handle(_in);
+                } catch (error) {
+                    setException(error);
+                }
+            }
         },
         setInstance: (i) => {
             if (memory !== i.exports.memory) immortalStrings.clear();
@@ -368,12 +457,95 @@ export async function createInstantiator(options, swift) {
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
             const js = swift.memory.heap;
+            const swiftHeapObjectFinalizationRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {
+                if (state.hasReleased) {
+                    return;
+                }
+                state.hasReleased = true;
+                state.identityMap?.delete(state.pointer);
+                state.deinit(state.pointer);
+            });
+
+            /// Represents a Swift heap object like a class instance or an actor instance.
+            class SwiftHeapObject {
+                static __wrap(pointer, deinit, prototype, identityCache) {
+                    pointer = pointer >>> 0;
+                    const makeFresh = (identityMap) => {
+                        const obj = Object.create(prototype);
+                        const state = { pointer, deinit, hasReleased: false, identityMap };
+                        obj.pointer = pointer;
+                        obj.__swiftHeapObjectState = state;
+                        swiftHeapObjectFinalizationRegistry.register(obj, state, state);
+                        if (identityMap) {
+                            identityMap.set(pointer, new WeakRef(obj));
+                        }
+                        return obj;
+                    };
+
+                    if (!identityCache) {
+                        return makeFresh(null);
+                    }
+
+                    const cached = identityCache.get(pointer)?.deref();
+                    if (cached && !cached.__swiftHeapObjectState.hasReleased) {
+                        deinit(pointer);
+                        return cached;
+                    }
+                    if (identityCache.has(pointer)) {
+                        identityCache.delete(pointer);
+                    }
+
+                    return makeFresh(identityCache);
+                }
+
+                release() {
+                    const state = this.__swiftHeapObjectState;
+                    if (state.hasReleased) {
+                        return;
+                    }
+                    state.hasReleased = true;
+                    swiftHeapObjectFinalizationRegistry.unregister(state);
+                    state.identityMap?.delete(state.pointer);
+                    state.deinit(state.pointer);
+                }
+            }
+            class ReservedWordBox extends SwiftHeapObject {
+                static __construct(ptr) {
+                    return SwiftHeapObject.__wrap(ptr, instance.exports.bjs_ReservedWordBox_deinit, ReservedWordBox.prototype, null);
+                }
+
+                constructor(_in) {
+                    const ret = instance.exports.bjs_ReservedWordBox_init(_in);
+                    return ReservedWordBox.__construct(ret);
+                }
+                run(_for) {
+                    instance.exports.bjs_ReservedWordBox_run(this.pointer, _for);
+                }
+                static make(_default) {
+                    const ret = instance.exports.bjs_ReservedWordBox_static_make(_default);
+                    return ret;
+                }
+            }
             const exports = {
                 check: function bjs_check(extension, _break, _function, _in) {
                     const _inBytes = textEncoder.encode(_in);
                     const _inId = swift.memory.retain(_inBytes);
                     instance.exports.bjs_check(extension, _break, _function, _inId, _inBytes.length);
                 },
+                checkEscaped: function bjs_checkEscaped(_in) {
+                    const _inBytes = textEncoder.encode(_in);
+                    const _inId = swift.memory.retain(_inBytes);
+                    instance.exports.bjs_checkEscaped(_inId, _inBytes.length);
+                },
+                checkEscapedCollision: function bjs_checkEscapedCollision(_in, _in1) {
+                    instance.exports.bjs_checkEscapedCollision(_in, _in1);
+                },
+                checkGlueNameCollision: function bjs_checkGlueNameCollision(instance1, swift1) {
+                    const swift1Bytes = textEncoder.encode(swift1);
+                    const swift1Id = swift.memory.retain(swift1Bytes);
+                    instance.exports.bjs_checkGlueNameCollision(instance1, swift1Id, swift1Bytes.length);
+                },
+                ReservedWordBox,
             };
             _exports = exports;
             return exports;

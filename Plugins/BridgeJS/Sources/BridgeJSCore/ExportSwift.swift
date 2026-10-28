@@ -213,10 +213,11 @@ public class ExportSwift {
 
         func liftParameter(param: Parameter) throws {
             parameters.append(param)
+            let escapedName = param.escapedSwiftIdentifier
             let liftingInfo = try param.type.liftParameterInfo()
             let argumentsToLift: [String]
             if liftingInfo.parameters.count == 1 {
-                argumentsToLift = [param.escapedSwiftIdentifier]
+                argumentsToLift = [escapedName]
             } else {
                 argumentsToLift = liftingInfo.parameters.map { (name, _) in param.name + name.capitalizedFirstLetter }
             }
@@ -228,7 +229,7 @@ public class ExportSwift {
             case .closure(let signature, _):
                 typeNameForIntrinsic = param.type.swiftType
                 liftingExpr = ExprSyntax(
-                    "_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: param.escapedSwiftIdentifier))"
+                    "_BJS_Closure_\(raw: signature.mangleName).bridgeJSLift(\(raw: escapedName))"
                 )
             case .swiftStruct(let structName):
                 typeNameForIntrinsic = structName
@@ -254,7 +255,7 @@ public class ExportSwift {
                 )
             }
 
-            parameterBindings.insert("let \(raw: param.escapedSwiftIdentifier) = \(liftingExpr)", at: 0)
+            parameterBindings.insert("let \(raw: param.escapedSwiftBindingIdentifier) = \(liftingExpr)", at: 0)
             for (name, type) in zip(argumentsToLift, liftingInfo.parameters.map { $0.type }) {
                 abiParameterSignatures.append((name, type))
             }
@@ -1592,12 +1593,6 @@ struct ProtocolCodegen {
         printer.write("}")
 
         return externDecls
-    }
-}
-
-extension Parameter {
-    fileprivate var escapedSwiftIdentifier: String {
-        name.backtickIfNeeded()
     }
 }
 

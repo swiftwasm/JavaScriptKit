@@ -4,7 +4,101 @@
 
     ],
     "classes" : [
+      {
+        "constructor" : {
+          "abiName" : "bjs_ReservedWordBox_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "in",
+              "name" : "in",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_ReservedWordBox_run",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "run",
+            "parameters" : [
+              {
+                "label" : "for",
+                "name" : "for",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
 
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_ReservedWordBox_static_make",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : true,
+              "isThrows" : false
+            },
+            "name" : "make",
+            "parameters" : [
+              {
+                "label" : "default",
+                "name" : "default",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            },
+            "staticContext" : {
+              "className" : {
+                "_0" : "ReservedWordBox"
+              }
+            }
+          }
+        ],
+        "name" : "ReservedWordBox",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "ReservedWordBox"
+      }
     ],
     "enums" : [
 
@@ -65,13 +159,297 @@
 
           }
         }
+      },
+      {
+        "abiName" : "bjs_checkEscaped",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkEscaped",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "in",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_checkEscapedCollision",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkEscapedCollision",
+        "parameters" : [
+          {
+            "label" : "in",
+            "name" : "in",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "_in",
+            "name" : "_in",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_checkGlueNameCollision",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "checkGlueNameCollision",
+        "parameters" : [
+          {
+            "label" : "instance",
+            "name" : "instance",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "swift",
+            "name" : "swift",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "void" : {
+
+          }
+        }
       }
     ],
     "protocols" : [
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_ReservedWordDelegate_handle",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "handle",
+            "parameters" : [
+              {
+                "label" : "in",
+                "name" : "in",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "label" : "for",
+                "name" : "for",
+                "type" : {
+                  "string" : {
 
+                  }
+                }
+              },
+              {
+                "label" : "_",
+                "name" : "default",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "ReservedWordDelegate",
+        "properties" : [
+
+        ]
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_BacktickedLabelDelegate_handle",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "handle",
+            "parameters" : [
+              {
+                "label" : "`in`",
+                "name" : "in",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "BacktickedLabelDelegate",
+        "properties" : [
+
+        ]
+      }
     ],
     "structs" : [
 
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "importedCheck",
+            "parameters" : [
+              {
+                "name" : "in",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "for",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "default",
+                "type" : {
+                  "bool" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "importedSelfClosure",
+            "parameters" : [
+              {
+                "name" : "self",
+                "type" : {
+                  "closure" : {
+                    "_0" : {
+                      "isAsync" : false,
+                      "isThrows" : false,
+                      "mangleName" : "10TestModuley_y",
+                      "moduleName" : "TestModule",
+                      "parameters" : [
+
+                      ],
+                      "returnType" : {
+                        "void" : {
+
+                        }
+                      },
+                      "sendingParameters" : false
+                    },
+                    "useJSTypedClosure" : false
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+
+        ]
+      }
     ]
   },
   "moduleName" : "TestModule",

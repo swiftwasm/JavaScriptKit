@@ -1587,7 +1587,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 continue
             }
 
-            let name = param.secondName?.text ?? param.firstName.text
+            let name = SwiftToSkeleton.normalizeIdentifier(param.secondName?.text ?? param.firstName.text)
             let label = param.firstName.text
 
             let defaultValue: DefaultValue?
