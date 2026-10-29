@@ -1,6 +1,6 @@
 // This file contains the job queue implementation which re-order jobs based on their priority.
-// The current implementation is much simple to be easily debugged, but should be re-implemented
-// using priority queue ideally.
+// Jobs form runs, one per priority in descending order, FIFO within a run. The first job of each
+// run points to its last job, so an insert steps over whole runs.
 
 import _Concurrency
 import _CJavaScriptEventLoop
@@ -19,15 +19,18 @@ extension JavaScriptEventLoop {
     func insertJobQueue(job newJob: UnownedJob) {
         withUnsafeMutablePointer(to: &queueState.headJob) { headJobPtr in
             var position: UnsafeMutablePointer<UnownedJob?> = headJobPtr
-            while let cur = position.pointee {
-                if cur.rawPriority < newJob.rawPriority {
-                    newJob.nextInQueue().pointee = cur
-                    position.pointee = newJob
+            while let runHead = position.pointee, runHead.rawPriority >= newJob.rawPriority {
+                let runTail = runHead.lastInRun().pointee!
+                if runHead.rawPriority == newJob.rawPriority {
+                    newJob.nextInQueue().pointee = runTail.nextInQueue().pointee
+                    runTail.nextInQueue().pointee = newJob
+                    runHead.lastInRun().pointee = newJob
                     return
                 }
-                position = cur.nextInQueue()
+                position = runTail.nextInQueue()
             }
-            newJob.nextInQueue().pointee = nil
+            newJob.nextInQueue().pointee = position.pointee
+            newJob.lastInRun().pointee = newJob
             position.pointee = newJob
         }
 
@@ -81,7 +84,14 @@ extension JavaScriptEventLoop {
 
     func claimNextFromQueue() -> UnownedJob? {
         if let job = self.queueState.headJob {
-            self.queueState.headJob = job.nextInQueue().pointee
+            let nextJob = job.nextInQueue().pointee
+            if let nextJob {
+                let runTail = job.lastInRun().pointee!
+                if !runTail.isSameJob(as: job) {
+                    nextJob.lastInRun().pointee = runTail
+                }
+            }
+            self.queueState.headJob = nextJob
             return job
         }
         return nil
@@ -107,6 +117,16 @@ extension UnownedJob {
         }
     }
 
+    /// The last job of the run. Valid only on the first job of a run.
+    fileprivate func lastInRun() -> UnsafeMutablePointer<UnownedJob?> {
+        return withUnsafeMutablePointer(to: &asImpl().pointee.SchedulerPrivate.1) { rawLastJobPtr in
+            UnsafeMutableRawPointer(rawLastJobPtr).bindMemory(to: UnownedJob?.self, capacity: 1)
+        }
+    }
+
+    fileprivate func isSameJob(as other: UnownedJob) -> Bool {
+        asImpl() == other.asImpl()
+    }
 }
 
 private struct JobFlags {
