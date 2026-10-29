@@ -143,7 +143,8 @@ public struct ImportTS {
         }
 
         func lowerParameter(param: Parameter) throws {
-            if let genericPush = param.type.genericStackPushStatement(value: param.name) {
+            let escapedName = param.escapedSwiftIdentifier
+            if let genericPush = param.type.genericStackPushStatement(value: escapedName) {
                 stackLoweringStmts.insert(genericPush, at: 0)
                 return
             }
@@ -153,10 +154,10 @@ public struct ImportTS {
             switch param.type {
             case .closure(let signature, useJSTypedClosure: false):
                 let jsTypedClosureType = BridgeType.closure(signature, useJSTypedClosure: true).swiftType
-                body.write("let \(param.name) = \(jsTypedClosureType)(\(param.name))")
+                body.write("let \(param.escapedSwiftBindingIdentifier) = \(jsTypedClosureType)(\(escapedName))")
                 // The just created JSObject is not owned by the caller unlike those passed in parameters,
                 // so we need to extend its lifetime during the call to ensure the JSObject.id is valid.
-                valuesToExtendLifetimeDuringCall.append(param.name)
+                valuesToExtendLifetimeDuringCall.append(escapedName)
             default:
                 break
             }
@@ -177,7 +178,7 @@ public struct ImportTS {
             if loweringInfo.useBorrowing {
                 let returnVariableName = "ret\(borrowedArguments.count)"
                 let assign = needsReturnVariable ? "let \(returnVariableName) = " : ""
-                body.write("\(assign)\(param.name).bridgeJSWithLoweredParameter { \(pattern) in")
+                body.write("\(assign)\(escapedName).bridgeJSWithLoweredParameter { \(pattern) in")
                 body.indent()
                 borrowedArguments.append(
                     BorrowedArgument(
@@ -190,10 +191,10 @@ public struct ImportTS {
                 )
             } else if case .nullable(.swiftProtocol(let protocolName), _) = param.type, context == .exportSwift {
                 body.write("let \(pattern): (Int32, Int32)")
-                body.write("if let \(param.name) {")
+                body.write("if let \(param.escapedSwiftBindingIdentifier) {")
                 body.indent {
                     body.write(
-                        "\(pattern) = (1, _bridgeJSUnwrapProtocolExportable(\(param.name), \"\(protocolName)\").bridgeJSLowerAsProtocolReturn())"
+                        "\(pattern) = (1, _bridgeJSUnwrapProtocolExportable(\(escapedName), \"\(protocolName)\").bridgeJSLowerAsProtocolReturn())"
                     )
                 }
                 body.write("} else {")
@@ -205,10 +206,10 @@ public struct ImportTS {
                 let initializerExpr: ExprSyntax
                 if case .swiftProtocol(let protocolName) = param.type, context == .exportSwift {
                     initializerExpr = ExprSyntax(
-                        "_bridgeJSUnwrapProtocolExportable(\(raw: param.name), \"\(raw: protocolName)\").bridgeJSLowerAsProtocolReturn()"
+                        "_bridgeJSUnwrapProtocolExportable(\(raw: escapedName), \"\(raw: protocolName)\").bridgeJSLowerAsProtocolReturn()"
                     )
                 } else {
-                    initializerExpr = ExprSyntax("\(raw: param.name).bridgeJSLowerParameter()")
+                    initializerExpr = ExprSyntax("\(raw: escapedName).bridgeJSLowerParameter()")
                 }
 
                 let binding = loweringInfo.loweredParameters.isEmpty ? "_" : pattern
@@ -218,10 +219,10 @@ public struct ImportTS {
 
             // Add to signatures and forwardings (unified for both single and multiple)
             for (index, (paramName, type)) in loweringInfo.loweredParameters.enumerated() {
-                // For single parameter, use param.name; for multiple, use constructed name
+                // For single parameter, use the escaped name; for multiple, use constructed name
                 let abiParamName: String
                 if loweringInfo.loweredParameters.count == 1 {
-                    abiParamName = param.name
+                    abiParamName = escapedName
                 } else {
                     abiParamName = "\(param.name)\(paramName.capitalizedFirstLetter)"
                 }
@@ -723,20 +724,21 @@ struct SwiftSignatureBuilder {
         var out = "("
         out += parameters.map { param in
             let label = param.label ?? param.name
+            let escapedName = param.escapedSwiftIdentifier
             let paramType = buildParameterTypeSyntax(from: param.type)
 
             if useWildcardLabels {
                 // Always use wildcard labels: "_ name: Type"
-                return "_ \(param.name): \(paramType)"
-            } else if label == param.name {
+                return "_ \(escapedName): \(paramType)"
+            } else if SwiftToSkeleton.normalizeIdentifier(label) == param.name {
                 // External label same as parameter name: "count: Int"
-                return "\(param.name): \(paramType)"
+                return "\(escapedName): \(paramType)"
             } else if param.label == nil {
                 // No label specified: use wildcard "_ name: Type"
-                return "_ \(param.name): \(paramType)"
+                return "_ \(escapedName): \(paramType)"
             } else {
                 // External label differs: "label count: Int"
-                return "\(label) \(param.name): \(paramType)"
+                return "\(label) \(escapedName): \(paramType)"
             }
         }.joined(separator: ", ")
         out += ")"
@@ -1063,5 +1065,15 @@ extension BridgeType {
 extension String {
     func backtickIfNeeded() -> String {
         return self.isValidSwiftIdentifier(for: .variableName) ? self : "`\(self)`"
+    }
+}
+
+extension Parameter {
+    var escapedSwiftIdentifier: String {
+        name == "self" ? name : name.backtickIfNeeded()
+    }
+
+    var escapedSwiftBindingIdentifier: String {
+        name.backtickIfNeeded()
     }
 }

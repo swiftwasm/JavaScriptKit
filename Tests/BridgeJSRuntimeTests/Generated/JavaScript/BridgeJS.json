@@ -15215,6 +15215,172 @@
         }
       },
       {
+        "abiName" : "bjs_describeReservedWordParameters",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "describeReservedWordParameters",
+        "parameters" : [
+          {
+            "label" : "extension",
+            "name" : "extension",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "break",
+            "name" : "break",
+            "type" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "label" : "function",
+            "name" : "function",
+            "type" : {
+              "bool" : {
+
+              }
+            }
+          },
+          {
+            "label" : "in",
+            "name" : "in",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_describeBacktickedParameter",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "describeBacktickedParameter",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "in",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_describeCollidingParameters",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "describeCollidingParameters",
+        "parameters" : [
+          {
+            "label" : "in",
+            "name" : "in",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "_in",
+            "name" : "_in",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "instance",
+            "name" : "instance",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "swift",
+            "name" : "swift",
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_describeWithReservedWordDescriber",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "describeWithReservedWordDescriber",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "describer",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "ReservedWordDescriber"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "string" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripSwiftHeapObject",
         "effects" : {
           "isAsync" : false,
@@ -19257,6 +19423,51 @@
               }
             }
           }
+        ]
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_ReservedWordDescriber_describe",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "describe",
+            "parameters" : [
+              {
+                "label" : "in",
+                "name" : "in",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "label" : "for",
+                "name" : "for",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "name" : "ReservedWordDescriber",
+        "properties" : [
+
         ]
       },
       {
@@ -26244,6 +26455,49 @@
                         }
                       }
                     }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "string" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "jsDescribeReservedWordParameters",
+            "parameters" : [
+              {
+                "name" : "in",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "for",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "name" : "default",
+                "type" : {
+                  "bool" : {
+
                   }
                 }
               }

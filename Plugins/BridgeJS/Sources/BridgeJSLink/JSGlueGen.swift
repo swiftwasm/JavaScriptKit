@@ -2586,25 +2586,21 @@ struct IntrinsicJSFragment: Sendable {
 
             // Attach instance methods to the struct instance
             for method in structDef.methods where !method.effects.isStatic {
-                let paramList = DefaultValueUtils.formatParameterList(
-                    method.parameters,
-                    resolveTypeName: context.defaultValueTypeName
+                let builder = BridgeJSLink.ExportedThunkBuilder(
+                    effects: method.effects,
+                    context: context
                 )
+                builder.body.write(
+                    "\(JSGlueVariableScope.reservedStructHelpers).\(context.scope.helperKey(forTypeNamed: structDef.swiftCallName)).lower(this);"
+                )
+                for param in method.parameters {
+                    try builder.lowerParameter(param: param)
+                }
+                let returnExpr = try builder.call(abiName: method.abiName, returnType: method.returnType)
                 printer.write(
-                    "\(instanceVar).\(method.resolvedJSName) = function(\(paramList)) {"
+                    "\(instanceVar).\(method.resolvedJSName) = function(\(builder.parameterList)) {"
                 )
-                try printer.indent {
-                    let builder = BridgeJSLink.ExportedThunkBuilder(
-                        effects: method.effects,
-                        context: context
-                    )
-                    builder.body.write(
-                        "\(JSGlueVariableScope.reservedStructHelpers).\(context.scope.helperKey(forTypeNamed: structDef.swiftCallName)).lower(this);"
-                    )
-                    for param in method.parameters {
-                        try builder.lowerParameter(param: param)
-                    }
-                    let returnExpr = try builder.call(abiName: method.abiName, returnType: method.returnType)
+                printer.indent {
                     builder.renderFunctionBody(into: printer, returnExpr: returnExpr)
                 }
                 printer.write("}.bind(\(instanceVar));")

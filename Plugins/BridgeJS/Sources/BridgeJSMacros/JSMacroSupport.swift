@@ -90,8 +90,9 @@ enum JSMacroHelper {
     static func parameterNames(_ parameters: FunctionParameterListSyntax) -> [String] {
         parameters.compactMap { param in
             let nameToken = param.secondName ?? param.firstName
-            let nameText = nameToken.text
-            return nameText == "_" ? nil : nameText
+            guard nameToken.text != "_" else { return nil }
+            let nameText = stripBackticks(nameToken.text)
+            return nameText.isValidSwiftIdentifier(for: .variableName) ? nameText : "`\(nameText)`"
         }
     }
 

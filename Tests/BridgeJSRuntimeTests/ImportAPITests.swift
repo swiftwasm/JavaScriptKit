@@ -31,6 +31,12 @@ import JavaScriptKit
     _ b: [Int]
 ) throws(JSException) -> String
 
+@JSFunction func jsDescribeReservedWordParameters(
+    in: Int,
+    for: String,
+    _ `default`: Bool
+) throws(JSException) -> String
+
 class ImportAPITests: XCTestCase {
     func testRoundTripVoid() throws {
         try jsRoundTripVoid()
@@ -210,5 +216,9 @@ class ImportAPITests: XCTestCase {
             try jsJoinStringThenStackParams("s", [1, 2], [7, 8, 9]),
             #""s"|[1,2]|[7,8,9]"#
         )
+    }
+
+    func testReservedWordParameters() throws {
+        XCTAssertEqual(try jsDescribeReservedWordParameters(in: 1, for: "for", true), "1:for:true")
     }
 }

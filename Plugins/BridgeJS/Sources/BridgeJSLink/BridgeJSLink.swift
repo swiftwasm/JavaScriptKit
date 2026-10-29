@@ -1730,6 +1730,9 @@ public struct BridgeJSLink {
     class ExportedThunkBuilder {
         var body: CodeFragmentPrinter
         var parameterForwardings: [String] = []
+
+        private var signatureParameters: [(parameter: Parameter, name: String)] = []
+
         let effects: Effects
         let scope: JSGlueVariableScope
         let context: IntrinsicJSFragment.PrintCodeContext
@@ -1758,13 +1761,28 @@ public struct BridgeJSLink {
                 loweringFragment.parameters.count == 1,
                 "Lowering fragment should have exactly one parameter to lower"
             )
-            let paramName = scope.variable(param.name)
+            let paramName = scope.variable(param.escapedJSIdentifier)
+            signatureParameters.append((param, paramName))
             let loweredValues = try loweringFragment.printCode([paramName], context)
             parameterForwardings.append(contentsOf: loweredValues)
         }
 
         func lowerSelf() {
             parameterForwardings.append("this.pointer")
+        }
+
+        var parameterList: String {
+            signatureParameters.map { parameter, name in
+                guard let defaultValue = parameter.defaultValue else {
+                    return name
+                }
+                let defaultJs = DefaultValueUtils.format(
+                    defaultValue,
+                    as: .javascript,
+                    resolveTypeName: context.defaultValueTypeName
+                )
+                return "\(name) = \(defaultJs)"
+            }.joined(separator: ", ")
         }
 
         func call(abiName: String, returnType: BridgeType) throws -> String? {
@@ -1830,16 +1848,10 @@ public struct BridgeJSLink {
 
         func renderFunction(
             name: String,
-            parameters: [Parameter],
             returnExpr: String?,
             declarationPrefixKeyword: String?
         ) -> [String] {
             let printer = CodeFragmentPrinter()
-
-            let parameterList = DefaultValueUtils.formatParameterList(
-                parameters,
-                resolveTypeName: context.defaultValueTypeName
-            )
 
             printer.write(
                 "\(declarationPrefixKeyword.map { "\($0) "} ?? "")\(name)(\(parameterList)) {"
@@ -1948,11 +1960,15 @@ public struct BridgeJSLink {
         } else {
             returnTypeWithEffect = resolveTypeScriptType(returnType)
         }
-        let parameterSignatures = parameters.map { param in
+        return "\(renderTSParameterList(parameters)): \(returnTypeWithEffect)"
+    }
+
+    private func renderTSParameterList(_ parameters: [Parameter]) -> String {
+        let parameterSignatures = zip(parameters, parameters.uniqueJSIdentifiers).map { param, name in
             let optional = param.hasDefault ? "?" : ""
-            return "\(param.name)\(optional): \(resolveTypeScriptType(param.type))"
+            return "\(name)\(optional): \(resolveTypeScriptType(param.type))"
         }
-        return "(\(parameterSignatures.joined(separator: ", "))): \(returnTypeWithEffect)"
+        return "(\(parameterSignatures.joined(separator: ", ")))"
     }
 
     private func renderGenericClause(_ genericParameters: [GenericParameter]) -> String {
@@ -2062,11 +2078,7 @@ public struct BridgeJSLink {
             )
 
             let constructorPrinter = CodeFragmentPrinter()
-            let paramList = DefaultValueUtils.formatParameterList(
-                constructor.parameters,
-                resolveTypeName: thunkBuilder.context.defaultValueTypeName
-            )
-            constructorPrinter.write("init: function(\(paramList)) {")
+            constructorPrinter.write("init: function(\(thunkBuilder.parameterList)) {")
             constructorPrinter.indent {
                 thunkBuilder.renderFunctionBody(into: constructorPrinter, returnExpr: returnExpr)
             }
@@ -2290,7 +2302,6 @@ extension BridgeJSLink {
         let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
         let funcLines = thunkBuilder.renderFunction(
             name: function.abiName,
-            parameters: function.parameters,
             returnExpr: returnExpr,
             declarationPrefixKeyword: "function"
         )
@@ -2341,7 +2352,6 @@ extension BridgeJSLink {
 
         let funcLines = thunkBuilder.renderFunction(
             name: function.resolvedJSName,
-            parameters: function.parameters,
             returnExpr: returnExpr,
             declarationPrefixKeyword: "static"
         )
@@ -2371,11 +2381,7 @@ extension BridgeJSLink {
         let returnExpr = try thunkBuilder.call(abiName: function.abiName, returnType: function.returnType)
 
         let printer = CodeFragmentPrinter()
-        let parameterList = DefaultValueUtils.formatParameterList(
-            function.parameters,
-            resolveTypeName: thunkBuilder.context.defaultValueTypeName
-        )
-        printer.write("\(function.resolvedJSName)(\(parameterList)) {")
+        printer.write("\(function.resolvedJSName)(\(thunkBuilder.parameterList)) {")
         printer.indent {
             thunkBuilder.renderFunctionBody(into: printer, returnExpr: returnExpr)
         }
@@ -2407,7 +2413,6 @@ extension BridgeJSLink {
 
         let funcLines = thunkBuilder.renderFunction(
             name: function.abiName,
-            parameters: function.parameters,
             returnExpr: returnExpr,
             declarationPrefixKeyword: "function"
         )
@@ -2431,12 +2436,8 @@ extension BridgeJSLink {
         let returnExpr = try thunkBuilder.call(abiName: method.abiName, returnType: method.returnType)
 
         let methodPrinter = CodeFragmentPrinter()
-        let parameterList = DefaultValueUtils.formatParameterList(
-            method.parameters,
-            resolveTypeName: thunkBuilder.context.defaultValueTypeName
-        )
         methodPrinter.write(
-            "\(method.resolvedJSName): function(\(parameterList)) {"
+            "\(method.resolvedJSName): function(\(thunkBuilder.parameterList)) {"
         )
         methodPrinter.indent {
             thunkBuilder.renderFunctionBody(into: methodPrinter, returnExpr: returnExpr)
@@ -2486,7 +2487,7 @@ extension BridgeJSLink {
                 returnType: .void
             )
 
-            propertyPrinter.write("set \(property.resolvedJSName)(value) {")
+            propertyPrinter.write("set \(property.resolvedJSName)(\(setterThunkBuilder.parameterList)) {")
             propertyPrinter.indent {
                 setterThunkBuilder.renderFunctionBody(into: propertyPrinter, returnExpr: nil)
             }
@@ -2540,13 +2541,8 @@ extension BridgeJSLink {
                 try thunkBuilder.lowerParameter(param: param)
             }
 
-            let constructorParamList = DefaultValueUtils.formatParameterList(
-                constructor.parameters,
-                resolveTypeName: thunkBuilder.context.defaultValueTypeName
-            )
-
             jsPrinter.indent {
-                jsPrinter.write("constructor(\(constructorParamList)) {")
+                jsPrinter.write("constructor(\(thunkBuilder.parameterList)) {")
                 let returnExpr = thunkBuilder.callConstructor(abiName: constructor.abiName)
                 let constructCall = "\(klass.resolvedJSName).__construct(\(returnExpr))"
                 jsPrinter.indent {
@@ -2574,7 +2570,6 @@ extension BridgeJSLink {
                     jsPrinter.write(
                         lines: thunkBuilder.renderFunction(
                             name: method.resolvedJSName,
-                            parameters: method.parameters,
                             returnExpr: returnExpr,
                             declarationPrefixKeyword: "static"
                         )
@@ -2595,7 +2590,6 @@ extension BridgeJSLink {
                     jsPrinter.write(
                         lines: thunkBuilder.renderFunction(
                             name: method.resolvedJSName,
-                            parameters: method.parameters,
                             returnExpr: returnExpr,
                             declarationPrefixKeyword: nil
                         )
@@ -2667,14 +2661,10 @@ extension BridgeJSLink {
         printer.write("class \(klass.resolvedJSName) {")
         printer.indent {
             if let constructor = klass.constructor {
-                let paramSignatures = constructor.parameters.map { param in
-                    let optional = param.hasDefault ? "?" : ""
-                    return "\(param.name)\(optional): \(resolveTypeScriptType(param.type))"
-                }
                 printer.write(
                     lines: renderJSDoc(documentation: constructor.documentation, parameters: constructor.parameters)
                 )
-                printer.write("constructor(\(paramSignatures.joined(separator: ", ")));")
+                printer.write("constructor\(renderTSParameterList(constructor.parameters));")
             }
             for method in klass.methods.sorted(by: { $0.resolvedJSName < $1.resolvedJSName }) {
                 let staticKeyword = method.effects.isStatic ? "static " : ""
@@ -2720,7 +2710,6 @@ extension BridgeJSLink {
             jsPrinter.write(
                 lines: getterThunkBuilder.renderFunction(
                     name: property.resolvedJSName,
-                    parameters: [],
                     returnExpr: getterReturnExpr,
                     declarationPrefixKeyword: getterKeyword
                 )
@@ -2748,7 +2737,6 @@ extension BridgeJSLink {
                 jsPrinter.write(
                     lines: setterThunkBuilder.renderFunction(
                         name: property.resolvedJSName,
-                        parameters: [.init(label: nil, name: "value", type: property.type)],
                         returnExpr: nil,
                         declarationPrefixKeyword: setterKeyword
                     )
@@ -2823,7 +2811,7 @@ extension BridgeJSLink {
                         message: "Generic codec for '\(name)' was not declared before lifting parameter '\(param.name)'"
                     )
                 }
-                let valueVar = scope.variable(param.name)
+                let valueVar = scope.variable(param.escapedJSIdentifier)
                 let liftExpr =
                     GenericJSCodegen.genericCodecLiftExpression(type: param.type, codec: codecVar)
                     ?? "\(codecVar).lift()"
@@ -2836,8 +2824,9 @@ extension BridgeJSLink {
             if liftingFragment.parameters.count == 0 {
                 valuesToLift = []
             } else if liftingFragment.parameters.count == 1 {
-                parameterNames.append(param.name)
-                valuesToLift = [scope.variable(param.name)]
+                let name = scope.variable(param.escapedJSIdentifier)
+                parameterNames.append(name)
+                valuesToLift = [name]
             } else {
                 valuesToLift = liftingFragment.parameters.map { scope.variable(param.name + $0.capitalizedFirstLetter) }
                 parameterNames.append(contentsOf: valuesToLift)
@@ -3525,7 +3514,7 @@ extension BridgeJSLink {
                     )
 
                     let setterPrinter = CodeFragmentPrinter()
-                    setterPrinter.write("set \(property.resolvedJSName)(value) {")
+                    setterPrinter.write("set \(property.resolvedJSName)(\(setterThunkBuilder.parameterList)) {")
                     setterPrinter.indent {
                         setterPrinter.write(contentsOf: setterThunkBuilder.body)
                         setterPrinter.write(lines: setterThunkBuilder.checkExceptionLines())
@@ -4312,20 +4301,6 @@ enum DefaultValueUtils {
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
     }
-
-    /// Generates a JavaScript parameter list with default values
-    static func formatParameterList(
-        _ parameters: [Parameter],
-        resolveTypeName: (BridgeType, OutputFormat) -> String? = { _, _ in nil }
-    ) -> String {
-        return parameters.map { param in
-            if let defaultValue = param.defaultValue {
-                let defaultJs = format(defaultValue, as: .javascript, resolveTypeName: resolveTypeName)
-                return "\(param.name) = \(defaultJs)"
-            }
-            return param.name
-        }.joined(separator: ", ")
-    }
 }
 
 extension BridgeJSLink {
@@ -4337,7 +4312,7 @@ extension BridgeJSLink {
 
         let resolveTypeName = makeCodecPrintContext(printer: CodeFragmentPrinter()).defaultValueTypeName
         var tagLines: [String] = []
-        for parameter in parameters {
+        for (parameter, name) in zip(parameters, parameters.uniqueJSIdentifiers) {
             let docText = parsed.parameter(named: parameter.name)
             let defaultValue = parameter.defaultValue.map {
                 DefaultValueUtils.format(
@@ -4348,11 +4323,11 @@ extension BridgeJSLink {
             }
             switch (docText, defaultValue) {
             case let (.some(text), .some(value)):
-                tagLines.append("@param \(parameter.name) \(text) (default: \(value))")
+                tagLines.append("@param \(name) \(text) (default: \(value))")
             case let (.some(text), .none):
-                tagLines.append("@param \(parameter.name) \(text)")
+                tagLines.append("@param \(name) \(text)")
             case let (.none, .some(value)):
-                tagLines.append("@param \(parameter.name) - Optional parameter (default: \(value))")
+                tagLines.append("@param \(name) - Optional parameter (default: \(value))")
             case (.none, .none):
                 continue
             }
@@ -4475,6 +4450,38 @@ private struct DocCComment {
 
 struct BridgeJSLinkError: Error {
     let message: String
+}
+
+extension Parameter {
+    // From: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#reserved_words
+    private static let javaScriptReservedWords: Set<String> = [
+        "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else",
+        "export", "extends", "false", "finally", "for", "function", "if", "import", "in", "instanceof", "new",
+        "null", "return", "super", "switch", "this", "throw", "true", "try", "typeof", "var", "void", "while",
+        "with", "let", "static", "yield", "await", "enum", "implements", "interface", "package", "private",
+        "protected", "public", "arguments", "eval",
+    ]
+
+    fileprivate var escapedJSIdentifier: String {
+        Self.javaScriptReservedWords.contains(name) ? "_\(name)" : name
+    }
+}
+
+extension [Parameter] {
+    fileprivate var uniqueJSIdentifiers: [String] {
+        var names: [String] = []
+        for parameter in self {
+            let escapedName = parameter.escapedJSIdentifier
+            var name = escapedName
+            var suffix = 1
+            while names.contains(name) {
+                name = escapedName + suffix.description
+                suffix += 1
+            }
+            names.append(name)
+        }
+        return names
+    }
 }
 
 extension ClosureSignature {
