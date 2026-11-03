@@ -15972,6 +15972,40 @@
         }
       },
       {
+        "abiName" : "bjs_throwsBeforeJSObjectResult",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "throwsBeforeJSObjectResult",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "jsObject" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_throwsBeforeProtocolResult",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : true
+        },
+        "name" : "throwsBeforeProtocolResult",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "swiftProtocol" : {
+            "_0" : "DataProcessor"
+          }
+        }
+      },
+      {
         "abiName" : "bjs_zeroArgAsyncThrows",
         "effects" : {
           "isAsync" : true,

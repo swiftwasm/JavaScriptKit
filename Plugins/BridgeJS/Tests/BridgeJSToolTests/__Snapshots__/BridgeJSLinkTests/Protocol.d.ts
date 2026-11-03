@@ -93,6 +93,7 @@ export interface MyViewController extends SwiftHeapObject {
     sendHelper(helper: Helper): void;
     validateValue(value: number): number;
     loadLabel(key: string): Promise<string>;
+    validatedDelegate(): MyViewControllerDelegate;
     delegate: MyViewControllerDelegate;
     secondDelegate: MyViewControllerDelegate | null;
 }

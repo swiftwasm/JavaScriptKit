@@ -755,14 +755,14 @@ export async function createInstantiator(options, swift) {
             const exports = {
                 makeFoo: function bjs_makeFoo() {
                     const ret = instance.exports.bjs_makeFoo();
-                    const ret1 = swift.memory.getObject(ret);
-                    swift.memory.release(ret);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
                         tmpRetException = undefined;
                         throw error;
                     }
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
                     return ret1;
                 },
                 processFooArray: function bjs_processFooArray(foos) {

@@ -110,6 +110,12 @@ struct TestError: Error {
 @JS func throwsWithDoubleResult() throws(JSException) -> Double { return 1.0 }
 @JS func throwsWithSwiftHeapObjectResult() throws(JSException) -> Greeter { return Greeter(name: "Test") }
 @JS func throwsWithJSObjectResult() throws(JSException) -> JSObject { return JSObject() }
+@JS func throwsBeforeJSObjectResult() throws(JSException) -> JSObject {
+    throw JSException(JSError(message: "JSObjectResultError").jsValue)
+}
+@JS func throwsBeforeProtocolResult() throws(JSException) -> DataProcessor {
+    throw JSException(JSError(message: "ProtocolResultError").jsValue)
+}
 
 @JS func zeroArgAsyncThrows() async throws(JSException) -> String {
     throw JSException(JSError(message: "ZeroArgAsyncThrowsError").jsValue)

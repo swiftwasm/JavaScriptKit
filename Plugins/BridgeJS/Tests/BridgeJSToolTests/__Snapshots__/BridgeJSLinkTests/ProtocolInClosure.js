@@ -248,14 +248,14 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModule10RenderableP_10RenderableP"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModule10RenderableP_10RenderableP = function(param0) {
                     const ret = instance.exports.invoke_swift_closure_TestModule_10TestModule10RenderableP_10RenderableP(boxPtr, swift.memory.retain(param0));
-                    const ret1 = swift.memory.getObject(ret);
-                    swift.memory.release(ret);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
                         tmpRetException = undefined;
                         throw error;
                     }
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
                     return ret1;
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule10RenderableP_10RenderableP);
@@ -273,14 +273,14 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModule10RenderableP_SS"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModule10RenderableP_SS = function(param0) {
                     instance.exports.invoke_swift_closure_TestModule_10TestModule10RenderableP_SS(boxPtr, swift.memory.retain(param0));
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
                         tmpRetException = undefined;
                         throw error;
                     }
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
                     return ret;
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModule10RenderableP_SS);
@@ -305,14 +305,14 @@ export async function createInstantiator(options, swift) {
                         result = 0;
                     }
                     instance.exports.invoke_swift_closure_TestModule_10TestModuleSq10RenderableP_SS(boxPtr, +isSome, result);
-                    const ret = tmpRetString;
-                    tmpRetString = undefined;
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
                         tmpRetException = undefined;
                         throw error;
                     }
+                    const ret = tmpRetString;
+                    tmpRetString = undefined;
                     return ret;
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleSq10RenderableP_SS);
@@ -330,14 +330,14 @@ export async function createInstantiator(options, swift) {
             bjs["make_swift_closure_TestModule_10TestModuley_10RenderableP"] = function(boxPtr, file, line) {
                 const lower_closure_TestModule_10TestModuley_10RenderableP = function() {
                     const ret = instance.exports.invoke_swift_closure_TestModule_10TestModuley_10RenderableP(boxPtr);
-                    const ret1 = swift.memory.getObject(ret);
-                    swift.memory.release(ret);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
                         tmpRetException = undefined;
                         throw error;
                     }
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
                     return ret1;
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuley_10RenderableP);

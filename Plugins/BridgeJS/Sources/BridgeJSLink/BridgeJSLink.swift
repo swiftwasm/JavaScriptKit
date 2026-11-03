@@ -1809,6 +1809,7 @@ public struct BridgeJSLink {
                 body.write("const \(returnVariable) = \(call);")
                 fragmentArguments = [returnVariable]
             }
+            body.write(lines: checkExceptionLines())
             let liftedValues = try liftingFragment.printCode(fragmentArguments, context)
             assert(liftedValues.count <= 1, "Lifting fragment should produce at most one value")
             return liftedValues.first
@@ -1818,10 +1819,11 @@ public struct BridgeJSLink {
             let call =
                 "\(JSGlueVariableScope.reservedInstance).exports.\(abiName)(\(parameterForwardings.joined(separator: ", ")))"
             body.write("const ret = \(call);")
+            body.write(lines: checkExceptionLines())
             return "ret"
         }
 
-        func checkExceptionLines() -> [String] {
+        private func checkExceptionLines() -> [String] {
             guard effects.isThrows else {
                 return []
             }
@@ -1837,10 +1839,9 @@ public struct BridgeJSLink {
             ]
         }
 
-        /// Renders the thunk body (body code, exception handling, and optional return) into a printer.
+        /// Renders the thunk body and optional return; `call`/`callConstructor` put the exception check in `body`.
         func renderFunctionBody(into printer: CodeFragmentPrinter, returnExpr: String?) {
             printer.write(contentsOf: body)
-            printer.write(lines: checkExceptionLines())
             if let returnExpr = returnExpr {
                 printer.write("return \(returnExpr);")
             }
@@ -3490,7 +3491,6 @@ extension BridgeJSLink {
                 getterPrinter.write("get \(property.resolvedJSName)() {")
                 getterPrinter.indent {
                     getterPrinter.write(contentsOf: getterThunkBuilder.body)
-                    getterPrinter.write(lines: getterThunkBuilder.checkExceptionLines())
                     if let returnExpr = getterReturnExpr {
                         getterPrinter.write("return \(returnExpr);")
                     }
@@ -3517,7 +3517,6 @@ extension BridgeJSLink {
                     setterPrinter.write("set \(property.resolvedJSName)(\(setterThunkBuilder.parameterList)) {")
                     setterPrinter.indent {
                         setterPrinter.write(contentsOf: setterThunkBuilder.body)
-                        setterPrinter.write(lines: setterThunkBuilder.checkExceptionLines())
                     }
                     setterPrinter.write("},")
 

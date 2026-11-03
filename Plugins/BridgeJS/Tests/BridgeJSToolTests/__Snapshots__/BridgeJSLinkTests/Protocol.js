@@ -1363,14 +1363,26 @@ export async function createInstantiator(options, swift) {
                     const keyBytes = textEncoder.encode(key);
                     const keyId = swift.memory.retain(keyBytes);
                     const ret = instance.exports.bjs_MyViewController_loadLabel(this.pointer, keyId, keyBytes.length);
-                    const ret1 = swift.memory.getObject(ret);
-                    swift.memory.release(ret);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
                         tmpRetException = undefined;
                         throw error;
                     }
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
+                    return ret1;
+                }
+                validatedDelegate() {
+                    const ret = instance.exports.bjs_MyViewController_validatedDelegate(this.pointer);
+                    if (tmpRetException) {
+                        const error = swift.memory.getObject(tmpRetException);
+                        swift.memory.release(tmpRetException);
+                        tmpRetException = undefined;
+                        throw error;
+                    }
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
                     return ret1;
                 }
                 get delegate() {
