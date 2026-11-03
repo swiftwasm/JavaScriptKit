@@ -163,7 +163,7 @@ jobs:
   # which collapses the wall-clock time from ~1h to that of the slowest single example.
   build-examples:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -196,7 +196,7 @@ jobs:
   # main: build all examples in release and publish them to GitHub Pages.
   build-examples-deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/install-swift
