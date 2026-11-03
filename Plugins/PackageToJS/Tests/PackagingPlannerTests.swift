@@ -52,27 +52,31 @@ import Testing
     @Test(arguments: [
         (
             variant: "debug", configuration: "debug", noOptimize: false,
-            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.browserWASIShim
+            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.browserWASIShim, enableCodeCoverage: false
         ),
         (
             variant: "debug_uwasi", configuration: "debug", noOptimize: false,
-            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.uwasi
+            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.uwasi, enableCodeCoverage: false
+        ),
+        (
+            variant: "debug_uwasi_coverage", configuration: "debug", noOptimize: false,
+            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.uwasi, enableCodeCoverage: true
         ),
         (
             variant: "release", configuration: "release", noOptimize: false,
-            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.browserWASIShim
+            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.browserWASIShim, enableCodeCoverage: false
         ),
         (
             variant: "release_no_optimize", configuration: "release", noOptimize: true,
-            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.browserWASIShim
+            debugInfoFormat: DebugInfoFormat.none, wasiRuntime: WASIRuntime.browserWASIShim, enableCodeCoverage: false
         ),
         (
             variant: "release_dwarf", configuration: "release", noOptimize: false,
-            debugInfoFormat: DebugInfoFormat.dwarf, wasiRuntime: WASIRuntime.browserWASIShim
+            debugInfoFormat: DebugInfoFormat.dwarf, wasiRuntime: WASIRuntime.browserWASIShim, enableCodeCoverage: false
         ),
         (
             variant: "release_name", configuration: "release", noOptimize: false,
-            debugInfoFormat: DebugInfoFormat.name, wasiRuntime: WASIRuntime.browserWASIShim
+            debugInfoFormat: DebugInfoFormat.name, wasiRuntime: WASIRuntime.browserWASIShim, enableCodeCoverage: false
         ),
     ])
     func planBuild(
@@ -80,10 +84,12 @@ import Testing
         configuration: String,
         noOptimize: Bool,
         debugInfoFormat: PackageToJS.DebugInfoFormat,
-        wasiRuntime: WASIRuntime
+        wasiRuntime: WASIRuntime,
+        enableCodeCoverage: Bool
     ) throws {
         var options = PackageToJS.PackageOptions()
         options.wasiRuntime = wasiRuntime
+        options.enableCodeCoverage = enableCodeCoverage
         let system = TestPackagingSystem()
         let planner = PackagingPlanner(
             options: options,

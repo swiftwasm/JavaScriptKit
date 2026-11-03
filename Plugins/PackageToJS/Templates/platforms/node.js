@@ -4,8 +4,17 @@ import { Worker, parentPort } from "node:worker_threads";
 import { MODULE_PATH /* #if USE_SHARED_MEMORY */, MEMORY_TYPE /* #endif */} from "../instantiate.js"
 /* #if IS_WASI */
 /* #if USE_UWASI */
-import { WASI, MemoryFileSystem, useAll, lineBuffered } from 'uwasi';
+import { WASI, lineBuffered, useStdio, useArgs, useEnviron, useClock, usePoll, useProc, useRandom } from 'uwasi';
+/* #if USE_UWASI_FILESYSTEM */
+import { MemoryFileSystem, useMemoryFS } from 'uwasi';
+/* #endif */
 import { createUwasi } from './uwasi.js';
+const uwasiRuntime = {
+    WASI, lineBuffered, useStdio, useArgs, useEnviron, useClock, usePoll, useProc, useRandom,
+/* #if USE_UWASI_FILESYSTEM */
+    MemoryFileSystem, useMemoryFS,
+/* #endif */
+};
 /* #else */
 import { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory, Directory, Inode } from '@bjorn3/browser_wasi_shim';
 /* #endif */
@@ -28,10 +37,7 @@ export async function defaultNodeThreadSetup() {
     }
 
 /* #if USE_UWASI */
-    const { wasi } = createUwasi(
-        { WASI, MemoryFileSystem, useAll, lineBuffered },
-        { modulePath: MODULE_PATH }
-    )
+    const { wasi } = createUwasi(uwasiRuntime, { modulePath: MODULE_PATH })
 /* #else */
     const wasi = new WASI(/* args */[MODULE_PATH], /* env */[], /* fd */[
         new OpenFile(new File([])), // stdin
@@ -136,14 +142,11 @@ export async function defaultNodeSetup(options = {}) {
 
     const args = options.args ?? process.argv.slice(2)
 /* #if USE_UWASI */
-    const { wasi } = createUwasi(
-        { WASI, MemoryFileSystem, useAll, lineBuffered },
-        {
-            modulePath: MODULE_PATH,
-            args,
-            withExtractFile: true,
-        }
-    )
+    const { wasi } = createUwasi(uwasiRuntime, {
+        modulePath: MODULE_PATH,
+        args,
+        withExtractFile: true,
+    })
 /* #else */
     const rootFs = new Map();
     const wasi = new WASI(/* args */[MODULE_PATH, ...args], /* env */[], /* fd */[

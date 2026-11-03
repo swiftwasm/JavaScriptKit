@@ -22,6 +22,12 @@ to generate browser and Node platform wrappers backed by `uwasi` instead:
 swift package --swift-sdk wasm32-unknown-wasi js --wasi-runtime uwasi
 ```
 
+The `uwasi` wrappers import only the stdio, args, environ, clock, poll, proc and
+random features, so bundlers can drop `uwasi`'s file system and file syscalls return
+`ENOSYS`. With `--enable-code-coverage`, the Node wrapper adds an in-memory file
+system so the test runner can read the coverage profile. To give an application a
+file system, pass your own `wasi` object to `instantiate`.
+
 The generated browser main-thread setup rejects blocking WASI waits. Run guests that
 require `poll_oneoff` clock waits in a worker. Node and browser workers use `uwasi`'s
 blocking implementation.

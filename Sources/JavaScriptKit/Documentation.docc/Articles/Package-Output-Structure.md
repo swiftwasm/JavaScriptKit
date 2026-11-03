@@ -128,6 +128,12 @@ PackageToJS uses `@bjorn3/browser_wasi_shim` for WASI packages by default. Pass
 `--wasi-runtime uwasi` to generate both platform wrappers against `uwasi`; this also
 adds `platforms/uwasi.js` to the package.
 
+The `uwasi` wrappers import only the stdio, args, environ, clock, poll, proc and random
+features, so file syscalls return `ENOSYS` and bundlers can drop `uwasi`'s file system.
+With `--enable-code-coverage`, the Node wrapper adds an in-memory file system so the
+test runner can read the coverage profile. To give an application a file system, pass
+your own `wasi` object to `instantiate`.
+
 The browser main-thread setup rejects blocking `poll_oneoff` clock waits instead of
 freezing the page. Run guests that require blocking waits in a worker. Node and browser
 workers use `uwasi`'s blocking implementation.

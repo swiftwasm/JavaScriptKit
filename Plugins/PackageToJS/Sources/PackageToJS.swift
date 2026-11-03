@@ -957,6 +957,7 @@ struct PackagingPlanner {
         let staticConditions: [String: Bool] = [
             "USE_WASI_CDN": options.useCDN,
             "USE_UWASI": options.wasiRuntime == .uwasi,
+            "USE_UWASI_FILESYSTEM": options.wasiRuntime == .uwasi && options.enableCodeCoverage,
             "HAS_BRIDGE": skeletons.count > 0,
             "HAS_IMPORTS": skeletons.count > 0,
             "TARGET_DEFAULT_PLATFORM_NODE": options.defaultPlatform == .node,
