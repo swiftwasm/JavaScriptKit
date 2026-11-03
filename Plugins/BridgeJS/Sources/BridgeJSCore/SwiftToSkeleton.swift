@@ -1986,6 +1986,14 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             guard let effects = collectEffects(signature: node.signature) else {
                 return .skipChildren
             }
+            if effects.isAsync || effects.isThrows {
+                diagnose(
+                    node: node,
+                    message: "@JS struct initializer cannot be async or throw",
+                    hint: "BridgeJS calls this initializer to rebuild struct values passed from JavaScript"
+                )
+                return .skipChildren
+            }
 
             let structAbiName = exportedStructByName[structKey]?.abiName ?? "unknown"
             let constructor = ExportedConstructor(

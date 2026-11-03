@@ -536,6 +536,21 @@ import Testing
     }
 
     @Test
+    func throwingStructInitProducesDiagnostic() throws {
+        let source = """
+            @JS struct Point {
+                var x: Double
+
+                @JS init(x: Double) throws(JSException) {
+                    self.x = x
+                }
+            }
+            """
+        let diagnostics = try #require(moduleDiagnostics(source: source))
+        #expect(diagnostics.description.contains("@JS struct initializer cannot be async or throw"))
+    }
+
+    @Test
     func structWithoutExplicitInitSucceeds() throws {
         let source = """
             @JS struct Point {
