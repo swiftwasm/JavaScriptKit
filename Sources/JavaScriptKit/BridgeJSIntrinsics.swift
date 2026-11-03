@@ -969,11 +969,14 @@ extension JSValue: _BridgedSwiftStackType {
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSStackPush() -> Void {
-        let lowered = bridgeJSLowerParameter()
-        let retainedPayload1 = Self.bridgeJSRetainPayloadIfNeeded(kind: lowered.kind, payload1: lowered.payload1)
-        _swift_js_push_i32(lowered.kind)
-        _swift_js_push_i32(retainedPayload1)
-        _swift_js_push_f64(lowered.payload2)
+        // Retain inside `withRawJSValue` so `self` still owns the JS reference.
+        withRawJSValue { raw in
+            let kind = Int32(raw.kind.rawValue)
+            let payload1 = Int32(bitPattern: raw.payload1)
+            _swift_js_push_i32(kind)
+            _swift_js_push_i32(Self.bridgeJSRetainPayloadIfNeeded(kind: kind, payload1: payload1))
+            _swift_js_push_f64(raw.payload2)
+        }
     }
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerParameter() -> (kind: Int32, payload1: Int32, payload2: Double) {
@@ -986,19 +989,18 @@ extension JSValue: _BridgedSwiftStackType {
         }
     }
 
+    /// Takes ownership of the payload reference that JavaScript retained when it lowered the value.
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(
         _ kind: Int32,
         _ payload1: Int32,
         _ payload2: Double
     ) -> JSValue {
-        let retainedPayload1 = bridgeJSRetainPayloadIfNeeded(kind: kind, payload1: payload1)
-
         guard let kindEnum = JavaScriptValueKind(rawValue: UInt32(kind)) else {
             fatalError("Invalid JSValue kind: \(kind)")
         }
         let rawValue = RawJSValue(
             kind: kindEnum,
-            payload1: JavaScriptPayload1(UInt32(bitPattern: retainedPayload1)),
+            payload1: JavaScriptPayload1(UInt32(bitPattern: payload1)),
             payload2: payload2
         )
         return rawValue.jsValue

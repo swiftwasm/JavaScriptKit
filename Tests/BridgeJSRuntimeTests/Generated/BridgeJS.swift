@@ -10531,6 +10531,28 @@ public func _bjs_roundTripJSValue(_ vKind: Int32, _ vPayload1: Int32, _ vPayload
     #endif
 }
 
+@_expose(wasm, "bjs_makeJSValueString")
+@_cdecl("bjs_makeJSValueString")
+public func _bjs_makeJSValueString() -> Void {
+    #if arch(wasm32)
+    let ret = makeJSValueString()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeJSValueObject")
+@_cdecl("bjs_makeJSValueObject")
+public func _bjs_makeJSValueObject() -> Void {
+    #if arch(wasm32)
+    let ret = makeJSValueObject()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_roundTripOptionalJSValue")
 @_cdecl("bjs_roundTripOptionalJSValue")
 public func _bjs_roundTripOptionalJSValue(_ vIsSome: Int32, _ vKind: Int32, _ vPayload1: Int32, _ vPayload2: Float64) -> Void {

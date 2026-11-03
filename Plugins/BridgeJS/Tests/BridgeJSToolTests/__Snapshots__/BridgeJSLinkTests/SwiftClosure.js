@@ -291,7 +291,7 @@ export async function createInstantiator(options, swift) {
                 const jsValuePayload2 = f64Stack.pop();
                 const jsValuePayload1 = i32Stack.pop();
                 const jsValueKind = i32Stack.pop();
-                const jsValue = __bjs_jsValueLift(jsValueKind, jsValuePayload1, jsValuePayload2);
+                const jsValue = __bjs_jsValueTake(jsValueKind, jsValuePayload1, jsValuePayload2);
                 return jsValue;
             },
         },
@@ -384,6 +384,13 @@ export async function createInstantiator(options, swift) {
                 throw new TypeError("Unsupported JSValue kind " + kind);
         }
         return jsValue;
+    }
+    function __bjs_jsValueTake(kind, payload1, payload2) {
+        const value = __bjs_jsValueLift(kind, payload1, payload2);
+        if (kind === 1 || kind === 3 || kind === 7 || kind === 8) {
+            swift.memory.release(payload1);
+        }
+        return value;
     }
 
     const swiftClosureRegistry = (typeof FinalizationRegistry === "undefined") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {

@@ -15687,6 +15687,40 @@
         }
       },
       {
+        "abiName" : "bjs_makeJSValueString",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeJSValueString",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "jsValue" : {
+
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeJSValueObject",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeJSValueObject",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "jsValue" : {
+
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripOptionalJSValue",
         "effects" : {
           "isAsync" : false,
