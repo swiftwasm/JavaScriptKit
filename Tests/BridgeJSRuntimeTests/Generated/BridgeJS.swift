@@ -10793,6 +10793,56 @@ public func _bjs_throwsWithJSObjectResult() -> Int32 {
     #endif
 }
 
+@_expose(wasm, "bjs_throwsBeforeJSObjectResult")
+@_cdecl("bjs_throwsBeforeJSObjectResult")
+public func _bjs_throwsBeforeJSObjectResult() -> Int32 {
+    #if arch(wasm32)
+    do {
+        let ret = try throwsBeforeJSObjectResult()
+        return ret.bridgeJSLowerReturn()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: error.description)
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_throwsBeforeProtocolResult")
+@_cdecl("bjs_throwsBeforeProtocolResult")
+public func _bjs_throwsBeforeProtocolResult() -> Int32 {
+    #if arch(wasm32)
+    do {
+        let ret = _bridgeJSUnwrapProtocolExportable(try throwsBeforeProtocolResult(), "DataProcessor")
+        return ret.bridgeJSLowerAsProtocolReturn()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: error.description)
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_zeroArgAsyncThrows")
 @_cdecl("bjs_zeroArgAsyncThrows")
 public func _bjs_zeroArgAsyncThrows() -> Int32 {

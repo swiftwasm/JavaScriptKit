@@ -107,6 +107,11 @@ import JavaScriptKit
     @JS func loadLabel(_ key: String) async throws(JSException) -> String {
         return try await delegate.loadLabel(key)
     }
+
+    @JS func validatedDelegate() throws(JSException) -> MyViewControllerDelegate {
+        _ = try delegate.validate(0)
+        return delegate
+    }
 }
 
 // Protocol array support

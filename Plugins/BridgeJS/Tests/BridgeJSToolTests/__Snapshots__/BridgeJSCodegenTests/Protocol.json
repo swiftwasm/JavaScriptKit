@@ -286,6 +286,23 @@
 
               }
             }
+          },
+          {
+            "abiName" : "bjs_MyViewController_validatedDelegate",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "validatedDelegate",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftProtocol" : {
+                "_0" : "MyViewControllerDelegate"
+              }
+            }
           }
         ],
         "name" : "MyViewController",

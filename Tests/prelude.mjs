@@ -629,6 +629,9 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
         assert.fail("Expected no error");
     }
 
+    assert.throws(() => exports.throwsBeforeJSObjectResult(), { name: "Error", message: "JSObjectResultError" });
+    assert.throws(() => exports.throwsBeforeProtocolResult(), { name: "Error", message: "ProtocolResultError" });
+
     // Test enums
     assert.equal(exports.Direction.North, 0);
     assert.equal(exports.Direction.South, 1);

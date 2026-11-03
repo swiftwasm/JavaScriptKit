@@ -1257,6 +1257,32 @@ public func _bjs_MyViewController_loadLabel(_ _self: UnsafeMutableRawPointer, _ 
     #endif
 }
 
+@_expose(wasm, "bjs_MyViewController_validatedDelegate")
+@_cdecl("bjs_MyViewController_validatedDelegate")
+public func _bjs_MyViewController_validatedDelegate(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let _self = MyViewController.bridgeJSLiftParameter(_self)
+    do {
+        let ret = _bridgeJSUnwrapProtocolExportable(try _self.validatedDelegate(), "MyViewControllerDelegate")
+        return ret.bridgeJSLowerAsProtocolReturn()
+    } catch let error {
+        if let error = error.thrownValue.object {
+            withExtendedLifetime(error) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        } else {
+            let jsError = JSError(message: error.description)
+            withExtendedLifetime(jsError.jsObject) {
+                _swift_js_throw(Int32(bitPattern: $0.id))
+            }
+        }
+        return 0
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
 @_expose(wasm, "bjs_MyViewController_delegate_get")
 @_cdecl("bjs_MyViewController_delegate_get")
 public func _bjs_MyViewController_delegate_get(_ _self: UnsafeMutableRawPointer) -> Int32 {

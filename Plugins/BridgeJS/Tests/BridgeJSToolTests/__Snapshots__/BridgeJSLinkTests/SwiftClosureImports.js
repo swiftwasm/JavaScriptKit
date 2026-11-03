@@ -406,14 +406,14 @@ export async function createInstantiator(options, swift) {
                     const param0Bytes = textEncoder.encode(param0);
                     const param0Id = swift.memory.retain(param0Bytes);
                     const ret = instance.exports.invoke_swift_closure_TestModule_10TestModuleYaKSS_SS(boxPtr, param0Id, param0Bytes.length);
-                    const ret1 = swift.memory.getObject(ret);
-                    swift.memory.release(ret);
                     if (tmpRetException) {
                         const error = swift.memory.getObject(tmpRetException);
                         swift.memory.release(tmpRetException);
                         tmpRetException = undefined;
                         throw error;
                     }
+                    const ret1 = swift.memory.getObject(ret);
+                    swift.memory.release(ret);
                     return ret1;
                 };
                 return makeClosure(boxPtr, file, line, lower_closure_TestModule_10TestModuleYaKSS_SS);
