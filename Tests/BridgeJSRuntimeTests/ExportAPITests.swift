@@ -73,6 +73,14 @@ func runJsWorks() -> Void
     return v
 }
 
+@JS func makeJSValueString() -> JSValue {
+    return .string("makeJSValueString")
+}
+
+@JS func makeJSValueObject() -> JSValue {
+    return .object(JSObject())
+}
+
 @JS func roundTripOptionalJSValue(v: JSValue?) -> JSValue? {
     return v
 }

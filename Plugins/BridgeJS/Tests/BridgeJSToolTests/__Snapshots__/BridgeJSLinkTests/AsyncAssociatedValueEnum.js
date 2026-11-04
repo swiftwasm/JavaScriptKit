@@ -128,6 +128,13 @@ export async function createInstantiator(options, swift) {
         }
         return jsValue;
     }
+    function __bjs_jsValueTake(kind, payload1, payload2) {
+        const value = __bjs_jsValueLift(kind, payload1, payload2);
+        if (kind === 1 || kind === 3 || kind === 7 || kind === 8) {
+            swift.memory.release(payload1);
+        }
+        return value;
+    }
 
     const __bjs_createEnumHelpers_M10TestModuleT18AsyncPayloadResult = () => ({
         lower: (value) => {

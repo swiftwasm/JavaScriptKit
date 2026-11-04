@@ -227,7 +227,7 @@ export async function setupOptions(options, context) {
             };
         },
         addToCoreImports(importObject, importsContext) {
-            const { getInstance, getExports } = importsContext;
+            const { getInstance, getExports, _swift } = importsContext;
             options.addToCoreImports?.(importObject, importsContext);
             importObject["JavaScriptEventLoopTestSupportTests"] = {
                 "isMainThread": () => context.isMainThread,
@@ -238,7 +238,7 @@ export async function setupOptions(options, context) {
                 if (!exports) {
                     throw new Error("No exports!?");
                 }
-                return BridgeJSRuntimeTests_runJsWorks(getInstance(), exports);
+                return BridgeJSRuntimeTests_runJsWorks(getInstance(), exports, _swift);
             }
             bridgeJSRuntimeTests["runJsStructWorks"] = () => {
                 const exports = getExports();
@@ -267,7 +267,7 @@ export async function setupOptions(options, context) {
 import assert from "node:assert";
 
 /** @param {import('./../.build/plugins/PackageToJS/outputs/PackageTests/bridge-js.d.ts').Exports} exports */
-function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
+function BridgeJSRuntimeTests_runJsWorks(instance, exports, swift) {
     exports.roundTripVoid();
     for (const v of [
         0.0, 1.0, -1.0,
@@ -609,6 +609,17 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports) {
     for (const value of jsValues) {
         const result = exports.roundTripJSValue(value);
         assert.strictEqual(result, value);
+    }
+    assert.strictEqual(exports.makeJSValueString(), "makeJSValueString");
+    const madeObject = exports.makeJSValueObject();
+    assert.deepStrictEqual(madeObject, {});
+
+    const isRetained = (value) => swift.memory._slotByValue.has(value);
+    assert.equal(isRetained(madeObject), false);
+    for (const value of [{}, "roundTripJSValue-ownership", Symbol("ownership"), 0xfedcba9876543210n]) {
+        assert.strictEqual(exports.roundTripJSValue(value), value);
+        assert.deepStrictEqual(exports.roundTripOptionalJSValueArray([value]), [value]);
+        assert.equal(isRetained(value), false);
     }
 
     assert.strictEqual(exports.roundTripOptionalJSValue(null), null);
