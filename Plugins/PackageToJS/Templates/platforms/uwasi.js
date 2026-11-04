@@ -17,7 +17,19 @@ export function browserMainThreadSleep() {
 }
 
 /**
- * @param {{ WASI: any, MemoryFileSystem: any, useAll: any, lineBuffered: any }} runtime
+ * @param {{
+ *   WASI: any,
+ *   lineBuffered: any,
+ *   useStdio: any,
+ *   useArgs: any,
+ *   useEnviron: any,
+ *   useClock: any,
+ *   usePoll: any,
+ *   useProc: any,
+ *   useRandom: any,
+ *   MemoryFileSystem?: any,
+ *   useMemoryFS?: any,
+ * }} runtime
  * @param {{
  *   modulePath: string,
  *   args?: string[],
@@ -32,27 +44,35 @@ export function createUwasi(runtime, options) {
     const onStdoutLine = options.onStdoutLine ?? ((line) => console.log(line));
     const onStderrLine =
         options.onStderrLine ?? ((line) => console.error(line));
-    const fileSystem = new runtime.MemoryFileSystem({ "/": "/" });
-    const stdout = runtime.lineBuffered(onStdoutLine);
-    const stderr = runtime.lineBuffered(onStderrLine);
+    const stdio = {
+        stdin: () => "",
+        stdout: runtime.lineBuffered(onStdoutLine),
+        stderr: runtime.lineBuffered(onStderrLine),
+        outputBuffers: true,
+    };
+    const fileSystem = runtime.MemoryFileSystem
+        ? new runtime.MemoryFileSystem({ "/": "/" })
+        : undefined;
     const wasi = new runtime.WASI({
         args: [options.modulePath, ...args],
         env: {},
         features: [
-            runtime.useAll({
-                withFileSystem: fileSystem,
-                withStdio: {
-                    stdin: () => "",
-                    stdout,
-                    stderr,
-                    outputBuffers: true,
-                },
-                sleep: options.sleep,
-            }),
+            fileSystem
+                ? runtime.useMemoryFS({
+                      withFileSystem: fileSystem,
+                      withStdio: stdio,
+                  })
+                : runtime.useStdio(stdio),
+            runtime.useArgs(),
+            runtime.useEnviron(),
+            runtime.useClock(),
+            runtime.usePoll({ sleep: options.sleep }),
+            runtime.useProc(),
+            runtime.useRandom(),
         ],
     });
 
-    if (options.withExtractFile) {
+    if (fileSystem && options.withExtractFile) {
         Object.assign(wasi, {
             extractFile(filePath) {
                 const node = fileSystem.lookup(filePath);

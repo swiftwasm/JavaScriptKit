@@ -17,12 +17,14 @@ import Foundation
     /// `npx tsc -p Templates/tsconfig.json`
     /// Test both WASI runtimes in node and browser platform variants.
     @Test(arguments: [
-        (platform: "node", runtime: "browser-wasi-shim", sharedMemory: false),
-        (platform: "browser", runtime: "browser-wasi-shim", sharedMemory: false),
-        (platform: "node", runtime: "uwasi", sharedMemory: false),
-        (platform: "browser", runtime: "uwasi", sharedMemory: true),
+        (platform: "node", runtime: "browser-wasi-shim", sharedMemory: false, filesystem: false),
+        (platform: "browser", runtime: "browser-wasi-shim", sharedMemory: false, filesystem: false),
+        (platform: "node", runtime: "uwasi", sharedMemory: false, filesystem: false),
+        (platform: "node", runtime: "uwasi", sharedMemory: false, filesystem: true),
+        (platform: "browser", runtime: "uwasi", sharedMemory: true, filesystem: false),
+        (platform: "browser", runtime: "uwasi", sharedMemory: false, filesystem: true),
     ])
-    func tscCheck(platform: String, runtime: String, sharedMemory: Bool) throws {
+    func tscCheck(platform: String, runtime: String, sharedMemory: Bool, filesystem: Bool) throws {
         // Use a local temporary directory to place instantiated templates so that
         // they can reference repo-root node_modules packages like @types/node.
         try FileManager.default.createDirectory(
@@ -41,6 +43,7 @@ import Foundation
                 "IS_WASI": true,
                 "USE_WASI_CDN": false,
                 "USE_UWASI": runtime == "uwasi",
+                "USE_UWASI_FILESYSTEM": runtime == "uwasi" && filesystem,
                 "HAS_BRIDGE": false,
                 "HAS_IMPORTS": false,
                 "TARGET_DEFAULT_PLATFORM_NODE": platform == "node",
@@ -78,6 +81,11 @@ import Foundation
             )
             let expectedImport = runtime == "uwasi" ? "from 'uwasi'" : "from '@bjorn3/browser_wasi_shim'"
             #expect(platformSource.contains(expectedImport))
+            if runtime == "uwasi" {
+                #expect(!platformSource.contains("useAll"))
+                #expect(platformSource.contains("useStdio"))
+                #expect(platformSource.contains("MemoryFileSystem") == (platform == "node" && filesystem))
+            }
 
             let manifestData = try Data(contentsOf: destination.appending(path: "package.json"))
             let manifest = try #require(

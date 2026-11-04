@@ -4,11 +4,12 @@ import { MODULE_PATH /* #if USE_SHARED_MEMORY */, MEMORY_TYPE /* #endif */} from
 /* #if USE_UWASI */
 /* #if USE_WASI_CDN */
 // @ts-ignore
-import { WASI, MemoryFileSystem, useAll, lineBuffered } from 'https://cdn.jsdelivr.net/npm/uwasi@1.5.2/+esm';
+import { WASI, lineBuffered, useStdio, useArgs, useEnviron, useClock, usePoll, useProc, useRandom } from 'https://cdn.jsdelivr.net/npm/uwasi@1.5.2/+esm';
 /* #else */
-import { WASI, MemoryFileSystem, useAll, lineBuffered } from 'uwasi';
+import { WASI, lineBuffered, useStdio, useArgs, useEnviron, useClock, usePoll, useProc, useRandom } from 'uwasi';
 /* #endif */
 import { browserMainThreadSleep, createUwasi } from './uwasi.js';
+const uwasiRuntime = { WASI, lineBuffered, useStdio, useArgs, useEnviron, useClock, usePoll, useProc, useRandom };
 /* #else */
 /* #if USE_WASI_CDN */
 // @ts-ignore
@@ -38,10 +39,7 @@ export async function defaultBrowserThreadSetup() {
 
 /* #if IS_WASI */
 /* #if USE_UWASI */
-    const { wasi } = createUwasi(
-        { WASI, MemoryFileSystem, useAll, lineBuffered },
-        { modulePath: MODULE_PATH }
-    )
+    const { wasi } = createUwasi(uwasiRuntime, { modulePath: MODULE_PATH })
 /* #else */
     const wasi = new WASI(/* args */[MODULE_PATH], /* env */[], /* fd */[
         new OpenFile(new File([])), // stdin
@@ -127,16 +125,13 @@ export async function defaultBrowserSetup(options) {
     const onStdoutLine = options.onStdoutLine ?? ((line) => console.log(line))
     const onStderrLine = options.onStderrLine ?? ((line) => console.error(line))
 /* #if USE_UWASI */
-    const { wasi } = createUwasi(
-        { WASI, MemoryFileSystem, useAll, lineBuffered },
-        {
-            modulePath: MODULE_PATH,
-            args,
-            onStdoutLine,
-            onStderrLine,
-            sleep: browserMainThreadSleep(),
-        }
-    )
+    const { wasi } = createUwasi(uwasiRuntime, {
+        modulePath: MODULE_PATH,
+        args,
+        onStdoutLine,
+        onStderrLine,
+        sleep: browserMainThreadSleep(),
+    })
 /* #else */
     const wasi = new WASI(/* args */[MODULE_PATH, ...args], /* env */[], /* fd */[
         new OpenFile(new File([])), // stdin

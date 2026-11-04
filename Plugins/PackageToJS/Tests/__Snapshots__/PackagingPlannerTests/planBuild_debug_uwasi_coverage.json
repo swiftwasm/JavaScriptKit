@@ -1,0 +1,311 @@
+[
+  {
+    "attributes" : [
+      "silent"
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH"
+    ],
+    "output" : "$INTERMEDIATES",
+    "wants" : [
+
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$WASM_PRODUCT_ARTIFACT"
+    ],
+    "output" : "$INTERMEDIATES\/wasm-imports.json",
+    "wants" : [
+      "$INTERMEDIATES"
+    ]
+  },
+  {
+    "attributes" : [
+      "silent"
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH"
+    ],
+    "output" : "$OUTPUT",
+    "wants" : [
+
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/index.d.ts",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/index.d.ts",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/index.js",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/index.js",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/instantiate.d.ts",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/instantiate.d.ts",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/instantiate.js",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/instantiate.js",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$WASM_PRODUCT_ARTIFACT"
+    ],
+    "output" : "$OUTPUT\/main.wasm",
+    "wants" : [
+      "$OUTPUT"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/package.json",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/package.json",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ]
+  },
+  {
+    "attributes" : [
+      "silent"
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH"
+    ],
+    "output" : "$OUTPUT\/platforms",
+    "wants" : [
+
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/platforms\/browser.d.ts",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/platforms\/browser.d.ts",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/platforms\/browser.js",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/platforms\/browser.js",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/platforms\/browser.worker.js",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/platforms\/browser.worker.js",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/platforms\/node.d.ts",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/platforms\/node.d.ts",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/platforms\/node.js",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/platforms\/node.js",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Plugins\/PackageToJS\/Templates\/platforms\/uwasi.js",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/platforms\/uwasi.js",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Sources\/JavaScriptKit\/Runtime\/index.d.ts",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/runtime.d.ts",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+
+    ],
+    "inputs" : [
+      "$PLANNER_SOURCE_PATH",
+      "$SELF_PACKAGE\/Sources\/JavaScriptKit\/Runtime\/index.mjs",
+      "$INTERMEDIATES\/wasm-imports.json"
+    ],
+    "output" : "$OUTPUT\/runtime.js",
+    "salt" : "eyJjb25kaXRpb25zIjp7IkhBU19CUklER0UiOmZhbHNlLCJIQVNfSU1QT1JUUyI6ZmFsc2UsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX0JST1dTRVIiOnRydWUsIlRBUkdFVF9ERUZBVUxUX1BMQVRGT1JNX05PREUiOmZhbHNlLCJVU0VfVVdBU0kiOnRydWUsIlVTRV9VV0FTSV9GSUxFU1lTVEVNIjp0cnVlLCJVU0VfV0FTSV9DRE4iOmZhbHNlfSwic3Vic3RpdHV0aW9ucyI6eyJQQUNLQUdFX1RPX0pTX01PRFVMRV9QQVRIIjoibWFpbi53YXNtIiwiUEFDS0FHRV9UT19KU19QQUNLQUdFX05BTUUiOiJ0ZXN0In19",
+    "wants" : [
+      "$OUTPUT",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/platforms"
+    ]
+  },
+  {
+    "attributes" : [
+      "phony",
+      "silent"
+    ],
+    "inputs" : [
+
+    ],
+    "output" : "all",
+    "wants" : [
+      "$OUTPUT\/main.wasm",
+      "$INTERMEDIATES\/wasm-imports.json",
+      "$OUTPUT\/package.json",
+      "$OUTPUT\/index.js",
+      "$OUTPUT\/index.d.ts",
+      "$OUTPUT\/instantiate.js",
+      "$OUTPUT\/instantiate.d.ts",
+      "$OUTPUT\/platforms\/browser.js",
+      "$OUTPUT\/platforms\/browser.d.ts",
+      "$OUTPUT\/platforms\/browser.worker.js",
+      "$OUTPUT\/platforms\/node.js",
+      "$OUTPUT\/platforms\/node.d.ts",
+      "$OUTPUT\/runtime.js",
+      "$OUTPUT\/runtime.d.ts",
+      "$OUTPUT\/platforms\/uwasi.js"
+    ]
+  }
+]
