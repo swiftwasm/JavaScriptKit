@@ -782,9 +782,10 @@ public struct BridgeJSLink {
                 printer.indent {
                     printer.write("const Ctor = taCtors[kind];")
                     printer.write("const byteLen = count * Ctor.BYTES_PER_ELEMENT;")
+                    printer.write("const start = ptr >>> 0;")
                     // slice() copies the bytes into a new ArrayBuffer that is properly aligned
                     printer.write(
-                        "const copy = \(JSGlueVariableScope.reservedMemory).buffer.slice(ptr, ptr + byteLen);"
+                        "const copy = \(JSGlueVariableScope.reservedMemory).buffer.slice(start, start + byteLen);"
                     )
                     printer.write("\(JSGlueVariableScope.reservedTaStack).push(Array.from(new Ctor(copy)));")
                 }
