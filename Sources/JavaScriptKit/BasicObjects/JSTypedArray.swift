@@ -68,7 +68,12 @@ public final class JSTypedArray<Traits>: JSBridgedClass, ExpressibleByArrayLiter
     private static func createTypedArray(from buffer: UnsafeBufferPointer<Element>) -> JSObject {
         // Retain the constructor function to avoid it being released before calling `swjs_create_typed_array`
         let jsArrayRef = withExtendedLifetime(Self.constructor!) { ctor in
-            swjs_create_typed_array(ctor.id, buffer.baseAddress, Int32(buffer.count))
+            swjs_create_typed_array(
+                ctor.id,
+                buffer.baseAddress,
+                Int32(buffer.count),
+                Int32(MemoryLayout<Element>.stride)
+            )
         }
         return JSObject(id: jsArrayRef)
     }
