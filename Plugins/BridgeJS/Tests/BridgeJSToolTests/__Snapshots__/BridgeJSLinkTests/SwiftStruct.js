@@ -617,7 +617,8 @@ export async function createInstantiator(options, swift) {
             bjs["swift_js_push_typed_array"] = function(kind, ptr, count) {
                 const Ctor = taCtors[kind];
                 const byteLen = count * Ctor.BYTES_PER_ELEMENT;
-                const copy = memory.buffer.slice(ptr, ptr + byteLen);
+                const start = ptr >>> 0;
+                const copy = memory.buffer.slice(start, start + byteLen);
                 taStack.push(Array.from(new Ctor(copy)));
             }
             bjs["swift_js_struct_lower_DataPoint"] = function(objectId) {
