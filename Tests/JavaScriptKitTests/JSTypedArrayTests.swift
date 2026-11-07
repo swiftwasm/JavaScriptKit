@@ -175,7 +175,7 @@ final class JSTypedArrayTests: XCTestCase {
         let expected: [Int32] = [3, 4, 5, 6]
         XCTAssertEqual(view.withUnsafeBytes { Array($0) }, expected)
 
-        let sentinel: Int32 = -559_038_737  // 0xDEADBEEF
+        let sentinel = Int32(bitPattern: 0xDEAD_BEEF)
         let storage = UnsafeMutableBufferPointer<Int32>.allocate(capacity: elements.count)
         defer { storage.deallocate() }
         storage.initialize(repeating: sentinel)
