@@ -105,6 +105,26 @@ console.log(a === b); // false — different JS wrapper each time
 
 For finer control, use the `@JS(identityMode:)` parameter on individual classes instead of the project-wide config. See <doc:Exporting-Swift-Class> for details.
 
+### `noncopyableWrappers`
+
+Controls whether the Swift code generated from `bridge-js.d.ts` declares noncopyable `@JSClass` wrappers, described in <doc:Importing-JS-Class>. Default: `false`.
+
+```json
+{
+  "noncopyableWrappers": true
+}
+```
+
+With `noncopyableWrappers: true`, the generated `BridgeJS.Macros.swift` differs from the default output in five ways:
+
+1. Every `@JSClass` struct is declared `~Copyable`.
+2. A parameter or setter value whose type is a wrapper, an optional wrapper, or a `UniqueArray` of wrappers is `borrowing`.
+3. A property or exported constant of such a type becomes `@JSGetterFunction func name() throws(JSException) -> T`, because Swift rejects a throwing getter of a noncopyable type. A writable property keeps its `@JSSetter` function.
+4. `T[]` of a wrapper type `T` becomes `UniqueArray<T>`, `(T | null)[]` becomes `UniqueArray<Optional<T>>`, and `T[] | null` or an optional `T[]` property becomes `Optional<UniqueArray<T>>`. Arrays of other types stay `[T]`.
+5. `T | undefined` and an optional property of a wrapper type become `Optional<T>`, and `Record<string, T>` becomes `[String: JSObject]`, because `JSUndefinedOr` and `Dictionary` cannot hold a noncopyable value. ts2swift prints a warning for each of these.
+
+Code that names `UniqueArray` needs Swift 6.4. Generate the bindings ahead of time with the command plugin, as <doc:Ahead-of-Time-Code-Generation> describes.
+
 ### `tools`
 
 Specify custom paths for external executables. This is particularly useful when working in environments like Xcode where the system PATH may not be inherited, or when you need to use a specific version of tools for your project.

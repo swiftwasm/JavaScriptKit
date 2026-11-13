@@ -2450,6 +2450,218 @@ func _$benchmarkRunner(_ name: String, _ body: JSObject) throws(JSException) -> 
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_ImportedObject_init")
+fileprivate func bjs_ImportedObject_init_extern(_ start: Int32) -> Int32
+#else
+fileprivate func bjs_ImportedObject_init_extern(_ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportedObject_init(_ start: Int32) -> Int32 {
+    return bjs_ImportedObject_init_extern(start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_ImportedObject_value")
+fileprivate func bjs_ImportedObject_value_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_ImportedObject_value_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportedObject_value(_ self: Int32) -> Int32 {
+    return bjs_ImportedObject_value_extern(self)
+}
+
+func _$ImportedObject_init(_ start: Int) throws(JSException) -> JSObject {
+    let startValue = start.bridgeJSLowerParameter()
+    let ret = bjs_ImportedObject_init(startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$ImportedObject_value(_ self: JSObject) throws(JSException) -> Int {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_ImportedObject_value(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_ImportedObjectRoundtrip_init")
+fileprivate func bjs_ImportedObjectRoundtrip_init_extern() -> Int32
+#else
+fileprivate func bjs_ImportedObjectRoundtrip_init_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportedObjectRoundtrip_init() -> Int32 {
+    return bjs_ImportedObjectRoundtrip_init_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_ImportedObjectRoundtrip_make")
+fileprivate func bjs_ImportedObjectRoundtrip_make_extern(_ self: Int32, _ start: Int32) -> Int32
+#else
+fileprivate func bjs_ImportedObjectRoundtrip_make_extern(_ self: Int32, _ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportedObjectRoundtrip_make(_ self: Int32, _ start: Int32) -> Int32 {
+    return bjs_ImportedObjectRoundtrip_make_extern(self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_ImportedObjectRoundtrip_take")
+fileprivate func bjs_ImportedObjectRoundtrip_take_extern(_ self: Int32, _ object: Int32) -> Int32
+#else
+fileprivate func bjs_ImportedObjectRoundtrip_take_extern(_ self: Int32, _ object: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_ImportedObjectRoundtrip_take(_ self: Int32, _ object: Int32) -> Int32 {
+    return bjs_ImportedObjectRoundtrip_take_extern(self, object)
+}
+
+func _$ImportedObjectRoundtrip_init() throws(JSException) -> JSObject {
+    let ret = bjs_ImportedObjectRoundtrip_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$ImportedObjectRoundtrip_make(_ self: JSObject, _ start: Int) throws(JSException) -> ImportedObject {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_ImportedObjectRoundtrip_make(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return ImportedObject.bridgeJSLiftReturn(ret)
+}
+
+func _$ImportedObjectRoundtrip_take(_ self: JSObject, _ object: ImportedObject) throws(JSException) -> Int {
+    let objectValue = object.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_ImportedObjectRoundtrip_take(selfValue, objectValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_NoncopyableImportedObject_init")
+fileprivate func bjs_NoncopyableImportedObject_init_extern(_ start: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableImportedObject_init_extern(_ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableImportedObject_init(_ start: Int32) -> Int32 {
+    return bjs_NoncopyableImportedObject_init_extern(start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_NoncopyableImportedObject_value")
+fileprivate func bjs_NoncopyableImportedObject_value_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableImportedObject_value_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableImportedObject_value(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableImportedObject_value_extern(self)
+}
+
+func _$NoncopyableImportedObject_init(_ start: Int) throws(JSException) -> JSUniqueRef {
+    let startValue = start.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableImportedObject_init(startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUniqueRef.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableImportedObject_value(_ self: borrowing JSUniqueRef) throws(JSException) -> Int {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableImportedObject_value(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_NoncopyableImportedObjectRoundtrip_init")
+fileprivate func bjs_NoncopyableImportedObjectRoundtrip_init_extern() -> Int32
+#else
+fileprivate func bjs_NoncopyableImportedObjectRoundtrip_init_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableImportedObjectRoundtrip_init() -> Int32 {
+    return bjs_NoncopyableImportedObjectRoundtrip_init_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_NoncopyableImportedObjectRoundtrip_make")
+fileprivate func bjs_NoncopyableImportedObjectRoundtrip_make_extern(_ self: Int32, _ start: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableImportedObjectRoundtrip_make_extern(_ self: Int32, _ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableImportedObjectRoundtrip_make(_ self: Int32, _ start: Int32) -> Int32 {
+    return bjs_NoncopyableImportedObjectRoundtrip_make_extern(self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "Benchmarks", name: "bjs_NoncopyableImportedObjectRoundtrip_take")
+fileprivate func bjs_NoncopyableImportedObjectRoundtrip_take_extern(_ self: Int32, _ object: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableImportedObjectRoundtrip_take_extern(_ self: Int32, _ object: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableImportedObjectRoundtrip_take(_ self: Int32, _ object: Int32) -> Int32 {
+    return bjs_NoncopyableImportedObjectRoundtrip_take_extern(self, object)
+}
+
+func _$NoncopyableImportedObjectRoundtrip_init() throws(JSException) -> JSUniqueRef {
+    let ret = bjs_NoncopyableImportedObjectRoundtrip_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUniqueRef.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableImportedObjectRoundtrip_make(_ self: borrowing JSUniqueRef, _ start: Int) throws(JSException) -> NoncopyableImportedObject {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableImportedObjectRoundtrip_make(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return NoncopyableImportedObject.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableImportedObjectRoundtrip_take(_ self: borrowing JSUniqueRef, _ object: borrowing NoncopyableImportedObject) throws(JSException) -> Int {
+    let objectValue = object.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableImportedObjectRoundtrip_take(selfValue, objectValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "bjs_Benchmarks_register_type_handles")
 fileprivate func _bjs_Benchmarks_register_type_handles_extern(_ base: UnsafePointer<Int32>?, _ count: Int32)
 

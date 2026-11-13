@@ -84,18 +84,21 @@ import ArgumentParser
             let skeletonData = try readData(from: skeletonFile)
             let skeleton = try JSONDecoder().decode(BridgeJSSkeleton.self, from: skeletonData)
             let moduleName = "InternalModule"
+            let availability = AvailabilityIndex(skeletons: [skeleton])
             let exported = try skeleton.exported.flatMap {
                 try ExportSwift(
                     progress: ProgressReporting(verbose: false),
                     moduleName: moduleName,
-                    skeleton: $0
+                    skeleton: $0,
+                    availability: availability
                 ).finalize()
             }
             let imported = try skeleton.imported.flatMap {
                 try ImportTS(
                     progress: ProgressReporting(verbose: false),
                     moduleName: moduleName,
-                    skeleton: $0
+                    skeleton: $0,
+                    availability: availability
                 ).finalize()
             }
             let typeRegistration = GenericTypeRegistrationCodegen().render(for: skeleton)

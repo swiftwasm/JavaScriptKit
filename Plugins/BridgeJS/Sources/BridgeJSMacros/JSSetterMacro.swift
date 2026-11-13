@@ -145,7 +145,7 @@ extension JSSetterMacro: BodyMacro {
 
         var arguments: [String] = []
         if isInstanceMember {
-            arguments.append("self.jsObject")
+            arguments.append(JSMacroHelper.selfArgument(in: context))
         }
 
         // Get the parameter name(s) - setters typically have one parameter

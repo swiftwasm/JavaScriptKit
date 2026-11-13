@@ -431,6 +431,46 @@ public final class SwiftToSkeleton {
         "Float64": "JSFloat64Array",
     ]
 
+    private func bridgedArray(
+        of elementType: BridgeType,
+        isUniqueArray: Bool,
+        node: TypeSyntax,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        let bridgeType = BridgeType.array(elementType)
+        if elementType.isNoncopyable == isUniqueArray {
+            return bridgeType
+        }
+        errors.append(
+            DiagnosticError(
+                node: node,
+                message: isUniqueArray
+                    ? "'UniqueArray' is supported only for noncopyable '@JSClass' wrapper elements"
+                    : "An array of noncopyable '@JSClass' wrappers must be a 'UniqueArray'",
+                hint: "Use '\(bridgeType.swiftType)'"
+            )
+        )
+        return nil
+    }
+
+    private func bridgedDictionary(
+        of valueType: BridgeType,
+        node: TypeSyntax,
+        errors: inout [DiagnosticError]
+    ) -> BridgeType? {
+        if !valueType.isNoncopyable {
+            return .dictionary(valueType)
+        }
+        errors.append(
+            DiagnosticError(
+                node: node,
+                message: "Dictionaries of noncopyable '@JSClass' wrappers are not supported",
+                hint: "Use JSObject values, or a copyable '@JSClass' wrapper"
+            )
+        )
+        return nil
+    }
+
     func lookupType(for type: TypeSyntax, errors: inout [DiagnosticError]) -> BridgeType? {
         if let attributedType = type.as(AttributedTypeSyntax.self) {
             return lookupType(for: attributedType.baseType, errors: &errors)
@@ -593,31 +633,33 @@ public final class SwiftToSkeleton {
         // [T]
         if let arrayType = type.as(ArrayTypeSyntax.self) {
             if let elementType = lookupType(for: arrayType.element, errors: &errors) {
-                return .array(elementType)
+                return bridgedArray(of: elementType, isUniqueArray: false, node: type, errors: &errors)
             }
         }
-        // Array<T>
+        // Array<T>, UniqueArray<T>
         if let identifierType = type.as(IdentifierTypeSyntax.self),
-            identifierType.name.text == "Array",
+            identifierType.name.text == "Array" || identifierType.name.text == "UniqueArray",
             let genericArgs = identifierType.genericArgumentClause?.arguments,
             genericArgs.count == 1,
             let argType = TypeSyntax(genericArgs.first?.argument)
         {
             if let elementType = lookupType(for: argType, errors: &errors) {
-                return .array(elementType)
+                let isUniqueArray = identifierType.name.text == "UniqueArray"
+                return bridgedArray(of: elementType, isUniqueArray: isUniqueArray, node: type, errors: &errors)
             }
         }
-        // Swift.Array<T>
+        // Swift.Array<T>, Swift.UniqueArray<T>
         if let memberType = type.as(MemberTypeSyntax.self),
             let baseType = memberType.baseType.as(IdentifierTypeSyntax.self),
             baseType.name.text == "Swift",
-            memberType.name.text == "Array",
+            memberType.name.text == "Array" || memberType.name.text == "UniqueArray",
             let genericArgs = memberType.genericArgumentClause?.arguments,
             genericArgs.count == 1,
             let argType = TypeSyntax(genericArgs.first?.argument)
         {
             if let elementType = lookupType(for: argType, errors: &errors) {
-                return .array(elementType)
+                let isUniqueArray = memberType.name.text == "UniqueArray"
+                return bridgedArray(of: elementType, isUniqueArray: isUniqueArray, node: type, errors: &errors)
             }
         }
         // [String: T]
@@ -626,7 +668,7 @@ public final class SwiftToSkeleton {
                 keyType == .string,
                 let valueType = lookupType(for: dictType.value, errors: &errors)
             {
-                return .dictionary(valueType)
+                return bridgedDictionary(of: valueType, node: type, errors: &errors)
             }
         }
         // Dictionary<String, T>
@@ -640,7 +682,7 @@ public final class SwiftToSkeleton {
             keyType == .string
         {
             if let valueType = lookupType(for: valueArg, errors: &errors) {
-                return .dictionary(valueType)
+                return bridgedDictionary(of: valueType, node: type, errors: &errors)
             }
         }
         // Swift.Dictionary<String, T>
@@ -656,7 +698,7 @@ public final class SwiftToSkeleton {
             keyType == .string
         {
             if let valueType = lookupType(for: valueArg, errors: &errors) {
-                return .dictionary(valueType)
+                return bridgedDictionary(of: valueType, node: type, errors: &errors)
             }
         }
         if let aliasDecl = typeDeclResolver.resolveTypeAlias(type) {
@@ -731,7 +773,7 @@ public final class SwiftToSkeleton {
                     itemName: structDecl.name.text
                 )
                 if structDecl.attributes.hasAttribute(name: "JSClass") {
-                    return .jsObject(swiftCallName)
+                    return structDecl.isNoncopyable ? .jsUniqueObject(swiftCallName) : .jsObject(swiftCallName)
                 }
                 if let jsAttribute = structDecl.attributes.firstJSAttribute,
                     let aliasTarget = extractAliasTarget(from: jsAttribute)
@@ -940,6 +982,7 @@ public final class SwiftToSkeleton {
 
         while let parent = currentNode {
             if let extensionDecl = parent.as(ExtensionDeclSyntax.self) {
+                declarations.append(parent)
                 if let extendedDecl = typeDeclResolver.resolveExtensionTarget(extensionDecl.extendedType),
                     visitedExtendedTypes.insert(extendedDecl.id).inserted
                 {
@@ -954,6 +997,14 @@ public final class SwiftToSkeleton {
             }
         }
         return declarations
+    }
+
+    fileprivate func computeAvailability(for node: some WithAttributesSyntax) -> [String]? {
+        let enclosingAttributes = enclosingDeclarations(of: node).compactMap {
+            $0.asProtocol(WithAttributesSyntax.self)?.attributes
+        }
+        let availability = ([node.attributes] + enclosingAttributes).flatMap(\.availableAttributes)
+        return availability.isEmpty ? nil : availability
     }
 
     /// This generates the qualified name needed for Swift code generation (e.g., "Networking.API.HTTPServer")
@@ -1125,6 +1176,37 @@ extension AttributeListSyntax {
             guard let syntax = attribute.as(AttributeSyntax.self) else { return false }
             return syntax.attributeNameText == name
         }
+    }
+
+    fileprivate var availableAttributes: [String] {
+        compactMap { attribute in
+            guard let syntax = attribute.as(AttributeSyntax.self), syntax.attributeNameText == "available" else {
+                return nil
+            }
+            return syntax.trimmedDescription
+        }
+    }
+}
+
+extension MemberBlockItemListSyntax {
+    fileprivate var declsIncludingAllIfConfigClauses: [DeclSyntax] {
+        flatMap { member -> [DeclSyntax] in
+            guard let ifConfig = member.decl.as(IfConfigDeclSyntax.self) else { return [member.decl] }
+            return ifConfig.clauses.flatMap { clause -> [DeclSyntax] in
+                guard case .decls(let members) = clause.elements else { return [] }
+                return members.declsIncludingAllIfConfigClauses
+            }
+        }
+    }
+}
+
+extension StructDeclSyntax {
+    fileprivate var isNoncopyable: Bool {
+        inheritanceClause?.inheritedTypes.contains { inherited in
+            guard let suppressed = inherited.type.as(SuppressedTypeSyntax.self) else { return false }
+            let name = suppressed.type.trimmedDescription
+            return name == "Copyable" || name == "Swift.Copyable"
+        } ?? false
     }
 }
 
@@ -2174,7 +2256,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             jsNamespace: namespaceResult.jsNamespace,
             identityMode: classIdentityMode,
             documentation: extractDocumentation(from: node),
-            isFinal: isFinal
+            isFinal: isFinal,
+            availability: parent.computeAvailability(for: node)
         )
         let uniqueKey = makeKey(name: name, namespace: effectiveNamespace)
 
@@ -2246,7 +2329,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
     }
 
     private func recordAlias(
-        node: some SyntaxProtocol & NamedDeclSyntax,
+        node: some NamedDeclSyntax & WithAttributesSyntax,
         jsAttribute: AttributeSyntax,
         aliasTarget: TypeSyntax
     ) {
@@ -2291,7 +2374,11 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             return
         }
         exportedAliases.append(
-            ExportedAlias(swiftCallName: swiftCallName, underlying: underlying)
+            ExportedAlias(
+                swiftCallName: swiftCallName,
+                underlying: underlying,
+                availability: parent.computeAvailability(for: node)
+            )
         )
     }
 
@@ -2339,7 +2426,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             emitStyle: emitStyle,
             staticMethods: [],
             staticProperties: [],
-            documentation: extractDocumentation(from: node)
+            documentation: extractDocumentation(from: node),
+            availability: parent.computeAvailability(for: node)
         )
 
         let enumUniqueKey = makeKey(name: name, namespace: effectiveNamespace)
@@ -2469,8 +2557,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
         stateStack.push(state: .protocolBody(name: name, key: protocolUniqueKey))
 
         var methods: [ExportedFunction] = []
-        for member in node.memberBlock.members {
-            if let funcDecl = member.decl.as(FunctionDeclSyntax.self) {
+        for decl in node.memberBlock.members.declsIncludingAllIfConfigClauses {
+            if let funcDecl = decl.as(FunctionDeclSyntax.self) {
                 if let exportedFunction = visitProtocolMethod(
                     node: funcDecl,
                     protocolName: name,
@@ -2478,7 +2566,7 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                 ) {
                     methods.append(exportedFunction)
                 }
-            } else if let varDecl = member.decl.as(VariableDeclSyntax.self) {
+            } else if let varDecl = decl.as(VariableDeclSyntax.self) {
                 _ = visitProtocolProperty(node: varDecl, protocolName: name, protocolKey: protocolUniqueKey)
             }
         }
@@ -2494,7 +2582,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             inheritedJSProtocols: inheritedJSProtocols.isEmpty ? nil : inheritedJSProtocols,
             isGenericBridgeable: (node.inheritanceClause?.inheritedTypes ?? []).contains {
                 parent.inheritsGenericBridgeability(for: $0.type)
-            } ? true : nil
+            } ? true : nil,
+            availability: parent.computeAvailability(for: node)
         )
 
         exportedProtocolByName[protocolUniqueKey] = exportedProtocol
@@ -2567,6 +2656,14 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
                     else {
                         continue
                     }
+                    if fieldType.isNoncopyable {
+                        diagnose(
+                            node: typeAnnotation.type,
+                            message: "A '@JS struct' field cannot be a noncopyable '@JSClass' wrapper",
+                            hint: "Use a JSObject field, or a copyable '@JSClass' wrapper"
+                        )
+                        continue
+                    }
 
                     let property = ExportedProperty(
                         name: fieldName,
@@ -2592,7 +2689,8 @@ private final class ExportSwiftAPICollector: SyntaxAnyVisitor {
             methods: [],
             namespace: effectiveNamespace,
             jsNamespace: namespaceResult.jsNamespace,
-            documentation: extractDocumentation(from: node)
+            documentation: extractDocumentation(from: node),
+            availability: parent.computeAvailability(for: node)
         )
 
         exportedStructByName[structUniqueKey] = exportedStruct
@@ -2965,6 +3063,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         let jsName: String?
         let from: JSImportFrom?
         let accessLevel: BridgeJSAccessLevel
+        var isNoncopyable = false
+        var availability: [String]?
         var constructor: ImportedConstructorSkeleton?
         var methods: [ImportedFunctionSkeleton]
         var staticMethods: [ImportedFunctionSkeleton]
@@ -2991,6 +3091,10 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
         static func firstJSGetterAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
             firstAttribute(attributes, named: "JSGetter")
+        }
+
+        static func firstJSGetterFunctionAttribute(_ attributes: AttributeListSyntax?) -> AttributeSyntax? {
+            firstAttribute(attributes, named: "JSGetterFunction")
         }
 
         static func hasJSSetterAttribute(_ attributes: AttributeListSyntax?) -> Bool {
@@ -3389,7 +3493,9 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                     getters: type.getters,
                     setters: type.setters,
                     documentation: nil,
-                    accessLevel: type.accessLevel
+                    accessLevel: type.accessLevel,
+                    isNoncopyable: type.isNoncopyable ? true : nil,
+                    availability: type.availability
                 )
             )
             currentType = nil
@@ -3410,6 +3516,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 from: from,
                 accessLevel: accessLevel
             )
+            currentType?.isNoncopyable = node.isNoncopyable
+            currentType?.availability = parent.computeAvailability(for: node)
         }
         return .visitChildren
     }
@@ -3433,6 +3541,7 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 from: from,
                 accessLevel: accessLevel
             )
+            currentType?.availability = parent.computeAvailability(for: node)
         }
         return .visitChildren
     }
@@ -3470,6 +3579,12 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             importedFunctions.append(function)
             return .skipChildren
         }
+        if let jsGetter = AttributeChecker.firstJSGetterFunctionAttribute(node.attributes) {
+            if let getter = parseGetterSkeleton(jsGetter, node) {
+                importedGlobalGetters.append(getter)
+            }
+            return .skipChildren
+        }
         // Top-level setters are not supported
         if AttributeChecker.hasJSSetterAttribute(node.attributes) {
             errors.append(
@@ -3496,6 +3611,21 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 } else {
                     type.methods.append(method)
                 }
+            }
+            return true
+        }
+
+        if let jsGetter = AttributeChecker.firstJSGetterFunctionAttribute(node.attributes) {
+            if isStaticMember {
+                errors.append(
+                    DiagnosticError(
+                        node: node,
+                        message:
+                            "@JSGetterFunction is not supported for static members. Use it only for instance members in @JSClass types."
+                    )
+                )
+            } else if let getter = parseGetterSkeleton(jsGetter, node) {
+                type.getters.append(getter)
             }
             return true
         }
@@ -3789,6 +3919,35 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     private func parseGetterSkeleton(
         _ jsGetter: AttributeSyntax,
+        _ node: FunctionDeclSyntax
+    ) -> ImportedGetterSkeleton? {
+        guard node.signature.parameterClause.parameters.isEmpty else {
+            errors.append(DiagnosticError(node: node, message: "@JSGetterFunction function must have no parameters."))
+            return nil
+        }
+        guard let returnType = node.signature.returnClause?.type else {
+            errors.append(DiagnosticError(node: node, message: "@JSGetterFunction function must have a return type."))
+            return nil
+        }
+        guard let propertyType = withLookupErrors({ parent.lookupType(for: returnType, errors: &$0) }) else {
+            return nil
+        }
+        let extractedJSName = extractJSName(from: jsGetter)
+        let from = extractJSImportFrom(from: jsGetter)
+        validateDefaultExportUsage(extractedJSName, from: from, node: node)
+        return ImportedGetterSkeleton(
+            name: SwiftToSkeleton.normalizeIdentifier(node.name.text),
+            jsName: extractedJSName?.memberName,
+            from: from,
+            type: propertyType,
+            documentation: nil,
+            functionName: nil,
+            accessLevel: Self.bridgeAccessLevel(from: node.modifiers)
+        )
+    }
+
+    private func parseGetterSkeleton(
+        _ jsGetter: AttributeSyntax,
         _ node: VariableDeclSyntax
     ) -> ImportedGetterSkeleton? {
         guard let (identifier, type) = extractPropertyInfo(node) else {
@@ -3798,6 +3957,21 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
             return nil
         }
         let propertyName = SwiftToSkeleton.normalizeIdentifier(identifier.identifier.text)
+        if propertyType.isNoncopyable {
+            let getterFunction = jsGetter.with(
+                \.attributeName,
+                TypeSyntax(IdentifierTypeSyntax(name: .identifier("JSGetterFunction")))
+            )
+            errors.append(
+                DiagnosticError(
+                    node: node,
+                    message: "@JSGetter cannot read a noncopyable '@JSClass' wrapper",
+                    hint:
+                        "Use '\(getterFunction.trimmedDescription) func \(identifier.identifier.text)() throws(JSException) -> \(type.trimmedDescription)'"
+                )
+            )
+            return nil
+        }
         let extractedJSName = extractJSName(from: jsGetter)
         let from = extractJSImportFrom(from: jsGetter)
         validateDefaultExportUsage(extractedJSName, from: from, node: node)

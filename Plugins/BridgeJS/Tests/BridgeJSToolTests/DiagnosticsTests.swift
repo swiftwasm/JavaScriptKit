@@ -592,7 +592,12 @@ import Testing
         swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
         let skeleton = try swiftAPI.finalize()
         let exported = try #require(skeleton.exported)
-        let exportSwift = ExportSwift(progress: .silent, moduleName: skeleton.moduleName, skeleton: exported)
+        let exportSwift = ExportSwift(
+            progress: .silent,
+            moduleName: skeleton.moduleName,
+            skeleton: exported,
+            availability: AvailabilityIndex(skeletons: [skeleton])
+        )
         #expect(throws: BridgeJSCoreError.self) {
             _ = try exportSwift.finalize()
         }
@@ -614,7 +619,12 @@ import Testing
         swiftAPI.addSourceFile(Parser.parse(source: source), inputFilePath: "test.swift")
         let skeleton = try swiftAPI.finalize()
         let exported = try #require(skeleton.exported)
-        let exportSwift = ExportSwift(progress: .silent, moduleName: skeleton.moduleName, skeleton: exported)
+        let exportSwift = ExportSwift(
+            progress: .silent,
+            moduleName: skeleton.moduleName,
+            skeleton: exported,
+            availability: AvailabilityIndex(skeletons: [skeleton])
+        )
         #expect(try exportSwift.finalize() != nil)
     }
 

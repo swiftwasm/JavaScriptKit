@@ -62,12 +62,18 @@ import class Foundation.JSONDecoder
 
         let skeleton = try swiftToSkeleton.finalize()
 
+        let availability = AvailabilityIndex(skeletons: [skeleton])
         let exportResult = try skeleton.exported.flatMap {
-            let exportSwift = ExportSwift(progress: .silent, moduleName: moduleName, skeleton: $0)
+            let exportSwift = ExportSwift(
+                progress: .silent,
+                moduleName: moduleName,
+                skeleton: $0,
+                availability: availability
+            )
             return try exportSwift.finalize()
         }
         let importResult = try skeleton.imported.flatMap {
-            let importTS = ImportTS(progress: .silent, moduleName: moduleName, skeleton: $0)
+            let importTS = ImportTS(progress: .silent, moduleName: moduleName, skeleton: $0, availability: availability)
             return try importTS.finalize()
         }
         let linker = BridgeJSLink(skeletons: [skeleton])

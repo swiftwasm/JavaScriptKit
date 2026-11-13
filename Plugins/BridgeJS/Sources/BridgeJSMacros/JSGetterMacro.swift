@@ -51,7 +51,7 @@ extension JSGetterMacro: AccessorMacro {
 
         var getterArgs: [String] = []
         if isInstanceMember {
-            getterArgs.append("self.jsObject")
+            getterArgs.append(JSMacroHelper.selfArgument(in: context))
         }
         let getterCall: CodeBlockItemSyntax =
             "return try \(raw: getterName)(\(raw: getterArgs.joined(separator: ", ")))"

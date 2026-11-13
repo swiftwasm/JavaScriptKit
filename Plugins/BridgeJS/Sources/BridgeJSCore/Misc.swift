@@ -361,16 +361,28 @@ public struct BridgeJSConfig: Codable {
     /// Default: `nil` (treated as `"none"`)
     public var identityMode: String?
 
-    public init(tools: [String: String]? = nil, exposeToGlobal: Bool = false, identityMode: String? = nil) {
+    /// Whether `ts2swift` emits `@JSClass` structs as noncopyable wrappers.
+    ///
+    /// Default: `nil` (treated as `false`)
+    public var noncopyableWrappers: Bool?
+
+    public init(
+        tools: [String: String]? = nil,
+        exposeToGlobal: Bool = false,
+        identityMode: String? = nil,
+        noncopyableWrappers: Bool? = nil
+    ) {
         self.tools = tools
         self.exposeToGlobal = exposeToGlobal
         self.identityMode = identityMode
+        self.noncopyableWrappers = noncopyableWrappers
     }
 
     enum CodingKeys: String, CodingKey {
         case tools
         case exposeToGlobal
         case identityMode
+        case noncopyableWrappers
     }
 
     public init(from decoder: Decoder) throws {
@@ -378,6 +390,7 @@ public struct BridgeJSConfig: Codable {
         tools = try container.decodeIfPresent([String: String].self, forKey: .tools)
         exposeToGlobal = try container.decodeIfPresent(Bool.self, forKey: .exposeToGlobal) ?? false
         identityMode = try container.decodeIfPresent(String.self, forKey: .identityMode)
+        noncopyableWrappers = try container.decodeIfPresent(Bool.self, forKey: .noncopyableWrappers)
     }
 
     /// Load the configuration file from the SwiftPM package target directory.
@@ -421,7 +434,8 @@ public struct BridgeJSConfig: Codable {
         return BridgeJSConfig(
             tools: (tools ?? [:]).merging(overrides.tools ?? [:], uniquingKeysWith: { $1 }),
             exposeToGlobal: overrides.exposeToGlobal,
-            identityMode: overrides.identityMode ?? identityMode
+            identityMode: overrides.identityMode ?? identityMode,
+            noncopyableWrappers: overrides.noncopyableWrappers ?? noncopyableWrappers
         )
     }
 }

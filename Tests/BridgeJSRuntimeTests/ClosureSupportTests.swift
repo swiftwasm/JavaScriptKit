@@ -286,9 +286,8 @@ final class ClosureSupportTests: XCTestCase {
             _ = try? ClosureSupportImports.jsCallTwice(0, closure)
         }
 
-        // Trigger GC and read heap size from JS side
         let after = try ClosureSupportImports.jsHeapCount()
-        XCTAssertEqual(after, baseline, "Heap entry count should return to baseline after GC")
+        XCTAssertEqual(after, baseline, "References held by the runtime should return to baseline")
     }
 
 }

@@ -9,11 +9,16 @@ import BridgeJSUtilities
 #endif
 
 public struct ClosureCodegen {
-    public init() {}
+    private let availability: AvailabilityIndex
+
+    public init(availability: AvailabilityIndex) {
+        self.availability = availability
+    }
 
     private func swiftClosureType(for signature: ClosureSignature) -> String {
-        let sendingPrefix = signature.sendingParameters ? "sending " : ""
-        let closureParams = signature.parameters.map { "\(sendingPrefix)\($0.closureSwiftType)" }.joined(
+        let closureParams = signature.parameters.map {
+            "\($0.closureParameterPrefix(sending: signature.sendingParameters))\($0.closureSwiftType)"
+        }.joined(
             separator: ", "
         )
         let swiftEffects = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws(JSException)" : "")
@@ -74,10 +79,10 @@ public struct ClosureCodegen {
                 helperEnumDeclPrinter.write("let callback = JSObject.bridgeJSLiftParameter(callbackId)")
                 let parameters: String
                 if signature.isThrows || signature.isAsync {
-                    let sendingPrefix = signature.sendingParameters ? "sending " : ""
                     let typedParams =
                         signature.parameters.enumerated().map { index, paramType in
-                            "param\(index): \(sendingPrefix)\(paramType.closureSwiftType)"
+                            let prefix = paramType.closureParameterPrefix(sending: signature.sendingParameters)
+                            return "param\(index): \(prefix)\(paramType.closureSwiftType)"
                         }.joined(separator: ", ")
                     let returnType = signature.returnType.closureSwiftType
                     let effects =
@@ -129,9 +134,16 @@ public struct ClosureCodegen {
             }
             """
 
-        return [
-            externDecl, makeClosureExternDecl, helperEnumDecl, typedClosureExtension,
+        let helperAvailability = availability.attributes(for: signature.parameters + [signature.returnType])
+        let decls: [(DeclSyntax, availability: [String])] = [
+            (makeClosureExternDecl, []),
+            (helperEnumDecl, helperAvailability),
+            (typedClosureExtension, helperAvailability),
         ]
+        return [externDecl]
+            + decls.map {
+                SwiftCodePattern.buildAvailableDecl($0, usesUniqueArray: builder.usesUniqueArray, availability: $1)
+            }
     }
 
     func renderClosureInvokeHandler(_ signature: ClosureSignature) throws -> DeclSyntax {

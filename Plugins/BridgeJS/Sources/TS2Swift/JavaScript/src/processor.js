@@ -36,6 +36,7 @@ export class TypeProcessor {
     /**
      * @param {ts.TypeChecker} checker - TypeScript type checker
      * @param {DiagnosticEngine} diagnosticEngine - Diagnostic engine
+     * @param {{ defaultImportFromGlobal?: boolean, noncopyableWrappers?: boolean }} options
      */
     constructor(checker, diagnosticEngine, options = {
         defaultImportFromGlobal: false,
@@ -68,6 +69,11 @@ export class TypeProcessor {
 
         /** @type {boolean} */
         this.defaultImportFromGlobal = options.defaultImportFromGlobal ?? false;
+
+        /** @type {boolean} */
+        this.noncopyableWrappers = options.noncopyableWrappers ?? false;
+        /** @type {Set<string>} */
+        this.wrapperTypeNames = new Set();
     }
 
     /**
@@ -116,6 +122,72 @@ export class TypeProcessor {
         const swiftName = isValidSwiftDeclName(jsTypeName) ? jsTypeName : makeValidSwiftIdentifier(jsTypeName, { emptyFallback: "_" });
         this.swiftTypeNameByJSTypeName.set(jsTypeName, swiftName);
         return swiftName;
+    }
+
+    /**
+     * @param {string} swiftType
+     * @returns {boolean}
+     * @private
+     */
+    isNoncopyable(swiftType) {
+        if (!this.noncopyableWrappers) return false;
+        const optional = /^Optional<(.*)>$/.exec(swiftType);
+        const wrapped = optional ? optional[1] : swiftType;
+        return wrapped.startsWith("UniqueArray<") || this.wrapperTypeNames.has(wrapped);
+    }
+
+    /**
+     * @param {string} swiftType
+     * @returns {string}
+     * @private
+     */
+    copyableFallback(swiftType) {
+        const optional = /^Optional<(.*)>$/.exec(swiftType);
+        if (optional) return `Optional<${this.copyableFallback(optional[1])}>`;
+        const array = /^UniqueArray<(.*)>$/.exec(swiftType);
+        if (array) return `[${this.copyableFallback(array[1])}]`;
+        return this.wrapperTypeNames.has(swiftType) ? "JSObject" : swiftType;
+    }
+
+    /**
+     * @param {string} annotation
+     * @param {string} typeName
+     * @returns {string}
+     * @private
+     */
+    renderWrapperStructLine(annotation, typeName) {
+        const conformance = this.noncopyableWrappers ? ": ~Copyable" : "";
+        return `${annotation} struct ${typeName}${conformance} {`;
+    }
+
+    /**
+     * @param {string} swiftType
+     * @returns {string}
+     * @private
+     */
+    renderParameterType(swiftType) {
+        return this.isNoncopyable(swiftType) ? `borrowing ${swiftType}` : swiftType;
+    }
+
+    /**
+     * In noncopyable mode, replaces a container Swift cannot form around a noncopyable type, and warns.
+     * `JSUndefinedOr` and `Dictionary` need a copyable element.
+     * @param {string} swiftType - The type rendered for copyable wrappers
+     * @param {string} elementType
+     * @param {(element: string) => string} makeReplacement - Builds the replacement from the element's `copyableFallback`
+     * @param {ts.Node} node
+     * @returns {string}
+     * @private
+     */
+    replaceNoncopyableContainer(swiftType, elementType, makeReplacement, node) {
+        if (!this.isNoncopyable(elementType)) return swiftType;
+        const replacement = makeReplacement(this.copyableFallback(elementType));
+        this.diagnosticEngine.print(
+            "warning",
+            `${swiftType} cannot hold the noncopyable type ${elementType}; using ${replacement}`,
+            node
+        );
+        return replacement;
     }
 
     /**
@@ -324,10 +396,15 @@ export class TypeProcessor {
             }
 
             const swiftType = this.visitType(type, decl);
-            const annotation = this.renderMacroAnnotation("JSGetter", args);
-
             this.emitDocComment(decl, { indent: "" });
-            this.swiftLines.push(`${annotation} var ${swiftVarName}: ${swiftType}`);
+            if (this.isNoncopyable(swiftType)) {
+                const annotation = this.renderMacroAnnotation("JSGetterFunction", args);
+                const effects = this.renderEffects({ isAsync: false });
+                this.swiftLines.push(`${annotation} func ${swiftVarName}() ${effects} -> ${swiftType}`);
+            } else {
+                const annotation = this.renderMacroAnnotation("JSGetter", args);
+                this.swiftLines.push(`${annotation} var ${swiftVarName}: ${swiftType}`);
+            }
             this.swiftLines.push("");
         }
     }
@@ -827,7 +904,7 @@ export class TypeProcessor {
         const annotation = this.renderMacroAnnotation("JSClass", args);
         const className = this.renderIdentifier(swiftName);
         this.emitDocComment(node, { indent: "" });
-        this.swiftLines.push(`${annotation} struct ${className} {`);
+        this.swiftLines.push(this.renderWrapperStructLine(annotation, className));
 
         // Process members in declaration order
         for (const member of node.members) {
@@ -899,7 +976,7 @@ export class TypeProcessor {
         if (docNode) {
             this.emitDocComment(docNode, { indent: "" });
         }
-        this.swiftLines.push(`${annotation} struct ${typeName} {`);
+        this.swiftLines.push(this.renderWrapperStructLine(annotation, typeName));
 
         // Collect all declarations with their positions to preserve order
         /** @type {Array<{ decl: ts.Node, symbol: ts.Symbol, position: number }>} */
@@ -953,7 +1030,7 @@ export class TypeProcessor {
             const typeArgs = this.checker.getTypeArguments(/** @type {ts.TypeReference} */ (type));
             if (typeArgs && typeArgs.length > 0) {
                 const elementType = this.visitType(typeArgs[0], node);
-                return `[${elementType}]`;
+                return this.isNoncopyable(elementType) ? `UniqueArray<${elementType}>` : `[${elementType}]`;
             }
             return "[JSObject]";
         }
@@ -961,6 +1038,11 @@ export class TypeProcessor {
         const recordType = this.convertRecordType(type, typeArguments, node);
         if (recordType) {
             return recordType;
+        }
+
+        const nullableType = this.convertNullableUnion(type, node);
+        if (nullableType) {
+            return nullableType;
         }
 
         // Treat A<B> and A<C> as the same type
@@ -977,29 +1059,8 @@ export class TypeProcessor {
          */
         const convert = (type) => {
             const originalType = type;
-            // Handle nullable/undefined unions (e.g. T | null, T | undefined)
             const isUnionType = (type.flags & ts.TypeFlags.Union) !== 0;
             if (isUnionType) {
-                /** @type {ts.UnionType} */
-                // @ts-ignore
-                const unionType = type;
-                const unionTypes = unionType.types;
-                const hasNull = unionTypes.some(t => (t.flags & ts.TypeFlags.Null) !== 0);
-                const hasUndefined = unionTypes.some(t => (t.flags & ts.TypeFlags.Undefined) !== 0);
-                const nonNullableTypes = unionTypes.filter(
-                    t => (t.flags & ts.TypeFlags.Null) === 0 && (t.flags & ts.TypeFlags.Undefined) === 0
-                );
-                if (nonNullableTypes.length === 1 && (hasNull || hasUndefined)) {
-                    const wrapped = this.visitType(nonNullableTypes[0], node);
-                    if (hasNull && hasUndefined) {
-                        return "JSObject";
-                    }
-                    if (hasNull) {
-                        return `Optional<${wrapped}>`;
-                    }
-                    return `JSUndefinedOr<${wrapped}>`;
-                }
-
                 const stringLiteralUnion = this.getStringLiteralUnionLiterals(type);
                 if (stringLiteralUnion && stringLiteralUnion.length > 0) {
                     const typeName = this.deriveTypeName(originalType) ?? this.deriveTypeName(type);
@@ -1060,7 +1121,9 @@ export class TypeProcessor {
                 return "JSObject";
             }
             this.seenTypes.set(type, node);
-            return this.renderTypeIdentifier(typeName);
+            const wrapperName = this.renderTypeIdentifier(typeName);
+            this.wrapperTypeNames.add(wrapperName);
+            return wrapperName;
         }
         const swiftType = convert(type);
         this.processedTypes.set(type, swiftType);
@@ -1097,7 +1160,40 @@ export class TypeProcessor {
         }
 
         const valueSwiftType = this.visitType(valueType, node);
-        return `[String: ${valueSwiftType}]`;
+        return this.replaceNoncopyableContainer(`[String: ${valueSwiftType}]`, valueSwiftType, (e) => `[String: ${e}]`, node);
+    }
+
+    /**
+     * Convert a `T | null` or `T | undefined` TypeScript type into a Swift optional type.
+     * @param {ts.Type} type
+     * @param {ts.Node} node
+     * @returns {string | null}
+     * @private
+     */
+    convertNullableUnion(type, node) {
+        if ((type.flags & ts.TypeFlags.Union) === 0) {
+            return null;
+        }
+        /** @type {ts.UnionType} */
+        // @ts-ignore
+        const unionType = type;
+        const unionTypes = unionType.types;
+        const hasNull = unionTypes.some(t => (t.flags & ts.TypeFlags.Null) !== 0);
+        const hasUndefined = unionTypes.some(t => (t.flags & ts.TypeFlags.Undefined) !== 0);
+        const nonNullableTypes = unionTypes.filter(
+            t => (t.flags & ts.TypeFlags.Null) === 0 && (t.flags & ts.TypeFlags.Undefined) === 0
+        );
+        if (nonNullableTypes.length !== 1 || !(hasNull || hasUndefined)) {
+            return null;
+        }
+        const wrapped = this.visitType(nonNullableTypes[0], node);
+        if (hasNull && hasUndefined) {
+            return "JSObject";
+        }
+        if (hasNull) {
+            return `Optional<${wrapped}>`;
+        }
+        return this.replaceNoncopyableContainer(`JSUndefinedOr<${wrapped}>`, wrapped, () => `Optional<${wrapped}>`, node);
     }
 
     /**
@@ -1153,12 +1249,18 @@ export class TypeProcessor {
         const getterArgs = [];
         if (needsJSGetterName) getterArgs.push(`jsName: "${this.escapeForSwiftStringLiteral(property.jsName)}"`);
         if (fromArg) getterArgs.push(fromArg);
-        const getterAnnotation = this.renderMacroAnnotation("JSGetter", getterArgs);
         const staticKeyword = isStatic ? "static " : "";
 
         // Always render getter
         this.emitDocComment(node, { indent: "    " });
-        this.swiftLines.push(`    ${getterAnnotation} ${staticKeyword}var ${swiftName}: ${type}`);
+        if (this.isNoncopyable(type)) {
+            const getterAnnotation = this.renderMacroAnnotation("JSGetterFunction", getterArgs);
+            const effects = this.renderEffects({ isAsync: false });
+            this.swiftLines.push(`    ${getterAnnotation} ${staticKeyword}func ${swiftName}() ${effects} -> ${type}`);
+        } else {
+            const getterAnnotation = this.renderMacroAnnotation("JSGetter", getterArgs);
+            this.swiftLines.push(`    ${getterAnnotation} ${staticKeyword}var ${swiftName}: ${type}`);
+        }
 
         // Render setter if not readonly
         if (!property.isReadonly) {
@@ -1171,7 +1273,7 @@ export class TypeProcessor {
             if (needsJSNameField) setterArgs.push(`jsName: "${this.escapeForSwiftStringLiteral(property.jsName)}"`);
             if (fromArg) setterArgs.push(fromArg);
             const annotation = this.renderMacroAnnotation("JSSetter", setterArgs);
-            this.swiftLines.push(`    ${annotation} ${staticKeyword}func ${this.renderIdentifier(setterName)}(_ value: ${type}) ${this.renderEffects({ isAsync: false })}`);
+            this.swiftLines.push(`    ${annotation} ${staticKeyword}func ${this.renderIdentifier(setterName)}(_ value: ${this.renderParameterType(type)}) ${this.renderEffects({ isAsync: false })}`);
         }
     }
 
@@ -1261,7 +1363,7 @@ export class TypeProcessor {
             const param = this.visitSignatureParameter(p, node);
             const paramName = this.renderIdentifier(p.name);
             const type = param.type;
-            params.push(`_ ${paramName}: ${type}`);
+            params.push(`_ ${paramName}: ${this.renderParameterType(type)}`);
         }
         return params.join(", ");
     }
