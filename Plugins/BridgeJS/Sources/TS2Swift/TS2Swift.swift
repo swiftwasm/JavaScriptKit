@@ -95,7 +95,8 @@ public func invokeTS2Swift(
     tsconfigPath: String,
     nodePath: URL,
     progress: ProgressReporting,
-    outputPath: String? = nil
+    outputPath: String? = nil,
+    noncopyableWrappers: Bool = false
 ) throws -> String {
     let ts2swiftPath = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent()
@@ -108,6 +109,9 @@ public func invokeTS2Swift(
     }
     if let outputPath = outputPath {
         arguments.append(contentsOf: ["--output", outputPath])
+    }
+    if noncopyableWrappers {
+        arguments.append("--noncopyable-wrappers")
     }
 
     progress.print("Running ts2swift...")

@@ -229,5 +229,8 @@ struct AnyCounter: Counter, _BridgedSwiftProtocolWrapper {
 | Existential protocol composition: `any Protocol1 & Protocol2` | ❌ |
 | Generic requirements | ❌ |
 | Protocol-valued properties, parameters, or results in requirements | ❌ |
+| Requirements inside `#if` | ✅ |
 
 > Note: For supported requirement types, see <doc:Exporting-Swift-Function>, <doc:Exporting-Swift-Optional>, and <doc:Exporting-Swift-Enum>.
+
+> Note: BridgeJS bridges the requirements of every clause of an `#if`, whichever clause is active. It wraps the members it generates for requirements that name `UniqueArray` in `#if compiler(>=6.4)`; any other requirement must name only types that exist in every build, and two clauses must not declare requirements with the same name.

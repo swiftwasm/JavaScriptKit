@@ -489,6 +489,8 @@ class IdentityCacheBenchmarkIdentity {
 }
 
 @JS func run() {
+    runImportedObjectBenchmarks()
+    runNoncopyableImportedObjectBenchmarks()
 
     let call = Benchmark("Call")
 

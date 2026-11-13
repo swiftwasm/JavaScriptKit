@@ -204,6 +204,18 @@ public macro JS(
 public macro JSGetter(jsName: JSName? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSGetterMacro")
 
+/// A macro that reads a JavaScript property through a throwing function.
+///
+/// Use it instead of ``JSGetter(jsName:from:)`` when the property's type is a noncopyable `@JSClass` wrapper:
+/// Swift rejects throwing getters of noncopyable type.
+///
+/// ```swift
+/// @JSGetterFunction func style() throws(JSException) -> JSCSSStyleDeclaration
+/// ```
+@attached(body)
+public macro JSGetterFunction(jsName: JSName? = nil, from: JSImportFrom? = nil) =
+    #externalMacro(module: "BridgeJSMacros", type: "JSGetterFunctionMacro")
+
 /// A macro that generates a Swift function body that writes a value to JavaScript.
 ///
 /// This macro is used by BridgeJS-generated Swift declarations.
@@ -269,7 +281,18 @@ public macro JSFunction(jsName: JSName? = nil, from: JSImportFrom? = nil) =
 ///   Use `.snippet("/path/to/module.js")` to construct a named class export from a file rooted at the Swift target,
 ///   or `.module("@scope/package")` to construct a named class export from an external module.
 ///   Pass `jsName: .default` to construct the module's default export.
-@attached(member, names: named(jsObject), named(init(unsafelyWrapping:)))
-@attached(extension, conformances: _JSBridgedClass)
+///
+/// On a `~Copyable` struct, the wrapper owns a `JSUniqueRef` instead of a `JSObject` and conforms to
+/// `_JSUniqueBridgedClass`.
+@attached(
+    member,
+    names: named(jsObject),
+    named(init(unsafelyWrapping:)),
+    named(jsRef),
+    named(init(unsafelyAdopting:)),
+    named(jsID),
+    named(takeJSRef)
+)
+@attached(extension, conformances: _JSBridgedClass, _JSUniqueBridgedClass)
 public macro JSClass(jsName: JSName? = nil, from: JSImportFrom? = nil) =
     #externalMacro(module: "BridgeJSMacros", type: "JSClassMacro")

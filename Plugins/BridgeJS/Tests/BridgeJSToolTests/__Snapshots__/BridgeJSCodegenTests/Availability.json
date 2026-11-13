@@ -1,0 +1,635 @@
+{
+  "exported" : {
+    "aliases" : [
+      {
+        "availability" : [
+          "@available(macOS 14.0, *)"
+        ],
+        "swiftCallName" : "Tag",
+        "underlying" : {
+          "swiftHeapObject" : {
+            "_0" : "TagReference"
+          }
+        }
+      }
+    ],
+    "classes" : [
+      {
+        "availability" : [
+          "@available(macOS 14.0, *)"
+        ],
+        "constructor" : {
+          "abiName" : "bjs_Counter_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "isFinal" : true,
+        "methods" : [
+
+        ],
+        "name" : "Counter",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Counter"
+      },
+      {
+        "constructor" : {
+          "abiName" : "bjs_Library_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+
+          ]
+        },
+        "methods" : [
+
+        ],
+        "name" : "Library",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "Library"
+      },
+      {
+        "availability" : [
+          "@available(macOS 14.0, *)"
+        ],
+        "constructor" : {
+          "abiName" : "bjs_TagReference_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "name",
+              "name" : "name",
+              "type" : {
+                "string" : {
+
+                }
+              }
+            }
+          ]
+        },
+        "isFinal" : true,
+        "methods" : [
+
+        ],
+        "name" : "TagReference",
+        "properties" : [
+
+        ],
+        "swiftCallName" : "TagReference"
+      }
+    ],
+    "enums" : [
+      {
+        "availability" : [
+          "@available(macOS 14.0, iOS 17.0, *)"
+        ],
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "north"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "south"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Direction",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Direction",
+        "tsFullPath" : "Direction"
+      },
+      {
+        "availability" : [
+          "@available(macOS 15.0, *)"
+        ],
+        "cases" : [
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "low"
+          },
+          {
+            "associatedValues" : [
+
+            ],
+            "name" : "high"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Level",
+        "rawType" : "String",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Level",
+        "tsFullPath" : "Level"
+      },
+      {
+        "availability" : [
+          "@available(macOS 14.0, *)"
+        ],
+        "cases" : [
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "circle"
+          },
+          {
+            "associatedValues" : [
+              {
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "square"
+          }
+        ],
+        "emitStyle" : "const",
+        "name" : "Shape",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Shape",
+        "tsFullPath" : "Shape"
+      },
+      {
+        "availability" : [
+          "@available(macOS 14.0, *)"
+        ],
+        "cases" : [
+
+        ],
+        "emitStyle" : "const",
+        "name" : "Geometry",
+        "staticMethods" : [
+
+        ],
+        "staticProperties" : [
+
+        ],
+        "swiftCallName" : "Geometry",
+        "tsFullPath" : "Geometry"
+      }
+    ],
+    "exposeToGlobal" : false,
+    "functions" : [
+      {
+        "abiName" : "bjs_mix",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "mix",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "point",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "Point"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "body",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModule5PointV5LevelO_9DirectionO",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "swiftStruct" : {
+                        "_0" : "Point"
+                      }
+                    },
+                    {
+                      "rawValueEnum" : {
+                        "_0" : "Level",
+                        "_1" : "String"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "caseEnum" : {
+                      "_0" : "Direction"
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_loadPoint",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "loadPoint",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "swiftStruct" : {
+            "_0" : "Point"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_countObjects",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "countObjects",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "body",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "10TestModuleSa17NoncopyableObjectV5PointV_Si",
+                  "moduleName" : "TestModule",
+                  "parameters" : [
+                    {
+                      "array" : {
+                        "_0" : {
+                          "jsUniqueObject" : {
+                            "_0" : "NoncopyableObject"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "swiftStruct" : {
+                        "_0" : "Point"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      }
+    ],
+    "protocols" : [
+      {
+        "availability" : [
+          "@available(macOS 14.0, *)"
+        ],
+        "methods" : [
+          {
+            "abiName" : "bjs_Source_value",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "value",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "Source",
+        "properties" : [
+
+        ]
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_PointSource_point",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "point",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "swiftStruct" : {
+                "_0" : "Point"
+              }
+            }
+          }
+        ],
+        "name" : "PointSource",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "name" : "origin",
+            "type" : {
+              "swiftStruct" : {
+                "_0" : "Point"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "structs" : [
+      {
+        "availability" : [
+          "@available(macOS 14.0, *)"
+        ],
+        "methods" : [
+
+        ],
+        "name" : "Point",
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "x",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Point"
+      },
+      {
+        "availability" : [
+          "@available(macOS 14.0, *)"
+        ],
+        "methods" : [
+
+        ],
+        "name" : "Box",
+        "namespace" : [
+          "Geometry"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "side",
+            "namespace" : [
+              "Geometry"
+            ],
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Geometry.Box"
+      },
+      {
+        "availability" : [
+          "@available(macOS 14.0, *)"
+        ],
+        "methods" : [
+
+        ],
+        "name" : "Shelf",
+        "namespace" : [
+          "Library"
+        ],
+        "properties" : [
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "label",
+            "namespace" : [
+              "Library"
+            ],
+            "type" : {
+              "string" : {
+
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "Library.Shelf"
+      }
+    ]
+  },
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "availability" : [
+              "@available(macOS 14.0, *)"
+            ],
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "id",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "Element",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "element",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "Element"
+                  }
+                }
+              }
+            ],
+            "name" : "Canvas",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "isNoncopyable" : true,
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "id",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "NoncopyableObject",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}

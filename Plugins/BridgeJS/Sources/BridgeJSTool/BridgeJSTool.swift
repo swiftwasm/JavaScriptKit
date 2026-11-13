@@ -161,7 +161,8 @@ import BridgeJSUtilities
                         tsconfigPath: tsconfigPath,
                         nodePath: nodePath,
                         progress: progress,
-                        outputPath: bridgeJSMacrosPath.path
+                        outputPath: bridgeJSMacrosPath.path,
+                        noncopyableWrappers: config.noncopyableWrappers ?? false
                     )
                 }
                 generatedMacrosPath = bridgeJSMacrosPath.path
@@ -221,12 +222,14 @@ import BridgeJSUtilities
                 printStderr(diagnostic.formattedDescription(fileName: file))
             }
 
+            let availability = AvailabilityIndex(skeletons: [skeleton] + dependencySkeletons.map(\.skeleton))
             var exporter: ExportSwift?
             if let skeleton = skeleton.exported {
                 exporter = ExportSwift(
                     progress: progress,
                     moduleName: moduleName,
-                    skeleton: skeleton
+                    skeleton: skeleton,
+                    availability: availability
                 )
             }
             var importer: ImportTS?
@@ -234,13 +237,14 @@ import BridgeJSUtilities
                 importer = ImportTS(
                     progress: progress,
                     moduleName: moduleName,
-                    skeleton: skeleton
+                    skeleton: skeleton,
+                    availability: availability
                 )
             }
 
             // Generate unified closure support for both import/export to avoid duplicate symbols when concatenating.
             let closureSupport = try withSpan("ClosureCodegen.renderSupport") {
-                return try ClosureCodegen().renderSupport(for: skeleton)
+                return try ClosureCodegen(availability: availability).renderSupport(for: skeleton)
             }
 
             let importResult = try withSpan("ImportTS.finalize") {

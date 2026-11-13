@@ -52,3 +52,11 @@ node --expose-gc run.js --filter=Identity/none
 | `churnObjects` | Create, roundtrip, release cycle (FinalizationRegistry cleanup pressure) |
 | `swiftConsumesSameObject` | JS passes same object to Swift repeatedly |
 | `swiftCreatesObject` | Fresh object creation overhead (cache miss path) |
+
+## Imported Object Benchmarks
+
+`Imported object/copyable/...` and `Imported object/noncopyable/...` run the same loops through a copyable `@JSClass` wrapper and a `~Copyable` one. The `convert` rows build each wrapper from a `JSObject` with `init(unsafelyWrapping:)`.
+
+```bash
+node --expose-gc run.js --filter='Imported object/'
+```

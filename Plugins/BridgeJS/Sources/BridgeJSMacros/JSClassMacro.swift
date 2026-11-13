@@ -64,6 +64,44 @@ extension JSClassMacro: MemberMacro {
         let memberAccessModifier = synthesizedMemberAccessModifier(for: declaration).map { "\($0) " } ?? ""
 
         let existingMembers = declaration.memberBlock.members
+        let hasUnsafelyWrappingInit = existingMembers.contains { member in
+            guard let initializer = member.decl.as(InitializerDeclSyntax.self) else { return false }
+            let parameters = initializer.signature.parameterClause.parameters
+            guard let firstParam = parameters.first else { return false }
+            let externalName = firstParam.firstName.text
+            let internalName = firstParam.secondName?.text
+            return externalName == "unsafelyWrapping" && internalName == "jsObject"
+        }
+
+        if JSMacroHelper.isNoncopyable(structDecl) {
+            members.append(DeclSyntax("\(raw: memberAccessModifier)let jsRef: JSUniqueRef"))
+            members.append(
+                DeclSyntax(
+                    """
+                    \(raw: memberAccessModifier)init(unsafelyAdopting jsRef: consuming JSUniqueRef) {
+                        self.jsRef = jsRef
+                    }
+                    """
+                )
+            )
+            if !hasUnsafelyWrappingInit {
+                members.append(
+                    DeclSyntax(
+                        """
+                        \(raw: memberAccessModifier)init(unsafelyWrapping jsObject: consuming JSObject) {
+                            self.init(unsafelyAdopting: JSUniqueRef(taking: consume jsObject))
+                        }
+                        """
+                    )
+                )
+            }
+            members.append(DeclSyntax("\(raw: memberAccessModifier)var jsID: Int32 { jsRef.jsID }"))
+            members.append(
+                DeclSyntax("\(raw: memberAccessModifier)consuming func takeJSRef() -> JSUniqueRef { jsRef }")
+            )
+            return members
+        }
+
         let hasJSObjectProperty = existingMembers.contains { member in
             guard let variable = member.decl.as(VariableDeclSyntax.self) else { return false }
             return variable.bindings.contains { binding in
@@ -73,15 +111,6 @@ extension JSClassMacro: MemberMacro {
 
         if !hasJSObjectProperty {
             members.append(DeclSyntax("\(raw: memberAccessModifier)let jsObject: JSObject"))
-        }
-
-        let hasUnsafelyWrappingInit = existingMembers.contains { member in
-            guard let initializer = member.decl.as(InitializerDeclSyntax.self) else { return false }
-            let parameters = initializer.signature.parameterClause.parameters
-            guard let firstParam = parameters.first else { return false }
-            let externalName = firstParam.firstName.text
-            let internalName = firstParam.secondName?.text
-            return externalName == "unsafelyWrapping" && internalName == "jsObject"
         }
 
         if !hasUnsafelyWrappingInit {
@@ -123,9 +152,13 @@ extension JSClassMacro: ExtensionMacro {
             return []
         }
 
-        let conformanceList = protocols.map { $0.trimmed.description }.joined(separator: ", ")
+        let wanted = JSMacroHelper.isNoncopyable(structDecl) ? "_JSUniqueBridgedClass" : "_JSBridgedClass"
+        let conformances = protocols.map { $0.trimmed.description }.filter {
+            $0 == wanted || $0.hasSuffix(".\(wanted)")
+        }
+        guard !conformances.isEmpty else { return [] }
         return [
-            try ExtensionDeclSyntax("extension \(type.trimmed): \(raw: conformanceList) {}")
+            try ExtensionDeclSyntax("extension \(type.trimmed): \(raw: conformances.joined(separator: ", ")) {}")
         ]
     }
 

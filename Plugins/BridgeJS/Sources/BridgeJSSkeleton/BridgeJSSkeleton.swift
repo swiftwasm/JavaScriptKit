@@ -286,6 +286,8 @@ public struct BridgeIntegerType: Codable, Equatable, Hashable, Sendable {
 public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case integer(BridgeIntegerType), float, double, string, bool, jsObject(String?), jsValue, swiftHeapObject(String),
         void
+    /// A noncopyable `@JSClass` wrapper, or `JSUniqueRef` when the name is `nil`.
+    case jsUniqueObject(String?)
     case unsafePointer(UnsafePointerType)
     indirect case nullable(BridgeType, JSOptionalKind)
     indirect case array(BridgeType)
@@ -843,6 +845,7 @@ public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedTy
     public let namespace: [String]?
     public let jsNamespace: [String]?
     public var documentation: String?
+    public var availability: [String]?
 
     public init(
         name: String,
@@ -854,7 +857,8 @@ public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedTy
         methods: [ExportedFunction] = [],
         namespace: [String]?,
         jsNamespace: [String]? = nil,
-        documentation: String? = nil
+        documentation: String? = nil,
+        availability: [String]? = nil
     ) {
         self.name = name
         self.jsName = jsName
@@ -866,6 +870,7 @@ public struct ExportedStruct: Codable, Equatable, Sendable, NamespacedExportedTy
         self.namespace = namespace
         self.jsNamespace = jsNamespace
         self.documentation = documentation
+        self.availability = availability
     }
 }
 
@@ -938,6 +943,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable, NamespacedExportedType
     public var staticMethods: [ExportedFunction]
     public var staticProperties: [ExportedProperty] = []
     public var documentation: String?
+    public var availability: [String]?
     public var enumType: EnumType {
         if cases.isEmpty {
             return .namespace
@@ -968,7 +974,8 @@ public struct ExportedEnum: Codable, Equatable, Sendable, NamespacedExportedType
         emitStyle: EnumEmitStyle,
         staticMethods: [ExportedFunction] = [],
         staticProperties: [ExportedProperty] = [],
-        documentation: String? = nil
+        documentation: String? = nil,
+        availability: [String]? = nil
     ) {
         self.name = name
         self.jsName = jsName
@@ -983,6 +990,7 @@ public struct ExportedEnum: Codable, Equatable, Sendable, NamespacedExportedType
         self.staticMethods = staticMethods
         self.staticProperties = staticProperties
         self.documentation = documentation
+        self.availability = availability
     }
 }
 
@@ -1024,6 +1032,7 @@ public struct ExportedProtocol: Codable, Equatable, NamespacedExportedType {
     public var documentation: String?
     public var inheritedJSProtocols: [String]?
     public var isGenericBridgeable: Bool?
+    public var availability: [String]?
 
     public init(
         name: String,
@@ -1034,7 +1043,8 @@ public struct ExportedProtocol: Codable, Equatable, NamespacedExportedType {
         jsNamespace: [String]? = nil,
         documentation: String? = nil,
         inheritedJSProtocols: [String]? = nil,
-        isGenericBridgeable: Bool? = nil
+        isGenericBridgeable: Bool? = nil,
+        availability: [String]? = nil
     ) {
         self.name = name
         self.jsName = jsName
@@ -1045,6 +1055,7 @@ public struct ExportedProtocol: Codable, Equatable, NamespacedExportedType {
         self.documentation = documentation
         self.inheritedJSProtocols = inheritedJSProtocols
         self.isGenericBridgeable = isGenericBridgeable
+        self.availability = availability
     }
 }
 
@@ -1097,6 +1108,7 @@ public struct ExportedClass: Codable, NamespacedExportedType {
     public var identityMode: Bool?  // nil = use config default, true/false = override
     public var documentation: String?
     public var isFinal: Bool?
+    public var availability: [String]?
 
     public init(
         name: String,
@@ -1110,7 +1122,8 @@ public struct ExportedClass: Codable, NamespacedExportedType {
         jsNamespace: [String]? = nil,
         identityMode: Bool? = nil,
         documentation: String? = nil,
-        isFinal: Bool? = nil
+        isFinal: Bool? = nil,
+        availability: [String]? = nil
     ) {
         self.name = name
         self.jsName = jsName
@@ -1124,6 +1137,7 @@ public struct ExportedClass: Codable, NamespacedExportedType {
         self.identityMode = identityMode
         self.documentation = documentation
         self.isFinal = isFinal
+        self.availability = availability
     }
 }
 
@@ -1219,10 +1233,12 @@ public struct ExportedProperty: Codable, Equatable, Sendable {
 public struct ExportedAlias: Codable, Equatable, Sendable {
     public let swiftCallName: String
     public let underlying: BridgeType
+    public var availability: [String]?
 
-    public init(swiftCallName: String, underlying: BridgeType) {
+    public init(swiftCallName: String, underlying: BridgeType, availability: [String]? = nil) {
         self.swiftCallName = swiftCallName
         self.underlying = underlying
+        self.availability = availability
     }
 }
 
@@ -1686,6 +1702,9 @@ public struct ImportedTypeSkeleton: Codable {
     public let documentation: String?
     /// Source access level of the originating Swift `@JSClass` declaration.
     public let accessLevel: BridgeJSAccessLevel
+    /// `true` for a `~Copyable` `@JSClass` struct; `nil` otherwise.
+    public let isNoncopyable: Bool?
+    public let availability: [String]?
 
     public var resolvedJSName: String { jsName ?? name }
 
@@ -1699,7 +1718,9 @@ public struct ImportedTypeSkeleton: Codable {
         getters: [ImportedGetterSkeleton] = [],
         setters: [ImportedSetterSkeleton] = [],
         documentation: String? = nil,
-        accessLevel: BridgeJSAccessLevel = .internal
+        accessLevel: BridgeJSAccessLevel = .internal,
+        isNoncopyable: Bool? = nil,
+        availability: [String]? = nil
     ) {
         self.name = name
         self.jsName = jsName
@@ -1711,10 +1732,13 @@ public struct ImportedTypeSkeleton: Codable {
         self.setters = setters
         self.documentation = documentation
         self.accessLevel = accessLevel
+        self.isNoncopyable = isNoncopyable
+        self.availability = availability
     }
 
     private enum CodingKeys: String, CodingKey {
-        case name, jsName, from, constructor, methods, staticMethods, getters, setters, documentation, accessLevel
+        case name, jsName, from, constructor, methods, staticMethods, getters, setters, documentation, accessLevel,
+            isNoncopyable, availability
     }
 
     public init(from decoder: any Decoder) throws {
@@ -1729,6 +1753,8 @@ public struct ImportedTypeSkeleton: Codable {
         self.setters = try container.decode([ImportedSetterSkeleton].self, forKey: .setters)
         self.documentation = try container.decodeIfPresent(String.self, forKey: .documentation)
         self.accessLevel = try container.decodeIfPresent(BridgeJSAccessLevel.self, forKey: .accessLevel) ?? .internal
+        self.isNoncopyable = try container.decodeIfPresent(Bool.self, forKey: .isNoncopyable)
+        self.availability = try container.decodeIfPresent([String].self, forKey: .availability)
     }
 }
 
@@ -1969,6 +1995,8 @@ extension BridgeType {
             self = .void
         case "JSObject":
             self = .jsObject(nil)
+        case "JSUniqueRef":
+            self = .jsUniqueObject(nil)
         case "UnsafeRawPointer":
             self = .unsafePointer(.init(kind: .unsafeRawPointer))
         case "UnsafeMutableRawPointer":
@@ -1986,7 +2014,7 @@ extension BridgeType {
         case .nullable(let wrapped, let kind): return .nullable(wrapped.unaliased, kind)
         case .array(let element): return .array(element.unaliased)
         case .dictionary(let value): return .dictionary(value.unaliased)
-        case .bool, .integer, .float, .double, .string, .jsValue, .jsObject,
+        case .bool, .integer, .float, .double, .string, .jsValue, .jsObject, .jsUniqueObject,
             .swiftHeapObject, .unsafePointer, .swiftProtocol, .void,
             .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct,
             .namespaceEnum, .closure, .generic:
@@ -2002,7 +2030,7 @@ extension BridgeType {
         case .float: return .f32
         case .double: return .f64
         case .string: return nil
-        case .jsObject: return .i32
+        case .jsObject, .jsUniqueObject: return .i32
         case .jsValue: return nil
         case .swiftHeapObject:
             // UnsafeMutableRawPointer is returned as an i32 pointer
@@ -2079,6 +2107,9 @@ extension BridgeType {
         case .jsObject(let name):
             let typeName = name ?? "JSObject"
             return "\(Self.mangleQualifiedName(typeName))C"
+        case .jsUniqueObject(let name):
+            let typeName = name ?? "JSUniqueRef"
+            return "\(Self.mangleQualifiedName(typeName))V"
         case .jsValue:
             return "7JSValueV"
         case .swiftHeapObject(let name):

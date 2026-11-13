@@ -83,6 +83,26 @@ const { exports } = await init({
 
 **If you chose global or module-backed lookup:** Do not pass the class in `getImports()`; the runtime resolves it from `globalThis` or the copied module.
 
+## Noncopyable wrappers
+
+A `@JSClass` struct declared `~Copyable` is a noncopyable wrapper. Each value holds its own reference to the JavaScript object, with no `JSObject` instance behind it, and releases the reference when the value is destroyed.
+
+```swift
+@JSClass struct Element: ~Copyable {
+    @JSFunction func appendChild(_ child: borrowing Element) throws(JSException)
+    @JSFunction func removeChild(_ child: consuming Element) throws(JSException)
+    @JSGetterFunction func firstElementChild() throws(JSException) -> Element?
+}
+```
+
+- A parameter of a wrapper type is `borrowing` or `consuming`. A `borrowing` parameter lends the reference for the call; a `consuming` one releases it when the call returns.
+- Read a property of a wrapper type with `@JSGetterFunction func name() throws(JSException) -> T`. Swift rejects a throwing getter of a noncopyable type, so BridgeJS reports an error for `@JSGetter var` of a wrapper type.
+- An array of wrappers is a `UniqueArray`, which Swift 6.4's standard library adds; `[T]` of a wrapper type is an error. If the package also builds with older Swift versions, put the declarations that name `UniqueArray` inside `#if compiler(>=6.4)`. BridgeJS wraps the code it generates for a declaration in the same `#if` only when the declaration's signature names `UniqueArray`, so keep other `@JS` and `@JSFunction` declarations outside it.
+- Dictionaries of wrappers are not supported, and neither are wrapper-typed `@JS struct` fields or `@JS enum` associated values.
+- A wrapper is not `Sendable`: its reference is valid only on the thread that created it.
+- `init(unsafelyWrapping:)` converts a `JSObject` into a wrapper. It takes over the `JSObject`'s reference when no other Swift reference to that `JSObject` exists, and otherwise takes a reference of its own. `withView(as:_:)` lends the object to a closure as another wrapper type without taking a reference.
+- `UniqueArray` is available from version 27 of Apple's operating systems. BridgeJS marks the declarations it generates that name `UniqueArray` with `@available(anyAppleOS 27.0, *)`, so a native build for an older version needs the same attribute on your declarations that name `UniqueArray`. A stored `UniqueArray` property of a `@JS class` cannot take the attribute, so such a class builds natively only for version 27 and later. WebAssembly builds are not affected.
+
 ## Macro options
 
 For optional parameters (`jsName`, `from`, etc.), see the API reference: ``JSClass(jsName:from:)``, ``JSFunction(jsName:from:)``, ``JSGetter(jsName:from:)``, and ``JSSetter(jsName:from:)``.

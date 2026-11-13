@@ -13,6 +13,7 @@ enum JSMacroMessage: String, DiagnosticMessage {
     case setterRequiresParameter = "@JSSetter function must have at least one parameter."
     case setterRequiresThrows = "@JSSetter function must declare throws(JSException)."
     case jsFunctionRequiresThrows = "@JSFunction throws must be declared as throws(JSException)."
+    case jsGetterFunctionRequiresThrows = "@JSGetterFunction throws must be declared as throws(JSException)."
     case requiresJSClass = "JavaScript members must be declared inside a @JSClass struct."
     case jsClassRequiresAtLeastInternal =
         "@JSClass does not support private/fileprivate access level. Use internal, package, or public."
@@ -36,6 +37,8 @@ struct JSMacroFixItMessage: FixItMessage {
 
 enum JSMacroText {
     static let jsExceptionPropagation = "@JSFunction must propagate JavaScript errors as JSException."
+    static let jsGetterFunctionExceptionPropagation =
+        "@JSGetterFunction must propagate JavaScript errors as JSException."
     static let jsSetterExceptionPropagation = "@JSSetter must propagate JavaScript errors as JSException."
 }
 
@@ -60,6 +63,22 @@ enum JSMacroHelper {
         return modifiers.contains { modifier in
             modifier.name.tokenKind == .keyword(.static) || modifier.name.tokenKind == .keyword(.class)
         }
+    }
+
+    static func isNoncopyable(_ structDecl: StructDeclSyntax) -> Bool {
+        structDecl.inheritanceClause?.inheritedTypes.contains { inherited in
+            guard let suppressed = inherited.type.as(SuppressedTypeSyntax.self) else { return false }
+            let name = suppressed.type.trimmedDescription
+            return name == "Copyable" || name == "Swift.Copyable"
+        } ?? false
+    }
+
+    static func enclosingTypeIsNoncopyable(in context: some MacroExpansionContext) -> Bool {
+        enclosingTypeSyntax(from: context)?.as(StructDeclSyntax.self).map(isNoncopyable) ?? false
+    }
+
+    static func selfArgument(in context: some MacroExpansionContext) -> String {
+        enclosingTypeIsNoncopyable(in: context) ? "self.jsRef" : "self.jsObject"
     }
 
     static func isVoidReturn(_ returnType: TypeSyntax?) -> Bool {
@@ -159,6 +178,8 @@ enum JSMacroHelper {
         signature: FunctionSignatureSyntax,
         on node: Syntax,
         in context: some MacroExpansionContext,
+        message: JSMacroMessage = .jsFunctionRequiresThrows,
+        noteMessage: String = JSMacroText.jsExceptionPropagation,
         additionalNotes: [Note] = []
     ) {
         let throwsClause = signature.effectSpecifiers?.throwsClause
@@ -195,14 +216,14 @@ enum JSMacroHelper {
         }
 
         var notes: [Note] = [
-            jsExceptionPropagationNote(on: node)
+            jsExceptionPropagationNote(on: node, message: noteMessage)
         ]
         notes.append(contentsOf: additionalNotes)
 
         context.diagnose(
             Diagnostic(
                 node: node,
-                message: JSMacroMessage.jsFunctionRequiresThrows,
+                message: message,
                 notes: notes,
                 fixIts: [fixIt]
             )

@@ -4515,6 +4515,8 @@ extension BridgeType {
                 return tsName
             }
             return name ?? "any"
+        case .jsUniqueObject(let name):
+            return name ?? "any"
         case .jsValue:
             return "any"
         case .swiftHeapObject(let name):
