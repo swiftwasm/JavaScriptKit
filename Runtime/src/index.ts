@@ -780,6 +780,10 @@ export class SwiftRuntime {
                 this.memory.release(ref);
             },
 
+            swjs_share_unique: (ref: ref) => {
+                return this.memory.shareUnique(ref);
+            },
+
             swjs_release_remote: (tid: number, ref: ref) => {
                 if (!this.options.threadChannel) {
                     throw new Error(

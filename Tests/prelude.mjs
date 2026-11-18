@@ -232,6 +232,13 @@ export async function setupOptions(options, context) {
             importObject["JavaScriptEventLoopTestSupportTests"] = {
                 "isMainThread": () => context.isMainThread,
             }
+            importObject["JavaScriptKitTests"] = {
+                "retainUnique": (ref) => _swift.memory.retainUnique(_swift.memory.getObject(ref)),
+                "referenceCount": (ref) => {
+                    const state = _swift.memory._stateBySlot[ref & 0xffffff];
+                    return state >>> 24 === ref >>> 24 ? state & 0x7fffff : 0;
+                },
+            };
             const bridgeJSRuntimeTests = importObject["BridgeJSRuntimeTests"] || {};
             bridgeJSRuntimeTests["runJsWorks"] = () => {
                 const exports = getExports();

@@ -309,6 +309,13 @@ IMPORT_JS_FUNCTION(swjs_load_typed_array, void, (const JavaScriptObjectRef ref, 
 /// @param ref The target JavaScript object.
 IMPORT_JS_FUNCTION(swjs_release, void, (const JavaScriptObjectRef ref))
 
+/// Consumes `ref` and returns the reference that `swjs_get_prop` and the other imports return for the same object,
+/// so that `JSObject`s for one object have equal ids.
+///
+/// @param ref A reference owned by the caller.
+/// @returns A reference owned by the caller.
+IMPORT_JS_FUNCTION(swjs_share_unique, JavaScriptObjectRef, (const JavaScriptObjectRef ref))
+
 /// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in `object_tid` thread.
 ///
 /// @param object_tid The TID of the thread that owns the target object.

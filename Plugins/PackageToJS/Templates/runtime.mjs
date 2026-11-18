@@ -250,6 +250,9 @@ const globalVariable = globalThis;
 const SLOT_BITS = 24;
 const SLOT_MASK = (1 << SLOT_BITS) - 1;
 const GEN_MASK = (1 << (32 - SLOT_BITS)) - 1;
+// Set in the state of a slot the value map does not hold.
+const MAP_FREE = 1 << (SLOT_BITS - 1);
+const COUNT_MASK = MAP_FREE - 1;
 class JSObjectSpace {
     constructor() {
         this._slotByValue = new Map();
@@ -267,36 +270,42 @@ class JSObjectSpace {
         if (slot !== undefined) {
             const state = this._stateBySlot[slot];
             const nextState = (state + 1) >>> 0;
-            if ((nextState & SLOT_MASK) === 0) {
+            if ((nextState & COUNT_MASK) === 0) {
                 throw new RangeError(`Reference count overflow at slot ${slot}`);
             }
             this._stateBySlot[slot] = nextState;
             return ((nextState & ~SLOT_MASK) | slot) >>> 0;
         }
-        let newSlot;
-        let state;
-        if (this._freeSlotStack.length > 0) {
-            newSlot = this._freeSlotStack.pop();
-            const gen = this._stateBySlot[newSlot] >>> SLOT_BITS;
-            state = ((gen << SLOT_BITS) | 1) >>> 0;
+        const reference = this._allocate(value, 0);
+        this._slotByValue.set(value, reference & SLOT_MASK);
+        return reference;
+    }
+    // Returns a reference to a new slot the value map does not hold.
+    retainUnique(value) {
+        return this._allocate(value, MAP_FREE);
+    }
+    // Consumes `reference` and returns the reference `retain` returns for its value.
+    shareUnique(reference) {
+        const state = this._getValidatedSlotState(reference);
+        if ((state & MAP_FREE) === 0) {
+            return reference;
         }
-        else {
-            newSlot = this._values.length;
-            if (newSlot > SLOT_MASK) {
-                throw new RangeError(`Reference slot overflow: ${newSlot} exceeds ${SLOT_MASK}`);
-            }
-            state = 1;
+        const slot = reference & SLOT_MASK;
+        const value = this._values[slot];
+        if (this._slotByValue.has(value)) {
+            const shared = this.retain(value);
+            this.release(reference);
+            return shared;
         }
-        this._stateBySlot[newSlot] = state;
-        this._values[newSlot] = value;
-        this._slotByValue.set(value, newSlot);
-        return ((state & ~SLOT_MASK) | newSlot) >>> 0;
+        this._slotByValue.set(value, slot);
+        this._stateBySlot[slot] = (state & ~MAP_FREE) >>> 0;
+        return reference;
     }
     retainByRef(reference) {
         const state = this._getValidatedSlotState(reference);
         const slot = reference & SLOT_MASK;
         const nextState = (state + 1) >>> 0;
-        if ((nextState & SLOT_MASK) === 0) {
+        if ((nextState & COUNT_MASK) === 0) {
             throw new RangeError(`Reference count overflow at slot ${slot}`);
         }
         this._stateBySlot[slot] = nextState;
@@ -305,11 +314,13 @@ class JSObjectSpace {
     release(reference) {
         const state = this._getValidatedSlotState(reference);
         const slot = reference & SLOT_MASK;
-        if ((state & SLOT_MASK) > 1) {
+        if ((state & COUNT_MASK) > 1) {
             this._stateBySlot[slot] = (state - 1) >>> 0;
             return;
         }
-        this._slotByValue.delete(this._values[slot]);
+        if ((state & MAP_FREE) === 0) {
+            this._slotByValue.delete(this._values[slot]);
+        }
         this._values[slot] = undefined;
         const nextGen = ((state >>> SLOT_BITS) + 1) & GEN_MASK;
         this._stateBySlot[slot] = (nextGen << SLOT_BITS) >>> 0;
@@ -318,6 +329,25 @@ class JSObjectSpace {
     getObject(reference) {
         this._getValidatedSlotState(reference);
         return this._values[reference & SLOT_MASK];
+    }
+    _allocate(value, flags) {
+        let newSlot;
+        let state;
+        if (this._freeSlotStack.length > 0) {
+            newSlot = this._freeSlotStack.pop();
+            const gen = this._stateBySlot[newSlot] >>> SLOT_BITS;
+            state = ((gen << SLOT_BITS) | flags | 1) >>> 0;
+        }
+        else {
+            newSlot = this._values.length;
+            if (newSlot > SLOT_MASK) {
+                throw new RangeError(`Reference slot overflow: ${newSlot} exceeds ${SLOT_MASK}`);
+            }
+            state = flags | 1;
+        }
+        this._stateBySlot[newSlot] = state;
+        this._values[newSlot] = value;
+        return ((state & ~SLOT_MASK) | newSlot) >>> 0;
     }
     // Returns the packed state for the slot, after validating the reference.
     _getValidatedSlotState(reference) {
@@ -769,6 +799,9 @@ class SwiftRuntime {
             },
             swjs_release: (ref) => {
                 this.memory.release(ref);
+            },
+            swjs_share_unique: (ref) => {
+                return this.memory.shareUnique(ref);
             },
             swjs_release_remote: (tid, ref) => {
                 var _a;
