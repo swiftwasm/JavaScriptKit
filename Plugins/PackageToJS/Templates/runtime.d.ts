@@ -8,9 +8,12 @@ declare class JSObjectSpace {
     private _freeSlotStack;
     constructor();
     retain(value: any): number;
+    retainUnique(value: any): number;
+    shareUnique(reference: ref): number;
     retainByRef(reference: ref): number;
     release(reference: ref): void;
     getObject(reference: ref): any;
+    private _allocate;
     private _getValidatedSlotState;
 }
 

@@ -65,7 +65,7 @@ jobs:
       - name: Check if SwiftPM resources are stale
         run: |
           make regenerate_swiftpm_resources
-          git diff --exit-code Sources/JavaScriptKit/Runtime
+          git diff --exit-code Plugins/PackageToJS/Templates/runtime.mjs Plugins/PackageToJS/Templates/runtime.d.ts
       - run: swift test --package-path ./Plugins/PackageToJS
       - run: swift test --package-path ./Plugins/BridgeJS
       - name: Validate BridgeJS TypeScript declarations

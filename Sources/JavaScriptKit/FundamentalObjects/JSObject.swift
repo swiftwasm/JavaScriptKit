@@ -45,6 +45,11 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
         self.init(id: swjs_create_object())
     }
 
+    /// Creates an object for the value `ref` references.
+    public convenience init(_ ref: consuming JSUniqueRef) {
+        self.init(id: swjs_share_unique(JavaScriptObjectRef(bitPattern: ref.relinquish())))
+    }
+
     /// Creates a new object with the key-value pairs in the dictionary literal.
     ///
     /// - Parameter elements: A variadic list of key-value pairs where all keys are strings
