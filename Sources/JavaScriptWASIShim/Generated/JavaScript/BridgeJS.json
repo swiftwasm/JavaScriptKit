@@ -1,0 +1,361 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "jsName" : "console",
+            "methods" : [
+
+            ],
+            "name" : "HostConsole",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "log",
+                "parameters" : [
+                  {
+                    "name" : "line",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "error",
+                "parameters" : [
+                  {
+                    "name" : "line",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "jsName" : "crypto",
+            "methods" : [
+
+            ],
+            "name" : "HostCrypto",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "getRandomValues",
+                "parameters" : [
+                  {
+                    "name" : "array",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "HostUint8Array"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "length",
+                  "type" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "jsName" : "Uint8Array",
+            "methods" : [
+
+            ],
+            "name" : "HostUint8Array",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "jsName" : "Date",
+            "methods" : [
+
+            ],
+            "name" : "HostDate",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "now",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "jsName" : "performance",
+            "methods" : [
+
+            ],
+            "name" : "HostPerformance",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "now",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "length",
+                  "type" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "jsName" : "SharedArrayBuffer",
+            "methods" : [
+
+            ],
+            "name" : "HostSharedArrayBuffer",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "buffer",
+                  "type" : {
+                    "jsObject" : {
+                      "_0" : "HostSharedArrayBuffer"
+                    }
+                  }
+                }
+              ]
+            },
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "jsName" : "Int32Array",
+            "methods" : [
+
+            ],
+            "name" : "HostInt32Array",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "from" : "global",
+            "getters" : [
+
+            ],
+            "jsName" : "Atomics",
+            "methods" : [
+
+            ],
+            "name" : "HostAtomics",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "wait",
+                "parameters" : [
+                  {
+                    "name" : "array",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "HostInt32Array"
+                      }
+                    }
+                  },
+                  {
+                    "name" : "index",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "timeout",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "JavaScriptWASIShim",
+  "usedExternalModules" : [
+
+  ]
+}
