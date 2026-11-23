@@ -1,8 +1,8 @@
 import JavaScriptKit
 
 // The browser globals the shim calls, imported through BridgeJS. Together with JavaScriptKit's
-// runtime import `swjs_load_typed_array` (see `Random.swift`), they are everything the shim needs
-// from the host, so it needs no JavaScript beyond the glue BridgeJS generates.
+// runtime imports `swjs_load_typed_array` (see `Random.swift`) and `swjs_proc_exit` (see
+// `Exports.swift`), they are everything the shim needs from the host.
 //
 // These declarations stay outside the `#if` gate the rest of the module uses: BridgeJS generates
 // glue for them regardless of `#if`, and that glue refers to them.

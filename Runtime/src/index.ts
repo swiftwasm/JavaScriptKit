@@ -780,6 +780,10 @@ export class SwiftRuntime {
                 this.memory.release(ref);
             },
 
+            swjs_proc_exit: (code: number) => {
+                throw new ProcessExit(code);
+            },
+
             swjs_release_remote: (tid: number, ref: ref) => {
                 if (!this.options.threadChannel) {
                     throw new Error(
@@ -1075,3 +1079,12 @@ export class SwiftRuntime {
 /// the JavaScript side. Otherwise, the `swift_task_asyncMainDrainQueue` ends up with `abort()`
 /// because the event loop expects `exit()` call before the end of the event loop.
 class UnsafeEventLoopYield extends Error {}
+
+/// Thrown by the default `swjs_proc_exit` import when the Swift program exits
+/// without a WASI implementation (see `JavaScriptWASIShim`). A host can
+/// replace the import to handle the exit itself, such as with `process.exit`.
+export class ProcessExit extends Error {
+    constructor(readonly code: number) {
+        super(`Process exited with code ${code}`);
+    }
+}

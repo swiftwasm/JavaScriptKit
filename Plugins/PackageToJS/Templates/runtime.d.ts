@@ -213,6 +213,10 @@ declare class SwiftRuntime {
 }
 declare class UnsafeEventLoopYield extends Error {
 }
+declare class ProcessExit extends Error {
+    readonly code: number;
+    constructor(code: number);
+}
 
-export { SwiftRuntime };
+export { ProcessExit, SwiftRuntime };
 export type { SwiftRuntimeOptions, SwiftRuntimeThreadChannel };

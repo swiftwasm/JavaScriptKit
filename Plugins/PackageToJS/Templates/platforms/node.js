@@ -232,6 +232,15 @@ export async function defaultNodeSetup(options = {}) {
                 process.exit(code);
             }
         },
+/* #else */
+        addToCoreImports(importObject) {
+            importObject["javascript_kit"]["swjs_proc_exit"] = (code) => {
+                if (options.onExit) {
+                    options.onExit(code);
+                }
+                process.exit(code);
+            }
+        },
 /* #endif */
 /* #if USE_SHARED_MEMORY */
         memory, threadChannel,

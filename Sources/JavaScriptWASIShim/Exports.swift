@@ -1,6 +1,7 @@
 #if os(WASI) && compiler(>=6.4) && !_runtime(_multithreaded)
 
 import WASILibc
+import _CJavaScriptKit
 
 // Definitions for every `wasi_snapshot_preview1` function wasi-libc imports.
 //
@@ -191,14 +192,14 @@ func wasi_sched_yield() -> Int32 {
     success
 }
 
-/// Flushes pending output, records the exit code for `wasi_shim_exit_code` and traps.
-///
-/// The trap is the only way to stop without host-provided code: BridgeJS catches every
-/// JavaScript exception, so a JavaScript `throw` cannot unwind through it.
+/// Flushes pending output and hands the exit code to JavaScriptKit's runtime, which throws or
+/// stops the process. It is a plain runtime import rather than a BridgeJS one because BridgeJS
+/// glue catches every JavaScript exception and hands it back to Swift.
 @c(__imported_wasi_snapshot_preview1_proc_exit)
 func wasi_proc_exit(_ code: UInt32) -> Never {
     withConsole { $0.flush() }
-    unsafe exitCode = Int32(bitPattern: code)
+    swjs_proc_exit(Int32(bitPattern: code))
+    // Only a host whose `swjs_proc_exit` returns gets here.
     abort()
 }
 
@@ -206,13 +207,6 @@ func wasi_proc_exit(_ code: UInt32) -> Never {
 @c(__imported_wasi_snapshot_preview1_proc_raise)
 func wasi_proc_raise(_ signal: UInt32) -> Int32 {
     wasi_proc_exit(128 &+ signal)
-}
-
-/// The code passed to `proc_exit`, or -1 if it was not called. A host that sees a
-/// `WebAssembly.RuntimeError` reads this to tell an exit from a crash.
-@_expose(wasm, "wasi_shim_exit_code")
-func wasi_shim_exit_code() -> Int32 {
-    unsafe exitCode
 }
 
 // MARK: - Unsupported file descriptor operations
@@ -471,7 +465,6 @@ private func wasiResult(_ body: () throws(Errno) -> Void) -> Int32 {
 nonisolated(unsafe) private var console = Console()
 nonisolated(unsafe) private var random = RandomSource()
 nonisolated(unsafe) private var sleeper = Sleeper()
-nonisolated(unsafe) private var exitCode: Int32 = -1
 
 private func withConsole<R>(_ body: (inout Console) -> R) -> R {
     unsafe body(&console)

@@ -2,7 +2,7 @@
 //
 // Loads an app linked with JavaScriptWASIShim through the generated package's own setup
 // (`defaultNodeSetup` or `defaultBrowserSetup`) and `instantiate()`, then checks its console
-// output, its exit code and that the module imports nothing from `wasi_snapshot_preview1`.
+// output, how it exits and that the module imports nothing from `wasi_snapshot_preview1`.
 //
 // The sleep mode decides how `Atomics.wait` behaves: `atomics` keeps it (it must block once per
 // sleep), `noAtomics` removes `SharedArrayBuffer` (the shim must busy-wait without calling it),
@@ -44,7 +44,7 @@ const expectations = {
         stdout: ["returns: start", "returns: end"],
         stderr: [],
         sleeps: 0,
-        exitCode: -1,
+        exitCode: null,
     },
 }[scenario];
 
@@ -62,12 +62,18 @@ const realLog = console.log;
 console.log = (line) => output.stdout.push(line);
 console.error = (line) => output.stderr.push(line);
 
-const { instantiate } = await import(packageFile("instantiate.js"));
-const { MODULE_PATH } = await import(packageFile("instantiate.js"));
+const { instantiate, MODULE_PATH } = await import(packageFile("instantiate.js"));
+const { ProcessExit } = await import(packageFile("runtime.js"));
+
+// Node: `defaultNodeSetup` reports the exit through `onExit` and then calls `process.exit`, so
+// the checks run inside `onExit`. Browser: the runtime's default `swjs_proc_exit` throws
+// `ProcessExit`, which `instantiate()` passes on.
 let options;
 if (platform === "node") {
     const { defaultNodeSetup } = await import(packageFile("platforms/node.js"));
-    options = await defaultNodeSetup();
+    options = await defaultNodeSetup({
+        onExit: (code) => finish(code),
+    });
 } else {
     const { defaultBrowserSetup } = await import(packageFile("platforms/browser.js"));
     const module = await WebAssembly.compile(await readFile(path.join(packageDir, MODULE_PATH)));
@@ -78,36 +84,34 @@ assert.deepEqual(
     [],
 );
 
-let instance;
-let exitCode;
 try {
-    await instantiate({
-        ...options,
-        instrumentInstance: (created) => (instance = created),
-    });
-    exitCode = instance.exports.wasi_shim_exit_code();
+    await instantiate(options);
 } catch (error) {
-    // `proc_exit` traps after recording its code.
-    exitCode = instance?.exports.wasi_shim_exit_code();
-    if (!(error instanceof WebAssembly.RuntimeError) || !(exitCode >= 0)) {
+    if (!(error instanceof ProcessExit)) {
         console.log = realLog;
         dump();
         throw error;
     }
+    finish(error.code);
 }
+finish(null);
 
-console.log = realLog;
-dump();
-assert.deepEqual(output.stdout, expectations.stdout);
-assert.deepEqual(output.stderr, expectations.stderr);
-assert.equal(exitCode, expectations.exitCode);
-if (sleepMode === "atomics") {
-    assert.ok(atomicsWaits >= expectations.sleeps, `${atomicsWaits} Atomics.wait calls for ${expectations.sleeps} sleeps`);
-} else {
-    const expectedWaits = sleepMode === "noAtomics" ? 0 : Math.min(expectations.sleeps, 1);
-    assert.equal(atomicsWaits, expectedWaits, `Atomics.wait calls in ${sleepMode} mode`);
+/** Checks the run that ended with exit code `code`, or without calling `exit` if it's null. */
+function finish(code) {
+    console.log = realLog;
+    dump();
+    assert.deepEqual(output.stdout, expectations.stdout);
+    assert.deepEqual(output.stderr, expectations.stderr);
+    assert.equal(code, expectations.exitCode);
+    if (sleepMode === "atomics") {
+        assert.ok(atomicsWaits >= expectations.sleeps, `${atomicsWaits} Atomics.wait calls for ${expectations.sleeps} sleeps`);
+    } else {
+        const expectedWaits = sleepMode === "noAtomics" ? 0 : Math.min(expectations.sleeps, 1);
+        assert.equal(atomicsWaits, expectedWaits, `Atomics.wait calls in ${sleepMode} mode`);
+    }
+    realLog(`${platform} ${scenario} ${sleepMode}: OK`);
+    process.exit(0);
 }
-realLog(`${platform} ${scenario} ${sleepMode}: OK`);
 
 function dump() {
     for (const line of output.stdout) realLog(`stdout | ${line}`);
