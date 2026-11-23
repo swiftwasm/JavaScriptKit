@@ -55,26 +55,6 @@ extension Trait where Self == ConditionTrait {
         // Check if ${SWIFT_SDK_ID}-embedded is available
         return .enabled(
             if: {
-                /// Check if the Swift SDK with the given ID is available.
-                func isSwiftSDKAvailable(_ id: String, swiftPath: String) -> Bool {
-                    let swiftExecutable = URL(
-                        fileURLWithPath: "swift",
-                        relativeTo: URL(fileURLWithPath: swiftPath)
-                    )
-                    let process = Process()
-                    process.executableURL = swiftExecutable
-                    let arguments = ["sdk", "configure", "--show-configuration", id]
-                    process.arguments = arguments
-                    process.standardOutput = FileHandle.nullDevice
-                    process.standardError = FileHandle.nullDevice
-                    do {
-                        try process.run()
-                        process.waitUntilExit()
-                        return process.terminationStatus == 0
-                    } catch {
-                        return false
-                    }
-                }
                 guard let swiftPath = ProcessInfo.processInfo.environment["SWIFT_BIN_PATH"],
                     let swiftSDKID = ProcessInfo.processInfo.environment["SWIFT_SDK_ID"]
                 else {
@@ -93,6 +73,43 @@ extension Trait where Self == ConditionTrait {
             }(),
             "Requires SWIFT_SDK_ID to contain 'embedded'"
         )
+    }
+
+    /// A single-threaded Swift SDK, and its Embedded variant if `embedded` is set.
+    static func requireSingleThreadedSwiftSDK(embedded: Bool) -> ConditionTrait {
+        .enabled(
+            if: {
+                guard let swiftPath = ProcessInfo.processInfo.environment["SWIFT_BIN_PATH"],
+                    let swiftSDKID = ProcessInfo.processInfo.environment["SWIFT_SDK_ID"],
+                    !swiftSDKID.contains("threads")
+                else {
+                    return false
+                }
+                return !embedded || isSwiftSDKAvailable("\(swiftSDKID)-embedded", swiftPath: swiftPath)
+            }(),
+            "Requires SWIFT_SDK_ID and SWIFT_BIN_PATH environment variables naming a single-threaded Swift SDK"
+        )
+    }
+}
+
+/// Check if the Swift SDK with the given ID is available.
+private func isSwiftSDKAvailable(_ id: String, swiftPath: String) -> Bool {
+    let swiftExecutable = URL(
+        fileURLWithPath: "swift",
+        relativeTo: URL(fileURLWithPath: swiftPath)
+    )
+    let process = Process()
+    process.executableURL = swiftExecutable
+    let arguments = ["sdk", "configure", "--show-configuration", id]
+    process.arguments = arguments
+    process.standardOutput = FileHandle.nullDevice
+    process.standardError = FileHandle.nullDevice
+    do {
+        try process.run()
+        process.waitUntilExit()
+        return process.terminationStatus == 0
+    } catch {
+        return false
     }
 }
 
@@ -460,4 +477,60 @@ extension Trait where Self == ConditionTrait {
             )
         }
     }
+
+    // JavaScriptWASIShim requires Swift 6.4.
+    #if compiler(>=6.4)
+    @Test(.requireSingleThreadedSwiftSDK(embedded: false))
+    func wasiShim() throws {
+        let swiftSDKID = try #require(Self.getSwiftSDKID())
+        try withPackage(at: "Plugins/PackageToJS/Fixtures/WASIShim") { packageDir, runProcess, runSwift in
+            for (product, platform, scenario) in [
+                ("App", "node", "app"), ("App", "browser", "app"), ("ReturnsApp", "node", "returns"),
+            ] {
+                let output = ".build/plugins/PackageToJS/outputs/\(product)-\(platform)"
+                try runSwift(
+                    [
+                        "package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "--product", product,
+                        "--default-platform", platform, "--output", output,
+                    ],
+                    [:]
+                )
+                try Self.checkWASIShimImports(packageDir.appending(path: ".build/debug/\(product).wasm"))
+                try Self.runWASIShimCheck(output: output, platform: platform, scenario: scenario, runProcess)
+            }
+        }
+    }
+
+    @Test(.requireSingleThreadedSwiftSDK(embedded: true))
+    func wasiShimEmbedded() throws {
+        let swiftSDKID = try #require(Self.getEmbeddedSwiftSDKID())
+        try withPackage(at: "Plugins/PackageToJS/Fixtures/WASIShim") { packageDir, runProcess, runSwift in
+            let output = ".build/plugins/PackageToJS/outputs/App-embedded"
+            try runSwift(
+                [
+                    "package", "--build-system", "native", "--swift-sdk", swiftSDKID, "js", "-c", "release",
+                    "--product", "App", "--default-platform", "node", "--output", output,
+                ],
+                ["JAVASCRIPTKIT_EXPERIMENTAL_EMBEDDED_WASM": "true"]
+            )
+            try Self.checkWASIShimImports(packageDir.appending(path: ".build/release/App.wasm"))
+            try Self.runWASIShimCheck(output: output, platform: "node", scenario: "app", runProcess)
+        }
+    }
+
+    /// Checks the linked binary, before wasm-opt drops unused imports: no WASI imports, and no
+    /// stubs wasm-ld leaves for a shim definition whose signature differs from libc's import.
+    static func checkWASIShimImports(_ wasm: URL) throws {
+        let bytes = try Data(contentsOf: wasm)
+        let wasiImports = try parseImports(moduleBytes: bytes).filter { $0.module == "wasi_snapshot_preview1" }
+        #expect(wasiImports.map(\.name) == [])
+        #expect(bytes.range(of: Data("signature_mismatch:".utf8)) == nil)
+    }
+
+    static func runWASIShimCheck(output: String, platform: String, scenario: String, _ runProcess: RunProcess) throws {
+        for sleepMode in ["atomics", "noAtomics", "atomicsThrows"] {
+            try runProcess(which("node"), ["check.mjs", output, platform, scenario, sleepMode], [:])
+        }
+    }
+    #endif
 }
