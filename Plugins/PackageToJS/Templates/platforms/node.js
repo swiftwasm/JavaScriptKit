@@ -36,6 +36,7 @@ export async function defaultNodeThreadSetup() {
         }
     }
 
+/* #if IS_WASI */
 /* #if USE_UWASI */
     const { wasi } = createUwasi(uwasiRuntime, { modulePath: MODULE_PATH })
 /* #else */
@@ -50,8 +51,10 @@ export async function defaultNodeThreadSetup() {
         new PreopenDirectory("/", new Map()),
     ], { debug: false })
 /* #endif */
+/* #endif */
 
     return {
+/* #if IS_WASI */
 /* #if USE_UWASI */
         wasi,
 /* #else */
@@ -60,6 +63,7 @@ export async function defaultNodeThreadSetup() {
                 wasi.inst = instance;
             }
         }),
+/* #endif */
 /* #endif */
         threadChannel,
     }
@@ -140,6 +144,7 @@ export async function defaultNodeSetup(options = {}) {
     const { fileURLToPath } = await import("node:url");
     const { readFile } = await import("node:fs/promises")
 
+/* #if IS_WASI */
     const args = options.args ?? process.argv.slice(2)
 /* #if USE_UWASI */
     const { wasi } = createUwasi(uwasiRuntime, {
@@ -159,6 +164,7 @@ export async function defaultNodeSetup(options = {}) {
         }),
         new PreopenDirectory("/", rootFs),
     ], { debug: false })
+/* #endif */
 /* #endif */
     const pkgDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
     const module = await WebAssembly.compile(new Uint8Array(await readFile(path.join(pkgDir, MODULE_PATH))))

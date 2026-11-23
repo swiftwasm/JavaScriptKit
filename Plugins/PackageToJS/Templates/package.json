@@ -8,10 +8,12 @@
         "./wasm": "./@PACKAGE_TO_JS_MODULE_PATH@"
     },
     "dependencies": {
+/* #if IS_WASI */
 /* #if USE_UWASI */
         "uwasi": "1.5.2"
 /* #else */
         "@bjorn3/browser_wasi_shim": "0.3.0"
+/* #endif */
 /* #endif */
     }
 }

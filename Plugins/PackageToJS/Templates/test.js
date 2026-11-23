@@ -179,10 +179,12 @@ export async function testBrowserInPage(options, processInfo) {
             ...options,
             addToCoreImports: (imports, context) => {
                 options.addToCoreImports?.(imports, context);
+/* #if IS_WASI */
                 imports["wasi_snapshot_preview1"]["proc_exit"] = (code) => {
                     exitTest(code);
                     throw new ExitError(code);
                 };
+/* #endif */
             },
         });
         // When JavaScriptEventLoop executor is still running,

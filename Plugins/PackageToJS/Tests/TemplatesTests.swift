@@ -15,7 +15,8 @@ import Foundation
         .appendingPathComponent("TemporaryDirectory")
 
     /// `npx tsc -p Templates/tsconfig.json`
-    /// Test both WASI runtimes in node and browser platform variants.
+    /// Test both WASI runtimes in node and browser platform variants, and modules without WASI
+    /// imports (`runtime: nil`).
     @Test(arguments: [
         (platform: "node", runtime: "browser-wasi-shim", sharedMemory: false, filesystem: false),
         (platform: "browser", runtime: "browser-wasi-shim", sharedMemory: false, filesystem: false),
@@ -23,8 +24,10 @@ import Foundation
         (platform: "node", runtime: "uwasi", sharedMemory: false, filesystem: true),
         (platform: "browser", runtime: "uwasi", sharedMemory: true, filesystem: false),
         (platform: "browser", runtime: "uwasi", sharedMemory: false, filesystem: true),
+        (platform: "node", runtime: nil, sharedMemory: false, filesystem: false),
+        (platform: "browser", runtime: nil, sharedMemory: false, filesystem: false),
     ])
-    func tscCheck(platform: String, runtime: String, sharedMemory: Bool, filesystem: Bool) throws {
+    func tscCheck(platform: String, runtime: String?, sharedMemory: Bool, filesystem: Bool) throws {
         // Use a local temporary directory to place instantiated templates so that
         // they can reference repo-root node_modules packages like @types/node.
         try FileManager.default.createDirectory(
@@ -40,7 +43,7 @@ import Foundation
             // Setup preprocessing conditions
             let conditions: [String: Bool] = [
                 "USE_SHARED_MEMORY": sharedMemory,
-                "IS_WASI": true,
+                "IS_WASI": runtime != nil,
                 "USE_WASI_CDN": false,
                 "USE_UWASI": runtime == "uwasi",
                 "USE_UWASI_FILESYSTEM": runtime == "uwasi" && filesystem,
@@ -79,8 +82,11 @@ import Foundation
                     .appending(path: "\(platform).js"),
                 encoding: .utf8
             )
-            let expectedImport = runtime == "uwasi" ? "from 'uwasi'" : "from '@bjorn3/browser_wasi_shim'"
-            #expect(platformSource.contains(expectedImport))
+            for (wasiRuntime, wasiImport) in [
+                ("uwasi", "from 'uwasi'"), ("browser-wasi-shim", "from '@bjorn3/browser_wasi_shim'"),
+            ] {
+                #expect(platformSource.contains(wasiImport) == (runtime == wasiRuntime))
+            }
             if runtime == "uwasi" {
                 #expect(!platformSource.contains("useAll"))
                 #expect(platformSource.contains("useStdio"))
@@ -92,8 +98,10 @@ import Foundation
                 JSONSerialization.jsonObject(with: manifestData) as? [String: Any]
             )
             let dependencies = try #require(manifest["dependencies"] as? [String: String])
-            let expectedDependency = runtime == "uwasi" ? "uwasi" : "@bjorn3/browser_wasi_shim"
-            #expect(dependencies.keys.sorted() == [expectedDependency])
+            let expectedDependencies = [
+                "uwasi": ["uwasi"], "browser-wasi-shim": ["@bjorn3/browser_wasi_shim"],
+            ][runtime ?? "", default: []]
+            #expect(dependencies.keys.sorted() == expectedDependencies)
         }
     }
 

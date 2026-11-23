@@ -88,6 +88,9 @@ export async function instantiate(options) {
     const { instantiator, ...result } = await _instantiate(options);
     /* #if IS_WASI */
     options.wasi.initialize(result.instance);
+    /* #else */
+    const initialize = result.instance.exports._initialize;
+    if (typeof initialize === "function") initialize();
     /* #endif */
     result.swift.main();
     return result;
