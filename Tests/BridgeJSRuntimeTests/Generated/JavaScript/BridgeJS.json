@@ -28917,6 +28917,517 @@
         "functions" : [
 
         ],
+        "globalGetters" : [
+          {
+            "accessLevel" : "internal",
+            "from" : "global",
+            "jsName" : "crypto",
+            "name" : "spanWebCrypto",
+            "type" : {
+              "jsObject" : {
+                "_0" : "SpanWebCrypto"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "SpanParameterImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsSum",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : false
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsLength",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : false
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsByteOffset",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : false
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsViewKind",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : false
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsFill",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : true
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "double" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsFillThenThrow",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : true
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "message",
+                    "type" : {
+                      "string" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "jsCopy",
+                "parameters" : [
+                  {
+                    "name" : "source",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "label" : "into",
+                    "name" : "destination",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : true
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "genericParameters" : [
+                  {
+                    "name" : "T"
+                  }
+                ],
+                "name" : "jsFillWithLengthAndEcho",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : true
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "value",
+                    "type" : {
+                      "generic" : {
+                        "_0" : "T"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "generic" : {
+                    "_0" : "T"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "header",
+                  "type" : {
+                    "span" : {
+                      "_0" : {
+                        "element" : {
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : false,
+                              "width" : "w8"
+                            }
+                          }
+                        },
+                        "isMutable" : false
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "sum",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : false
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "readHeader",
+                "parameters" : [
+                  {
+                    "label" : "into",
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : true
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "SpanHeaderStore",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "getRandomValues",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : true
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "SpanWebCrypto",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
         "types" : [
           {
             "accessLevel" : "internal",

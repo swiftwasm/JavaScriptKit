@@ -10,6 +10,8 @@ final class JSIntrinsicRegistry {
 
     var typeOwnerModules: [String: String] = [:]
 
+    var sharedMemory = false
+
     private var codecNameOrder: [String] = []
     private var codecBodies: [String: [String]] = [:]
 
@@ -46,6 +48,7 @@ final class JSIntrinsicRegistry {
         classPaths.removeAll()
         renamedEnumNames.removeAll()
         typeOwnerModules.removeAll()
+        sharedMemory = false
         codecNameOrder.removeAll()
         codecBodies.removeAll()
     }

@@ -100,12 +100,34 @@ import JavaScriptKit
 
 Constraints may use `@JS` protocols from dependency modules, including qualified names such as `T: BridgedSwiftGenericBridgeable & Models.Named`. Concrete conformers must expose the required members to JavaScript too, including marking methods with `@JS`. This does not enable existential compositions such as `any P & Q`; the generic-import limitations above still apply.
 
+## Passing bytes
+
+Use `Span<UInt8>` and `inout MutableSpan<UInt8>` parameters to pass bytes for JavaScript to read and write, respectively, during the call. JavaScript receives a `Uint8Array` view of Wasm memory.
+
+```swift
+@JSClass struct Crypto {
+    @JSFunction func getRandomValues(_ bytes: inout MutableSpan<UInt8>) throws(JSException)
+}
+@JSGetter(from: .global) var crypto: Crypto
+
+var key = [UInt8](repeating: 0, count: 32)
+var span = key.mutableSpan
+try crypto.getRandomValues(&span)
+```
+
+The view is valid only until the call returns. It is detached earlier if JavaScript calls back into Swift and Wasm memory grows. JavaScript that keeps the bytes must copy them with `slice()`, or the parameter must be a ``JSUint8Array``. JavaScript must not write to a `Span<UInt8>` parameter's array.
+
+With shared memory, as in builds with threads, JavaScript receives a copy. BridgeJS writes a `MutableSpan<UInt8>` copy back to Wasm memory when the call returns or throws.
+
+Spans must have `UInt8` elements and can only be parameters of synchronous `@JSFunction` functions, methods and initializers. A type alias of a span type is not supported.
+
 ## Supported features
 
 | Feature | Status |
 |:--|:--|
 | Primitive parameter/result types (e.g. `Double`, `Bool`) | ✅ |
 | `String` parameter/result type | ✅ |
+| `Span<UInt8>` and `inout MutableSpan<UInt8>` parameters | ✅ |
 | Generic parameter/result types (constrained to `BridgedSwiftGenericBridgeable`) | ✅ |
 | `@JS` protocol constraints on generic imports | ✅ |
-| Async function | ❌ |
+| Async function | ✅ |

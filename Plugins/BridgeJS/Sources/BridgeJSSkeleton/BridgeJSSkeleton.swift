@@ -205,6 +205,17 @@ public struct UnsafePointerType: Codable, Equatable, Hashable, Sendable {
     }
 }
 
+/// A `Span` or `inout MutableSpan` parameter of an imported JavaScript function.
+public struct BridgeSpanType: Codable, Equatable, Hashable, Sendable {
+    public let element: BridgeType
+    public let isMutable: Bool
+
+    public init(element: BridgeType, isMutable: Bool) {
+        self.element = element
+        self.isMutable = isMutable
+    }
+}
+
 /// JS semantics for optional/nullable types: which value represents "absent".
 public enum JSOptionalKind: String, Codable, Equatable, Hashable, Sendable {
     case null
@@ -287,6 +298,7 @@ public enum BridgeType: Codable, Equatable, Hashable, Sendable {
     case integer(BridgeIntegerType), float, double, string, bool, jsObject(String?), jsValue, swiftHeapObject(String),
         void
     case unsafePointer(UnsafePointerType)
+    indirect case span(BridgeSpanType)
     indirect case nullable(BridgeType, JSOptionalKind)
     indirect case array(BridgeType)
     indirect case dictionary(BridgeType)
@@ -1987,7 +1999,7 @@ extension BridgeType {
         case .array(let element): return .array(element.unaliased)
         case .dictionary(let value): return .dictionary(value.unaliased)
         case .bool, .integer, .float, .double, .string, .jsValue, .jsObject,
-            .swiftHeapObject, .unsafePointer, .swiftProtocol, .void,
+            .swiftHeapObject, .unsafePointer, .span, .swiftProtocol, .void,
             .caseEnum, .rawValueEnum, .associatedValueEnum, .swiftStruct,
             .namespaceEnum, .closure, .generic:
             return self
@@ -2009,6 +2021,8 @@ extension BridgeType {
             return .pointer
         case .unsafePointer:
             return .pointer
+        case .span:
+            return nil
         case .nullable:
             return nil
         case .caseEnum:
@@ -2100,6 +2114,8 @@ extension BridgeType {
                 return "\(kindCode)\(p.count)\(p)"
             }
             return kindCode
+        case .span(let span):
+            return "\(span.isMutable ? "Sms" : "Ss")\(span.element.mangleTypeName)"
         case .nullable(let wrapped, let kind):
             let prefix = kind == .null ? "Sq" : "Su"
             return "\(prefix)\(wrapped.mangleTypeName)"

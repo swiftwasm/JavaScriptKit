@@ -921,6 +921,8 @@ struct StackCodegen {
             return "JSObject.bridgeJSStackPop()"
         case .void, .namespaceEnum:
             return "()"
+        case .span:
+            fatalError("Span types are only supported as parameters of imported JavaScript functions")
         case .generic:
             fatalError(
                 "Generic parameters are only supported on imported declarations, not exported concrete-type codegen"
@@ -937,7 +939,7 @@ struct StackCodegen {
             return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: typeName)<JSObject>.bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
-        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol, .generic:
+        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .span, .swiftProtocol, .generic:
             fatalError("Invalid nullable wrapped type: \(wrappedType)")
         }
     }
@@ -970,6 +972,8 @@ struct StackCodegen {
             return lowerArrayStatements(elementType: elementType, accessor: accessor, varPrefix: varPrefix)
         case .dictionary(let valueType):
             return lowerDictionaryStatements(valueType: valueType, accessor: accessor, varPrefix: varPrefix)
+        case .span:
+            fatalError("Span types are only supported as parameters of imported JavaScript functions")
         case .generic:
             fatalError(
                 "Generic parameters are only supported on imported declarations, not exported concrete-type codegen"
@@ -1625,6 +1629,13 @@ extension UnsafePointerType {
     }
 }
 
+extension BridgeSpanType {
+    var swiftType: String {
+        // A user type named `Span` or `MutableSpan` would shadow the unqualified name.
+        "Swift.\(isMutable ? "MutableSpan" : "Span")<\(element.swiftType)>"
+    }
+}
+
 extension BridgeType {
     var aliasConformanceProtocols: [String]? {
         switch self {
@@ -1636,7 +1647,7 @@ extension BridgeType {
             return ["_BridgedSwiftCaseEnum"]
         case .associatedValueEnum:
             return ["_BridgedSwiftAssociatedValueEnum"]
-        case .rawValueEnum, .void, .unsafePointer, .namespaceEnum,
+        case .rawValueEnum, .void, .unsafePointer, .span, .namespaceEnum,
             .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias, .generic:
             // Not supported yet.
             return nil
@@ -1677,6 +1688,7 @@ extension BridgeType {
         case .jsObject(let name?): return name
         case .swiftHeapObject(let name): return name
         case .unsafePointer(let ptr): return ptr.swiftType
+        case .span(let span): return span.swiftType
         case .swiftProtocol(let name): return "Any\(name)"
         case .void: return "Void"
         case .nullable(let wrappedType, let kind):
@@ -1743,6 +1755,8 @@ extension BridgeType {
         case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer
+        case .span:
+            throw BridgeJSCoreError("Span types are only supported as parameters of imported JavaScript functions")
         case .swiftProtocol: return .jsObject
         case .void: return .void
         case .nullable(let wrappedType, _):
@@ -1807,6 +1821,8 @@ extension BridgeType {
         case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer
+        case .span:
+            throw BridgeJSCoreError("Span types are only supported as parameters of imported JavaScript functions")
         case .swiftProtocol: return .jsObject
         case .void: return .void
         case .nullable: return .optional

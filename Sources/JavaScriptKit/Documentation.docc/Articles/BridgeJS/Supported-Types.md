@@ -17,6 +17,7 @@ Swift types and their JavaScript/TypeScript equivalents at the BridgeJS boundary
 | ``JSObject`` | object | `object` |
 | ``JSValue`` | any | `any` |
 | ``JSTypedArray`` `<T>` | TypedArray | `Uint8Array`, `Float32Array`, etc. |
+| `Span<UInt8>`, `inout MutableSpan<UInt8>` | Uint8Array | `Uint8Array` |
 
 ### TypedArray mapping
 
@@ -30,6 +31,10 @@ When using `JSTypedArray<T>` (or convenience typealiases) in `@JS` signatures, t
 | `JSTypedArray<Double>` / `JSFloat64Array` | `Float64Array` |
 
 See <doc:Exporting-Swift-Array> for usage details.
+
+### Byte spans
+
+`Span<UInt8>` and `inout MutableSpan<UInt8>` can only be parameters of imported `@JSFunction` declarations. See <doc:Importing-JS-Function#Passing-bytes>.
 
 ## Generic type parameters
 

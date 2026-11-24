@@ -10,11 +10,12 @@ import Testing
     private func snapshot(
         bridgeJSLink: BridgeJSLink,
         name: String? = nil,
+        sharedMemory: Bool = false,
         filePath: String = #filePath,
         function: String = #function,
         sourceLocation: Testing.SourceLocation = #_sourceLocation
     ) throws {
-        let output = try bridgeJSLink.link()
+        let output = try bridgeJSLink.link(sharedMemory: sharedMemory)
         try assertSnapshot(
             name: name,
             filePath: filePath,
@@ -102,6 +103,17 @@ import Testing
             ]
         )
         try snapshot(bridgeJSLink: bridgeJSLink, name: name + ".Global")
+    }
+
+    @Test
+    func snapshotSpanParametersWithSharedMemory() throws {
+        let url = Self.inputsDirectory.appendingPathComponent("SpanParameters.swift")
+        let skeleton = try makeSkeleton(String(contentsOf: url, encoding: .utf8))
+        try snapshot(
+            bridgeJSLink: BridgeJSLink(skeletons: [skeleton]),
+            name: "SpanParameters.SharedMemory",
+            sharedMemory: true
+        )
     }
 
     @Test

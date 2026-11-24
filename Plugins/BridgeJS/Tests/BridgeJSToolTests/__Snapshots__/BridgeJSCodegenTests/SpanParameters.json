@@ -1,0 +1,285 @@
+{
+  "imported" : {
+    "children" : [
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "readBytes",
+            "parameters" : [
+              {
+                "name" : "bytes",
+                "type" : {
+                  "span" : {
+                    "_0" : {
+                      "element" : {
+                        "integer" : {
+                          "_0" : {
+                            "isSigned" : false,
+                            "width" : "w8"
+                          }
+                        }
+                      },
+                      "isMutable" : false
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "fillBytes",
+            "parameters" : [
+              {
+                "name" : "bytes",
+                "type" : {
+                  "span" : {
+                    "_0" : {
+                      "element" : {
+                        "integer" : {
+                          "_0" : {
+                            "isSigned" : false,
+                            "width" : "w8"
+                          }
+                        }
+                      },
+                      "isMutable" : true
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "void" : {
+
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "copyBytes",
+            "parameters" : [
+              {
+                "name" : "source",
+                "type" : {
+                  "span" : {
+                    "_0" : {
+                      "element" : {
+                        "integer" : {
+                          "_0" : {
+                            "isSigned" : false,
+                            "width" : "w8"
+                          }
+                        }
+                      },
+                      "isMutable" : false
+                    }
+                  }
+                }
+              },
+              {
+                "name" : "label",
+                "type" : {
+                  "string" : {
+
+                  }
+                }
+              },
+              {
+                "label" : "into",
+                "name" : "destination",
+                "type" : {
+                  "span" : {
+                    "_0" : {
+                      "element" : {
+                        "integer" : {
+                          "_0" : {
+                            "isSigned" : false,
+                            "width" : "w8"
+                          }
+                        }
+                      },
+                      "isMutable" : true
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "double" : {
+
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "header",
+                  "type" : {
+                    "span" : {
+                      "_0" : {
+                        "element" : {
+                          "integer" : {
+                            "_0" : {
+                              "isSigned" : false,
+                              "width" : "w8"
+                            }
+                          }
+                        },
+                        "isMutable" : false
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "write",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : false
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "read",
+                "parameters" : [
+                  {
+                    "label" : "into",
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : true
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ],
+            "name" : "ByteSink",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "checksum",
+                "parameters" : [
+                  {
+                    "name" : "bytes",
+                    "type" : {
+                      "span" : {
+                        "_0" : {
+                          "element" : {
+                            "integer" : {
+                              "_0" : {
+                                "isSigned" : false,
+                                "width" : "w8"
+                              }
+                            }
+                          },
+                          "isMutable" : false
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "double" : {
+
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "moduleName" : "TestModule",
+  "usedExternalModules" : [
+
+  ]
+}
