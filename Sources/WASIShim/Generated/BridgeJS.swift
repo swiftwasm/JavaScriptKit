@@ -9,7 +9,7 @@
 @_spi(BridgeJS) import JavaScriptKit
 
 #if arch(wasm32)
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostConsole_log_static")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostConsole_log_static")
 fileprivate func bjs_HostConsole_log_static_extern(_ lineWord0: Int32, _ lineWord1: Int32, _ lineWord2: Int32) -> Void
 #else
 fileprivate func bjs_HostConsole_log_static_extern(_ lineWord0: Int32, _ lineWord1: Int32, _ lineWord2: Int32) -> Void {
@@ -21,7 +21,7 @@ fileprivate func bjs_HostConsole_log_static_extern(_ lineWord0: Int32, _ lineWor
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostConsole_error_static")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostConsole_error_static")
 fileprivate func bjs_HostConsole_error_static_extern(_ lineWord0: Int32, _ lineWord1: Int32, _ lineWord2: Int32) -> Void
 #else
 fileprivate func bjs_HostConsole_error_static_extern(_ lineWord0: Int32, _ lineWord1: Int32, _ lineWord2: Int32) -> Void {
@@ -51,7 +51,7 @@ func _$HostConsole_error(_ line: String) throws(JSException) -> Void {
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostCrypto_getRandomValues_static")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostCrypto_getRandomValues_static")
 fileprivate func bjs_HostCrypto_getRandomValues_static_extern(_ array: Int32) -> Void
 #else
 fileprivate func bjs_HostCrypto_getRandomValues_static_extern(_ array: Int32) -> Void {
@@ -71,7 +71,7 @@ func _$HostCrypto_getRandomValues(_ array: HostUint8Array) throws(JSException) -
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostUint8Array_init")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostUint8Array_init")
 fileprivate func bjs_HostUint8Array_init_extern(_ length: Int32) -> Int32
 #else
 fileprivate func bjs_HostUint8Array_init_extern(_ length: Int32) -> Int32 {
@@ -92,7 +92,7 @@ func _$HostUint8Array_init(_ length: Int) throws(JSException) -> JSObject {
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostDate_now_static")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostDate_now_static")
 fileprivate func bjs_HostDate_now_static_extern() -> Float64
 #else
 fileprivate func bjs_HostDate_now_static_extern() -> Float64 {
@@ -112,7 +112,7 @@ func _$HostDate_now() throws(JSException) -> Double {
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostPerformance_now_static")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostPerformance_now_static")
 fileprivate func bjs_HostPerformance_now_static_extern() -> Float64
 #else
 fileprivate func bjs_HostPerformance_now_static_extern() -> Float64 {
@@ -132,7 +132,7 @@ func _$HostPerformance_now() throws(JSException) -> Double {
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostSharedArrayBuffer_init")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostSharedArrayBuffer_init")
 fileprivate func bjs_HostSharedArrayBuffer_init_extern(_ length: Int32) -> Int32
 #else
 fileprivate func bjs_HostSharedArrayBuffer_init_extern(_ length: Int32) -> Int32 {
@@ -153,7 +153,7 @@ func _$HostSharedArrayBuffer_init(_ length: Int) throws(JSException) -> JSObject
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostInt32Array_init")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostInt32Array_init")
 fileprivate func bjs_HostInt32Array_init_extern(_ buffer: Int32) -> Int32
 #else
 fileprivate func bjs_HostInt32Array_init_extern(_ buffer: Int32) -> Int32 {
@@ -174,7 +174,7 @@ func _$HostInt32Array_init(_ buffer: HostSharedArrayBuffer) throws(JSException) 
 }
 
 #if arch(wasm32)
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostAtomics_wait_static")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostAtomics_wait_static")
 fileprivate func bjs_HostAtomics_wait_static_extern(_ array: Int32, _ index: Int32, _ value: Int32, _ timeout: Float64) -> Void
 #else
 fileprivate func bjs_HostAtomics_wait_static_extern(_ array: Int32, _ index: Int32, _ value: Int32, _ timeout: Float64) -> Void {

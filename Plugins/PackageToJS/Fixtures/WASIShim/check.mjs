@@ -1,6 +1,6 @@
 // Usage: node check.mjs <PackageToJS output dir> <node|browser> <app|returns> [atomics|noAtomics|atomicsThrows]
 //
-// Loads an app linked with JavaScriptWASIShim through the generated package's own setup
+// Loads an app linked with WASIShim through the generated package's own setup
 // (`defaultNodeSetup` or `defaultBrowserSetup`) and `instantiate()`, then checks its console
 // output, how it exits and that the module imports nothing from `wasi_snapshot_preview1`.
 //

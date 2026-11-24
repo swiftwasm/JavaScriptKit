@@ -1,8 +1,8 @@
 #if os(WASI) && !compiler(>=6.4)
-#error("JavaScriptWASIShim requires Swift 6.4 or later.")
+#error("WASIShim requires Swift 6.4 or later.")
 #endif
 #if os(WASI) && _runtime(_multithreaded)
-#error("JavaScriptWASIShim supports only single-threaded wasm32-unknown-wasip1.")
+#error("WASIShim supports only single-threaded wasm32-unknown-wasip1.")
 #endif
 
 // The shim's sources are gated on the same conditions, so a rejected build reports only the

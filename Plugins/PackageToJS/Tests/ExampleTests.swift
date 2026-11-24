@@ -478,7 +478,7 @@ private func isSwiftSDKAvailable(_ id: String, swiftPath: String) -> Bool {
         }
     }
 
-    // JavaScriptWASIShim requires Swift 6.4.
+    // WASIShim requires Swift 6.4.
     #if compiler(>=6.4)
     @Test(.requireSingleThreadedSwiftSDK(embedded: false))
     func wasiShim() throws {

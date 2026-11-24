@@ -178,7 +178,7 @@ func wasi_poll_oneoff(
     wasiResult { () throws(Errno) in
         guard subscriptionCount > 0 else { throw .inval }
         // wasi-libc's sleep functions pass one subscription; `poll` and `select` with several
-        // are unsupported, as in browser_wasi_shim.
+        // are unsupported.
         guard subscriptionCount == 1 else { throw .notsup }
         let subscription = unsafe Span(_unsafeStart: subscriptions, count: Layout.subscriptionWords)
         var event = unsafe MutableSpan(_unsafeStart: events, count: Layout.eventWords)

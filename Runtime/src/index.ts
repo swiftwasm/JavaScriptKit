@@ -1081,7 +1081,7 @@ export class SwiftRuntime {
 class UnsafeEventLoopYield extends Error {}
 
 /// Thrown by the default `swjs_proc_exit` import when the Swift program exits
-/// without a WASI implementation (see `JavaScriptWASIShim`). A host can
+/// without a WASI implementation (see `WASIShim`). A host can
 /// replace the import to handle the exit itself, such as with `process.exit`.
 export class ProcessExit extends Error {
     constructor(readonly code: number) {

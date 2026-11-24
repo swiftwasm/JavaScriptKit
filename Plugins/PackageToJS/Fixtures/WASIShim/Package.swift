@@ -17,14 +17,14 @@ let package = Package(
             name: "App",
             dependencies: [
                 "JavaScriptKit",
-                .product(name: "JavaScriptWASIShim", package: "JavaScriptKit"),
+                .product(name: "WASIShim", package: "JavaScriptKit"),
             ],
             linkerSettings: reactorLinkerSettings
         ),
         .executableTarget(
             name: "ReturnsApp",
             dependencies: [
-                .product(name: "JavaScriptWASIShim", package: "JavaScriptKit")
+                .product(name: "WASIShim", package: "JavaScriptKit")
             ],
             linkerSettings: reactorLinkerSettings
         ),

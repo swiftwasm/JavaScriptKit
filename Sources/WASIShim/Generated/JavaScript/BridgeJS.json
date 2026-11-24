@@ -354,7 +354,7 @@
       }
     ]
   },
-  "moduleName" : "JavaScriptWASIShim",
+  "moduleName" : "WASIShim",
   "usedExternalModules" : [
 
   ]

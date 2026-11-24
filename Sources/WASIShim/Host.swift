@@ -18,10 +18,10 @@ struct HostConsole {
 // declarations are fileprivate. The module name is this target's name.
 // Once BridgeJS lowers `Span<UInt8>` / `UTF8Span` parameters to pointer and length, `log` and
 // `error` can take the span directly and these, along with `unsafeCallUnowned`, can go.
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostConsole_log_static")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostConsole_log_static")
 func bjs_HostConsole_log_static_unowned(_ count: Int32, _ storage: Int32, _ flags: Int32)
 
-@_extern(wasm, module: "JavaScriptWASIShim", name: "bjs_HostConsole_error_static")
+@_extern(wasm, module: "WASIShim", name: "bjs_HostConsole_error_static")
 func bjs_HostConsole_error_static_unowned(_ count: Int32, _ storage: Int32, _ flags: Int32)
 #endif
 
