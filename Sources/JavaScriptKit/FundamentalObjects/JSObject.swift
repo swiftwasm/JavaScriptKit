@@ -282,6 +282,10 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     })
 
     deinit {
+        // `JSUniqueRef(taking:)` took the reference over.
+        if _id == 0 {
+            return
+        }
         #if _runtime(_multithreaded)
         if ownerTid != swjs_get_worker_thread_id_cached() {
             // If the object is not owned by the current thread

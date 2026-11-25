@@ -3418,6 +3418,274 @@
         "types" : [
 
         ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "start",
+                  "type" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "value",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "ImportedObject",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+
+              ]
+            },
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "make",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "ImportedObject"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "take",
+                "parameters" : [
+                  {
+                    "name" : "object",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "ImportedObject"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "ImportedObjectRoundtrip",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
+        ]
+      },
+      {
+        "functions" : [
+
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "start",
+                  "type" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+
+            ],
+            "isNoncopyable" : true,
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "value",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "NoncopyableImportedObject",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+
+              ]
+            },
+            "getters" : [
+
+            ],
+            "isNoncopyable" : true,
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "make",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableImportedObject"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "take",
+                "parameters" : [
+                  {
+                    "name" : "object",
+                    "type" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableImportedObject"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "NoncopyableImportedObjectRoundtrip",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          }
+        ]
       }
     ]
   },

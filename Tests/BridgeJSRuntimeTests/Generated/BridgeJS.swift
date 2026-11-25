@@ -201,6 +201,258 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests13D
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si_extern(_ callback: Int32, _ param0: Int32) -> Int32
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si_extern(_ callback: Int32, _ param0: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si(_ callback: Int32, _ param0: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTests17NoncopyableObjectV_Si {
+    static func bridgeJSLift(_ callbackId: Int32) -> (borrowing NoncopyableObject) -> Int {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si(callbackValue, param0Value)
+            return Int.bridgeJSLiftReturn(ret)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (borrowing NoncopyableObject) -> Int {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (borrowing NoncopyableObject) -> Int) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
+    #if arch(wasm32)
+    let param0 = NoncopyableObject.bridgeJSLiftParameter(param0)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(borrowing NoncopyableObject) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y_extern(_ callback: Int32, _ param0: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y_extern(_ callback: Int32, _ param0: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y(_ callback: Int32, _ param0: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTests17NoncopyableObjectV_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (borrowing NoncopyableObject) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y(callbackValue, param0Value)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (borrowing NoncopyableObject) -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (borrowing NoncopyableObject) -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
+    #if arch(wasm32)
+    let param0 = NoncopyableObject.bridgeJSLiftParameter(param0)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(borrowing NoncopyableObject) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(param0)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si_extern(_ callback: Int32, _ param0: Int32) -> Int32
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si_extern(_ callback: Int32, _ param0: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si(_ callback: Int32, _ param0: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si {
+    static func bridgeJSLift(_ callbackId: Int32) -> (CopyableObjectRoundtrip) -> Int {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si(callbackValue, param0Value)
+            return Int.bridgeJSLiftReturn(ret)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (CopyableObjectRoundtrip) -> Int {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (CopyableObjectRoundtrip) -> Int) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Int32 {
+    #if arch(wasm32)
+    let param0 = CopyableObjectRoundtrip.bridgeJSLiftParameter(param0)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(CopyableObjectRoundtrip) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y_extern(_ callback: Int32, _ param0: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y_extern(_ callback: Int32, _ param0: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y(_ callback: Int32, _ param0: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (CopyableObjectRoundtrip) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y(callbackValue, param0Value)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (CopyableObjectRoundtrip) -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (CopyableObjectRoundtrip) -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
+    #if arch(wasm32)
+    let param0 = CopyableObjectRoundtrip.bridgeJSLiftParameter(param0)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(CopyableObjectRoundtrip) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(param0)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTests5ThemeO_SS_extern(_ callback: Int32, _ param0Word0: Int32, _ param0Word1: Int32, _ param0Word2: Int32) -> Int32
 #else
@@ -1145,6 +1397,80 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSS_
     fatalError("Only available on WebAssembly")
     #endif
 }
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y_extern(_ callback: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y_extern(_ callback: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y(_ callback: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y_extern(callback)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y_extern(boxPtr, file, line)
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (borrowing UniqueArray<NoncopyableObject>) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let _ = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y(callbackValue)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+extension JSTypedClosure where Signature == (borrowing UniqueArray<NoncopyableObject>) -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (borrowing UniqueArray<NoncopyableObject>) -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let param0 = UniqueArray<NoncopyableObject>.bridgeJSStackPop()
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(borrowing UniqueArray<NoncopyableObject>) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(param0)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSa7JSValueV_Sa7JSValueV")
@@ -2119,6 +2445,132 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq1
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(Optional<any DataProcessor>) -> String>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     let ret = closure(param0)
     return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32 {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si_extern(callback, param0IsSome, param0Value)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si {
+    static func bridgeJSLift(_ callbackId: Int32) -> (borrowing Optional<NoncopyableObject>) -> Int {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let (param0IsSome, param0Value) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            let ret = invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si(callbackValue, param0IsSome, param0Value)
+            return Int.bridgeJSLiftReturn(ret)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (borrowing Optional<NoncopyableObject>) -> Int {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (borrowing Optional<NoncopyableObject>) -> Int) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Int32 {
+    #if arch(wasm32)
+    let param0 = Optional<NoncopyableObject>.bridgeJSLiftParameter(param0IsSome, param0Value)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(borrowing Optional<NoncopyableObject>) -> Int>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    let ret = closure(param0)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y_extern(callback, param0IsSome, param0Value)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (borrowing Optional<NoncopyableObject>) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let (param0IsSome, param0Value) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y(callbackValue, param0IsSome, param0Value)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (borrowing Optional<NoncopyableObject>) -> Void {
+    init(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (borrowing Optional<NoncopyableObject>) -> Void) {
+        self.init(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    #if arch(wasm32)
+    let param0 = Optional<NoncopyableObject>.bridgeJSLiftParameter(param0IsSome, param0Value)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(borrowing Optional<NoncopyableObject>) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(param0)
     #else
     fatalError("Only available on WebAssembly")
     #endif
@@ -3132,6 +3584,68 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss11
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y_extern(_ callback: Int32, _ param0: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y_extern(_ callback: Int32, _ param0: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y(_ callback: Int32, _ param0: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestss17NoncopyableObjectV_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (consuming sending NoncopyableObject) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y(callbackValue, param0Value)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (consuming sending NoncopyableObject) -> Void {
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (consuming sending NoncopyableObject) -> Void) -> Self {
+        Self(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
+    #if arch(wasm32)
+    let param0 = NoncopyableObject.bridgeJSLiftParameter(param0)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(consuming sending NoncopyableObject) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(param0)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss18AsyncPayloadResultO_y")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss18AsyncPayloadResultO_y_extern(_ callback: Int32, _ param0: Int32) -> Void
 #else
@@ -3187,6 +3701,68 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss18
     #if arch(wasm32)
     let param0 = AsyncPayloadResult.bridgeJSLiftParameter(param0)
     let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending AsyncPayloadResult) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(param0)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y_extern(_ callback: Int32, _ param0: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y_extern(_ callback: Int32, _ param0: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y(_ callback: Int32, _ param0: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y_extern(callback, param0)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (sending CopyableObjectRoundtrip) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let param0Value = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y(callbackValue, param0Value)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (sending CopyableObjectRoundtrip) -> Void {
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (sending CopyableObjectRoundtrip) -> Void) -> Self {
+        Self(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestss23CopyableObjectRoundtripC_y(_ boxPtr: UnsafeMutableRawPointer, _ param0: Int32) -> Void {
+    #if arch(wasm32)
+    let param0 = CopyableObjectRoundtrip.bridgeJSLiftParameter(param0)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(sending CopyableObjectRoundtrip) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
     closure(param0)
     #else
     fatalError("Only available on WebAssembly")
@@ -3441,6 +4017,80 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSS
     fatalError("Only available on WebAssembly")
     #endif
 }
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y_extern(_ callback: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y_extern(_ callback: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y(_ callback: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y_extern(callback)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y_extern(boxPtr, file, line)
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+private enum _BJS_Closure_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (consuming sending UniqueArray<NoncopyableObject>) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let _ = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y(callbackValue)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+extension JSTypedClosure where Signature == (consuming sending UniqueArray<NoncopyableObject>) -> Void {
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (consuming sending UniqueArray<NoncopyableObject>) -> Void) -> Self {
+        Self(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSa17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let param0 = UniqueArray<NoncopyableObject>.bridgeJSStackPop()
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(consuming sending UniqueArray<NoncopyableObject>) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(param0)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSaSS_y")
@@ -3815,6 +4465,68 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSi
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y(_ callback: Int32, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y_extern(callback, param0IsSome, param0Value)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y_extern(boxPtr, file, line)
+}
+
+private enum _BJS_Closure_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (consuming sending Optional<NoncopyableObject>) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let (param0IsSome, param0Value) = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y(callbackValue, param0IsSome, param0Value)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+
+extension JSTypedClosure where Signature == (consuming sending Optional<NoncopyableObject>) -> Void {
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (consuming sending Optional<NoncopyableObject>) -> Void) -> Self {
+        Self(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ param0IsSome: Int32, _ param0Value: Int32) -> Void {
+    #if arch(wasm32)
+    let param0 = Optional<NoncopyableObject>.bridgeJSLiftParameter(param0IsSome, param0Value)
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(consuming sending Optional<NoncopyableObject>) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(param0)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y")
 fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq26AsyncImportedPayloadResultO_y_extern(_ callback: Int32, _ param0IsSome: Int32, _ param0CaseId: Int32) -> Void
 #else
@@ -3938,6 +4650,80 @@ public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSq
     fatalError("Only available on WebAssembly")
     #endif
 }
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y")
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y_extern(_ callback: Int32) -> Void
+#else
+fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y_extern(_ callback: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y(_ callback: Int32) -> Void {
+    return invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y_extern(callback)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y")
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32
+#else
+fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y_extern(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer, _ file: UnsafePointer<UInt8>, _ line: UInt32) -> Int32 {
+    return make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y_extern(boxPtr, file, line)
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+private enum _BJS_Closure_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y {
+    static func bridgeJSLift(_ callbackId: Int32) -> (consuming sending Optional<UniqueArray<NoncopyableObject>>) -> Void {
+        let callback = JSObject.bridgeJSLiftParameter(callbackId)
+        return { [callback] param0 in
+            #if arch(wasm32)
+            let _ = param0.bridgeJSLowerParameter()
+            let callbackValue = callback.bridgeJSLowerParameter()
+            invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y(callbackValue)
+            #else
+            fatalError("Only available on WebAssembly")
+            #endif
+        }
+    }
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+extension JSTypedClosure where Signature == (consuming sending Optional<UniqueArray<NoncopyableObject>>) -> Void {
+    static func sending(fileID: StaticString = #fileID, line: UInt32 = #line, _ body: @escaping (consuming sending Optional<UniqueArray<NoncopyableObject>>) -> Void) -> Self {
+        Self(
+            makeClosure: make_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y,
+            body: body,
+            fileID: fileID,
+            line: line
+        )
+    }
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y")
+@_cdecl("invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y")
+public func _invoke_swift_closure_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSa17NoncopyableObjectV_y(_ boxPtr: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let param0 = Optional<UniqueArray<NoncopyableObject>>.bridgeJSLiftParameter()
+    let closure = Unmanaged<_BridgeJSTypedClosureBox<(consuming sending Optional<UniqueArray<NoncopyableObject>>) -> Void>>.fromOpaque(boxPtr).takeUnretainedValue().closure
+    closure(param0)
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
 
 #if arch(wasm32)
 @_extern(wasm, module: "bjs", name: "invoke_js_callback_BridgeJSRuntimeTests_20BridgeJSRuntimeTestssSqSd_y")
@@ -5252,6 +6038,112 @@ fileprivate func bjs_JSNameTransformer_apply_extern(_ jsObject: Int32, _ value: 
 #endif
 @inline(never) fileprivate func bjs_JSNameTransformer_apply(_ jsObject: Int32, _ value: Int32) -> Int32 {
     return bjs_JSNameTransformer_apply_extern(jsObject, value)
+}
+
+extension NoncopyableObjectVisitor where Self: _BridgedSwiftProtocolWrapper {
+    func visit(_ object: borrowing NoncopyableObject) -> Int {
+        let objectValue = object.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let ret = bjs_NoncopyableObjectVisitor_visit(jsObjectValue, objectValue)
+        return Int.bridgeJSLiftReturn(ret)
+    }
+
+    #if compiler(>=6.4)
+    @available(anyAppleOS 27.0, *)
+    func visitAll(_ objects: borrowing UniqueArray<NoncopyableObject>) -> Int {
+        let _ = objects.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let ret = bjs_NoncopyableObjectVisitor_visitAll(jsObjectValue)
+        return Int.bridgeJSLiftReturn(ret)
+    }
+    #endif
+
+    #if compiler(>=6.4)
+    @available(anyAppleOS 27.0, *)
+    func makeAll(_ count: Int) -> UniqueArray<NoncopyableObject> {
+        let countValue = count.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        bjs_NoncopyableObjectVisitor_makeAll(jsObjectValue, countValue)
+        return UniqueArray<NoncopyableObject>.bridgeJSLiftReturn()
+    }
+    #endif
+}
+
+struct AnyNoncopyableObjectVisitor: NoncopyableObjectVisitor, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyNoncopyableObjectVisitor(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectVisitor_visit")
+fileprivate func bjs_NoncopyableObjectVisitor_visit_extern(_ jsObject: Int32, _ object: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectVisitor_visit_extern(_ jsObject: Int32, _ object: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectVisitor_visit(_ jsObject: Int32, _ object: Int32) -> Int32 {
+    return bjs_NoncopyableObjectVisitor_visit_extern(jsObject, object)
+}
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectVisitor_visitAll")
+fileprivate func bjs_NoncopyableObjectVisitor_visitAll_extern(_ jsObject: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectVisitor_visitAll_extern(_ jsObject: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectVisitor_visitAll(_ jsObject: Int32) -> Int32 {
+    return bjs_NoncopyableObjectVisitor_visitAll_extern(jsObject)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectVisitor_makeAll")
+fileprivate func bjs_NoncopyableObjectVisitor_makeAll_extern(_ jsObject: Int32, _ count: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableObjectVisitor_makeAll_extern(_ jsObject: Int32, _ count: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectVisitor_makeAll(_ jsObject: Int32, _ count: Int32) -> Void {
+    return bjs_NoncopyableObjectVisitor_makeAll_extern(jsObject, count)
+}
+#endif
+
+extension NoncopyableOptionalObjectVisitor where Self: _BridgedSwiftProtocolWrapper {
+    func visit(_ object: borrowing Optional<NoncopyableObject>) -> Int {
+        let (objectIsSome, objectValue) = object.bridgeJSLowerParameter()
+        let jsObjectValue = jsObject.bridgeJSLowerParameter()
+        let ret = bjs_NoncopyableOptionalObjectVisitor_visit(jsObjectValue, objectIsSome, objectValue)
+        return Int.bridgeJSLiftReturn(ret)
+    }
+}
+
+struct AnyNoncopyableOptionalObjectVisitor: NoncopyableOptionalObjectVisitor, _BridgedSwiftProtocolWrapper {
+    let jsObject: JSObject
+
+    static func bridgeJSLiftParameter(_ value: Int32) -> Self {
+        return AnyNoncopyableOptionalObjectVisitor(jsObject: JSObject(id: UInt32(bitPattern: value)))
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableOptionalObjectVisitor_visit")
+fileprivate func bjs_NoncopyableOptionalObjectVisitor_visit_extern(_ jsObject: Int32, _ objectIsSome: Int32, _ objectValue: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableOptionalObjectVisitor_visit_extern(_ jsObject: Int32, _ objectIsSome: Int32, _ objectValue: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableOptionalObjectVisitor_visit(_ jsObject: Int32, _ objectIsSome: Int32, _ objectValue: Int32) -> Int32 {
+    return bjs_NoncopyableOptionalObjectVisitor_visit_extern(jsObject, objectIsSome, objectValue)
 }
 
 extension Severity: _BridgedSwiftCaseEnum {
@@ -11989,6 +12881,305 @@ public func _bjs_greetCount(_ count: Int32) -> Void {
     #endif
 }
 
+@_expose(wasm, "bjs_noncopyableTake")
+@_cdecl("bjs_noncopyableTake")
+public func _bjs_noncopyableTake(_ object: Int32) -> Int32 {
+    #if arch(wasm32)
+    let object = NoncopyableObject.bridgeJSLiftParameter(object)
+    let ret = noncopyableTake(_: object)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableConsume")
+@_cdecl("bjs_noncopyableConsume")
+public func _bjs_noncopyableConsume(_ object: Int32) -> Int32 {
+    #if arch(wasm32)
+    let object = NoncopyableObject.bridgeJSLiftParameter(object)
+    let ret = noncopyableConsume(_: object)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableMake")
+@_cdecl("bjs_noncopyableMake")
+public func _bjs_noncopyableMake(_ start: Int32) -> Int32 {
+    #if arch(wasm32)
+    let start = Int.bridgeJSLiftParameter(start)
+    let ret = noncopyableMake(_: start)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableLoad")
+@_cdecl("bjs_noncopyableLoad")
+public func _bjs_noncopyableLoad(_ start: Int32) -> Int32 {
+    #if arch(wasm32)
+    let start = Int.bridgeJSLiftParameter(start)
+    return _bjs_makePromise(resolve: Promise_resolve_17NoncopyableObjectV, reject: Promise_reject) {
+        return await noncopyableLoad(_: start)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableCallWith")
+@_cdecl("bjs_noncopyableCallWith")
+public func _bjs_noncopyableCallWith(_ start: Int32, _ body: Int32) -> Int32 {
+    #if arch(wasm32)
+    let body = _BJS_Closure_20BridgeJSRuntimeTests17NoncopyableObjectV_Si.bridgeJSLift(body)
+    let start = Int.bridgeJSLiftParameter(start)
+    let ret = noncopyableCallWith(_: start, _: body)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableCallWithOptional")
+@_cdecl("bjs_noncopyableCallWithOptional")
+public func _bjs_noncopyableCallWithOptional(_ start: Int32, _ body: Int32) -> Int32 {
+    #if arch(wasm32)
+    let body = _BJS_Closure_20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si.bridgeJSLift(body)
+    let start = Int.bridgeJSLiftParameter(start)
+    let ret = noncopyableCallWithOptional(_: start, _: body)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableTakeOptional")
+@_cdecl("bjs_noncopyableTakeOptional")
+public func _bjs_noncopyableTakeOptional(_ objectIsSome: Int32, _ objectValue: Int32) -> Int32 {
+    #if arch(wasm32)
+    let object = Optional<NoncopyableObject>.bridgeJSLiftParameter(objectIsSome, objectValue)
+    let ret = noncopyableTakeOptional(_: object)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_copyableTakeOptional")
+@_cdecl("bjs_copyableTakeOptional")
+public func _bjs_copyableTakeOptional(_ copyableIsSome: Int32, _ copyableValue: Int32) -> Int32 {
+    #if arch(wasm32)
+    let copyable = Optional<CopyableObjectRoundtrip>.bridgeJSLiftParameter(copyableIsSome, copyableValue)
+    let ret = copyableTakeOptional(_: copyable)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableFindOptional")
+@_cdecl("bjs_noncopyableFindOptional")
+public func _bjs_noncopyableFindOptional(_ start: Int32) -> Void {
+    #if arch(wasm32)
+    let start = Int.bridgeJSLiftParameter(start)
+    let ret = noncopyableFindOptional(_: start)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableVisit")
+@_cdecl("bjs_noncopyableVisit")
+public func _bjs_noncopyableVisit(_ visitor: Int32, _ start: Int32) -> Int32 {
+    #if arch(wasm32)
+    let start = Int.bridgeJSLiftParameter(start)
+    let visitor = AnyNoncopyableObjectVisitor.bridgeJSLiftParameter(visitor)
+    let ret = noncopyableVisit(_: visitor, _: start)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableVisitOptional")
+@_cdecl("bjs_noncopyableVisitOptional")
+public func _bjs_noncopyableVisitOptional(_ visitor: Int32, _ start: Int32) -> Int32 {
+    #if arch(wasm32)
+    let start = Int.bridgeJSLiftParameter(start)
+    let visitor = AnyNoncopyableOptionalObjectVisitor.bridgeJSLiftParameter(visitor)
+    let ret = noncopyableVisitOptional(_: visitor, _: start)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_noncopyableMakeReader")
+@_cdecl("bjs_noncopyableMakeReader")
+public func _bjs_noncopyableMakeReader() -> Int32 {
+    #if arch(wasm32)
+    let ret = noncopyableMakeReader()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_copyableMakeReader")
+@_cdecl("bjs_copyableMakeReader")
+public func _bjs_copyableMakeReader() -> Int32 {
+    #if arch(wasm32)
+    let ret = copyableMakeReader()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_makeIntReader")
+@_cdecl("bjs_makeIntReader")
+public func _bjs_makeIntReader() -> Int32 {
+    #if arch(wasm32)
+    let ret = makeIntReader()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_noncopyableTakeAll")
+@_cdecl("bjs_noncopyableTakeAll")
+public func _bjs_noncopyableTakeAll() -> Void {
+    #if arch(wasm32)
+    let objects = UniqueArray<NoncopyableObject>.bridgeJSStackPop()
+    let ret = noncopyableTakeAll(_: objects)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_noncopyableMakeAll")
+@_cdecl("bjs_noncopyableMakeAll")
+public func _bjs_noncopyableMakeAll(_ count: Int32) -> Void {
+    #if arch(wasm32)
+    let count = Int.bridgeJSLiftParameter(count)
+    let ret = noncopyableMakeAll(_: count)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_noncopyableLoadAll")
+@_cdecl("bjs_noncopyableLoadAll")
+public func _bjs_noncopyableLoadAll(_ count: Int32) -> Int32 {
+    #if arch(wasm32)
+    let count = Int.bridgeJSLiftParameter(count)
+    return _bjs_makePromise(resolve: Promise_resolve_Sa17NoncopyableObjectV, reject: Promise_reject) {
+        return await noncopyableLoadAll(_: count)
+    }
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_noncopyablePassAll")
+@_cdecl("bjs_noncopyablePassAll")
+public func _bjs_noncopyablePassAll() -> Void {
+    #if arch(wasm32)
+    let objects = UniqueArray<NoncopyableObject>.bridgeJSStackPop()
+    let ret = noncopyablePassAll(_: objects)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_noncopyableTakeAllOptional")
+@_cdecl("bjs_noncopyableTakeAllOptional")
+public func _bjs_noncopyableTakeAllOptional() -> Void {
+    #if arch(wasm32)
+    let objects = UniqueArray<Optional<NoncopyableObject>>.bridgeJSStackPop()
+    let ret = noncopyableTakeAllOptional(_: objects)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_noncopyableTakeMaybe")
+@_cdecl("bjs_noncopyableTakeMaybe")
+public func _bjs_noncopyableTakeMaybe() -> Void {
+    #if arch(wasm32)
+    let objects = Optional<UniqueArray<NoncopyableObject>>.bridgeJSLiftParameter()
+    let ret = noncopyableTakeMaybe(_: objects)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_noncopyableMakeMaybe")
+@_cdecl("bjs_noncopyableMakeMaybe")
+public func _bjs_noncopyableMakeMaybe(_ count: Int32) -> Void {
+    #if arch(wasm32)
+    let count = Int.bridgeJSLiftParameter(count)
+    let ret = noncopyableMakeMaybe(_: count)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_noncopyableVisitAll")
+@_cdecl("bjs_noncopyableVisitAll")
+public func _bjs_noncopyableVisitAll(_ visitor: Int32) -> Int32 {
+    #if arch(wasm32)
+    let objects = UniqueArray<NoncopyableObject>.bridgeJSStackPop()
+    let visitor = AnyNoncopyableObjectVisitor.bridgeJSLiftParameter(visitor)
+    let ret = noncopyableVisitAll(_: visitor, _: objects)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_noncopyableVisitorMakeAll")
+@_cdecl("bjs_noncopyableVisitorMakeAll")
+public func _bjs_noncopyableVisitorMakeAll(_ visitor: Int32, _ count: Int32) -> Void {
+    #if arch(wasm32)
+    let count = Int.bridgeJSLiftParameter(count)
+    let visitor = AnyNoncopyableObjectVisitor.bridgeJSLiftParameter(visitor)
+    let ret = noncopyableVisitorMakeAll(_: visitor, _: count)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
 @_expose(wasm, "bjs_roundTripPointerFields")
 @_cdecl("bjs_roundTripPointerFields")
 public func _bjs_roundTripPointerFields() -> Void {
@@ -16106,6 +17297,223 @@ fileprivate func _bjs_JSNameRenamedClass_wrap_extern(_ pointer: UnsafeMutableRaw
     return _bjs_JSNameRenamedClass_wrap_extern(pointer)
 }
 
+@_expose(wasm, "bjs_NoncopyableObjectBox_init")
+@_cdecl("bjs_NoncopyableObjectBox_init")
+public func _bjs_NoncopyableObjectBox_init(_ start: Int32) -> UnsafeMutableRawPointer {
+    #if arch(wasm32)
+    let start = Int.bridgeJSLiftParameter(start)
+    let ret = NoncopyableObjectBox(_: start)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_value")
+@_cdecl("bjs_NoncopyableObjectBox_value")
+public func _bjs_NoncopyableObjectBox_value(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    let ret = _self.value()
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_take")
+@_cdecl("bjs_NoncopyableObjectBox_take")
+public func _bjs_NoncopyableObjectBox_take(_ _self: UnsafeMutableRawPointer, _ other: Int32) -> Int32 {
+    #if arch(wasm32)
+    let other = NoncopyableObject.bridgeJSLiftParameter(other)
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    let ret = _self.take(_: other)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_object_get")
+@_cdecl("bjs_NoncopyableObjectBox_object_get")
+public func _bjs_NoncopyableObjectBox_object_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    let ret = NoncopyableObject.bridgeJSRetaining(_self.object)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_object_set")
+@_cdecl("bjs_NoncopyableObjectBox_object_set")
+public func _bjs_NoncopyableObjectBox_object_set(_ _self: UnsafeMutableRawPointer, _ value: Int32) -> Void {
+    #if arch(wasm32)
+    let value = NoncopyableObject.bridgeJSLiftParameter(value)
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    _self.object = value
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_made_get")
+@_cdecl("bjs_NoncopyableObjectBox_made_get")
+public func _bjs_NoncopyableObjectBox_made_get(_ _self: UnsafeMutableRawPointer) -> Int32 {
+    #if arch(wasm32)
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    let ret = NoncopyableObject.bridgeJSRetaining(_self.made)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_static_shared_get")
+@_cdecl("bjs_NoncopyableObjectBox_static_shared_get")
+public func _bjs_NoncopyableObjectBox_static_shared_get() -> Int32 {
+    #if arch(wasm32)
+    let ret = NoncopyableObject.bridgeJSRetaining(NoncopyableObjectBox.shared)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_static_shared_set")
+@_cdecl("bjs_NoncopyableObjectBox_static_shared_set")
+public func _bjs_NoncopyableObjectBox_static_shared_set(_ value: Int32) -> Void {
+    #if arch(wasm32)
+    let value = NoncopyableObject.bridgeJSLiftParameter(value)
+    NoncopyableObjectBox.shared = value
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_static_staticMade_get")
+@_cdecl("bjs_NoncopyableObjectBox_static_staticMade_get")
+public func _bjs_NoncopyableObjectBox_static_staticMade_get() -> Int32 {
+    #if arch(wasm32)
+    let ret = NoncopyableObject.bridgeJSRetaining(NoncopyableObjectBox.staticMade)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_optionalObject_get")
+@_cdecl("bjs_NoncopyableObjectBox_optionalObject_get")
+public func _bjs_NoncopyableObjectBox_optionalObject_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    let ret = Optional<NoncopyableObject>.bridgeJSRetaining(_self.optionalObject)
+    return ret.bridgeJSLowerReturn()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_optionalObject_set")
+@_cdecl("bjs_NoncopyableObjectBox_optionalObject_set")
+public func _bjs_NoncopyableObjectBox_optionalObject_set(_ _self: UnsafeMutableRawPointer, _ valueIsSome: Int32, _ valueValue: Int32) -> Void {
+    #if arch(wasm32)
+    let value = Optional<NoncopyableObject>.bridgeJSLiftParameter(valueIsSome, valueValue)
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    _self.optionalObject = value
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_NoncopyableObjectBox_objects_get")
+@_cdecl("bjs_NoncopyableObjectBox_objects_get")
+public func _bjs_NoncopyableObjectBox_objects_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    let ret = UniqueArray<NoncopyableObject>.bridgeJSRetaining(_self.objects)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_NoncopyableObjectBox_objects_set")
+@_cdecl("bjs_NoncopyableObjectBox_objects_set")
+public func _bjs_NoncopyableObjectBox_objects_set(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let value = UniqueArray<NoncopyableObject>.bridgeJSStackPop()
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    _self.objects = value
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_NoncopyableObjectBox_maybeObjects_get")
+@_cdecl("bjs_NoncopyableObjectBox_maybeObjects_get")
+public func _bjs_NoncopyableObjectBox_maybeObjects_get(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    let ret = Optional<UniqueArray<NoncopyableObject>>.bridgeJSRetaining(_self.maybeObjects)
+    ret.bridgeJSStackPush()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+#if compiler(>=6.4)
+@_expose(wasm, "bjs_NoncopyableObjectBox_maybeObjects_set")
+@_cdecl("bjs_NoncopyableObjectBox_maybeObjects_set")
+public func _bjs_NoncopyableObjectBox_maybeObjects_set(_ _self: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    let value = Optional<UniqueArray<NoncopyableObject>>.bridgeJSLiftParameter()
+    let _self = NoncopyableObjectBox.bridgeJSLiftParameter(_self)
+    _self.maybeObjects = value
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+#endif
+
+@_expose(wasm, "bjs_NoncopyableObjectBox_deinit")
+@_cdecl("bjs_NoncopyableObjectBox_deinit")
+public func _bjs_NoncopyableObjectBox_deinit(_ pointer: UnsafeMutableRawPointer) -> Void {
+    #if arch(wasm32)
+    Unmanaged<NoncopyableObjectBox>.fromOpaque(pointer).release()
+    #else
+    fatalError("Only available on WebAssembly")
+    #endif
+}
+
+extension NoncopyableObjectBox: ConvertibleToJSValue, _BridgedSwiftHeapObject, _BridgedSwiftProtocolExportable {
+    var jsValue: JSValue {
+        return .object(JSObject(id: UInt32(bitPattern: _bjs_NoncopyableObjectBox_wrap(Unmanaged.passRetained(self).toOpaque()))))
+    }
+    consuming func bridgeJSLowerAsProtocolReturn() -> Int32 {
+        _bjs_NoncopyableObjectBox_wrap(Unmanaged.passRetained(self).toOpaque())
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectBox_wrap")
+fileprivate func _bjs_NoncopyableObjectBox_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32
+#else
+fileprivate func _bjs_NoncopyableObjectBox_wrap_extern(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func _bjs_NoncopyableObjectBox_wrap(_ pointer: UnsafeMutableRawPointer) -> Int32 {
+    return _bjs_NoncopyableObjectBox_wrap_extern(pointer)
+}
+
 @_expose(wasm, "bjs_OptionalHolder_init")
 @_cdecl("bjs_OptionalHolder_init")
 public func _bjs_OptionalHolder_init(_ nullableGreeterIsSome: Int32, _ nullableGreeterValue: UnsafeMutableRawPointer, _ undefinedNumberIsSome: Int32, _ undefinedNumberValue: Float64) -> UnsafeMutableRawPointer {
@@ -17193,6 +18601,56 @@ func _$Promise_resolve_Sq18AsyncPayloadResultO(_ promise: JSObject, _ value: Opt
     promise_resolve_BridgeJSRuntimeTests_Sq18AsyncPayloadResultO(promiseValue, valueIsSome, valueCaseId)
     if let error = _swift_js_take_exception() { throw error }
 }
+
+@JSFunction func Promise_resolve_17NoncopyableObjectV(_ promise: JSObject, _ value: borrowing NoncopyableObject) throws(JSException)
+
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_17NoncopyableObjectV")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_17NoncopyableObjectV_extern(_ promise: Int32, _ value: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_17NoncopyableObjectV_extern(_ promise: Int32, _ value: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_17NoncopyableObjectV(_ promise: Int32, _ value: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_17NoncopyableObjectV_extern(promise, value)
+}
+
+func _$Promise_resolve_17NoncopyableObjectV(_ promise: JSObject, _ value: borrowing NoncopyableObject) throws(JSException) -> Void {
+    let valueValue = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_17NoncopyableObjectV(promiseValue, valueValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+@JSFunction func Promise_resolve_Sa17NoncopyableObjectV(_ promise: JSObject, _ value: borrowing UniqueArray<NoncopyableObject>) throws(JSException)
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "bjs", name: "promise_resolve_BridgeJSRuntimeTests_Sa17NoncopyableObjectV")
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa17NoncopyableObjectV_extern(_ promise: Int32) -> Void
+#else
+fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa17NoncopyableObjectV_extern(_ promise: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func promise_resolve_BridgeJSRuntimeTests_Sa17NoncopyableObjectV(_ promise: Int32) -> Void {
+    return promise_resolve_BridgeJSRuntimeTests_Sa17NoncopyableObjectV_extern(promise)
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$Promise_resolve_Sa17NoncopyableObjectV(_ promise: JSObject, _ value: borrowing UniqueArray<NoncopyableObject>) throws(JSException) -> Void {
+    let _ = value.bridgeJSLowerParameter()
+    let promiseValue = promise.bridgeJSLowerParameter()
+    promise_resolve_BridgeJSRuntimeTests_Sa17NoncopyableObjectV(promiseValue)
+    if let error = _swift_js_take_exception() { throw error }
+}
+#endif
 
 @JSFunction func Promise_resolve_11PublicPointV(_ promise: JSObject, _ value: PublicPoint) throws(JSException)
 
@@ -21567,6 +23025,1397 @@ func _$jsFunctionWithPrivateAccess() throws(JSException) -> Void {
     bjs_jsFunctionWithPrivateAccess()
     if let error = _swift_js_take_exception() {
         throw error
+    }
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_noncopyableSharedObject_get")
+fileprivate func bjs_noncopyableSharedObject_get_extern() -> Int32
+#else
+fileprivate func bjs_noncopyableSharedObject_get_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_noncopyableSharedObject_get() -> Int32 {
+    return bjs_noncopyableSharedObject_get_extern()
+}
+
+func _$noncopyableSharedObject_get() throws(JSException) -> NoncopyableObject {
+    let ret = bjs_noncopyableSharedObject_get()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return NoncopyableObject.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_noncopyableMakeObject")
+fileprivate func bjs_noncopyableMakeObject_extern(_ start: Int32) -> Int32
+#else
+fileprivate func bjs_noncopyableMakeObject_extern(_ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_noncopyableMakeObject(_ start: Int32) -> Int32 {
+    return bjs_noncopyableMakeObject_extern(start)
+}
+
+func _$noncopyableMakeObject(_ start: Int) throws(JSException) -> NoncopyableObject {
+    let startValue = start.bridgeJSLowerParameter()
+    let ret = bjs_noncopyableMakeObject(startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return NoncopyableObject.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_noncopyableUseObject")
+fileprivate func bjs_noncopyableUseObject_extern(_ object: Int32) -> Int32
+#else
+fileprivate func bjs_noncopyableUseObject_extern(_ object: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_noncopyableUseObject(_ object: Int32) -> Int32 {
+    return bjs_noncopyableUseObject_extern(object)
+}
+
+func _$noncopyableUseObject(_ object: borrowing NoncopyableObject) throws(JSException) -> Int {
+    let objectValue = object.bridgeJSLowerParameter()
+    let ret = bjs_noncopyableUseObject(objectValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObject_init")
+fileprivate func bjs_NoncopyableObject_init_extern(_ start: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObject_init_extern(_ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObject_init(_ start: Int32) -> Int32 {
+    return bjs_NoncopyableObject_init_extern(start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObject_create_static")
+fileprivate func bjs_NoncopyableObject_create_static_extern(_ start: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObject_create_static_extern(_ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObject_create_static(_ start: Int32) -> Int32 {
+    return bjs_NoncopyableObject_create_static_extern(start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObject_value")
+fileprivate func bjs_NoncopyableObject_value_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObject_value_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObject_value(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableObject_value_extern(self)
+}
+
+func _$NoncopyableObject_init(_ start: Int) throws(JSException) -> JSUniqueRef {
+    let startValue = start.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObject_init(startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUniqueRef.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObject_create(_ start: Int) throws(JSException) -> NoncopyableObject {
+    let startValue = start.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObject_create_static(startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return NoncopyableObject.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObject_value(_ self: borrowing JSUniqueRef) throws(JSException) -> Int {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObject_value(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectView_value")
+fileprivate func bjs_NoncopyableObjectView_value_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectView_value_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectView_value(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableObjectView_value_extern(self)
+}
+
+func _$NoncopyableObjectView_value(_ self: borrowing JSUniqueRef) throws(JSException) -> Int {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObjectView_value(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_init")
+fileprivate func bjs_NoncopyableObjectRoundtrip_init_extern() -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_init_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_init() -> Int32 {
+    return bjs_NoncopyableObjectRoundtrip_init_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_child_get")
+fileprivate func bjs_NoncopyableObjectRoundtrip_child_get_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_child_get_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_child_get(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableObjectRoundtrip_child_get_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_child_set")
+fileprivate func bjs_NoncopyableObjectRoundtrip_child_set_extern(_ self: Int32, _ newValue: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_child_set_extern(_ self: Int32, _ newValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_child_set(_ self: Int32, _ newValue: Int32) -> Void {
+    return bjs_NoncopyableObjectRoundtrip_child_set_extern(self, newValue)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_take")
+fileprivate func bjs_NoncopyableObjectRoundtrip_take_extern(_ self: Int32, _ object: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_take_extern(_ self: Int32, _ object: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_take(_ self: Int32, _ object: Int32) -> Int32 {
+    return bjs_NoncopyableObjectRoundtrip_take_extern(self, object)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_make")
+fileprivate func bjs_NoncopyableObjectRoundtrip_make_extern(_ self: Int32, _ start: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_make_extern(_ self: Int32, _ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_make(_ self: Int32, _ start: Int32) -> Int32 {
+    return bjs_NoncopyableObjectRoundtrip_make_extern(self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_adopt")
+fileprivate func bjs_NoncopyableObjectRoundtrip_adopt_extern(_ self: Int32, _ object: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_adopt_extern(_ self: Int32, _ object: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_adopt(_ self: Int32, _ object: Int32) -> Int32 {
+    return bjs_NoncopyableObjectRoundtrip_adopt_extern(self, object)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_takeCopyable")
+fileprivate func bjs_NoncopyableObjectRoundtrip_takeCopyable_extern(_ self: Int32, _ copyable: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_takeCopyable_extern(_ self: Int32, _ copyable: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_takeCopyable(_ self: Int32, _ copyable: Int32) -> Int32 {
+    return bjs_NoncopyableObjectRoundtrip_takeCopyable_extern(self, copyable)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_makeCopyable")
+fileprivate func bjs_NoncopyableObjectRoundtrip_makeCopyable_extern(_ self: Int32, _ start: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_makeCopyable_extern(_ self: Int32, _ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_makeCopyable(_ self: Int32, _ start: Int32) -> Int32 {
+    return bjs_NoncopyableObjectRoundtrip_makeCopyable_extern(self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_failTake")
+fileprivate func bjs_NoncopyableObjectRoundtrip_failTake_extern(_ self: Int32, _ object: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_failTake_extern(_ self: Int32, _ object: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_failTake(_ self: Int32, _ object: Int32) -> Int32 {
+    return bjs_NoncopyableObjectRoundtrip_failTake_extern(self, object)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableObjectRoundtrip_failMake")
+fileprivate func bjs_NoncopyableObjectRoundtrip_failMake_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableObjectRoundtrip_failMake_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableObjectRoundtrip_failMake(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableObjectRoundtrip_failMake_extern(self)
+}
+
+func _$NoncopyableObjectRoundtrip_init() throws(JSException) -> JSUniqueRef {
+    let ret = bjs_NoncopyableObjectRoundtrip_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUniqueRef.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObjectRoundtrip_child_get(_ self: borrowing JSUniqueRef) throws(JSException) -> NoncopyableObject {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObjectRoundtrip_child_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return NoncopyableObject.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObjectRoundtrip_child_set(_ self: borrowing JSUniqueRef, _ newValue: borrowing NoncopyableObject) throws(JSException) -> Void {
+    let newValueValue = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableObjectRoundtrip_child_set(selfValue, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$NoncopyableObjectRoundtrip_take(_ self: borrowing JSUniqueRef, _ object: borrowing NoncopyableObject) throws(JSException) -> Int {
+    let objectValue = object.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObjectRoundtrip_take(selfValue, objectValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObjectRoundtrip_make(_ self: borrowing JSUniqueRef, _ start: Int) throws(JSException) -> NoncopyableObject {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObjectRoundtrip_make(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return NoncopyableObject.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObjectRoundtrip_adopt(_ self: borrowing JSUniqueRef, _ object: borrowing NoncopyableObject) throws(JSException) -> Int {
+    let objectValue = object.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObjectRoundtrip_adopt(selfValue, objectValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObjectRoundtrip_takeCopyable(_ self: borrowing JSUniqueRef, _ copyable: CopyableObjectRoundtrip) throws(JSException) -> Int {
+    let copyableValue = copyable.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObjectRoundtrip_takeCopyable(selfValue, copyableValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObjectRoundtrip_makeCopyable(_ self: borrowing JSUniqueRef, _ start: Int) throws(JSException) -> CopyableObjectRoundtrip {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObjectRoundtrip_makeCopyable(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return CopyableObjectRoundtrip.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObjectRoundtrip_failTake(_ self: borrowing JSUniqueRef, _ object: borrowing NoncopyableObject) throws(JSException) -> Int {
+    let objectValue = object.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObjectRoundtrip_failTake(selfValue, objectValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableObjectRoundtrip_failMake(_ self: borrowing JSUniqueRef) throws(JSException) -> NoncopyableObject {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableObjectRoundtrip_failMake(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return NoncopyableObject.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_CopyableObjectRoundtrip_value")
+fileprivate func bjs_CopyableObjectRoundtrip_value_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_CopyableObjectRoundtrip_value_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_CopyableObjectRoundtrip_value(_ self: Int32) -> Int32 {
+    return bjs_CopyableObjectRoundtrip_value_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_CopyableObjectRoundtrip_take")
+fileprivate func bjs_CopyableObjectRoundtrip_take_extern(_ self: Int32, _ object: Int32) -> Int32
+#else
+fileprivate func bjs_CopyableObjectRoundtrip_take_extern(_ self: Int32, _ object: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_CopyableObjectRoundtrip_take(_ self: Int32, _ object: Int32) -> Int32 {
+    return bjs_CopyableObjectRoundtrip_take_extern(self, object)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_CopyableObjectRoundtrip_make")
+fileprivate func bjs_CopyableObjectRoundtrip_make_extern(_ self: Int32, _ start: Int32) -> Int32
+#else
+fileprivate func bjs_CopyableObjectRoundtrip_make_extern(_ self: Int32, _ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_CopyableObjectRoundtrip_make(_ self: Int32, _ start: Int32) -> Int32 {
+    return bjs_CopyableObjectRoundtrip_make_extern(self, start)
+}
+
+func _$CopyableObjectRoundtrip_value(_ self: JSObject) throws(JSException) -> Int {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_CopyableObjectRoundtrip_value(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$CopyableObjectRoundtrip_take(_ self: JSObject, _ object: borrowing NoncopyableObject) throws(JSException) -> Int {
+    let objectValue = object.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_CopyableObjectRoundtrip_take(selfValue, objectValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$CopyableObjectRoundtrip_make(_ self: JSObject, _ start: Int) throws(JSException) -> NoncopyableObject {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_CopyableObjectRoundtrip_make(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return NoncopyableObject.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_init")
+fileprivate func bjs_NoncopyableSource_init_extern() -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_init_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_init() -> Int32 {
+    return bjs_NoncopyableSource_init_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_optionalChild_get")
+fileprivate func bjs_NoncopyableSource_optionalChild_get_extern(_ self: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_optionalChild_get_extern(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_optionalChild_get(_ self: Int32) -> Void {
+    return bjs_NoncopyableSource_optionalChild_get_extern(self)
+}
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_children_get")
+fileprivate func bjs_NoncopyableSource_children_get_extern(_ self: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_children_get_extern(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_children_get(_ self: Int32) -> Void {
+    return bjs_NoncopyableSource_children_get_extern(self)
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_optionalChild_set")
+fileprivate func bjs_NoncopyableSource_optionalChild_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_optionalChild_set_extern(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_optionalChild_set(_ self: Int32, _ newValueIsSome: Int32, _ newValueValue: Int32) -> Void {
+    return bjs_NoncopyableSource_optionalChild_set_extern(self, newValueIsSome, newValueValue)
+}
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_children_set")
+fileprivate func bjs_NoncopyableSource_children_set_extern(_ self: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_children_set_extern(_ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_children_set(_ self: Int32) -> Void {
+    return bjs_NoncopyableSource_children_set_extern(self)
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_forEachObject")
+fileprivate func bjs_NoncopyableSource_forEachObject_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_forEachObject_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_forEachObject(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    return bjs_NoncopyableSource_forEachObject_extern(self, count, body)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_forEachObjectEscaping")
+fileprivate func bjs_NoncopyableSource_forEachObjectEscaping_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_forEachObjectEscaping_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_forEachObjectEscaping(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    return bjs_NoncopyableSource_forEachObjectEscaping_extern(self, count, body)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_forEachCopyableEscaping")
+fileprivate func bjs_NoncopyableSource_forEachCopyableEscaping_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_forEachCopyableEscaping_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_forEachCopyableEscaping(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    return bjs_NoncopyableSource_forEachCopyableEscaping_extern(self, count, body)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_load")
+fileprivate func bjs_NoncopyableSource_load_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ start: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_load_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ start: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_load(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ start: Int32) -> Void {
+    return bjs_NoncopyableSource_load_extern(resolveRef, rejectRef, self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_loadCopyable")
+fileprivate func bjs_NoncopyableSource_loadCopyable_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ start: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_loadCopyable_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ start: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_loadCopyable(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ start: Int32) -> Void {
+    return bjs_NoncopyableSource_loadCopyable_extern(resolveRef, rejectRef, self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_loadFail")
+fileprivate func bjs_NoncopyableSource_loadFail_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_loadFail_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_loadFail(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32) -> Void {
+    return bjs_NoncopyableSource_loadFail_extern(resolveRef, rejectRef, self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_use")
+fileprivate func bjs_NoncopyableSource_use_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ object: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_use_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ object: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_use(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ object: Int32) -> Void {
+    return bjs_NoncopyableSource_use_extern(resolveRef, rejectRef, self, object)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_referencesToCreated")
+fileprivate func bjs_NoncopyableSource_referencesToCreated_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_referencesToCreated_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_referencesToCreated(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableSource_referencesToCreated_extern(self)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_referencesTo")
+fileprivate func bjs_NoncopyableSource_referencesTo_extern(_ self: Int32, _ object: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_referencesTo_extern(_ self: Int32, _ object: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_referencesTo(_ self: Int32, _ object: Int32) -> Int32 {
+    return bjs_NoncopyableSource_referencesTo_extern(self, object)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_takeOptional")
+fileprivate func bjs_NoncopyableSource_takeOptional_extern(_ self: Int32, _ objectIsSome: Int32, _ objectValue: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_takeOptional_extern(_ self: Int32, _ objectIsSome: Int32, _ objectValue: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_takeOptional(_ self: Int32, _ objectIsSome: Int32, _ objectValue: Int32) -> Int32 {
+    return bjs_NoncopyableSource_takeOptional_extern(self, objectIsSome, objectValue)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_takeOptionalCopyable")
+fileprivate func bjs_NoncopyableSource_takeOptionalCopyable_extern(_ self: Int32, _ copyableIsSome: Int32, _ copyableValue: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_takeOptionalCopyable_extern(_ self: Int32, _ copyableIsSome: Int32, _ copyableValue: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_takeOptionalCopyable(_ self: Int32, _ copyableIsSome: Int32, _ copyableValue: Int32) -> Int32 {
+    return bjs_NoncopyableSource_takeOptionalCopyable_extern(self, copyableIsSome, copyableValue)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_findOptional")
+fileprivate func bjs_NoncopyableSource_findOptional_extern(_ self: Int32, _ start: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_findOptional_extern(_ self: Int32, _ start: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_findOptional(_ self: Int32, _ start: Int32) -> Void {
+    return bjs_NoncopyableSource_findOptional_extern(self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_findOptionalCopyable")
+fileprivate func bjs_NoncopyableSource_findOptionalCopyable_extern(_ self: Int32, _ start: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_findOptionalCopyable_extern(_ self: Int32, _ start: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_findOptionalCopyable(_ self: Int32, _ start: Int32) -> Void {
+    return bjs_NoncopyableSource_findOptionalCopyable_extern(self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_forEachOptional")
+fileprivate func bjs_NoncopyableSource_forEachOptional_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_forEachOptional_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_forEachOptional(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    return bjs_NoncopyableSource_forEachOptional_extern(self, count, body)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_loadOptional")
+fileprivate func bjs_NoncopyableSource_loadOptional_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ start: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_loadOptional_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ start: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_loadOptional(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ start: Int32) -> Void {
+    return bjs_NoncopyableSource_loadOptional_extern(resolveRef, rejectRef, self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_raw")
+fileprivate func bjs_NoncopyableSource_raw_extern(_ self: Int32, _ start: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_raw_extern(_ self: Int32, _ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_raw(_ self: Int32, _ start: Int32) -> Int32 {
+    return bjs_NoncopyableSource_raw_extern(self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_rawValue")
+fileprivate func bjs_NoncopyableSource_rawValue_extern(_ self: Int32, _ ref: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_rawValue_extern(_ self: Int32, _ ref: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_rawValue(_ self: Int32, _ ref: Int32) -> Int32 {
+    return bjs_NoncopyableSource_rawValue_extern(self, ref)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_maybeRaw")
+fileprivate func bjs_NoncopyableSource_maybeRaw_extern(_ self: Int32, _ start: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_maybeRaw_extern(_ self: Int32, _ start: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_maybeRaw(_ self: Int32, _ start: Int32) -> Void {
+    return bjs_NoncopyableSource_maybeRaw_extern(self, start)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_rawObject")
+fileprivate func bjs_NoncopyableSource_rawObject_extern(_ self: Int32, _ start: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_rawObject_extern(_ self: Int32, _ start: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_rawObject(_ self: Int32, _ start: Int32) -> Int32 {
+    return bjs_NoncopyableSource_rawObject_extern(self, start)
+}
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_takeAll")
+fileprivate func bjs_NoncopyableSource_takeAll_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_takeAll_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_takeAll(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableSource_takeAll_extern(self)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_makeAll")
+fileprivate func bjs_NoncopyableSource_makeAll_extern(_ self: Int32, _ count: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_makeAll_extern(_ self: Int32, _ count: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_makeAll(_ self: Int32, _ count: Int32) -> Void {
+    return bjs_NoncopyableSource_makeAll_extern(self, count)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_takeAllOptional")
+fileprivate func bjs_NoncopyableSource_takeAllOptional_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_takeAllOptional_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_takeAllOptional(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableSource_takeAllOptional_extern(self)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_makeAllOptional")
+fileprivate func bjs_NoncopyableSource_makeAllOptional_extern(_ self: Int32, _ count: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_makeAllOptional_extern(_ self: Int32, _ count: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_makeAllOptional(_ self: Int32, _ count: Int32) -> Void {
+    return bjs_NoncopyableSource_makeAllOptional_extern(self, count)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_makeGrid")
+fileprivate func bjs_NoncopyableSource_makeGrid_extern(_ self: Int32, _ count: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_makeGrid_extern(_ self: Int32, _ count: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_makeGrid(_ self: Int32, _ count: Int32) -> Void {
+    return bjs_NoncopyableSource_makeGrid_extern(self, count)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_loadAll")
+fileprivate func bjs_NoncopyableSource_loadAll_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ count: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_loadAll_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ count: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_loadAll(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ count: Int32) -> Void {
+    return bjs_NoncopyableSource_loadAll_extern(resolveRef, rejectRef, self, count)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_forEachBatch")
+fileprivate func bjs_NoncopyableSource_forEachBatch_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_forEachBatch_extern(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_forEachBatch(_ self: Int32, _ count: Int32, _ body: Int32) -> Void {
+    return bjs_NoncopyableSource_forEachBatch_extern(self, count, body)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_takeMaybe")
+fileprivate func bjs_NoncopyableSource_takeMaybe_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_takeMaybe_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_takeMaybe(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableSource_takeMaybe_extern(self)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_makeMaybe")
+fileprivate func bjs_NoncopyableSource_makeMaybe_extern(_ self: Int32, _ count: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_makeMaybe_extern(_ self: Int32, _ count: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_makeMaybe(_ self: Int32, _ count: Int32) -> Void {
+    return bjs_NoncopyableSource_makeMaybe_extern(self, count)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_takeRows")
+fileprivate func bjs_NoncopyableSource_takeRows_extern(_ self: Int32) -> Int32
+#else
+fileprivate func bjs_NoncopyableSource_takeRows_extern(_ self: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_takeRows(_ self: Int32) -> Int32 {
+    return bjs_NoncopyableSource_takeRows_extern(self)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_makeRows")
+fileprivate func bjs_NoncopyableSource_makeRows_extern(_ self: Int32, _ count: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_makeRows_extern(_ self: Int32, _ count: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_makeRows(_ self: Int32, _ count: Int32) -> Void {
+    return bjs_NoncopyableSource_makeRows_extern(self, count)
+}
+#endif
+
+#if compiler(>=6.4)
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableSource_loadMaybe")
+fileprivate func bjs_NoncopyableSource_loadMaybe_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ count: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableSource_loadMaybe_extern(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ count: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableSource_loadMaybe(_ resolveRef: Int32, _ rejectRef: Int32, _ self: Int32, _ count: Int32) -> Void {
+    return bjs_NoncopyableSource_loadMaybe_extern(resolveRef, rejectRef, self, count)
+}
+#endif
+
+func _$NoncopyableSource_init() throws(JSException) -> JSUniqueRef {
+    let ret = bjs_NoncopyableSource_init()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUniqueRef.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableSource_optionalChild_get(_ self: borrowing JSUniqueRef) throws(JSException) -> Optional<NoncopyableObject> {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_optionalChild_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<NoncopyableObject>.bridgeJSLiftReturn()
+}
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_children_get(_ self: borrowing JSUniqueRef) throws(JSException) -> UniqueArray<NoncopyableObject> {
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_children_get(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UniqueArray<NoncopyableObject>.bridgeJSLiftReturn()
+}
+#endif
+
+func _$NoncopyableSource_optionalChild_set(_ self: borrowing JSUniqueRef, _ newValue: borrowing Optional<NoncopyableObject>) throws(JSException) -> Void {
+    let (newValueIsSome, newValueValue) = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_optionalChild_set(selfValue, newValueIsSome, newValueValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_children_set(_ self: borrowing JSUniqueRef, _ newValue: borrowing UniqueArray<NoncopyableObject>) throws(JSException) -> Void {
+    let _ = newValue.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_children_set(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+#endif
+
+func _$NoncopyableSource_forEachObject(_ self: borrowing JSUniqueRef, _ count: Int, _ body: JSTypedClosure<(borrowing NoncopyableObject) -> Void>) throws(JSException) -> Void {
+    let bodyFuncRef = body.bridgeJSLowerParameter()
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_forEachObject(selfValue, countValue, bodyFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$NoncopyableSource_forEachObjectEscaping(_ self: borrowing JSUniqueRef, _ count: Int, _ body: @escaping (borrowing NoncopyableObject) -> Void) throws(JSException) -> Void {
+    let body = JSTypedClosure<(borrowing NoncopyableObject) -> Void>(body)
+    let bodyFuncRef = body.bridgeJSLowerParameter()
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    withExtendedLifetime((body)) {
+        bjs_NoncopyableSource_forEachObjectEscaping(selfValue, countValue, bodyFuncRef)
+    }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$NoncopyableSource_forEachCopyableEscaping(_ self: borrowing JSUniqueRef, _ count: Int, _ body: @escaping (CopyableObjectRoundtrip) -> Void) throws(JSException) -> Void {
+    let body = JSTypedClosure<(CopyableObjectRoundtrip) -> Void>(body)
+    let bodyFuncRef = body.bridgeJSLowerParameter()
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    withExtendedLifetime((body)) {
+        bjs_NoncopyableSource_forEachCopyableEscaping(selfValue, countValue, bodyFuncRef)
+    }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$NoncopyableSource_load(_ self: borrowing JSUniqueRef, _ start: Int) async throws(JSException) -> NoncopyableObject {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(consuming sending NoncopyableObject) -> Void>.sending($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        let startValue = start.bridgeJSLowerParameter()
+        let selfValue = self.bridgeJSLowerParameter()
+        bjs_NoncopyableSource_load(resolveRef, rejectRef, selfValue, startValue)
+    }
+    return resolved
+}
+
+func _$NoncopyableSource_loadCopyable(_ self: borrowing JSUniqueRef, _ start: Int) async throws(JSException) -> CopyableObjectRoundtrip {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(sending CopyableObjectRoundtrip) -> Void>.sending($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        let startValue = start.bridgeJSLowerParameter()
+        let selfValue = self.bridgeJSLowerParameter()
+        bjs_NoncopyableSource_loadCopyable(resolveRef, rejectRef, selfValue, startValue)
+    }
+    return resolved
+}
+
+func _$NoncopyableSource_loadFail(_ self: borrowing JSUniqueRef) async throws(JSException) -> NoncopyableObject {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(consuming sending NoncopyableObject) -> Void>.sending($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        let selfValue = self.bridgeJSLowerParameter()
+        bjs_NoncopyableSource_loadFail(resolveRef, rejectRef, selfValue)
+    }
+    return resolved
+}
+
+func _$NoncopyableSource_use(_ self: borrowing JSUniqueRef, _ object: borrowing NoncopyableObject) async throws(JSException) -> Int {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(sending Int) -> Void>.sending($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        let objectValue = object.bridgeJSLowerParameter()
+        let selfValue = self.bridgeJSLowerParameter()
+        bjs_NoncopyableSource_use(resolveRef, rejectRef, selfValue, objectValue)
+    }
+    return resolved
+}
+
+func _$NoncopyableSource_referencesToCreated(_ self: borrowing JSUniqueRef) throws(JSException) -> Int {
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_referencesToCreated(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableSource_referencesTo(_ self: borrowing JSUniqueRef, _ object: borrowing NoncopyableObject) throws(JSException) -> Int {
+    let objectValue = object.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_referencesTo(selfValue, objectValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableSource_takeOptional(_ self: borrowing JSUniqueRef, _ object: borrowing Optional<NoncopyableObject>) throws(JSException) -> Int {
+    let (objectIsSome, objectValue) = object.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_takeOptional(selfValue, objectIsSome, objectValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableSource_takeOptionalCopyable(_ self: borrowing JSUniqueRef, _ copyable: Optional<CopyableObjectRoundtrip>) throws(JSException) -> Int {
+    let (copyableIsSome, copyableValue) = copyable.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_takeOptionalCopyable(selfValue, copyableIsSome, copyableValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableSource_findOptional(_ self: borrowing JSUniqueRef, _ start: Int) throws(JSException) -> Optional<NoncopyableObject> {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_findOptional(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<NoncopyableObject>.bridgeJSLiftReturn()
+}
+
+func _$NoncopyableSource_findOptionalCopyable(_ self: borrowing JSUniqueRef, _ start: Int) throws(JSException) -> Optional<CopyableObjectRoundtrip> {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_findOptionalCopyable(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<CopyableObjectRoundtrip>.bridgeJSLiftReturn()
+}
+
+func _$NoncopyableSource_forEachOptional(_ self: borrowing JSUniqueRef, _ count: Int, _ body: JSTypedClosure<(borrowing Optional<NoncopyableObject>) -> Void>) throws(JSException) -> Void {
+    let bodyFuncRef = body.bridgeJSLowerParameter()
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_forEachOptional(selfValue, countValue, bodyFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$NoncopyableSource_loadOptional(_ self: borrowing JSUniqueRef, _ start: Int) async throws(JSException) -> Optional<NoncopyableObject> {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(consuming sending Optional<NoncopyableObject>) -> Void>.sending($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        let startValue = start.bridgeJSLowerParameter()
+        let selfValue = self.bridgeJSLowerParameter()
+        bjs_NoncopyableSource_loadOptional(resolveRef, rejectRef, selfValue, startValue)
+    }
+    return resolved
+}
+
+func _$NoncopyableSource_raw(_ self: borrowing JSUniqueRef, _ start: Int) throws(JSException) -> JSUniqueRef {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_raw(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSUniqueRef.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableSource_rawValue(_ self: borrowing JSUniqueRef, _ ref: borrowing JSUniqueRef) throws(JSException) -> Int {
+    let refValue = ref.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_rawValue(selfValue, refValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableSource_maybeRaw(_ self: borrowing JSUniqueRef, _ start: Int) throws(JSException) -> Optional<JSUniqueRef> {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_maybeRaw(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<JSUniqueRef>.bridgeJSLiftReturn()
+}
+
+func _$NoncopyableSource_rawObject(_ self: borrowing JSUniqueRef, _ start: Int) throws(JSException) -> JSObject {
+    let startValue = start.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_rawObject(selfValue, startValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_takeAll(_ self: borrowing JSUniqueRef, _ objects: borrowing UniqueArray<NoncopyableObject>) throws(JSException) -> Int {
+    let _ = objects.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_takeAll(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_makeAll(_ self: borrowing JSUniqueRef, _ count: Int) throws(JSException) -> UniqueArray<NoncopyableObject> {
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_makeAll(selfValue, countValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UniqueArray<NoncopyableObject>.bridgeJSLiftReturn()
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_takeAllOptional(_ self: borrowing JSUniqueRef, _ objects: borrowing UniqueArray<Optional<NoncopyableObject>>) throws(JSException) -> Int {
+    let _ = objects.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_takeAllOptional(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_makeAllOptional(_ self: borrowing JSUniqueRef, _ count: Int) throws(JSException) -> UniqueArray<Optional<NoncopyableObject>> {
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_makeAllOptional(selfValue, countValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UniqueArray<Optional<NoncopyableObject>>.bridgeJSLiftReturn()
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_makeGrid(_ self: borrowing JSUniqueRef, _ count: Int) throws(JSException) -> UniqueArray<UniqueArray<NoncopyableObject>> {
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_makeGrid(selfValue, countValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UniqueArray<UniqueArray<NoncopyableObject>>.bridgeJSLiftReturn()
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_loadAll(_ self: borrowing JSUniqueRef, _ count: Int) async throws(JSException) -> UniqueArray<NoncopyableObject> {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(consuming sending UniqueArray<NoncopyableObject>) -> Void>.sending($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        let countValue = count.bridgeJSLowerParameter()
+        let selfValue = self.bridgeJSLowerParameter()
+        bjs_NoncopyableSource_loadAll(resolveRef, rejectRef, selfValue, countValue)
+    }
+    return resolved
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_forEachBatch(_ self: borrowing JSUniqueRef, _ count: Int, _ body: JSTypedClosure<(borrowing UniqueArray<NoncopyableObject>) -> Void>) throws(JSException) -> Void {
+    let bodyFuncRef = body.bridgeJSLowerParameter()
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_forEachBatch(selfValue, countValue, bodyFuncRef)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_takeMaybe(_ self: borrowing JSUniqueRef, _ objects: borrowing Optional<UniqueArray<NoncopyableObject>>) throws(JSException) -> Int {
+    let _ = objects.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_takeMaybe(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_makeMaybe(_ self: borrowing JSUniqueRef, _ count: Int) throws(JSException) -> Optional<UniqueArray<NoncopyableObject>> {
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_makeMaybe(selfValue, countValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Optional<UniqueArray<NoncopyableObject>>.bridgeJSLiftReturn()
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_takeRows(_ self: borrowing JSUniqueRef, _ rows: borrowing UniqueArray<Optional<UniqueArray<NoncopyableObject>>>) throws(JSException) -> Int {
+    let _ = rows.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    let ret = bjs_NoncopyableSource_takeRows(selfValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_makeRows(_ self: borrowing JSUniqueRef, _ count: Int) throws(JSException) -> UniqueArray<Optional<UniqueArray<NoncopyableObject>>> {
+    let countValue = count.bridgeJSLowerParameter()
+    let selfValue = self.bridgeJSLowerParameter()
+    bjs_NoncopyableSource_makeRows(selfValue, countValue)
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return UniqueArray<Optional<UniqueArray<NoncopyableObject>>>.bridgeJSLiftReturn()
+}
+#endif
+
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+func _$NoncopyableSource_loadMaybe(_ self: borrowing JSUniqueRef, _ count: Int) async throws(JSException) -> Optional<UniqueArray<NoncopyableObject>> {
+    let resolved = try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<(consuming sending Optional<UniqueArray<NoncopyableObject>>) -> Void>.sending($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        let countValue = count.bridgeJSLowerParameter()
+        let selfValue = self.bridgeJSLowerParameter()
+        bjs_NoncopyableSource_loadMaybe(resolveRef, rejectRef, selfValue, countValue)
+    }
+    return resolved
+}
+#endif
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableJSClassSupportImports_liveReferenceCount_static")
+fileprivate func bjs_NoncopyableJSClassSupportImports_liveReferenceCount_static_extern() -> Int32
+#else
+fileprivate func bjs_NoncopyableJSClassSupportImports_liveReferenceCount_static_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableJSClassSupportImports_liveReferenceCount_static() -> Int32 {
+    return bjs_NoncopyableJSClassSupportImports_liveReferenceCount_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableJSClassSupportImports_retainByRefCount_static")
+fileprivate func bjs_NoncopyableJSClassSupportImports_retainByRefCount_static_extern() -> Int32
+#else
+fileprivate func bjs_NoncopyableJSClassSupportImports_retainByRefCount_static_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableJSClassSupportImports_retainByRefCount_static() -> Int32 {
+    return bjs_NoncopyableJSClassSupportImports_retainByRefCount_static_extern()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableJSClassSupportImports_runNoncopyableExportedPathTests_static")
+fileprivate func bjs_NoncopyableJSClassSupportImports_runNoncopyableExportedPathTests_static_extern(_ resolveRef: Int32, _ rejectRef: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableJSClassSupportImports_runNoncopyableExportedPathTests_static_extern(_ resolveRef: Int32, _ rejectRef: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableJSClassSupportImports_runNoncopyableExportedPathTests_static(_ resolveRef: Int32, _ rejectRef: Int32) -> Void {
+    return bjs_NoncopyableJSClassSupportImports_runNoncopyableExportedPathTests_static_extern(resolveRef, rejectRef)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_NoncopyableJSClassSupportImports_runNoncopyableUniqueArrayExportedPathTests_static")
+fileprivate func bjs_NoncopyableJSClassSupportImports_runNoncopyableUniqueArrayExportedPathTests_static_extern(_ resolveRef: Int32, _ rejectRef: Int32) -> Void
+#else
+fileprivate func bjs_NoncopyableJSClassSupportImports_runNoncopyableUniqueArrayExportedPathTests_static_extern(_ resolveRef: Int32, _ rejectRef: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_NoncopyableJSClassSupportImports_runNoncopyableUniqueArrayExportedPathTests_static(_ resolveRef: Int32, _ rejectRef: Int32) -> Void {
+    return bjs_NoncopyableJSClassSupportImports_runNoncopyableUniqueArrayExportedPathTests_static_extern(resolveRef, rejectRef)
+}
+
+func _$NoncopyableJSClassSupportImports_liveReferenceCount() throws(JSException) -> Int {
+    let ret = bjs_NoncopyableJSClassSupportImports_liveReferenceCount_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableJSClassSupportImports_retainByRefCount() throws(JSException) -> Int {
+    let ret = bjs_NoncopyableJSClassSupportImports_retainByRefCount_static()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Int.bridgeJSLiftReturn(ret)
+}
+
+func _$NoncopyableJSClassSupportImports_runNoncopyableExportedPathTests() async throws(JSException) -> Void {
+    try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<() -> Void>($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        bjs_NoncopyableJSClassSupportImports_runNoncopyableExportedPathTests_static(resolveRef, rejectRef)
+    }
+}
+
+func _$NoncopyableJSClassSupportImports_runNoncopyableUniqueArrayExportedPathTests() async throws(JSException) -> Void {
+    try await _bjs_awaitPromise(makeResolveClosure: {
+            JSTypedClosure<() -> Void>($0)
+        }, makeRejectClosure: {
+            JSTypedClosure<(sending JSValue) -> Void>.sending($0)
+        }) { resolveRef, rejectRef in
+        bjs_NoncopyableJSClassSupportImports_runNoncopyableUniqueArrayExportedPathTests_static(resolveRef, rejectRef)
     }
 }
 

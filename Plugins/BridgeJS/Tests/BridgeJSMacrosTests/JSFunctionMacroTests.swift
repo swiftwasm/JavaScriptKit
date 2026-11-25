@@ -297,6 +297,28 @@ import BridgeJSMacros
         )
     }
 
+    @Test func noncopyableInstanceMethod() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            struct MyClass: ~Copyable {
+                @JSFunction
+                func getName() throws(JSException) -> String
+            }
+            """,
+            expandedSource: """
+                @JSClass
+                struct MyClass: ~Copyable {
+                    func getName() throws(JSException) -> String {
+                        return try _$MyClass_getName(self.jsRef)
+                    }
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
     @Test func staticMethod() {
         TestSupport.assertMacroExpansion(
             """
@@ -412,6 +434,29 @@ import BridgeJSMacros
                     init(name: String) async throws(JSException) {
                         let jsObject = try await _$MyClass_init(name)
                         self.init(unsafelyWrapping: jsObject)
+                    }
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func noncopyableInitializer() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            struct MyClass: ~Copyable {
+                @JSFunction
+                init(name: String) throws(JSException)
+            }
+            """,
+            expandedSource: """
+                @JSClass
+                struct MyClass: ~Copyable {
+                    init(name: String) throws(JSException) {
+                        let jsRef = try _$MyClass_init(name)
+                        self.init(unsafelyAdopting: jsRef)
                     }
                 }
                 """,

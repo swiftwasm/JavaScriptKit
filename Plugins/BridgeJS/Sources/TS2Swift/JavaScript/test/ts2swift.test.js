@@ -16,8 +16,8 @@ function runTs2Swift(dtsPath) {
     return run([dtsPath], { tsconfigPath, logLevel: 'error' });
 }
 
-function collectDtsInputs() {
-    const entries = readdirSync(inputsDir, { withFileTypes: true });
+function collectDtsInputs(directory = inputsDir) {
+    const entries = readdirSync(directory, { withFileTypes: true });
     return entries
         .filter((e) => e.isFile() && e.name.endsWith('.d.ts'))
         .map((e) => e.name)
@@ -63,5 +63,72 @@ describe('ts2swift', () => {
         expect(messages).toMatch(/Skipping export assignment/);
         const occurrences = (messages.match(/Skipping export assignment/g) || []).length;
         expect(occurrences).toBe(1);
+    });
+});
+
+describe('ts2swift noncopyable mode', () => {
+    const noncopyableDir = path.join(inputsDir, 'Noncopyable');
+
+    /**
+     * @param {string} dtsFile
+     * @param {{ print: (level: string, message: string, node?: import('typescript').Node) => void }} [diagnosticEngine]
+     */
+    function runNoncopyable(dtsFile, diagnosticEngine) {
+        return run([path.join(noncopyableDir, dtsFile)], {
+            tsconfigPath,
+            logLevel: diagnosticEngine ? 'warning' : 'error',
+            diagnosticEngine,
+            noncopyableWrappers: true,
+        });
+    }
+
+    for (const dtsFile of collectDtsInputs(noncopyableDir)) {
+        it(`snapshots Swift output for Noncopyable/${dtsFile}`, () => {
+            const name = dtsFile.replace(/\.d\.ts$/, '');
+            expect(runNoncopyable(dtsFile)).toMatchSnapshot(`Noncopyable/${name}`);
+        });
+    }
+
+    it('warns once at every position whose container cannot hold a wrapper', () => {
+        /** @type {{ line: number, column: number, text: string }[]} */
+        const diagnostics = [];
+        const diagnosticEngine = {
+            print: (level, message, node) => {
+                const sourceFile = node.getSourceFile();
+                const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+                diagnostics.push({ line: line + 1, column: character + 1, text: `${level} ${message}` });
+            },
+        };
+        runNoncopyable('Warnings.d.ts', diagnosticEngine);
+        diagnostics.sort((a, b) => a.line - b.line || a.column - b.column);
+        const optional = 'warning JSUndefinedOr<Item> cannot hold the noncopyable type Item; using Optional<Item>';
+        const record = 'warning [String: Item] cannot hold the noncopyable type Item; using [String: JSObject]';
+        expect(diagnostics.map((d) => `${d.line}:${d.column} ${d.text}`)).toEqual([
+            `4:5 ${optional}`,
+            `5:5 ${optional}`,
+            `6:5 ${record}`,
+            `8:1 ${optional}`,
+            `9:1 ${optional}`,
+            `10:1 ${optional}`,
+            `11:1 ${record}`,
+            `12:1 ${record}`,
+            '13:1 warning [String: Optional<Item>] cannot hold the noncopyable type Optional<Item>; using [String: Optional<JSObject>]',
+            '14:1 warning [String: UniqueArray<Item>] cannot hold the noncopyable type UniqueArray<Item>; using [String: [JSObject]]',
+        ]);
+    });
+
+    it('keeps wrappers copyable without the option', () => {
+        /** @type {string[]} */
+        const messages = [];
+        const diagnosticEngine = { print: (_level, message) => messages.push(message) };
+        const output = run([path.join(noncopyableDir, 'Warnings.d.ts')], {
+            tsconfigPath,
+            logLevel: 'warning',
+            diagnosticEngine,
+        });
+        expect(output).toContain('@JSClass struct Item {');
+        expect(output).toContain('@JSGetter var maybe: JSUndefinedOr<Item>');
+        expect(output).not.toContain('~Copyable');
+        expect(messages).toEqual([]);
     });
 });

@@ -122,21 +122,28 @@ import Testing
         sourceLocation: Testing.SourceLocation = #_sourceLocation
     ) throws {
         var swiftParts: [String] = []
-        if let closureSupport = try ClosureCodegen().renderSupport(for: skeleton) {
+        let availability = AvailabilityIndex(skeletons: [skeleton])
+        if let closureSupport = try ClosureCodegen(availability: availability).renderSupport(for: skeleton) {
             swiftParts.append(closureSupport)
         }
         if let exported = skeleton.exported {
             let exportSwift = ExportSwift(
                 progress: .silent,
                 moduleName: skeleton.moduleName,
-                skeleton: exported
+                skeleton: exported,
+                availability: availability
             )
             if let s = try exportSwift.finalize() {
                 swiftParts.append(s)
             }
         }
         if let imported = skeleton.imported {
-            let importTS = ImportTS(progress: .silent, moduleName: skeleton.moduleName, skeleton: imported)
+            let importTS = ImportTS(
+                progress: .silent,
+                moduleName: skeleton.moduleName,
+                skeleton: imported,
+                availability: availability
+            )
             if let s = try importTS.finalize() {
                 swiftParts.append(s)
             }

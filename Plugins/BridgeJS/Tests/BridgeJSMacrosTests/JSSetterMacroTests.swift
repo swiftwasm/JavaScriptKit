@@ -65,6 +65,28 @@ import BridgeJSMacros
         )
     }
 
+    @Test func noncopyableInstanceSetter() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            struct MyClass: ~Copyable {
+                @JSSetter
+                func setName(_ name: String) throws(JSException)
+            }
+            """,
+            expandedSource: """
+                @JSClass
+                struct MyClass: ~Copyable {
+                    func setName(_ name: String) throws(JSException) {
+                        try _$MyClass_name_set(self.jsRef, name)
+                    }
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
     @Test func instanceSetterRequiresJSClass() {
         TestSupport.assertMacroExpansion(
             """

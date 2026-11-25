@@ -656,3 +656,135 @@ exports[`ts2swift > snapshots Swift output for WebIDLDOMDocs.d.ts > WebIDLDOMDoc
 }
 "
 `;
+
+exports[`ts2swift noncopyable mode > snapshots Swift output for Noncopyable/Warnings.d.ts > Noncopyable/Warnings 1`] = `
+"// swift-format-ignore-file
+// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
+// DO NOT EDIT.
+//
+// To update this file, just rebuild your project or run
+// \`swift package bridge-js\`.
+
+@_spi(BridgeJS) import JavaScriptKit
+
+@JSFunction func findUndefined(_ start: Double) throws(JSException) -> Optional<Item>
+
+@JSClass struct Item: ~Copyable {
+    @JSFunction func value() throws(JSException) -> Double
+    @JSGetterFunction func maybe() throws(JSException) -> Optional<Item>
+    @JSSetter func setMaybe(_ value: borrowing Optional<Item>) throws(JSException)
+    @JSGetterFunction func later() throws(JSException) -> Optional<Item>
+    @JSSetter func setLater(_ value: borrowing Optional<Item>) throws(JSException)
+    @JSGetter var byName: [String: JSObject]
+    @JSSetter func setByName(_ value: [String: JSObject]) throws(JSException)
+}
+
+@JSFunction func useOptional(_ item: borrowing Optional<Item>) throws(JSException) -> Double
+
+@JSFunction func useUndefined(_ item: borrowing Optional<Item>) throws(JSException) -> Double
+
+@JSFunction func makeByName() throws(JSException) -> [String: JSObject]
+
+@JSFunction func useByName(_ items: [String: JSObject]) throws(JSException) -> Double
+
+@JSFunction func useNullableByName(_ items: [String: Optional<JSObject>]) throws(JSException) -> Double
+
+@JSFunction func useArraysByName(_ items: [String: [JSObject]]) throws(JSException) -> Double
+"
+`;
+
+exports[`ts2swift noncopyable mode > snapshots Swift output for Noncopyable/WrapperArrays.d.ts > Noncopyable/WrapperArrays 1`] = `
+"// swift-format-ignore-file
+// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
+// DO NOT EDIT.
+//
+// To update this file, just rebuild your project or run
+// \`swift package bridge-js\`.
+
+@_spi(BridgeJS) import JavaScriptKit
+
+@JSClass struct Store: ~Copyable {
+    @JSFunction init(_ seed: borrowing UniqueArray<Item>) throws(JSException)
+    @JSFunction func take(_ items: borrowing UniqueArray<Item>) throws(JSException) -> Double
+    @JSFunction func takeGeneric(_ items: borrowing UniqueArray<Item>) throws(JSException) -> Double
+    @JSFunction func takeReadonly(_ items: borrowing UniqueArray<Item>) throws(JSException) -> Double
+    @JSFunction func takeSlots(_ slots: borrowing UniqueArray<Optional<Item>>) throws(JSException) -> Double
+    @JSFunction func takeMaybe(_ items: borrowing Optional<UniqueArray<Item>>) throws(JSException) -> Double
+    @JSFunction func takeUndefined(_ items: borrowing Optional<UniqueArray<Item>>) throws(JSException) -> Double
+    @JSFunction func make(_ count: Double) throws(JSException) -> UniqueArray<Item>
+    @JSFunction func makeSlots(_ count: Double) throws(JSException) -> UniqueArray<Optional<Item>>
+    @JSFunction func makeMaybe(_ count: Double) throws(JSException) -> Optional<UniqueArray<Item>>
+    @JSFunction func makeGrid(_ count: Double) throws(JSException) -> UniqueArray<UniqueArray<Item>>
+    @JSFunction func load(_ count: Double) async throws(JSException) -> UniqueArray<Item>
+    @JSFunction func each(_ callback: JSObject) throws(JSException) -> Void
+    @JSFunction func numbers(_ values: [Double]) throws(JSException) -> [Double]
+    @JSFunction func shelf() throws(JSException) -> Shelf
+}
+
+@JSClass struct Item: ~Copyable {
+    @JSFunction func value() throws(JSException) -> Double
+}
+
+@JSClass struct Shelf: ~Copyable {
+    @JSGetterFunction func items() throws(JSException) -> UniqueArray<Item>
+    @JSSetter func setItems(_ value: borrowing UniqueArray<Item>) throws(JSException)
+    @JSGetterFunction func fixed() throws(JSException) -> UniqueArray<Item>
+    @JSGetterFunction func slots() throws(JSException) -> UniqueArray<Optional<Item>>
+    @JSSetter func setSlots(_ value: borrowing UniqueArray<Optional<Item>>) throws(JSException)
+    @JSGetterFunction func maybeItems() throws(JSException) -> Optional<UniqueArray<Item>>
+    @JSSetter func setMaybeItems(_ value: borrowing Optional<UniqueArray<Item>>) throws(JSException)
+    @JSGetterFunction func grid() throws(JSException) -> UniqueArray<UniqueArray<Item>>
+    @JSSetter func setGrid(_ value: borrowing UniqueArray<UniqueArray<Item>>) throws(JSException)
+    @JSGetter var byName: [String: [JSObject]]
+    @JSSetter func setByName(_ value: [String: [JSObject]]) throws(JSException)
+}
+
+@JSGetterFunction func allItems() throws(JSException) -> UniqueArray<Item>
+
+@JSFunction func makeItems(_ count: Double) throws(JSException) -> UniqueArray<Item>
+"
+`;
+
+exports[`ts2swift noncopyable mode > snapshots Swift output for Noncopyable/Wrappers.d.ts > Noncopyable/Wrappers 1`] = `
+"// swift-format-ignore-file
+// NOTICE: This is auto-generated code by BridgeJS from JavaScriptKit,
+// DO NOT EDIT.
+//
+// To update this file, just rebuild your project or run
+// \`swift package bridge-js\`.
+
+@_spi(BridgeJS) import JavaScriptKit
+
+@JSClass struct Factory: ~Copyable {
+    @JSFunction init(_ seed: borrowing Item) throws(JSException)
+    @JSFunction func make(_ start: Double) throws(JSException) -> Item
+    @JSFunction func makeMany(_ count: Double) throws(JSException) -> UniqueArray<Item>
+    @JSFunction func find(_ start: Double) throws(JSException) -> Optional<Item>
+    @JSFunction func findUndefined(_ start: Double) throws(JSException) -> Optional<Item>
+    @JSFunction func load(_ start: Double) async throws(JSException) -> Item
+    @JSFunction func loadOptional(_ start: Double) async throws(JSException) -> Optional<Item>
+    @JSFunction func use(_ item: borrowing Item) throws(JSException) -> Double
+    @JSFunction func useMany(_ items: borrowing UniqueArray<Item>) throws(JSException) -> Double
+    @JSFunction func useOptional(_ item: borrowing Optional<Item>) throws(JSException) -> Double
+    @JSFunction func useNullable(_ item: borrowing Optional<Item>) throws(JSException) -> Double
+    @JSFunction func each(_ callback: JSObject) throws(JSException) -> Void
+}
+
+@JSClass struct Item: ~Copyable {
+    @JSFunction func value() throws(JSException) -> Double
+    @JSGetterFunction func child() throws(JSException) -> Item
+    @JSGetterFunction func sibling() throws(JSException) -> Optional<Item>
+    @JSSetter func setSibling(_ value: borrowing Optional<Item>) throws(JSException)
+    @JSGetterFunction func maybe() throws(JSException) -> Optional<Item>
+    @JSSetter func setMaybe(_ value: borrowing Optional<Item>) throws(JSException)
+    @JSGetterFunction func items() throws(JSException) -> UniqueArray<Item>
+    @JSSetter func setItems(_ value: borrowing UniqueArray<Item>) throws(JSException)
+    @JSGetter var byName: [String: JSObject]
+    @JSSetter func setByName(_ value: [String: JSObject]) throws(JSException)
+}
+
+@JSGetterFunction func defaultItem() throws(JSException) -> Item
+
+@JSFunction func makeItem(_ start: Double) throws(JSException) -> Item
+"
+`;

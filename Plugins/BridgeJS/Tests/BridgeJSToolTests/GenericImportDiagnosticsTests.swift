@@ -40,7 +40,12 @@ import Testing
             ]
         )
         let glue = try #require(
-            try ImportTS(progress: .silent, moduleName: skeleton.moduleName, skeleton: imported).finalize()
+            try ImportTS(
+                progress: .silent,
+                moduleName: skeleton.moduleName,
+                skeleton: imported,
+                availability: AvailabilityIndex(skeletons: [skeleton])
+            ).finalize()
         )
         #expect(glue.contains("T: BridgedSwiftGenericBridgeable & GraphKit.Node"))
         #expect(roundTrip.usedExternalModules == ["GraphKit"])
@@ -72,7 +77,12 @@ import Testing
             }
         )
         let glue = try #require(
-            try ExportSwift(progress: .silent, moduleName: skeleton.moduleName, skeleton: exported).finalize()
+            try ExportSwift(
+                progress: .silent,
+                moduleName: skeleton.moduleName,
+                skeleton: exported,
+                availability: AvailabilityIndex(skeletons: [skeleton])
+            ).finalize()
         )
         #expect(glue.contains("extension Base where Self: _BridgedSwiftProtocolWrapper {"))
         #expect(glue.contains("extension Node where Self: _BridgedSwiftProtocolWrapper {"))

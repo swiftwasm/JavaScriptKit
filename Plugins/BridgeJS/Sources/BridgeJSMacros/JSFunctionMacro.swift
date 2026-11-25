@@ -33,7 +33,7 @@ extension JSFunctionMacro: BodyMacro {
 
             var arguments: [String] = []
             if isInstanceMember {
-                arguments.append("self.jsObject")
+                arguments.append(JSMacroHelper.selfArgument(in: context))
             }
             arguments.append(
                 contentsOf: JSMacroHelper.parameterNames(functionDecl.signature.parameterClause.parameters)
@@ -86,6 +86,12 @@ extension JSFunctionMacro: BodyMacro {
             let isAsync = effects?.asyncSpecifier != nil
             let prefix = JSMacroHelper.tryAwaitPrefix(isAsync: isAsync, isThrows: true)
 
+            if JSMacroHelper.enclosingTypeIsNoncopyable(in: context) {
+                return [
+                    CodeBlockItemSyntax(stringLiteral: "let jsRef = \(prefix)\(call)"),
+                    CodeBlockItemSyntax(stringLiteral: "self.init(unsafelyAdopting: jsRef)"),
+                ]
+            }
             return [
                 CodeBlockItemSyntax(stringLiteral: "let jsObject = \(prefix)\(call)"),
                 CodeBlockItemSyntax(stringLiteral: "self.init(unsafelyWrapping: jsObject)"),

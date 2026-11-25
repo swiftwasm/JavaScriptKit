@@ -5408,6 +5408,182 @@
       },
       {
         "constructor" : {
+          "abiName" : "bjs_NoncopyableObjectBox_init",
+          "effects" : {
+            "isAsync" : false,
+            "isStatic" : false,
+            "isThrows" : false
+          },
+          "parameters" : [
+            {
+              "label" : "_",
+              "name" : "start",
+              "type" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "methods" : [
+          {
+            "abiName" : "bjs_NoncopyableObjectBox_value",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "value",
+            "parameters" : [
+
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_NoncopyableObjectBox_take",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "take",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "other",
+                "type" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "NoncopyableObjectBox",
+        "properties" : [
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "object",
+            "type" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : false,
+            "name" : "made",
+            "type" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : true,
+            "name" : "shared",
+            "staticContext" : {
+              "className" : {
+                "_0" : "NoncopyableObjectBox"
+              }
+            },
+            "type" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          },
+          {
+            "isReadonly" : true,
+            "isStatic" : true,
+            "name" : "staticMade",
+            "staticContext" : {
+              "className" : {
+                "_0" : "NoncopyableObjectBox"
+              }
+            },
+            "type" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "optionalObject",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "isReadonly" : false,
+            "isStatic" : false,
+            "name" : "maybeObjects",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "swiftCallName" : "NoncopyableObjectBox"
+      },
+      {
+        "constructor" : {
           "abiName" : "bjs_OptionalHolder_init",
           "effects" : {
             "isAsync" : false,
@@ -18664,6 +18840,885 @@
         }
       },
       {
+        "abiName" : "bjs_noncopyableTake",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableTake",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "object",
+            "type" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableConsume",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableConsume",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "object",
+            "type" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableMake",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableMake",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "start",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsUniqueObject" : {
+            "_0" : "NoncopyableObject"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableLoad",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableLoad",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "start",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "jsUniqueObject" : {
+            "_0" : "NoncopyableObject"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableCallWith",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableCallWith",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "start",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "body",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTests17NoncopyableObjectV_Si",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableCallWithOptional",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableCallWithOptional",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "start",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "body",
+            "type" : {
+              "closure" : {
+                "_0" : {
+                  "isAsync" : false,
+                  "isThrows" : false,
+                  "mangleName" : "20BridgeJSRuntimeTestsSq17NoncopyableObjectV_Si",
+                  "moduleName" : "BridgeJSRuntimeTests",
+                  "parameters" : [
+                    {
+                      "nullable" : {
+                        "_0" : {
+                          "jsUniqueObject" : {
+                            "_0" : "NoncopyableObject"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  ],
+                  "returnType" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  },
+                  "sendingParameters" : false
+                },
+                "useJSTypedClosure" : false
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableTakeOptional",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableTakeOptional",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "object",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_copyableTakeOptional",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "copyableTakeOptional",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "copyable",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "jsObject" : {
+                    "_0" : "CopyableObjectRoundtrip"
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableFindOptional",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableFindOptional",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "start",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableVisit",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableVisit",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "visitor",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "NoncopyableObjectVisitor"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "start",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableVisitOptional",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableVisitOptional",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "visitor",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "NoncopyableOptionalObjectVisitor"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "start",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableMakeReader",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableMakeReader",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : false,
+              "mangleName" : "20BridgeJSRuntimeTests17NoncopyableObjectV_Si",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              ],
+              "returnType" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_copyableMakeReader",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "copyableMakeReader",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : false,
+              "mangleName" : "20BridgeJSRuntimeTests23CopyableObjectRoundtripC_Si",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "jsObject" : {
+                    "_0" : "CopyableObjectRoundtrip"
+                  }
+                }
+              ],
+              "returnType" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_makeIntReader",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "makeIntReader",
+        "parameters" : [
+
+        ],
+        "returnType" : {
+          "closure" : {
+            "_0" : {
+              "isAsync" : false,
+              "isThrows" : false,
+              "mangleName" : "20BridgeJSRuntimeTestsSi_Si",
+              "moduleName" : "BridgeJSRuntimeTests",
+              "parameters" : [
+                {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              ],
+              "returnType" : {
+                "integer" : {
+                  "_0" : {
+                    "isSigned" : true,
+                    "width" : "word"
+                  }
+                }
+              },
+              "sendingParameters" : false
+            },
+            "useJSTypedClosure" : true
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableTakeAll",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableTakeAll",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableMakeAll",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableMakeAll",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableLoadAll",
+        "effects" : {
+          "isAsync" : true,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableLoadAll",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyablePassAll",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyablePassAll",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableTakeAllOptional",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableTakeAllOptional",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableTakeMaybe",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableTakeMaybe",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "nullable" : {
+                "_0" : {
+                  "array" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                },
+                "_1" : "null"
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "array" : {
+                "_0" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableMakeMaybe",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableMakeMaybe",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "nullable" : {
+            "_0" : {
+              "array" : {
+                "_0" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            },
+            "_1" : "null"
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableVisitAll",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableVisitAll",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "visitor",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "NoncopyableObjectVisitor"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "objects",
+            "type" : {
+              "array" : {
+                "_0" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "integer" : {
+            "_0" : {
+              "isSigned" : true,
+              "width" : "word"
+            }
+          }
+        }
+      },
+      {
+        "abiName" : "bjs_noncopyableVisitorMakeAll",
+        "effects" : {
+          "isAsync" : false,
+          "isStatic" : false,
+          "isThrows" : false
+        },
+        "name" : "noncopyableVisitorMakeAll",
+        "parameters" : [
+          {
+            "label" : "_",
+            "name" : "visitor",
+            "type" : {
+              "swiftProtocol" : {
+                "_0" : "NoncopyableObjectVisitor"
+              }
+            }
+          },
+          {
+            "label" : "_",
+            "name" : "count",
+            "type" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "returnType" : {
+          "array" : {
+            "_0" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          }
+        }
+      },
+      {
         "abiName" : "bjs_roundTripPointerFields",
         "effects" : {
           "isAsync" : false,
@@ -20244,6 +21299,147 @@
           }
         ],
         "name" : "JSNameTransformer",
+        "properties" : [
+
+        ]
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_NoncopyableObjectVisitor_visit",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "visit",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "object",
+                "type" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_NoncopyableObjectVisitor_visitAll",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "visitAll",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "objects",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          },
+          {
+            "abiName" : "bjs_NoncopyableObjectVisitor_makeAll",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "makeAll",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "count",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "array" : {
+                "_0" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "name" : "NoncopyableObjectVisitor",
+        "properties" : [
+
+        ]
+      },
+      {
+        "methods" : [
+          {
+            "abiName" : "bjs_NoncopyableOptionalObjectVisitor_visit",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : false
+            },
+            "name" : "visit",
+            "parameters" : [
+              {
+                "label" : "_",
+                "name" : "object",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "name" : "NoncopyableOptionalObjectVisitor",
         "properties" : [
 
         ]
@@ -28522,6 +29718,1750 @@
         ],
         "types" : [
 
+        ]
+      },
+      {
+        "functions" : [
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "noncopyableMakeObject",
+            "parameters" : [
+              {
+                "name" : "start",
+                "type" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          },
+          {
+            "accessLevel" : "internal",
+            "effects" : {
+              "isAsync" : false,
+              "isStatic" : false,
+              "isThrows" : true
+            },
+            "name" : "noncopyableUseObject",
+            "parameters" : [
+              {
+                "name" : "object",
+                "type" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            ],
+            "returnType" : {
+              "integer" : {
+                "_0" : {
+                  "isSigned" : true,
+                  "width" : "word"
+                }
+              }
+            }
+          }
+        ],
+        "globalGetters" : [
+          {
+            "accessLevel" : "internal",
+            "from" : "global",
+            "jsName" : "noncopyableSharedObject",
+            "name" : "noncopyableSharedObject",
+            "type" : {
+              "jsUniqueObject" : {
+                "_0" : "NoncopyableObject"
+              }
+            }
+          }
+        ],
+        "types" : [
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+                {
+                  "name" : "start",
+                  "type" : {
+                    "integer" : {
+                      "_0" : {
+                        "isSigned" : true,
+                        "width" : "word"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "getters" : [
+
+            ],
+            "isNoncopyable" : true,
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "value",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "NoncopyableObject",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "create",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "isNoncopyable" : true,
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "value",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              }
+            ],
+            "name" : "NoncopyableObjectView",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+
+              ]
+            },
+            "getters" : [
+              {
+                "accessLevel" : "internal",
+                "name" : "child",
+                "type" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            ],
+            "isNoncopyable" : true,
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "take",
+                "parameters" : [
+                  {
+                    "name" : "object",
+                    "type" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "make",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "adopt",
+                "parameters" : [
+                  {
+                    "name" : "object",
+                    "type" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "takeCopyable",
+                "parameters" : [
+                  {
+                    "name" : "copyable",
+                    "type" : {
+                      "jsObject" : {
+                        "_0" : "CopyableObjectRoundtrip"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "makeCopyable",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "CopyableObjectRoundtrip"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "failTake",
+                "parameters" : [
+                  {
+                    "name" : "object",
+                    "type" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "failMake",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            ],
+            "name" : "NoncopyableObjectRoundtrip",
+            "setters" : [
+              {
+                "accessLevel" : "internal",
+                "functionName" : "child_set",
+                "name" : "child",
+                "type" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "value",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "take",
+                "parameters" : [
+                  {
+                    "name" : "object",
+                    "type" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "make",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              }
+            ],
+            "name" : "CopyableObjectRoundtrip",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "constructor" : {
+              "accessLevel" : "internal",
+              "parameters" : [
+
+              ]
+            },
+            "getters" : [
+              {
+                "accessLevel" : "internal",
+                "name" : "optionalChild",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "name" : "children",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "isNoncopyable" : true,
+            "methods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "forEachObject",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "body",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTests17NoncopyableObjectV_y",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "jsUniqueObject" : {
+                                "_0" : "NoncopyableObject"
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "forEachObjectEscaping",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "body",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTests17NoncopyableObjectV_y",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "jsUniqueObject" : {
+                                "_0" : "NoncopyableObject"
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : false
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "forEachCopyableEscaping",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "body",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTests23CopyableObjectRoundtripC_y",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "jsObject" : {
+                                "_0" : "CopyableObjectRoundtrip"
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : false
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "load",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "loadCopyable",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+                    "_0" : "CopyableObjectRoundtrip"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "loadFail",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "jsUniqueObject" : {
+                    "_0" : "NoncopyableObject"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "use",
+                "parameters" : [
+                  {
+                    "name" : "object",
+                    "type" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "referencesToCreated",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "referencesTo",
+                "parameters" : [
+                  {
+                    "name" : "object",
+                    "type" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "takeOptional",
+                "parameters" : [
+                  {
+                    "name" : "object",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "jsUniqueObject" : {
+                            "_0" : "NoncopyableObject"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "takeOptionalCopyable",
+                "parameters" : [
+                  {
+                    "name" : "copyable",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "jsObject" : {
+                            "_0" : "CopyableObjectRoundtrip"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "findOptional",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "findOptionalCopyable",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsObject" : {
+                        "_0" : "CopyableObjectRoundtrip"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "forEachOptional",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "body",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSq17NoncopyableObjectV_y",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "nullable" : {
+                                "_0" : {
+                                  "jsUniqueObject" : {
+                                    "_0" : "NoncopyableObject"
+                                  }
+                                },
+                                "_1" : "null"
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "loadOptional",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "raw",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsUniqueObject" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "rawValue",
+                "parameters" : [
+                  {
+                    "name" : "ref",
+                    "type" : {
+                      "jsUniqueObject" : {
+
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "maybeRaw",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "rawObject",
+                "parameters" : [
+                  {
+                    "name" : "start",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "jsObject" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "takeAll",
+                "parameters" : [
+                  {
+                    "name" : "objects",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "jsUniqueObject" : {
+                            "_0" : "NoncopyableObject"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "makeAll",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "takeAllOptional",
+                "parameters" : [
+                  {
+                    "name" : "objects",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "nullable" : {
+                            "_0" : {
+                              "jsUniqueObject" : {
+                                "_0" : "NoncopyableObject"
+                              }
+                            },
+                            "_1" : "null"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "makeAllOptional",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "nullable" : {
+                        "_0" : {
+                          "jsUniqueObject" : {
+                            "_0" : "NoncopyableObject"
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "makeGrid",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "jsUniqueObject" : {
+                            "_0" : "NoncopyableObject"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "loadAll",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "forEachBatch",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name" : "body",
+                    "type" : {
+                      "closure" : {
+                        "_0" : {
+                          "isAsync" : false,
+                          "isThrows" : false,
+                          "mangleName" : "20BridgeJSRuntimeTestsSa17NoncopyableObjectV_y",
+                          "moduleName" : "BridgeJSRuntimeTests",
+                          "parameters" : [
+                            {
+                              "array" : {
+                                "_0" : {
+                                  "jsUniqueObject" : {
+                                    "_0" : "NoncopyableObject"
+                                  }
+                                }
+                              }
+                            }
+                          ],
+                          "returnType" : {
+                            "void" : {
+
+                            }
+                          },
+                          "sendingParameters" : false
+                        },
+                        "useJSTypedClosure" : true
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "takeMaybe",
+                "parameters" : [
+                  {
+                    "name" : "objects",
+                    "type" : {
+                      "nullable" : {
+                        "_0" : {
+                          "array" : {
+                            "_0" : {
+                              "jsUniqueObject" : {
+                                "_0" : "NoncopyableObject"
+                              }
+                            }
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "makeMaybe",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "jsUniqueObject" : {
+                            "_0" : "NoncopyableObject"
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "takeRows",
+                "parameters" : [
+                  {
+                    "name" : "rows",
+                    "type" : {
+                      "array" : {
+                        "_0" : {
+                          "nullable" : {
+                            "_0" : {
+                              "array" : {
+                                "_0" : {
+                                  "jsUniqueObject" : {
+                                    "_0" : "NoncopyableObject"
+                                  }
+                                }
+                              }
+                            },
+                            "_1" : "null"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "makeRows",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "array" : {
+                    "_0" : {
+                      "nullable" : {
+                        "_0" : {
+                          "array" : {
+                            "_0" : {
+                              "jsUniqueObject" : {
+                                "_0" : "NoncopyableObject"
+                              }
+                            }
+                          }
+                        },
+                        "_1" : "null"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "loadMaybe",
+                "parameters" : [
+                  {
+                    "name" : "count",
+                    "type" : {
+                      "integer" : {
+                        "_0" : {
+                          "isSigned" : true,
+                          "width" : "word"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType" : {
+                  "nullable" : {
+                    "_0" : {
+                      "array" : {
+                        "_0" : {
+                          "jsUniqueObject" : {
+                            "_0" : "NoncopyableObject"
+                          }
+                        }
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              }
+            ],
+            "name" : "NoncopyableSource",
+            "setters" : [
+              {
+                "accessLevel" : "internal",
+                "functionName" : "optionalChild_set",
+                "name" : "optionalChild",
+                "type" : {
+                  "nullable" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    },
+                    "_1" : "null"
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "functionName" : "children_set",
+                "name" : "children",
+                "type" : {
+                  "array" : {
+                    "_0" : {
+                      "jsUniqueObject" : {
+                        "_0" : "NoncopyableObject"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "staticMethods" : [
+
+            ]
+          },
+          {
+            "accessLevel" : "internal",
+            "getters" : [
+
+            ],
+            "methods" : [
+
+            ],
+            "name" : "NoncopyableJSClassSupportImports",
+            "setters" : [
+
+            ],
+            "staticMethods" : [
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "liveReferenceCount",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : false,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "retainByRefCount",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "integer" : {
+                    "_0" : {
+                      "isSigned" : true,
+                      "width" : "word"
+                    }
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "runNoncopyableExportedPathTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              },
+              {
+                "accessLevel" : "internal",
+                "effects" : {
+                  "isAsync" : true,
+                  "isStatic" : false,
+                  "isThrows" : true
+                },
+                "name" : "runNoncopyableUniqueArrayExportedPathTests",
+                "parameters" : [
+
+                ],
+                "returnType" : {
+                  "void" : {
+
+                  }
+                }
+              }
+            ]
+          }
         ]
       },
       {

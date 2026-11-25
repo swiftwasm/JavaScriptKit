@@ -14,7 +14,10 @@ Swift types and their JavaScript/TypeScript equivalents at the BridgeJS boundary
 | `[String: T]` | object | `Record<string, T>` |
 | `Optional<T>` | `null` or `T` | `T \| null` |
 | ``JSUndefinedOr`` `<T>` | `undefined` or `T` | `T \| undefined` |
-| ``JSObject`` | object | `object` |
+| ``JSObject`` | object | `any` |
+| ``JSUniqueRef`` | object | `any` |
+| Noncopyable `@JSClass` struct | object | the struct's name |
+| `UniqueArray<T>` of a noncopyable `@JSClass` struct `T` | array | `T[]` |
 | ``JSValue`` | any | `any` |
 | ``JSTypedArray`` `<T>` | TypedArray | `Uint8Array`, `Float32Array`, etc. |
 
@@ -30,6 +33,10 @@ When using `JSTypedArray<T>` (or convenience typealiases) in `@JS` signatures, t
 | `JSTypedArray<Double>` / `JSFloat64Array` | `Float64Array` |
 
 See <doc:Exporting-Swift-Array> for usage details.
+
+## Availability
+
+BridgeJS copies a type's `@available` attributes, and those of the declarations and extensions that enclose it, onto the code it generates for the type and onto every other generated declaration that names the type in code a native build compiles. Generated declarations that name `UniqueArray` also get `@available(anyAppleOS 27.0, *)`. The platform versions in these attributes restrict only native builds for Apple platforms. See <doc:Importing-JS-Class> for noncopyable wrappers and `UniqueArray`.
 
 ## Generic type parameters
 

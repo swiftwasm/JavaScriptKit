@@ -19,6 +19,7 @@ import { getImports as getJSClassSupportImports, JSClassWithArrayMembers } from 
 import { getImports as getIntegerTypesSupportImports } from './BridgeJSRuntimeTests/JavaScript/IntegerTypesSupportTests.mjs';
 import { getImports as getAsyncImportImports, runAsyncWorksTests } from './BridgeJSRuntimeTests/JavaScript/AsyncImportTests.mjs';
 import { getImports as getJSTypedArrayImports } from './BridgeJSRuntimeTests/JavaScript/JSTypedArrayTests.mjs';
+import { getImports as getNoncopyableJSClassSupportImports } from './BridgeJSRuntimeTests/JavaScript/NoncopyableJSClassSupportTests.mjs';
 import { getImports as getIdentityModeTestImports } from './BridgeJSIdentityTests/JavaScript/IdentityModeTests.mjs';
 import { runJSNameTests } from './BridgeJSRuntimeTests/JavaScript/JSNameTests.mjs';
 
@@ -54,6 +55,7 @@ export async function setupOptions(options, context) {
         ...options,
         getImports: (importsContext) => {
             return {
+                ...getNoncopyableJSClassSupportImports(importsContext),
                 "jsRoundTripVoid": () => {
                     return;
                 },

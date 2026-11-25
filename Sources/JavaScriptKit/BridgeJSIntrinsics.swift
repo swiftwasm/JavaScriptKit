@@ -204,6 +204,18 @@ extension _BridgedSwiftStackType {
     }
 }
 
+/// A noncopyable type BridgeJS can pass on the bridge stack, as an element of a `UniqueArray`.
+public protocol _BridgedSwiftUniqueStackType: ~Copyable {
+    static func bridgeJSStackPop() -> Self
+    consuming func bridgeJSStackPush()
+    /// Pushes a reference of its own for JavaScript to release, and keeps this value's.
+    borrowing func bridgeJSStackPushRetained()
+    static func bridgeJSRetaining(_ other: borrowing Self) -> Self
+}
+
+/// A noncopyable type BridgeJS passes only on the bridge stack, like a copyable `_BridgedSwiftTypeLoweredIntoVoidType`.
+public protocol _BridgedSwiftUniqueTypeLoweredIntoVoidType: _BridgedSwiftUniqueStackType, ~Copyable {}
+
 /// A type usable as a generic argument of an imported `@JSFunction`.
 public protocol BridgedSwiftGenericBridgeable: _BridgedSwiftStackType
 where StackLiftResult == Self {
@@ -1111,6 +1123,36 @@ extension _JSBridgedClass {
     }
     public consuming func bridgeJSStackPush() {
         jsObject.bridgeJSStackPush()
+    }
+}
+
+extension _JSUniqueBridgedClass where Self: ~Copyable {
+    // MARK: ImportTS
+    @_spi(BridgeJS) @_transparent public borrowing func bridgeJSLowerParameter() -> Int32 { jsID }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn(_ id: Int32) -> Self {
+        Self(unsafelyAdopting: JSUniqueRef(adopting: id))
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ id: Int32) -> Self {
+        Self(unsafelyAdopting: JSUniqueRef(adopting: id))
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Int32 { takeJSRef().relinquish() }
+
+    /// Returns an instance with a reference of its own to the object `other` holds.
+    public static func bridgeJSRetaining(_ other: borrowing Self) -> Self {
+        Self(unsafelyAdopting: JSUniqueRef(adopting: _swift_js_retain(other.jsID)))
+    }
+
+    // MARK: Stack ABI
+    public static func bridgeJSStackPop() -> Self {
+        bridgeJSLiftParameter(_swift_js_pop_i32())
+    }
+    public consuming func bridgeJSStackPush() {
+        _swift_js_push_i32(bridgeJSLowerReturn())
+    }
+    public borrowing func bridgeJSStackPushRetained() {
+        _swift_js_push_i32(_swift_js_retain(jsID))
     }
 }
 
@@ -2250,8 +2292,14 @@ extension _BridgedAsOptional where Wrapped: _JSBridgedClass {
     // (`isSome`, object id) ABI while returns travel through the bridge stack.
     //
     // Stack push/pop is provided by the generic `Wrapped: _BridgedSwiftStackType`
-    // extension; only the direct parameter lift and the export return lowering need
+    // extension; only the direct parameter ABI and the export return lowering need
     // dedicated implementations here.
+    @_spi(BridgeJS) @_transparent public consuming func bridgeJSLowerParameter() -> (
+        isSome: Int32, value: Int32
+    ) {
+        asOptional._bridgeJSLowerParameter(noneValue: 0, lowerWrapped: { $0.bridgeJSLowerParameter() })
+    }
+
     @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ objectId: Int32) -> Self {
         Self(
             optional: Optional<Wrapped>._bridgeJSLiftParameter(
@@ -2264,6 +2312,91 @@ extension _BridgedAsOptional where Wrapped: _JSBridgedClass {
 
     @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
         Wrapped.bridgeJSStackPushAsOptional(asOptional)
+    }
+}
+
+// `_BridgedAsOptional.Wrapped` must be copyable. The stack layout matches a copyable optional's.
+extension Optional: _BridgedSwiftUniqueStackType where Wrapped: _BridgedSwiftUniqueStackType & ~Copyable {
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        if _swift_js_pop_i32() == 0 {
+            return nil
+        }
+        return Wrapped.bridgeJSStackPop()
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        switch consume self {
+        case .none:
+            _swift_js_push_i32(0)
+        case .some(let wrapped):
+            wrapped.bridgeJSStackPush()
+            _swift_js_push_i32(1)
+        }
+    }
+    @_spi(BridgeJS) public borrowing func bridgeJSStackPushRetained() {
+        switch self {
+        case .none:
+            _swift_js_push_i32(0)
+        case .some(let wrapped):
+            wrapped.bridgeJSStackPushRetained()
+            _swift_js_push_i32(1)
+        }
+    }
+
+    /// Returns an optional with references of its own to the objects `other` holds.
+    @_spi(BridgeJS) public static func bridgeJSRetaining(_ other: borrowing Self) -> Self {
+        switch other {
+        case .none:
+            return nil
+        case .some(let wrapped):
+            return Wrapped.bridgeJSRetaining(wrapped)
+        }
+    }
+}
+
+// The ABI matches an optional copyable wrapper's.
+extension Optional where Wrapped: _JSUniqueBridgedClass & ~Copyable {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public borrowing func bridgeJSLowerParameter() -> (isSome: Int32, value: Int32) {
+        switch self {
+        case .none:
+            return (isSome: 0, value: 0)
+        case .some(let wrapped):
+            return (isSome: 1, value: wrapped.bridgeJSLowerParameter())
+        }
+    }
+
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> Self {
+        bridgeJSStackPop()
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter(_ isSome: Int32, _ id: Int32) -> Self {
+        if isSome == 0 {
+            return nil
+        }
+        return Wrapped.bridgeJSLiftParameter(id)
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() -> Void {
+        bridgeJSStackPush()
+    }
+}
+
+extension Optional where Wrapped: _BridgedSwiftUniqueTypeLoweredIntoVoidType & ~Copyable {
+    // MARK: ImportTS
+    @_spi(BridgeJS) public borrowing func bridgeJSLowerParameter() {
+        bridgeJSStackPushRetained()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> Self {
+        bridgeJSStackPop()
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> Self {
+        bridgeJSStackPop()
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
+        bridgeJSStackPush()
     }
 }
 
@@ -2548,6 +2681,77 @@ extension Array: _BridgedSwiftStackType where Element: _BridgedSwiftStackType, E
     }
 }
 
+#if compiler(>=6.4)
+@available(anyAppleOS 27.0, *)
+extension UniqueArray: _BridgedSwiftUniqueTypeLoweredIntoVoidType
+where Element: _BridgedSwiftUniqueStackType & ~Copyable {}
+
+// The stack layout matches `Array`'s: the elements in order, then the count.
+@available(anyAppleOS 27.0, *)
+extension UniqueArray: _BridgedSwiftUniqueStackType where Element: _BridgedSwiftUniqueStackType & ~Copyable {
+    @_spi(BridgeJS) public static func bridgeJSStackPop() -> Self {
+        let count = Int(_swift_js_pop_i32())
+        var result = UniqueArray<Element>(capacity: count)
+        for _ in 0..<count {
+            result.append(Element.bridgeJSStackPop())
+        }
+        result._bridgeJSReverse()
+        return result
+    }
+
+    @_spi(BridgeJS) public consuming func bridgeJSStackPush() {
+        let count = Int32(self.count)
+        _bridgeJSReverse()
+        while let element = popLast() {
+            element.bridgeJSStackPush()
+        }
+        _swift_js_push_i32(count)
+    }
+
+    @_spi(BridgeJS) public borrowing func bridgeJSStackPushRetained() {
+        for index in indices {
+            self[index].bridgeJSStackPushRetained()
+        }
+        _swift_js_push_i32(Int32(count))
+    }
+
+    /// Returns an array with references of its own to the objects `other` holds.
+    @_spi(BridgeJS) public static func bridgeJSRetaining(_ other: borrowing Self) -> Self {
+        var result = UniqueArray<Element>(capacity: other.count)
+        for index in other.indices {
+            result.append(Element.bridgeJSRetaining(other[index]))
+        }
+        return result
+    }
+
+    private mutating func _bridgeJSReverse() {
+        var low = 0
+        var high = count - 1
+        while low < high {
+            swapAt(low, high)
+            low += 1
+            high -= 1
+        }
+    }
+
+    // MARK: ImportTS
+    @_spi(BridgeJS) public borrowing func bridgeJSLowerParameter() {
+        bridgeJSStackPushRetained()
+    }
+    @_spi(BridgeJS) public static func bridgeJSLiftReturn() -> Self {
+        bridgeJSStackPop()
+    }
+
+    // MARK: ExportSwift
+    @_spi(BridgeJS) public static func bridgeJSLiftParameter() -> Self {
+        bridgeJSStackPop()
+    }
+    @_spi(BridgeJS) public consuming func bridgeJSLowerReturn() {
+        bridgeJSStackPush()
+    }
+}
+#endif
+
 // MARK: - Dictionary Support
 
 extension Dictionary: _BridgedSwiftStackType
@@ -2648,6 +2852,50 @@ where Key == String, Value: _BridgedSwiftStackType, Value.StackLiftResult == Val
     return try result.get()
 }
 
+/// Noncopyable-result overload of `_bjs_awaitPromise`.
+@_spi(BridgeJS)
+public func _bjs_awaitPromise<
+    T: ~Copyable,
+    R: _BridgeJSReleasableClosure,
+    E: _BridgeJSReleasableClosure
+>(
+    makeResolveClosure: (@escaping (consuming sending T) -> Void) -> R,
+    makeRejectClosure: (@escaping (sending JSValue) -> Void) -> E,
+    _ body: (_ resolveRef: Int32, _ rejectRef: Int32) -> Void
+) async throws(JSException) -> T {
+    let resolved = _BridgeJSResolvedValue<T>()
+    var resolveClosure: R?
+    var rejectClosure: E?
+    let error: JSException? = await withCheckedContinuation { continuation in
+        let resolve = makeResolveClosure { value in
+            resolved.value = consume value
+            continuation.resume(returning: nil)
+        }
+        let reject = makeRejectClosure { value in
+            continuation.resume(returning: JSException(value))
+        }
+        resolveClosure = resolve
+        rejectClosure = reject
+        body(
+            Int32(bitPattern: resolve.jsObject.id),
+            Int32(bitPattern: reject.jsObject.id)
+        )
+    }
+    resolveClosure?.release()
+    rejectClosure?.release()
+    if let error {
+        throw error
+    }
+    guard let value = resolved.value.take() else {
+        fatalError("A promise resolved without a value")
+    }
+    return value
+}
+
+private final class _BridgeJSResolvedValue<T: ~Copyable> {
+    var value: T?
+}
+
 /// Void-returning overload of `_bjs_awaitPromise`.
 ///
 /// Needed because `(Void) -> Void` is not the same as `() -> Void` in Swift (SE-0110),
@@ -2690,17 +2938,17 @@ private func _swift_js_make_promise_extern() -> Int32 { _onlyAvailableOnWasm() }
 #endif
 
 // `@unchecked Sendable` is safe because the Wasm runtime is single-threaded.
-private struct _BridgeJSMakePromiseContext<T>: @unchecked Sendable {
+private struct _BridgeJSMakePromiseContext<T: ~Copyable>: @unchecked Sendable {
     let promise: JSObject
-    let resolve: (JSObject, T) throws(JSException) -> Void
+    let resolve: (JSObject, borrowing T) throws(JSException) -> Void
     let reject: (JSObject, JSValue) throws(JSException) -> Void
     let body: () async throws(JSException) -> T
 }
 
 /// Returns a `Promise` synchronously and settles it from a `Task` via the generated
 /// `resolve` / `reject` thunks, which this library cannot name directly.
-@_spi(BridgeJS) public func _bjs_makePromise<T>(
-    resolve: @escaping (JSObject, T) throws(JSException) -> Void,
+@_spi(BridgeJS) public func _bjs_makePromise<T: ~Copyable>(
+    resolve: @escaping (JSObject, borrowing T) throws(JSException) -> Void,
     reject: @escaping (JSObject, JSValue) throws(JSException) -> Void,
     _ body: @escaping () async throws(JSException) -> T
 ) -> Int32 {

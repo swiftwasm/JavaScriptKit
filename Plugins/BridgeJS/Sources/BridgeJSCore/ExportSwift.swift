@@ -22,13 +22,20 @@ public class ExportSwift {
     let moduleName: String
     private let exposeToGlobal: Bool
     private var skeleton: ExportedSkeleton
+    private let availability: AvailabilityIndex
     private var sourceFiles: [(sourceFile: SourceFileSyntax, inputFilePath: String)] = []
 
-    public init(progress: ProgressReporting, moduleName: String, skeleton: ExportedSkeleton) {
+    public init(
+        progress: ProgressReporting,
+        moduleName: String,
+        skeleton: ExportedSkeleton,
+        availability: AvailabilityIndex
+    ) {
         self.progress = progress
         self.moduleName = moduleName
         self.exposeToGlobal = skeleton.exposeToGlobal
         self.skeleton = skeleton
+        self.availability = availability
     }
 
     /// Finalizes the export process and generates the bridge code
@@ -48,7 +55,7 @@ public class ExportSwift {
         var decls: [DeclSyntax] = []
 
         try withSpan("Render Protocols") { [self] in
-            let protocolCodegen = ProtocolCodegen()
+            let protocolCodegen = ProtocolCodegen(availability: availability)
             for proto in skeleton.protocols {
                 decls.append(contentsOf: try protocolCodegen.renderProtocolWrapper(proto, moduleName: moduleName))
             }
@@ -94,7 +101,12 @@ public class ExportSwift {
         withSpan("Render Generic Bridgeable Conformances") { [self] in
             let genericConformanceCodegen = GenericConformanceCodegen()
             for entry in skeleton.genericBridgeableTypeEntries {
-                decls.append(contentsOf: genericConformanceCodegen.renderConformance(typeName: entry.swiftName))
+                decls.append(
+                    contentsOf: genericConformanceCodegen.renderConformance(
+                        typeName: entry.swiftName,
+                        availability: availability.attributes(for: [entry.bridgeType])
+                    )
+                )
             }
         }
 
@@ -165,14 +177,20 @@ public class ExportSwift {
         try builder.call()
         try builder.liftReturnValue()
 
-        let valueParam = valueType == .void ? "" : ", _ value: \(valueType.swiftType)"
-        let macroDecl: DeclSyntax =
-            "@JSFunction func \(raw: functionName)(_ promise: JSObject\(raw: valueParam)) throws(JSException)"
+        let valueParam =
+            valueType == .void
+            ? "" : ", _ value: \(valueType.closureParameterPrefix(sending: false))\(valueType.swiftType)"
+        let macroDecl = SwiftCodePattern.buildAvailableDecl(
+            "@JSFunction func \(raw: functionName)(_ promise: JSObject\(raw: valueParam)) throws(JSException)",
+            usesUniqueArray: builder.usesUniqueArray,
+            availability: availability.attributes(for: [valueType])
+        )
         let glueDecl = builder.renderThunkDecl(
             name: "_$\(functionName)",
             parameters: parameters,
             returnType: .void,
-            effects: effects
+            effects: effects,
+            availability: availability
         )
         return [macroDecl, builder.renderImportDecl(), glueDecl]
     }
@@ -184,6 +202,7 @@ public class ExportSwift {
         var abiReturnType: WasmCoreType?
         var externDecls: [DeclSyntax] = []
         let effects: Effects
+        private(set) var usesUniqueArray: Bool
 
         /// The async return type settled through `_bjs_makePromise`'s `Promise_resolve_<mangled>`
         /// helper. Set for every `async` thunk.
@@ -193,6 +212,7 @@ public class ExportSwift {
 
         init(effects: Effects, returnType: BridgeType) throws {
             self.effects = effects
+            self.usesUniqueArray = returnType.usesUniqueArray
             guard effects.isAsync else { return }
             guard returnType.isAsyncResolvable else {
                 throw BridgeJSCoreError(
@@ -212,6 +232,7 @@ public class ExportSwift {
         }
 
         func liftParameter(param: Parameter) throws {
+            usesUniqueArray = usesUniqueArray || param.type.usesUniqueArray
             parameters.append(param)
             let escapedName = param.escapedSwiftIdentifier
             let liftingInfo = try param.type.liftParameterInfo()
@@ -319,10 +340,17 @@ public class ExportSwift {
         func callStaticProperty(name: String, returnType: BridgeType) {
             if returnType == .void {
                 append("\(raw: name)")
+            } else if let retained = Self.retainingNoncopyableRead(of: name, type: returnType) {
+                append("let ret = \(raw: retained)")
             } else {
                 let (prefix, suffix) = protocolCastSuffix(for: returnType)
                 append("let ret = \(raw: prefix)\(raw: name)\(raw: suffix)")
             }
+        }
+
+        private static func retainingNoncopyableRead(of expression: String, type: BridgeType) -> String? {
+            guard type.isNoncopyable else { return nil }
+            return "\(type.swiftType).bridgeJSRetaining(\(expression))"
         }
 
         func callMethod(methodName: String, returnType: BridgeType) {
@@ -338,6 +366,11 @@ public class ExportSwift {
             let selfExpr = removeFirstLiftedParameter()
             if returnType == .void {
                 append("\(raw: selfExpr).\(raw: propertyName)")
+            } else if let retained = Self.retainingNoncopyableRead(
+                of: "\(selfExpr).\(propertyName)",
+                type: returnType
+            ) {
+                append("let ret = \(raw: retained)")
             } else {
                 let (prefix, suffix) = protocolCastSuffix(for: returnType)
                 append("let ret = \(raw: prefix)\(raw: selfExpr).\(raw: propertyName)\(raw: suffix)")
@@ -487,7 +520,11 @@ public class ExportSwift {
                 printer.write(multilineString: preparedBody.description)
             }
 
-            return DeclSyntax(funcDecl)
+            return SwiftCodePattern.buildAvailableDecl(
+                funcDecl,
+                usesUniqueArray: usesUniqueArray,
+                availability: []
+            )
         }
 
         private func returnPlaceholderStmt() -> String {
@@ -845,15 +882,23 @@ public class ExportSwift {
             returnType: .i32
         )
         let externDecl: DeclSyntax = "\(raw: externDeclPrinter.lines.joined(separator: "\n"))"
-        return [extensionDecl, externDecl]
+        return [
+            SwiftCodePattern.buildAvailableDecl(
+                extensionDecl,
+                usesUniqueArray: false,
+                availability: klass.availability ?? []
+            ),
+            externDecl,
+        ]
     }
 }
 
 // MARK: - GenericConformanceCodegen
 
 struct GenericConformanceCodegen {
-    func renderConformance(typeName: String) -> [DeclSyntax] {
+    func renderConformance(typeName: String, availability: [String]) -> [DeclSyntax] {
         let printer = CodeFragmentPrinter()
+        printer.write(lines: availability)
         printer.write("extension \(typeName): BridgedSwiftGenericBridgeable {")
         printer.indent {
             printer.write(
@@ -915,6 +960,8 @@ struct StackCodegen {
             return "\(raw: type.swiftType).bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: className)(unsafelyWrapping: JSObject.bridgeJSStackPop())"
+        case .jsUniqueObject:
+            fatalError("Noncopyable @JSClass wrappers are not supported in the stack ABI")
         case .nullable(let wrappedType, let kind):
             return liftNullableExpression(wrappedType: wrappedType, kind: kind)
         case .closure:
@@ -937,7 +984,7 @@ struct StackCodegen {
             return "\(raw: typeName)<\(raw: wrappedType.swiftType)>.bridgeJSStackPop()"
         case .jsObject(let className?):
             return "\(raw: typeName)<JSObject>.bridgeJSStackPop().map { \(raw: className)(unsafelyWrapping: $0) }"
-        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol, .generic:
+        case .nullable, .void, .namespaceEnum, .closure, .unsafePointer, .swiftProtocol, .generic, .jsUniqueObject:
             fatalError("Invalid nullable wrapped type: \(wrappedType)")
         }
     }
@@ -960,6 +1007,8 @@ struct StackCodegen {
             return ["\(raw: accessor).bridgeJSStackPush()"]
         case .jsObject(_?):
             return ["\(raw: accessor).jsObject.bridgeJSStackPush()"]
+        case .jsUniqueObject:
+            fatalError("Noncopyable @JSClass wrappers are not supported in the stack ABI")
         case .swiftProtocol(let protocolName):
             return [
                 "_swift_js_push_i32(_bridgeJSUnwrapProtocolExportable(\(raw: accessor), \"\(raw: protocolName)\").bridgeJSLowerAsProtocolReturn())"
@@ -1102,16 +1151,22 @@ struct EnumCodegen {
     private let stackCodegen = StackCodegen()
 
     func renderEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax? {
+        let helpers: DeclSyntax
         switch enumDef.enumType {
         case .simple:
-            return renderCaseEnumHelpers(enumDef)
+            helpers = renderCaseEnumHelpers(enumDef)
         case .rawValue:
-            return renderRawValueEnumHelpers(enumDef)
+            helpers = renderRawValueEnumHelpers(enumDef)
         case .associatedValue:
-            return renderAssociatedValueEnumHelpers(enumDef)
+            helpers = renderAssociatedValueEnumHelpers(enumDef)
         case .namespace:
             return nil
         }
+        return SwiftCodePattern.buildAvailableDecl(
+            helpers,
+            usesUniqueArray: false,
+            availability: enumDef.availability ?? []
+        )
     }
 
     private func renderCaseEnumHelpers(_ enumDef: ExportedEnum) -> DeclSyntax {
@@ -1300,6 +1355,7 @@ struct StructCodegen {
         let liftFunctionName = "_bjs_struct_lift_\(structDef.abiName)"
 
         let printer = CodeFragmentPrinter()
+        printer.write(lines: structDef.availability ?? [])
         printer.write("extension \(typeName): _BridgedSwiftStruct {")
         printer.indent {
             printer.write("@_spi(BridgeJS) @_transparent public static func bridgeJSStackPop() -> \(typeName) {")
@@ -1409,13 +1465,19 @@ struct AliasCodegen {
             return nil
         }
         let conformances = (["_BridgedSwiftAlias"] + protocols).joined(separator: ", ")
-        return "extension \(raw: alias.swiftCallName): \(raw: conformances) {}"
+        return SwiftCodePattern.buildAvailableDecl(
+            "extension \(raw: alias.swiftCallName): \(raw: conformances) {}",
+            usesUniqueArray: false,
+            availability: alias.availability ?? []
+        )
     }
 }
 
 // MARK: - ProtocolCodegen
 
 struct ProtocolCodegen {
+    let availability: AvailabilityIndex
+
     func renderProtocolWrapper(_ proto: ExportedProtocol, moduleName: String) throws -> [DeclSyntax] {
         let wrapperName = "Any\(proto.name)"
         let protocolName = proto.name
@@ -1445,23 +1507,19 @@ struct ProtocolCodegen {
                 effects: method.effects
             )
 
-            // Build extern declaration using helper function
-            let externDeclPrinter = CodeFragmentPrinter()
-            SwiftCodePattern.buildExternFunctionDecl(
-                printer: externDeclPrinter,
-                moduleName: moduleName,
-                abiName: method.abiName,
-                functionName: method.abiName,
-                abiParameters: builder.abiParameterSignatures,
-                returnType: builder.abiReturnType
-            )
-            externDecls.append(DeclSyntax("\(raw: externDeclPrinter.lines.joined(separator: "\n"))"))
+            externDecls.append(builder.renderImportDecl())
             let methodImplPrinter = CodeFragmentPrinter()
-            methodImplPrinter.write("func \(method.name)\(signature) {")
-            methodImplPrinter.indent {
-                methodImplPrinter.write(lines: builder.body.lines)
+            SwiftCodePattern.buildAvailableDecl(
+                printer: methodImplPrinter,
+                usesUniqueArray: builder.usesUniqueArray,
+                availability: availability.attributes(for: method.parameters.map(\.type) + [method.returnType])
+            ) { printer in
+                printer.write("func \(method.name)\(signature) {")
+                printer.indent {
+                    printer.write(lines: builder.body.lines)
+                }
+                printer.write("}")
             }
-            methodImplPrinter.write("}")
             methodDecls.append(methodImplPrinter)
         }
 
@@ -1482,6 +1540,7 @@ struct ProtocolCodegen {
         var decls: [DeclSyntax] = []
         if !methodDecls.isEmpty || !propertyDecls.isEmpty {
             let extensionPrinter = CodeFragmentPrinter()
+            extensionPrinter.write(lines: proto.availability ?? [])
             extensionPrinter.write("extension \(protocolName) where Self: _BridgedSwiftProtocolWrapper {")
             extensionPrinter.indent {
                 var first = true
@@ -1537,60 +1596,43 @@ struct ProtocolCodegen {
         try getterBuilder.call()
         try getterBuilder.liftReturnValue()
 
-        // Build getter extern declaration using helper function
-        let getterExternDeclPrinter = CodeFragmentPrinter()
-        SwiftCodePattern.buildExternFunctionDecl(
-            printer: getterExternDeclPrinter,
-            moduleName: moduleName,
-            abiName: getterAbiName,
-            functionName: getterAbiName,
-            abiParameters: getterBuilder.abiParameterSignatures,
-            returnType: getterBuilder.abiReturnType
-        )
-        let getterExternDecl = DeclSyntax("\(raw: getterExternDeclPrinter.lines.joined(separator: "\n"))")
-        var externDecls: [DeclSyntax] = [getterExternDecl]
+        var externDecls: [DeclSyntax] = [getterBuilder.renderImportDecl()]
 
-        printer.write("var \(property.name): \(property.type.swiftType) {")
-        try printer.indent {
-            printer.write("get {")
-            printer.indent {
-                printer.write(lines: getterBuilder.body.lines)
-            }
-            printer.write("}")
+        try SwiftCodePattern.buildAvailableDecl(
+            printer: printer,
+            usesUniqueArray: getterBuilder.usesUniqueArray,
+            availability: availability.attributes(for: [property.type])
+        ) { printer in
+            printer.write("var \(property.name): \(property.type.swiftType) {")
+            try printer.indent {
+                printer.write("get {")
+                printer.indent {
+                    printer.write(lines: getterBuilder.body.lines)
+                }
+                printer.write("}")
 
-            if property.isReadonly { return }
+                if property.isReadonly { return }
 
-            let setterBuilder = try ImportTS.CallJSEmission(
-                moduleName: moduleName,
-                abiName: setterAbiName,
-                effects: Effects(isAsync: false, isThrows: false),
-                returnType: .void,
-                context: .exportSwift
-            )
-            try setterBuilder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
-            try setterBuilder.lowerParameter(param: Parameter(label: nil, name: "newValue", type: property.type))
-            try setterBuilder.call()
+                let setterBuilder = try ImportTS.CallJSEmission(
+                    moduleName: moduleName,
+                    abiName: setterAbiName,
+                    effects: Effects(isAsync: false, isThrows: false),
+                    returnType: .void,
+                    context: .exportSwift
+                )
+                try setterBuilder.lowerParameter(param: Parameter(label: nil, name: "jsObject", type: .jsObject(nil)))
+                try setterBuilder.lowerParameter(param: Parameter(label: nil, name: "newValue", type: property.type))
+                try setterBuilder.call()
+                externDecls.append(setterBuilder.renderImportDecl())
 
-            // Build setter extern declaration using helper function
-            let setterExternDeclPrinter = CodeFragmentPrinter()
-            SwiftCodePattern.buildExternFunctionDecl(
-                printer: setterExternDeclPrinter,
-                moduleName: moduleName,
-                abiName: setterAbiName,
-                functionName: setterAbiName,
-                abiParameters: setterBuilder.abiParameterSignatures,
-                returnType: setterBuilder.abiReturnType
-            )
-            let setterExternDecl = DeclSyntax("\(raw: setterExternDeclPrinter.lines.joined(separator: "\n"))")
-            externDecls.append(setterExternDecl)
-
-            printer.write("set {")
-            printer.indent {
-                printer.write(lines: setterBuilder.body.lines)
+                printer.write("set {")
+                printer.indent {
+                    printer.write(lines: setterBuilder.body.lines)
+                }
+                printer.write("}")
             }
             printer.write("}")
         }
-        printer.write("}")
 
         return externDecls
     }
@@ -1637,7 +1679,7 @@ extension BridgeType {
         case .associatedValueEnum:
             return ["_BridgedSwiftAssociatedValueEnum"]
         case .rawValueEnum, .void, .unsafePointer, .namespaceEnum,
-            .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias, .generic:
+            .swiftProtocol, .closure, .nullable, .array, .dictionary, .alias, .generic, .jsUniqueObject:
             // Not supported yet.
             return nil
         }
@@ -1675,13 +1717,16 @@ extension BridgeType {
         case .jsValue: return "JSValue"
         case .jsObject(nil): return "JSObject"
         case .jsObject(let name?): return name
+        case .jsUniqueObject(nil): return "JSUniqueRef"
+        case .jsUniqueObject(let name?): return name
         case .swiftHeapObject(let name): return name
         case .unsafePointer(let ptr): return ptr.swiftType
         case .swiftProtocol(let name): return "Any\(name)"
         case .void: return "Void"
         case .nullable(let wrappedType, let kind):
             return kind == .null ? "Optional<\(wrappedType.swiftType)>" : "JSUndefinedOr<\(wrappedType.swiftType)>"
-        case .array(let elementType): return "[\(elementType.swiftType)]"
+        case .array(let elementType):
+            return elementType.isNoncopyable ? "UniqueArray<\(elementType.swiftType)>" : "[\(elementType.swiftType)]"
         case .dictionary(let valueType): return "[String: \(valueType.swiftType)]"
         case .caseEnum(let name): return name
         case .rawValueEnum(let name, _): return name
@@ -1689,7 +1734,9 @@ extension BridgeType {
         case .swiftStruct(let name): return name
         case .namespaceEnum(let name): return name
         case .closure(let signature, let useJSTypedClosure):
-            let paramTypes = signature.parameters.map { $0.swiftType }.joined(separator: ", ")
+            let paramTypes = signature.parameters.map {
+                "\($0.closureParameterPrefix(sending: false))\($0.swiftType)"
+            }.joined(separator: ", ")
             let effectsStr = (signature.isAsync ? " async" : "") + (signature.isThrows ? " throws" : "")
             let closureType = "(\(paramTypes))\(effectsStr) -> \(signature.returnType.swiftType)"
             return useJSTypedClosure ? "JSTypedClosure<\(closureType)>" : closureType
@@ -1706,6 +1753,33 @@ extension BridgeType {
             return kind == .null ? "Optional<\(wrappedClosureType)>" : "JSUndefinedOr<\(wrappedClosureType)>"
         default: return swiftType
         }
+    }
+
+    var isNoncopyable: Bool {
+        switch self {
+        case .jsUniqueObject: return true
+        case .nullable(let wrappedType, _): return wrappedType.isNoncopyable
+        case .array(let elementType): return elementType.isNoncopyable
+        default: return false
+        }
+    }
+
+    /// Whether the Swift spelling contains `UniqueArray`, which Swift 6.3's standard library lacks.
+    var usesUniqueArray: Bool {
+        switch self {
+        case .array(let elementType): return elementType.isNoncopyable || elementType.usesUniqueArray
+        case .nullable(let wrappedType, _): return wrappedType.usesUniqueArray
+        case .dictionary(let valueType): return valueType.usesUniqueArray
+        case .alias(_, let underlying): return underlying.usesUniqueArray
+        case .closure(let signature, _):
+            return signature.parameters.contains { $0.usesUniqueArray } || signature.returnType.usesUniqueArray
+        default: return false
+        }
+    }
+
+    func closureParameterPrefix(sending: Bool) -> String {
+        if isNoncopyable { return sending ? "consuming sending " : "borrowing " }
+        return sending ? "sending " : ""
     }
 
     var isClosureType: Bool {
@@ -1740,6 +1814,7 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsUniqueObject: return .jsObject
         case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer
@@ -1804,6 +1879,7 @@ extension BridgeType {
         case .double: return .double
         case .string: return .string
         case .jsObject: return .jsObject
+        case .jsUniqueObject: return .jsObject
         case .jsValue: return .jsValue
         case .swiftHeapObject: return .swiftHeapObject
         case .unsafePointer: return .unsafePointer

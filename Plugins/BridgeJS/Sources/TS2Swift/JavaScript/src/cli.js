@@ -83,6 +83,7 @@ Options:
   -p, --project <path>    Path to tsconfig.json (default: tsconfig.json).
   --global <path>         Add a .d.ts as a global declaration file (repeatable).
   --log-level <level>     One of: verbose, info, warning, error (default: info).
+  --noncopyable-wrappers  Emit \`@JSClass\` structs as \`~Copyable\` wrappers.
   -h, --help              Show this help.
 
 Examples:
@@ -97,12 +98,12 @@ Examples:
 /**
  * Run ts2swift for a single input file (programmatic API, no process I/O).
  * @param {string[]} filePaths - Paths to the .d.ts files
- * @param {{ tsconfigPath: string, logLevel?: keyof typeof DiagnosticEngine.LEVELS, globalFiles?: string[], diagnosticEngine?: DiagnosticEngine }} options
+ * @param {{ tsconfigPath: string, logLevel?: keyof typeof DiagnosticEngine.LEVELS, globalFiles?: string[], diagnosticEngine?: DiagnosticEngine, noncopyableWrappers?: boolean }} options
  * @returns {string} Generated Swift source
  * @throws {Error} on parse/type-check errors (diagnostics are included in the message)
  */
 export function run(filePaths, options) {
-    const { tsconfigPath, logLevel = 'info', globalFiles = [], diagnosticEngine } = options;
+    const { tsconfigPath, logLevel = 'info', globalFiles = [], diagnosticEngine, noncopyableWrappers = false } = options;
     const engine = diagnosticEngine ?? new DiagnosticEngine(logLevel);
 
     const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
@@ -167,6 +168,7 @@ export function run(filePaths, options) {
     for (const inputPath of [...filePaths, ...globalFiles]) {
         const processor = new TypeProcessor(program.getTypeChecker(), engine, {
             defaultImportFromGlobal: globalFileSet.has(inputPath),
+            noncopyableWrappers,
         });
         const result = processor.processTypeDeclarations(program, inputPath);
         const body = result.content.trim();
@@ -201,6 +203,9 @@ export function main(args) {
             "log-level": {
                 type: 'string',
                 default: 'info',
+            },
+            "noncopyable-wrappers": {
+                type: 'boolean',
             },
             help: {
                 type: 'boolean',
@@ -248,7 +253,13 @@ export function main(args) {
 
     let swiftOutput;
     try {
-        swiftOutput = run(filePaths, { tsconfigPath, logLevel, globalFiles, diagnosticEngine });
+        swiftOutput = run(filePaths, {
+            tsconfigPath,
+            logLevel,
+            globalFiles,
+            diagnosticEngine,
+            noncopyableWrappers: options.values["noncopyable-wrappers"] ?? false,
+        });
     } catch (/** @type {unknown} */ err) {
         if (err instanceof Error) {
             diagnosticEngine.print("error", err.message);

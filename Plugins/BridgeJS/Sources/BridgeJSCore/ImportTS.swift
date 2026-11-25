@@ -20,11 +20,18 @@ public struct ImportTS {
     public let progress: ProgressReporting
     public private(set) var skeleton: ImportedModuleSkeleton
     private let moduleName: String
+    private let availability: AvailabilityIndex
 
-    public init(progress: ProgressReporting, moduleName: String, skeleton: ImportedModuleSkeleton) {
+    public init(
+        progress: ProgressReporting,
+        moduleName: String,
+        skeleton: ImportedModuleSkeleton,
+        availability: AvailabilityIndex
+    ) {
         self.progress = progress
         self.moduleName = moduleName
         self.skeleton = skeleton
+        self.availability = availability
     }
 
     /// Finalizes the import process and generates Swift code
@@ -81,9 +88,10 @@ public struct ImportTS {
                 name: "_$\(getter.name)_get",
                 parameters: [],
                 returnType: getter.type,
-                effects: effects
+                effects: effects,
+                documentation: getter.documentation,
+                availability: availability
             )
-            .with(\.leadingTrivia, Self.renderDocumentation(documentation: getter.documentation))
         ]
     }
 
@@ -114,6 +122,7 @@ public struct ImportTS {
         // Closures to close borrowed parameters
         private var borrowedArguments: [BorrowedArgument] = []
         private let needsReturnVariable: Bool
+        private(set) var usesUniqueArray: Bool
 
         init(
             moduleName: String,
@@ -127,6 +136,7 @@ public struct ImportTS {
             self.effects = effects
             self.returnType = returnType
             self.context = context
+            self.usesUniqueArray = returnType.usesUniqueArray
             let liftingInfo = try returnType.liftingReturnInfo(context: context)
             if effects.isAsync || returnType == .void || returnType.usesSideChannelForOptionalReturn()
                 || liftingInfo.valueToLift == nil
@@ -143,6 +153,7 @@ public struct ImportTS {
         }
 
         func lowerParameter(param: Parameter) throws {
+            usesUniqueArray = usesUniqueArray || param.type.usesUniqueArray
             let escapedName = param.escapedSwiftIdentifier
             if let genericPush = param.type.genericStackPushStatement(value: escapedName) {
                 stackLoweringStmts.insert(genericPush, at: 0)
@@ -348,8 +359,9 @@ public struct ImportTS {
                 )
             } else {
                 let resolveSwiftType = returnType.closureSwiftType
+                let resolvePrefix = returnType.closureParameterPrefix(sending: true)
                 let resolveFactory =
-                    "makeResolveClosure: { JSTypedClosure<(sending \(resolveSwiftType)) -> Void>.sending($0) }"
+                    "makeResolveClosure: { JSTypedClosure<(\(resolvePrefix)\(resolveSwiftType)) -> Void>.sending($0) }"
                 body.write(
                     "let resolved = \(tryKeyword) await _bjs_awaitPromise(\(resolveFactory), \(rejectFactory)) { resolveRef, rejectRef in"
                 )
@@ -366,14 +378,20 @@ public struct ImportTS {
 
         func renderImportDecl() -> DeclSyntax {
             let printer = CodeFragmentPrinter()
-            SwiftCodePattern.buildExternFunctionDecl(
+            SwiftCodePattern.buildAvailableDecl(
                 printer: printer,
-                moduleName: moduleName,
-                abiName: abiName,
-                functionName: abiName,
-                abiParameters: abiParameterSignatures,
-                returnType: abiReturnType
-            )
+                usesUniqueArray: usesUniqueArray,
+                availability: []
+            ) {
+                SwiftCodePattern.buildExternFunctionDecl(
+                    printer: $0,
+                    moduleName: moduleName,
+                    abiName: abiName,
+                    functionName: abiName,
+                    abiParameters: abiParameterSignatures,
+                    returnType: abiReturnType
+                )
+            }
             return "\(raw: printer.lines.joined(separator: "\n"))"
         }
 
@@ -382,7 +400,9 @@ public struct ImportTS {
             parameters: [Parameter],
             returnType: BridgeType,
             effects: Effects,
-            genericParameters: [GenericParameter] = []
+            genericParameters: [GenericParameter] = [],
+            documentation: String? = nil,
+            availability: AvailabilityIndex
         ) -> DeclSyntax {
             let printer = CodeFragmentPrinter()
             let signature = SwiftSignatureBuilder.buildFunctionSignature(
@@ -407,7 +427,12 @@ public struct ImportTS {
                 printer.write(lines: body.lines)
             }
             printer.write("}")
-            return "\(raw: printer.lines.joined(separator: "\n"))"
+            let decl: DeclSyntax = "\(raw: printer.lines.joined(separator: "\n"))"
+            return SwiftCodePattern.buildAvailableDecl(
+                decl.with(\.leadingTrivia, ImportTS.renderDocumentation(documentation: documentation)),
+                usesUniqueArray: usesUniqueArray,
+                availability: availability.attributes(for: parameters.map(\.type) + [returnType])
+            )
         }
 
         func renderConstructorDecl(parameters: [Parameter]) -> DeclSyntax {
@@ -472,14 +497,16 @@ public struct ImportTS {
                 parameters: function.parameters,
                 returnType: function.returnType,
                 effects: function.effects,
-                genericParameters: function.genericParameters ?? []
+                genericParameters: function.genericParameters ?? [],
+                documentation: function.documentation,
+                availability: availability
             )
-            .with(\.leadingTrivia, Self.renderDocumentation(documentation: function.documentation))
         ]
     }
 
     func renderSwiftType(_ type: ImportedTypeSkeleton, topLevelDecls: inout [DeclSyntax]) throws -> [DeclSyntax] {
-        let selfParameter = Parameter(label: nil, name: "self", type: .jsObject(nil))
+        let selfType: BridgeType = type.isNoncopyable == true ? .jsUniqueObject(nil) : .jsObject(nil)
+        let selfParameter = Parameter(label: nil, name: "self", type: selfType)
         var decls: [DeclSyntax] = []
 
         func renderMethod(method: ImportedFunctionSkeleton) throws -> [DeclSyntax] {
@@ -503,7 +530,8 @@ public struct ImportTS {
                     parameters: [selfParameter] + method.parameters,
                     returnType: method.returnType,
                     effects: method.effects,
-                    genericParameters: method.genericParameters ?? []
+                    genericParameters: method.genericParameters ?? [],
+                    availability: availability
                 )
             ]
         }
@@ -529,7 +557,8 @@ public struct ImportTS {
                     parameters: method.parameters,
                     returnType: method.returnType,
                     effects: method.effects,
-                    genericParameters: method.genericParameters ?? []
+                    genericParameters: method.genericParameters ?? [],
+                    availability: availability
                 )
             ]
         }
@@ -540,7 +569,7 @@ public struct ImportTS {
                 moduleName: moduleName,
                 abiName: constructor.abiName(context: type),
                 effects: effects,
-                returnType: .jsObject(nil)
+                returnType: selfType
             )
             for param in constructor.parameters {
                 try builder.lowerParameter(param: param)
@@ -553,9 +582,10 @@ public struct ImportTS {
                 builder.renderThunkDecl(
                     name: Self.thunkName(type: type),
                     parameters: constructor.parameters,
-                    returnType: .jsObject(nil),
+                    returnType: selfType,
                     effects: effects,
-                    genericParameters: constructor.genericParameters ?? []
+                    genericParameters: constructor.genericParameters ?? [],
+                    availability: availability
                 )
             ]
         }
@@ -577,7 +607,8 @@ public struct ImportTS {
                     name: Self.thunkName(type: type, propertyName: getter.name, operation: "get"),
                     parameters: [selfParameter],
                     returnType: getter.type,
-                    effects: effects
+                    effects: effects,
+                    availability: availability
                 )
             )
         }
@@ -608,7 +639,8 @@ public struct ImportTS {
                 name: Self.thunkName(type: type, propertyName: propertyNameForThunk, operation: "set"),
                 parameters: [selfParameter, newValue],
                 returnType: .void,
-                effects: effects
+                effects: effects,
+                availability: availability
             )
         }
         if let constructor = type.constructor {
@@ -800,6 +832,8 @@ struct SwiftSignatureBuilder {
         switch type {
         case .closure(_, useJSTypedClosure: false):
             return "@escaping \(type.swiftType)"
+        case _ where type.isNoncopyable:
+            return "borrowing \(type.swiftType)"
         default:
             return buildTypeSyntax(from: type)
         }
@@ -831,6 +865,33 @@ enum SwiftCodePattern {
         elseDecl(printer)
         printer.write("#endif")
     }
+
+    static func buildAvailableDecl(
+        printer: CodeFragmentPrinter,
+        usesUniqueArray: Bool,
+        availability: [String],
+        body: (_ printer: CodeFragmentPrinter) throws -> Void
+    ) rethrows {
+        if usesUniqueArray {
+            printer.write("#if compiler(>=6.4)")
+        }
+        printer.write(lines: availability)
+        try body(printer)
+        if usesUniqueArray {
+            printer.write("#endif")
+        }
+    }
+
+    static func buildAvailableDecl(
+        _ decl: DeclSyntax,
+        usesUniqueArray: Bool,
+        availability: [String]
+    ) -> DeclSyntax {
+        let attributes = availability.map { "\($0)\n" }.joined()
+        let annotated: DeclSyntax = "\(raw: decl.leadingTrivia)\(raw: attributes)\(decl.with(\.leadingTrivia, []))"
+        return usesUniqueArray ? "#if compiler(>=6.4)\n\(annotated)\n#endif" : annotated
+    }
+
     static func buildExternFunctionDecl(
         printer: CodeFragmentPrinter,
         moduleName: String,
@@ -948,7 +1009,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
-        case .jsObject: return .jsObject
+        case .jsObject, .jsUniqueObject: return .jsObject
         case .jsValue: return .jsValue
         case .void: return .void
         case .closure:
@@ -1017,7 +1078,7 @@ extension BridgeType {
         case .float: return .float
         case .double: return .double
         case .string: return .string
-        case .jsObject: return .jsObject
+        case .jsObject, .jsUniqueObject: return .jsObject
         case .jsValue: return .jsValue
         case .void: return .void
         case .closure:
@@ -1046,8 +1107,11 @@ extension BridgeType {
         case .nullable(let wrappedType, _):
             // jsObject uses the stack ABI for optionals — the thunk returns void and the
             // value (plus isSome discriminator) flows through the stacks.
-            if case .jsObject = wrappedType {
+            switch wrappedType {
+            case .jsObject, .jsUniqueObject:
                 return LiftingReturnInfo(valueToLift: nil)
+            default:
+                break
             }
             let wrappedInfo = try wrappedType.liftingReturnInfo(context: context)
             return LiftingReturnInfo(valueToLift: wrappedInfo.valueToLift)

@@ -5,6 +5,15 @@ import path from 'path';
 import { parseArgs } from "util";
 import { APIResultValues as APIResult, ComplexResultValues as ComplexResult } from "./.build/plugins/PackageToJS/outputs/Package/bridge-js.js";
 
+class ImportedObject {
+    constructor(start) { this.start = start; }
+    value() { return this.start; }
+}
+class ImportedObjectRoundtrip {
+    make(start) { return new ImportedObject(start); }
+    take(object) { return object.value(); }
+}
+
 /**
  * Update progress bar on the current line
  * @param {number} current - Current progress
@@ -300,7 +309,11 @@ async function singleRun(results, nameFilter, iterations) {
         getImports: () => ({
             benchmarkHelperNoop: () => { },
             benchmarkHelperNoopWithNumber: (n) => { },
-            benchmarkRunner: benchmarkRunner
+            benchmarkRunner: benchmarkRunner,
+            ImportedObject,
+            ImportedObjectRoundtrip,
+            NoncopyableImportedObject: ImportedObject,
+            NoncopyableImportedObjectRoundtrip: ImportedObjectRoundtrip,
         })
     });
     exports.run();

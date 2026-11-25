@@ -52,8 +52,18 @@ import Testing
         let renamed = try parse(
             source.replacingOccurrences(of: "@JS(namespace:", with: "@JS(\"PublicAPI\", namespace:")
         )
-        let originalThunks = try ExportSwift(progress: .silent, moduleName: "TestModule", skeleton: original).finalize()
-        let renamedThunks = try ExportSwift(progress: .silent, moduleName: "TestModule", skeleton: renamed).finalize()
+        let originalThunks = try ExportSwift(
+            progress: .silent,
+            moduleName: "TestModule",
+            skeleton: original,
+            availability: .empty
+        ).finalize()
+        let renamedThunks = try ExportSwift(
+            progress: .silent,
+            moduleName: "TestModule",
+            skeleton: renamed,
+            availability: .empty
+        ).finalize()
         #expect(renamedThunks == originalThunks)
         #expect(renamed.classes.first?.tsFullPath == "API.PublicAPI.Item")
     }

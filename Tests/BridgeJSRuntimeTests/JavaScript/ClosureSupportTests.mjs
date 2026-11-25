@@ -64,8 +64,11 @@ export function getImports(importsContext) {
             fn();
         },
         jsHeapCount: () => {
-            globalThis.gc?.();
-            return globalThis.swift?.memory?._heapValueById?.size ?? -1;
+            let count = 0;
+            for (const state of importsContext._swift.memory._stateBySlot) {
+                count += (state ?? 0) & 0xffffff;
+            }
+            return count;
         },
         jsCallAfterRelease: (fn) => {
             try {

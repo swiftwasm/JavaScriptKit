@@ -1634,7 +1634,7 @@ struct IntrinsicJSFragment: Sendable {
         case .rawValueEnum(_, let rawType) where rawType != .string:
             return .identity
         case .string: return .stringLowerParameter
-        case .jsObject: return .jsObjectLowerParameter
+        case .jsObject, .jsUniqueObject: return .jsObjectLowerParameter
         case .jsValue: return .jsValueLower
         case .swiftHeapObject: return .swiftHeapObjectLowerParameter
         case .swiftProtocol: return .jsObjectLowerParameter
@@ -1692,7 +1692,7 @@ struct IntrinsicJSFragment: Sendable {
         case .rawValueEnum(_, let rawType) where rawType != .string && rawType != .bool:
             return .identity
         case .string: return .stringLiftReturn
-        case .jsObject: return .jsObjectLiftReturn
+        case .jsObject, .jsUniqueObject: return .jsObjectLiftReturn
         case .jsValue: return .jsValueLift
         case .swiftHeapObject(let name): return .swiftHeapObjectLiftReturn(name)
         case .swiftProtocol: return .jsObjectLiftReturn
@@ -1749,7 +1749,7 @@ struct IntrinsicJSFragment: Sendable {
         case .rawValueEnum(_, let rawType) where rawType != .string && rawType != .bool:
             return .identity
         case .string: return .stringLiftParameter
-        case .jsObject: return .jsObjectLiftParameter
+        case .jsObject, .jsUniqueObject: return .jsObjectLiftParameter
         case .jsValue: return .jsValueLiftParameter
         case .swiftHeapObject(let name):
             return .swiftHeapObjectLiftParameter(name)
@@ -1820,7 +1820,7 @@ struct IntrinsicJSFragment: Sendable {
         case .rawValueEnum(_, let rawType) where rawType != .string && rawType != .bool:
             return .identity
         case .string: return .stringLowerReturn
-        case .jsObject: return .jsObjectLowerReturn
+        case .jsObject, .jsUniqueObject: return .jsObjectLowerReturn
         case .jsValue: return .jsValueLowerReturn(context: context)
         case .swiftHeapObject: return .swiftHeapObjectLowerReturn
         case .swiftProtocol: return .jsObjectLowerReturn
@@ -2300,7 +2300,7 @@ struct IntrinsicJSFragment: Sendable {
                     return [objVar]
                 }
             )
-        case .jsObject, .swiftProtocol:
+        case .jsObject, .jsUniqueObject, .swiftProtocol:
             return IntrinsicJSFragment(
                 parameters: [],
                 printCode: { arguments, context in
@@ -2422,7 +2422,7 @@ struct IntrinsicJSFragment: Sendable {
                     return []
                 }
             )
-        case .jsObject, .swiftProtocol:
+        case .jsObject, .jsUniqueObject, .swiftProtocol:
             return IntrinsicJSFragment(
                 parameters: ["value"],
                 printCode: { arguments, context in
@@ -2808,7 +2808,7 @@ private extension BridgeType {
             return .sideChannelReturn(.none)
         case .string:
             return .sideChannelReturn(.storage)
-        case .jsObject:
+        case .jsObject, .jsUniqueObject:
             return .stackABI
         case .jsValue:
             return .inlineFlag
@@ -2855,7 +2855,7 @@ private extension BridgeType {
     /// `Optional<JSObject>` and exported `@JS class` parameters.
     var optionalParameterUsesStackABI: Bool {
         switch self {
-        case .jsObject:
+        case .jsObject, .jsUniqueObject:
             return false
         case .nullable(let wrapped, _):
             return wrapped.optionalParameterUsesStackABI
@@ -2906,7 +2906,7 @@ private extension BridgeType {
             return [("value", .f64)]
         case .string:
             return [("bytes", .i32), ("length", .i32)]
-        case .jsObject:
+        case .jsObject, .jsUniqueObject:
             return [("value", .i32)]
         case .jsValue:
             return [("kind", .i32), ("payload1", .i32), ("payload2", .f64)]

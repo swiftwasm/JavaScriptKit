@@ -526,4 +526,90 @@ import BridgeJSMacros
             indentationWidth: indentationWidth
         )
     }
+
+    @Test func noncopyableStruct() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            struct MyClass: ~Copyable {
+            }
+            """,
+            expandedSource: """
+                struct MyClass: ~Copyable {
+
+                    let jsRef: JSUniqueRef
+
+                    init(unsafelyAdopting jsRef: consuming JSUniqueRef) {
+                        self.jsRef = jsRef
+                    }
+
+                    init(unsafelyWrapping jsObject: consuming JSObject) {
+                        self.init(unsafelyAdopting: JSUniqueRef(taking: consume jsObject))
+                    }
+
+                    var jsID: Int32 {
+                        jsRef.jsID
+                    }
+
+                    consuming func takeJSRef() -> JSUniqueRef {
+                        jsRef
+                    }
+                }
+
+                extension MyClass: _JSUniqueBridgedClass {
+                }
+                """,
+            macroSpecs: [
+                "JSClass": MacroSpec(
+                    type: JSClassMacro.self,
+                    conformances: ["_JSBridgedClass", "_JSUniqueBridgedClass"]
+                )
+            ],
+            indentationWidth: indentationWidth
+        )
+    }
+
+    @Test func noncopyableStructWithExistingUnsafelyWrappingInit() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            struct MyClass: ~Copyable {
+                init(unsafelyWrapping jsObject: JSObject) {
+                    self.init(unsafelyAdopting: JSUniqueRef(retaining: jsObject))
+                }
+            }
+            """,
+            expandedSource: """
+                struct MyClass: ~Copyable {
+                    init(unsafelyWrapping jsObject: JSObject) {
+                        self.init(unsafelyAdopting: JSUniqueRef(retaining: jsObject))
+                    }
+
+                    let jsRef: JSUniqueRef
+
+                    init(unsafelyAdopting jsRef: consuming JSUniqueRef) {
+                        self.jsRef = jsRef
+                    }
+
+                    var jsID: Int32 {
+                        jsRef.jsID
+                    }
+
+                    consuming func takeJSRef() -> JSUniqueRef {
+                        jsRef
+                    }
+                }
+
+                extension MyClass: _JSUniqueBridgedClass {
+                }
+                """,
+            macroSpecs: [
+                "JSClass": MacroSpec(
+                    type: JSClassMacro.self,
+                    conformances: ["_JSBridgedClass", "_JSUniqueBridgedClass"]
+                )
+            ],
+            indentationWidth: indentationWidth
+        )
+    }
 }
