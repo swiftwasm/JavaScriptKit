@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.3
 
 import PackageDescription
 
@@ -21,5 +21,6 @@ let package = Package(
                 .product(name: "ChibiRay", package: "chibi-ray"),
             ]
         )
-    ]
+    ],
+    swiftLanguageModes: [.v5]
 )

@@ -15,7 +15,7 @@ JavaScriptKit supports running tests written with both XCTest and swift-testing.
 Your `Package.swift` should have a test target with a dependency on your library target. Here's a simple example:
 
 ```swift
-// swift-tools-version: 6.2
+// swift-tools-version: 6.3
 
 import PackageDescription
 
