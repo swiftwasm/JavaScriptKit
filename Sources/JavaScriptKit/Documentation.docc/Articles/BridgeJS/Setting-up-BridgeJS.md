@@ -11,7 +11,7 @@ BridgeJS requires the JavaScriptKit package dependency, the experimental `Extern
 Add the JavaScriptKit dependency, enable the Extern feature on the target that uses BridgeJS, and register the BridgeJS plugin:
 
 ```swift
-// swift-tools-version:6.0
+// swift-tools-version:6.3
 
 import PackageDescription
 

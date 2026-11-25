@@ -22,7 +22,7 @@ jobs:
               JAVASCRIPTKIT_DISABLE_TRACING_TRAIT=1
           - os: ubuntu-24.04
             toolchain:
-              download-url: https://download.swift.org/swift-6.3-branch/ubuntu2404/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a-ubuntu24.04.tar.gz
+              download-url: https://download.swift.org/swift-6.3.2-release/ubuntu2404/swift-6.3.2-RELEASE/swift-6.3.2-RELEASE-ubuntu24.04.tar.gz
             wasi-backend: Node
             target: "wasm32-unknown-wasip1"
             build-system: native
@@ -104,8 +104,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-15
-            xcode: Xcode_26.0.1
+          - os: macos-26
+            xcode: Xcode_26.5
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7

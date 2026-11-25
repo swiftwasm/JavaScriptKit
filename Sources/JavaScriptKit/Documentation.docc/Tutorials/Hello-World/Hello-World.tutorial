@@ -17,7 +17,7 @@
       }
 
       @Step {
-        Install the latest Swift 6.2 development snapshot using `swiftly`:
+        Install the latest Swift 6.3 release using `swiftly`:
 
         @Code(name: "Console", file: "hello-world-0-1-install-toolchain.txt")
       }
