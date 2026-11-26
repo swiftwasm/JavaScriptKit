@@ -44,6 +44,17 @@ import Testing
         return Set(matches.map { String(js[Range($0.range(at: 1), in: js)!]) })
     }
 
+    /// The `__bjs_*` helpers the generated JS uses but doesn't declare.
+    private func undeclaredHelpers(_ js: String) throws -> Set<String> {
+        func names(_ pattern: String) throws -> Set<String> {
+            let regex = try NSRegularExpression(pattern: pattern)
+            let matches = regex.matches(in: js, range: NSRange(js.startIndex..., in: js))
+            return Set(matches.map { String(js[Range($0.range(at: 1), in: js)!]) })
+        }
+        let declared = try names(#"(?:\b(?:const|let|var|function|class|import)\s+|\bas\s+)(__bjs_\w+)"#)
+        return try names(#"\b(__bjs_\w+)"#).subtracting(declared)
+    }
+
     @Test(arguments: BridgeJSLinkTests.collectInputs(extension: ".swift"))
     func filteringKeepsGlueConsistent(input: String) throws {
         let link = try makeLink(input: input)
@@ -63,7 +74,17 @@ import Testing
             let js = try link.link(usedImports: used).outputJs
             let defined = try assignedImports(js)["bjs", default: []]
             #expect(try referencedBJSImports(js).isSubset(of: defined))
+            #expect(try undeclaredHelpers(js).isEmpty)
         }
+    }
+
+    @Test
+    func keepsHelpersOfKeptGlue() throws {
+        // The dictionary codec of a generic import encodes its keys with the string codec
+        let link = try makeLink(input: "GenericImports.swift")
+        let js = try link.link(usedImports: ["TestModule": ["bjs_importGenericDictionary"]]).outputJs
+        #expect(js.contains("__bjs_dictCodec"))
+        #expect(try undeclaredHelpers(js).isEmpty)
     }
 
     @Test
