@@ -16,6 +16,7 @@ public struct BridgeJSLink {
     private let namespaceBuilder = NamespaceBuilder()
     private let intrinsicRegistry = JSIntrinsicRegistry()
     private let importedModuleRegistry = ImportedJSModuleRegistry()
+    private let importUsage = ImportUsage()
 
     public init(
         skeletons: [BridgeJSSkeleton] = []
@@ -535,14 +536,20 @@ public struct BridgeJSLink {
     /// resolve/reject settlers are stashed.
     private static let promiseSettlersSymbol = "__bjs_promiseSettlers"
 
-    /// Renders a `bjs[...]` settlement handler that lifts `(promise, value)` and calls the
+    /// Defines a `bjs[...]` settlement handler that lifts `(promise, value)` and calls the
     /// promise's stashed `resolve` / `reject` settler.
-    private func renderPromiseSettleHandler(
+    private func definePromiseSettleHandler(
         externName: String,
         valueType: BridgeType,
         settle: String,
-        into printer: CodeFragmentPrinter
-    ) throws {
+        into bjsImports: inout BJSImportDefinitions
+    ) {
+        bjsImports.define(externName) { printer in
+            printer.write(lines: try renderPromiseSettleHandler(valueType: valueType, settle: settle))
+        }
+    }
+
+    private func renderPromiseSettleHandler(valueType: BridgeType, settle: String) throws -> [String] {
         let builder = ImportedThunkBuilder(
             effects: Effects(isAsync: false, isThrows: true),
             returnType: .void,
@@ -560,9 +567,7 @@ public struct BridgeJSLink {
         builder.body.write(
             "\(builder.parameterForwardings[0])[\(Self.promiseSettlersSymbol)].\(settle)(\(valueArg));"
         )
-        var lines = builder.renderFunction(name: nil)
-        lines[0] = "bjs[\"\(externName)\"] = \(lines[0])"
-        printer.write(lines: lines)
+        return builder.renderFunction(name: nil)
     }
 
     private func makeCodecPrintContext(printer: CodeFragmentPrinter) -> IntrinsicJSFragment.PrintCodeContext {
@@ -588,14 +593,20 @@ public struct BridgeJSLink {
         printer.write("}")
     }
 
-    private func generateCoreTypeRegistrationHook(into printer: CodeFragmentPrinter) throws {
+    private func defineCoreTypeRegistrationHook(into bjsImports: inout BJSImportDefinitions) {
         let hookName = ABINameGenerator.coreTypeRegistrationFunctionName
         guard hasGenerics else {
-            printer.write("bjs[\"\(hookName)\"] = function() {};")
+            bjsImports.define(hookName) { $0.write("function() {};") }
             return
         }
+        bjsImports.define(hookName) { printer in
+            try renderCoreTypeRegistrationHook(into: printer)
+        }
+    }
+
+    private func renderCoreTypeRegistrationHook(into printer: CodeFragmentPrinter) throws {
         try ContainerCodecJS.registerPrimitiveCodecs(context: makeCodecPrintContext(printer: printer))
-        printer.write("bjs[\"\(hookName)\"] = function(base, count) {")
+        printer.write("function(base, count) {")
         printer.indent {
             printer.write("const codecs = [")
             printer.indent {
@@ -609,30 +620,32 @@ public struct BridgeJSLink {
         printer.write("}")
     }
 
-    private func generateTypeRegistrationHooks(into printer: CodeFragmentPrinter) throws {
-        try generateCoreTypeRegistrationHook(into: printer)
+    private func generateTypeRegistrationHooks(into bjsImports: inout BJSImportDefinitions) {
+        defineCoreTypeRegistrationHook(into: &bjsImports)
         for skeleton in skeletons {
             guard let moduleEntries = skeleton.typeRegistrationEntries else { continue }
             let hookName = ABINameGenerator.typeRegistrationFunctionName(moduleName: skeleton.moduleName)
             guard hasGenerics else {
-                printer.write("bjs[\"\(hookName)\"] = function() {};")
+                bjsImports.define(hookName) { $0.write("function() {};") }
                 continue
             }
-            printer.write("bjs[\"\(hookName)\"] = function(base, count) {")
-            try printer.indent {
-                let codecNames = try moduleEntries.map {
-                    try genericCodecReference(type: $0.bridgeType, into: printer)
-                }
-                printer.write("const codecs = [")
-                printer.indent {
-                    for name in codecNames {
-                        printer.write("\(name),")
+            bjsImports.define(hookName) { printer in
+                printer.write("function(base, count) {")
+                try printer.indent {
+                    let codecNames = try moduleEntries.map {
+                        try genericCodecReference(type: $0.bridgeType, into: printer)
                     }
+                    printer.write("const codecs = [")
+                    printer.indent {
+                        for name in codecNames {
+                            printer.write("\(name),")
+                        }
+                    }
+                    printer.write("];")
+                    writeTypeHandleRegistrationBody(into: printer)
                 }
-                printer.write("];")
-                writeTypeHandleRegistrationBody(into: printer)
+                printer.write("}")
             }
-            printer.write("}")
         }
     }
 
@@ -660,356 +673,437 @@ public struct BridgeJSLink {
                         "const imports = options.getImports(importsContext);"
                     ])
                 }
-                printer.write("bjs[\"swift_js_return_string\"] = function(word0, word1, word2) {")
-                printer.indent {
-                    printer.write(
-                        "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2);"
-                    )
+                var bjsImports = BJSImportDefinitions()
+                bjsImports.define("swift_js_return_string") { printer in
+                    printer.write("function(word0, word1, word2) {")
+                    printer.indent {
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2);"
+                        )
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_init_memory\"] = function(sourceId, bytesPtr) {")
-                printer.indent {
-                    printer.write(
-                        "const source = \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).getObject(sourceId);"
-                    )
-                    printer.write(
-                        "\(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).release(sourceId);"
-                    )
-                    printer.write(
-                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, bytesPtr >>> 0);"
-                    )
-                    printer.write("bytes.set(source);")
+                bjsImports.define("swift_js_init_memory") { printer in
+                    printer.write("function(sourceId, bytesPtr) {")
+                    printer.indent {
+                        printer.write(
+                            "const source = \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).getObject(sourceId);"
+                        )
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).release(sourceId);"
+                        )
+                        printer.write(
+                            "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, bytesPtr >>> 0);"
+                        )
+                        printer.write("bytes.set(source);")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_make_js_string\"] = function(word0, word1, word2) {")
-                printer.indent {
-                    printer.write(
-                        "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(\(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2));"
-                    )
+                bjsImports.define("swift_js_make_js_string") { printer in
+                    printer.write("function(word0, word1, word2) {")
+                    printer.indent {
+                        printer.write(
+                            "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(\(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2));"
+                        )
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_init_memory_with_result\"] = function(ptr, len) {")
-                printer.indent {
-                    printer.write(
-                        "const target = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr >>> 0, len >>> 0);"
-                    )
-                    printer.write("target.set(\(JSGlueVariableScope.reservedStorageToReturnBytes));")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = undefined;")
+                bjsImports.define("swift_js_init_memory_with_result") { printer in
+                    printer.write("function(ptr, len) {")
+                    printer.indent {
+                        printer.write(
+                            "const target = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, ptr >>> 0, len >>> 0);"
+                        )
+                        printer.write("target.set(\(JSGlueVariableScope.reservedStorageToReturnBytes));")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = undefined;")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_throw\"] = function(id) {")
-                printer.indent {
-                    printer.write(
-                        "\(JSGlueVariableScope.reservedStorageToReturnException) = \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retainByRef(id);"
-                    )
+                bjsImports.define("swift_js_throw") { printer in
+                    printer.write("function(id) {")
+                    printer.indent {
+                        printer.write(
+                            "\(JSGlueVariableScope.reservedStorageToReturnException) = \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retainByRef(id);"
+                        )
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_retain\"] = function(id) {")
-                printer.indent {
-                    printer.write(
-                        "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retainByRef(id);"
-                    )
+                bjsImports.define("swift_js_retain") { printer in
+                    printer.write("function(id) {")
+                    printer.indent {
+                        printer.write(
+                            "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retainByRef(id);"
+                        )
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_release\"] = function(id) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(id);")
+                bjsImports.define("swift_js_release") { printer in
+                    printer.write("function(id) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedSwift).memory.release(id);")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_push_i32\"] = function(v) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedI32Stack).push(v | 0);")
+                bjsImports.define("swift_js_push_i32") { printer in
+                    printer.write("function(v) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedI32Stack).push(v | 0);")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_push_f32\"] = function(v) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedF32Stack).push(Math.fround(v));")
+                bjsImports.define("swift_js_push_f32") { printer in
+                    printer.write("function(v) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedF32Stack).push(Math.fround(v));")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_push_f64\"] = function(v) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedF64Stack).push(v);")
+                bjsImports.define("swift_js_push_f64") { printer in
+                    printer.write("function(v) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedF64Stack).push(v);")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_push_string\"] = function(word0, word1, word2) {")
-                printer.indent {
-                    printer.write(
-                        "const value = \(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2);"
-                    )
-                    printer.write("\(JSGlueVariableScope.reservedStringStack).push(value);")
+                bjsImports.define("swift_js_push_string") { printer in
+                    printer.write("function(word0, word1, word2) {")
+                    printer.indent {
+                        printer.write(
+                            "const value = \(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2);"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedStringStack).push(value);")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_pop_i32\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedI32Stack).pop();")
+                bjsImports.define("swift_js_pop_i32") { printer in
+                    printer.write("function() {")
+                    printer.indent {
+                        printer.write("return \(JSGlueVariableScope.reservedI32Stack).pop();")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_pop_f32\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedF32Stack).pop();")
+                bjsImports.define("swift_js_pop_f32") { printer in
+                    printer.write("function() {")
+                    printer.indent {
+                        printer.write("return \(JSGlueVariableScope.reservedF32Stack).pop();")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_pop_f64\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedF64Stack).pop();")
+                bjsImports.define("swift_js_pop_f64") { printer in
+                    printer.write("function() {")
+                    printer.indent {
+                        printer.write("return \(JSGlueVariableScope.reservedF64Stack).pop();")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_push_pointer\"] = function(pointer) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedPointerStack).push(pointer);")
+                bjsImports.define("swift_js_push_pointer") { printer in
+                    printer.write("function(pointer) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedPointerStack).push(pointer);")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_pop_pointer\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedPointerStack).pop();")
+                bjsImports.define("swift_js_pop_pointer") { printer in
+                    printer.write("function() {")
+                    printer.indent {
+                        printer.write("return \(JSGlueVariableScope.reservedPointerStack).pop();")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_push_i64\"] = function(v) {")
-                printer.indent {
-                    printer.write("\(JSGlueVariableScope.reservedI64Stack).push(v);")
+                bjsImports.define("swift_js_push_i64") { printer in
+                    printer.write("function(v) {")
+                    printer.indent {
+                        printer.write("\(JSGlueVariableScope.reservedI64Stack).push(v);")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_pop_i64\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedI64Stack).pop();")
+                bjsImports.define("swift_js_pop_i64") { printer in
+                    printer.write("function() {")
+                    printer.indent {
+                        printer.write("return \(JSGlueVariableScope.reservedI64Stack).pop();")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
                 // Typed array constructors indexed by kind (must match _BridgedNumericArrayKind)
-                printer.write(
+                bjsImports.write(
                     "const taCtors = [Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array];"
                 )
-                printer.write("bjs[\"swift_js_push_typed_array\"] = function(kind, ptr, count) {")
-                printer.indent {
-                    printer.write("const Ctor = taCtors[kind];")
-                    printer.write("const byteLen = count * Ctor.BYTES_PER_ELEMENT;")
-                    printer.write("const start = ptr >>> 0;")
-                    // slice() copies the bytes into a new ArrayBuffer that is properly aligned
-                    printer.write(
-                        "const copy = \(JSGlueVariableScope.reservedMemory).buffer.slice(start, start + byteLen);"
-                    )
-                    printer.write("\(JSGlueVariableScope.reservedTaStack).push(Array.from(new Ctor(copy)));")
+                bjsImports.define("swift_js_push_typed_array") { printer in
+                    printer.write("function(kind, ptr, count) {")
+                    printer.indent {
+                        printer.write("const Ctor = taCtors[kind];")
+                        printer.write("const byteLen = count * Ctor.BYTES_PER_ELEMENT;")
+                        printer.write("const start = ptr >>> 0;")
+                        // slice() copies the bytes into a new ArrayBuffer that is properly aligned
+                        printer.write(
+                            "const copy = \(JSGlueVariableScope.reservedMemory).buffer.slice(start, start + byteLen);"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedTaStack).push(Array.from(new Ctor(copy)));")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
                 if !allStructs.isEmpty {
                     for (moduleName, structDef) in allStructs {
                         let key = HelperNaming.type(module: moduleName, swiftName: structDef.swiftCallName)
-                        printer.write("bjs[\"swift_js_struct_lower_\(structDef.abiName)\"] = function(objectId) {")
-                        printer.indent {
-                            printer.write(
-                                "\(JSGlueVariableScope.reservedStructHelpers).\(key).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
-                            )
+                        bjsImports.define("swift_js_struct_lower_\(structDef.abiName)") { printer in
+                            printer.write("function(objectId) {")
+                            printer.indent {
+                                printer.write(
+                                    "\(JSGlueVariableScope.reservedStructHelpers).\(key).lower(\(JSGlueVariableScope.reservedSwift).memory.getObject(objectId));"
+                                )
+                            }
+                            printer.write("}")
                         }
-                        printer.write("}")
 
-                        printer.write("bjs[\"swift_js_struct_lift_\(structDef.abiName)\"] = function() {")
-                        printer.indent {
-                            printer.write(
-                                "const value = \(JSGlueVariableScope.reservedStructHelpers).\(key).lift();"
-                            )
-                            printer.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(value);")
+                        bjsImports.define("swift_js_struct_lift_\(structDef.abiName)") { printer in
+                            printer.write("function() {")
+                            printer.indent {
+                                printer.write(
+                                    "const value = \(JSGlueVariableScope.reservedStructHelpers).\(key).lift();"
+                                )
+                                printer.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(value);")
+                            }
+                            printer.write("}")
                         }
-                        printer.write("}")
                     }
                 }
-                try generateTypeRegistrationHooks(into: printer)
+                generateTypeRegistrationHooks(into: &bjsImports)
 
                 // Always provided: the runtime's `_bjs_makePromise` imports it unconditionally.
                 // The settlers are stored under a Symbol to avoid clashing with promise fields.
-                printer.write("const \(Self.promiseSettlersSymbol) = Symbol(\"JavaScriptKit.promiseSettlers\");")
-                printer.write("bjs[\"swift_js_make_promise\"] = function() {")
-                printer.indent {
-                    printer.write("let resolve, reject;")
-                    printer.write("const promise = new Promise((res, rej) => { resolve = res; reject = rej; });")
-                    printer.write("promise[\(Self.promiseSettlersSymbol)] = { resolve, reject };")
-                    printer.write(
-                        "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(promise);"
-                    )
+                bjsImports.write("const \(Self.promiseSettlersSymbol) = Symbol(\"JavaScriptKit.promiseSettlers\");")
+                bjsImports.define("swift_js_make_promise") { printer in
+                    printer.write("function() {")
+                    printer.indent {
+                        printer.write("let resolve, reject;")
+                        printer.write("const promise = new Promise((res, rej) => { resolve = res; reject = rej; });")
+                        printer.write("promise[\(Self.promiseSettlersSymbol)] = { resolve, reject };")
+                        printer.write(
+                            "return \(JSGlueVariableScope.reservedSwift).\(JSGlueVariableScope.reservedMemory).retain(promise);"
+                        )
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
                 for skeleton in skeletons {
                     guard let exported = skeleton.exported else { continue }
                     let asyncResolveTypes = exported.asyncPromiseResolveReturnTypes
                     guard !asyncResolveTypes.isEmpty else { continue }
                     for type in asyncResolveTypes {
-                        try renderPromiseSettleHandler(
+                        definePromiseSettleHandler(
                             externName: "promise_resolve_\(skeleton.moduleName)_\(type.mangleTypeName)",
                             valueType: type,
                             settle: "resolve",
-                            into: printer
+                            into: &bjsImports
                         )
                     }
-                    try renderPromiseSettleHandler(
+                    definePromiseSettleHandler(
                         externName: "promise_reject_\(skeleton.moduleName)",
                         valueType: .jsValue,
                         settle: "reject",
-                        into: printer
+                        into: &bjsImports
                     )
                 }
 
-                printer.write("bjs[\"swift_js_return_optional_bool\"] = function(isSome, value) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
+                bjsImports.define("swift_js_return_optional_bool") { printer in
+                    printer.write("function(isSome, value) {")
                     printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = value !== 0;")
-                    }
-                    printer.write("}")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_int\"] = function(isSome, value) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = value | 0;")
+                        printer.write("if (isSome === 0) {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = null;")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalBool) = value !== 0;")
+                        }
+                        printer.write("}")
                     }
                     printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_float\"] = function(isSome, value) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
+                bjsImports.define("swift_js_return_optional_int") { printer in
+                    printer.write("function(isSome, value) {")
                     printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = null;")
+                        printer.write("if (isSome === 0) {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = null;")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = value | 0;")
+                        }
+                        printer.write("}")
                     }
-                    printer.write("} else {")
+                    printer.write("}")
+                }
+                bjsImports.define("swift_js_return_optional_float") { printer in
+                    printer.write("function(isSome, value) {")
+                    printer.indent {
+                        printer.write("if (isSome === 0) {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = null;")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write(
+                                "\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = Math.fround(value);"
+                            )
+                        }
+                        printer.write("}")
+                    }
+                    printer.write("}")
+                }
+                bjsImports.define("swift_js_return_optional_double") { printer in
+                    printer.write("function(isSome, value) {")
+                    printer.indent {
+                        printer.write("if (isSome === 0) {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = null;")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = value;")
+                        }
+                        printer.write("}")
+                    }
+                    printer.write("}")
+                }
+                bjsImports.define("swift_js_return_optional_string") { printer in
+                    printer.write("function(isSome, word0, word1, word2) {")
+                    printer.indent {
+                        printer.write("if (isSome === 0) {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write(lines: [
+                                "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2);"
+                            ])
+                        }
+                        printer.write("}")
+                    }
+                    printer.write("}")
+                }
+                bjsImports.define("swift_js_return_optional_object") { printer in
+                    printer.write("function(isSome, objectId) {")
+                    printer.indent {
+                        printer.write("if (isSome === 0) {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write(
+                                "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedSwift).memory.getObject(objectId);"
+                            )
+                        }
+                        printer.write("}")
+                    }
+                    printer.write("}")
+                }
+                bjsImports.define("swift_js_return_optional_heap_object") { printer in
+                    printer.write("function(isSome, pointer) {")
+                    printer.indent {
+                        printer.write("if (isSome === 0) {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = null;")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = pointer;")
+                        }
+                        printer.write("}")
+                    }
+                    printer.write("}")
+                }
+                bjsImports.define("swift_js_get_optional_int_presence") { printer in
+                    printer.write("function() {")
                     printer.indent {
                         printer.write(
-                            "\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = Math.fround(value);"
+                            "return \(JSGlueVariableScope.reservedStorageToReturnOptionalInt) != null ? 1 : 0;"
                         )
                     }
                     printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_double\"] = function(isSome, value) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
+                bjsImports.define("swift_js_get_optional_int_value") { printer in
+                    printer.write("function() {")
                     printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = value;")
+                        printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
+                        printer.write("return value;")
                     }
                     printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_string\"] = function(isSome, word0, word1, word2) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
+                bjsImports.define("swift_js_get_optional_string") { printer in
+                    printer.write("function() {")
                     printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write(lines: [
-                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedDecodeString)(word0, word1, word2);"
-                        ])
+                        printer.write("const str = \(JSGlueVariableScope.reservedStorageToReturnString);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
+                        printer.write("if (str == null) {")
+                        printer.indent {
+                            printer.write("return -1;")
+                        }
+                        printer.write("} else {")
+                        printer.indent {
+                            printer.write("const bytes = \(JSGlueVariableScope.reservedTextEncoder).encode(str);")
+                            printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = bytes;")
+                            printer.write("return bytes.length;")
+                        }
+                        printer.write("}")
                     }
                     printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_object\"] = function(isSome, objectId) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = null;")
-                    }
-                    printer.write("} else {")
+                bjsImports.define("swift_js_get_optional_float_presence") { printer in
+                    printer.write("function() {")
                     printer.indent {
                         printer.write(
-                            "\(JSGlueVariableScope.reservedStorageToReturnString) = \(JSGlueVariableScope.reservedSwift).memory.getObject(objectId);"
+                            "return \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) != null ? 1 : 0;"
                         )
                     }
                     printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_return_optional_heap_object\"] = function(isSome, pointer) {")
-                printer.indent {
-                    printer.write("if (isSome === 0) {")
+                bjsImports.define("swift_js_get_optional_float_value") { printer in
+                    printer.write("function() {")
                     printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = null;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = pointer;")
+                        printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = undefined;")
+                        printer.write("return value;")
                     }
                     printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_int_presence\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedStorageToReturnOptionalInt) != null ? 1 : 0;")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_int_value\"] = function() {")
-                printer.indent {
-                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalInt);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalInt) = undefined;")
-                    printer.write("return value;")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_string\"] = function() {")
-                printer.indent {
-                    printer.write("const str = \(JSGlueVariableScope.reservedStorageToReturnString);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnString) = undefined;")
-                    printer.write("if (str == null) {")
+                bjsImports.define("swift_js_get_optional_double_presence") { printer in
+                    printer.write("function() {")
                     printer.indent {
-                        printer.write("return -1;")
-                    }
-                    printer.write("} else {")
-                    printer.indent {
-                        printer.write("const bytes = \(JSGlueVariableScope.reservedTextEncoder).encode(str);")
-                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnBytes) = bytes;")
-                        printer.write("return bytes.length;")
+                        printer.write(
+                            "return \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) != null ? 1 : 0;"
+                        )
                     }
                     printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_float_presence\"] = function() {")
-                printer.indent {
-                    printer.write("return \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) != null ? 1 : 0;")
+                bjsImports.define("swift_js_get_optional_double_value") { printer in
+                    printer.write("function() {")
+                    printer.indent {
+                        printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);")
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = undefined;")
+                        printer.write("return value;")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_float_value\"] = function() {")
-                printer.indent {
-                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalFloat);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalFloat) = undefined;")
-                    printer.write("return value;")
+                bjsImports.define("swift_js_get_optional_heap_object_pointer") { printer in
+                    printer.write("function() {")
+                    printer.indent {
+                        printer.write(
+                            "const pointer = \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);"
+                        )
+                        printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = undefined;")
+                        printer.write("return pointer || 0;")
+                    }
+                    printer.write("}")
                 }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_double_presence\"] = function() {")
-                printer.indent {
-                    printer.write(
-                        "return \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) != null ? 1 : 0;"
-                    )
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_double_value\"] = function() {")
-                printer.indent {
-                    printer.write("const value = \(JSGlueVariableScope.reservedStorageToReturnOptionalDouble);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalDouble) = undefined;")
-                    printer.write("return value;")
-                }
-                printer.write("}")
-                printer.write("bjs[\"swift_js_get_optional_heap_object_pointer\"] = function() {")
-                printer.indent {
-                    printer.write("const pointer = \(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject);")
-                    printer.write("\(JSGlueVariableScope.reservedStorageToReturnOptionalHeapObject) = undefined;")
-                    printer.write("return pointer || 0;")
-                }
-                printer.write("}")
                 // Always provide swift_js_closure_unregister as a no-op by default.
                 // The @_extern(wasm) declaration in BridgeJSIntrinsics.swift is unconditional,
                 // so the WASM binary always imports this symbol. When closures ARE used,
                 // the real implementation below will override this no-op.
-                printer.write("bjs[\"swift_js_closure_unregister\"] = function(funcRef) {}")
+                bjsImports.define("swift_js_closure_unregister") { $0.write("function(funcRef) {}") }
 
                 for unified in skeletons {
                     let moduleName = unified.moduleName
@@ -1019,105 +1113,111 @@ public struct BridgeJSLink {
                     let closureSignatures = walker.visitor.signatures
                     guard !closureSignatures.isEmpty else { continue }
 
-                    intrinsicRegistry.register(name: "swiftClosureHelpers") { helperPrinter in
-                        helperPrinter.write(
-                            "const \(JSGlueVariableScope.reservedSwiftClosureRegistry) = (typeof FinalizationRegistry === \"undefined\") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {"
-                        )
-                        helperPrinter.indent {
-                            helperPrinter.write("if (state.unregistered) { return; }")
-                            helperPrinter.write(
-                                "\(JSGlueVariableScope.reservedInstance)?.exports?.bjs_release_swift_closure(state.pointer);"
-                            )
-                        }
-                        helperPrinter.write("});")
-                        helperPrinter.write(
-                            "const \(JSGlueVariableScope.reservedMakeSwiftClosure) = (pointer, file, line, func) => {"
-                        )
-                        helperPrinter.indent {
-                            helperPrinter.write(
-                                "const state = { pointer, file, line, unregistered: false };"
-                            )
-                            helperPrinter.write("const real = (...args) => {")
-                            helperPrinter.indent {
-                                helperPrinter.write("if (state.unregistered) {")
-                                helperPrinter.indent {
-                                    helperPrinter.write(
-                                        "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, state.file >>> 0);"
-                                    )
-                                    helperPrinter.write("let length = 0;")
-                                    helperPrinter.write("while (bytes[length] !== 0) { length += 1; }")
-                                    helperPrinter.write(
-                                        "const fileID = \(JSGlueVariableScope.reservedDecodeUTF8)(state.file, length);"
-                                    )
-                                    helperPrinter.write(
-                                        "throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);"
-                                    )
-                                }
-                                helperPrinter.write("}")
-                                helperPrinter.write("return func(...args);")
-                            }
-                            helperPrinter.write("};")
-                            helperPrinter.write(
-                                "real.__unregister = () => {"
-                            )
-                            helperPrinter.indent {
-                                helperPrinter.write(
-                                    "if (state.unregistered) { return; }"
-                                )
-                                helperPrinter.write("state.unregistered = true;")
-                                helperPrinter.write(
-                                    "\(JSGlueVariableScope.reservedSwiftClosureRegistry).unregister(state);"
-                                )
-                            }
-                            helperPrinter.write("};")
-                            helperPrinter.write(
-                                "\(JSGlueVariableScope.reservedSwiftClosureRegistry).register(real, state, state);"
-                            )
-                            helperPrinter.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(real);")
-                        }
-                        helperPrinter.write("};")
-                    }
-                    printer.write("bjs[\"swift_js_closure_unregister\"] = function(funcRef) {")
-                    printer.indent {
-                        printer.write("const func = \(JSGlueVariableScope.reservedSwift).memory.getObject(funcRef);")
-                        printer.write("func.__unregister();")
-                    }
-                    printer.write("}")
-
-                    for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
-                        let invokeFuncName = "invoke_js_callback_\(moduleName)_\(signature.mangleName)"
-                        let invokeLines = try generateInvokeFunction(
-                            signature: signature,
-                            functionName: invokeFuncName
-                        )
-                        printer.write(lines: invokeLines)
-
-                        let lowerFuncName = "lower_closure_\(moduleName)_\(signature.mangleName)"
-                        let makeFuncName = "make_swift_closure_\(moduleName)_\(signature.mangleName)"
-                        printer.write("bjs[\"\(makeFuncName)\"] = function(boxPtr, file, line) {")
-                        try printer.indent {
-                            let lowerLines = try generateLowerClosureFunction(
-                                signature: signature,
-                                functionName: lowerFuncName
-                            )
-                            printer.write(lines: lowerLines)
+                    bjsImports.define("swift_js_closure_unregister") { printer in
+                        printer.write("function(funcRef) {")
+                        printer.indent {
                             printer.write(
-                                "return \(JSGlueVariableScope.reservedMakeSwiftClosure)(boxPtr, file, line, \(lowerFuncName));"
+                                "const func = \(JSGlueVariableScope.reservedSwift).memory.getObject(funcRef);"
                             )
+                            printer.write("func.__unregister();")
                         }
                         printer.write("}")
                     }
+
+                    for signature in closureSignatures.sorted(by: { $0.mangleName < $1.mangleName }) {
+                        bjsImports.define("invoke_js_callback_\(moduleName)_\(signature.mangleName)") { printer in
+                            printer.write(lines: try generateInvokeFunction(signature: signature))
+                        }
+
+                        let lowerFuncName = "lower_closure_\(moduleName)_\(signature.mangleName)"
+                        bjsImports.define("make_swift_closure_\(moduleName)_\(signature.mangleName)") { printer in
+                            registerSwiftClosureHelpers()
+                            printer.write("function(boxPtr, file, line) {")
+                            try printer.indent {
+                                let lowerLines = try generateLowerClosureFunction(
+                                    signature: signature,
+                                    functionName: lowerFuncName
+                                )
+                                printer.write(lines: lowerLines)
+                                printer.write(
+                                    "return \(JSGlueVariableScope.reservedMakeSwiftClosure)(boxPtr, file, line, \(lowerFuncName));"
+                                )
+                            }
+                            printer.write("}")
+                        }
+                    }
                 }
+
+                printer.write(lines: try bjsImports.render(importUsage: importUsage, registry: intrinsicRegistry))
             }
         }
 
         return printer
     }
 
-    private func generateInvokeFunction(
-        signature: ClosureSignature,
-        functionName: String
-    ) throws -> [String] {
+    /// Registers the helpers that `make_swift_closure_*` imports wrap Swift closures with.
+    private func registerSwiftClosureHelpers() {
+        intrinsicRegistry.register(name: "swiftClosureHelpers") { helperPrinter in
+            helperPrinter.write(
+                "const \(JSGlueVariableScope.reservedSwiftClosureRegistry) = (typeof FinalizationRegistry === \"undefined\") ? { register: () => {}, unregister: () => {} } : new FinalizationRegistry((state) => {"
+            )
+            helperPrinter.indent {
+                helperPrinter.write("if (state.unregistered) { return; }")
+                helperPrinter.write(
+                    "\(JSGlueVariableScope.reservedInstance)?.exports?.bjs_release_swift_closure(state.pointer);"
+                )
+            }
+            helperPrinter.write("});")
+            helperPrinter.write(
+                "const \(JSGlueVariableScope.reservedMakeSwiftClosure) = (pointer, file, line, func) => {"
+            )
+            helperPrinter.indent {
+                helperPrinter.write(
+                    "const state = { pointer, file, line, unregistered: false };"
+                )
+                helperPrinter.write("const real = (...args) => {")
+                helperPrinter.indent {
+                    helperPrinter.write("if (state.unregistered) {")
+                    helperPrinter.indent {
+                        helperPrinter.write(
+                            "const bytes = new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, state.file >>> 0);"
+                        )
+                        helperPrinter.write("let length = 0;")
+                        helperPrinter.write("while (bytes[length] !== 0) { length += 1; }")
+                        helperPrinter.write(
+                            "const fileID = \(JSGlueVariableScope.reservedDecodeUTF8)(state.file, length);"
+                        )
+                        helperPrinter.write(
+                            "throw new Error(`Attempted to call a released JSTypedClosure created at ${fileID}:${state.line}`);"
+                        )
+                    }
+                    helperPrinter.write("}")
+                    helperPrinter.write("return func(...args);")
+                }
+                helperPrinter.write("};")
+                helperPrinter.write(
+                    "real.__unregister = () => {"
+                )
+                helperPrinter.indent {
+                    helperPrinter.write(
+                        "if (state.unregistered) { return; }"
+                    )
+                    helperPrinter.write("state.unregistered = true;")
+                    helperPrinter.write(
+                        "\(JSGlueVariableScope.reservedSwiftClosureRegistry).unregister(state);"
+                    )
+                }
+                helperPrinter.write("};")
+                helperPrinter.write(
+                    "\(JSGlueVariableScope.reservedSwiftClosureRegistry).register(real, state, state);"
+                )
+                helperPrinter.write("return \(JSGlueVariableScope.reservedSwift).memory.retain(real);")
+            }
+            helperPrinter.write("};")
+        }
+    }
+
+    private func generateInvokeFunction(signature: ClosureSignature) throws -> [String] {
         let thunkBuilder = ImportedThunkBuilder(
             effects: Effects(isAsync: signature.isAsync, isThrows: signature.isThrows),
             returnType: signature.returnType,
@@ -1134,10 +1234,7 @@ public struct BridgeJSLink {
 
         try thunkBuilder.call(calleeExpr: "callback")
 
-        var functionLines = thunkBuilder.renderFunction(name: nil)
-        functionLines[0] = "bjs[\"\(functionName)\"] = " + functionLines[0]
-
-        return functionLines
+        return thunkBuilder.renderFunction(name: nil)
     }
 
     /// Generates a lower_closure_* function that wraps a Swift closure for JavaScript
@@ -1515,8 +1612,18 @@ public struct BridgeJSLink {
         return printer.lines.joined(separator: "\n")
     }
 
-    public func link(sharedMemory: Bool = false) throws -> (outputJs: String, outputDts: String) {
+    /// Links the skeletons into JS glue and TypeScript declarations.
+    ///
+    /// - Parameters:
+    ///   - sharedMemory: Whether the module's memory is shared between threads.
+    ///   - usedImports: The imports of the linked `.wasm` module keyed by import module name, if known.
+    ///     The JS glue then only implements the imports among them; declarations are unaffected.
+    public func link(
+        sharedMemory: Bool = false,
+        usedImports: [String: Set<String>]? = nil
+    ) throws -> (outputJs: String, outputDts: String) {
         intrinsicRegistry.reset()
+        importUsage.configure(imports: usedImports)
         importedModuleRegistry.configure(skeletons: skeletons)
         intrinsicRegistry.classPaths = skeletons.reduce(into: [:]) { result, unified in
             for klass in unified.exported?.classes ?? [] {
@@ -1619,13 +1726,16 @@ public struct BridgeJSLink {
 
         // Generate wrapper functions for each module
         for (moduleName, classes) in modulesByName.sorted(by: { $0.key < $1.key }) {
+            let wrappers = classes.sorted(by: { $0.name < $1.name })
+                .map { (klass: $0, functionName: "bjs_\($0.abiName)_wrap") }
+                .filter { importUsage.isUsed(module: moduleName, name: $0.functionName) }
+            guard !wrappers.isEmpty else { continue }
             wrapperLines.append("// Wrapper functions for module: \(moduleName)")
             wrapperLines.append("if (!importObject[\"\(moduleName)\"]) {")
             wrapperLines.append("    importObject[\"\(moduleName)\"] = {};")
             wrapperLines.append("}")
 
-            for klass in classes.sorted(by: { $0.name < $1.name }) {
-                let wrapperFunctionName = "bjs_\(klass.abiName)_wrap"
+            for (klass, wrapperFunctionName) in wrappers {
                 let namespacePath = (klass.resolvedJSNamespace ?? []).map { ".\($0)" }.joined()
                 let exportsPath =
                     namespacePath.isEmpty
@@ -2793,9 +2903,11 @@ extension BridgeJSLink {
             parameterNames.append("self")
         }
 
-        func declareGenericCodecs(genericParameters: [String]) {
+        func declareGenericCodecs(genericParameters: [String]) throws {
             if !genericParameters.isEmpty {
+                // The combinators build on the primitive codecs (e.g. dictionary keys use the string codec)
                 ContainerCodecJS.registerCombinators(scope: scope)
+                try ContainerCodecJS.registerPrimitiveCodecs(context: printContext)
             }
             for genericParam in genericParameters {
                 let typeIdParam = scope.variable("\(genericParam.lowercased())TypeId")
@@ -2839,7 +2951,7 @@ extension BridgeJSLink {
         }
 
         func liftParametersAndGenericTypeIds(_ parameters: [Parameter], genericParameters: [String]) throws {
-            declareGenericCodecs(genericParameters: genericParameters)
+            try declareGenericCodecs(genericParameters: genericParameters)
             for param in parameters {
                 try liftParameter(param: param)
             }
@@ -3926,6 +4038,18 @@ extension BridgeJSLink {
         importObjectBuilder: ImportObjectBuilder,
         function: ImportedFunctionSkeleton
     ) throws {
+        let jsName = function.resolvedJSName
+        if function.from == nil {
+            let genericClause = renderGenericClause(function.genericParameters ?? [])
+            importObjectBuilder.appendDts(
+                [
+                    "\(renderTSPropertyName(jsName))\(genericClause)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
+                ]
+            )
+        }
+        let abiName = function.abiName(context: nil)
+        guard importUsage.isUsed(module: importObjectBuilder.moduleName, name: abiName) else { return }
+
         let thunkBuilder = ImportedThunkBuilder(
             effects: function.effects,
             returnType: function.returnType,
@@ -3936,7 +4060,6 @@ extension BridgeJSLink {
             function.parameters,
             genericParameters: genericParameters
         )
-        let jsName = function.resolvedJSName
         let calleeExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
             from: function.from,
@@ -3944,28 +4067,28 @@ extension BridgeJSLink {
         )
 
         try thunkBuilder.call(calleeExpr: calleeExpr)
-        let funcLines = thunkBuilder.renderFunction(name: function.abiName(context: nil))
-        if function.from == nil {
-            let genericClause = renderGenericClause(function.genericParameters ?? [])
-            importObjectBuilder.appendDts(
-                [
-                    "\(renderTSPropertyName(jsName))\(genericClause)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
-                ]
-            )
-        }
-        importObjectBuilder.assignToImportObject(name: function.abiName(context: nil), function: funcLines)
+        let funcLines = thunkBuilder.renderFunction(name: abiName)
+        importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
     }
 
     func renderImportedGlobalGetter(
         importObjectBuilder: ImportObjectBuilder,
         getter: ImportedGetterSkeleton
     ) throws {
+        let jsName = getter.resolvedJSName
+        let abiName = getter.abiName(context: nil)
+        if getter.from == nil {
+            importObjectBuilder.appendDts(
+                ["readonly \(renderTSPropertyName(jsName)): \(resolveTypeScriptType(getter.type));"]
+            )
+        }
+        guard importUsage.isUsed(module: importObjectBuilder.moduleName, name: abiName) else { return }
+
         let thunkBuilder = ImportedThunkBuilder(
             effects: Effects(isAsync: false, isThrows: true),
             returnType: getter.type,
             intrinsicRegistry: intrinsicRegistry
         )
-        let jsName = getter.resolvedJSName
         let accessExpr = try importedModuleRegistry.memberExpression(
             swiftModuleName: importObjectBuilder.moduleName,
             from: getter.from,
@@ -3975,13 +4098,7 @@ extension BridgeJSLink {
             accessExpr: accessExpr,
             returnType: getter.type
         )
-        let abiName = getter.abiName(context: nil)
         let funcLines = thunkBuilder.renderFunction(name: abiName)
-        if getter.from == nil {
-            importObjectBuilder.appendDts(
-                ["readonly \(renderTSPropertyName(jsName)): \(resolveTypeScriptType(getter.type));"]
-            )
-        }
         importObjectBuilder.assignToImportObject(name: abiName, function: funcLines)
     }
 
@@ -3989,7 +4106,10 @@ extension BridgeJSLink {
         importObjectBuilder: ImportObjectBuilder,
         type: ImportedTypeSkeleton
     ) throws {
-        if let constructor = type.constructor {
+        let module = importObjectBuilder.moduleName
+        if let constructor = type.constructor,
+            importUsage.isUsed(module: module, name: constructor.abiName(context: type))
+        {
             try renderImportedConstructor(
                 importObjectBuilder: importObjectBuilder,
                 type: type,
@@ -3998,6 +4118,7 @@ extension BridgeJSLink {
         }
         for getter in type.getters {
             let getterAbiName = getter.abiName(context: type)
+            guard importUsage.isUsed(module: module, name: getterAbiName) else { continue }
             let (js, dts) = try renderImportedGetter(
                 getter: getter,
                 abiName: getterAbiName,
@@ -4011,6 +4132,7 @@ extension BridgeJSLink {
 
         for setter in type.setters {
             let setterAbiName = setter.abiName(context: type)
+            guard importUsage.isUsed(module: module, name: setterAbiName) else { continue }
             let (js, dts) = try renderImportedSetter(
                 setter: setter,
                 abiName: setterAbiName,
@@ -4026,6 +4148,7 @@ extension BridgeJSLink {
         }
         for method in type.staticMethods {
             let abiName = method.abiName(context: type, operation: "static")
+            guard importUsage.isUsed(module: module, name: abiName) else { continue }
             let (js, dts) = try renderImportedStaticMethod(
                 swiftModuleName: importObjectBuilder.moduleName,
                 context: type,
@@ -4057,8 +4180,10 @@ extension BridgeJSLink {
             importObjectBuilder.appendDts(dtsPrinter.lines)
         }
         for method in type.methods {
+            let abiName = method.abiName(context: type)
+            guard importUsage.isUsed(module: module, name: abiName) else { continue }
             let (js, dts) = try renderImportedMethod(context: type, method: method)
-            importObjectBuilder.assignToImportObject(name: method.abiName(context: type), function: js)
+            importObjectBuilder.assignToImportObject(name: abiName, function: js)
             importObjectBuilder.appendDts(dts)
         }
     }
@@ -4182,16 +4307,18 @@ extension BridgeJSLink {
             className: `protocol`.name
         )
 
-        let getterThunkBuilder = ImportedThunkBuilder(
-            effects: Effects(isAsync: false, isThrows: true),
-            returnType: property.type,
-            context: .exportSwift,
-            intrinsicRegistry: intrinsicRegistry
-        )
-        getterThunkBuilder.liftSelf()
-        try getterThunkBuilder.callPropertyGetter(name: property.name)
-        let getterLines = getterThunkBuilder.renderFunction(name: getterAbiName)
-        importObjectBuilder.assignToImportObject(name: getterAbiName, function: getterLines)
+        if importUsage.isUsed(module: importObjectBuilder.moduleName, name: getterAbiName) {
+            let getterThunkBuilder = ImportedThunkBuilder(
+                effects: Effects(isAsync: false, isThrows: true),
+                returnType: property.type,
+                context: .exportSwift,
+                intrinsicRegistry: intrinsicRegistry
+            )
+            getterThunkBuilder.liftSelf()
+            try getterThunkBuilder.callPropertyGetter(name: property.name)
+            let getterLines = getterThunkBuilder.renderFunction(name: getterAbiName)
+            importObjectBuilder.assignToImportObject(name: getterAbiName, function: getterLines)
+        }
 
         if !property.isReadonly {
             let setterAbiName = ABINameGenerator.generateABIName(
@@ -4201,6 +4328,7 @@ extension BridgeJSLink {
                 operation: "set",
                 className: `protocol`.name
             )
+            guard importUsage.isUsed(module: importObjectBuilder.moduleName, name: setterAbiName) else { return }
             let setterThunkBuilder = ImportedThunkBuilder(
                 effects: Effects(isAsync: false, isThrows: false),
                 returnType: .void,
@@ -4222,6 +4350,7 @@ extension BridgeJSLink {
         protocol: ExportedProtocol,
         method: ExportedFunction
     ) throws {
+        guard importUsage.isUsed(module: importObjectBuilder.moduleName, name: method.abiName) else { return }
         let thunkBuilder = ImportedThunkBuilder(
             effects: method.effects,
             returnType: method.returnType,

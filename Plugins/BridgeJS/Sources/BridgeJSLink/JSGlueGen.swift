@@ -102,6 +102,11 @@ final class JSGlueVariableScope {
         return suffixedName
     }
 
+    /// Returns the JS expression for the `bjs` import `name`, recording the reference.
+    func referenceBJSImport(_ name: String) -> String {
+        intrinsicRegistry.referenceBJSImport(name)
+    }
+
     func registerIntrinsic(_ name: String, build: (CodeFragmentPrinter) throws -> Void) rethrows {
         try intrinsicRegistry.register(name: name, build: build)
     }
@@ -1396,7 +1401,9 @@ struct IntrinsicJSFragment: Sendable {
                         )
                     }
                     printer.write("}")
-                    printer.write("bjs[\"swift_js_return_optional_object\"](\(isSomeVar) ? 1 : 0, \(idVar));")
+                    printer.write(
+                        "\(scope.referenceBJSImport("swift_js_return_optional_object"))(\(isSomeVar) ? 1 : 0, \(idVar));"
+                    )
                 }
 
                 return []
@@ -1474,7 +1481,7 @@ struct IntrinsicJSFragment: Sendable {
                         coerced = value
                     }
                     printer.write(
-                        "bjs[\"\(funcName)\"](\(isSomeVar) ? 1 : 0, \(isSomeVar) ? \(coerced) : \(wasmType.jsZeroLiteral));"
+                        "\(scope.referenceBJSImport(funcName))(\(isSomeVar) ? 1 : 0, \(isSomeVar) ? \(coerced) : \(wasmType.jsZeroLiteral));"
                     )
                     return []
                 }

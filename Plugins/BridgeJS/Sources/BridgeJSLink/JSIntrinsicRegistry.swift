@@ -11,6 +11,11 @@ final class JSIntrinsicRegistry {
     var typeOwnerModules: [String: String] = [:]
 
     private var codecNameOrder: [String] = []
+
+    /// The `bjs` imports that the generated JS references itself, in the order of their first reference,
+    /// which must be defined even when the linked module doesn't import them.
+    private(set) var referencedBJSImports: [String] = []
+    private var referencedBJSImportSet: Set<String> = []
     private var codecBodies: [String: [String]] = [:]
 
     var isEmpty: Bool {
@@ -48,6 +53,20 @@ final class JSIntrinsicRegistry {
         typeOwnerModules.removeAll()
         codecNameOrder.removeAll()
         codecBodies.removeAll()
+        referencedBJSImports.removeAll()
+        referencedBJSImportSet.removeAll()
+    }
+
+    func isReferencedBJSImport(_ name: String) -> Bool {
+        referencedBJSImportSet.contains(name)
+    }
+
+    /// Returns the JS expression for the `bjs` import `name`, recording the reference.
+    func referenceBJSImport(_ name: String) -> String {
+        if referencedBJSImportSet.insert(name).inserted {
+            referencedBJSImports.append(name)
+        }
+        return "bjs[\"\(name)\"]"
     }
 
     func emitLines() -> [String] {
