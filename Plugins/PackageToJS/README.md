@@ -34,7 +34,7 @@ blocking implementation.
 
 ## Requirements
 
-- Swift 6.0 or later
+- Swift 6.3 or later
 - A compatible WebAssembly SDK
 
 ## Relationship with Carton

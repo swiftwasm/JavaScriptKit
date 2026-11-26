@@ -21,7 +21,7 @@ The `swift package plugin bridge-js` command provides an alternative to the buil
 Configure your package to use JavaScriptKit, but without including the BridgeJS build plugin:
 
 ```swift
-// swift-tools-version:6.0
+// swift-tools-version:6.3
 
 import PackageDescription
 
