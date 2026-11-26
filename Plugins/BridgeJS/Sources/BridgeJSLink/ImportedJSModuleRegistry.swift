@@ -48,7 +48,11 @@ final class ImportedJSModuleRegistry {
         }
     }
 
-    func configure(skeletons: [BridgeJSSkeleton]) {
+    /// The graph the import declarations are defined in and member lookups are recorded to.
+    private var graph: JSDeclGraph?
+
+    func configure(skeletons: [BridgeJSSkeleton], graph: JSDeclGraph? = nil) {
+        self.graph = graph
         bindings.removeAll(keepingCapacity: true)
         references = Self.collectReferences(skeletons: skeletons)
 
@@ -182,7 +186,8 @@ final class ImportedJSModuleRegistry {
     ) throws -> String {
         switch from {
         case nil:
-            return BridgeJSLink.ImportedThunkBuilder.propertyAccessExpr(objectExpr: "imports", propertyName: memberName)
+            let imports = graph?.ref(.importsObject) ?? JSSymbol.importsObject.spelling
+            return BridgeJSLink.ImportedThunkBuilder.propertyAccessExpr(objectExpr: imports, propertyName: memberName)
         case .global:
             return BridgeJSLink.ImportedThunkBuilder.propertyAccessExpr(
                 objectExpr: "globalThis",
@@ -198,10 +203,12 @@ final class ImportedJSModuleRegistry {
                 )
             }
             if binding.usesNamedImports {
-                return Self.namedImportBinding(index: binding.index, memberName: memberName)
+                let member = Self.memberSymbol(index: binding.index, memberName: memberName)
+                return graph?.ref(member) ?? member.spelling
             }
+            let module = Self.moduleSymbol(index: binding.index)
             return BridgeJSLink.ImportedThunkBuilder.propertyAccessExpr(
-                objectExpr: Self.namespaceAlias(index: binding.index),
+                objectExpr: graph?.ref(module) ?? module.spelling,
                 propertyName: memberName
             )
         }
@@ -215,9 +222,26 @@ final class ImportedJSModuleRegistry {
         "__bjs_import_\(index)_\(memberName)"
     }
 
-    var importLines: [String] {
-        references.compactMap { reference in
-            guard let binding = bindings[reference] else { return nil }
+    private static func moduleSymbol(index: Int) -> JSSymbol {
+        JSSymbol(kind: .jsModule, name: String(index), spelling: namespaceAlias(index: index))
+    }
+
+    private static func memberSymbol(index: Int, memberName: String) -> JSSymbol {
+        JSSymbol(
+            kind: .jsModuleMember(module: String(index)),
+            name: memberName,
+            spelling: namedImportBinding(index: index, memberName: memberName)
+        )
+    }
+
+    /// Defines the import declarations of the referenced JS modules in `graph`.
+    ///
+    /// A module imported with named imports imports only the members kept glue uses, and is left out if
+    /// it uses none. A module imported as a namespace is always imported, as it was before any glue used it.
+    func defineImportDeclarations() {
+        guard let graph else { return }
+        for reference in references {
+            guard let binding = bindings[reference] else { continue }
             let specifier: String
             switch reference {
             case .snippet(let swiftModuleName, let path):
@@ -226,13 +250,23 @@ final class ImportedJSModuleRegistry {
             case .module(let moduleSpecifier):
                 specifier = BridgeJSLink.escapeForJavaScriptStringLiteral(moduleSpecifier)
             }
+            let module = Self.moduleSymbol(index: binding.index)
             guard binding.usesNamedImports else {
-                return "import * as \(Self.namespaceAlias(index: binding.index)) from \"\(specifier)\";"
+                graph.define(module, isRoot: true) { decl in
+                    decl.part(.jsModuleImports) { $0.write("import * as \(decl.name) from \"\(specifier)\";") }
+                }
+                continue
             }
-            let clauses = binding.members.map {
-                "\($0) as \(Self.namedImportBinding(index: binding.index, memberName: $0))"
+            let members = binding.members.map { Self.memberSymbol(index: binding.index, memberName: $0) }
+            for member in members {
+                graph.define(member) { $0.depend(on: module) }
             }
-            return "import { \(clauses.joined(separator: ", ")) } from \"\(specifier)\";"
+            graph.define(module) { decl in
+                decl.lazyPart(.jsModuleImports) { graph in
+                    let clauses = members.filter(graph.isLive).map { "\($0.name) as \($0.spelling)" }
+                    return ["import { \(clauses.joined(separator: ", ")) } from \"\(specifier)\";"]
+                }
+            }
         }
     }
 }

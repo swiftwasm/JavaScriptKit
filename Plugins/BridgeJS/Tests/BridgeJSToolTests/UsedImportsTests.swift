@@ -20,6 +20,12 @@ import Testing
         return BridgeJSLink(skeletons: [try swiftAPI.finalize()])
     }
 
+    private func matches(_ pattern: String, in js: String) throws -> Set<String> {
+        let regex = try NSRegularExpression(pattern: pattern, options: .anchorsMatchLines)
+        let matches = regex.matches(in: js, range: NSRange(js.startIndex..., in: js))
+        return Set(matches.map { String(js[Range($0.range(at: 1), in: js)!]) })
+    }
+
     /// The `module["name"] = ...` and `importObject["module"]["name"] = ...` assignments in the
     /// generated JS, keyed by module.
     private func assignedImports(_ js: String) throws -> [String: Set<String>] {
@@ -37,44 +43,98 @@ import Testing
         }
     }
 
-    /// The `bjs` imports the generated JS calls itself as `bjs["name"](...)`.
-    private func referencedBJSImports(_ js: String) throws -> Set<String> {
-        let regex = try NSRegularExpression(pattern: #"bjs\["(\w+)"\]\("#)
-        let matches = regex.matches(in: js, range: NSRange(js.startIndex..., in: js))
-        return Set(matches.map { String(js[Range($0.range(at: 1), in: js)!]) })
+    /// The names the JS declares in the module and instantiator scopes, and the import functions and
+    /// helpers it assigns.
+    private func declarations(_ js: String) throws -> Set<String> {
+        try matches(#"^(?: {4}| {12})?(?:export )?(?:const|let|var|function|class)\s+([\w$]+)"#, in: js)
+            .union(matches(#"\bas\s+([\w$]+)"#, in: js))
+            .union(matches(#"^\s*((?:bjs|\w+)\["\w+"\]|(?:structHelpers|enumHelpers)\.\w+) = "#, in: js))
+            .filter { !$0.hasPrefix("importObject[") }
     }
 
-    /// The `__bjs_*` helpers the generated JS uses but doesn't declare.
-    private func undeclaredHelpers(_ js: String) throws -> Set<String> {
-        func names(_ pattern: String) throws -> Set<String> {
-            let regex = try NSRegularExpression(pattern: pattern)
-            let matches = regex.matches(in: js, range: NSRange(js.startIndex..., in: js))
-            return Set(matches.map { String(js[Range($0.range(at: 1), in: js)!]) })
+    /// The names the JS declares in any scope, including parameters. The glue never shadows the names of
+    /// the module and instantiator scopes, so a use of one of those names refers to a local only if a
+    /// local of that name exists.
+    private func localDeclarations(_ js: String) throws -> Set<String> {
+        let parameterLists = try matches(#"\(([\w$, =]*)\)\s*(?:=>|\{)"#, in: js)
+        let parameters = parameterLists.flatMap { list in
+            list.split(separator: ",").map { $0.split(separator: "=")[0].trimmingCharacters(in: .whitespaces) }
         }
-        let declared = try names(#"(?:\b(?:const|let|var|function|class|import)\s+|\bas\s+)(__bjs_\w+)"#)
-        return try names(#"\b(__bjs_\w+)"#).subtracting(declared)
+        return try matches(#"\b(?:const|let|var|function|class)\s+([\w$]+)"#, in: js)
+            .union(matches(#"\b([\w$]+)\s*=>"#, in: js))
+            .union(parameters)
+    }
+
+    /// The identifiers the JS uses outside of string literals and comments, and the import functions
+    /// and helpers it accesses.
+    private func uses(_ js: String) throws -> Set<String> {
+        let code = js.replacingOccurrences(
+            of: #""(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|//.*"#,
+            with: "\"\"",
+            options: .regularExpression
+        )
+        return try matches(#"(?<![\w$.])([A-Za-z_$][\w$]*)"#, in: code)
+            .union(matches(#"\b((?:bjs|\w+)\["\w+"\]|(?:structHelpers|enumHelpers)\.\w+)"#, in: js))
+    }
+
+    /// Checks that `js`, the glue left after dead code elimination, declares everything it uses that
+    /// `full`, the glue with every declaration, declares, and that it is `full` with lines removed.
+    private func expectConsistent(_ js: String, comparedTo full: String, _ comment: Comment) throws {
+        let missing = try uses(js).intersection(declarations(full))
+            .subtracting(declarations(js))
+            .subtracting(localDeclarations(js))
+        #expect(missing.isEmpty, "\(comment): uses undeclared \(missing.sorted())")
+
+        // Named imports list only the kept members, so they are the only lines that change
+        var fullLines = full.split(separator: "\n", omittingEmptySubsequences: false)[...]
+        for line in js.split(separator: "\n", omittingEmptySubsequences: false) where !line.hasPrefix("import {") {
+            guard let index = fullLines.firstIndex(of: line) else {
+                Issue.record("\(comment): line missing from the full glue or out of order: \(line)")
+                return
+            }
+            fullLines = fullLines[(index + 1)...]
+        }
     }
 
     @Test(arguments: BridgeJSLinkTests.collectInputs(extension: ".swift"))
-    func filteringKeepsGlueConsistent(input: String) throws {
-        let link = try makeLink(input: input)
+    func eliminationKeepsGlueConsistent(input: String) throws {
+        var link = try makeLink(input: input)
+        link.keepsUnusedDeclarations = true
+        let full = try link.link().outputJs
+        link.keepsUnusedDeclarations = false
+
+        let all = try assignedImports(full)
         let unfiltered = try link.link().outputJs
-        let all = try assignedImports(unfiltered)
-
         #expect(try link.link(usedImports: all).outputJs == unfiltered)
+        try expectConsistent(unfiltered, comparedTo: full, "all imports used")
 
-        // Every bjs import the remaining glue references must stay defined, whether module imports
-        // or closure imports are what references it
-        let moduleImports = all.filter { $0.key != "bjs" }
-        var closureImports = moduleImports
-        closureImports["bjs"] = all["bjs", default: []].filter {
-            $0.hasPrefix("make_swift_closure_") || $0.hasPrefix("invoke_js_callback_")
+        var usedSets: [(Comment, [String: Set<String>])] = [
+            ("no imports used", [:]),
+            ("module imports used", all.filter { $0.key != "bjs" }),
+        ]
+        for (module, names) in all.sorted(by: { $0.key < $1.key }) {
+            for name in names.sorted() {
+                usedSets.append(("only \(module).\(name) used", [module: [name]]))
+            }
         }
-        for used in [moduleImports, closureImports, [:]] {
+        for (comment, used) in usedSets {
             let js = try link.link(usedImports: used).outputJs
-            let defined = try assignedImports(js)["bjs", default: []]
-            #expect(try referencedBJSImports(js).isSubset(of: defined))
-            #expect(try undeclaredHelpers(js).isEmpty)
+            try expectConsistent(js, comparedTo: full, comment)
+            for (module, names) in used {
+                #expect(try assignedImports(js)[module, default: []].isSuperset(of: names), "\(comment)")
+            }
+        }
+    }
+
+    @Test
+    func dropsRuntimeHelpersOfDroppedGlue() throws {
+        let link = try makeLink(input: "PrimitiveParameters.swift")
+        let js = try link.link(usedImports: ["TestModule": ["bjs_check"]]).outputJs
+        #expect(try assignedImports(js) == ["TestModule": ["bjs_check"]])
+        #expect(js.contains("const imports = options.getImports(importsContext);"))
+        #expect(js.contains("setException"))
+        for helper in ["decodeString", "textEncoder", "i32Stack", "tmpRetString", "structHelpers", "bjs = {}"] {
+            #expect(!js.contains(helper), "\(helper)")
         }
     }
 
@@ -84,7 +144,7 @@ import Testing
         let link = try makeLink(input: "GenericImports.swift")
         let js = try link.link(usedImports: ["TestModule": ["bjs_importGenericDictionary"]]).outputJs
         #expect(js.contains("__bjs_dictCodec"))
-        #expect(try undeclaredHelpers(js).isEmpty)
+        #expect(js.contains("__bjs_stringCodec"))
     }
 
     @Test
@@ -106,13 +166,27 @@ import Testing
         let used: [String: Set<String>] = ["TestModule": [moduleImports[0]], "bjs": [bjsImports[0]]]
         let output = try link.link(usedImports: used)
         #expect(try assignedImports(output.outputJs) == used)
-        #expect(output.outputDts == unfiltered.outputDts)
+    }
+
+    @Test
+    func unusedImportsAreOptionalInDeclarations() throws {
+        let link = try makeLink(input: "JSClass.swift")
+        #expect(try link.link().outputDts.contains("    returnAnimatable(): Animatable;"))
+
+        let dts = try link.link(usedImports: ["TestModule": ["bjs_Greeter_init"]]).outputDts
+        #expect(dts.contains("    returnAnimatable?(): Animatable;"))
+        #expect(dts.contains("    Greeter: {"))
+
+        let noneUsed = try link.link(usedImports: [:]).outputDts
+        #expect(noneUsed.contains("    Greeter?: {"))
     }
 
     @Test
     func emptyUsedImportsDropsAllGlue() throws {
         let link = try makeLink(input: "JSClass.swift")
-        #expect(try assignedImports(link.link(usedImports: [:]).outputJs).isEmpty)
+        let js = try link.link(usedImports: [:]).outputJs
+        #expect(try assignedImports(js).isEmpty)
+        #expect(!js.contains("options.getImports"))
     }
 
     @Test
@@ -124,11 +198,11 @@ import Testing
 
         let invokeOnly = try link.link(usedImports: ["bjs": [invoke]]).outputJs
         #expect(try assignedImports(invokeOnly) == ["bjs": [invoke]])
-        #expect(!invokeOnly.contains(JSGlueVariableScope.reservedSwiftClosureRegistry))
+        #expect(!invokeOnly.contains("swiftClosureRegistry"))
 
         let makeOnly = try link.link(usedImports: ["bjs": [make]]).outputJs
         #expect(try assignedImports(makeOnly) == ["bjs": [make]])
-        #expect(makeOnly.contains(JSGlueVariableScope.reservedSwiftClosureRegistry))
+        #expect(makeOnly.contains("swiftClosureRegistry"))
     }
 
     @Test

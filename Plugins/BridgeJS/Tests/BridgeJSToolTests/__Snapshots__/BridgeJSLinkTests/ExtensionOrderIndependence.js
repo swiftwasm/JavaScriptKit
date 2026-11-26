@@ -7,7 +7,6 @@
 export async function createInstantiator(options, swift) {
     let instance;
     let memory;
-    let setException;
     let decodeString;
     let decodeUTF8;
     const immortalStrings = new Map();
@@ -28,11 +27,10 @@ export async function createInstantiator(options, swift) {
     let f64Stack = [];
     let ptrStack = [];
     let taStack = [];
-    const enumHelpers = {};
     const structHelpers = {};
+    let bjs = null;
 
     let _exports = null;
-    let bjs = null;
     const __bjs_createStructHelpers_M10TestModuleT5DepotT5Crate = () => ({
         lower: (value) => {
             const bytes = textEncoder.encode(value.label);
@@ -249,7 +247,6 @@ export async function createInstantiator(options, swift) {
             instance = i;
             memory = instance.exports.memory;
 
-            decodeUTF8 = (ptr, len) => { const bytes = new Uint8Array(memory.buffer, ptr >>> 0, len >>> 0); return textDecoder.decode(bytes); }
             decodeString = (() => {
                 const byteAt = (word0, word1, byteIndex) =>
                     byteIndex < 4
@@ -397,10 +394,7 @@ export async function createInstantiator(options, swift) {
                     return value;
                 };
             })();
-
-            setException = (error) => {
-                instance.exports._swift_js_exception.value = swift.memory.retain(error)
-            }
+            decodeUTF8 = (ptr, len) => { const bytes = new Uint8Array(memory.buffer, ptr >>> 0, len >>> 0); return textDecoder.decode(bytes); }
         },
         /** @param {WebAssembly.Instance} instance */
         createExports: (instance) => {
