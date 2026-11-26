@@ -292,14 +292,15 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
         swjs_release(id)
     }
 
-    /// Returns a Boolean value indicating whether two values point to same objects.
+    /// Returns a Boolean value indicating whether two values point to same objects, using the `===` operator in JS.
     ///
     /// - Parameters:
     ///   - lhs: A object to compare.
     ///   - rhs: Another object to compare.
     public static func == (lhs: JSObject, rhs: JSObject) -> Bool {
         assertSameOwnerThread(lhs: lhs, rhs: rhs, hint: "comparing two JSObjects for equality")
-        return lhs.id == rhs.id
+        lhs.assertOnOwnerThread(hint: "comparing two JSObjects for equality")
+        return swjs_value_strict_equals(lhs.id, rhs.id)
     }
 
     public static func construct(from value: JSValue) -> Self? {
@@ -326,17 +327,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
 
 extension JSObject: CustomStringConvertible {
     public var description: String { self.toString!().string! }
-}
-
-extension JSObject: Hashable {
-    /// Hashes the essential components of this value by feeding them into the
-    /// given hasher.
-    ///
-    /// - Parameter hasher: The hasher to use when combining the components
-    ///   of this instance.
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
 }
 
 #if !hasFeature(Embedded)

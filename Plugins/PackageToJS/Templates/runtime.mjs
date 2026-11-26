@@ -252,27 +252,16 @@ const SLOT_MASK = (1 << SLOT_BITS) - 1;
 const GEN_MASK = (1 << (32 - SLOT_BITS)) - 1;
 class JSObjectSpace {
     constructor() {
-        this._slotByValue = new Map();
         this._values = [];
         this._stateBySlot = [];
         this._freeSlotStack = [];
         // Note: 0 is preserved for invalid references, 1 is preserved for globalThis
         this._values[0] = undefined;
         this._values[1] = globalVariable;
-        this._slotByValue.set(globalVariable, 1);
         this._stateBySlot[1] = 1; // gen=0, rc=1
     }
+    // Returns a reference to a new slot, even when another slot holds `value`.
     retain(value) {
-        const slot = this._slotByValue.get(value);
-        if (slot !== undefined) {
-            const state = this._stateBySlot[slot];
-            const nextState = (state + 1) >>> 0;
-            if ((nextState & SLOT_MASK) === 0) {
-                throw new RangeError(`Reference count overflow at slot ${slot}`);
-            }
-            this._stateBySlot[slot] = nextState;
-            return ((nextState & ~SLOT_MASK) | slot) >>> 0;
-        }
         let newSlot;
         let state;
         if (this._freeSlotStack.length > 0) {
@@ -289,7 +278,6 @@ class JSObjectSpace {
         }
         this._stateBySlot[newSlot] = state;
         this._values[newSlot] = value;
-        this._slotByValue.set(value, newSlot);
         return ((state & ~SLOT_MASK) | newSlot) >>> 0;
     }
     retainByRef(reference) {
@@ -309,7 +297,6 @@ class JSObjectSpace {
             this._stateBySlot[slot] = (state - 1) >>> 0;
             return;
         }
-        this._slotByValue.delete(this._values[slot]);
         this._values[slot] = undefined;
         const nextGen = ((state >>> SLOT_BITS) + 1) & GEN_MASK;
         this._stateBySlot[slot] = (nextGen << SLOT_BITS) >>> 0;
@@ -723,6 +710,10 @@ class SwiftRuntime {
                 const lhs = memory.getObject(lhs_ref);
                 const rhs = memory.getObject(rhs_ref);
                 return lhs == rhs;
+            },
+            swjs_value_strict_equals: (lhs_ref, rhs_ref) => {
+                const memory = this.memory;
+                return memory.getObject(lhs_ref) === memory.getObject(rhs_ref);
             },
             swjs_create_function: (host_func_id, line, file) => {
                 var _a;

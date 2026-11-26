@@ -266,6 +266,13 @@ IMPORT_JS_FUNCTION(swjs_instanceof, bool, (const JavaScriptObjectRef obj,
 /// @result Return `true` if `lhs` is `==` to `rhs`. Return `false` if not.
 IMPORT_JS_FUNCTION(swjs_value_equals, bool, (const JavaScriptObjectRef lhs, const JavaScriptObjectRef rhs))
 
+/// Performs "===" comparison, a.k.a the "Strict Equality Comparison" algorithm defined in the ECMAScript.
+///
+/// @param lhs The left-hand side value to compare.
+/// @param rhs The right-hand side value to compare.
+/// @result Return `true` if `lhs` is `===` to `rhs`. Return `false` if not.
+IMPORT_JS_FUNCTION(swjs_value_strict_equals, bool, (const JavaScriptObjectRef lhs, const JavaScriptObjectRef rhs))
+
 /// Creates a JavaScript thunk function that calls Swift side closure.
 /// See also comments on JSFunction.swift
 ///

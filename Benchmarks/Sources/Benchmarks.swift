@@ -489,6 +489,7 @@ class IdentityCacheBenchmarkIdentity {
 }
 
 @JS func run() {
+    runJSObjectBenchmarks()
 
     let call = Benchmark("Call")
 
