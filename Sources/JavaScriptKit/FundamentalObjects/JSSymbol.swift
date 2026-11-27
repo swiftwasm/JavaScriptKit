@@ -13,15 +13,15 @@ public class JSSymbol: JSObject {
         // can’t do `self =` so we have to get the ID manually
         let result = Symbol.invokeNonThrowingJSFunction(arguments: [description.jsValue])
         precondition(result.kind == .symbol)
-        super.init(id: UInt32(result.payload1))
+        super.init(JSUniqueRef(adopting: result.payload1))
     }
     @_disfavoredOverload
     public convenience init(_ description: String) {
         self.init(JSString(description))
     }
 
-    override init(id: JavaScriptObjectRef) {
-        super.init(id: id)
+    override public init(_ ref: consuming JSUniqueRef) {
+        super.init(ref)
     }
 
     @available(*, unavailable, message: "JSSymbol does not support dictionary literal initialization")

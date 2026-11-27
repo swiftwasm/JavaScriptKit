@@ -19,25 +19,39 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     internal static var constructor: JSObject { _constructor.wrappedValue }
     private static let _constructor = LazyThreadLocal(initialize: { JSObject.global.Object.object! })
 
+    /// The reference this object owns. Releasing it is left to `JSUniqueRef`'s `deinit`.
     @usableFromInline
-    internal var _id: JavaScriptObjectRef
+    internal var _ref: JSUniqueRef
 
     #if _runtime(_multithreaded)
-    package let ownerTid: Int32
+    package var ownerTid: Int32 { _ref.ownerTid }
     #endif
 
     @_spi(JSObject_id)
     @_spi(BridgeJS)
     @inlinable
-    public var id: JavaScriptObjectRef { _id }
+    public var id: JavaScriptObjectRef { _ref._id }
 
+    /// Creates an object that takes over the reference `ref` owns.
+    public init(_ ref: consuming JSUniqueRef) {
+        self._ref = ref
+    }
+
+    /// Creates an object that takes over `id`, a reference the caller owns.
     @_spi(JSObject_id)
     @_spi(BridgeJS)
-    public init(id: JavaScriptObjectRef) {
-        self._id = id
-        #if _runtime(_multithreaded)
-        self.ownerTid = swjs_get_worker_thread_id_cached()
-        #endif
+    public convenience init(id: JavaScriptObjectRef) {
+        self.init(JSUniqueRef(adopting: id))
+    }
+
+    /// Replaces a placeholder reference of 0 with `id`, a reference the caller owns.
+    ///
+    /// For subclasses that need `self` before they can create their JavaScript object.
+    internal func _replacePlaceholderRef(with id: JavaScriptObjectRef) {
+        var ref = JSUniqueRef(adopting: id)
+        swap(&_ref, &ref)
+        let placeholder = ref.unsafeTake()
+        assert(placeholder == 0, "replaced a reference other than the placeholder")
     }
 
     /// Creates an empty JavaScript object.
@@ -280,17 +294,6 @@ public class JSObject: Equatable, ExpressibleByDictionaryLiteral {
     private static let _global = LazyThreadLocal(initialize: {
         JSObject(id: _JS_Predef_Value_Global)
     })
-
-    deinit {
-        #if _runtime(_multithreaded)
-        if ownerTid != swjs_get_worker_thread_id_cached() {
-            // If the object is not owned by the current thread
-            swjs_release_remote(ownerTid, id)
-            return
-        }
-        #endif
-        swjs_release(id)
-    }
 
     /// Returns a Boolean value indicating whether two values point to same objects, using the `===` operator in JS.
     ///

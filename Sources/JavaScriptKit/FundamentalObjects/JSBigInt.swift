@@ -6,22 +6,23 @@ private var constructor: JSObject { JSObject.global.BigInt.object! }
 /// class](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)
 /// that exposes its properties in a type-safe and Swifty way.
 public final class JSBigInt: JSObject {
-    @_spi(JSObject_id)
-    override public init(id: JavaScriptObjectRef) {
-        super.init(id: id)
+    override public init(_ ref: consuming JSUniqueRef) {
+        super.init(ref)
     }
 
     /// Instantiate a new `JSBigInt` with given Int64 value in a slow path
     /// This doesn't require [JS-BigInt-integration](https://github.com/WebAssembly/JS-BigInt-integration) feature.
     public init(_slowBridge value: Int64) {
         let value = UInt64(bitPattern: value)
-        super.init(id: swjs_i64_to_bigint_slow(UInt32(value & 0xffff_ffff), UInt32(value >> 32), true))
+        let id = swjs_i64_to_bigint_slow(UInt32(value & 0xffff_ffff), UInt32(value >> 32), true)
+        super.init(JSUniqueRef(adopting: id))
     }
 
     /// Instantiate a new `JSBigInt` with given UInt64 value in a slow path
     /// This doesn't require [JS-BigInt-integration](https://github.com/WebAssembly/JS-BigInt-integration) feature.
     public init(_slowBridge value: UInt64) {
-        super.init(id: swjs_i64_to_bigint_slow(UInt32(value & 0xffff_ffff), UInt32(value >> 32), false))
+        let id = swjs_i64_to_bigint_slow(UInt32(value & 0xffff_ffff), UInt32(value >> 32), false)
+        super.init(JSUniqueRef(adopting: id))
     }
 
     override public var jsValue: JSValue {
