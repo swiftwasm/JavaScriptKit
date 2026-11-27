@@ -63,35 +63,20 @@ import Testing
 
         #expect(try link.link(usedImports: all).outputJs == unfiltered)
 
-        // Every bjs import the remaining glue references must stay defined, whether module imports
-        // or closure imports are what references it
+        // Every bjs import and helper the remaining glue references must stay defined, whether module
+        // imports or closure imports are what references it, also when its other users are dropped
         let moduleImports = all.filter { $0.key != "bjs" }
         var closureImports = moduleImports
         closureImports["bjs"] = all["bjs", default: []].filter {
             $0.hasPrefix("make_swift_closure_") || $0.hasPrefix("invoke_js_callback_")
         }
-        for used in [moduleImports, closureImports, [:]] {
+        let eachImportAlone: [[String: Set<String>]] = all.flatMap { module, names in names.map { [module: [$0]] } }
+        for used in [moduleImports, closureImports, [:]] + eachImportAlone {
             let js = try link.link(usedImports: used).outputJs
             let defined = try assignedImports(js)["bjs", default: []]
             #expect(try referencedBJSImports(js).isSubset(of: defined))
             #expect(try undeclaredHelpers(js).isEmpty)
         }
-    }
-
-    @Test
-    func keepsHelpersOfKeptGlue() throws {
-        // The dictionary codec of a generic import encodes its keys with the string codec
-        let link = try makeLink(input: "GenericImports.swift")
-        let js = try link.link(usedImports: ["TestModule": ["bjs_importGenericDictionary"]]).outputJs
-        #expect(js.contains("__bjs_dictCodec"))
-        #expect(try undeclaredHelpers(js).isEmpty)
-    }
-
-    @Test
-    func keepsBJSImportsReferencedByGlue() throws {
-        let link = try makeLink(input: "Optionals.swift")
-        let js = try link.link(usedImports: ["TestModule": ["bjs_WithOptionalJSClass_intOrNull_get"]]).outputJs
-        #expect(try assignedImports(js)["bjs"] == ["swift_js_return_optional_int"])
     }
 
     @Test
@@ -111,7 +96,7 @@ import Testing
 
     @Test
     func emptyUsedImportsDropsAllGlue() throws {
-        let link = try makeLink(input: "JSClass.swift")
+        let link = try makeLink(input: "SwiftClosure.swift")
         #expect(try assignedImports(link.link(usedImports: [:]).outputJs).isEmpty)
     }
 
@@ -129,15 +114,5 @@ import Testing
         let makeOnly = try link.link(usedImports: ["bjs": [make]]).outputJs
         #expect(try assignedImports(makeOnly) == ["bjs": [make]])
         #expect(makeOnly.contains(JSGlueVariableScope.reservedSwiftClosureRegistry))
-    }
-
-    @Test
-    func classWrappersFollowUsedImports() throws {
-        let link = try makeLink(input: "SwiftClosure.swift")
-        let wrapper = "bjs_Person_wrap"
-        #expect(try link.link().outputJs.contains(wrapper))
-
-        #expect(try !link.link(usedImports: [:]).outputJs.contains(wrapper))
-        #expect(try link.link(usedImports: ["TestModule": [wrapper]]).outputJs.contains(wrapper))
     }
 }

@@ -16,7 +16,6 @@ public struct BridgeJSLink {
     private let namespaceBuilder = NamespaceBuilder()
     private let intrinsicRegistry = JSIntrinsicRegistry()
     private let importedModuleRegistry = ImportedJSModuleRegistry()
-    private let importUsage = ImportUsage()
 
     public init(
         skeletons: [BridgeJSSkeleton] = []
@@ -869,7 +868,7 @@ public struct BridgeJSLink {
                 }
                 generateTypeRegistrationHooks(into: &bjsImports)
 
-                // Always provided: the runtime's `_bjs_makePromise` imports it unconditionally.
+                // Emitted whenever the wasm imports it, which the runtime's `_bjs_makePromise` does.
                 // The settlers are stored under a Symbol to avoid clashing with promise fields.
                 bjsImports.write("const \(Self.promiseSettlersSymbol) = Symbol(\"JavaScriptKit.promiseSettlers\");")
                 bjsImports.define("swift_js_make_promise") { printer in
@@ -1099,10 +1098,8 @@ public struct BridgeJSLink {
                     }
                     printer.write("}")
                 }
-                // Always provide swift_js_closure_unregister as a no-op by default.
-                // The @_extern(wasm) declaration in BridgeJSIntrinsics.swift is unconditional,
-                // so the WASM binary always imports this symbol. When closures ARE used,
-                // the real implementation below will override this no-op.
+                // A no-op swift_js_closure_unregister, emitted whenever the wasm imports it. When closures
+                // are used, the real implementation below overrides it.
                 bjsImports.define("swift_js_closure_unregister") { $0.write("function(funcRef) {}") }
 
                 for unified in skeletons {
@@ -1148,7 +1145,7 @@ public struct BridgeJSLink {
                     }
                 }
 
-                printer.write(lines: try bjsImports.render(importUsage: importUsage, registry: intrinsicRegistry))
+                printer.write(lines: try bjsImports.render(registry: intrinsicRegistry))
             }
         }
 
@@ -1623,7 +1620,7 @@ public struct BridgeJSLink {
         usedImports: [String: Set<String>]? = nil
     ) throws -> (outputJs: String, outputDts: String) {
         intrinsicRegistry.reset()
-        importUsage.configure(imports: usedImports)
+        intrinsicRegistry.usedImports = usedImports
         importedModuleRegistry.configure(skeletons: skeletons)
         intrinsicRegistry.classPaths = skeletons.reduce(into: [:]) { result, unified in
             for klass in unified.exported?.classes ?? [] {
@@ -1728,7 +1725,7 @@ public struct BridgeJSLink {
         for (moduleName, classes) in modulesByName.sorted(by: { $0.key < $1.key }) {
             let wrappers = classes.sorted(by: { $0.name < $1.name })
                 .map { (klass: $0, functionName: "bjs_\($0.abiName)_wrap") }
-                .filter { importUsage.isUsed(module: moduleName, name: $0.functionName) }
+                .filter { intrinsicRegistry.isUsed(module: moduleName, name: $0.functionName) }
             guard !wrappers.isEmpty else { continue }
             wrapperLines.append("// Wrapper functions for module: \(moduleName)")
             wrapperLines.append("if (!importObject[\"\(moduleName)\"]) {")
@@ -4048,7 +4045,7 @@ extension BridgeJSLink {
             )
         }
         let abiName = function.abiName(context: nil)
-        guard importUsage.isUsed(module: importObjectBuilder.moduleName, name: abiName) else { return }
+        guard intrinsicRegistry.isUsed(module: importObjectBuilder.moduleName, name: abiName) else { return }
 
         let thunkBuilder = ImportedThunkBuilder(
             effects: function.effects,
@@ -4082,7 +4079,7 @@ extension BridgeJSLink {
                 ["readonly \(renderTSPropertyName(jsName)): \(resolveTypeScriptType(getter.type));"]
             )
         }
-        guard importUsage.isUsed(module: importObjectBuilder.moduleName, name: abiName) else { return }
+        guard intrinsicRegistry.isUsed(module: importObjectBuilder.moduleName, name: abiName) else { return }
 
         let thunkBuilder = ImportedThunkBuilder(
             effects: Effects(isAsync: false, isThrows: true),
@@ -4108,7 +4105,7 @@ extension BridgeJSLink {
     ) throws {
         let module = importObjectBuilder.moduleName
         if let constructor = type.constructor,
-            importUsage.isUsed(module: module, name: constructor.abiName(context: type))
+            intrinsicRegistry.isUsed(module: module, name: constructor.abiName(context: type))
         {
             try renderImportedConstructor(
                 importObjectBuilder: importObjectBuilder,
@@ -4118,7 +4115,7 @@ extension BridgeJSLink {
         }
         for getter in type.getters {
             let getterAbiName = getter.abiName(context: type)
-            guard importUsage.isUsed(module: module, name: getterAbiName) else { continue }
+            guard intrinsicRegistry.isUsed(module: module, name: getterAbiName) else { continue }
             let (js, dts) = try renderImportedGetter(
                 getter: getter,
                 abiName: getterAbiName,
@@ -4132,7 +4129,7 @@ extension BridgeJSLink {
 
         for setter in type.setters {
             let setterAbiName = setter.abiName(context: type)
-            guard importUsage.isUsed(module: module, name: setterAbiName) else { continue }
+            guard intrinsicRegistry.isUsed(module: module, name: setterAbiName) else { continue }
             let (js, dts) = try renderImportedSetter(
                 setter: setter,
                 abiName: setterAbiName,
@@ -4148,7 +4145,7 @@ extension BridgeJSLink {
         }
         for method in type.staticMethods {
             let abiName = method.abiName(context: type, operation: "static")
-            guard importUsage.isUsed(module: module, name: abiName) else { continue }
+            guard intrinsicRegistry.isUsed(module: module, name: abiName) else { continue }
             let (js, dts) = try renderImportedStaticMethod(
                 swiftModuleName: importObjectBuilder.moduleName,
                 context: type,
@@ -4181,7 +4178,7 @@ extension BridgeJSLink {
         }
         for method in type.methods {
             let abiName = method.abiName(context: type)
-            guard importUsage.isUsed(module: module, name: abiName) else { continue }
+            guard intrinsicRegistry.isUsed(module: module, name: abiName) else { continue }
             let (js, dts) = try renderImportedMethod(context: type, method: method)
             importObjectBuilder.assignToImportObject(name: abiName, function: js)
             importObjectBuilder.appendDts(dts)
@@ -4307,7 +4304,7 @@ extension BridgeJSLink {
             className: `protocol`.name
         )
 
-        if importUsage.isUsed(module: importObjectBuilder.moduleName, name: getterAbiName) {
+        if intrinsicRegistry.isUsed(module: importObjectBuilder.moduleName, name: getterAbiName) {
             let getterThunkBuilder = ImportedThunkBuilder(
                 effects: Effects(isAsync: false, isThrows: true),
                 returnType: property.type,
@@ -4328,7 +4325,7 @@ extension BridgeJSLink {
                 operation: "set",
                 className: `protocol`.name
             )
-            guard importUsage.isUsed(module: importObjectBuilder.moduleName, name: setterAbiName) else { return }
+            guard intrinsicRegistry.isUsed(module: importObjectBuilder.moduleName, name: setterAbiName) else { return }
             let setterThunkBuilder = ImportedThunkBuilder(
                 effects: Effects(isAsync: false, isThrows: false),
                 returnType: .void,
@@ -4350,7 +4347,7 @@ extension BridgeJSLink {
         protocol: ExportedProtocol,
         method: ExportedFunction
     ) throws {
-        guard importUsage.isUsed(module: importObjectBuilder.moduleName, name: method.abiName) else { return }
+        guard intrinsicRegistry.isUsed(module: importObjectBuilder.moduleName, name: method.abiName) else { return }
         let thunkBuilder = ImportedThunkBuilder(
             effects: method.effects,
             returnType: method.returnType,
@@ -4702,5 +4699,72 @@ extension WasmCoreType {
         case .i64: return "0n"
         case .i32, .f32, .f64, .pointer: return "0"
         }
+    }
+}
+
+/// The statements of `addImports` that define the functions of the `bjs` import module.
+///
+/// Each import is rendered on demand, only when the linked module imports it or other rendered
+/// glue references it (see ``JSIntrinsicRegistry/referenceBJSImport(_:)``), so that the helpers
+/// its rendering registers are also left out when it isn't needed.
+struct BJSImportDefinitions: ~Copyable {
+    private enum Entry {
+        case statement(String)
+        case bjsImport(name: String, renderValue: (CodeFragmentPrinter) throws -> Void)
+    }
+
+    private var entries: [Entry] = []
+
+    /// Adds a statement that is always emitted.
+    mutating func write(_ statement: String) {
+        entries.append(.statement(statement))
+    }
+
+    /// Adds the import `bjs[name]`, whose value `renderValue` prints when it is needed.
+    mutating func define(_ name: String, renderValue: @escaping (CodeFragmentPrinter) throws -> Void) {
+        entries.append(.bjsImport(name: name, renderValue: renderValue))
+    }
+
+    /// Renders the statements and the definitions of the needed imports in the order they were added,
+    /// except that definitions only referenced by glue rendered after them come last.
+    consuming func render(registry: JSIntrinsicRegistry) throws -> [String] {
+        var lines: [String] = []
+        func emit(_ name: String, _ renderValue: (CodeFragmentPrinter) throws -> Void) throws {
+            let printer = CodeFragmentPrinter()
+            try renderValue(printer)
+            var value = printer.lines
+            value[0] = "bjs[\"\(name)\"] = \(value[0])"
+            lines += value
+        }
+        // The definitions left out so far, which glue rendered later may still reference; a later
+        // definition of a name overrides an earlier one
+        var skipped: [String: (CodeFragmentPrinter) throws -> Void] = [:]
+        for entry in entries {
+            switch entry {
+            case .statement(let statement):
+                lines.append(statement)
+            case .bjsImport(let name, let renderValue):
+                guard registry.isUsed(module: "bjs", name: name) || registry.isReferencedBJSImport(name)
+                else {
+                    skipped[name] = renderValue
+                    continue
+                }
+                skipped[name] = nil
+                try emit(name, renderValue)
+            }
+        }
+        // Glue can reference imports defined before it: the closure imports reference the
+        // `swift_js_return_optional_*` ones. Defining those after the closures would avoid this loop, but
+        // would reorder the unfiltered output. Rendering a definition here can reference further imports,
+        // which are appended to the references this loop walks.
+        var next = 0
+        while next < registry.referencedBJSImports.count {
+            let name = registry.referencedBJSImports[next]
+            next += 1
+            if let renderValue = skipped.removeValue(forKey: name) {
+                try emit(name, renderValue)
+            }
+        }
+        return lines
     }
 }

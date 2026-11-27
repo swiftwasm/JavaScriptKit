@@ -10,6 +10,10 @@ final class JSIntrinsicRegistry {
 
     var typeOwnerModules: [String: String] = [:]
 
+    /// The imports of the linked `.wasm` module keyed by import module name, which decide what JS glue
+    /// gets emitted, or `nil` to treat every import as used.
+    var usedImports: [String: Set<String>]?
+
     private var codecNameOrder: [String] = []
 
     /// The `bjs` imports that the generated JS references itself, in the order of their first reference,
@@ -51,10 +55,16 @@ final class JSIntrinsicRegistry {
         classPaths.removeAll()
         renamedEnumNames.removeAll()
         typeOwnerModules.removeAll()
+        usedImports = nil
         codecNameOrder.removeAll()
         codecBodies.removeAll()
         referencedBJSImports.removeAll()
         referencedBJSImportSet.removeAll()
+    }
+
+    func isUsed(module: String, name: String) -> Bool {
+        guard let usedImports else { return true }
+        return usedImports[module]?.contains(name) ?? false
     }
 
     func isReferencedBJSImport(_ name: String) -> Bool {
