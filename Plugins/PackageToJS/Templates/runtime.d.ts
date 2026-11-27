@@ -2,7 +2,6 @@ type ref = number;
 type pointer = number;
 
 declare class JSObjectSpace {
-    private _slotByValue;
     private _values;
     private _stateBySlot;
     private _freeSlotStack;

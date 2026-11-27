@@ -614,7 +614,7 @@ function BridgeJSRuntimeTests_runJsWorks(instance, exports, swift) {
     const madeObject = exports.makeJSValueObject();
     assert.deepStrictEqual(madeObject, {});
 
-    const isRetained = (value) => swift.memory._slotByValue.has(value);
+    const isRetained = (value) => swift.memory._values.includes(value);
     assert.equal(isRetained(madeObject), false);
     for (const value of [{}, "roundTripJSValue-ownership", Symbol("ownership"), 0xfedcba9876543210n]) {
         assert.strictEqual(exports.roundTripJSValue(value), value);

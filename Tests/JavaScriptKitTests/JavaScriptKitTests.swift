@@ -506,20 +506,16 @@ class JavaScriptKitTests: XCTestCase {
         XCTAssertEqual(string, jsString.description)
     }
 
-    func testHashableConformance() {
-        let globalObject1 = JSObject.global.console.object!
-        let globalObject2 = JSObject.global.console.object!
-        XCTAssertEqual(globalObject1.hashValue, globalObject2.hashValue)
+    func testEquatableConformance() {
+        let console1 = JSObject.global.console.object!
+        let console2 = JSObject.global.console.object!
         // These are 2 different objects in Swift referencing the same object in JavaScript
-        XCTAssertNotEqual(ObjectIdentifier(globalObject1), ObjectIdentifier(globalObject2))
+        XCTAssertNotEqual(ObjectIdentifier(console1), ObjectIdentifier(console2))
+        XCTAssertEqual(console1, console2)
+        XCTAssertNotEqual(console1, JSObject.global.Math.object!)
 
-        let objectConstructor = JSObject.global.Object.function!
-        let obj = objectConstructor.new()
-        obj.a = 1.jsValue
-        let firstHash = obj.hashValue
-        obj.b = 2.jsValue
-        let secondHash = obj.hashValue
-        XCTAssertEqual(firstHash, secondHash)
+        let symbol = JSSymbol("description")
+        XCTAssertEqual(symbol.jsValue.symbol!, symbol)
     }
 }
 
