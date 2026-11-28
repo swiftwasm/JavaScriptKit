@@ -19,6 +19,7 @@ import { getImports as getJSClassSupportImports, JSClassWithArrayMembers } from 
 import { getImports as getIntegerTypesSupportImports } from './BridgeJSRuntimeTests/JavaScript/IntegerTypesSupportTests.mjs';
 import { getImports as getAsyncImportImports, runAsyncWorksTests } from './BridgeJSRuntimeTests/JavaScript/AsyncImportTests.mjs';
 import { getImports as getJSTypedArrayImports } from './BridgeJSRuntimeTests/JavaScript/JSTypedArrayTests.mjs';
+import { getImports as getSpanParameterImports, SpanHeaderStore } from './BridgeJSRuntimeTests/JavaScript/SpanParameterTests.mjs';
 import { getImports as getIdentityModeTestImports } from './BridgeJSIdentityTests/JavaScript/IdentityModeTests.mjs';
 import { runJSNameTests } from './BridgeJSRuntimeTests/JavaScript/JSNameTests.mjs';
 
@@ -112,6 +113,7 @@ export async function setupOptions(options, context) {
                 },
                 ArrayElementObject,
                 JSClassWithArrayMembers,
+                SpanHeaderStore,
                 Surface,
                 JsGreeter: class {
                     /**
@@ -222,6 +224,7 @@ export async function setupOptions(options, context) {
                 JSClassSupportImports: getJSClassSupportImports(importsContext),
                 IntegerTypesSupportImports: getIntegerTypesSupportImports(importsContext),
                 JSTypedArrayImports: getJSTypedArrayImports(importsContext),
+                SpanParameterImports: getSpanParameterImports(importsContext),
                 IdentityModeTestImports: getIdentityModeTestImports(importsContext),
                 AliasImports: getAliasImports(importsContext),
             };

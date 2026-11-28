@@ -21781,6 +21781,313 @@ func _$OptionalSupportImports_runJsOptionalSupportTests() throws(JSException) ->
 }
 
 #if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_spanWebCrypto_get")
+fileprivate func bjs_spanWebCrypto_get_extern() -> Int32
+#else
+fileprivate func bjs_spanWebCrypto_get_extern() -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_spanWebCrypto_get() -> Int32 {
+    return bjs_spanWebCrypto_get_extern()
+}
+
+func _$spanWebCrypto_get() throws(JSException) -> SpanWebCrypto {
+    let ret = bjs_spanWebCrypto_get()
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return SpanWebCrypto.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanParameterImports_jsSum_static")
+fileprivate func bjs_SpanParameterImports_jsSum_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32) -> Float64
+#else
+fileprivate func bjs_SpanParameterImports_jsSum_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanParameterImports_jsSum_static(_ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    return bjs_SpanParameterImports_jsSum_static_extern(bytesPointer, bytesCount)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanParameterImports_jsLength_static")
+fileprivate func bjs_SpanParameterImports_jsLength_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32) -> Float64
+#else
+fileprivate func bjs_SpanParameterImports_jsLength_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanParameterImports_jsLength_static(_ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    return bjs_SpanParameterImports_jsLength_static_extern(bytesPointer, bytesCount)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanParameterImports_jsByteOffset_static")
+fileprivate func bjs_SpanParameterImports_jsByteOffset_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32) -> Float64
+#else
+fileprivate func bjs_SpanParameterImports_jsByteOffset_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanParameterImports_jsByteOffset_static(_ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    return bjs_SpanParameterImports_jsByteOffset_static_extern(bytesPointer, bytesCount)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanParameterImports_jsViewKind_static")
+fileprivate func bjs_SpanParameterImports_jsViewKind_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32) -> Int32
+#else
+fileprivate func bjs_SpanParameterImports_jsViewKind_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanParameterImports_jsViewKind_static(_ bytesPointer: Int32, _ bytesCount: Int32) -> Int32 {
+    return bjs_SpanParameterImports_jsViewKind_static_extern(bytesPointer, bytesCount)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanParameterImports_jsFill_static")
+fileprivate func bjs_SpanParameterImports_jsFill_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32, _ value: Float64) -> Void
+#else
+fileprivate func bjs_SpanParameterImports_jsFill_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32, _ value: Float64) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanParameterImports_jsFill_static(_ bytesPointer: Int32, _ bytesCount: Int32, _ value: Float64) -> Void {
+    return bjs_SpanParameterImports_jsFill_static_extern(bytesPointer, bytesCount, value)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanParameterImports_jsFillThenThrow_static")
+fileprivate func bjs_SpanParameterImports_jsFillThenThrow_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32, _ messageWord0: Int32, _ messageWord1: Int32, _ messageWord2: Int32) -> Void
+#else
+fileprivate func bjs_SpanParameterImports_jsFillThenThrow_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32, _ messageWord0: Int32, _ messageWord1: Int32, _ messageWord2: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanParameterImports_jsFillThenThrow_static(_ bytesPointer: Int32, _ bytesCount: Int32, _ messageWord0: Int32, _ messageWord1: Int32, _ messageWord2: Int32) -> Void {
+    return bjs_SpanParameterImports_jsFillThenThrow_static_extern(bytesPointer, bytesCount, messageWord0, messageWord1, messageWord2)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanParameterImports_jsCopy_static")
+fileprivate func bjs_SpanParameterImports_jsCopy_static_extern(_ sourcePointer: Int32, _ sourceCount: Int32, _ destinationPointer: Int32, _ destinationCount: Int32) -> Float64
+#else
+fileprivate func bjs_SpanParameterImports_jsCopy_static_extern(_ sourcePointer: Int32, _ sourceCount: Int32, _ destinationPointer: Int32, _ destinationCount: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanParameterImports_jsCopy_static(_ sourcePointer: Int32, _ sourceCount: Int32, _ destinationPointer: Int32, _ destinationCount: Int32) -> Float64 {
+    return bjs_SpanParameterImports_jsCopy_static_extern(sourcePointer, sourceCount, destinationPointer, destinationCount)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanParameterImports_jsFillWithLengthAndEcho_static")
+fileprivate func bjs_SpanParameterImports_jsFillWithLengthAndEcho_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32, _ _generic0TypeId: Int32) -> Void
+#else
+fileprivate func bjs_SpanParameterImports_jsFillWithLengthAndEcho_static_extern(_ bytesPointer: Int32, _ bytesCount: Int32, _ _generic0TypeId: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanParameterImports_jsFillWithLengthAndEcho_static(_ bytesPointer: Int32, _ bytesCount: Int32, _ _generic0TypeId: Int32) -> Void {
+    return bjs_SpanParameterImports_jsFillWithLengthAndEcho_static_extern(bytesPointer, bytesCount, _generic0TypeId)
+}
+
+func _$SpanParameterImports_jsSum(_ bytes: Swift.Span<UInt8>) throws(JSException) -> Double {
+    let ret0 = bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        let ret = bjs_SpanParameterImports_jsSum_static(bytesPointer, bytesCount)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$SpanParameterImports_jsLength(_ bytes: Swift.Span<UInt8>) throws(JSException) -> Double {
+    let ret0 = bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        let ret = bjs_SpanParameterImports_jsLength_static(bytesPointer, bytesCount)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$SpanParameterImports_jsByteOffset(_ bytes: Swift.Span<UInt8>) throws(JSException) -> Double {
+    let ret0 = bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        let ret = bjs_SpanParameterImports_jsByteOffset_static(bytesPointer, bytesCount)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$SpanParameterImports_jsViewKind(_ bytes: Swift.Span<UInt8>) throws(JSException) -> String {
+    let ret0 = bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        let ret = bjs_SpanParameterImports_jsViewKind_static(bytesPointer, bytesCount)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return String.bridgeJSLiftReturn(ret)
+}
+
+func _$SpanParameterImports_jsFill(_ bytes: inout Swift.MutableSpan<UInt8>, _ value: Double) throws(JSException) -> Void {
+    bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        let valueValue = value.bridgeJSLowerParameter()
+        bjs_SpanParameterImports_jsFill_static(bytesPointer, bytesCount, valueValue)
+    }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$SpanParameterImports_jsFillThenThrow(_ bytes: inout Swift.MutableSpan<UInt8>, _ message: String) throws(JSException) -> Void {
+    bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        message.bridgeJSWithLoweredParameter { (messageWord0, messageWord1, messageWord2) in
+            bjs_SpanParameterImports_jsFillThenThrow_static(bytesPointer, bytesCount, messageWord0, messageWord1, messageWord2)
+        }
+    }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+func _$SpanParameterImports_jsCopy(_ source: Swift.Span<UInt8>, _ destination: inout Swift.MutableSpan<UInt8>) throws(JSException) -> Double {
+    let ret0 = source.bridgeJSWithLoweredParameter { (sourcePointer, sourceCount) in
+        let ret1 = destination.bridgeJSWithLoweredParameter { (destinationPointer, destinationCount) in
+            let ret = bjs_SpanParameterImports_jsCopy_static(sourcePointer, sourceCount, destinationPointer, destinationCount)
+            return ret
+        }
+        return ret1
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$SpanParameterImports_jsFillWithLengthAndEcho<T: BridgedSwiftGenericBridgeable>(_ bytes: inout Swift.MutableSpan<UInt8>, _ value: T) throws(JSException) -> T {
+    bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        value.bridgeJSStackPush()
+        bjs_SpanParameterImports_jsFillWithLengthAndEcho_static(bytesPointer, bytesCount, T.bridgeJSTypeID)
+    }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return T.bridgeJSStackPop()
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanHeaderStore_init")
+fileprivate func bjs_SpanHeaderStore_init_extern(_ headerPointer: Int32, _ headerCount: Int32) -> Int32
+#else
+fileprivate func bjs_SpanHeaderStore_init_extern(_ headerPointer: Int32, _ headerCount: Int32) -> Int32 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanHeaderStore_init(_ headerPointer: Int32, _ headerCount: Int32) -> Int32 {
+    return bjs_SpanHeaderStore_init_extern(headerPointer, headerCount)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanHeaderStore_sum")
+fileprivate func bjs_SpanHeaderStore_sum_extern(_ self: Int32, _ bytesPointer: Int32, _ bytesCount: Int32) -> Float64
+#else
+fileprivate func bjs_SpanHeaderStore_sum_extern(_ self: Int32, _ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanHeaderStore_sum(_ self: Int32, _ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    return bjs_SpanHeaderStore_sum_extern(self, bytesPointer, bytesCount)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanHeaderStore_readHeader")
+fileprivate func bjs_SpanHeaderStore_readHeader_extern(_ self: Int32, _ bytesPointer: Int32, _ bytesCount: Int32) -> Float64
+#else
+fileprivate func bjs_SpanHeaderStore_readHeader_extern(_ self: Int32, _ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanHeaderStore_readHeader(_ self: Int32, _ bytesPointer: Int32, _ bytesCount: Int32) -> Float64 {
+    return bjs_SpanHeaderStore_readHeader_extern(self, bytesPointer, bytesCount)
+}
+
+func _$SpanHeaderStore_init(_ header: Swift.Span<UInt8>) throws(JSException) -> JSObject {
+    let ret0 = header.bridgeJSWithLoweredParameter { (headerPointer, headerCount) in
+        let ret = bjs_SpanHeaderStore_init(headerPointer, headerCount)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return JSObject.bridgeJSLiftReturn(ret)
+}
+
+func _$SpanHeaderStore_sum(_ self: JSObject, _ bytes: Swift.Span<UInt8>) throws(JSException) -> Double {
+    let ret0 = bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        let selfValue = self.bridgeJSLowerParameter()
+        let ret = bjs_SpanHeaderStore_sum(selfValue, bytesPointer, bytesCount)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+func _$SpanHeaderStore_readHeader(_ self: JSObject, _ bytes: inout Swift.MutableSpan<UInt8>) throws(JSException) -> Double {
+    let ret0 = bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        let selfValue = self.bridgeJSLowerParameter()
+        let ret = bjs_SpanHeaderStore_readHeader(selfValue, bytesPointer, bytesCount)
+        return ret
+    }
+    let ret = ret0
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+    return Double.bridgeJSLiftReturn(ret)
+}
+
+#if arch(wasm32)
+@_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_SpanWebCrypto_getRandomValues")
+fileprivate func bjs_SpanWebCrypto_getRandomValues_extern(_ self: Int32, _ bytesPointer: Int32, _ bytesCount: Int32) -> Void
+#else
+fileprivate func bjs_SpanWebCrypto_getRandomValues_extern(_ self: Int32, _ bytesPointer: Int32, _ bytesCount: Int32) -> Void {
+    fatalError("Only available on WebAssembly")
+}
+#endif
+@inline(never) fileprivate func bjs_SpanWebCrypto_getRandomValues(_ self: Int32, _ bytesPointer: Int32, _ bytesCount: Int32) -> Void {
+    return bjs_SpanWebCrypto_getRandomValues_extern(self, bytesPointer, bytesCount)
+}
+
+func _$SpanWebCrypto_getRandomValues(_ self: JSObject, _ bytes: inout Swift.MutableSpan<UInt8>) throws(JSException) -> Void {
+    bytes.bridgeJSWithLoweredParameter { (bytesPointer, bytesCount) in
+        let selfValue = self.bridgeJSLowerParameter()
+        bjs_SpanWebCrypto_getRandomValues(selfValue, bytesPointer, bytesCount)
+    }
+    if let error = _swift_js_take_exception() {
+        throw error
+    }
+}
+
+#if arch(wasm32)
 @_extern(wasm, module: "BridgeJSRuntimeTests", name: "bjs_StringABIImports_jsEcho_static")
 fileprivate func bjs_StringABIImports_jsEcho_static_extern(_ valueWord0: Int32, _ valueWord1: Int32, _ valueWord2: Int32) -> Int32
 #else

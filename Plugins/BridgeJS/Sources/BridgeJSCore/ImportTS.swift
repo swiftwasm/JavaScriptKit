@@ -800,6 +800,8 @@ struct SwiftSignatureBuilder {
         switch type {
         case .closure(_, useJSTypedClosure: false):
             return "@escaping \(type.swiftType)"
+        case .span(let span) where span.isMutable:
+            return "inout \(type.swiftType)"
         default:
             return buildTypeSyntax(from: type)
         }
@@ -956,6 +958,8 @@ extension BridgeType {
             return LoweringParameterInfo(loweredParameters: [("funcRef", .i32)])
         case .unsafePointer:
             return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
+        case .span:
+            return LoweringParameterInfo(loweredParameters: [("pointer", .i32), ("count", .i32)], useBorrowing: true)
         case .swiftHeapObject:
             return LoweringParameterInfo(loweredParameters: [("pointer", .pointer)])
         case .swiftProtocol:
@@ -1025,6 +1029,8 @@ extension BridgeType {
             return LiftingReturnInfo(valueToLift: .i32)
         case .unsafePointer:
             return LiftingReturnInfo(valueToLift: .pointer)
+        case .span:
+            throw BridgeJSCoreError("Span types cannot be returned from imported JavaScript functions")
         case .swiftHeapObject:
             return LiftingReturnInfo(valueToLift: .pointer)
         case .swiftProtocol:

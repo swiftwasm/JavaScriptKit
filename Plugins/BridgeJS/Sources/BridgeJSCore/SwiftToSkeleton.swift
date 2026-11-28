@@ -769,6 +769,17 @@ public final class SwiftToSkeleton {
             return externalType
         }
 
+        if Self.spanTypeName(of: type) != nil {
+            errors.append(
+                DiagnosticError(
+                    node: type,
+                    message: Self.spanPositionMessage,
+                    hint: Self.spanHint
+                )
+            )
+            return nil
+        }
+
         errors.append(
             DiagnosticError(
                 node: type,
@@ -928,6 +939,103 @@ public final class SwiftToSkeleton {
         }
 
         return nil
+    }
+
+    static let spanPositionMessage =
+        "Span<UInt8> and MutableSpan<UInt8> are supported only as parameters of synchronous @JSFunction declarations."
+    static let spanHint = "Use JSUint8Array for bytes that JavaScript keeps after the call."
+
+    fileprivate static func spanTypeName(of type: TypeSyntax) -> (name: String, element: TypeSyntax?)? {
+        let name: TokenSyntax
+        let arguments: GenericArgumentListSyntax?
+        if let identifier = type.as(IdentifierTypeSyntax.self) {
+            name = identifier.name
+            arguments = identifier.genericArgumentClause?.arguments
+        } else if let member = type.as(MemberTypeSyntax.self),
+            member.baseType.as(IdentifierTypeSyntax.self)?.name.text == "Swift"
+        {
+            name = member.name
+            arguments = member.genericArgumentClause?.arguments
+        } else {
+            return nil
+        }
+        guard name.text == "Span" || name.text == "MutableSpan" else {
+            return nil
+        }
+        let element = arguments?.count == 1 ? TypeSyntax(arguments?.first?.argument) : nil
+        return (name.text, element)
+    }
+
+    fileprivate static func isUInt8(_ type: TypeSyntax) -> Bool {
+        if let tuple = type.as(TupleTypeSyntax.self) {
+            guard tuple.elements.count == 1, let only = tuple.elements.first, only.firstName == nil, only.colon == nil
+            else {
+                return false
+            }
+            return isUInt8(only.type)
+        }
+        if let identifier = type.as(IdentifierTypeSyntax.self) {
+            return identifier.name.text == "UInt8" && identifier.genericArgumentClause == nil
+        }
+        if let member = type.as(MemberTypeSyntax.self) {
+            return member.baseType.as(IdentifierTypeSyntax.self)?.name.text == "Swift"
+                && member.name.text == "UInt8" && member.genericArgumentClause == nil
+        }
+        return false
+    }
+
+    enum SpanParameterResolution {
+        case notSpan
+        case span(BridgeSpanType)
+        case invalid(String)
+    }
+
+    fileprivate func resolveSpanParameter(_ type: TypeSyntax) -> SpanParameterResolution {
+        var baseType = type
+        var specifier: Keyword?
+        if let attributed = type.as(AttributedTypeSyntax.self) {
+            baseType = attributed.baseType
+            for element in attributed.specifiers {
+                if case .simpleTypeSpecifier(let simple) = element,
+                    case .keyword(let keyword) = simple.specifier.tokenKind
+                {
+                    specifier = keyword
+                }
+            }
+        }
+        if let alias = typeDeclResolver.resolveTypeAlias(baseType) {
+            var target = alias.initializer.value
+            var visited: Set<SyntaxIdentifier> = [alias.id]
+            while typeDeclResolver.resolve(target) == nil, let next = typeDeclResolver.resolveTypeAlias(target),
+                visited.insert(next.id).inserted
+            {
+                target = next.initializer.value
+            }
+            guard typeDeclResolver.resolve(target) != nil || Self.spanTypeName(of: target) == nil else {
+                return .invalid(
+                    "A type alias of a span is not supported; write Span<UInt8> or MutableSpan<UInt8> in the parameter."
+                )
+            }
+            return .notSpan
+        }
+        guard typeDeclResolver.resolve(baseType) == nil, let span = Self.spanTypeName(of: baseType) else {
+            return .notSpan
+        }
+        guard let element = span.element, Self.isUInt8(element) else {
+            return .invalid(
+                "Only Span<UInt8> and MutableSpan<UInt8> are supported, got '\(baseType.trimmedDescription)'."
+            )
+        }
+        let spanType = BridgeSpanType(element: .integer(.uint8), isMutable: span.name == "MutableSpan")
+        if spanType.isMutable, specifier != .inout {
+            return .invalid("A MutableSpan<UInt8> parameter must be 'inout'.")
+        }
+        if !spanType.isMutable, specifier != nil, specifier != .borrowing {
+            return .invalid(
+                "A Span<UInt8> parameter must be borrowed; use 'inout MutableSpan<UInt8>' for bytes that JavaScript writes."
+            )
+        }
+        return .span(spanType)
     }
 
     /// This currently doesn’t work correctly for extensions on types defined in other modules,
@@ -3655,7 +3763,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
         }
         let parameters = parseParameters(
             from: initializer.signature.parameterClause,
-            genericParameterNames: genericParameterNames
+            genericParameterNames: genericParameterNames,
+            isAsync: effects.isAsync
         )
         for genericName in genericParameterNames
         where !parameters.contains(where: { $0.type.referencedGenericName == genericName }) {
@@ -3715,7 +3824,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
         let parameters = parseParameters(
             from: node.signature.parameterClause,
-            genericParameterNames: genericParameterNames
+            genericParameterNames: genericParameterNames,
+            isAsync: effects.isAsync
         )
         let returnType: BridgeType
         if let returnTypeSyntax = node.signature.returnClause?.type {
@@ -3863,7 +3973,8 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
 
     private func parseParameters(
         from clause: FunctionParameterClauseSyntax,
-        genericParameterNames: [String] = []
+        genericParameterNames: [String] = [],
+        isAsync: Bool
     ) -> [Parameter] {
         clause.parameters.compactMap { param in
             let type = param.type
@@ -3876,9 +3987,30 @@ private final class ImportSwiftMacrosAPICollector: SyntaxAnyVisitor {
                 )
                 return nil
             }
-            guard let bridgeType = lookupTypeWithGenerics(for: type, genericParameterNames: genericParameterNames)
-            else {
+            let bridgeType: BridgeType
+            switch parent.resolveSpanParameter(type) {
+            case .span(let span):
+                if isAsync {
+                    errors.append(
+                        DiagnosticError(
+                            node: type,
+                            message: SwiftToSkeleton.spanPositionMessage,
+                            hint: SwiftToSkeleton.spanHint
+                        )
+                    )
+                    return nil
+                }
+                bridgeType = .span(span)
+            case .invalid(let message):
+                errors.append(DiagnosticError(node: type, message: message))
                 return nil
+            case .notSpan:
+                guard
+                    let resolved = lookupTypeWithGenerics(for: type, genericParameterNames: genericParameterNames)
+                else {
+                    return nil
+                }
+                bridgeType = resolved
             }
             let nameToken = param.secondName ?? param.firstName
             let name = SwiftToSkeleton.normalizeIdentifier(nameToken.text)

@@ -92,8 +92,31 @@ enum JSMacroHelper {
             let nameToken = param.secondName ?? param.firstName
             guard nameToken.text != "_" else { return nil }
             let nameText = stripBackticks(nameToken.text)
-            return nameText.isValidSwiftIdentifier(for: .variableName) ? nameText : "`\(nameText)`"
+            let name = nameText.isValidSwiftIdentifier(for: .variableName) ? nameText : "`\(nameText)`"
+            // The glue takes every other `inout` parameter by value.
+            return isInoutMutableSpan(param.type) ? "&\(name)" : name
         }
+    }
+
+    private static func isInoutMutableSpan(_ type: TypeSyntax) -> Bool {
+        guard let attributed = type.as(AttributedTypeSyntax.self),
+            attributed.specifiers.contains(where: { element in
+                guard case .simpleTypeSpecifier(let simple) = element else { return false }
+                return simple.specifier.tokenKind == .keyword(.inout)
+            })
+        else {
+            return false
+        }
+        let baseType = attributed.baseType
+        // The glue takes a user type named `MutableSpan` by value.
+        if let identifier = baseType.as(IdentifierTypeSyntax.self) {
+            return identifier.name.text == "MutableSpan" && identifier.genericArgumentClause != nil
+        }
+        if let member = baseType.as(MemberTypeSyntax.self) {
+            return member.baseType.as(IdentifierTypeSyntax.self)?.name.text == "Swift"
+                && member.name.text == "MutableSpan" && member.genericArgumentClause != nil
+        }
+        return false
     }
 
     static func tryAwaitPrefix(isAsync: Bool, isThrows: Bool) -> String {

@@ -1529,6 +1529,7 @@ public struct BridgeJSLink {
             }
         }
         intrinsicRegistry.typeOwnerModules = collectTypeOwnerModules()
+        intrinsicRegistry.sharedMemory = sharedMemory
         let data = try collectLinkData()
         let outputJs = try generateJavaScript(data: data, sharedMemory: sharedMemory)
         let outputDts = generateTypeScript(data: data)
@@ -1697,6 +1698,7 @@ public struct BridgeJSLink {
                         let genericClause = renderGenericClause(method.genericParameters ?? [])
                         let methodSignature =
                             "\(renderTSPropertyName(methodName))\(genericClause)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                        printer.write(lines: renderSpanParameterJSDoc(method.parameters))
                         printer.write(methodSignature)
                     }
 
@@ -1971,6 +1973,20 @@ public struct BridgeJSLink {
             return "\(name)\(optional): \(resolveTypeScriptType(param.type))"
         }
         return "(\(parameterSignatures.joined(separator: ", ")))"
+    }
+
+    private func renderSpanParameterJSDoc(_ parameters: [Parameter]) -> [String] {
+        let validity = "valid only until this call returns."
+        let lines = zip(parameters, parameters.uniqueJSIdentifiers).compactMap { param, name -> String? in
+            guard case .span(let span) = param.type else { return nil }
+            let description =
+                span.isMutable
+                ? "Writable bytes from Wasm memory, \(validity) Writes are visible to Swift when the call returns."
+                : "Read-only bytes from Wasm memory, \(validity)"
+            return " * @param \(name) \(description)"
+        }
+        guard !lines.isEmpty else { return [] }
+        return ["/**"] + lines + [" */"]
     }
 
     private func renderGenericClause(_ genericParameters: [GenericParameter]) -> String {
@@ -2770,6 +2786,9 @@ extension BridgeJSLink {
         var genericCodecVariables: [String: String] = [:]
         var genericTypeIdParameters: [String: String] = [:]
         let printContext: IntrinsicJSFragment.PrintCodeContext
+        private let sharedMemory: Bool
+        private var declarationsBeforeTry: [String] = []
+        private var finallyStatements: [String] = []
 
         init(
             effects: Effects,
@@ -2787,6 +2806,7 @@ extension BridgeJSLink {
                 printer: body,
                 hasDirectAccessToSwiftClass: false,
             )
+            self.sharedMemory = intrinsicRegistry.sharedMemory
         }
 
         func liftSelf() {
@@ -2821,6 +2841,10 @@ extension BridgeJSLink {
                 parameterForwardings.append(valueVar)
                 return
             }
+            if case .span(let span) = param.type {
+                liftSpanParameter(param: param, span: span)
+                return
+            }
             let liftingFragment = try IntrinsicJSFragment.liftParameter(type: param.type, context: context)
             let valuesToLift: [String]
             if liftingFragment.parameters.count == 0 {
@@ -2836,6 +2860,27 @@ extension BridgeJSLink {
             let liftedValues = try liftingFragment.printCode(valuesToLift, printContext)
             assert(liftedValues.count == 1, "Lifting fragment should produce exactly one value")
             parameterForwardings.append(contentsOf: liftedValues)
+        }
+
+        private func liftSpanParameter(param: Parameter, span: BridgeSpanType) {
+            let pointer = scope.variable(param.name + "Pointer")
+            let count = scope.variable(param.name + "Count")
+            parameterNames.append(contentsOf: [pointer, count])
+            let view = "new Uint8Array(\(JSGlueVariableScope.reservedMemory).buffer, \(pointer) >>> 0, \(count) >>> 0)"
+            guard sharedMemory else {
+                parameterForwardings.append(view)
+                return
+            }
+            // Many Web APIs reject views on a SharedArrayBuffer.
+            let copy = scope.variable(param.escapedJSIdentifier)
+            if span.isMutable {
+                declarationsBeforeTry.append("let \(copy);")
+                body.write("\(copy) = \(view).slice();")
+                finallyStatements.append("if (\(copy) !== undefined) \(view).set(\(copy));")
+            } else {
+                body.write("const \(copy) = \(view).slice();")
+            }
+            parameterForwardings.append(copy)
         }
 
         func liftParametersAndGenericTypeIds(_ parameters: [Parameter], genericParameters: [String]) throws {
@@ -2865,6 +2910,7 @@ extension BridgeJSLink {
 
             printer.write("function\(name.map { " \($0)" } ?? "")(\(parameterNames.joined(separator: ", "))) {")
             printer.indent {
+                printer.write(lines: declarationsBeforeTry)
                 printer.write("try {")
                 printer.indent {
                     printer.write(contentsOf: body)
@@ -2877,6 +2923,12 @@ extension BridgeJSLink {
                     printer.write("setException(error);")
                     if let abiReturnType = returnType.abiReturnType {
                         printer.write("return \(abiReturnType.placeholderValue)")
+                    }
+                }
+                if !finallyStatements.isEmpty {
+                    printer.write("} finally {")
+                    printer.indent {
+                        printer.write(lines: finallyStatements)
                     }
                 }
                 printer.write("}")
@@ -3948,7 +4000,7 @@ extension BridgeJSLink {
         if function.from == nil {
             let genericClause = renderGenericClause(function.genericParameters ?? [])
             importObjectBuilder.appendDts(
-                [
+                renderSpanParameterJSDoc(function.parameters) + [
                     "\(renderTSPropertyName(jsName))\(genericClause)\(renderTSSignature(parameters: function.parameters, returnType: function.returnType, effects: function.effects));"
                 ]
             )
@@ -4041,6 +4093,7 @@ extension BridgeJSLink {
                 if let constructor = type.constructor {
                     let returnType = BridgeType.jsObject(type.name)
                     let genericClause = renderGenericClause(constructor.genericParameters ?? [])
+                    dtsPrinter.write(lines: renderSpanParameterJSDoc(constructor.parameters))
                     dtsPrinter.write(
                         "new\(genericClause)\(renderTSSignature(parameters: constructor.parameters, returnType: returnType, effects: Effects(isAsync: false, isThrows: false)));"
                     )
@@ -4050,6 +4103,7 @@ extension BridgeJSLink {
                     let genericClause = renderGenericClause(method.genericParameters ?? [])
                     let signature =
                         "\(renderTSPropertyName(methodName))\(genericClause)\(renderTSSignature(parameters: method.parameters, returnType: method.returnType, effects: method.effects));"
+                    dtsPrinter.write(lines: renderSpanParameterJSDoc(method.parameters))
                     dtsPrinter.write(signature)
                 }
             }
@@ -4521,6 +4575,8 @@ extension BridgeType {
             return name
         case .unsafePointer:
             return "number"
+        case .span:
+            return "Uint8Array"
         case .nullable(let wrappedType, let kind):
             return "\(wrappedType.tsType) | \(kind.absenceLiteral)"
         case .caseEnum(let name):

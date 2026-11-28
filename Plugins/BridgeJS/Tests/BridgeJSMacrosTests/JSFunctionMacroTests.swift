@@ -540,4 +540,74 @@ import BridgeJSMacros
             indentationWidth: indentationWidth,
         )
     }
+
+    @Test func inoutMutableSpanIsForwardedInout() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSFunction
+            func copy(_ source: borrowing Span<UInt8>, into destination: inout MutableSpan<UInt8>, other: inout Swift.MutableSpan<UInt8>, count: inout Int) throws(JSException)
+            """,
+            expandedSource: """
+                func copy(_ source: borrowing Span<UInt8>, into destination: inout MutableSpan<UInt8>, other: inout Swift.MutableSpan<UInt8>, count: inout Int) throws(JSException) {
+                    try _$copy(source, &destination, &other, count)
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func inoutUserTypeNamedMutableSpanIsForwardedByValue() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSFunction
+            func measure(_ span: inout MutableSpan) throws(JSException)
+            """,
+            expandedSource: """
+                func measure(_ span: inout MutableSpan) throws(JSException) {
+                    try _$measure(span)
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func inoutModuleQualifiedMutableSpanIsForwardedByValue() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSFunction
+            func fill(_ span: inout MyModule.MutableSpan<UInt8>) throws(JSException)
+            """,
+            expandedSource: """
+                func fill(_ span: inout MyModule.MutableSpan<UInt8>) throws(JSException) {
+                    try _$fill(span)
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
+
+    @Test func methodForwardsInoutMutableSpan() {
+        TestSupport.assertMacroExpansion(
+            """
+            @JSClass
+            struct Sink {
+                @JSFunction
+                func read(into bytes: inout MutableSpan<UInt8>) throws(JSException) -> Double
+            }
+            """,
+            expandedSource: """
+                @JSClass
+                struct Sink {
+                    func read(into bytes: inout MutableSpan<UInt8>) throws(JSException) -> Double {
+                        return try _$Sink_read(self.jsObject, &bytes)
+                    }
+                }
+                """,
+            macroSpecs: macroSpecs,
+            indentationWidth: indentationWidth,
+        )
+    }
 }

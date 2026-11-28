@@ -1825,6 +1825,36 @@ private func _swift_js_pop_pointer_extern() -> UnsafeMutableRawPointer {
     _swift_js_pop_pointer_extern()
 }
 
+// MARK: - Span and MutableSpan
+
+extension Span where Element == UInt8 {
+    // MARK: ImportTS
+
+    @_spi(BridgeJS) public func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T {
+        withUnsafeBufferPointer { buffer in
+            #if arch(wasm32)
+            return body(Int32(bitPattern: UInt32(UInt(bitPattern: buffer.baseAddress))), Int32(buffer.count))
+            #else
+            _onlyAvailableOnWasm()
+            #endif
+        }
+    }
+}
+
+extension MutableSpan where Element == UInt8 {
+    // MARK: ImportTS
+
+    @_spi(BridgeJS) public mutating func bridgeJSWithLoweredParameter<T>(_ body: (Int32, Int32) -> T) -> T {
+        withUnsafeMutableBufferPointer { buffer in
+            #if arch(wasm32)
+            return body(Int32(bitPattern: UInt32(UInt(bitPattern: buffer.baseAddress))), Int32(buffer.count))
+            #else
+            _onlyAvailableOnWasm()
+            #endif
+        }
+    }
+}
+
 // MARK: - UnsafePointer family
 
 public protocol _BridgedSwiftUnsafePointerLike: _BridgedSwiftStackType {

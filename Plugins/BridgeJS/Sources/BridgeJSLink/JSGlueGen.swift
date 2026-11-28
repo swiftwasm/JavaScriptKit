@@ -2837,7 +2837,7 @@ private extension BridgeType {
             return .inlineFlag
         case .closure:
             return .inlineFlag
-        case .swiftStruct, .array, .dictionary, .void, .namespaceEnum, .generic:
+        case .swiftStruct, .array, .dictionary, .void, .namespaceEnum, .generic, .span:
             return .stackABI
         case .nullable(let wrapped, _):
             return wrapped.optionalConvention
@@ -2914,6 +2914,8 @@ private extension BridgeType {
             return [("pointer", .pointer)]
         case .unsafePointer:
             return [("pointer", .pointer)]
+        case .span:
+            return [("pointer", .i32), ("count", .i32)]
         case .swiftProtocol:
             return [("value", .i32)]
         case .caseEnum:
