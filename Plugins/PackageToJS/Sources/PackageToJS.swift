@@ -785,7 +785,8 @@ struct PackagingPlanner {
             output: bridgeJs
         ) { _, scope in
             let features = try Self.loadWasmFeatures(at: scope.resolve(path: wasmImportsPath))
-            let output = try bridge.link.link(sharedMemory: features.sharedMemory)
+            // The linker drops unreferenced imports, so glue for the remaining ones is enough
+            let output = try bridge.link.link(sharedMemory: features.sharedMemory, usedImports: features.imports)
             try system.writeFile(
                 atPath: scope.resolve(path: bridgeJs).path,
                 content: Data(output.outputJs.utf8)
@@ -1019,8 +1020,11 @@ struct WasmFeatures {
     let sharedMemory: Bool
     /// The type of the memory imported by the module if any
     let importedMemory: MemoryType?
+    /// The names of the imported entities, keyed by import module name
+    let imports: [String: Set<String>]
 
     init(imports: [ImportEntry]) {
+        self.imports = imports.reduce(into: [:]) { $0[$1.module, default: []].insert($1.name) }
         self.isWASI = imports.contains { $0.module == "wasi_snapshot_preview1" }
         let memoryImport = imports.first { $0.module == "env" && $0.name == "memory" }
         if case .memory(let type) = memoryImport?.kind {

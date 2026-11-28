@@ -2,65 +2,48 @@
 import BridgeJSUtilities
 #endif
 
-/// Registry for JS helper intrinsics used during code generation.
+/// The state shared by the code generation of one link: the declaration graph and lookup tables.
 final class JSIntrinsicRegistry {
-    private var entries: [String: [String]] = [:]
+    let graph = JSDeclGraph()
     var classPaths: [String: [String]] = [:]
     var renamedEnumNames: [String: (value: String, type: String)] = [:]
 
     var typeOwnerModules: [String: String] = [:]
 
-    private var codecNameOrder: [String] = []
-    private var codecBodies: [String: [String]] = [:]
+    /// The imports of the linked `.wasm` module keyed by import module name, or `nil` to treat every
+    /// import as used.
+    var usedImports: [String: Set<String>]?
 
-    var isEmpty: Bool {
-        entries.isEmpty
+    /// Whether the linked module imports `name` from `module`, which makes its glue a root.
+    func isUsedImport(module: String, name: String) -> Bool {
+        guard let usedImports else { return true }
+        return usedImports[module]?.contains(name) ?? false
     }
 
+    /// Defines the intrinsic `name` in the intrinsics slot unless it is defined, and references it.
     func register(name: String, build: (CodeFragmentPrinter) throws -> Void) rethrows {
-        guard entries[name] == nil else { return }
-        let printer = CodeFragmentPrinter()
-        try build(printer)
-        entries[name] = printer.lines
+        try graph.defineOnce(.intrinsic(name)) { decl in
+            try decl.part(.intrinsics, build)
+        }
     }
 
+    /// Defines the named codec `name` unless it is defined, and references it.
     func registerNamedCodec(name: String, build: (CodeFragmentPrinter) throws -> Void) rethrows {
-        guard codecBodies[name] == nil else { return }
-        let printer = CodeFragmentPrinter()
-        try build(printer)
-        guard codecBodies[name] == nil else { return }
-        codecBodies[name] = printer.lines
-        codecNameOrder.append(name)
-    }
-
-    var hasNamedCodecs: Bool {
-        !codecNameOrder.isEmpty
-    }
-
-    func emitNamedCodecLines() -> [String] {
-        codecNameOrder.flatMap { codecBodies[$0] ?? [] }
+        try graph.defineOnce(.codec(name)) { decl in
+            try decl.part(.namedCodecs, build)
+        }
     }
 
     func reset() {
-        entries.removeAll()
+        graph.reset()
         classPaths.removeAll()
         renamedEnumNames.removeAll()
         typeOwnerModules.removeAll()
-        codecNameOrder.removeAll()
-        codecBodies.removeAll()
+        usedImports = nil
     }
 
-    func emitLines() -> [String] {
-        var emitted: [String] = []
-        for key in entries.keys.sorted() {
-            if let lines = entries[key] {
-                emitted.append(contentsOf: lines)
-                emitted.append("")
-            }
-        }
-        if emitted.last == "" {
-            emitted.removeLast()
-        }
-        return emitted
+    /// Returns the spelling of `symbol` and records the reference.
+    func ref(_ symbol: JSSymbol) -> String {
+        graph.ref(symbol)
     }
 }
