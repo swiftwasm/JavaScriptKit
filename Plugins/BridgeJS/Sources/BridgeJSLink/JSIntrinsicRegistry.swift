@@ -10,7 +10,16 @@ final class JSIntrinsicRegistry {
 
     var typeOwnerModules: [String: String] = [:]
 
+    /// The imports of the linked `.wasm` module keyed by import module name, which decide what JS glue
+    /// gets emitted, or `nil` to treat every import as used.
+    var usedImports: [String: Set<String>]?
+
     private var codecNameOrder: [String] = []
+
+    /// The `bjs` imports that the generated JS references itself, in the order of their first reference,
+    /// which must be defined even when the linked module doesn't import them.
+    private(set) var referencedBJSImports: [String] = []
+    private var referencedBJSImportSet: Set<String> = []
     private var codecBodies: [String: [String]] = [:]
 
     var isEmpty: Bool {
@@ -46,8 +55,28 @@ final class JSIntrinsicRegistry {
         classPaths.removeAll()
         renamedEnumNames.removeAll()
         typeOwnerModules.removeAll()
+        usedImports = nil
         codecNameOrder.removeAll()
         codecBodies.removeAll()
+        referencedBJSImports.removeAll()
+        referencedBJSImportSet.removeAll()
+    }
+
+    func isUsed(module: String, name: String) -> Bool {
+        guard let usedImports else { return true }
+        return usedImports[module]?.contains(name) ?? false
+    }
+
+    func isReferencedBJSImport(_ name: String) -> Bool {
+        referencedBJSImportSet.contains(name)
+    }
+
+    /// Returns the JS expression for the `bjs` import `name`, recording the reference.
+    func referenceBJSImport(_ name: String) -> String {
+        if referencedBJSImportSet.insert(name).inserted {
+            referencedBJSImports.append(name)
+        }
+        return "bjs[\"\(name)\"]"
     }
 
     func emitLines() -> [String] {
