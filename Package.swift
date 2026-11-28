@@ -42,6 +42,7 @@ let package = Package(
         .library(name: "JavaScriptBigIntSupport", targets: ["JavaScriptBigIntSupport"]),
         .library(name: "JavaScriptFoundationCompat", targets: ["JavaScriptFoundationCompat"]),
         .library(name: "JavaScriptEventLoopTestSupport", targets: ["JavaScriptEventLoopTestSupport"]),
+        .library(name: "WASIShim", targets: ["WASIShim"]),
         .plugin(name: "PackageToJS", targets: ["PackageToJS"]),
         .plugin(name: "BridgeJS", targets: ["BridgeJS"]),
         .plugin(name: "BridgeJSCommandPlugin", targets: ["BridgeJSCommandPlugin"]),
@@ -156,6 +157,15 @@ let package = Package(
                 "JavaScriptFoundationCompat"
             ],
             linkerSettings: testingLinkerFlags
+        ),
+        .target(
+            name: "WASIShim",
+            dependencies: ["JavaScriptKit", "_CJavaScriptKit"],
+            exclude: ["Generated/JavaScript"],
+            swiftSettings: [
+                .strictMemorySafety(),
+                .enableExperimentalFeature("Extern"),
+            ]
         ),
         .plugin(
             name: "PackageToJS",

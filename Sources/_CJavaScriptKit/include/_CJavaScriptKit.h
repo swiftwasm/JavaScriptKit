@@ -316,6 +316,12 @@ IMPORT_JS_FUNCTION(swjs_load_typed_array, void, (const JavaScriptObjectRef ref, 
 /// @param ref The target JavaScript object.
 IMPORT_JS_FUNCTION(swjs_release, void, (const JavaScriptObjectRef ref))
 
+/// Ends the program with `code` when it runs without a WASI implementation.
+/// The JavaScript side throws or stops the process, so this doesn't return.
+///
+/// @param code The exit code.
+IMPORT_JS_FUNCTION(swjs_proc_exit, void, (const int code))
+
 /// Decrements reference count of `ref` retained by `SwiftRuntimeHeap` in `object_tid` thread.
 ///
 /// @param object_tid The TID of the thread that owns the target object.
