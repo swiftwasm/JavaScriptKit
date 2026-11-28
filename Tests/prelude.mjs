@@ -232,6 +232,18 @@ export async function setupOptions(options, context) {
             importObject["JavaScriptEventLoopTestSupportTests"] = {
                 "isMainThread": () => context.isMainThread,
             }
+            importObject["JavaScriptKitTests"] = {
+                // Returns a new reference, owned by the caller, to the value `ref` references.
+                "retainNew": (ref) => _swift.memory.retain(_swift.memory.getObject(ref)),
+                "isLive": (ref) => {
+                    try {
+                        _swift.memory.getObject(ref);
+                        return true;
+                    } catch {
+                        return false;
+                    }
+                },
+            };
             const bridgeJSRuntimeTests = importObject["BridgeJSRuntimeTests"] || {};
             bridgeJSRuntimeTests["runJsWorks"] = () => {
                 const exports = getExports();

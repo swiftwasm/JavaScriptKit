@@ -24,13 +24,14 @@ public class JSOneshotClosure: JSObject, JSClosureProtocol {
         _ body: @escaping (sending [JSValue]) -> JSValue
     ) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
-        super.init(id: 0)
+        super.init(JSUniqueRef(adopting: 0))
 
         // 2. Create a new JavaScript function which calls the given Swift function.
         hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
-        _id = withExtendedLifetime(JSString(file)) { file in
+        let id = withExtendedLifetime(JSString(file)) { file in
             swjs_create_oneshot_function(hostFuncRef, line, file.asInternalJSRef())
         }
+        _replacePlaceholderRef(with: id)
 
         // 3. Retain the given body in static storage by `funcRef`.
         JSClosure.sharedClosures.wrappedValue[hostFuncRef] = .init(
@@ -176,13 +177,14 @@ public class JSClosure: JSObject, JSClosureProtocol {
         _ body: @escaping (sending [JSValue]) -> JSValue
     ) {
         // 1. Fill `id` as zero at first to access `self` to get `ObjectIdentifier`.
-        super.init(id: 0)
+        super.init(JSUniqueRef(adopting: 0))
 
         // 2. Create a new JavaScript function which calls the given Swift function.
         hostFuncRef = JavaScriptHostFuncRef(bitPattern: ObjectIdentifier(self))
-        _id = withExtendedLifetime(JSString(file)) { file in
+        let id = withExtendedLifetime(JSString(file)) { file in
             swjs_create_function(hostFuncRef, line, file.asInternalJSRef())
         }
+        _replacePlaceholderRef(with: id)
 
         // 3. Retain the given body in static storage by `funcRef`.
         Self.sharedClosures.wrappedValue[hostFuncRef] = .init(
